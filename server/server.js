@@ -59,7 +59,7 @@ app.use(async (ctx, next) => {
   return koaBunyanLogger.requestLogger().apply(this, [ ctx, next ])
 })
 // set signed cookie keys
-app.keys = [ '173app.com', 'zaizaibo' ]
+app.keys = [ 'tenxcloud.com', '5f4a73e9-0493-4c66-86a6-ffaf7a8b73c8' ]
 
 // uses async arrow functions
 app.use(async (ctx, next) => {
