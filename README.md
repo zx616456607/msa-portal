@@ -2,11 +2,13 @@
 
 ### 本地开发
 * 第一次运行项目时需要先安装项目依赖，然后构建 dll 依赖
+
 ```
 npm run install
 npm run build:dll
 ```
 * 开发模式启动项目
+
 ```
 npm run dev
 ```
@@ -24,11 +26,13 @@ npm run lint:fix
 
 ### 生产部署
 * 先安装项目依赖，然后构建
+
 ```
 npm run install
 npm run build
 ```
 * 生产模式启动项目
+
 ```
 npm run prod
 ```
