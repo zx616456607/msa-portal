@@ -15,6 +15,7 @@ const path = require('path')
 const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
 const postcssConfig = require('./postcss')
 
@@ -25,7 +26,7 @@ module.exports = {
 
   entry: {
     main: [
-      './client/index.js',
+      './client/entry/index.js',
     ],
   },
 
@@ -104,6 +105,15 @@ module.exports = {
     new ExtractTextPlugin({
       filename: 'styles.[contenthash:8].css',
       allChunks: true,
+    }),
+    new HtmlWebpackPlugin({
+      // inject: false, // disabled inject
+      minify: {
+        collapseWhitespace: true,
+        minifyJS: true,
+      },
+      filename: path.join(__dirname, '../index.html'),
+      template: path.join(__dirname, '../client/index.html'),
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.UglifyJsPlugin({

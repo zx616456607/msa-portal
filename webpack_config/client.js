@@ -9,10 +9,9 @@
  * v0.1 - 2017-08-15
  * @author Zhangpc
  */
-const path = require('path')
+
 const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const siteConfig = require('../config')
 const { site } = siteConfig
 const analyze = !!process.env.ANALYZE_ENV
@@ -44,18 +43,5 @@ const licenseBannerPlugin = new webpack.BannerPlugin({
   banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
 })
 config.plugins.push(licenseBannerPlugin)
-
-// for html
-const htmlWebpackPlugin = new HtmlWebpackPlugin({
-  // inject: false, // disabled inject
-  // chunks: [ 'main', 'common' ],
-  // minify: {
-  //   collapseWhitespace: true,
-  //   minifyJS: true,
-  // },
-  filename: path.join(__dirname, isDebug ? '../index.debug.html' : '../index.html'),
-  template: path.join(__dirname, '../client/index.html'),
-})
-config.plugins.push(htmlWebpackPlugin)
 
 module.exports = config
