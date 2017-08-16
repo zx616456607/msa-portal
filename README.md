@@ -1,4 +1,9 @@
 # msa-portal
+
+### 环境要求
+
+Node.js >= 7.6.0 required.
+
 ### 项目结构
 ```
 .
@@ -73,10 +78,6 @@
     ├── postcss.js
     └── server.js
 ```
-
-### 环境要求
-
-Node.js >= 7.6.0 required.
 
 ### 本地开发
 * 第一次运行项目时需要先安装项目依赖，然后构建 dll 依赖
