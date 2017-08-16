@@ -112,6 +112,7 @@ module.exports = {
         collapseWhitespace: true,
         minifyJS: true,
       },
+      title: '<%= title %>',
       filename: path.join(__dirname, '../index.html'),
       template: path.join(__dirname, '../client/index.html'),
     }),
