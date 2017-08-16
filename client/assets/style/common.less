@@ -1,0 +1,35 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Site common style
+ *
+ * 2017-08-16
+ * @author zhangpc
+ */
+
+ @import './core/index.less';
+
+body {
+  background-color: @backgroudColor;
+  #root {
+    width: 100%;
+    height: 100%;
+    .ant-layout {
+      background-color: @backgroudColor;
+      .layout-content {
+        padding-right: 50px;
+        margin-top: 82px;
+        margin-left: 270px;
+      }
+    }
+    .txt-of-ellipsis {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+  }
+}
