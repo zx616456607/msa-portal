@@ -113,6 +113,11 @@ npm run build
 * 生产模式启动项目
 
 ```
-npm run prod
+npm run pro
 ```
+
+### 调试工具
+* [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
+* [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+
 ### 常见错误解决
