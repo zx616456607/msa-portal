@@ -107,7 +107,7 @@ npm run lint:fix
 * 先安装项目依赖，然后构建
 
 ```
-npm run install
+npm run i
 npm run build
 ```
 * 生产模式启动项目
@@ -115,3 +115,4 @@ npm run build
 ```
 npm run prod
 ```
+### 常见错误解决
