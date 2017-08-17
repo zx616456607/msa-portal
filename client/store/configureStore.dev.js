@@ -12,7 +12,6 @@
 
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import { createLogger } from 'redux-logger'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { routerMiddleware } from 'react-router-redux'
 import api from '../middleware/api'
@@ -21,7 +20,7 @@ import rootReducer from '../reducers'
 // Use redux-devtools-extension
 // https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
 const configureStore = history => {
-  const middlewares = [ routerMiddleware(history), thunk, api, createLogger() ]
+  const middlewares = [ routerMiddleware(history), thunk, api ]
   const store = createStore(
     rootReducer,
     composeWithDevTools(

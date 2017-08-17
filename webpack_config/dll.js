@@ -28,7 +28,6 @@ const vendors = [
   'redux',
   'redux-thunk',
   'redux-devtools-extension',
-  'redux-logger',
   // ...其它库
 ]
 
