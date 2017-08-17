@@ -46,7 +46,7 @@ class App extends React.Component {
         <b>{errorMessage}</b>
         {' '}
         (<a href="#"
-            onClick={this.handleDismissClick}>
+          onClick={this.handleDismissClick}>
           Dismiss
         </a>)
       </p>

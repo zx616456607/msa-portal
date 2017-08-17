@@ -70,7 +70,7 @@ module.exports = {
     new webpack.BannerPlugin({
       banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2020 ${site}. All Rights Reserved.\nhttp://${site}`,
     }),
-    /*new webpack.optimize.UglifyJsPlugin({
+    /* new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
       }

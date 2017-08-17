@@ -3,7 +3,7 @@
  * (C) Copyright 2017 TenxCloud. All Rights Reserved.
  */
 
- /**
+/**
  * App webpack dev config
  *
  * https://webpack.js.org/guides/migrating/

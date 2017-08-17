@@ -3,7 +3,7 @@
  * (C) Copyright 2017 TenxCloud. All Rights Reserved.
  */
 
- /**
+/**
  * App webpack server config
  *
  * v0.1 - 2017-08-15
