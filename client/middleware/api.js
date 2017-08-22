@@ -12,8 +12,7 @@
 
 import { normalize } from 'normalizr'
 import fetch from 'isomorphic-fetch'
-import { JWT_COOKIE_NAME, API_PREFIX, API_URL } from '../constants'
-import { getCookie } from '../common/utils'
+import { JWT, API_URL } from '../constants'
 
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
@@ -76,7 +75,15 @@ export default store => next => action => {
 
   options = options || {}
 
-  const _callApi = () => callApi(endpoint, options, schema).then(
+  // Set jwt token to headers
+  const jwtAuth = store.getState().entities.auth[JWT] || {}
+  let jwtToken = jwtAuth.token
+  if (!jwtToken && localStorage) {
+    jwtToken = localStorage.getItem(JWT)
+  }
+  options.headers = Object.assign({}, { Authorization: `Bearer ${jwtToken}` }, options.headers)
+
+  return callApi(endpoint, options, schema).then(
     response => next(actionWith({
       response,
       type: successType,
@@ -84,38 +91,6 @@ export default store => next => action => {
     error => next(actionWith({
       type: failureType,
       error: error.message || 'Something bad happened',
-    }))
-  )
-
-  // set jwt token to headers
-  const _setJwtTokenToHeader = () => {
-    const jwtToken = getCookie(JWT_COOKIE_NAME)
-    if (!jwtToken) {
-      return false
-    }
-    options.headers = Object.assign({}, options.headers, { Authorization: `Bearer ${jwtToken}` })
-    return true
-  }
-
-  if (_setJwtTokenToHeader()) {
-    return _callApi()
-  }
-
-  const jwtUrl = `${API_PREFIX}/jwt`
-
-  return fetch(jwtUrl, { method: 'POST', credentials: 'same-origin' }).then(
-    () => {
-      if (_setJwtTokenToHeader()) {
-        return _callApi()
-      }
-      return next(actionWith({
-        type: failureType,
-        error: 'Get token failed.',
-      }))
-    },
-    error => next(actionWith({
-      type: failureType,
-      error: error.message || 'Internal server error.',
     }))
   )
 }

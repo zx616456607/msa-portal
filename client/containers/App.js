@@ -13,12 +13,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Layout } from 'antd'
+import { Route } from 'react-router-dom'
+import { Layout, Spin, Modal, notification } from 'antd'
+import { parse } from 'query-string'
 import { resetErrorMessage } from '../actions'
 import Header from '../components/Header'
-import Sider from '../components/Sider'
+import { getAuth, AUTH_FAILURE } from '../actions'
+import { JWT } from '../constants'
+import { childRoutes } from '../RoutesDom'
 
-const { Content, Footer } = Layout
+const { Footer } = Layout
 
 class App extends React.Component {
   static propTypes = {
@@ -27,46 +31,56 @@ class App extends React.Component {
     resetErrorMessage: PropTypes.func.isRequired,
     // Injected by React Router
     children: PropTypes.node,
-    routes: PropTypes.node.isRequired,
   }
 
-  handleDismissClick = e => {
-    this.props.resetErrorMessage()
-    e.preventDefault()
+  componentWillMount() {
+    const { getAuth, location, history } = this.props
+    const { username, token } = parse(location.search)
+    getAuth({ username, token }).then(res => {
+      if (res.type === AUTH_FAILURE) {
+        Modal.error({
+          title: '认证失败',
+          content: '请您刷新页面重试或点击确定返回',
+          closable: false,
+          onOk: () => history.goBack(),
+        })
+        return
+      }
+      // Save jwt token to localStorage
+      if (localStorage) {
+        localStorage.setItem(JWT, res.response.entities.auth[JWT].token)
+      }
+    })
   }
 
-  renderErrorMessage() {
+  renderErrorMessage = () => {
     const { errorMessage } = this.props
     if (!errorMessage) {
       return null
     }
-
-    return (
-      <p style={{ backgroundColor: '#e99', padding: 10 }}>
-        <b>{errorMessage}</b>
-        {' '}
-        (<a href="#"
-          onClick={this.handleDismissClick}>
-          Dismiss
-        </a>)
-      </p>
-    )
+    notification.error({
+      message: errorMessage,
+    })
   }
 
   render() {
-    const { children, routes } = this.props
-    console.log('location', this.props.location)
+    const { children, auth } = this.props
+    const jwt = auth[JWT] || {}
+    if (!jwt.token) {
+      return (
+        <div className="loading">
+          <Spin size="large" />
+        </div>
+      )
+    }
     return (
       <Layout>
         {this.renderErrorMessage()}
         <Header />
-        <Sider />
-        <Content className="layout-content">
-          <main style={{ background: '#fff', padding: 24, minHeight: 520 }}>
-            {children}
-            {routes}
-          </main>
-        </Content>
+        { children }
+        {
+          childRoutes.map(routeProps => <Route {...routeProps} />)
+        }
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
         </Footer>
@@ -77,8 +91,10 @@ class App extends React.Component {
 
 const mapStateToProps = state => ({
   errorMessage: state.errorMessage,
+  auth: state.entities.auth,
 })
 
 export default connect(mapStateToProps, {
   resetErrorMessage,
+  getAuth,
 })(App)

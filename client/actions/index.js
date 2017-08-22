@@ -12,27 +12,37 @@
 
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
-import { toQuerystring } from '../common/utils'
 
-export const APPS_REQUEST = 'APPS_REQUEST'
-export const APPS_SUCCESS = 'APPS_SUCCESS'
-export const APPS_FAILURE = 'APPS_FAILURE'
+export const AUTH_REQUEST = 'AUTH_REQUEST'
+export const AUTH_SUCCESS = 'AUTH_SUCCESS'
+export const AUTH_FAILURE = 'AUTH_FAILURE'
 
-// Fetches a page of apps.
+// Get Auth info.
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchApps = query => ({
-  query,
-  [CALL_API]: {
-    types: [ APPS_REQUEST, APPS_SUCCESS, APPS_FAILURE ],
-    endpoint: `/apps${toQuerystring(query)}`,
-    schema: Schemas.APP_ARRAY,
-  },
-})
+const fetchAuth = ({ username, token }) => {
+  let headers
+  if (username && token) {
+    headers = {
+      username,
+      Authorization: `token ${token}`,
+    }
+  }
+  return {
+    [CALL_API]: {
+      types: [ AUTH_REQUEST, AUTH_SUCCESS, AUTH_FAILURE ],
+      endpoint: '/auth',
+      schema: Schemas.AUTH_DATA,
+      options: {
+        headers,
+      },
+    },
+  }
+}
 
-// Fetches a page of apps.
+// Fetches Auth info.
 // Relies on Redux Thunk middleware.
-export const loadApps = query => dispatch => {
-  return dispatch(fetchApps(query))
+export const getAuth = ({ username, token }) => dispatch => {
+  return dispatch(fetchAuth(({ username, token })))
 }
 
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE'
@@ -40,11 +50,4 @@ export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE'
 // Resets the currently visible error message.
 export const resetErrorMessage = () => ({
   type: RESET_ERROR_MESSAGE,
-})
-
-export const SAVE_JWT = 'SAVE_JWT'
-
-export const saveJwt = jwt => ({
-  jwt,
-  type: SAVE_JWT,
 })

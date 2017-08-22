@@ -10,38 +10,6 @@
  * @date 2017-08-15
  */
 
-// import uuid from 'uuid'
-// import ms from 'ms'
-// import { getJwt } from '../service/jwt'
-import { jwtConfig } from '../../config'
-import { JWT_COOKIE_NAME } from '../../client/constants'
-
-export async function jwt(ctx, next) {
-  const { expiresIn, errorTime } = jwtConfig
-  if (ctx.cookies.get(JWT_COOKIE_NAME)) {
-    ctx.log.info('ctx.cookies.get(JWT_COOKIE_NAME)--', ctx.cookies.get(JWT_COOKIE_NAME))
-    return await next()
-  }
-  // const jwtid = uuid.v4()
-  // const { data } = await getJwt({ jwtid, expiresIn: ms(expiresIn) })
-  const data = {
-    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqd3RpZCI6InRlc3QiLCJpYXQiOjE1MDI3OTAwNDQsImV4cCI6MTUwMjg3NjQ0NH0.NycCLWkdlVgLYaBlE5lW3xnSnlX5erC5rPPHxeit86A',
-    expires: 1502876444746,
-  }
-  const { token } = data
-  let expires = Date.now() + expiresIn - errorTime
-  expires = new Date(expires)
-  const cookieOpts = {
-    signed: true,
-    httpOnly: false,
-    expires,
-  }
-  ctx.cookies.set(JWT_COOKIE_NAME, token, cookieOpts)
-  ctx.state[JWT_COOKIE_NAME] = token
-  ctx.log.info('[set]jwtInfo--', JSON.stringify(data))
-  await next()
-}
-
 /**
  * Webpack middleware for dev and hot reload
  *
@@ -100,4 +68,4 @@ export function webpack() {
  * import { jwt, webpack } fom './middlewares'
  * ```
  */
-export default { jwt, webpack }
+export default { webpack }

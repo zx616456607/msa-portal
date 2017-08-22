@@ -13,7 +13,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
-import RoutesDom from '../../RoutesDom'
+import { RoutesDom } from '../../RoutesDom'
 import { ConnectedRouter } from 'react-router-redux'
 
 const Root = ({ store, history }) => (

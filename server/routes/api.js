@@ -10,7 +10,7 @@
  * @date 2017-08-15
  */
 
-import { jwt } from '../controllers/api'
+import { test } from '../controllers/api'
 import { API_PREFIX } from '../../client/constants'
 
 export default function(Router) {
@@ -18,7 +18,7 @@ export default function(Router) {
     prefix: API_PREFIX,
   })
 
-  router.post('/jwt', jwt)
+  router.post('/test', test)
 
   return router.routes()
 }

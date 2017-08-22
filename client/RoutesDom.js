@@ -11,24 +11,28 @@
  */
 
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import App from './containers/App'
 import IndexPage from './containers/IndexPage'
 import TestPage from './containers/TestPage'
 
-export default class RoutesDom extends React.Component {
+export const childRoutes = [
+  {
+    path: '/',
+    component: IndexPage,
+    exact: true,
+    key: 'index',
+  },
+  {
+    path: '/test',
+    component: TestPage,
+    exact: true,
+    key: 'test',
+  },
+]
+
+export class RoutesDom extends React.Component {
   render() {
-    const parent = props => (
-      <App
-        {...props}
-        routes={
-          <Switch>
-            <Route exact path='/' component={IndexPage} />
-            <Route path='/test' component={TestPage} />
-          </Switch>
-        }
-      />
-    )
-    return <Route path="/" component={parent} />
+    return <Route path="/" component={App} />
   }
 }

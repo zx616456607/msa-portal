@@ -105,9 +105,6 @@ if (!isDebug) {
 }
 app.use(serveStatic(path.join(__dirname, '../static'), staticOpts))
 
-// jwt auth
-app.use(middlewares.jwt)
-
 // routes middleware
 app.use(indexRoutes(Router))
 

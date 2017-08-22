@@ -20,6 +20,7 @@ const vendors = [
   'isomorphic-fetch',
   'lodash',
   'normalizr',
+  'query-string',
   'react',
   'react-dom',
   'react-redux',

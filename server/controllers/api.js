@@ -10,9 +10,9 @@
  * @date 2017-08-15
  */
 
-export function jwt(ctx) {
+export function test(ctx) {
   ctx.status = 200
   ctx.body = {
-    message: 'success',
+    message: 'test',
   }
 }
