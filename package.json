@@ -18,6 +18,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "pro": "cross-env NODE_ENV=production npm start",
+    "pre-commit-msg": "echo 'Pre-commit checks...' && exit 0",
     "start": "node server/index.js | bunyan -o short",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,6 +31,10 @@
     "koa",
     "react",
     "redux"
+  ],
+  "pre-commit": [
+    "pre-commit-msg",
+    "lint"
   ],
   "author": "zhangpc@tenxcloud.com",
   "license": "ISC",
@@ -88,6 +93,7 @@
     "less-loader": "^4.0.5",
     "normalize.css": "^7.0.0",
     "postcss-loader": "^2.0.5",
+    "pre-commit": "^1.2.2",
     "redux-devtools-extension": "^2.13.0",
     "style-loader": "^0.18.1",
     "url-loader": "^0.5.8",
