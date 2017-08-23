@@ -38,7 +38,11 @@ export default class Header extends React.Component {
             test
             </Link>
           </Menu.Item>
-          <Menu.Item key="3">nav 3</Menu.Item>
+          <Menu.Item key="3">
+            <Link to="/apms">
+            apms
+            </Link>
+          </Menu.Item>
         </Menu>
       </LayoutHeader>
     )

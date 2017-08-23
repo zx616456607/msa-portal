@@ -13,14 +13,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Route } from 'react-router-dom'
 import { Layout, Spin, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import { resetErrorMessage } from '../actions'
 import Header from '../components/Header'
 import { getAuth, AUTH_FAILURE } from '../actions'
 import { JWT } from '../constants'
-import { childRoutes } from '../RoutesDom'
+import { Route, Switch } from 'react-router-dom'
+import { appChildRoutes } from '../RoutesDom'
 
 const { Footer } = Layout
 
@@ -78,9 +78,11 @@ class App extends React.Component {
         {this.renderErrorMessage()}
         <Header />
         { children }
-        {
-          childRoutes.map(routeProps => <Route {...routeProps} />)
-        }
+        <Switch>
+          {
+            appChildRoutes.map(routeProps => <Route {...routeProps} />)
+          }
+        </Switch>
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
         </Footer>
