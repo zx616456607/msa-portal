@@ -12,13 +12,38 @@
 
 import { normalize } from 'normalizr'
 import fetch from 'isomorphic-fetch'
-import { JWT, API_URL } from '../constants'
+import { JWT, API_URL, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
+import { toQuerystring } from '../common/utils'
 
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 const callApi = (endpoint, options, schema) => {
   const fullUrl = (endpoint.indexOf(API_URL) === -1) ? API_URL + endpoint : endpoint
 
+  if (options.method) {
+    options.method = options.method.toUpperCase()
+  }
+
+  // The request body can be of the type String, Blob, or FormData.
+  // Other data structures need to be encoded before hand as one of these types.
+  // https://github.github.io/fetch/#request-body
+  const REQUEST_BODY_METHODS = [ 'POST', 'PUT', 'PATCH' ]
+  if (REQUEST_BODY_METHODS.indexOf(options.method) > -1) {
+    if (!options.headers) options.headers = {}
+    if (options.headers['Content-Type'] === undefined) {
+      options.headers['Content-Type'] = CONTENT_TYPE_JSON
+    }
+    switch (options.headers['Content-Type']) {
+      case CONTENT_TYPE_JSON:
+        options.body = JSON.stringify(options.body)
+        break
+      case CONTENT_TYPE_URLENCODED:
+        options.body = toQuerystring(options.body)
+        break
+      default:
+        break
+    }
+  }
   return fetch(fullUrl, options)
     .then(response =>
       response.json().then(json => {

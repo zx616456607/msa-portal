@@ -80,7 +80,7 @@ export function toQuerystring(obj, sep, eq) {
         return ''
     }
   }
-  let queryString = Object.keys(obj).map(k => {
+  const queryString = Object.keys(obj).map(k => {
     const ks = stringifyPrimitive(k) + eq
     if (Array.isArray(obj[k])) {
       return obj[k].map(v => {
@@ -92,7 +92,6 @@ export function toQuerystring(obj, sep, eq) {
   if (!queryString) {
     return ''
   }
-  queryString = `?${queryString}`
   return queryString
 }
 
