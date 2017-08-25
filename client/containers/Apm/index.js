@@ -35,7 +35,7 @@ class Apm extends React.Component {
     return (
       <Layout className="apm">
         <Sider>
-          <div className="title">性能管理 APM</div>
+          <div className="apm-title">性能管理 APM</div>
           <Menu mode="inline" defaultSelectedKeys={[ '4' ]}>
             <Menu.Item key="topology">
               <Link to="/apms/topology">
