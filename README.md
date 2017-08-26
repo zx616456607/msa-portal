@@ -121,3 +121,7 @@ npm run pro
 * [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
 ### 常见错误解决
+1.认证失败
+
+首次打开页面需要在 query 里面带上 username 和 token，例如：
+http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsklwspaohpgecxv
