@@ -10,7 +10,6 @@ function generateUniqueId() {
   return `rc-g6-${uniqueId++}`
 }
 
-// export default function createG6(__operation) {
 export default class Component extends React.Component {
 
   constructor(props, context) {
@@ -37,20 +36,11 @@ export default class Component extends React.Component {
   }
 
   componentWillUnmount() {
-    // this.graph.destroy()
     this.graph = null
     this.graphId = null
   }
 
   initGraph() {
-    // const graph = new G6.Graph({
-    //   id: this.graphId,
-    //   ...props,
-    // })
-    // // __operation(graph)
-    // this.graph = graph
-    // this.graph.render()
-    // this.graph.autoZoom()
     const data = {
       nodes: [
         {
@@ -75,6 +65,7 @@ export default class Component extends React.Component {
     const net = new G6.Net({
       id: 'c1', // 容器ID
       height: 450, // 画布高
+      // width: 500, // 画布宽
     })
     net.source(data.nodes, data.edges)
     net.render()
@@ -120,11 +111,3 @@ export default class Component extends React.Component {
   }
 }
 
-// Component.propTypes = {
-//   data: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-//   width: React.PropTypes.number.isRequired,
-//   height: React.PropTypes.number.isRequired,
-// }
-
-// return Component
-// }
