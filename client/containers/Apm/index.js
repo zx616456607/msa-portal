@@ -25,17 +25,17 @@ const { Content } = Layout
 const menus = [
   {
     to: '/apms/topology',
-    icon: <Icon type="user" />,
+    icon: <Icon type="api" />,
     text: '微服务拓扑',
   },
   {
     to: '/apms/performance',
-    icon: <Icon type="video-camera" />,
+    icon: <Icon type="bar-chart" />,
     text: '微服务性能',
   },
   {
     to: '/apms/call-link-tracking',
-    icon: <Icon type="upload" />,
+    icon: <Icon type="compass" />,
     text: '调用链路跟踪',
   },
 ]
