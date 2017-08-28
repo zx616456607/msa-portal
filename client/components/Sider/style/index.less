@@ -10,9 +10,22 @@
  * @author zhangpc
  */
 
+@import '../../../assets/style/core/index.less';
+
 .layout-sider {
   background: #fff;
   left: 0;
   margin-top: 82px;
   margin-left: 50px;
+  .ant-menu {
+    .ant-menu-item-selected.ant-menu-item {
+      background-color: @primaryColor;
+      a {
+        color: #fff;
+      }
+    }
+    .ant-menu-item::after {
+      border: 0;
+    }
+  }
 }

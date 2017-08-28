@@ -64,7 +64,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { children, auth } = this.props
+    const { children, auth, location } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
       return (
@@ -76,7 +76,7 @@ class App extends React.Component {
     return (
       <Layout>
         {this.renderErrorMessage()}
-        <Header />
+        <Header location={location} />
         { children }
         <Switch>
           {

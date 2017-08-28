@@ -96,3 +96,29 @@ export function toQuerystring(obj, sep, eq) {
 }
 
 export const getQueryKey = query => toQuerystring(query) || DEFAULT
+
+/**
+ * get default select keys
+ *
+ * @param {object} location the object of location from react-router
+ * @param {array} menus menu list
+ * @return {array} defaultSelectedKeys
+ */
+export const getDefaultSelectedKeys = (location, menus) => {
+  const defaultSelectedKeys = []
+  menus.every(menu => {
+    if (menu.to === '/') {
+      if (location.pathname === menu.to) {
+        defaultSelectedKeys.push(menu.to)
+        return false
+      }
+      return true
+    }
+    if (location.pathname.indexOf(menu.to) === 0) {
+      defaultSelectedKeys.push(menu.to)
+      return false
+    }
+    return true
+  })
+  return defaultSelectedKeys
+}
