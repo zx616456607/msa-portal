@@ -18,6 +18,7 @@ const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
 const postcssConfig = require('./postcss')
+const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 
 console.log('Use production webpack config ...')
 
@@ -35,6 +36,9 @@ module.exports = {
       path.join(__dirname, '../client'),
       'node_modules',
     ],
+    alias: {
+      '@': path.join(__dirname, '..', 'client'),
+    },
   },
 
   output: {
@@ -53,7 +57,20 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(jpe?g|png|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-sprite-loader',
+            options: {
+              extract: true,
+              spriteFilename: 'sprite-[hash:6].svg',
+            },
+          },
+          'svgo-loader',
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
         loader: 'url-loader',
         options: {
           limit: 5192, // 5KB 以下图片自动转成 base64 码
@@ -116,6 +133,7 @@ module.exports = {
       filename: path.join(__dirname, '../index.html'),
       template: path.join(__dirname, '../client/index.html'),
     }),
+    new SpriteLoaderPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
