@@ -120,5 +120,8 @@ export const getDefaultSelectedKeys = (location, menus) => {
     }
     return true
   })
+  if (defaultSelectedKeys.length === 0) {
+    defaultSelectedKeys.push(menus[0].to)
+  }
   return defaultSelectedKeys
 }
