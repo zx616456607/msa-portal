@@ -14,34 +14,28 @@ import union from 'lodash/union'
 import * as ActionTypes from '../actions/pinpoint'
 
 const apps = (state = {}, action) => {
-  const { type, clusterID, ppID } = action
+  const { type, ppID } = action
   switch (type) {
     case ActionTypes.PINPOINT_APPS_REQUEST:
       return {
         ...state,
-        [clusterID]: {
-          [ppID]: {
-            isFetching: true,
-          },
+        [ppID]: {
+          isFetching: true,
         },
       }
     case ActionTypes.PINPOINT_APPS_SUCCESS:
       return {
         ...state,
-        [clusterID]: {
-          [ppID]: {
-            isFetching: false,
-            ids: union(state.ids, action.response.result),
-          },
+        [ppID]: {
+          isFetching: false,
+          ids: union(state.ids, action.response.result),
         },
       }
     case ActionTypes.PINPOINT_APPS_FAILURE:
       return {
         ...state,
-        [clusterID]: {
-          [ppID]: {
-            isFetching: false,
-          },
+        [ppID]: {
+          isFetching: false,
         },
       }
     default:
