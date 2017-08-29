@@ -120,8 +120,40 @@ npm run pro
 * [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 * [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
-### 常见错误解决
-1.认证失败
+### FAQ
+1.认证失败怎么办？
 
 首次打开页面需要在 query 里面带上 username 和 token，例如：
 http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsklwspaohpgecxv
+
+2.如何引入 SVG 图片？
+
+网站已集成 [svg-sprite-loader](https://github.com/kisenka/svg-sprite-loader)，有两种方式引入 SVG：
+* CSS 中引入，特点是会保留原有 SVG 图片的配色，适用于多色 SVG 图片，例如 logo 等:
+```css
+.logo {
+  width: 120px;
+  height: 41px;
+  background: url('../../../assets/img/logo.svg') no-repeat;
+  border-radius: 6px;
+  margin: 11px 24px 11px 0;
+  float: left;
+}
+```
+* JS 中引入，特点是可以通过 `fill` 控制 SVG 图片颜色，只适用于单色 SVG 图片，例如图标等：
+```js
+import React from 'react'
+import settingIcon from '../../assets/img/setting.svg'
+
+class IndexPage extends React.Component {
+  render() {
+    return (
+      <div>
+        <svg>
+          <use xlinkHref={settingIcon.url} />
+        </svg>
+      </div>
+    )
+  }
+}
+```
