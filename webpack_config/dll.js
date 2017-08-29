@@ -22,7 +22,7 @@ const vendors = [
   'normalizr',
   'query-string',
   'react',
-  'reac-dock',
+  'react-dock',
   'react-dom',
   'react-redux',
   'react-router',
