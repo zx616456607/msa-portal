@@ -121,12 +121,12 @@ npm run pro
 * [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
 ### FAQ
-1.认证失败怎么办？
+#### 1.认证失败怎么办？
 
 首次打开页面需要在 query 里面带上 username 和 token，例如：
 http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsklwspaohpgecxv
 
-2.如何引入 SVG 图片？
+#### 2.如何引入 SVG 图片？
 
 网站已集成 [svg-sprite-loader](https://github.com/kisenka/svg-sprite-loader)，有两种方式引入 SVG：
 * CSS 中引入，特点是会保留原有 SVG 图片的配色，适用于多色 SVG 图片，例如 logo 等:
