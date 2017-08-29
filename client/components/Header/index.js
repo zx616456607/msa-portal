@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Layout, Menu, Dropdown, Icon } from 'antd'
+import { Layout, Menu, Dropdown, Icon, Button } from 'antd'
 import { Link } from 'react-router-dom'
 import { getDefaultSelectedKeys } from '../../common/utils'
 import './style/index.less'
@@ -44,14 +44,73 @@ const menus = [
   },
 ]
 
+const testClusters = [
+  {
+    clusterID: 'CID-fe23111d77cb',
+    clusterName: '时速云测试环境',
+  },
+  {
+    clusterID: 'CID-fe23111d7test',
+    clusterName: '不要删除修改测试集群',
+  },
+]
+
 export default class Header extends React.Component {
+  state = {
+    clustersText: '切换集群',
+  }
+
+  componentDidMount() {
+    const [ firstCluster ] = testClusters
+    this.setState({
+      clustersText: firstCluster.clusterName,
+    })
+    this.props.setCurrent({
+      cluster: {
+        id: firstCluster.clusterID,
+      },
+    })
+  }
+
+  handleClusterChange = ({ item, key }) => {
+    const { setCurrent } = this.props
+    this.setState({
+      clustersText: item.props.children,
+    })
+    setCurrent({
+      cluster: {
+        id: key,
+      },
+    })
+  }
+
   render() {
     const { location } = this.props
+    const { clustersText } = this.state
     return (
       <LayoutHeader className="layout-header">
         <Link to="/apms">
           <div className="logo" />
         </Link>
+        <div className="clusters">
+          <Dropdown
+            overlay={
+              <Menu onSelect={this.handleClusterChange}>
+                {
+                  testClusters.map(cluster => (
+                    <Menu.Item key={cluster.clusterID}>
+                      {cluster.clusterName}
+                    </Menu.Item>
+                  ))
+                }
+              </Menu>
+            }
+            trigger={[ 'click' ]}>
+            <Button type="ghost" style={{ marginLeft: 8 }} title={clustersText}>
+              {clustersText} <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </div>
         <div className="user">
           <Dropdown
             overlay={

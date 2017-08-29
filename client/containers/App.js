@@ -18,6 +18,7 @@ import { parse } from 'query-string'
 import { resetErrorMessage } from '../actions'
 import Header from '../components/Header'
 import { getAuth, AUTH_FAILURE } from '../actions'
+import { setCurrent } from '../actions/current'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -64,26 +65,38 @@ class App extends React.Component {
     })
   }
 
+  renderLoading = tip => (
+    <div className="loading">
+      <Spin size="large" tip={tip} />
+    </div>
+  )
+
+  renderChildren = () => {
+    const { current, children } = this.props
+    if (!current.cluster || !current.cluster.id) {
+      return this.renderLoading('加载基础配置中 ...')
+    }
+    return [
+      children,
+      <Switch key="switch">
+        {
+          appChildRoutes.map(routeProps => <Route {...routeProps} />)
+        }
+      </Switch>,
+    ]
+  }
+
   render() {
-    const { children, auth, location } = this.props
+    const { auth, location, setCurrent } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
-      return (
-        <div className="loading">
-          <Spin size="large" tip="Loading..." />
-        </div>
-      )
+      return this.renderLoading('Loading...')
     }
     return (
       <Layout>
         {this.renderErrorMessage()}
-        <Header location={location} />
-        { children }
-        <Switch>
-          {
-            appChildRoutes.map(routeProps => <Route {...routeProps} />)
-          }
-        </Switch>
+        <Header location={location} setCurrent={setCurrent} />
+        { this.renderChildren() }
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
         </Footer>
@@ -95,9 +108,11 @@ class App extends React.Component {
 const mapStateToProps = state => ({
   errorMessage: state.errorMessage,
   auth: state.entities.auth,
+  current: state.current || {},
 })
 
 export default connect(mapStateToProps, {
   resetErrorMessage,
   getAuth,
+  setCurrent,
 })(App)
