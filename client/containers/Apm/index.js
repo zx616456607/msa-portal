@@ -12,10 +12,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
+import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import { loadApms } from '../../actions/apm'
+import { loadPPApps } from '../../actions/pinpoint'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
@@ -42,11 +43,37 @@ const menus = [
 
 class Apm extends React.Component {
   componentWillMount() {
-    const { loadApms, current } = this.props
-    loadApms(current.cluster.id)
+    const { loadApms, current, loadPPApps } = this.props
+    const clusterId = current.cluster.id
+    loadApms(clusterId).then(res => {
+      const { apms } = res.response.result.data
+      return loadPPApps(clusterId, apms[0])
+    })
   }
+
+  renderLoading = tip => (
+    <div className="loading">
+      <Spin size="large" tip={tip} />
+    </div>
+  )
+
+  renderChildren = () => {
+    const { apms, children } = this.props
+    if (!apms || !apms.ids) {
+      return this.renderLoading('加载 APM 中 ...')
+    }
+    return [
+      children,
+      <Switch key="switch">
+        {
+          apmChildRoutes.map(routeProps => <Route {...routeProps} />)
+        }
+      </Switch>,
+    ]
+  }
+
   render() {
-    const { children, location } = this.props
+    const { location } = this.props
     const title = (
       <div>
         性能管理 APM
@@ -91,12 +118,7 @@ class Apm extends React.Component {
           </Card>
         </Sider>
         <Content className="layout-content">
-          { children }
-          <Switch>
-            {
-              apmChildRoutes.map(routeProps => <Route {...routeProps} />)
-            }
-          </Switch>
+          {this.renderChildren()}
         </Content>
       </Layout>
     )
@@ -107,8 +129,10 @@ const mapStateToProps = state => ({
   errorMessage: state.errorMessage,
   auth: state.entities.auth,
   current: state.current || {},
+  apms: state.queryApms[state.current.cluster.id],
 })
 
 export default connect(mapStateToProps, {
   loadApms,
+  loadPPApps,
 })(Apm)
