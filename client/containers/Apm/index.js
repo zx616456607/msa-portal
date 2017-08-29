@@ -42,8 +42,8 @@ const menus = [
 
 class Apm extends React.Component {
   componentWillMount() {
-    // const { loadApms } = this.props
-    // loadApms('test')
+    const { loadApms, current } = this.props
+    loadApms(current.cluster.id)
   }
   render() {
     const { children, location } = this.props
@@ -106,6 +106,7 @@ class Apm extends React.Component {
 const mapStateToProps = state => ({
   errorMessage: state.errorMessage,
   auth: state.entities.auth,
+  current: state.current || {},
 })
 
 export default connect(mapStateToProps, {
