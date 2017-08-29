@@ -21,7 +21,6 @@ export const PINPOINT_APPS_FAILURE = 'PINPOINT_APPS_FAILURE'
 // Fetches a page of pinpoint apps.
 // Relies on the custom API middleware defined in ../middleware/api.js.
 const fetchPPApps = (clusterID, ppID) => ({
-  clusterID,
   ppID,
   [CALL_API]: {
     types: [ PINPOINT_APPS_REQUEST, PINPOINT_APPS_SUCCESS, PINPOINT_APPS_FAILURE ],
