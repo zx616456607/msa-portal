@@ -10,26 +10,33 @@
  * @author zhaoyb
  */
 
-.Layout-content {
+.content {
   .header {
     .server {
-      margin: 0 0 0 10px;
+      margin: 0 10px 0 0;
     }
-    .Example {
-      margin: 0 10px;
+    .example {
+      float: right;
+      display: inline-block;
     }
     .timer {
+      display: inline-block;
+      margin: 0 10px;
       .btn {
         border-radius: 0;
       }
-      display: inline-block;
-      margin: 0 10px;
+      .picker {
+        margin-right: 30px;
+      }
+      div {
+        display: inline-block;
+      }
     }
   }
   .section {
     width: 100%;
     height: 50%;
-    margin: 20px 10px 10px;
+    margin: 20px 10px 10px 0;
     background: #fff;
     .left {
       width: 30%;
@@ -37,7 +44,7 @@
       margin: 20px;
       margin-left: 28%;
       span {
-        font-size: 15px;
+        font-size: 12px;
       }
       .titleName {
         font-size: 27;
@@ -50,13 +57,13 @@
       margin-bottom: 30px;
       // margin-left: 28%;
       span {
-        font-size: 15px;
+        font-size: 12px;
       }
     }
   }
   .footer {
     width: 100%;
-    margin: 10px;
+    margin: 10px 0;
     background: #fff;
     .left {
       width: 48%;
@@ -65,6 +72,9 @@
       .titleInfo {
         margin-left: 10%;
         padding: 15px;
+        .btn {
+          float: right;
+        }
       }
     }
     .rigth {
@@ -74,6 +84,9 @@
       .titleInfo {
         margin-left: 10%;
         padding: 15px;
+        .btn {
+          float: right;
+        }
       }
     }
   }
