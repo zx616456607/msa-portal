@@ -44,10 +44,10 @@ const menus = [
 class Apm extends React.Component {
   componentWillMount() {
     const { loadApms, current, loadPPApps } = this.props
-    const clusterId = current.cluster.id
-    loadApms(clusterId).then(res => {
+    const clusterID = current.cluster.id
+    loadApms(clusterID).then(res => {
       const { apms } = res.response.result.data
-      return loadPPApps(clusterId, apms[0])
+      return loadPPApps(clusterID, apms[0])
     })
   }
 

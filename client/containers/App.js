@@ -15,10 +15,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Layout, Spin, Modal, notification } from 'antd'
 import { parse } from 'query-string'
-import { resetErrorMessage } from '../actions'
 import Header from '../components/Header'
-import { getAuth, AUTH_FAILURE } from '../actions'
-import { setCurrent } from '../actions/current'
+import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
+import { setCurrent, getCurrentUser } from '../actions/current'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -35,7 +34,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    const { getAuth, location, history } = this.props
+    const { getAuth, getCurrentUser, location, history } = this.props
     const { username, token } = parse(location.search)
     getAuth({ username, token }).then(res => {
       if (res.type === AUTH_FAILURE) {
@@ -47,11 +46,13 @@ class App extends React.Component {
         })
         return
       }
+      const jwt = res.response.entities.auth[JWT]
       // Save jwt token to localStorage
       if (localStorage) {
-        localStorage.setItem(JWT, res.response.entities.auth[JWT].token)
+        localStorage.setItem(JWT, jwt.token)
       }
       // Get user detail info
+      return getCurrentUser(jwt.userID)
     })
   }
 
@@ -76,6 +77,9 @@ class App extends React.Component {
     if (!current.cluster || !current.cluster.id) {
       return this.renderLoading('加载基础配置中 ...')
     }
+    if (!current.user || !current.user.info) {
+      return this.renderLoading('加载用户信息中 ...')
+    }
     return [
       children,
       <Switch key="switch">
@@ -87,7 +91,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { auth, location, setCurrent } = this.props
+    const { auth, location, setCurrent, current } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
       return this.renderLoading('Loading...')
@@ -95,7 +99,7 @@ class App extends React.Component {
     return (
       <Layout>
         {this.renderErrorMessage()}
-        <Header location={location} setCurrent={setCurrent} />
+        <Header location={location} setCurrent={setCurrent} currentUser={current.user.info || {}} />
         { this.renderChildren() }
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
@@ -115,4 +119,5 @@ export default connect(mapStateToProps, {
   resetErrorMessage,
   getAuth,
   setCurrent,
+  getCurrentUser,
 })(App)

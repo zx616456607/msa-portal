@@ -12,12 +12,34 @@
 
 import * as ActionTypes from '../actions/current'
 
-export default function current(state = { cluster: {} }, action) {
+export default function current(state = { cluster: {}, user: {} }, action) {
   switch (action.type) {
     case ActionTypes.SET_CURRENT:
       return {
         ...state,
         ...action.current,
+      }
+    case ActionTypes.CURRENT_USER_REQUEST:
+      return {
+        ...state,
+        user: {
+          isFetching: true,
+        },
+      }
+    case ActionTypes.CURRENT_USER_SUCCESS:
+      return {
+        ...state,
+        user: {
+          isFetching: false,
+          info: action.response.result.data,
+        },
+      }
+    case ActionTypes.CURRENT_USER_FAILURE:
+      return {
+        ...state,
+        user: {
+          isFetching: false,
+        },
       }
     default:
       return state
