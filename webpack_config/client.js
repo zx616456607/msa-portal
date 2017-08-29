@@ -41,6 +41,7 @@ config.plugins.unshift(envDefinePlugin)
 // for banner license
 const licenseBannerPlugin = new webpack.BannerPlugin({
   banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
+  exclude: /\.svg$/,
 })
 config.plugins.push(licenseBannerPlugin)
 

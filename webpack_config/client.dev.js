@@ -16,6 +16,8 @@ const webpack = require('webpack')
 const postcssConfig = require('./postcss')
 // const nodeModulesPath = path.join(__dirname, '/node_modules/')
 const hotMiddleWareConfig = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'
+const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
+
 console.log('Use development webpack config ...')
 
 module.exports = {
@@ -34,7 +36,10 @@ module.exports = {
       path.join(__dirname, '../client'),
       'node_modules',
     ],
-    extensions: [ '.less', '.gif', '.js' ],
+    extensions: [ '.js', '.jsx', '.json' ],
+    alias: {
+      '@': path.join(__dirname, '../client'),
+    },
   },
 
   output: {
@@ -52,7 +57,20 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(jpe?g|png|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-sprite-loader',
+            options: {
+              extract: true,
+              esModule: false,
+            },
+          },
+          'svgo-loader',
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
         loader: 'url-loader',
         options: {
           limit: 5192, // 5KB 以下图片自动转成 base64 码
@@ -94,6 +112,7 @@ module.exports = {
       name: 'commons',
       filename: 'commons.js',
     }),
+    new SpriteLoaderPlugin(),
     // new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),

@@ -50,6 +50,7 @@ class App extends React.Component {
       if (localStorage) {
         localStorage.setItem(JWT, res.response.entities.auth[JWT].token)
       }
+      // Get user detail info
     })
   }
 
@@ -64,19 +65,19 @@ class App extends React.Component {
   }
 
   render() {
-    const { children, auth } = this.props
+    const { children, auth, location } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
       return (
         <div className="loading">
-          <Spin size="large" />
+          <Spin size="large" tip="Loading..." />
         </div>
       )
     }
     return (
       <Layout>
         {this.renderErrorMessage()}
-        <Header />
+        <Header location={location} />
         { children }
         <Switch>
           {
