@@ -4,7 +4,7 @@
  */
 
 /**
- * Auth reducers for redux
+ * Apm reducers for redux
  *
  * 2017-08-22
  * @author zhangpc

@@ -29,6 +29,12 @@ const authSchema = new schema.Entity('auth', {}, {
   idAttribute: () => JWT,
 })
 
+// PinPoint
+const ppAppsSchema = new schema.Entity('ppApps', {}, {
+  idAttribute: 'applicationName',
+})
+
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -45,4 +51,6 @@ export const Schemas = {
   AUTH_DATA: {
     data: authSchema,
   },
+  PP_APPS: ppAppsSchema,
+  PP_APPS_ARRAY: [ ppAppsSchema ],
 }

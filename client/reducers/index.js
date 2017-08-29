@@ -14,7 +14,9 @@ import * as ActionTypes from '../actions'
 import merge from 'lodash/merge'
 import { routerReducer as routing } from 'react-router-redux'
 import { combineReducers } from 'redux'
+import current from './current'
 import * as apm from './apm'
+import pinpoint from './pinpoint'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = { auth: {} }, action) => {
@@ -42,7 +44,9 @@ const rootReducer = combineReducers({
   entities,
   errorMessage,
   routing,
+  current,
   ...apm,
+  pinpoint,
 })
 
 export default rootReducer
