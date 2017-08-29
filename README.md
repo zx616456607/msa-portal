@@ -130,6 +130,7 @@ http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsk
 
 网站已集成 [svg-sprite-loader](https://github.com/kisenka/svg-sprite-loader)，有两种方式引入 SVG：
 * CSS 中引入，特点是会保留原有 SVG 图片的配色，适用于多色 SVG 图片，例如 logo 等:
+
 ```css
 .logo {
   width: 120px;
@@ -141,6 +142,7 @@ http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsk
 }
 ```
 * JS 中引入，特点是可以通过 `fill` 控制 SVG 图片颜色，只适用于单色 SVG 图片，例如图标等：
+
 ```js
 import React from 'react'
 import settingIcon from '../../assets/img/setting.svg'
