@@ -12,19 +12,56 @@
 
 import React from 'react'
 import { Select, Button, DatePicker, Card, Icon, Table } from 'antd'
+import { connect } from 'react-redux'
 import Dock from 'react-dock'
+import { loadPPApps, loadScatterData } from '../../../actions/pinpoint'
+import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT } from '../../../constants'
 import './style/index.less'
 
 const Option = Select.Option
 const ButtonGroup = Button.Group
 const { RangePicker } = DatePicker
 
-export default class CallLinkTracking extends React.Component {
+class CallLinkTracking extends React.Component {
   state = {
     isVisible: false,
+    currentRecord: {},
+    application: null,
+    agent: null,
+    rangeDateTime: null,
+  }
+
+  componentWillMount() {
+    const { loadPPApps, clusterID, apmID } = this.props
+    loadPPApps(clusterID, apmID)
+  }
+
+  loadData = () => {
+    const { loadScatterData, clusterID, apmID, apps } = this.props
+    const { application, rangeDateTime } = this.state
+    let serviceTypeName
+    apps.every(app => {
+      if (app.applicationName === application) {
+        serviceTypeName = app.serviceType
+        return false
+      }
+      return true
+    })
+    const query = {
+      application,
+      serviceTypeName,
+      from: rangeDateTime[0].valueOf(),
+      to: rangeDateTime[1].valueOf(),
+      xGroupUnit: X_GROUP_UNIT,
+      yGroupUnit: Y_GROUP_UNIT,
+      limit: PINPOINT_LIMIT,
+    }
+    loadScatterData(clusterID, apmID, query)
   }
 
   render() {
+    const { apps } = this.props
+    const { application, agent, rangeDateTime } = this.state
     const columns = [{
       title: 'Name',
       dataIndex: 'name',
@@ -78,22 +115,14 @@ export default class CallLinkTracking extends React.Component {
             style={{ width: 200 }}
             placeholder="选择微服务"
             optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            value={application}
+            onChange={application => this.setState({ application })}
           >
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="tom">Tom</Option>
-          </Select>
-          <Select
-            showSearch
-            style={{ width: 200 }}
-            placeholder="选择一个实例"
-            optionFilterProp="children"
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-          >
-            <Option value="all">All</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="tom">Tom</Option>
+            {
+              apps.map(app => (
+                <Option key={app.applicationName}>{app.applicationName}</Option>
+              ))
+            }
           </Select>
           <Button icon="reload">
             刷新
@@ -106,9 +135,23 @@ export default class CallLinkTracking extends React.Component {
               showTime={{ format: 'HH:mm' }}
               format="YYYY-MM-DD HH:mm"
               placeholder={[ '开始日期', '结束日期' ]}
+              value={rangeDateTime}
+              onChange={rangeDateTime => this.setState({ rangeDateTime })}
             />
-            <Button icon="search" />
+            <Button icon="search" onClick={this.loadData} />
           </ButtonGroup>
+          <Select
+            className="float-right"
+            showSearch
+            style={{ width: 200 }}
+            placeholder="选择一个实例"
+            optionFilterProp="children"
+            value={agent}
+            onChange={agent => this.setState({ agent })}
+          >
+            <Option value="lalala456">lalala456</Option>
+            <Option value="lalala123">lalala123</Option>
+          </Select>
         </div>
         <div className="layout-content-body">
           <Card className="call-link-tracking-table">
@@ -116,7 +159,7 @@ export default class CallLinkTracking extends React.Component {
               columns={columns}
               dataSource={data}
               pagination={false}
-              onRowClick={() => this.setState({ isVisible: true })}
+              onRowClick={record => this.setState({ isVisible: true, currentRecord: record })}
             />
           </Card>
         </div>
@@ -128,10 +171,32 @@ export default class CallLinkTracking extends React.Component {
           defaultSize={0.5}
         >
           <h1 onClick={() => this.setState({ isVisible: false })}>
-            哈哈哈，我是 inspector
+            哈哈哈，我是 inspector - {this.state.currentRecord.name}
           </h1>
         </Dock>
       </div>
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { current, queryApms, pinpoint, entities } = state
+  const { cluster } = current
+  const clusterID = cluster.id
+  // @Todo: not support other apm yet
+  const apmID = queryApms[clusterID].ids[0]
+  let { apps } = pinpoint
+  const { ppApps } = entities
+  const appIDs = apps[apmID] && apps[apmID].ids || []
+  apps = appIDs.map(id => ppApps[id])
+  return {
+    clusterID,
+    apmID,
+    apps,
+  }
+}
+
+export default connect(mapStateToProps, {
+  loadPPApps,
+  loadScatterData,
+})(CallLinkTracking)

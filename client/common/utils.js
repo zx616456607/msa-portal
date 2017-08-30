@@ -80,15 +80,18 @@ export function toQuerystring(obj, sep, eq) {
         return ''
     }
   }
-  const queryString = Object.keys(obj).map(k => {
-    const ks = stringifyPrimitive(k) + eq
-    if (Array.isArray(obj[k])) {
-      return obj[k].map(v => {
-        return ks + stringifyPrimitive(v)
-      }).join(sep)
-    }
-    return ks + stringifyPrimitive(obj[k])
-  }).join(sep)
+  const queryString = Object.keys(obj)
+    .sort()
+    .map(k => {
+      const ks = stringifyPrimitive(k) + eq
+      if (Array.isArray(obj[k])) {
+        return obj[k].map(v => {
+          return ks + stringifyPrimitive(v)
+        }).join(sep)
+      }
+      return ks + stringifyPrimitive(obj[k])
+    })
+    .join(sep)
   if (!queryString) {
     return ''
   }
