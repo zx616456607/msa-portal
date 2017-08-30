@@ -11,11 +11,21 @@
  */
 
 import React from 'react'
-import { Select, Button, DatePicker, Card, Icon, Table } from 'antd'
+import { Select, Button, DatePicker, Card, Table } from 'antd'
 import { connect } from 'react-redux'
 import Dock from 'react-dock'
-import { loadPPApps, loadScatterData } from '../../../actions/pinpoint'
-import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT } from '../../../constants'
+import { formatDate } from '../../../common/utils'
+import {
+  loadPPApps,
+  loadScatterData,
+  loadTransactionMetadata,
+} from '../../../actions/pinpoint'
+import {
+  PINPOINT_LIMIT,
+  X_GROUP_UNIT,
+  Y_GROUP_UNIT,
+  ALL,
+} from '../../../constants'
 import './style/index.less'
 
 const Option = Select.Option
@@ -27,8 +37,9 @@ class CallLinkTracking extends React.Component {
     isVisible: false,
     currentRecord: {},
     application: null,
-    agent: null,
+    agent: ALL,
     rangeDateTime: null,
+    loading: false,
   }
 
   componentWillMount() {
@@ -37,8 +48,17 @@ class CallLinkTracking extends React.Component {
   }
 
   loadData = () => {
-    const { loadScatterData, clusterID, apmID, apps } = this.props
-    const { application, rangeDateTime } = this.state
+    this.setState({
+      loading: true,
+    })
+    const {
+      loadScatterData,
+      loadTransactionMetadata,
+      clusterID,
+      apmID,
+      apps,
+    } = this.props
+    const { application, rangeDateTime, agent } = this.state
     let serviceTypeName
     apps.every(app => {
       if (app.applicationName === application) {
@@ -56,57 +76,84 @@ class CallLinkTracking extends React.Component {
       yGroupUnit: Y_GROUP_UNIT,
       limit: PINPOINT_LIMIT,
     }
-    loadScatterData(clusterID, apmID, query)
+    loadScatterData(clusterID, apmID, query).then(res => {
+      if (res.error) {
+        this.setState({
+          loading: false,
+        })
+        return
+      }
+      const body = {}
+      const { scatter, from } = res.response.result
+      let { dotList, metadata } = scatter
+      if (agent !== ALL) {
+        const targetAgentKey = Object.keys(metadata).filter(key => metadata[key][0] === agent)
+        console.log('targetAgentKey', targetAgentKey)
+        dotList = dotList.filter(dot => targetAgentKey.indexOf(dot[2] + '') > -1)
+      }
+      const I = 'I'
+      const T = 'T'
+      const R = 'R'
+      dotList.forEach((dot, index) => {
+        const agentMetadata = metadata[dot[2]]
+        body[`${I}${index}`] = `${agentMetadata[0]}^${agentMetadata[2]}^${dot[3]}`
+        body[`${T}${index}`] = from + dot[0]
+        body[`${R}${index}`] = dot[1]
+      })
+      return loadTransactionMetadata(clusterID, apmID, application, body)
+    }).then(() => {
+      this.setState({
+        loading: false,
+      })
+    })
+  }
+
+  onAgentChange = agent => {
+    this.setState({ agent }, () => {
+      this.loadData()
+    })
   }
 
   render() {
-    const { apps } = this.props
-    const { application, agent, rangeDateTime } = this.state
+    const { apps, transaction } = this.props
+    const { application, agent, rangeDateTime, loading } = this.state
     const columns = [{
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: text => <a href="#">{text}</a>,
+      title: '#',
+      dataIndex: '#',
+      key: '#',
+      render: (text, record, index) => <a href="#">{index}</a>,
     }, {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
+      title: 'Stat time',
+      dataIndex: 'startTime',
+      key: 'startTime',
+      render: text => formatDate(text),
     }, {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: 'Path',
+      dataIndex: 'application',
+      key: 'application',
     }, {
-      title: 'Action',
-      key: 'action',
-      render: (text, record) => (
-        <span>
-          <a href="#">Action 一 {record.name}</a>
-          <span className="ant-divider" />
-          <a href="#">Delete</a>
-          <span className="ant-divider" />
-          <a href="#" className="ant-dropdown-link">
-            More actions <Icon type="down" />
-          </a>
-        </span>
-      ),
+      title: 'Res.(ms)',
+      dataIndex: 'elapsed',
+      key: 'elapsed',
+    }, {
+      title: 'Exception',
+      dataIndex: 'exception',
+      key: 'exception',
+    }, {
+      title: 'Agent',
+      dataIndex: 'agentId',
+      key: 'agentId',
+    }, {
+      title: 'Client IP',
+      dataIndex: 'remoteAddr',
+      key: 'remoteAddr',
+    }, {
+      title: 'Transaction',
+      dataIndex: 'traceId',
+      key: 'traceId',
     }]
 
-    const data = [{
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-    }, {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-    }, {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-    }]
+    const data = transaction[application] && transaction[application].metadata || []
     return (
       <div className="call-link-tracking">
         <div className="layout-content-btns">
@@ -147,8 +194,9 @@ class CallLinkTracking extends React.Component {
             placeholder="选择一个实例"
             optionFilterProp="children"
             value={agent}
-            onChange={agent => this.setState({ agent })}
+            onChange={this.onAgentChange}
           >
+            <Option value={ALL}>{ALL}</Option>
             <Option value="lalala456">lalala456</Option>
             <Option value="lalala123">lalala123</Option>
           </Select>
@@ -159,6 +207,8 @@ class CallLinkTracking extends React.Component {
               columns={columns}
               dataSource={data}
               pagination={false}
+              rowKey={row => row.spanId}
+              loading={loading}
               onRowClick={record => this.setState({ isVisible: true, currentRecord: record })}
             />
           </Card>
@@ -185,7 +235,7 @@ const mapStateToProps = state => {
   const clusterID = cluster.id
   // @Todo: not support other apm yet
   const apmID = queryApms[clusterID].ids[0]
-  let { apps } = pinpoint
+  let { apps, queryTransaction } = pinpoint
   const { ppApps } = entities
   const appIDs = apps[apmID] && apps[apmID].ids || []
   apps = appIDs.map(id => ppApps[id])
@@ -193,10 +243,12 @@ const mapStateToProps = state => {
     clusterID,
     apmID,
     apps,
+    transaction: queryTransaction[apmID] || {},
   }
 }
 
 export default connect(mapStateToProps, {
   loadPPApps,
   loadScatterData,
+  loadTransactionMetadata,
 })(CallLinkTracking)
