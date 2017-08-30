@@ -80,13 +80,89 @@ const queryScatter = (state = {}, action) => {
   }
 }
 
+const serviceMap = (state = {}, action) => {
+  const { type, apmID, query } = action
+  switch (type) {
+    case ActionTypes.PINPOINT_MAP_REQUEST:
+      return {
+        ...state,
+        [apmID]: {
+          [query.applicationName]: {
+            isFetching: true,
+          },
+        },
+      }
+    case ActionTypes.PINPOINT_MAP_SUCCESS:
+      return {
+        ...state,
+        [apmID]: {
+          [query.applicationName]: {
+            isFetching: false,
+            ...action.response.result,
+          },
+        },
+      }
+    case ActionTypes.PINPOINT_MAP_FAILURE:
+      return {
+        ...state,
+        [apmID]: {
+          [query.applicationName]: {
+            isFetching: false,
+          },
+        },
+      }
+    default:
+      return state
+  }
+}
+
+const queryTransaction = (state = {}, action) => {
+  const { type, apmID, application } = action
+  switch (type) {
+    case ActionTypes.TRANSACTION_METADATA_REQUEST:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: true,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_METADATA_SUCCESS:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+            ...action.response.result,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_METADATA_FAILURE:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+          },
+        },
+      }
+    default:
+      return state
+  }
+}
+
 const pinpoint = (state = {
   apps: {},
   queryScatter: {},
+  serviceMap: {},
+  queryTransaction: {},
 }, action) => {
   return {
     apps: apps(state.apps, action),
-    queryScatter: queryScatter(state.scatter, action),
+    queryScatter: queryScatter(state.queryScatter, action),
+    serviceMap: serviceMap(state.serviceMap, action),
+    queryTransaction: queryTransaction(state.queryTransaction, action),
   }
 }
 
