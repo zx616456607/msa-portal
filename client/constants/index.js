@@ -20,3 +20,6 @@ export const API_URL = `${API_PROTOCOL}://${API_HOST}${API_PREFIX}`
 export const DEFAULT = 'default'
 export const CONTENT_TYPE_JSON = 'application/json'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
+export const PINPOINT_LIMIT = 5000
+export const X_GROUP_UNIT = 284211
+export const Y_GROUP_UNIT = 57
