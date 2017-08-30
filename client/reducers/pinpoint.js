@@ -12,7 +12,7 @@
 
 import union from 'lodash/union'
 import * as ActionTypes from '../actions/pinpoint'
-import { toQuerystring } from '../common/utils'
+// import { toQuerystring } from '../common/utils'
 
 const apps = (state = {}, action) => {
   const { type, apmID } = action
@@ -51,7 +51,7 @@ const queryScatter = (state = {}, action) => {
       return {
         ...state,
         [apmID]: {
-          [toQuerystring(query)]: {
+          [query.application]: {
             isFetching: true,
           },
         },
@@ -60,7 +60,7 @@ const queryScatter = (state = {}, action) => {
       return {
         ...state,
         [apmID]: {
-          [toQuerystring(query)]: {
+          [query.application]: {
             isFetching: false,
             ...action.response.result,
           },
@@ -70,7 +70,7 @@ const queryScatter = (state = {}, action) => {
       return {
         ...state,
         [apmID]: {
-          [toQuerystring(query)]: {
+          [query.application]: {
             isFetching: false,
           },
         },
