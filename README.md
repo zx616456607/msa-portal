@@ -159,3 +159,37 @@ class IndexPage extends React.Component {
   }
 }
 ```
+
+#### 3.如何在 `action` 中做错误处理?
+
+根据返回值中的 `error` 字段判断 `action` 有没有执行成功：
+
+```js
+import { loadApms } from '../../actions/apm'
+import { loadPPApps } from '../../actions/pinpoint'
+
+class Apm extends React.Component {
+  componentWillMount() {
+    const { loadApms, current, loadPPApps } = this.props
+    const clusterID = current.cluster.id
+    loadApms(clusterID).then(res => {
+      // 根据返回值中的 `error` 字段判断 `action` 有没有执行成功
+      if (res.error) {
+        console.error(res.error)
+        return
+      }
+      const { apms } = res.response.result.data
+      return loadPPApps(clusterID, apms[0])
+    })
+  }
+}
+
+const mapStateToProps = state => ({
+  //
+})
+
+export default connect(mapStateToProps, {
+  loadApms,
+  loadPPApps,
+})(Apm)
+```

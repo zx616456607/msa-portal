@@ -110,15 +110,53 @@ const pinpointMap = (state = {}, action) => {
   }
 }
 
+const queryTransaction = (state = {}, action) => {
+  const { type, apmID, application } = action
+  switch (type) {
+    case ActionTypes.TRANSACTION_METADATA_REQUEST:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: true,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_METADATA_SUCCESS:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+            ...action.response.result,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_METADATA_FAILURE:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+          },
+        },
+      }
+    default:
+      return state
+  }
+}
+
 const pinpoint = (state = {
   apps: {},
   queryScatter: {},
   pinpointMap: {},
+  queryTransaction: {},
 }, action) => {
   return {
     apps: apps(state.apps, action),
-    queryScatter: queryScatter(state.scatter, action),
+    queryScatter: queryScatter(state.queryScatter, action),
     pinpointMap: pinpointMap(state.pinpointMap, action),
+    queryTransaction: queryTransaction(state.queryTransaction, action),
   }
 }
 
