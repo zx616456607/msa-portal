@@ -1,9 +1,14 @@
-FROM node:7.7.4
+FROM 192.168.1.113/zhangpc/node:base-8-alpine
 MAINTAINER zhangpc<zhangpc@tenxcloud.com>
+
+ENV NODE_ENV production
 
 ADD . /usr/src/app/
 
-RUN npm install --registry=https://registry.npm.taobao.org
+# package files
+RUN npm run build
+
+RUN rm -rf /usr/src/app/client
 
 EXPOSE 8989
 
