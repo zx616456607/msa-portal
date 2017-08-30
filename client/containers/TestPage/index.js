@@ -13,7 +13,6 @@
 import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import Sider from '../../components/Sider'
-import RelationSchema from '../../components/RelationSchema'
 
 const { Content } = Layout
 
@@ -52,7 +51,6 @@ export default class TestPage extends React.Component {
         <Content className="layout-content">
           <div>
             <h1>TestPage33</h1>
-            <RelationSchema data={[]} width={200} height={200}/>
           </div>
         </Content>
       </Layout>

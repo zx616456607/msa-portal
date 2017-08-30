@@ -22,8 +22,6 @@ class IndexPage extends React.Component {
   test = a => <h2>{a}</h2>
 
   componentWillMount() {
-    const { loadApms } = this.props
-    loadApms('test')
   }
 
   render() {

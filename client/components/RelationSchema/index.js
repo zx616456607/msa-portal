@@ -44,70 +44,112 @@ export default class Component extends React.Component {
     const data = {
       nodes: [
         {
-          id: 'node1',
+          shape: 'customNode1',
+          id: 'd62d1569',
           x: 100,
-          y: 160,
+          y: 250,
+          tooltip: true,
         },
         {
-          id: 'node2',
-          x: 290,
-          y: 160,
+          shape: 'customNode2',
+          id: 'd62s1569',
+          x: 380,
+          y: 250,
         },
       ],
       edges: [
         {
-          id: 'node1-node2',
-          target: 'node1',
-          source: 'node2',
+          shape: 'customEdge',
+          source: 'd62d1569',
+          target: 'd62s1569',
+          id: '75ae90a8',
         },
       ],
     }
+    G6.registNode('customNode1', {
+      draw: (cfg, group) => {
+        group.addShape('text', {
+          attrs: {
+            x: cfg.x - 50,
+            y: cfg.y - 50,
+            fill: '#333',
+            text: '我是一个自定义node1',
+          },
+        })
+        return group.addShape('rect', {
+          attrs: {
+            x: cfg.x - 50,
+            y: cfg.y - 50,
+            width: cfg.size,
+            height: cfg.size,
+            stroke: cfg.color,
+          },
+        })
+      },
+    })
+    G6.registNode('customNode2', {
+      draw: (cfg, group) => {
+        group.addShape('text', {
+          attrs: {
+            x: cfg.x - 50,
+            y: cfg.x - 50,
+            fill: '#999',
+            text: '我是一个自定义node2',
+          },
+        })
+        return group.addShape('rect', {
+          attrs: {
+            x: cfg.x - 50,
+            y: cfg.y - 50,
+            width: cfg.size,
+            height: cfg.size,
+            stroke: cfg.color,
+          },
+        })
+      },
+    })
+    G6.registEdge('customEdge', {
+      draw: (cfg, group) => {
+        group.addShape('text', {
+          attrs: {
+            x: (cfg.points[0].x + cfg.points[1].x) / 2,
+            y: (cfg.points[0].y + cfg.points[1].y) / 2,
+            fill: '#333',
+            text: '我是一个自定义边（edge）',
+            textAlign: 'center',
+          },
+        })
+        return group.addShape('polyline', {
+          attrs: {
+            points: [
+              [ cfg.points[0].x, cfg.points[0].y ],
+              [ cfg.points[1].x, cfg.points[1].y ],
+            ],
+            stroke: cfg.color,
+            lineWidth: cfg.size,
+          },
+        })
+      },
+    })
     const net = new G6.Net({
-      id: 'c1', // 容器ID
-      height: 450, // 画布高
-      // width: 500, // 画布宽
+      id: 'c1',
+      // width: 500,
+      height: 500,
+      grid: {
+        forceAlign: true,
+        cell: 10,
+      },
     })
     net.source(data.nodes, data.edges)
+    net.node().size(100).color('red')
+    net.edge()
+      .color('blue')
+      .size(3)
     net.render()
-    net.on('itemclick', function(ev) {
-      console.log('击中' + ev.item.get('model').id + '!')
-    })
-    net.on('itemmousedown', function(ev) {
-      const item = ev.item
-      if (net.isNode(item)) {
-        net.update(item, {
-          shape: 'circle',
-        })
-        net.refresh()
-      }
-    })
-    net.on('itemmouseup', function(ev) {
-      const item = ev.item
-      if (net.isNode(item)) {
-        net.update(item, {
-          shape: 'rect',
-        })
-        net.refresh()
-      }
-    })
-    net.on('itemmouseenter', function(ev) {
-      const item = ev.item
-      net.update(item, {
-        color: 'red',
-      })
-      net.refresh()
-    })
-    net.on('itemmouseleave', function(ev) {
-      const item = ev.item
-      net.update(item, {
-        color: null,
-      })
-      net.refresh()
-    })
   }
 
   render() {
-    return (<div id="c1"></div>)
+    return (<div id="c1"/>)
   }
 }
 
