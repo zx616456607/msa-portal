@@ -116,3 +116,39 @@ const fetchTransactionMetadata = (clusterID, apmID, application, body) => ({
 export const loadTransactionMetadata = (clusterID, apmID, application, body) => dispatch => {
   return dispatch(fetchTransactionMetadata(clusterID, apmID, application, body))
 }
+export const FEtCH_AgentList_REQUEST = 'FEtCH_AgentList_REQUEST'
+export const FETCH_AgentList_SUCCESS = 'FETCH_AgentList_SUCCESS'
+export const FETCH_AgentList_FAILURE = 'FETCH_AgentList_FAILURE'
+
+const fetchAgentList = (clusterID, apmID, query) => ({
+  apmID,
+  query,
+  [CALL_API]: {
+    types: [ FEtCH_AgentList_REQUEST, FETCH_AgentList_SUCCESS, FETCH_AgentList_FAILURE ],
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentList?${toQuerystring(query)}`,
+    schema: {},
+  },
+})
+
+export const fetchAgentData = (clusterID, apmID, query) => dispatch => {
+  return dispatch(fetchAgentList(clusterID, apmID, query))
+}
+
+export const FETCH_JVMGC_REQUEST = 'FETCH_JVMGC_REQUEST'
+export const FETCH_JVMGC_SUCCESS = 'FETCH_JVMGC_SUCCESS'
+export const FETCH_JVMGC_FAILURE = 'FETCH_JVMGC_FAILURE'
+
+const fetchJvmGCList = (clusterID, apmID, query) => ({
+  apmID,
+  query,
+  [CALL_API]: {
+    types: [ FETCH_JVMGC_REQUEST, FETCH_JVMGC_SUCCESS, FETCH_JVMGC_FAILURE ],
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/jvmGC/${toQuerystring(query)}`,
+    schema: {},
+  },
+})
+
+export const fetchJVMGCData = (clusterID, apmID, query) => dispatch => {
+  return dispatch(fetchJvmGCList(clusterID, apmID, query))
+}
+
