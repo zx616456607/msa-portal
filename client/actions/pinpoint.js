@@ -20,18 +20,17 @@ export const PINPOINT_APPS_FAILURE = 'PINPOINT_APPS_FAILURE'
 
 // Fetches a page of pinpoint apps.
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchPPApps = (clusterId, ppId) => ({
-  clusterId,
-  ppId,
+const fetchPPApps = (clusterID, ppID) => ({
+  ppID,
   [CALL_API]: {
     types: [ PINPOINT_APPS_REQUEST, PINPOINT_APPS_SUCCESS, PINPOINT_APPS_FAILURE ],
-    endpoint: `/clusters/${clusterId}/apms/pinpoint/${ppId}/applications`,
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${ppID}/applications`,
     schema: Schemas.PP_APPS_ARRAY,
   },
 })
 
 // Fetches a page of pinpoint apps.
 // Relies on Redux Thunk middleware.
-export const loadPPApps = (clusterId, ppId) => dispatch => {
-  return dispatch(fetchPPApps(clusterId, ppId))
+export const loadPPApps = (clusterID, ppID) => dispatch => {
+  return dispatch(fetchPPApps(clusterID, ppID))
 }

@@ -14,19 +14,19 @@ import union from 'lodash/union'
 import * as ActionTypes from '../actions/apm'
 
 export const queryApms = (state = {}, action) => {
-  const { type, clusterId } = action
+  const { type, clusterID } = action
   switch (type) {
     case ActionTypes.APMS_REQUEST:
       return {
         ...state,
-        [clusterId]: Object.assign({}, state[clusterId], {
+        [clusterID]: Object.assign({}, state[clusterID], {
           isFetching: true,
         }),
       }
     case ActionTypes.APMS_SUCCESS:
       return {
         ...state,
-        [clusterId]: {
+        [clusterID]: {
           isFetching: false,
           ids: union(state.ids, action.response.result.data.apms),
         },
@@ -34,7 +34,7 @@ export const queryApms = (state = {}, action) => {
     case ActionTypes.APMS_FAILURE:
       return {
         ...state,
-        [clusterId]: {
+        [clusterID]: {
           isFetching: false,
         },
       }

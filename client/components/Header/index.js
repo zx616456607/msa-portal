@@ -85,7 +85,7 @@ export default class Header extends React.Component {
   }
 
   render() {
-    const { location } = this.props
+    const { location, currentUser } = this.props
     const { clustersText } = this.state
     return (
       <LayoutHeader className="layout-header">
@@ -129,7 +129,7 @@ export default class Header extends React.Component {
             }
             trigger={[ 'click' ]}>
             <a className="ant-dropdown-link" href="#">
-              Click me <Icon type="down" />
+              {currentUser.userName || '...'} <Icon type="down" />
             </a>
           </Dropdown>
         </div>
