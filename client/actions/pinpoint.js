@@ -58,6 +58,36 @@ export const loadScatterData = (clusterID, apmID, query) => dispatch => {
   return dispatch(fetchScatterData(clusterID, apmID, query))
 }
 
+export const PINPOINT_MAP_REQUEST = 'PINPOINT_MAP_REQUEST'
+export const PINPOINT_MAP_SUCCESS = 'PINPOINT_MAP_SUCCESS'
+export const PINPOINT_MAP_FAILURE = 'PINPOINT_MAP_FAILURE'
+
+// Fetches pinpoint map.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+
+const fetchPinpointMap = (clusterID, apmID, query) => {
+  let endpoint = `/clusters/${clusterID}/apms/pinpoint/${apmID}/serverMapData`
+  if (query) {
+    endpoint += `?${toQuerystring(query, null, null)}`
+  }
+  return {
+    apmID,
+    query,
+    [CALL_API]: {
+      types: [ PINPOINT_MAP_REQUEST, PINPOINT_MAP_SUCCESS, PINPOINT_MAP_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+
+// Fetches pinpoint map.
+// Relies on Redux Thunk middleware.
+
+export const loadPinpointMap = (clusterID, apmID, query) => dispatch => {
+  return dispatch(fetchPinpointMap(clusterID, apmID, query))
+}
+
 export const TRANSACTION_METADATA_REQUEST = 'TRANSACTION_METADATA_REQUEST'
 export const TRANSACTION_METADATA_SUCCESS = 'TRANSACTION_METADATA_SUCCESS'
 export const TRANSACTION_METADATA_FAILURE = 'TRANSACTION_METADATA_FAILURE'
