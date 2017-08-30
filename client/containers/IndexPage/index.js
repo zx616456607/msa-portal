@@ -14,7 +14,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Layout, Menu, Icon } from 'antd'
 import Sider from '../../components/Sider'
-import { loadApms } from '../../actions/apm'
 
 const { Content } = Layout
 
@@ -22,8 +21,7 @@ class IndexPage extends React.Component {
   test = a => <h2>{a}</h2>
 
   componentWillMount() {
-    const { loadApms } = this.props
-    loadApms('test')
+    //
   }
 
   render() {
@@ -80,5 +78,5 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  loadApms,
+  //
 })(IndexPage)
