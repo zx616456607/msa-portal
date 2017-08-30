@@ -88,7 +88,6 @@ class CallLinkTracking extends React.Component {
       let { dotList, metadata } = scatter
       if (agent !== ALL) {
         const targetAgentKey = Object.keys(metadata).filter(key => metadata[key][0] === agent)
-        console.log('targetAgentKey', targetAgentKey)
         dotList = dotList.filter(dot => targetAgentKey.indexOf(dot[2] + '') > -1)
       }
       const I = 'I'
@@ -171,7 +170,7 @@ class CallLinkTracking extends React.Component {
               ))
             }
           </Select>
-          <Button icon="reload">
+          <Button icon="reload" onClick={this.loadData}>
             刷新
           </Button>
           <ButtonGroup className="call-link-tracking-date">
@@ -221,7 +220,7 @@ class CallLinkTracking extends React.Component {
           defaultSize={0.5}
         >
           <h1 onClick={() => this.setState({ isVisible: false })}>
-            哈哈哈，我是 inspector - {this.state.currentRecord.name}
+            哈哈哈，我是 inspector - {this.state.currentRecord.application}
           </h1>
         </Dock>
       </div>
