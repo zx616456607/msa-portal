@@ -5,6 +5,7 @@ import '../style/topology.less'
 import RelationSchema from '../../../components/RelationSchema'
 const { RangePicker } = DatePicker
 import { loadApms } from '../../../actions/apm'
+import { loadPinpointMap, loadPPApps } from '../../../actions/pinpoint'
 import createG2 from 'g2-react'
 const G2 = require('g2')
 
@@ -203,8 +204,25 @@ class Topology extends React.Component {
     }
   }
   componentWillMount() {
+    const { clusterID, apmID, loadPPApps } = this.props
+    loadPPApps(clusterID, apmID).then(() => {
+      const { apps } = this.props
+      this.getPinpointMap(clusterID, apmID, apps)
+    })
   }
-  handleMenuClick(e) {
+  getPinpointMap = (clusterID, apmID, apps) => {
+    const { loadPinpointMap } = this.props
+    loadPinpointMap(clusterID, apmID, {
+      applicationName: apps[0].applicationName,
+      from: '1500195530000',
+      to: '1500195830000',
+      callerRange: 1,
+      calleeRange: 1,
+      serviceTypeName: apps[0].serviceType,
+      _: '1504078244220',
+    })
+  }
+  handleMenuClick = e => {
     console.log(e)
   }
   handleSizeChange = e => {
@@ -222,7 +240,7 @@ class Topology extends React.Component {
     )
     return (
       <div className="topology">
-        <div className="topology-header">
+        <div className="layout-content-btns">
           <Dropdown trigger={[ 'click' ]} overlay={menu}>
             <Button size="large">
               选择微服务（展示其所在链路拓扑） <Icon type="down" />
@@ -241,7 +259,7 @@ class Topology extends React.Component {
             <Radio.Button value="small">最近7天</Radio.Button>
           </Radio.Group>
         </div>
-        <Row className="topology-body">
+        <Row className="topology-body layout-content-body">
           <Col span={14} className="topology-body-relation-schema">
             <RelationSchema data={[]}/>
           </Col>
@@ -328,14 +346,20 @@ const mapStateToProps = state => {
   let apps = []
   if (pinpoint.apps[apmID]) {
     apps = pinpoint.apps[apmID].ids || []
+    apps = apps.map(id => entities.ppApps[id])
   }
-  apps = apps.map(id => entities.ppApps[id])
   return {
+    clusterID,
     apmID,
     apps,
+    apms,
+    pinpoint,
+    entities,
   }
 }
 
 export default connect(mapStateToProps, {
   loadApms,
+  loadPinpointMap,
+  loadPPApps,
 })(Topology)
