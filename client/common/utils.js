@@ -18,7 +18,10 @@
  * @return {string} cookie
  */
 
-import { DEFAULT } from '../constants'
+import { DEFAULT, DEFAULT_TIME_FORMAT } from '../constants'
+import moment from 'moment'
+
+moment.locale('zh-cn')
 
 export function getCookie(cName) {
   if (document.cookie.length === 0) {
@@ -127,4 +130,20 @@ export const getDefaultSelectedKeys = (location, menus) => {
     defaultSelectedKeys.push(menus[0].to)
   }
   return defaultSelectedKeys
+}
+
+/**
+ * Format date
+ *
+ * @export
+ * @param {any} timestamp date
+ * @param {any} format date format
+ * @return {string} format date string
+ */
+export function formatDate(timestamp, format) {
+  format = format || DEFAULT_TIME_FORMAT
+  if (!timestamp || timestamp === '') {
+    return moment(new Date()).format(format)
+  }
+  return moment(timestamp).format(format)
 }
