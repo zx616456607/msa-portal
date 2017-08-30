@@ -1,13 +1,27 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Topology
+ *
+ * 2017-08-28
+ * @author zhangxuan
+ */
+
 import React from 'react'
 import { connect } from 'react-redux'
-import { Menu, Dropdown, Button, Icon, DatePicker, Radio, Row, Col, Checkbox } from 'antd'
+import { Button, Icon, DatePicker, Radio, Row, Col, Checkbox, Select } from 'antd'
 import '../style/topology.less'
 import RelationSchema from '../../../components/RelationSchema'
 const { RangePicker } = DatePicker
 import { loadApms } from '../../../actions/apm'
-import { loadPinpointMap, loadPPApps } from '../../../actions/pinpoint'
+import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
+import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT } from '../../../constants'
 import createG2 from 'g2-react'
 const G2 = require('g2')
+const Option = Select.Option
 
 // 点图
 // 设置鼠标 hove 至气泡的样式
@@ -201,62 +215,101 @@ class Topology extends React.Component {
         { name: 'Mark', vote: 13654 },
       ],
       thirdData: frame,
+      application: null,
+      rangeDateTime: null,
     }
   }
   componentWillMount() {
-    const { clusterID, apmID, loadPPApps } = this.props
-    loadPPApps(clusterID, apmID).then(() => {
-      const { apps } = this.props
-      this.getPinpointMap(clusterID, apmID, apps)
-    })
   }
-  getPinpointMap = (clusterID, apmID, apps) => {
-    const { loadPinpointMap } = this.props
+  loadData = () => {
+    const { loadScatterData, clusterID, apmID, apps } = this.props
+    const { application, rangeDateTime } = this.state
+    let serviceTypeName
+    apps.every(app => {
+      if (app.applicationName === application) {
+        serviceTypeName = app.serviceType
+        return false
+      }
+      return true
+    })
+    const query = {
+      application,
+      serviceTypeName,
+      from: rangeDateTime[0].valueOf(),
+      to: rangeDateTime[1].valueOf(),
+      xGroupUnit: X_GROUP_UNIT,
+      yGroupUnit: Y_GROUP_UNIT,
+      limit: PINPOINT_LIMIT,
+    }
+    loadScatterData(clusterID, apmID, query)
+  }
+  getPinpointMap = () => {
+    const { clusterID, apmID, loadPinpointMap, apps } = this.props
+    const { rangeDateTime, application } = this.state
+    const date = new Date().getTime()
+    let serviceTypeName
+    apps.every(app => {
+      if (app.applicationName === application) {
+        serviceTypeName = app.serviceType
+        return false
+      }
+      return true
+    })
     loadPinpointMap(clusterID, apmID, {
-      applicationName: apps[0].applicationName,
-      from: '1500195530000',
-      to: '1500195830000',
-      callerRange: 1,
-      calleeRange: 1,
-      serviceTypeName: apps[0].serviceType,
-      _: '1504078244220',
+      applicationName: application,
+      from: Date.parse(rangeDateTime[0]),
+      to: Date.parse(rangeDateTime[1]),
+      callerRange: 4,
+      calleeRange: 4,
+      serviceTypeName,
+      _: date,
     })
   }
-  handleMenuClick = e => {
-    console.log(e)
+  getData = () => {
+    this.getPinpointMap()
+    this.loadData()
   }
   handleSizeChange = e => {
     this.setState({ size: e.target.value })
   }
   render() {
-    const { size } = this.state
+    const { size, application, rangeDateTime } = this.state
     const { apps } = this.props
-    const menu = (
-      <Menu onClick={this.handleMenuClick}>
-        {
-          apps.length && apps.map(item => <Menu.Item key={item.applicationName}>{item.applicationName}</Menu.Item>)
-        }
-      </Menu>
-    )
     return (
       <div className="topology">
         <div className="layout-content-btns">
-          <Dropdown trigger={[ 'click' ]} overlay={menu}>
-            <Button size="large">
-              选择微服务（展示其所在链路拓扑） <Icon type="down" />
-            </Button>
-          </Dropdown>
-          <Button size="large">
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            placeholder="选择微服务 （展示其所在链路拓扑）"
+            optionFilterProp="children"
+            value={application}
+            onChange={application => this.setState({ application })}
+          >
+            {
+              apps.map(app => (
+                <Option key={app.applicationName}>{app.applicationName}</Option>
+              ))
+            }
+          </Select>
+          <Button>
             <i className="fa fa-refresh"/> 刷新
           </Button>
-          <RangePicker size="large" renderExtraFooter={() => 'extra footer'} showTime />
-          <Radio.Group size="large" value={size} onChange={this.handleSizeChange}>
-            <Radio.Button value="large"><Icon type="calendar" /> 自定义日期</Radio.Button>
-            <Radio.Button value="large">最近5分钟</Radio.Button>
-            <Radio.Button value="default">3小时</Radio.Button>
-            <Radio.Button value="small">今天</Radio.Button>
-            <Radio.Button value="small">昨天</Radio.Button>
-            <Radio.Button value="small">最近7天</Radio.Button>
+          <RangePicker
+            showTime={{ format: 'HH:mm' }}
+            format="YYYY-MM-DD HH:mm"
+            placeholder={[ '开始日期', '结束日期' ]}
+            value={rangeDateTime}
+            onChange={rangeDateTime => this.setState({ rangeDateTime })}
+            onOk={this.getData}
+          />
+          <Radio.Group value={size} onChange={this.handleSizeChange}>
+            <Radio.Button value="option"><Icon type="calendar" /> 自定义日期</Radio.Button>
+            <Radio.Button value="fiveMin">最近5分钟</Radio.Button>
+            <Radio.Button value="threeHour">3小时</Radio.Button>
+            <Radio.Button value="today">今天</Radio.Button>
+            <Radio.Button value="yesterday">昨天</Radio.Button>
+            <Radio.Button value="sevenDay">最近7天</Radio.Button>
           </Radio.Group>
         </div>
         <Row className="topology-body layout-content-body">
@@ -281,11 +334,20 @@ class Topology extends React.Component {
                   服务实例
                 </Col>
                 <Col span={18}>
-                  <Dropdown trigger={[ 'click' ]} overlay={menu}>
-                    <Button size="large">
-                      选择微服务实例 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
+                  <Select
+                    showSearch
+                    style={{ width: 200 }}
+                    placeholder="选择微服务"
+                    optionFilterProp="children"
+                    value={application}
+                    onChange={application => this.setState({ application })}
+                  >
+                    {
+                      apps.map(app => (
+                        <Option key={app.applicationName}>{app.applicationName}</Option>
+                      ))
+                    }
+                  </Select>
                 </Col>
               </Row>
               <div>请求相应分布</div>
@@ -362,4 +424,5 @@ export default connect(mapStateToProps, {
   loadApms,
   loadPinpointMap,
   loadPPApps,
+  loadScatterData,
 })(Topology)

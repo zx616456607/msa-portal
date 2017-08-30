@@ -1,5 +1,13 @@
 /**
- * Created by Administrator on 2017/8/23.
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * RelationSchema component
+ *
+ * 2017-08-23
+ * @author zhangxuan
  */
 
 import React from 'react'

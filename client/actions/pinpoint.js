@@ -72,6 +72,7 @@ const fetchPinpointMap = (clusterID, apmID, query) => {
   }
   return {
     apmID,
+    query,
     [CALL_API]: {
       types: [ PINPOINT_MAP_REQUEST, PINPOINT_MAP_SUCCESS, PINPOINT_MAP_FAILURE ],
       endpoint,

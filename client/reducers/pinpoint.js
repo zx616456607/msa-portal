@@ -80,29 +80,35 @@ const queryScatter = (state = {}, action) => {
   }
 }
 
-const pinpointMap = (state = {}, action) => {
-  const { type, apmID } = action
+const serviceMap = (state = {}, action) => {
+  const { type, apmID, query } = action
   switch (type) {
     case ActionTypes.PINPOINT_MAP_REQUEST:
       return {
         ...state,
         [apmID]: {
-          isFetching: true,
+          [query.applicationName]: {
+            isFetching: true,
+          },
         },
       }
     case ActionTypes.PINPOINT_MAP_SUCCESS:
       return {
         ...state,
         [apmID]: {
-          isFetching: false,
-          ...action.response.result,
+          [query.applicationName]: {
+            isFetching: false,
+            ...action.response.result,
+          },
         },
       }
     case ActionTypes.PINPOINT_MAP_FAILURE:
       return {
         ...state,
         [apmID]: {
-          isFetching: false,
+          [query.applicationName]: {
+            isFetching: false,
+          },
         },
       }
     default:
@@ -149,13 +155,13 @@ const queryTransaction = (state = {}, action) => {
 const pinpoint = (state = {
   apps: {},
   queryScatter: {},
-  pinpointMap: {},
+  serviceMap: {},
   queryTransaction: {},
 }, action) => {
   return {
     apps: apps(state.apps, action),
     queryScatter: queryScatter(state.queryScatter, action),
-    pinpointMap: pinpointMap(state.pinpointMap, action),
+    serviceMap: serviceMap(state.serviceMap, action),
     queryTransaction: queryTransaction(state.queryTransaction, action),
   }
 }
