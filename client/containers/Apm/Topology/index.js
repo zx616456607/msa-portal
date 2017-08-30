@@ -18,7 +18,8 @@ import RelationSchema from '../../../components/RelationSchema'
 const { RangePicker } = DatePicker
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
-import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT } from '../../../constants'
+import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
+import { formatDate } from '../../../common/utils'
 import createG2 from 'g2-react'
 const G2 = require('g2')
 const Option = Select.Option
@@ -30,45 +31,29 @@ G2.Global.activeShape.point = {
   shadowBlur: 12,
   shadowColor: '#3182bd',
 }
-const data = [
-  { x: 95, y: 95, z: 13.8, name: 'BE', country: 'Belgium' },
-  { x: 86.5, y: 102.9, z: 14.7, name: 'DE', country: 'Germany' },
-  { x: 80.8, y: 91.5, z: 15.8, name: 'FI', country: 'Finland' },
-  { x: 80.4, y: 102.5, z: 12, name: 'NL', country: 'Netherlands' },
-  { x: 80.3, y: 86.1, z: 11.8, name: 'SE', country: 'Sweden' },
-  { x: 78.4, y: 70.1, z: 16.6, name: 'ES', country: 'Spain' },
-  { x: 74.2, y: 68.5, z: 14.5, name: 'FR', country: 'France' },
-  { x: 73.5, y: 83.1, z: 10, name: 'NO', country: 'Norway' },
-  { x: 71, y: 93.2, z: 24.7, name: 'UK', country: 'United Kingdom' },
-  { x: 69.2, y: 57.6, z: 10.4, name: 'IT', country: 'Italy' },
-  { x: 68.6, y: 20, z: 16, name: 'RU', country: 'Russia' },
-  { x: 65.5, y: 126.4, z: 35.3, name: 'US', country: 'United States' },
-  { x: 65.4, y: 50.8, z: 28.5, name: 'HU', country: 'Hungary' },
-  { x: 63.4, y: 51.8, z: 15.4, name: 'PT', country: 'Portugal' },
-  { x: 64, y: 82.9, z: 31.3, name: 'NZ', country: 'New Zealand' },
-]
+
 const Chart1 = createG2(chart => {
   chart.col('x', {
-    alias: 'Daily fat intake', // 定义别名
-    tickInterval: 5, // 自定义刻度间距
+    // alias: 'Daily fat intake', // 定义别名
+    // tickInterval: 5, // 自定义刻度间距
     nice: false, // 不对最大最小值优化
-    max: 96, // 自定义最大值
-    min: 62, // 自定义最小值
+    max: 1503573684715, // 自定义最大值
+    min: 1503400884715, // 自定义最小值
   })
   chart.col('y', {
-    alias: 'Daily sugar intake',
-    tickInterval: 50,
+    // alias: 'Daily sugar intake',
+    // tickInterval: 50,
     nice: false,
-    max: 165,
-    min: 0,
+    // max: 165,
+    // min: 0,
   })
-  chart.col('z', {
-    alias: 'Obesity(adults) %',
-  })
+  // chart.col('z', {
+  //   alias: 'Obesity(adults) %',
+  // })
   // 开始配置坐标轴
   chart.axis('x', {
     formatter(val) {
-      return val + ' gr' // 格式化坐标轴显示文本
+      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR) // 格式化坐标轴显示文本
     },
     grid: {
       line: {
@@ -82,18 +67,18 @@ const Chart1 = createG2(chart => {
     titleOffset: 80, // 设置标题距离坐标轴的距离
     formatter(val) {
       if (val > 0) {
-        return val + ' gr'
+        return val
       }
     },
   })
   chart.legend(false)
-  chart.tooltip({
-    map: {
-      title: 'country',
-    },
-  })
-  chart.point().position('x*y').size('z', 40, 10)
-    .label('name*country',
+  // chart.tooltip({
+  //   map: {
+  //     title: 'country',
+  //   },
+  // })
+  chart.point().position('x*y').size('x', 2, 2)
+    .label('*',
       {
         offset: 0, // 文本距离图形的距离
         label: {
@@ -106,7 +91,7 @@ const Chart1 = createG2(chart => {
     .color('#3182bd')
     .opacity(0.5)
     .shape('circle')
-    .tooltip('x*y*z')
+    .tooltip('x*y')
   chart.render()
 })
 
@@ -197,7 +182,7 @@ class Topology extends React.Component {
     super()
     this.state = {
       size: 'defalut',
-      data,
+      scatterData: [],
       forceFit: true,
       width: 500,
       height: 450,
@@ -241,7 +226,28 @@ class Topology extends React.Component {
       yGroupUnit: Y_GROUP_UNIT,
       limit: PINPOINT_LIMIT,
     }
-    loadScatterData(clusterID, apmID, query)
+    loadScatterData(clusterID, apmID, query).then(() => {
+      const { pinpoint } = this.props
+      const { dotList } = pinpoint.queryScatter[apmID][application].scatter
+      this.formatScatterData(dotList)
+    })
+  }
+  formatScatterData = arr => {
+    const data = []
+    for (let i = 0; i < arr.length; i++) {
+      let obj
+      for (let j = 0; j < arr[i].length; j++) {
+        obj = Object.assign({
+          x: arr[i][0] + 1503400884715,
+          y: arr[i][1],
+        })
+        if (j >= 1) break
+      }
+      data.push(obj)
+    }
+    this.setState({
+      scatterData: data,
+    })
   }
   getPinpointMap = () => {
     const { clusterID, apmID, loadPinpointMap, apps } = this.props
@@ -266,8 +272,8 @@ class Topology extends React.Component {
     })
   }
   getData = () => {
-    this.getPinpointMap()
     this.loadData()
+    this.getPinpointMap()
   }
   handleSizeChange = e => {
     this.setState({ size: e.target.value })
@@ -361,7 +367,7 @@ class Topology extends React.Component {
               </Row>
               <div>
                 <Chart1
-                  data={this.state.data}
+                  data={this.state.scatterData}
                   width={this.state.width}
                   height={this.state.height}
                   plotCfg={this.state.plotCfg}
