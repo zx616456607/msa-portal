@@ -25,3 +25,5 @@ export const PINPOINT_LIMIT = 5000
 export const X_GROUP_UNIT = 284211
 export const Y_GROUP_UNIT = 57
 export const ALL = 'all'
+export const NORMAL = 0
+export const ERROR = 1

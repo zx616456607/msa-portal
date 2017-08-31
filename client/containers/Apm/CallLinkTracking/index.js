@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Select, Button, DatePicker, Card, Table, message } from 'antd'
+import { Select, Button, DatePicker, Card, Table, message, Icon } from 'antd'
 import { connect } from 'react-redux'
 import Dock from '../../../components/Dock'
 import TransactionInspector from '../../../components/TransactionInspector'
@@ -27,6 +27,7 @@ import {
   X_GROUP_UNIT,
   Y_GROUP_UNIT,
   ALL,
+  ERROR,
 } from '../../../constants'
 import './style/index.less'
 
@@ -168,6 +169,12 @@ class CallLinkTracking extends React.Component {
       title: 'Exception',
       dataIndex: 'exception',
       key: 'exception',
+      render: text => {
+        if (text === ERROR) {
+          return <Icon type="close-circle-o" className="error"/>
+        }
+        return
+      },
     }, {
       title: 'Agent',
       dataIndex: 'agentId',
