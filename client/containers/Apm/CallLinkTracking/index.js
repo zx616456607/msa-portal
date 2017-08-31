@@ -63,7 +63,7 @@ class CallLinkTracking extends React.Component {
       message.warning('请选择微服务')
       return
     }
-    if (!rangeDateTime) {
+    if (!rangeDateTime || !rangeDateTime[0]) {
       message.warning('请选择开始跟结束时间')
       return
     }
