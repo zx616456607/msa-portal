@@ -20,23 +20,38 @@ import { loadPPApps } from '../../actions/pinpoint'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import topologyIcon from '../../assets/img/apm/topology.svg'
+import performanceIcon from '../../assets/img/apm/performance.svg'
+import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
 import './style/index.less'
 
 const { Content } = Layout
 const menus = [
   {
     to: '/apms/topology',
-    icon: <Icon type="api" />,
+    icon: (
+      <svg className="apm-icon">
+        <use xlinkHref={topologyIcon.url} />
+      </svg>
+    ),
     text: '微服务拓扑',
   },
   {
     to: '/apms/performance',
-    icon: <Icon type="bar-chart" />,
+    icon: (
+      <svg className="apm-icon">
+        <use xlinkHref={performanceIcon.url} />
+      </svg>
+    ),
     text: '微服务性能',
   },
   {
     to: '/apms/call-link-tracking',
-    icon: <Icon type="compass" />,
+    icon: (
+      <svg className="apm-icon">
+        <use xlinkHref={callLinkTrackingIcon.url} />
+      </svg>
+    ),
     text: '调用链路跟踪',
   },
 ]
