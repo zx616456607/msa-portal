@@ -1,3 +1,17 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Apm container style
+ *
+ * 2017-08-16
+ * @author zhangpc
+ */
+
+@import '../../../assets/style/core/index.less';
+
 .apm {
   &-title {
     padding: 10px;
@@ -19,6 +33,25 @@
     padding: 0;
     .ant-menu-inline, .ant-menu-vertical {
       border-right: 0;
+    }
+    .apm-icon {
+      height: 14px;
+      width: 14px;
+      vertical-align: text-bottom;
+      margin-right: 10px;
+      fill: rgba(0, 0, 0, 0.65);
+    }
+    .ant-menu-item > a {
+      &:hover {
+        & > .apm-icon {
+          fill: #108ee9;
+        }
+      }
+    }
+    .ant-menu-item-selected > a {
+      &:hover > .apm-icon, & > .apm-icon {
+        fill: #fff;
+      }
     }
   }
 }
