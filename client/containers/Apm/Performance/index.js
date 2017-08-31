@@ -28,7 +28,7 @@ const Chart1 = createG2(chart => {
   chart.line().position('month*temperature').size(2)
   chart.setMode('select')
   chart.select('rangeX')
-  chart.on('plotmove', function(ev) {
+  chart.on('plotmove', ev => {
     const point = {
       x: ev.x,
       y: ev.y,
@@ -42,7 +42,7 @@ const Chart = createG2(chart => {
   chart.line().position('month*temperature').size(2)
   chart.setMode('select')
   chart.select('rangeX')
-  chart.on('plotmove', function(ev) {
+  chart.on('plotmove', ev => {
     const point = {
       x: ev.x,
       y: ev.y,
@@ -66,6 +66,7 @@ class Performance extends React.Component {
     agentData: [],
     exampleData: [],
     timer: null,
+    serviceName: '',
   }
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
@@ -94,45 +95,69 @@ class Performance extends React.Component {
   }
 
   handleSelect = value => {
-    const { clusterID, apmID, fetchAgentData } = this.props
+    const { clusterID, apmID, fetchAgentData, loadPinpointMap } = this.props
     const { timer } = this.state
     const query = {
-      application: value,
-      from: timer ? timer[0].valueOf() : '1503972480000',
-      to: timer ? timer[1].valueOf() : '1504091580000',
+      applicationName: value,
+      from: timer ? timer[0].valueOf() : '1504141320000',
+      to: timer ? timer[1].valueOf() : '1504166556000',
+      calleeRange: 4,
+      callerRange: 4,
+      serviceTypeName: 'STAND_ALONE',
+      // _: 1504148006003,
     }
-
     fetchAgentData(clusterID, apmID, query).then(res => {
       if (res.error) {
         return
       }
-      this.handleAgent(value)
       loadPinpointMap(clusterID, apmID, query)
-      this.setState({
-        agentData: res.requery.response.result,
-      })
+      if (res.response.result) {
+        this.setState({
+          agentData: res.response.result,
+          serviceName: value,
+        })
+      }
     })
   }
-
-  handleAgent = () => {
-    const { sercerMap } = this.props
+  handleOnExample = () => {
+    const { apmID, serverName } = this.props
+    const { serviceName } = this.state
     const curAgent = []
-    if (sercerMap) {
-      const serverName = sercerMap.name.applicationMapData.nodeDataArray
-      if (serverName) {
-        const RowData = serverName.map(item => {
+    if (serverName) {
+      const serName = serverName[apmID]
+      const nodeData = serName[serviceName].applicationMapData.nodeDataArray
+      if (nodeData) {
+        nodeData.map(item => {
           if (item.applicationName === '' || item.category === 'STAND_ALONE') {
             curAgent.push(item.agentHistogram)
           }
-          return RowData
+          return curAgent
         })
       }
     }
   }
+  handleExample = () => { }
 
   render() {
-    const { isTimerShow, timer, agentData } = this.state
-    const { apps } = this.props
+    const { isTimerShow, timer, agentData, serviceName } = this.state
+    const { apps, serverName } = this.props
+    const nodeData = serverName === undefined ? '' : serverName[serviceName]
+    nodeData === undefined ? console.log(1) : nodeData !== undefined ? nodeData.isFetching === false ?
+      nodeData.applicationMapData.nodeDataArray.map(item => {
+        if (item.applicationName === serviceName) {
+          if (Object.keys(item.agentHistogram).length !== 0) {
+            const nodeName = []
+            for (const node in item.agentHistogram) {
+              nodeName.push(node)
+            }
+            // this.setState({
+            //   exampleData: nodeName,
+            // })
+          }
+        }
+        return null
+      }) : '' : ''
+
     return (
       <LayoutContent className="content">
         <div className="capability">
@@ -144,7 +169,7 @@ class Performance extends React.Component {
                 ))
               }
             </Select>
-            <Button className=""><Icon type="reload" />刷新</Button>
+            <Button className="" onClick={this.handleOnExample}><Icon type="reload" />刷新</Button>
             <div className="timer">
               <ButtonGroup className="call-link-tracking-date">
                 <Button icon="calendar" type="primary" onClick={() => this.handleTimer()}>
@@ -163,24 +188,28 @@ class Performance extends React.Component {
                       <RangePicker
                         showTime={{ format: 'HH:mm' }}
                         format="YYYY-MM-DD HH:mm"
-                        value={ timer }
-                        onChange={ timer => this.setState({ timer })}
+                        value={timer}
+                        onChange={timer => this.setState({ timer })}
                       />
-                      <Button icon="search" onClick={() => this.handleCustomTimer()}/>
+                      <Button icon="search" onClick={() => this.handleCustomTimer()} />
                     </Row>
                 }
               </ButtonGroup>
             </div>
             <Select className="example" defaultValue="选择具体实例" style={{ width: 120 }}>
-              <Option value="jack">Jack</Option>
-              <Option value="lucy">Lucy</Option>
+              {
+                serverName === undefined ? console.log(1) : nodeData !== undefined ? nodeData.isFetching === false ?
+                  nodeData.applicationMapData.nodeDataArray.map((item, index) => (
+                    <Option key={index}>{item.applicationName}</Option>
+                  )) : '' : ''
+              }
             </Select>
           </div>
           <Row className="layout-content-body">
             <div className="section">
               {/* <img src=""/> */}
               <div className="left">
-                <span style={{ fontSize: 16 }}>微服务名称{ agentData.applicationName }</span><br />
+                <span style={{ fontSize: 16 }}>微服务名称{agentData.applicationName}</span><br />
                 <span>Agent Id {agentData.agentId}</span><br />
                 <span>hostname apmservice-{agentData.hostName}</span><br />
                 <span>IP　{agentData.ip}</span><br />
@@ -198,7 +227,7 @@ class Performance extends React.Component {
           <Row>
             <div className="footer">
               <div className="left">
-                <div className="titleInfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 1</span>
+                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 1</span>
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart
@@ -206,7 +235,7 @@ class Performance extends React.Component {
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
-                <div className="titleInfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 2</span>
+                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 2</span>
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
@@ -216,7 +245,7 @@ class Performance extends React.Component {
                   forceFit={this.state.forceFit} />
               </div>
               <div className="rigth">
-                <div className="titleInfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 3</span>
+                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 3</span>
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
@@ -224,7 +253,7 @@ class Performance extends React.Component {
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
-                <div className="titleInfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 4</span>
+                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 4</span>
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
@@ -242,17 +271,17 @@ class Performance extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current, queryApms, pinpoint, entities, serviceMap } = state
+  const { current, queryApms, pinpoint, entities } = state
   const { cluster } = current
   const clusterID = cluster.id
   const apmID = queryApms[clusterID].ids[0]
-  let { apps } = pinpoint
+  let { apps, serviceMap } = pinpoint
   const { ppApps } = entities
+  const serverName = serviceMap[apmID]
   const appIDs = apps[apmID] && apps[apmID].ids || []
-  const sercerMap = serviceMap[apmID]
   apps = appIDs.map(id => ppApps[id])
   return {
-    sercerMap,
+    serverName,
     clusterID,
     apmID,
     apps,

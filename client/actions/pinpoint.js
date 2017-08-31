@@ -116,15 +116,15 @@ const fetchTransactionMetadata = (clusterID, apmID, application, body) => ({
 export const loadTransactionMetadata = (clusterID, apmID, application, body) => dispatch => {
   return dispatch(fetchTransactionMetadata(clusterID, apmID, application, body))
 }
-export const FEtCH_AgentList_REQUEST = 'FEtCH_AgentList_REQUEST'
-export const FETCH_AgentList_SUCCESS = 'FETCH_AgentList_SUCCESS'
-export const FETCH_AgentList_FAILURE = 'FETCH_AgentList_FAILURE'
+export const FEtCH_AGENTLIST_REQUEST = 'FEtCH_AGENTLIST_REQUEST'
+export const FETCH_AGENTLIST_SUCCESS = 'FETCH_AGENTLIST_SUCCESS'
+export const FETCH_AGENTLIST_FAILURE = 'FETCH_AGENTLIST_FAILURE'
 
 const fetchAgentList = (clusterID, apmID, query) => ({
   apmID,
   query,
   [CALL_API]: {
-    types: [ FEtCH_AgentList_REQUEST, FETCH_AgentList_SUCCESS, FETCH_AgentList_FAILURE ],
+    types: [ FEtCH_AGENTLIST_REQUEST, FETCH_AGENTLIST_SUCCESS, FETCH_AGENTLIST_FAILURE ],
     endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentList?${toQuerystring(query)}`,
     schema: {},
   },
