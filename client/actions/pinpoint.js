@@ -144,11 +144,28 @@ const fetchJvmGCList = (clusterID, apmID, query) => ({
   [CALL_API]: {
     types: [ FETCH_JVMGC_REQUEST, FETCH_JVMGC_SUCCESS, FETCH_JVMGC_FAILURE ],
     endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/jvmGC/${toQuerystring(query)}`,
-    schema: {},
   },
 })
-
 export const fetchJVMGCData = (clusterID, apmID, query) => dispatch => {
   return dispatch(fetchJvmGCList(clusterID, apmID, query))
 }
 
+export const TRANSACTION_INFO_REQUEST = 'TRANSACTION_INFO_REQUEST'
+export const TRANSACTION_INFO_SUCCESS = 'TRANSACTION_INFO_SUCCESS'
+export const TRANSACTION_INFO_FAILURE = 'TRANSACTION_INFO_FAILURE'
+
+// Fetches pinpoint transactionInfo.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchTransactionInfo = (clusterID, apmID, query) => ({
+  query,
+  [CALL_API]: {
+    types: [ TRANSACTION_INFO_REQUEST, TRANSACTION_INFO_SUCCESS, TRANSACTION_INFO_FAILURE ],
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/transactionInfo?${toQuerystring(query)}`,
+    schema: {},
+  },
+})
+// Fetches pinpoint transactionInfo.
+// Relies on Redux Thunk middleware.
+export const loadTransactionInfo = (clusterID, apmID, application, query) => dispatch => {
+  return dispatch(fetchTransactionInfo(clusterID, apmID, application, query))
+}

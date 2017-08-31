@@ -152,17 +152,58 @@ const queryTransaction = (state = {}, action) => {
   }
 }
 
+const transactionInfo = (state = {}, action) => {
+  const { type, query } = action
+  switch (type) {
+    case ActionTypes.TRANSACTION_INFO_REQUEST:
+      return {
+        ...state,
+        [query.agentId]: {
+          ...state[query.agentId],
+          [query.spanId]: {
+            isFetching: true,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_INFO_SUCCESS:
+      return {
+        ...state,
+        [query.agentId]: {
+          ...state[query.agentId],
+          [query.spanId]: {
+            isFetching: false,
+            ...action.response.result,
+          },
+        },
+      }
+    case ActionTypes.TRANSACTION_INFO_FAILURE:
+      return {
+        ...state,
+        [query.agentId]: {
+          ...state[query.agentId],
+          [query.spanId]: {
+            isFetching: false,
+          },
+        },
+      }
+    default:
+      return state
+  }
+}
+
 const pinpoint = (state = {
   apps: {},
   queryScatter: {},
   serviceMap: {},
   queryTransaction: {},
+  transactionInfo: {},
 }, action) => {
   return {
     apps: apps(state.apps, action),
     queryScatter: queryScatter(state.queryScatter, action),
     serviceMap: serviceMap(state.serviceMap, action),
     queryTransaction: queryTransaction(state.queryTransaction, action),
+    transactionInfo: transactionInfo(state.transactionInfo, action),
   }
 }
 

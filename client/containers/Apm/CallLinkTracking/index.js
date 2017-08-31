@@ -11,20 +11,23 @@
  */
 
 import React from 'react'
-import { Select, Button, DatePicker, Card, Table } from 'antd'
+import { Select, Button, DatePicker, Card, Table, message, Icon } from 'antd'
 import { connect } from 'react-redux'
-import Dock from 'react-dock'
+import Dock from '../../../components/Dock'
+import TransactionInspector from '../../../components/TransactionInspector'
 import { formatDate } from '../../../common/utils'
 import {
   loadPPApps,
   loadScatterData,
   loadTransactionMetadata,
+  loadTransactionInfo,
 } from '../../../actions/pinpoint'
 import {
   PINPOINT_LIMIT,
   X_GROUP_UNIT,
   Y_GROUP_UNIT,
   ALL,
+  ERROR,
 } from '../../../constants'
 import './style/index.less'
 
@@ -36,7 +39,7 @@ class CallLinkTracking extends React.Component {
   state = {
     isVisible: false,
     currentRecord: {},
-    application: null,
+    application: undefined,
     agent: ALL,
     rangeDateTime: null,
     loading: false,
@@ -48,9 +51,6 @@ class CallLinkTracking extends React.Component {
   }
 
   loadData = () => {
-    this.setState({
-      loading: true,
-    })
     const {
       loadScatterData,
       loadTransactionMetadata,
@@ -59,6 +59,17 @@ class CallLinkTracking extends React.Component {
       apps,
     } = this.props
     const { application, rangeDateTime, agent } = this.state
+    if (!application) {
+      message.warning('请选择微服务')
+      return
+    }
+    if (!rangeDateTime || !rangeDateTime[0]) {
+      message.warning('请选择开始跟结束时间')
+      return
+    }
+    this.setState({
+      loading: true,
+    })
     let serviceTypeName
     apps.every(app => {
       if (app.applicationName === application) {
@@ -113,9 +124,29 @@ class CallLinkTracking extends React.Component {
     })
   }
 
+  handleRowClick = record => {
+    const { currentRecord } = this.state
+    if (currentRecord.agentId === record.agentId && currentRecord.spanId === record.spanId) {
+      return
+    }
+    this.setState({
+      isVisible: true,
+      currentRecord: record,
+    })
+    const { loadTransactionInfo, clusterID, apmID } = this.props
+    const { agentId, spanId, traceId, collectorAcceptTime } = record
+    const query = {
+      agentId,
+      spanId,
+      traceId,
+      focusTimestamp: collectorAcceptTime,
+    }
+    loadTransactionInfo(clusterID, apmID, query)
+  }
+
   render() {
-    const { apps, transaction } = this.props
-    const { application, agent, rangeDateTime, loading } = this.state
+    const { apps, transaction, transactionInfo } = this.props
+    const { application, agent, rangeDateTime, loading, currentRecord } = this.state
     const columns = [{
       title: '#',
       dataIndex: '#',
@@ -138,6 +169,12 @@ class CallLinkTracking extends React.Component {
       title: 'Exception',
       dataIndex: 'exception',
       key: 'exception',
+      render: text => {
+        if (text === ERROR) {
+          return <Icon type="close-circle-o" className="error"/>
+        }
+        return
+      },
     }, {
       title: 'Agent',
       dataIndex: 'agentId',
@@ -158,7 +195,7 @@ class CallLinkTracking extends React.Component {
         <div className="layout-content-btns">
           <Select
             showSearch
-            style={{ width: 200 }}
+            style={{ width: 100 }}
             placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
@@ -189,7 +226,7 @@ class CallLinkTracking extends React.Component {
           <Select
             className="float-right"
             showSearch
-            style={{ width: 200 }}
+            style={{ width: 100 }}
             placeholder="选择一个实例"
             optionFilterProp="children"
             value={agent}
@@ -208,7 +245,7 @@ class CallLinkTracking extends React.Component {
               pagination={false}
               rowKey={row => row.spanId}
               loading={loading}
-              onRowClick={record => this.setState({ isVisible: true, currentRecord: record })}
+              onRowClick={this.handleRowClick}
             />
           </Card>
         </div>
@@ -219,9 +256,9 @@ class CallLinkTracking extends React.Component {
           dimStyle={{ backgroundColor: 'transparent' }}
           defaultSize={0.5}
         >
-          <h1 onClick={() => this.setState({ isVisible: false })}>
-            哈哈哈，我是 inspector - {this.state.currentRecord.application}
-          </h1>
+          <TransactionInspector
+            callStack={transactionInfo[currentRecord.agentId] && transactionInfo[currentRecord.agentId][currentRecord.spanId].callStack}
+          />
         </Dock>
       </div>
     )
@@ -234,7 +271,7 @@ const mapStateToProps = state => {
   const clusterID = cluster.id
   // @Todo: not support other apm yet
   const apmID = queryApms[clusterID].ids[0]
-  let { apps, queryTransaction } = pinpoint
+  let { apps, queryTransaction, transactionInfo } = pinpoint
   const { ppApps } = entities
   const appIDs = apps[apmID] && apps[apmID].ids || []
   apps = appIDs.map(id => ppApps[id])
@@ -243,6 +280,7 @@ const mapStateToProps = state => {
     apmID,
     apps,
     transaction: queryTransaction[apmID] || {},
+    transactionInfo,
   }
 }
 
@@ -250,4 +288,5 @@ export default connect(mapStateToProps, {
   loadPPApps,
   loadScatterData,
   loadTransactionMetadata,
+  loadTransactionInfo,
 })(CallLinkTracking)
