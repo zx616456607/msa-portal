@@ -97,7 +97,7 @@ class App extends React.Component {
       return this.renderLoading('Loading...')
     }
     return (
-      <Layout>
+      <Layout id="app">
         {this.renderErrorMessage()}
         <Header location={location} setCurrent={setCurrent} currentUser={current.user.info || {}} />
         { this.renderChildren() }

@@ -34,6 +34,7 @@ import './style/index.less'
 const Option = Select.Option
 const ButtonGroup = Button.Group
 const { RangePicker } = DatePicker
+const DEFAULT_DOCK_SIZE = 0.5
 
 class CallLinkTracking extends React.Component {
   state = {
@@ -41,6 +42,7 @@ class CallLinkTracking extends React.Component {
     currentRecord: {},
     application: undefined,
     agent: ALL,
+    agentList: [],
     rangeDateTime: null,
     loading: false,
   }
@@ -48,6 +50,14 @@ class CallLinkTracking extends React.Component {
   componentWillMount() {
     const { loadPPApps, clusterID, apmID } = this.props
     loadPPApps(clusterID, apmID)
+  }
+
+  componentDidMount() {
+    this.appDom = document.getElementById('app')
+  }
+
+  componentWillUnmount() {
+    this.appDom.style.cssText = ''
   }
 
   loadData = () => {
@@ -111,10 +121,17 @@ class CallLinkTracking extends React.Component {
         body[`${R}${index}`] = dot[1]
       })
       return loadTransactionMetadata(clusterID, apmID, application, body)
-    }).then(() => {
+    }).then(res => {
       this.setState({
         loading: false,
       })
+      if (agent === ALL) {
+        const agentListObj = {}
+        res.response.result.metadata.map(agent => (agentListObj[agent.agentId] = true))
+        this.setState({
+          agentList: Object.keys(agentListObj),
+        })
+      }
     })
   }
 
@@ -128,6 +145,9 @@ class CallLinkTracking extends React.Component {
     const { currentRecord } = this.state
     if (currentRecord.agentId === record.agentId && currentRecord.spanId === record.spanId) {
       return
+    }
+    if (!currentRecord.agentId) {
+      this.onDockSizeChange(DEFAULT_DOCK_SIZE)
     }
     this.setState({
       isVisible: true,
@@ -144,9 +164,21 @@ class CallLinkTracking extends React.Component {
     loadTransactionInfo(clusterID, apmID, query)
   }
 
+  onDockSizeChange = size => {
+    this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
+    this.appDom.style.overflow = 'auto'
+  }
+
   render() {
     const { apps, transaction, transactionInfo } = this.props
-    const { application, agent, rangeDateTime, loading, currentRecord } = this.state
+    const {
+      application,
+      agent,
+      rangeDateTime,
+      loading,
+      currentRecord,
+      agentList,
+    } = this.state
     const columns = [{
       title: '#',
       dataIndex: '#',
@@ -195,7 +227,7 @@ class CallLinkTracking extends React.Component {
         <div className="layout-content-btns">
           <Select
             showSearch
-            style={{ width: 100 }}
+            style={{ width: 150 }}
             placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
@@ -220,21 +252,23 @@ class CallLinkTracking extends React.Component {
               placeholder={[ '开始日期', '结束日期' ]}
               value={rangeDateTime}
               onChange={rangeDateTime => this.setState({ rangeDateTime })}
+              onOk={this.loadData}
             />
             <Button icon="search" onClick={this.loadData} />
           </ButtonGroup>
           <Select
             className="float-right"
             showSearch
-            style={{ width: 100 }}
+            style={{ width: 150 }}
             placeholder="选择一个实例"
             optionFilterProp="children"
             value={agent}
             onChange={this.onAgentChange}
           >
             <Option value={ALL}>{ALL}</Option>
-            <Option value="lalala456">lalala456</Option>
-            <Option value="lalala123">lalala123</Option>
+            {
+              agentList.map(agent => <Option key={agent}>{agent}</Option>)
+            }
           </Select>
         </div>
         <div className="layout-content-body">
@@ -249,17 +283,24 @@ class CallLinkTracking extends React.Component {
             />
           </Card>
         </div>
-        <Dock
-          position="bottom"
-          isVisible={this.state.isVisible}
-          dimMode="transparent"
-          dimStyle={{ backgroundColor: 'transparent' }}
-          defaultSize={0.5}
-        >
-          <TransactionInspector
-            callStack={transactionInfo[currentRecord.agentId] && transactionInfo[currentRecord.agentId][currentRecord.spanId].callStack}
-          />
-        </Dock>
+        <div className="call-stack-dock">
+          <Dock
+            position="bottom"
+            isVisible={this.state.isVisible}
+            dimMode="transparent"
+            dimStyle={{ backgroundColor: 'transparent' }}
+            defaultSize={DEFAULT_DOCK_SIZE}
+            onSizeChange={this.onDockSizeChange}
+          >
+            <TransactionInspector
+              dataSource={
+                transactionInfo[currentRecord.agentId]
+                && transactionInfo[currentRecord.agentId][currentRecord.spanId]
+                || {}
+              }
+            />
+          </Dock>
+        </div>
       </div>
     )
   }
