@@ -191,6 +191,41 @@ const transactionInfo = (state = {}, action) => {
   }
 }
 
+const charts = (state = {}, action) => {
+  const { type, apmID, application } = action
+  switch (type) {
+    case ActionTypes.FETCH_JVMGC_FAILURE:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+          },
+        },
+      }
+    case ActionTypes.FETCH_JVMGC_SUCCESS:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: false,
+            ...action.response.result,
+          },
+        },
+      }
+    case ActionTypes.FETCH_JVMGC_REQUEST:
+      return {
+        ...state,
+        [apmID]: {
+          [application]: {
+            isFetching: true,
+          },
+        },
+      }
+    default:
+      return state
+  }
+}
 const pinpoint = (state = {
   apps: {},
   queryScatter: {},
@@ -200,6 +235,7 @@ const pinpoint = (state = {
 }, action) => {
   return {
     apps: apps(state.apps, action),
+    charts: charts(state.charts, action),
     queryScatter: queryScatter(state.queryScatter, action),
     serviceMap: serviceMap(state.serviceMap, action),
     queryTransaction: queryTransaction(state.queryTransaction, action),
