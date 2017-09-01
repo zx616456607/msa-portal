@@ -14,7 +14,7 @@ import React from 'react'
 import './style/index.less'
 import createG2 from 'g2-react'
 import { connect } from 'react-redux'
-import { loadPPApps, fetchAgentData, loadPinpointMap } from '../../../actions/pinpoint'
+import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 
 const LayoutContent = Layout.Content
@@ -36,6 +36,10 @@ const Chart1 = createG2(chart => {
     charts.showTooltip(point)
   })
   chart.render()
+  chart.on('plotdblclick', () => {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
 })
 const Chart = createG2(chart => {
   charts = chart
@@ -50,6 +54,10 @@ const Chart = createG2(chart => {
     charts.showTooltip(point)
   })
   chart.render()
+  chart.on('plotdblclick', () => {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
 })
 class Performance extends React.Component {
   state = {
@@ -62,11 +70,12 @@ class Performance extends React.Component {
     forceFit: true,
     width: 530,
     height: 300,
-    isTimerShow: false,
+    isTimerShow: true,
     agentData: [],
     exampleData: [],
     timer: null,
     serviceName: '',
+    exampleName: '',
   }
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
@@ -88,10 +97,13 @@ class Performance extends React.Component {
       })
     }
   }
+
   /**
    * 已定义日期
    */
   handleCustomTimer = () => {
+    const { timer } = this.state
+    console.log(Date.parse(timer[0]) + ',' + Date.parse(timer[1]))
   }
 
   handleSelect = value => {
@@ -99,12 +111,11 @@ class Performance extends React.Component {
     const { timer } = this.state
     const query = {
       applicationName: value,
-      from: timer ? timer[0].valueOf() : '1504141320000',
-      to: timer ? timer[1].valueOf() : '1504166556000',
+      from: timer ? timer[0].valueOf() : '1504228315797',
+      to: timer ? timer[1].valueOf() : '1504232580000',
       calleeRange: 4,
       callerRange: 4,
       serviceTypeName: 'STAND_ALONE',
-      // _: 1504148006003,
     }
     fetchAgentData(clusterID, apmID, query).then(res => {
       if (res.error) {
@@ -116,43 +127,49 @@ class Performance extends React.Component {
           agentData: res.response.result,
           serviceName: value,
         })
+        this.setState({
+          exampleData: res.response.result[value][0],
+          exampleName: res.response.result[value][0].agentId,
+        })
       }
     })
   }
-  handleOnExample = () => {
-    const { apmID, serverName } = this.props
-    const { serviceName } = this.state
-    const curAgent = []
-    if (serverName) {
-      const serName = serverName[apmID]
-      const nodeData = serName[serviceName].applicationMapData.nodeDataArray
-      if (nodeData) {
-        nodeData.map(item => {
-          if (item.applicationName === '' || item.category === 'STAND_ALONE') {
-            curAgent.push(item.agentHistogram)
-          }
-          return curAgent
+
+  handleOnExample = value => {
+    const { agentData, serviceName, timer } = this.state
+    const { fetchJVMGCData, clusterID, apmID } = this.props
+    agentData[serviceName].map(values => {
+      if (values.agentId === value) {
+        this.setState({
+          exampleData: values,
         })
       }
+      return null
+    })
+    const query = {
+      agentId: value,
+      from: timer ? timer[0].valueOf() : '1504142280000',
+      to: timer ? timer[1].valueOf() : '1504160580000',
     }
+    fetchJVMGCData(clusterID, apmID, query).then(res => {
+      console.log(res)
+    })
   }
+
   handleExample = () => { }
 
   render() {
-    const { isTimerShow, timer, agentData, serviceName } = this.state
+    const { isTimerShow, timer, exampleData, serviceName, exampleName } = this.state
     const { apps, serverName } = this.props
+    const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
-    nodeData === undefined ? console.log(1) : nodeData !== undefined ? nodeData.isFetching === false ?
+    nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
       nodeData.applicationMapData.nodeDataArray.map(item => {
         if (item.applicationName === serviceName) {
           if (Object.keys(item.agentHistogram).length !== 0) {
-            const nodeName = []
             for (const node in item.agentHistogram) {
               nodeName.push(node)
             }
-            // this.setState({
-            //   exampleData: nodeName,
-            // })
           }
         }
         return null
@@ -196,12 +213,12 @@ class Performance extends React.Component {
                 }
               </ButtonGroup>
             </div>
-            <Select className="example" defaultValue="选择具体实例" style={{ width: 120 }}>
+            <Select className="example" defaultValue={`${exampleName}`} style={{ width: 120 }} onChange={this.handleOnExample}>
               {
-                serverName === undefined ? console.log(1) : nodeData !== undefined ? nodeData.isFetching === false ?
-                  nodeData.applicationMapData.nodeDataArray.map((item, index) => (
-                    <Option key={index}>{item.applicationName}</Option>
-                  )) : '' : ''
+                nodeName ?
+                  nodeName.map(value => (
+                    <Option key={value}>{value}</Option>
+                  )) : ''
               }
             </Select>
           </div>
@@ -209,18 +226,18 @@ class Performance extends React.Component {
             <div className="section">
               {/* <img src=""/> */}
               <div className="left">
-                <span style={{ fontSize: 16 }}>微服务名称{agentData.applicationName}</span><br />
-                <span>Agent Id {agentData.agentId}</span><br />
-                <span>hostname apmservice-{agentData.hostName}</span><br />
-                <span>IP　{agentData.ip}</span><br />
-                <span>Service Type {agentData.serviceType}</span><br />
+                <span style={{ fontSize: 16 }}>微服务名称 {exampleData.applicationName}</span><br />
+                <span>Agent Id {exampleData.agentId}</span><br />
+                <span>hostname apmservice- </span><br />
+                <span>IP {exampleData.ip}</span><br />
+                <span>Service Type {exampleData.serviceType}</span><br />
                 <span>End Status Runing (last checked: 2017-08-07)</span>
               </div>
               <div className="rigth">
-                <span>Agent Version {agentData.jvmInfo}</span><br />
-                <span>PID {agentData.pid}</span><br />
+                <span>Agent Version </span><br />
+                <span>PID {exampleData.pid}</span><br />
                 <span>JSM(GC Type)1.7.0_111</span><br />
-                <span>Start Time 2017-08-07</span>
+                <span>Start Time {exampleData.startTimestamp}</span>
               </div>
             </div>
           </Row>
@@ -292,4 +309,6 @@ export default connect(mapStateToProps, {
   loadPPApps,
   fetchAgentData,
   loadPinpointMap,
+  fetchJVMGCData,
+  fetchJVMCPUData,
 })(Performance)
