@@ -42,6 +42,7 @@ class CallLinkTracking extends React.Component {
     currentRecord: {},
     application: undefined,
     agent: ALL,
+    agentList: [],
     rangeDateTime: null,
     loading: false,
   }
@@ -120,10 +121,17 @@ class CallLinkTracking extends React.Component {
         body[`${R}${index}`] = dot[1]
       })
       return loadTransactionMetadata(clusterID, apmID, application, body)
-    }).then(() => {
+    }).then(res => {
       this.setState({
         loading: false,
       })
+      if (agent === ALL) {
+        const agentListObj = {}
+        res.response.result.metadata.map(agent => (agentListObj[agent.agentId] = true))
+        this.setState({
+          agentList: Object.keys(agentListObj),
+        })
+      }
     })
   }
 
@@ -163,7 +171,14 @@ class CallLinkTracking extends React.Component {
 
   render() {
     const { apps, transaction, transactionInfo } = this.props
-    const { application, agent, rangeDateTime, loading, currentRecord } = this.state
+    const {
+      application,
+      agent,
+      rangeDateTime,
+      loading,
+      currentRecord,
+      agentList,
+    } = this.state
     const columns = [{
       title: '#',
       dataIndex: '#',
@@ -251,8 +266,9 @@ class CallLinkTracking extends React.Component {
             onChange={this.onAgentChange}
           >
             <Option value={ALL}>{ALL}</Option>
-            <Option value="lalala456">lalala456</Option>
-            <Option value="lalala123">lalala123</Option>
+            {
+              agentList.map(agent => <Option key={agent}>{agent}</Option>)
+            }
           </Select>
         </div>
         <div className="layout-content-body">
