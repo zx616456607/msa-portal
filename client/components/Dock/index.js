@@ -35,6 +35,7 @@ export default class Dock extends React.Component {
     const { minSize, maxSize } = this.props
     if (size >= minSize && size <= maxSize) {
       this.setState({ size })
+      this.props.onSizeChange(size)
     }
   }
 

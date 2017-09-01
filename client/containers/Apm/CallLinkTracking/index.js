@@ -34,6 +34,7 @@ import './style/index.less'
 const Option = Select.Option
 const ButtonGroup = Button.Group
 const { RangePicker } = DatePicker
+const DEFAULT_DOCK_SIZE = 0.5
 
 class CallLinkTracking extends React.Component {
   state = {
@@ -48,6 +49,14 @@ class CallLinkTracking extends React.Component {
   componentWillMount() {
     const { loadPPApps, clusterID, apmID } = this.props
     loadPPApps(clusterID, apmID)
+  }
+
+  componentDidMount() {
+    this.appDom = document.getElementById('app')
+  }
+
+  componentWillUnmount() {
+    this.appDom.style.cssText = ''
   }
 
   loadData = () => {
@@ -129,6 +138,9 @@ class CallLinkTracking extends React.Component {
     if (currentRecord.agentId === record.agentId && currentRecord.spanId === record.spanId) {
       return
     }
+    if (!currentRecord.agentId) {
+      this.onDockSizeChange(DEFAULT_DOCK_SIZE)
+    }
     this.setState({
       isVisible: true,
       currentRecord: record,
@@ -142,6 +154,11 @@ class CallLinkTracking extends React.Component {
       focusTimestamp: collectorAcceptTime,
     }
     loadTransactionInfo(clusterID, apmID, query)
+  }
+
+  onDockSizeChange = size => {
+    this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
+    this.appDom.style.overflow = 'auto'
   }
 
   render() {
@@ -195,7 +212,7 @@ class CallLinkTracking extends React.Component {
         <div className="layout-content-btns">
           <Select
             showSearch
-            style={{ width: 100 }}
+            style={{ width: 150 }}
             placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
@@ -220,13 +237,14 @@ class CallLinkTracking extends React.Component {
               placeholder={[ '开始日期', '结束日期' ]}
               value={rangeDateTime}
               onChange={rangeDateTime => this.setState({ rangeDateTime })}
+              onOk={this.loadData}
             />
             <Button icon="search" onClick={this.loadData} />
           </ButtonGroup>
           <Select
             className="float-right"
             showSearch
-            style={{ width: 100 }}
+            style={{ width: 150 }}
             placeholder="选择一个实例"
             optionFilterProp="children"
             value={agent}
@@ -249,17 +267,24 @@ class CallLinkTracking extends React.Component {
             />
           </Card>
         </div>
-        <Dock
-          position="bottom"
-          isVisible={this.state.isVisible}
-          dimMode="transparent"
-          dimStyle={{ backgroundColor: 'transparent' }}
-          defaultSize={0.5}
-        >
-          <TransactionInspector
-            callStack={transactionInfo[currentRecord.agentId] && transactionInfo[currentRecord.agentId][currentRecord.spanId].callStack}
-          />
-        </Dock>
+        <div className="call-stack-dock">
+          <Dock
+            position="bottom"
+            isVisible={this.state.isVisible}
+            dimMode="transparent"
+            dimStyle={{ backgroundColor: 'transparent' }}
+            defaultSize={DEFAULT_DOCK_SIZE}
+            onSizeChange={this.onDockSizeChange}
+          >
+            <TransactionInspector
+              dataSource={
+                transactionInfo[currentRecord.agentId]
+                && transactionInfo[currentRecord.agentId][currentRecord.spanId]
+                || {}
+              }
+            />
+          </Dock>
+        </div>
       </div>
     )
   }
