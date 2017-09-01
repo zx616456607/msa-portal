@@ -22,6 +22,7 @@ import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '
 import { formatDate } from '../../../common/utils'
 import createG2 from 'g2-react'
 const G2 = require('g2')
+import keys from 'lodash/keys'
 const Option = Select.Option
 
 // 点图
@@ -33,33 +34,29 @@ G2.Global.activeShape.point = {
 }
 
 const Chart1 = createG2(chart => {
+  chart.setMode('select') // 开启框选模式
+  chart.select('rangeX') // 设置 X 轴范围的框选
   chart.col('x', {
-    // alias: 'Daily fat intake', // 定义别名
-    // tickInterval: 5, // 自定义刻度间距
+    alias: ' ',
     nice: false, // 不对最大最小值优化
-    max: 1503573684715, // 自定义最大值
-    min: 1503400884715, // 自定义最小值
+    // tickInterval: 10000,
+    // min: 1504236000584, // 自定义最大值
+    // max: 1504254041584, // 自定义最小值
   })
   chart.col('y', {
-    // alias: 'Daily sugar intake',
-    // tickInterval: 50,
+    alias: ' ',
     nice: false,
-    // max: 165,
-    // min: 0,
+    max: 10000,
+    tickInterval: 2500,
   })
-  // chart.col('z', {
-  //   alias: 'Obesity(adults) %',
-  // })
-  // 开始配置坐标轴
   chart.axis('x', {
     formatter(val) {
-      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR) // 格式化坐标轴显示文本
+      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
     },
     grid: {
       line: {
-        stroke: '#d9d9d9',
+        stroke: '#e6e6e6',
         lineWidth: 1,
-        lineDash: [ 2, 2 ],
       },
     },
   })
@@ -67,144 +64,110 @@ const Chart1 = createG2(chart => {
     titleOffset: 80, // 设置标题距离坐标轴的距离
     formatter(val) {
       if (val > 0) {
-        return val
+        return val + '(ms)'
       }
     },
   })
   chart.legend(false)
-  // chart.tooltip({
-  //   map: {
-  //     title: 'country',
-  //   },
-  // })
-  chart.point().position('x*y').size('x', 2, 2)
-    .label('*',
-      {
-        offset: 0, // 文本距离图形的距离
-        label: {
-          fill: '#000',
-          fontWeight: 'bold', // 文本粗细
-          shadowBlur: 5, // 文本阴影模糊
-          shadowColor: '#fff', // 阴影颜色
-        },
-      })
+  chart.tooltip({
+    map: {
+      title: 'y',
+    },
+  })
+  chart.point().position('x*y').size('x', 3, 3)
     .color('#3182bd')
     .opacity(0.5)
     .shape('circle')
-    .tooltip('x*y')
+    .tooltip('y')
   chart.render()
+  // 监听双击事件，这里用于复原图表
+  chart.on('plotdblclick', function() {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
 })
 
 // 柱状图
+const colorSet = {
+  '1s': '#5bb85d',
+  '3s': '#2db7f5',
+  '5s': '#8e68fc',
+  '10s': '#ffc000',
+  '100s': '#f85a5b',
+}
 const Chart2 = createG2(chart => {
-  const imageMap = {
-    John: 'https://zos.alipayobjects.com/rmsportal/mYhpaYHyHhjYcQf.png',
-    Damon: 'https://zos.alipayobjects.com/rmsportal/JBxkqlzhrlkGlLW.png',
-    Patrick: 'https://zos.alipayobjects.com/rmsportal/zlkGnEMgOawcyeX.png',
-    Mark: 'https://zos.alipayobjects.com/rmsportal/KzCdIdkwsXdtWkg.png',
-  }
-  // 自定义 shape, 支持图片形式的气泡
-  const Shape = G2.Shape
-  Shape.registShape('interval', 'image-top', {
-    drawShape(cfg, container) {
-      const points = cfg.points // 点从左下角开始，顺时针方向
-      let path = []
-      path.push([ 'M', points[0].x, points[0].y ])
-      path.push([ 'L', points[1].x, points[1].y ])
-      path = this.parsePath(path)
-      container.addShape('rect', {
-        attrs: {
-          x: cfg.x - 50,
-          y: path[1][2], // 矩形起始点为左上角
-          width: 100,
-          height: path[0][2] - cfg.y,
-          fill: cfg.color,
-          radius: 10,
-        },
-      })
-      return container.addShape('image', {
-        attrs: {
-          x: cfg.x - 20,
-          y: cfg.y - 20,
-          width: 40,
-          height: 40,
-          img: cfg.shape[1],
-        },
-      })
+  chart.axis('reqTime', {
+    formatter(val) {
+      return val === '10s' ? 'slow' : (val === '100s' ? 'error' : val)
     },
   })
-  chart.col('vote', {
-    min: 0,
+  chart.axis('countNum', {
+    formatter(val) {
+      return val
+    },
+  })
+  chart.col('reqTime', {
+    alias: ' ',
+  })
+  chart.col('countNum', {
+    alias: ' ',
   })
   chart.legend(false)
-  chart.axis('vote', {
-    labels: null,
-    title: null,
-    line: null,
-    tickLine: null,
-  })
-  chart.axis('name', {
-    title: null,
-  })
-  chart.interval().position('name*vote').color('name', [ '#7f8da9', '#fec514', '#db4c3c', '#daf0fd' ])
-    .shape('name', function(name) {
-      return [ 'image-top', imageMap[name] ] // 根据具体的字段指定 shape
-    })
+  chart.interval().position('reqTime*countNum').tooltip('countNum')
+    .color('reqTime', countNum => colorSet[countNum])
   chart.render()
 })
 
 // 柱状赛选
 const Chart3 = createG2(chart => {
-  chart.col('name', { alias: '城市' })
-  chart.intervalDodge().position('月份*月均降雨量').color('name')
+  chart.legend({
+    position: 'top',
+  })
+  chart.axis('请求时间', {
+    title: null,
+  })
+  chart.axis('请求数量', {
+    // titleOffset: 75,
+    formatter(val) {
+      return val
+    },
+    // position: 'right',
+  })
+  chart.intervalStack().position('State*请求数量').color('请求时间', [ '#98ABC5', '#8A89A6', '#7B6888', '#6B486B', '#A05D56', '#D0743C', '#FF8C00' ])
+    .size(9)
   chart.render()
 })
-const thirdData = [
-  { name: 'Tokyo', data: [ 49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4 ] },
-  { name: 'New York', data: [ 83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3 ] },
-  { name: 'London', data: [ 48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2 ] },
-  { name: 'Berlin', data: [ 42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1 ] },
-]
-for (let i = 0; i < thirdData.length; i++) {
-  const item = thirdData[i]
-  const datas = item.data
-  const months = [ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.' ]
-  for (let j = 0; j < datas.length; j++) {
-    item[months[j]] = datas[j]
-  }
-  thirdData[i] = item
-}
-const Frame = G2.Frame
-let frame = new Frame(thirdData)
-frame = Frame.combinColumns(frame, [ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.' ], '月均降雨量', '月份', 'name')
 class Topology extends React.Component {
   constructor() {
     super()
     this.state = {
       size: 'defalut',
-      scatterData: [],
+      firstData: [],
       forceFit: true,
-      width: 500,
+      width: 100,
       height: 450,
       plotCfg: {
-        margin: [ 20, 80, 90, 60 ],
+        margin: [ 20, 80, 90, 80 ],
         background: {
           stroke: '#ccc', // 边颜色
           lineWidth: 1, // 边框粗细
         }, // 绘图区域背景设置
       },
-      secondData: [
-        { name: 'John', vote: 35654 },
-        { name: 'Damon', vote: 65456 },
-        { name: 'Patrick', vote: 45724 },
-        { name: 'Mark', vote: 13654 },
-      ],
-      thirdData: frame,
+      secondData: [],
+      thirdData: [],
       application: null,
       rangeDateTime: null,
+      agentList: [],
+      currentAgent: 'all,0',
+      dotList: [],
+      from: null,
+      checkSuccess: true,
+      checkFailed: true,
+      totalCount: 0,
+      errorCount: 0,
     }
   }
-  componentWillMount() {
+  componentDidMount() {
   }
   loadData = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
@@ -228,31 +191,101 @@ class Topology extends React.Component {
     }
     loadScatterData(clusterID, apmID, query).then(() => {
       const { pinpoint } = this.props
-      const { dotList } = pinpoint.queryScatter[apmID][application].scatter
-      this.formatScatterData(dotList)
+      const { scatter, from } = pinpoint.queryScatter[apmID][application]
+      const { dotList } = scatter
+      this.setState({
+        dotList,
+        from,
+      }, () => {
+        this.formatScatterData()
+      })
     })
   }
-  formatScatterData = arr => {
+  formatScatterData = () => {
+    const { dotList, from, currentAgent, checkSuccess, checkFailed } = this.state
     const data = []
-    for (let i = 0; i < arr.length; i++) {
-      let obj
-      for (let j = 0; j < arr[i].length; j++) {
-        obj = Object.assign({
-          x: arr[i][0] + 1503400884715,
-          y: arr[i][1],
+    let objFirst
+    let objSecond
+    let oneSenc = 0
+    let threeSenc = 0
+    let fiveSenc = 0
+    let slow = 0
+    let error = 0
+    for (let i = 0; i < dotList.length; i++) {
+      for (let j = 0; j < dotList[i].length; j++) {
+        const req = dotList[i][1]
+        const isError = dotList[i][4]
+        if (currentAgent && (currentAgent.split(',')[1] !== '0')) {
+          if (parseInt(currentAgent.split(',')[1]) !== dotList[i][2]) {
+            continue
+          }
+        }
+        if (!checkFailed && !checkSuccess) {
+          continue
+        } else {
+          if (checkSuccess && (dotList[i][4] === 0)) {
+            continue
+          } else if (checkFailed && (dotList[i][4] === 1)) {
+            continue
+          }
+        }
+        objFirst = Object.assign({
+          x: parseInt(dotList[i][0] + from),
+          y: req,
         })
-        if (j >= 1) break
+        objSecond = Object.assign({
+          '1s': req < 1000 && j === 1 && isError ? ++oneSenc : oneSenc || 0,
+          '3s': req >= 1000 && req < 3 && j === 1 && isError ? ++threeSenc : threeSenc || 0,
+          '5s': req >= 3000 && req < 5 && j === 1 && isError ? ++fiveSenc : fiveSenc || 0,
+          '10s': req >= 5000 && j === 1 && isError ? ++slow : slow || 0,
+          '100s': !isError && j === 4 ? ++error : error || 0,
+        })
       }
-      data.push(obj)
+      data.unshift(objFirst)
     }
+    let secondData = []
+    for (const i in objSecond) {
+      secondData.push({
+        reqTime: i,
+        countNum: objSecond[i],
+      })
+    }
+    const FrameSecond = G2.Frame
+    secondData = new FrameSecond(secondData)
     this.setState({
-      scatterData: data,
+      firstData: data,
+      secondData,
+    })
+  }
+  getAgentList = arr => {
+    const { application } = this.state
+    const currentNode = arr.filter(item => item.applicationName === application)
+    const { agentHistogram, totalCount, errorCount, timeSeriesHistogram } = currentNode[0]
+    const thirdData = []
+    if (timeSeriesHistogram && timeSeriesHistogram.length) {
+      timeSeriesHistogram.forEach(item => {
+        const obj = {}
+        Object.assign(obj, { key: item.key })
+        const data = item.values
+        data.forEach(record => {
+          Object.assign(obj, { [record[0]]: record[1] })
+        })
+        thirdData.push(obj)
+      })
+    }
+    const Frame = G2.Frame
+    let frame = new Frame(thirdData)
+    frame = Frame.combinColumns(frame, [ '1s', '3s', '5s', 'slow', 'error' ], '请求数量', '请求时间')
+    this.setState({
+      totalCount,
+      errorCount,
+      agentList: keys(agentHistogram),
+      thirdData: frame,
     })
   }
   getPinpointMap = () => {
     const { clusterID, apmID, loadPinpointMap, apps } = this.props
     const { rangeDateTime, application } = this.state
-    const date = new Date().getTime()
     let serviceTypeName
     apps.every(app => {
       if (app.applicationName === application) {
@@ -268,7 +301,10 @@ class Topology extends React.Component {
       callerRange: 4,
       calleeRange: 4,
       serviceTypeName,
-      _: date,
+    }).then(() => {
+      const { pinpoint } = this.props
+      const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData
+      this.getAgentList(nodeDataArray)
     })
   }
   getData = () => {
@@ -278,8 +314,27 @@ class Topology extends React.Component {
   handleSizeChange = e => {
     this.setState({ size: e.target.value })
   }
+  selectAgent = currentAgent => {
+    this.setState({ currentAgent }, () => {
+      this.formatScatterData()
+    })
+  }
+  checkSuccess = e => {
+    this.setState({
+      checkSuccess: e.target.checked,
+    }, () => {
+      this.formatScatterData()
+    })
+  }
+  checkFailed = e => {
+    this.setState({
+      checkFailed: e.target.checked,
+    }, () => {
+      this.formatScatterData()
+    })
+  }
   render() {
-    const { size, application, rangeDateTime } = this.state
+    const { size, application, rangeDateTime, agentList, currentAgent } = this.state
     const { apps } = this.props
     return (
       <div className="topology">
@@ -331,7 +386,7 @@ class Topology extends React.Component {
                 <div className="service-info-name">service-micro#1</div>
                 <div className="service-info-app">application-micro#0</div>
                 <div className="service-info-status">状态：在线</div>
-                <div className="service-info-example">实力数量：2/2</div>
+                <div className="service-info-example">实例数量：2/2</div>
               </Col>
             </Row>
             <div className="service-chart-wrapper">
@@ -345,29 +400,30 @@ class Topology extends React.Component {
                     style={{ width: 200 }}
                     placeholder="选择微服务"
                     optionFilterProp="children"
-                    value={application}
-                    onChange={application => this.setState({ application })}
+                    value={currentAgent}
+                    onChange={this.selectAgent}
                   >
+                    <Option key="all,0">All</Option>
                     {
-                      apps.map(app => (
-                        <Option key={app.applicationName}>{app.applicationName}</Option>
+                      agentList.map((item, index) => (
+                        <Option key={`${item},${index + 1}`}>{item}</Option>
                       ))
                     }
                   </Select>
                 </Col>
               </Row>
-              <div>请求相应分布</div>
+              <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
               <Row style={{ margin: '10px 0' }}>
                 <Col span={6} offset={6}>
-                  <Checkbox>Success: 0</Checkbox>
+                  <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
                 </Col>
                 <Col span={6}>
-                  <Checkbox>Failed: 0</Checkbox>
+                  <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
                 </Col>
               </Row>
               <div>
                 <Chart1
-                  data={this.state.scatterData}
+                  data={this.state.firstData}
                   width={this.state.width}
                   height={this.state.height}
                   plotCfg={this.state.plotCfg}
@@ -375,7 +431,7 @@ class Topology extends React.Component {
                 />
               </div>
               <div>
-                请求时间相应摘要（2 day）：82
+                请求响应时间摘要（2 day）：{this.state.totalCount}
               </div>
               <div>
                 <Chart2
@@ -386,7 +442,7 @@ class Topology extends React.Component {
                 />
               </div>
               <div>
-                请求分时段负载（2 day）：82
+                请求分时段负载（2 day）：{this.state.totalCount}
               </div>
               <div>
                 <Chart3
