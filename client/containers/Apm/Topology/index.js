@@ -33,91 +33,6 @@ G2.Global.activeShape.point = {
   shadowColor: '#3182bd',
 }
 
-const Chart1 = createG2(chart => {
-  chart.setMode('select') // 开启框选模式
-  chart.select('rangeX') // 设置 X 轴范围的框选
-  chart.col('x', {
-    alias: ' ',
-    nice: false, // 不对最大最小值优化
-    // tickInterval: 10000,
-    // min: 1504236000584, // 自定义最大值
-    // max: 1504254041584, // 自定义最小值
-  })
-  chart.col('y', {
-    alias: ' ',
-    nice: false,
-    max: 10000,
-    tickInterval: 2500,
-  })
-  chart.axis('x', {
-    formatter(val) {
-      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
-    },
-    grid: {
-      line: {
-        stroke: '#e6e6e6',
-        lineWidth: 1,
-      },
-    },
-  })
-  chart.axis('y', {
-    titleOffset: 80, // 设置标题距离坐标轴的距离
-    formatter(val) {
-      if (val > 0) {
-        return val + '(ms)'
-      }
-    },
-  })
-  chart.legend(false)
-  chart.tooltip({
-    map: {
-      title: 'y',
-    },
-  })
-  chart.point().position('x*y').size('x', 3, 3)
-    .color('#3182bd')
-    .opacity(0.5)
-    .shape('circle')
-    .tooltip('y')
-  chart.render()
-  // 监听双击事件，这里用于复原图表
-  chart.on('plotdblclick', function() {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-})
-
-// 柱状图
-const colorSet = {
-  '1s': '#5bb85d',
-  '3s': '#2db7f5',
-  '5s': '#8e68fc',
-  '10s': '#ffc000',
-  '100s': '#f85a5b',
-}
-const Chart2 = createG2(chart => {
-  chart.axis('reqTime', {
-    formatter(val) {
-      return val === '10s' ? 'slow' : (val === '100s' ? 'error' : val)
-    },
-  })
-  chart.axis('countNum', {
-    formatter(val) {
-      return val
-    },
-  })
-  chart.col('reqTime', {
-    alias: ' ',
-  })
-  chart.col('countNum', {
-    alias: ' ',
-  })
-  chart.legend(false)
-  chart.interval().position('reqTime*countNum').tooltip('countNum')
-    .color('reqTime', countNum => colorSet[countNum])
-  chart.render()
-})
-
 // 柱状赛选
 const Chart3 = createG2(chart => {
   chart.legend({
@@ -213,6 +128,7 @@ class Topology extends React.Component {
     let error = 0
     for (let i = 0; i < dotList.length; i++) {
       for (let j = 0; j < dotList[i].length; j++) {
+        const time = dotList[i][0]
         const req = dotList[i][1]
         const isError = dotList[i][4]
         if (currentAgent && (currentAgent.split(',')[1] !== '0')) {
@@ -223,20 +139,22 @@ class Topology extends React.Component {
         if (!checkFailed && !checkSuccess) {
           continue
         } else {
-          if (checkSuccess && (dotList[i][4] === 0)) {
+          if (checkSuccess && !checkFailed && (dotList[i][4] === 0)) {
             continue
-          } else if (checkFailed && (dotList[i][4] === 1)) {
+          } else if (checkFailed && !checkSuccess && (dotList[i][4] === 1)) {
             continue
           }
         }
-        objFirst = Object.assign({
-          x: parseInt(dotList[i][0] + from),
-          y: req,
-        })
+        if (j === 1) {
+          objFirst = Object.assign({
+            x: parseInt(time + from),
+            y: req,
+          })
+        }
         objSecond = Object.assign({
           '1s': req < 1000 && j === 1 && isError ? ++oneSenc : oneSenc || 0,
-          '3s': req >= 1000 && req < 3 && j === 1 && isError ? ++threeSenc : threeSenc || 0,
-          '5s': req >= 3000 && req < 5 && j === 1 && isError ? ++fiveSenc : fiveSenc || 0,
+          '3s': req >= 1000 && req < 3000 && j === 1 && isError ? ++threeSenc : threeSenc || 0,
+          '5s': req >= 3000 && req < 5000 && j === 1 && isError ? ++fiveSenc : fiveSenc || 0,
           '10s': req >= 5000 && j === 1 && isError ? ++slow : slow || 0,
           '100s': !isError && j === 4 ? ++error : error || 0,
         })
@@ -336,6 +254,90 @@ class Topology extends React.Component {
   render() {
     const { size, application, rangeDateTime, agentList, currentAgent } = this.state
     const { apps } = this.props
+    const Chart1 = createG2(chart => {
+      chart.setMode('select') // 开启框选模式
+      chart.select('rangeX') // 设置 X 轴范围的框选
+      chart.col('x', {
+        alias: ' ',
+        nice: false, // 不对最大最小值优化
+        // tickInterval: 10000,
+        min: rangeDateTime[0].valueOf(), // 自定义最大值
+        max: rangeDateTime[1].valueOf(), // 自定义最小值
+      })
+      chart.col('y', {
+        alias: ' ',
+        nice: false,
+        max: 10000,
+        tickInterval: 2500,
+      })
+      chart.axis('x', {
+        formatter(val) {
+          return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+        },
+        grid: {
+          line: {
+            stroke: '#e6e6e6',
+            lineWidth: 1,
+          },
+        },
+      })
+      chart.axis('y', {
+        titleOffset: 80, // 设置标题距离坐标轴的距离
+        formatter(val) {
+          if (val > 0) {
+            return val + '(ms)'
+          }
+        },
+      })
+      chart.legend(false)
+      chart.tooltip({
+        map: {
+          title: 'y',
+        },
+      })
+      chart.point().position('x*y').size('x', 3, 3)
+        .color('#3182bd')
+        .opacity(0.5)
+        .shape('circle')
+        .tooltip('y')
+      chart.render()
+      // 监听双击事件，这里用于复原图表
+      chart.on('plotdblclick', function() {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    })
+    // 柱状图
+    const colorSet = {
+      '1s': '#5bb85d',
+      '3s': '#2db7f5',
+      '5s': '#8e68fc',
+      '10s': '#ffc000',
+      '100s': '#f85a5b',
+    }
+    const Chart2 = createG2(chart => {
+      chart.axis('reqTime', {
+        formatter(val) {
+          return val === '10s' ? 'slow' : (val === '100s' ? 'error' : val)
+        },
+      })
+      chart.axis('countNum', {
+        formatter(val) {
+          return val
+        },
+      })
+      chart.col('reqTime', {
+        alias: ' ',
+      })
+      chart.col('countNum', {
+        alias: ' ',
+        max: this.state.totalCount + 10,
+      })
+      chart.legend(false)
+      chart.interval().position('reqTime*countNum').tooltip('countNum')
+        .color('reqTime', countNum => colorSet[countNum])
+      chart.render()
+    })
     return (
       <div className="topology">
         <div className="layout-content-btns">
