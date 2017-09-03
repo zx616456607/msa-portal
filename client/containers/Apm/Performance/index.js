@@ -16,56 +16,22 @@ import createG2 from 'g2-react'
 import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
-
+import { formatDate } from '../../../common/utils.js'
 const LayoutContent = Layout.Content
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 
-let charts
-const Chart1 = createG2(chart => {
-  charts = chart
-  chart.line().position('month*temperature').size(2)
-  chart.setMode('select')
-  chart.select('rangeX')
-  chart.on('plotmove', ev => {
-    const point = {
-      x: ev.x,
-      y: ev.y,
-    }
-    charts.showTooltip(point)
-  })
-  chart.render()
-  chart.on('plotdblclick', () => {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-})
-const Chart = createG2(chart => {
-  charts = chart
-  chart.line().position('month*temperature').size(2)
-  chart.setMode('select')
-  chart.select('rangeX')
-  chart.on('plotmove', ev => {
-    const point = {
-      x: ev.x,
-      y: ev.y,
-    }
-    charts.showTooltip(point)
-  })
-  chart.render()
-  chart.on('plotdblclick', () => {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-})
 class Performance extends React.Component {
   state = {
     data: [
-      { month: 'Jan', temperature: 7.0 },
-      { month: 'Feb', temperature: 6.9 },
-      { month: 'Mar', temperature: 9.5 },
-      { month: 'Dec', temperature: 9.6 },
+      { country: 'Asia', year: '1750', value: 502 },
+      { country: 'Asia', year: '1800', value: 635 },
+      { country: 'Asia', year: '1850', value: 809 },
+      { country: 'Asia', year: '1900', value: 947 },
+      { country: 'Asia', year: '1950', value: 1402 },
+      { country: 'Europe', year: '1750', value: 163 },
+      { country: 'Europe', year: '1800', value: 203 },
     ],
     forceFit: true,
     width: 530,
@@ -73,10 +39,12 @@ class Performance extends React.Component {
     isTimerShow: true,
     agentData: [],
     exampleData: [],
-    timer: null,
+    timer: [],
+    Timers: [],
     serviceName: '',
-    exampleName: '',
+    chartsData: [],
   }
+
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     loadPPApps(clusterID, apmID)
@@ -102,17 +70,24 @@ class Performance extends React.Component {
    * 已定义日期
    */
   handleCustomTimer = () => {
-    const { timer } = this.state
-    console.log(Date.parse(timer[0]) + ',' + Date.parse(timer[1]))
+    const { Timers, serviceName } = this.state
+    const curTimer = {
+      sTimer: Date.parse(Timers[0]),
+      eTimer: Date.parse(Timers[1]),
+    }
+    this.setState({
+      timer: curTimer,
+    })
+    serviceName ? this.handleSelect(serviceName) : ''
   }
 
   handleSelect = value => {
     const { clusterID, apmID, fetchAgentData, loadPinpointMap } = this.props
-    const { timer } = this.state
+    const { Timers } = this.state
     const query = {
       applicationName: value,
-      from: timer ? timer[0].valueOf() : '1504228315797',
-      to: timer ? timer[1].valueOf() : '1504232580000',
+      from: Timers.length > 0 ? Timers[0] : '1504239480000',
+      to: Timers.length > 0 ? Timers[1] : '1504241280000',
       calleeRange: 4,
       callerRange: 4,
       serviceTypeName: 'STAND_ALONE',
@@ -122,22 +97,19 @@ class Performance extends React.Component {
         return
       }
       loadPinpointMap(clusterID, apmID, query)
-      if (res.response.result) {
+      if (Object.keys(res.response.entities).length === 0) {
         this.setState({
+          exampleData: res.response.result[value][0],
           agentData: res.response.result,
           serviceName: value,
         })
-        this.setState({
-          exampleData: res.response.result[value][0],
-          exampleName: res.response.result[value][0].agentId,
-        })
+
       }
     })
   }
 
   handleOnExample = value => {
-    const { agentData, serviceName, timer } = this.state
-    const { fetchJVMGCData, clusterID, apmID } = this.props
+    const { agentData, serviceName } = this.state
     agentData[serviceName].map(values => {
       if (values.agentId === value) {
         this.setState({
@@ -146,20 +118,49 @@ class Performance extends React.Component {
       }
       return null
     })
+    this.loadChartData(serviceName)
+  }
+
+  /**
+   * 加载图形数据
+   */
+
+  loadChartData = value => {
+    const { Timers } = this.state
+    const { clusterID, apmID, fetchJVMGCData } = this.props
     const query = {
       agentId: value,
-      from: timer ? timer[0].valueOf() : '1504142280000',
-      to: timer ? timer[1].valueOf() : '1504160580000',
+      from: Timers.length > 0 ? Timers[0] : '1504239480000',
+      to: Timers.length > 0 ? Timers[1] : '1504241280000',
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
-      console.log(res)
+      const chartJVM = {
+        heapMax: res.response.result.charts.JVM_MEMORY_HEAP_MAX,
+        heapSued: res.response.result.charts.JVM_MEMORY_HEAP_USED,
+        permGenMax: res.response.result.charts.JVM_MEMORY_NON_HEAP_MAX,
+        permGenSued: res.response.result.charts.JVM_MEMORY_NON_HEAP_USED,
+      }
+      let obj = null
+      const Ary = []
+      chartJVM.heapMax.points.map(item => {
+        obj = {
+          Timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
+          Count: item.minYVal === -1 ? 0 : item.minYVal,
+        }
+        return null
+      })
+      Ary.push(obj)
+      // Ary.push(item.xVal + ',' + item.minYVal)
+      this.setState({
+        chartsData: Ary,
+      })
     })
   }
 
-  handleExample = () => { }
+  handleRefresh = () => {}
 
   render() {
-    const { isTimerShow, timer, exampleData, serviceName, exampleName } = this.state
+    const { isTimerShow, timer, exampleData, serviceName, chartsData } = this.state
     const { apps, serverName } = this.props
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
@@ -175,6 +176,56 @@ class Performance extends React.Component {
         return null
       }) : '' : ''
 
+    let charts
+    const Chart = createG2(chart => {
+      charts = chart
+      chart.line().position('year*value').size(2)
+      chart.setMode('select')
+      chart.select('rangeX')
+      charts.on('plotmove', ev => {
+        const point = {
+          x: ev.x,
+          y: ev.y,
+        }
+        charts.showTooltip(point)
+      })
+      chart.tooltip({
+        crosshairs: true,
+      })
+      chart.areaStack().position('year*value')
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    })
+    const Chart1 = createG2(chart => {
+      charts = chart
+      chart.line().position('Timer*Count').size(2)
+      chart.setMode('select')
+      chart.select('rangeX')
+      chart.on('plotmove', ev => {
+        const point = {
+          x: ev.x,
+          y: ev.y,
+        }
+        charts.showTooltip(point)
+      })
+      chart.source(chartsData, {
+        Count: {
+          alias: '数量',
+        },
+        Timer: {
+          alias: '时间节点',
+        },
+      })
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    })
+
     return (
       <LayoutContent className="content">
         <div className="capability">
@@ -186,7 +237,7 @@ class Performance extends React.Component {
                 ))
               }
             </Select>
-            <Button className="" onClick={this.handleOnExample}><Icon type="reload" />刷新</Button>
+            <Button className="" onClick={this.handleRefresh}><Icon type="reload" />刷新</Button>
             <div className="timer">
               <ButtonGroup className="call-link-tracking-date">
                 <Button icon="calendar" type="primary" onClick={() => this.handleTimer()}>
@@ -213,7 +264,7 @@ class Performance extends React.Component {
                 }
               </ButtonGroup>
             </div>
-            <Select className="example" defaultValue={`${exampleName}`} style={{ width: 120 }} onChange={this.handleOnExample}>
+            <Select className="example" value={exampleData.agentId} style={{ width: 120 }} onChange={this.handleOnExample}>
               {
                 nodeName ?
                   nodeName.map(value => (
@@ -256,7 +307,7 @@ class Performance extends React.Component {
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
-                  data={this.state.data}
+                  data={this.state.chartsData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -266,7 +317,7 @@ class Performance extends React.Component {
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
-                  data={this.state.data}
+                  data={this.state.chartsData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -274,7 +325,7 @@ class Performance extends React.Component {
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
-                  data={this.state.data}
+                  data={this.state.chartsData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
