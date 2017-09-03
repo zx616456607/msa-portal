@@ -18,6 +18,7 @@ export const API_PROTOCOL = isProd ? 'http' : 'http'
 export const API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
 export const API_URL = `${API_PROTOCOL}://${API_HOST}${API_PREFIX}`
 export const DEFAULT = 'default'
+export const TIMES_WITHOUT_YEAR = 'MM-DD HH:mm:ss'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const CONTENT_TYPE_JSON = 'application/json'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
