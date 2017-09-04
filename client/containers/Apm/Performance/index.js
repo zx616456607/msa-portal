@@ -12,29 +12,94 @@
 
 import React from 'react'
 import './style/index.less'
-import createG2 from 'g2-react'
+import G2 from 'g2'
 import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 import { formatDate } from '../../../common/utils.js'
-import SynchronizedG2Group from '../../../components/CreateG2Group/demo/SynchronizedG2Group'
+// import SynchronizedG2Group from '../../../components/CreateG2Group/demo/SynchronizedG2Group'
+import CreateG2Group from '../../../components/CreateG2Group/index.js'
 
 const LayoutContent = Layout.Content
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
+const Frame = G2.Frame
+
+
+let visib = 'hidden'
+const Chart = chart => {
+  chart.line().position('time*count').size(2)
+  chart.setMode('select')
+  chart.select('rangeX')
+  chart.on('rangeselectstart', () => {
+    console.log(1234)
+    visib = 'initial'
+  })
+  chart.tooltip({
+    crosshairs: true,
+  })
+  chart.axis('time', {
+    title: null,
+  })
+  chart.col('count', {
+    alias: 'Memory（bytes）',
+    min: 0,
+  })
+  chart.legend(false)
+  chart.area().position('time*waiting').color('type', [ '#43b5d8' ])
+  chart.intervalStack().position('time*count')
+  chart.render()
+  chart.on('plotdblclick', () => {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
+}
+const Chart1 = chart => {
+  chart.setMode('select')
+  chart.select('rangeX')
+  chart.axis('time', {
+    title: null,
+  })
+  chart.tooltip({
+    crosshairs: true,
+  })
+  chart.legend(false)
+  chart.area().position('time*count').color('type')
+  chart.line().position('time*count').color('type')
+  chart.render()
+  chart.on('plotdblclick', () => {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
+}
+const Chart2 = chart => {
+  chart.line().position('time*waiting').size(2).
+    shape('smooth')
+  chart.setMode('select')
+  chart.select('rangeX')
+  chart.tooltip({
+    crosshairs: true,
+  })
+  chart.axis('time', {
+    title: null,
+  })
+  chart.legend(false)
+  chart.area().position('time*waiting').color('type', [ '#43b5d8' ]).
+    size(2).
+    shape('smooth')
+  chart.render()
+  chart.on('plotdblclick', () => {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
+}
+const chartAry = [ Chart, Chart1, Chart2 ]
+const ChartGroup = CreateG2Group(chartAry, true)
 
 class Performance extends React.Component {
   state = {
-    data: [
-      { country: 'Asia', year: '1750', value: 502 },
-      { country: 'Asia', year: '1800', value: 635 },
-      { country: 'Asia', year: '1850', value: 809 },
-      { country: 'Asia', year: '1900', value: 947 },
-      { country: 'Asia', year: '1950', value: 1402 },
-      { country: 'Europe', year: '1750', value: 163 },
-      { country: 'Europe', year: '1800', value: 203 },
-    ],
+    data: [],
     forceFit: true,
     width: 530,
     height: 300,
@@ -46,10 +111,25 @@ class Performance extends React.Component {
     serviceName: '',
     chartsData: [],
   }
-
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     loadPPApps(clusterID, apmID)
+  }
+  componentDidMount() {
+    const Ary = [
+      { time: '10:10', call: 4, waiting: 2 },
+      { time: '10:15', call: 2, waiting: 6 },
+      { time: '10:20', call: 13, waiting: 2 },
+      { time: '10:25', call: 9, waiting: 9 },
+      { time: '10:30', call: 5, waiting: 2 },
+      { time: '10:35', call: 8, waiting: 2 },
+      { time: '10:40', call: 13, waiting: 1 },
+    ]
+    let frame = new Frame(Ary)
+    frame = Frame.combinColumns(frame, [ 'call' ], 'count')// , [ 'call' ], 'count', 'type'
+    this.setState({
+      data: frame,
+    })
   }
 
   /**
@@ -153,16 +233,18 @@ class Performance extends React.Component {
       })
       Ary.push(obj)
       // Ary.push(item.xVal + ',' + item.minYVal)
+      let frame = new Frame(Ary)
+      frame = Frame.combinColumns(frame, [ 'ACME', 'Compitor' ], 'value')
       this.setState({
-        chartsData: Ary,
+        data: frame,
       })
     })
   }
 
-  handleRefresh = () => {}
+  handleRefresh = () => { }
 
   render() {
-    const { isTimerShow, timer, exampleData, serviceName, chartsData } = this.state
+    const { isTimerShow, timer, exampleData, serviceName } = this.state
     const { apps, serverName } = this.props
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
@@ -178,56 +260,7 @@ class Performance extends React.Component {
         return null
       }) : '' : ''
 
-    let charts
-    const Chart = createG2(chart => {
-      charts = chart
-      chart.line().position('year*value').size(2)
-      chart.setMode('select')
-      chart.select('rangeX')
-      charts.on('plotmove', ev => {
-        const point = {
-          x: ev.x,
-          y: ev.y,
-        }
-        charts.showTooltip(point)
-      })
-      chart.tooltip({
-        crosshairs: true,
-      })
-      chart.areaStack().position('year*value')
-      chart.render()
-      chart.on('plotdblclick', () => {
-        chart.get('options').filters = {} // 清空 filters
-        chart.repaint()
-      })
-    })
-    const Chart1 = createG2(chart => {
-      charts = chart
-      chart.line().position('Timer*Count').size(2)
-      chart.setMode('select')
-      chart.select('rangeX')
-      chart.on('plotmove', ev => {
-        const point = {
-          x: ev.x,
-          y: ev.y,
-        }
-        charts.showTooltip(point)
-      })
-      chart.source(chartsData, {
-        Count: {
-          alias: '数量',
-        },
-        Timer: {
-          alias: '时间节点',
-        },
-      })
-      chart.render()
-      chart.on('plotdblclick', () => {
-        chart.get('options').filters = {} // 清空 filters
-        chart.repaint()
-      })
-    })
-
+    const [ Chart, Chart1, Chart2 ] = ChartGroup
     return (
       <LayoutContent className="content">
         <div className="capability">
@@ -280,17 +313,17 @@ class Performance extends React.Component {
               {/* <img src=""/> */}
               <div className="left">
                 <span style={{ fontSize: 16 }}>微服务名称 {exampleData.applicationName}</span><br />
-                <span>Agent Id {exampleData.agentId}</span><br />
-                <span>hostname apmservice- </span><br />
-                <span>IP {exampleData.ip}</span><br />
-                <span>Service Type {exampleData.serviceType}</span><br />
-                <span>End Status Runing (last checked: 2017-08-07)</span>
+                <span>Agent Id： {exampleData.agentId}</span><br />
+                <span>hostname： {exampleData.applicationName}</span><br />
+                <span>IP： {exampleData.ip}</span><br />
+                <span>Service Type： {exampleData.serviceType}</span><br />
+                <span>End Status Runing： (last checked: 2017-08-07)</span>
               </div>
               <div className="rigth">
-                <span>Agent Version </span><br />
-                <span>PID {exampleData.pid}</span><br />
-                <span>JSM(GC Type)1.7.0_111</span><br />
-                <span>Start Time {exampleData.startTimestamp}</span>
+                <span>Agent Version： </span><br />
+                <span>PID： {exampleData.pid}</span><br />
+                <span>JSM(GC Type)：</span><br />
+                <span>Start Time： {exampleData.startTimestamp}</span>
               </div>
             </div>
           </Row>
@@ -298,7 +331,7 @@ class Performance extends React.Component {
             <div className="footer">
               <div className="left">
                 <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 1</span>
-                  <Button className="btn">重置</Button>
+                  <Button className="btn" style={{ visibility: visib }}>重置</Button>
                 </div>
                 <Chart
                   data={this.state.data}
@@ -309,7 +342,7 @@ class Performance extends React.Component {
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
-                  data={this.state.chartsData}
+                  data={this.state.data}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -318,23 +351,22 @@ class Performance extends React.Component {
                 <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 3</span>
                   <Button className="btn">重置</Button>
                 </div>
-                <Chart1
-                  data={this.state.chartsData}
+                <Chart
+                  data={this.state.data}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
                 <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 4</span>
                   <Button className="btn">重置</Button>
                 </div>
-                <Chart1
-                  data={this.state.chartsData}
+                <Chart2
+                  data={this.state.data}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
               </div>
             </div>
           </Row>
-          <SynchronizedG2Group />
         </div>
       </LayoutContent>
     )
