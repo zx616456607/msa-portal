@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 import { formatDate } from '../../../common/utils.js'
+import SynchronizedG2Group from '../../../components/CreateG2Group/demo/SynchronizedG2Group'
+
 const LayoutContent = Layout.Content
 const Option = Select.Option
 const { RangePicker } = DatePicker
@@ -332,6 +334,7 @@ class Performance extends React.Component {
               </div>
             </div>
           </Row>
+          <SynchronizedG2Group />
         </div>
       </LayoutContent>
     )
