@@ -71,7 +71,7 @@ class Topology extends React.Component {
       secondData: [],
       thirdData: [],
       application: null,
-      rangeDateTime: null,
+      rangeDateTime: [],
       agentList: [],
       currentAgent: 'all,0',
       dotList: [],
@@ -261,8 +261,8 @@ class Topology extends React.Component {
         alias: ' ',
         nice: false, // 不对最大最小值优化
         // tickInterval: 10000,
-        min: rangeDateTime && rangeDateTime[0].valueOf(), // 自定义最大值
-        max: rangeDateTime && rangeDateTime[1].valueOf(), // 自定义最小值
+        min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
+        max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
       })
       chart.col('y', {
         alias: ' ',
