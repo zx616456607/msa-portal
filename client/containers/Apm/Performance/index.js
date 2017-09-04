@@ -343,7 +343,7 @@ class Performance extends React.Component {
 
 const mapStateToProps = state => {
   const { current, queryApms, pinpoint, entities } = state
-  const { cluster } = current
+  const { cluster } = current.config
   const clusterID = cluster.id
   const apmID = queryApms[clusterID].ids[0]
   let { apps, serviceMap } = pinpoint

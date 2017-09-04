@@ -12,36 +12,74 @@
 
 import * as ActionTypes from '../actions/current'
 
-export default function current(state = { cluster: {}, user: {} }, action) {
+function config(state, action) {
   switch (action.type) {
     case ActionTypes.SET_CURRENT:
       return {
         ...state,
         ...action.current,
       }
+    default:
+      return state
+  }
+}
+
+function user(state, action) {
+  switch (action.type) {
     case ActionTypes.CURRENT_USER_REQUEST:
       return {
         ...state,
-        user: {
-          isFetching: true,
-        },
+        isFetching: true,
       }
     case ActionTypes.CURRENT_USER_SUCCESS:
       return {
         ...state,
-        user: {
-          isFetching: false,
-          info: action.response.result.data,
-        },
+        isFetching: false,
+        info: action.response.result.data,
       }
     case ActionTypes.CURRENT_USER_FAILURE:
       return {
         ...state,
-        user: {
-          isFetching: false,
-        },
+        isFetching: false,
       }
     default:
       return state
   }
 }
+
+function projects(state, action) {
+  switch (action.type) {
+    case ActionTypes.USER_PROJECTS_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.USER_PROJECTS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        info: action.response.result.data,
+      }
+    case ActionTypes.USER_PROJECTS_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+const current = (state = {
+  config: { project: {}, cluster: {} },
+  user: {},
+  projects: {},
+}, action) => {
+  return {
+    config: config(state.config, action),
+    user: user(state.user, action),
+    projects: projects(state.projects, action),
+  }
+}
+
+export default current

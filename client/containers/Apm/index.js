@@ -59,7 +59,7 @@ const menus = [
 class Apm extends React.Component {
   componentWillMount() {
     const { loadApms, current, loadPPApps } = this.props
-    const clusterID = current.cluster.id
+    const clusterID = current.config.cluster.id
     loadApms(clusterID).then(res => {
       const { apms } = res.response.result.data
       return loadPPApps(clusterID, apms[0])
@@ -144,7 +144,7 @@ const mapStateToProps = state => ({
   errorMessage: state.errorMessage,
   auth: state.entities.auth,
   current: state.current || {},
-  apms: state.queryApms[state.current.cluster.id],
+  apms: state.queryApms[state.current.config.cluster.id],
 })
 
 export default connect(mapStateToProps, {

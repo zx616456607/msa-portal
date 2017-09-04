@@ -17,7 +17,7 @@ import { Layout, Spin, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
 import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
-import { setCurrent, getCurrentUser } from '../actions/current'
+import { setCurrent, getCurrentUser, getUserProjects } from '../actions/current'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -34,7 +34,13 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    const { getAuth, getCurrentUser, location, history } = this.props
+    const {
+      getAuth,
+      getCurrentUser,
+      getUserProjects,
+      location,
+      history,
+    } = this.props
     const { username, token } = parse(location.search)
     getAuth({ username, token }).then(res => {
       if (res.type === AUTH_FAILURE) {
@@ -51,8 +57,11 @@ class App extends React.Component {
       if (localStorage) {
         localStorage.setItem(JWT, jwt.token)
       }
+      const { userID } = jwt
       // Get user detail info
-      return getCurrentUser(jwt.userID)
+      getCurrentUser(userID)
+      // Get user projects
+      getUserProjects(userID)
     })
   }
 
@@ -74,10 +83,11 @@ class App extends React.Component {
 
   renderChildren = () => {
     const { current, children } = this.props
-    if (!current.cluster || !current.cluster.id) {
+    const { config, user } = current
+    if (!config.cluster || !config.cluster.id) {
       return this.renderLoading('加载基础配置中 ...')
     }
-    if (!current.user || !current.user.info) {
+    if (!user || !user.info) {
       return this.renderLoading('加载用户信息中 ...')
     }
     return [
@@ -120,4 +130,5 @@ export default connect(mapStateToProps, {
   getAuth,
   setCurrent,
   getCurrentUser,
+  getUserProjects,
 })(App)

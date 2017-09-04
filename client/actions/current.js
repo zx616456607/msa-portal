@@ -11,6 +11,7 @@
  */
 
 import { CALL_API } from '../middleware/api'
+import { toQuerystring } from '../common/utils'
 
 export const SET_CURRENT = 'SET_CURRENT'
 
@@ -41,4 +42,26 @@ const fetchCurrentUser = userID => {
 // Relies on Redux Thunk middleware.
 export const getCurrentUser = userID => dispatch => {
   return dispatch(fetchCurrentUser(userID))
+}
+
+export const USER_PROJECTS_REQUEST = 'USER_PROJECTS_REQUEST'
+export const USER_PROJECTS_SUCCESS = 'USER_PROJECTS_SUCCESS'
+export const USER_PROJECTS_FAILURE = 'USER_PROJECTS_FAILURE'
+
+// Get projects of user.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchUserProjects = (userID, query) => {
+  return {
+    [CALL_API]: {
+      types: [ USER_PROJECTS_REQUEST, USER_PROJECTS_SUCCESS, USER_PROJECTS_FAILURE ],
+      endpoint: `/users/${userID}/projects?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+// Fetches projects of user.
+// Relies on Redux Thunk middleware.
+export const getUserProjects = (userID, query) => dispatch => {
+  return dispatch(fetchUserProjects(userID, query))
 }

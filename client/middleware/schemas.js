@@ -29,11 +29,14 @@ const authSchema = new schema.Entity('auth', {}, {
   idAttribute: () => JWT,
 })
 
+const projectSchema = new schema.Entity('project', {}, {
+  idAttribute: 'namespace',
+})
+
 // PinPoint
 const ppAppsSchema = new schema.Entity('ppApps', {}, {
   idAttribute: 'applicationName',
 })
-
 
 // Schemas for tce API responses.
 export const Schemas = {
@@ -46,6 +49,9 @@ export const Schemas = {
     data: {
       apms: [ apmSchema ],
     },
+  },
+  PROJECT_ARRAY_DATA: {
+    data: [ projectSchema ],
   },
   AUTH: authSchema,
   AUTH_DATA: {
