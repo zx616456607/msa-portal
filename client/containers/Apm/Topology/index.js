@@ -33,7 +33,7 @@ G2.Global.activeShape.point = {
   shadowColor: '#3182bd',
 }
 
-// 柱状赛选
+// 柱状筛选
 const Chart3 = createG2(chart => {
   chart.legend({
     position: 'top',
@@ -261,8 +261,8 @@ class Topology extends React.Component {
         alias: ' ',
         nice: false, // 不对最大最小值优化
         // tickInterval: 10000,
-        min: rangeDateTime[0].valueOf(), // 自定义最大值
-        max: rangeDateTime[1].valueOf(), // 自定义最小值
+        min: rangeDateTime && rangeDateTime[0].valueOf(), // 自定义最大值
+        max: rangeDateTime && rangeDateTime[1].valueOf(), // 自定义最小值
       })
       chart.col('y', {
         alias: ' ',
