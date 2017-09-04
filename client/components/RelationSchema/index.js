@@ -142,7 +142,7 @@ export default class Component extends React.Component {
     const net = new G6.Net({
       id: 'c1',
       // width: 500,
-      height: 500,
+      // height: 500,
       grid: {
         forceAlign: true,
         cell: 10,
