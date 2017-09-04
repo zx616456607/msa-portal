@@ -12,13 +12,19 @@
 
 import { normalize } from 'normalizr'
 import fetch from 'isomorphic-fetch'
-import { JWT, API_URL, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
+import { JWT, API_URL, SPI_URL, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring } from '../common/utils'
 
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 const callApi = (endpoint, options, schema) => {
-  const fullUrl = (endpoint.indexOf(API_URL) === -1) ? API_URL + endpoint : endpoint
+  let fullUrl = (endpoint.indexOf(API_URL) === -1) ? API_URL + endpoint : endpoint
+
+  // Support spi
+  if (options.isSpi) {
+    fullUrl = (endpoint.indexOf(SPI_URL) === -1) ? SPI_URL + endpoint : endpoint
+    delete options.isSpi
+  }
 
   if (options.method) {
     options.method = options.method.toUpperCase()

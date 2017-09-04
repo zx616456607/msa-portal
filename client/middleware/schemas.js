@@ -29,8 +29,12 @@ const authSchema = new schema.Entity('auth', {}, {
   idAttribute: () => JWT,
 })
 
-const projectSchema = new schema.Entity('project', {}, {
+const projectSchema = new schema.Entity('projects', {}, {
   idAttribute: 'namespace',
+})
+
+const clusterSchema = new schema.Entity('clusters', {}, {
+  idAttribute: 'clusterID',
 })
 
 // PinPoint
@@ -52,6 +56,14 @@ export const Schemas = {
   },
   PROJECT_ARRAY_DATA: {
     data: [ projectSchema ],
+  },
+  CLUSTER_ARRAY_DATA: {
+    data: {
+      cluster: [ clusterSchema ],
+    },
+  },
+  CLUSTERS_ARRAY_DATA: {
+    clusters: [ clusterSchema ],
   },
   AUTH: authSchema,
   AUTH_DATA: {

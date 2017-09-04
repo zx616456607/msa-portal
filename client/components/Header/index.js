@@ -16,6 +16,8 @@ import { Link } from 'react-router-dom'
 import { getDefaultSelectedKeys } from '../../common/utils'
 import './style/index.less'
 
+// const MenuItemGroup = Menu.ItemGroup
+const SubMenu = Menu.SubMenu
 const LayoutHeader = Layout.Header
 const menus = [
   {
@@ -57,6 +59,7 @@ const testClusters = [
 
 export default class Header extends React.Component {
   state = {
+    projectsText: '切换项目',
     clustersText: '切换集群',
   }
 
@@ -68,6 +71,18 @@ export default class Header extends React.Component {
     this.props.setCurrent({
       cluster: {
         id: firstCluster.clusterID,
+      },
+    })
+  }
+
+  handleProjectChange = ({ item, key }) => {
+    const { setCurrent } = this.props
+    this.setState({
+      projectsText: item.props.children,
+    })
+    setCurrent({
+      project: {
+        namespace: key,
       },
     })
   }
@@ -85,13 +100,37 @@ export default class Header extends React.Component {
   }
 
   render() {
-    const { location, currentUser } = this.props
-    const { clustersText } = this.state
+    const { location, currentUser, projects } = this.props
+    const { projectsText, clustersText } = this.state
     return (
       <LayoutHeader className="layout-header">
         <Link to="/apms">
           <div className="logo" />
         </Link>
+        <div className="projects">
+          <Dropdown
+            overlay={
+              <Menu onSelect={this.handleProjectChange}>
+                <Menu.Item key="default">
+                我的个人项目
+                </Menu.Item>
+                <SubMenu key="share" title="共享项目">
+                  {
+                    projects.map(project => (
+                      <Menu.Item key={project.namespace}>
+                        {project.projectName}
+                      </Menu.Item>
+                    ))
+                  }
+                </SubMenu>
+              </Menu>
+            }
+            trigger={[ 'click' ]}>
+            <Button type="ghost" style={{ marginLeft: 8 }} title={projectsText}>
+              {projectsText} <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </div>
         <div className="clusters">
           <Dropdown
             overlay={

@@ -17,7 +17,13 @@ import { Layout, Spin, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
 import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
-import { setCurrent, getCurrentUser, getUserProjects } from '../actions/current'
+import {
+  setCurrent,
+  getCurrentUser,
+  getUserProjects,
+  getProjectClusters,
+  getDefaultClusters,
+} from '../actions/current'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -101,7 +107,15 @@ class App extends React.Component {
   }
 
   render() {
-    const { auth, location, setCurrent, current } = this.props
+    const {
+      auth,
+      location,
+      setCurrent,
+      current,
+      projects,
+      projectClusters,
+      getProjectClusters,
+    } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
       return this.renderLoading('Loading...')
@@ -109,7 +123,14 @@ class App extends React.Component {
     return (
       <Layout id="app">
         {this.renderErrorMessage()}
-        <Header location={location} setCurrent={setCurrent} currentUser={current.user.info || {}} />
+        <Header
+          location={location}
+          setCurrent={setCurrent}
+          currentUser={current.user.info || {}}
+          projects={projects}
+          getProjectClusters={getProjectClusters}
+          projectClusters={projectClusters}
+        />
         { this.renderChildren() }
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
@@ -119,11 +140,24 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  errorMessage: state.errorMessage,
-  auth: state.entities.auth,
-  current: state.current || {},
-})
+const mapStateToProps = state => {
+  const { entities, current } = state
+  const { auth, projects, clusters } = entities
+  const userProjects = current.projects && current.projects.ids || []
+  const currentClusters = current.clusters || {}
+  const projectClusters = {}
+  Object.keys(currentClusters).forEach(namespace => {
+    const clusterList = currentClusters[namespace].ids || []
+    projectClusters[namespace] = clusterList.map(id => clusters[id])
+  })
+  return {
+    errorMessage: state.errorMessage,
+    auth,
+    current: current || {},
+    projects: userProjects.map(namespace => projects[namespace]),
+    projectClusters,
+  }
+}
 
 export default connect(mapStateToProps, {
   resetErrorMessage,
@@ -131,4 +165,6 @@ export default connect(mapStateToProps, {
   setCurrent,
   getCurrentUser,
   getUserProjects,
+  getProjectClusters,
+  getDefaultClusters,
 })(App)

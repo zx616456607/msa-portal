@@ -11,6 +11,7 @@
  */
 
 import { CALL_API } from '../middleware/api'
+import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
 
 export const SET_CURRENT = 'SET_CURRENT'
@@ -55,7 +56,7 @@ const fetchUserProjects = (userID, query) => {
     [CALL_API]: {
       types: [ USER_PROJECTS_REQUEST, USER_PROJECTS_SUCCESS, USER_PROJECTS_FAILURE ],
       endpoint: `/users/${userID}/projects?${toQuerystring(query)}`,
-      schema: {},
+      schema: Schemas.PROJECT_ARRAY_DATA,
     },
   }
 }
@@ -64,4 +65,54 @@ const fetchUserProjects = (userID, query) => {
 // Relies on Redux Thunk middleware.
 export const getUserProjects = (userID, query) => dispatch => {
   return dispatch(fetchUserProjects(userID, query))
+}
+
+export const PROJECT_CLUSTERS_REQUEST = 'PROJECT_CLUSTERS_REQUEST'
+export const PROJECT_CLUSTERS_SUCCESS = 'PROJECT_CLUSTERS_SUCCESS'
+export const PROJECT_CLUSTERS_FAILURE = 'PROJECT_CLUSTERS_FAILURE'
+
+// Get clusters of project.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchProjectClusters = (namespace, query) => {
+  return {
+    namespace,
+    [CALL_API]: {
+      types: [ PROJECT_CLUSTERS_REQUEST, PROJECT_CLUSTERS_SUCCESS, PROJECT_CLUSTERS_FAILURE ],
+      endpoint: `/projects/${namespace}/clusters?${toQuerystring(query)}`,
+      schema: Schemas.CLUSTER_ARRAY_DATA,
+    },
+  }
+}
+
+// Fetches clusters of project.
+// Relies on Redux Thunk middleware.
+export const getProjectClusters = (namespace, query) => dispatch => {
+  return dispatch(fetchProjectClusters(namespace, query))
+}
+
+export const DEFAULT_CLUSTERS_REQUEST = 'DEFAULT_CLUSTERS_REQUEST'
+export const DEFAULT_CLUSTERS_SUCCESS = 'DEFAULT_CLUSTERS_SUCCESS'
+export const DEFAULT_CLUSTERS_FAILURE = 'DEFAULT_CLUSTERS_FAILURE'
+
+// Get clusters of project.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchDefaultClusters = query => {
+  const namespace = 'default'
+  return {
+    namespace,
+    [CALL_API]: {
+      types: [ DEFAULT_CLUSTERS_REQUEST, DEFAULT_CLUSTERS_SUCCESS, DEFAULT_CLUSTERS_FAILURE ],
+      endpoint: `/clusters/${namespace}?${toQuerystring(query)}`,
+      schema: Schemas.CLUSTERS_ARRAY_DATA,
+      options: {
+        isSpi: true,
+      },
+    },
+  }
+}
+
+// Fetches clusters of project.
+// Relies on Redux Thunk middleware.
+export const getDefaultClusters = query => dispatch => {
+  return dispatch(fetchDefaultClusters(query))
 }
