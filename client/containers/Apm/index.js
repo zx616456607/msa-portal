@@ -61,8 +61,10 @@ class Apm extends React.Component {
     const { loadApms, current, loadPPApps } = this.props
     const clusterID = current.config.cluster.id
     loadApms(clusterID).then(res => {
-      const { apms } = res.response.result.data
-      return loadPPApps(clusterID, apms[0])
+      if (!res.error) {
+        const { apms } = res.response.result.data
+        return loadPPApps(clusterID, apms[0])
+      }
     })
   }
 

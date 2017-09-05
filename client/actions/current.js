@@ -13,13 +13,27 @@
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
+import { USER_CURRENT_CONFIG } from '../constants'
 
-export const SET_CURRENT = 'SET_CURRENT'
+export const SET_CURRENT_CONFIG = 'SET_CURRENT_CONFIG'
 
-export function setCurrent(current) {
+export function setCurrentConfig(current) {
+  if (localStorage) {
+    const config = localStorage.getItem(USER_CURRENT_CONFIG)
+    let [ namespace, clusterID ] = config && config.split(',') || []
+    if (current.project) {
+      namespace = current.project.namespace
+    }
+    if (current.cluster) {
+      clusterID = current.cluster.id
+    }
+    if (namespace && clusterID) {
+      localStorage.setItem(USER_CURRENT_CONFIG, `${namespace},${clusterID}`)
+    }
+  }
   return {
     current,
-    type: SET_CURRENT,
+    type: SET_CURRENT_CONFIG,
   }
 }
 

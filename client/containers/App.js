@@ -18,7 +18,7 @@ import { parse } from 'query-string'
 import Header from '../components/Header'
 import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
 import {
-  setCurrent,
+  setCurrentConfig,
   getCurrentUser,
   getUserProjects,
   getProjectClusters,
@@ -43,7 +43,6 @@ class App extends React.Component {
     const {
       getAuth,
       getCurrentUser,
-      getUserProjects,
       location,
       history,
     } = this.props
@@ -66,8 +65,6 @@ class App extends React.Component {
       const { userID } = jwt
       // Get user detail info
       getCurrentUser(userID)
-      // Get user projects
-      getUserProjects(userID)
     })
   }
 
@@ -94,8 +91,11 @@ class App extends React.Component {
   renderChildren = () => {
     const { current, children } = this.props
     const { config, user } = current
-    if (!config.cluster || !config.cluster.id) {
+    if (!config.project || !config.project.namespace) {
       return this.renderLoading('加载基础配置中 ...')
+    }
+    if (!config.cluster || !config.cluster.id) {
+      return this.renderLoading('加载集群配置中 ...')
     }
     if (!user || !user.info) {
       return this.renderLoading('加载用户信息中 ...')
@@ -114,11 +114,13 @@ class App extends React.Component {
     const {
       auth,
       location,
-      setCurrent,
+      setCurrentConfig,
       current,
       projects,
       projectClusters,
+      getUserProjects,
       getProjectClusters,
+      getDefaultClusters,
     } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
@@ -128,11 +130,15 @@ class App extends React.Component {
       <Layout id="app">
         {this.renderErrorMessage()}
         <Header
+          userID={jwt.userID}
           location={location}
-          setCurrent={setCurrent}
+          setCurrentConfig={setCurrentConfig}
           currentUser={current.user.info || {}}
+          currentConfig={current.config || {}}
           projects={projects}
+          getUserProjects={getUserProjects}
           getProjectClusters={getProjectClusters}
+          getDefaultClusters={getDefaultClusters}
           projectClusters={projectClusters}
         />
         { this.renderChildren() }
@@ -166,7 +172,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   resetErrorMessage,
   getAuth,
-  setCurrent,
+  setCurrentConfig,
   getCurrentUser,
   getUserProjects,
   getProjectClusters,

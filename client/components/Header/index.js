@@ -11,9 +11,10 @@
  */
 
 import React from 'react'
-import { Layout, Menu, Dropdown, Icon, Button } from 'antd'
+import { Layout, Menu, Dropdown, Icon, Button, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { USER_CURRENT_CONFIG } from '../../constants'
 import './style/index.less'
 
 // const MenuItemGroup = Menu.ItemGroup
@@ -45,6 +46,7 @@ const menus = [
     disabled: true,
   },
 ]
+const MY_PORJECT = '我的个人项目'
 
 const testClusters = [
   {
@@ -61,6 +63,7 @@ export default class Header extends React.Component {
   state = {
     projectsText: '切换项目',
     clustersText: '切换集群',
+    clustersDropdownVisible: false,
   }
 
   componentDidMount() {
@@ -68,19 +71,115 @@ export default class Header extends React.Component {
     this.setState({
       clustersText: firstCluster.clusterName,
     })
-    this.props.setCurrent({
+    this.props.setCurrentConfig({
       cluster: {
         id: firstCluster.clusterID,
       },
     })
+    const {
+      userID,
+      getUserProjects,
+      setCurrentConfig,
+      getDefaultClusters,
+      getProjectClusters,
+    } = this.props
+    getUserProjects(userID).then(res => {
+      let namespace
+      let clusterID
+      let setCurrentConfigFlag
+      if (localStorage) {
+        const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
+        if (currentConfig) {
+          const configArray = currentConfig.split(',')
+          namespace = configArray[0]
+          clusterID = configArray[1]
+          setCurrentConfigFlag = true
+          setCurrentConfig({
+            project: { namespace },
+            cluster: { id: clusterID },
+          })
+        }
+      }
+      const projects = res.response.entities.projects || {}
+      if (!namespace || !clusterID) {
+        namespace = 'default'
+      }
+      let projectsText
+      let clustersText
+      const handleProjectClusters = (clusters, clustersObj) => {
+        if (!clusters || clusters.length === 0) {
+          notification.warn({
+            message: '该项目下没有集群',
+          })
+          return
+        }
+        let currentCluster
+        clusters.every(clusterID => {
+          const cluster = clustersObj[clusterID]
+          if (cluster.isOk) {
+            currentCluster = cluster
+            return false
+          }
+          return true
+        })
+        if (!currentCluster) {
+          currentCluster = clustersObj[clusters[0]]
+        }
+        clusterID = currentCluster.clusterID
+        clustersText = currentCluster.clusterName
+        this.setState({
+          projectsText,
+          clustersText,
+        })
+        if (!setCurrentConfigFlag) {
+          setCurrentConfig({
+            project: { namespace },
+            cluster: { id: clusterID },
+          })
+        }
+      }
+      if (namespace === 'default') {
+        projectsText = MY_PORJECT
+        getDefaultClusters().then(res => {
+          if (res.error) {
+            notification.error({
+              message: '获取集群失败，请刷新页面重试',
+            })
+            return
+          }
+          const clustersObj = res.response.entities.clusters
+          const clusters = res.response.result.clusters
+          handleProjectClusters(clusters, clustersObj)
+        })
+        return
+      }
+      projectsText = projects && projects[namespace] && projects[namespace].projectName
+      getProjectClusters(namespace).then(res => {
+        if (res.error) {
+          notification.error({
+            message: '获取集群失败，请刷新页面重试',
+          })
+          return
+        }
+        const clustersObj = res.response.entities.clusters
+        const clusters = res.response.result.clusters
+        handleProjectClusters(clusters, clustersObj)
+      })
+    })
   }
 
   handleProjectChange = ({ item, key }) => {
-    const { setCurrent } = this.props
+    const { setCurrentConfig, getProjectClusters, getDefaultClusters } = this.props
     this.setState({
       projectsText: item.props.children,
+      clustersDropdownVisible: true,
     })
-    setCurrent({
+    if (key === 'default') {
+      getDefaultClusters()
+    } else {
+      getProjectClusters(key)
+    }
+    setCurrentConfig({
       project: {
         namespace: key,
       },
@@ -88,11 +187,12 @@ export default class Header extends React.Component {
   }
 
   handleClusterChange = ({ item, key }) => {
-    const { setCurrent } = this.props
+    const { setCurrentConfig } = this.props
     this.setState({
       clustersText: item.props.children,
+      clustersDropdownVisible: false,
     })
-    setCurrent({
+    setCurrentConfig({
       cluster: {
         id: key,
       },
@@ -100,8 +200,16 @@ export default class Header extends React.Component {
   }
 
   render() {
-    const { location, currentUser, projects } = this.props
-    const { projectsText, clustersText } = this.state
+    const {
+      location,
+      currentUser,
+      currentConfig,
+      projects,
+      projectClusters,
+    } = this.props
+    const { project } = currentConfig
+    const currentProjectClusters = projectClusters[project.namespace] || []
+    const { projectsText, clustersText, clustersDropdownVisible } = this.state
     return (
       <LayoutHeader className="layout-header">
         <Link to="/apms">
@@ -112,7 +220,7 @@ export default class Header extends React.Component {
             overlay={
               <Menu onSelect={this.handleProjectChange}>
                 <Menu.Item key="default">
-                我的个人项目
+                  {MY_PORJECT}
                 </Menu.Item>
                 <SubMenu key="share" title="共享项目">
                   {
@@ -121,6 +229,13 @@ export default class Header extends React.Component {
                         {project.projectName}
                       </Menu.Item>
                     ))
+                  }
+                  {
+                    projects.length === 0 && (
+                      <Menu.Item key="no-project" disabled>
+                        暂无项目
+                      </Menu.Item>
+                    )
                   }
                 </SubMenu>
               </Menu>
@@ -133,10 +248,12 @@ export default class Header extends React.Component {
         </div>
         <div className="clusters">
           <Dropdown
+            visible={clustersDropdownVisible}
+            onVisibleChange={visible => this.setState({ clustersDropdownVisible: visible })}
             overlay={
               <Menu onSelect={this.handleClusterChange}>
                 {
-                  testClusters.map(cluster => (
+                  currentProjectClusters.map(cluster => (
                     <Menu.Item key={cluster.clusterID}>
                       {cluster.clusterName}
                     </Menu.Item>

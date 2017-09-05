@@ -30,3 +30,4 @@ export const Y_GROUP_UNIT = 57
 export const ALL = 'all'
 export const NORMAL = 0
 export const ERROR = 1
+export const USER_CURRENT_CONFIG = 'msa_user_current_config'

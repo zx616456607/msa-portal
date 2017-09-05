@@ -14,7 +14,7 @@ import * as ActionTypes from '../actions/current'
 
 function config(state, action) {
   switch (action.type) {
-    case ActionTypes.SET_CURRENT:
+    case ActionTypes.SET_CURRENT_CONFIG:
       return {
         ...state,
         ...action.current,
