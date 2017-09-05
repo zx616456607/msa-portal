@@ -14,7 +14,7 @@ import React from 'react'
 import './style/index.less'
 import G2 from 'g2'
 import { connect } from 'react-redux'
-import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
+import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 import { formatDate } from '../../../common/utils.js'
 import CreateG2Group from '../../../components/CreateG2Group'
@@ -25,78 +25,8 @@ const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
 
-let visib = 'hidden'
-const Chart = chart => {
-  chart.line().position('time*count').size(2)
-  chart.setMode('select')
-  chart.select('rangeX')
-  chart.on('rangeselectstart', () => {
-    visib = 'initial'
-  })
-  chart.tooltip({
-    crosshairs: true,
-  })
-  chart.axis('time', {
-    title: null,
-  })
-  chart.col('count', {
-    alias: 'Memory（bytes）',
-    min: 0,
-  })
-  chart.legend(false)
-  chart.area().position('time*waiting').color('type', [ '#43b5d8' ])
-  chart.intervalStack().position('time*count')
-  chart.render()
-  chart.on('plotdblclick', () => {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-}
-const Chart1 = chart => {
-  chart.setMode('select')
-  chart.select('rangeX')
-  chart.axis('time', {
-    title: null,
-  })
-  chart.tooltip({
-    crosshairs: true,
-  })
-  chart.legend(false)
-  chart.area().position('time*count').color('type')
-  chart.line().position('time*count').color('type')
-  chart.render()
-  chart.on('plotdblclick', () => {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-}
-const Chart2 = chart => {
-  chart.line().position('time*waiting').size(2).
-    shape('smooth')
-  chart.setMode('select')
-  chart.select('rangeX')
-  chart.tooltip({
-    crosshairs: true,
-  })
-  chart.axis('time', {
-    title: null,
-  })
-  chart.legend(false)
-  chart.area().position('time*waiting').color('type', [ '#43b5d8' ]).
-    size(2).
-    shape('smooth')
-  chart.render()
-  chart.on('plotdblclick', () => {
-    chart.get('options').filters = {} // 清空 filters
-    chart.repaint()
-  })
-}
-const chartAry = [ Chart, Chart1, Chart2 ]
-const ChartGroup = CreateG2Group(chartAry, true)
-
 class Performance extends React.Component {
   state = {
-    data: [],
     forceFit: true,
     width: 530,
     height: 300,
@@ -106,8 +36,13 @@ class Performance extends React.Component {
     timer: [],
     Timers: [],
     serviceName: '',
-    chartsData: [],
+    heapData: [],
+    gcData: [],
+    permData: [],
+    cpuData: [],
+    tranData: [],
   }
+
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     loadPPApps(clusterID, apmID)
@@ -149,8 +84,8 @@ class Performance extends React.Component {
     const { Timers } = this.state
     const query = {
       applicationName: value,
-      from: Timers.length > 0 ? Timers[0] : '1504239480000',
-      to: Timers.length > 0 ? Timers[1] : '1504241280000',
+      from: Timers.length > 0 ? Timers[0] : '1504610853000',
+      to: Timers.length > 0 ? Timers[1] : '1504611153000',
       calleeRange: 4,
       callerRange: 4,
       serviceTypeName: 'STAND_ALONE',
@@ -162,12 +97,13 @@ class Performance extends React.Component {
       loadPinpointMap(clusterID, apmID, query)
       if (Object.keys(res.response.entities).length === 0) {
         this.setState({
-          exampleData: res.response.result[value][0],
+          exampleData: Object.keys(res.response.result).length > 0 ? res.response.result[value][0] : [],
           agentData: res.response.result,
           serviceName: value,
         })
-
       }
+      Object.keys(res.response.result).length > 0 ?
+        this.loadChartData(res.response.result[value][0].agentId) : null
     })
   }
 
@@ -184,64 +120,252 @@ class Performance extends React.Component {
     this.loadChartData(serviceName)
   }
 
-  /**
-   * 加载图形数据
-   */
-
   loadChartData = value => {
     const { Timers } = this.state
-    const { clusterID, apmID, fetchJVMGCData } = this.props
+    const { clusterID, apmID, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } = this.props
     const query = {
       agentId: value,
-      from: Timers.length > 0 ? Timers[0] : '1504239480000',
-      to: Timers.length > 0 ? Timers[1] : '1504241280000',
+      from: Timers.length > 0 ? Timers[0] : '1504610853000',
+      to: Timers.length > 0 ? Timers[1] : '1504611153000',
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
       const chartJVM = {
-        heapMax: res.response.result.charts.JVM_MEMORY_HEAP_MAX,
+        heapMax: res.response.result.charts.JVM_MEMORY_HEAP_MAX, // Heap Usage
         heapSued: res.response.result.charts.JVM_MEMORY_HEAP_USED,
-        permGenMax: res.response.result.charts.JVM_MEMORY_NON_HEAP_MAX,
+        permGenMax: res.response.result.charts.JVM_MEMORY_NON_HEAP_MAX, // PermGen Usage
         permGenSued: res.response.result.charts.JVM_MEMORY_NON_HEAP_USED,
       }
-      let obj = null
-      const Ary = []
-      chartJVM.heapMax.points.map(item => {
-        obj = {
-          Timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
-          Count: item.minYVal === -1 ? 0 : item.minYVal,
-        }
+      let heapObj = null
+      const heapAry = []
+      chartJVM.heapMax.points.map((item, index) => {
+        heapObj = Object.assign({
+          timer: this.dateFtt(item.xVal), // formatDate(Number(item.xVal), 'HH:mm:ss')
+          xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
+          yVal: chartJVM.heapSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
+        })
+        heapAry.push(heapObj)
         return null
       })
-      Ary.push(obj)
-      // Ary.push(item.xVal + ',' + item.minYVal)
-      let frame = new Frame(Ary)
-      frame = Frame.combinColumns(frame, [ 'ACME', 'Compitor' ], 'value')
+      let frame = new Frame(heapAry)
+      frame = Frame.combinColumns(frame, [ 'xVal' ], 'count')
       this.setState({
-        data: frame,
+        heapData: frame,
+      })
+      let permObj = null
+      const permAry = []
+      chartJVM.permGenMax.points.map((item, index) => {
+        permObj = {
+          timer: formatDate(Number(item.maxYVal), 'HH:mm:ss'),
+          xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
+          yVal: chartJVM.permGenSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
+        }
+        permAry.push(permObj)
+        return null
+      })
+      let frames = new Frame(permAry)
+      frames = Frame.combinColumns(frames, [ 'xVal' ], 'count')
+      this.setState({
+        gcData: frames,
       })
     })
+
+    fetchJVMCPUData(clusterID, apmID, query).then(res => {
+      const chartJVM = {
+        system: res.response.result.charts.CPU_LOAD_SYSTEM,
+        jvm: res.response.result.charts.CPU_LOAD_JVM,
+      }
+      let cpuObj = null
+      const cpumAry = []
+      chartJVM.system.points.map((item, index) => {
+        cpuObj = {
+          timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
+          xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
+          yVal: chartJVM.jvm.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
+        }
+        cpumAry.push(cpuObj)
+        return null
+      })
+      let frame = new Frame(cpumAry)
+      frame = Frame.combinColumns(frame, [ 'yVal', 'xVal' ], 'value')
+      this.setState({
+        cpuData: frame,
+      })
+    })
+
+    fetchJVMTRANData(clusterID, apmID, query).then(res => {
+      const chartJVM = {
+        unsampled_c: res.response.result.charts.TPS_UNSAMPLED_CONTINUATION,
+        unsampled_n: res.response.result.charts.TPS_UNSAMPLED_NEW,
+        sampled: res.response.result.charts.TPS_SAMPLED_CONTINUATION,
+        total: res.response.result.charts.TPS_TOTAL,
+        sampled_n: res.response.result.charts.TPS_SAMPLED_NEW,
+      }
+      let tranObj = null
+      const tranAry = []
+      chartJVM.unsampled_c.points.map((item, index) => {
+        tranObj = {
+          timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
+          total: chartJVM.total.points[index].maxYVal === -1 ? 0 : chartJVM.total.points[index].maxYVal,
+          unsampledNew: chartJVM.unsampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.unsampled_n.points[index].maxYVal,
+          sampledContinuation: chartJVM.sampled.points[index].maxYVal === -1 ? 0 : chartJVM.sampled.points[index].maxYVal,
+          sampledNew: chartJVM.sampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.sampled_n.points[index].maxYVal,
+        }
+        tranAry.push(tranObj)
+        return null
+      })
+      let frame = new Frame(tranAry)
+      frame = Frame.combinColumns(frame, [ 'total' ], 'count')
+      this.setState({
+        tranData: frame,
+      })
+    })
+  }
+
+  bytesToSize = bytes => {
+    if (bytes === 0) return '0'
+    const k = 1000 // or 1024
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Number((bytes / Math.pow(k, i)).toFixed(1))
+  }
+  dateFtt = value => {
+    const d = Date(value)
+    return d.toLocaleDateString().replace(/\//g, '-') + ' ' + d.toTimeString().substr(0, 8)
   }
 
   handleRefresh = () => { }
 
   render() {
-    const { isTimerShow, timer, exampleData, serviceName } = this.state
+    const { isTimerShow, timer, exampleData, serviceName, heapData } = this.state
     const { apps, serverName } = this.props
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
     nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
-      nodeData.applicationMapData.nodeDataArray.map(item => {
-        if (item.applicationName === serviceName) {
-          if (Object.keys(item.agentHistogram).length !== 0) {
-            for (const node in item.agentHistogram) {
-              nodeName.push(node)
+      nodeData.applicationMapData.nodeDataArray.length > 0 ?
+        nodeData.applicationMapData.nodeDataArray.map(item => {
+          if (item.applicationName === serviceName) {
+            if (Object.keys(item.agentHistogram).length !== 0) {
+              for (const node in item.agentHistogram) {
+                nodeName.push(node)
+              }
             }
           }
-        }
-        return null
-      }) : '' : ''
+          return null
+        }) : '' : '' : ''
 
-    const [ Chart, Chart1, Chart2 ] = ChartGroup
+    const Charts = chart => {
+      chart.line().position('timer*count')
+      chart.setMode('select')
+      chart.select('rangeX')
+      chart.on('rangeselectstart', () => {
+      })
+      chart.tooltip({
+        crosshairs: true,
+      })
+      chart.axis('timer', {
+        title: null,
+      })
+      chart.source(heapData, {
+        time: {
+          type: 'timer',
+          tickCount: 3,
+          mask: 'hh:MM',
+        },
+      })
+      chart.col('count', {
+        alias: 'Memory（bytes）',
+        formatter: val => {
+          return val + 'G'
+        },
+        release: {
+          tickInterval: 3,
+        },
+      })
+      chart.legend(false)
+      chart.area().position('timer*yVal').color('type', [ '#43b5d8' ])
+      chart.intervalStack().position('timer*count')
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    }
+    const Charts1 = chart => {
+      chart.setMode('select')
+      chart.select('rangeX')
+      chart.axis('timer', {
+        title: null,
+      })
+      chart.tooltip({
+        crosshairs: true,
+      })
+      chart.col('value', {
+        alias: 'Cpu Usage (%)',
+      })
+      chart.legend(false)
+      chart.area().position('timer*value').color('type')
+      chart.line().position('timer*value').color('type').
+        size(2)
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    }
+    const Charts2 = chart => {
+      chart.line().position('timer*count').size(2).
+        shape('smooth')
+      chart.setMode('select')
+      chart.select('rangeX')
+      chart.tooltip({
+        crosshairs: true,
+      })
+      chart.axis('timer', {
+        title: null,
+      })
+      chart.col('count', {
+        alias: 'TPS',
+      })
+      chart.legend(false)
+      chart.area().position('timer*count').color('type', [ '#43b5d8' ]).
+        size(2).
+        shape('smooth')
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    }
+    const Charts3 = chart => {
+      chart.line().position('timer*count')
+      chart.setMode('select')
+      chart.select('rangeX')
+      chart.on('rangeselectstart', () => {
+      })
+      chart.tooltip({
+        crosshairs: true,
+      })
+      chart.axis('timer', {
+        title: null,
+      })
+      chart.col('count', {
+        alias: 'Memory（bytes）',
+        formatter: val => {
+          return val + 'M'
+        },
+      })
+      chart.legend(false)
+      chart.area().position('timer*yVal').color('type', [ '#43b5d8' ])
+      chart.intervalStack().position('timer*count')
+      chart.render()
+      chart.on('plotdblclick', () => {
+        chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+    }
+    const chartAry = [ Charts, Charts1, Charts2, Charts3 ]
+    const ChartGroup = CreateG2Group(chartAry, true)
+    const [ Chart, Chart1, Chart2, Chart3 ] = ChartGroup
+
     return (
       <LayoutContent className="content">
         <div className="capability">
@@ -312,10 +436,10 @@ class Performance extends React.Component {
             <div className="footer">
               <div className="left">
                 <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 1</span>
-                  <Button className="btn" style={{ visibility: visib }}>重置</Button>
+                  <Button className="btn">重置</Button>
                 </div>
                 <Chart
-                  data={this.state.data}
+                  data={this.state.heapData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -323,7 +447,7 @@ class Performance extends React.Component {
                   <Button className="btn">重置</Button>
                 </div>
                 <Chart1
-                  data={this.state.data}
+                  data={this.state.cpuData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -332,8 +456,8 @@ class Performance extends React.Component {
                 <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 3</span>
                   <Button className="btn">重置</Button>
                 </div>
-                <Chart
-                  data={this.state.data}
+                <Chart3
+                  data={this.state.gcData}
                   width={this.state.width}
                   height={this.state.height}
                   forceFit={this.state.forceFit} />
@@ -378,4 +502,5 @@ export default connect(mapStateToProps, {
   loadPinpointMap,
   fetchJVMGCData,
   fetchJVMCPUData,
+  fetchJVMTRANData,
 })(Performance)

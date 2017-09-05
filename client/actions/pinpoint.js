@@ -134,23 +134,6 @@ export const fetchAgentData = (clusterID, apmID, query) => dispatch => {
   return dispatch(fetchAgentList(clusterID, apmID, query))
 }
 
-export const FETCH_JVMGC_REQUEST = 'FETCH_JVMGC_REQUEST'
-export const FETCH_JVMGC_SUCCESS = 'FETCH_JVMGC_SUCCESS'
-export const FETCH_JVMGC_FAILURE = 'FETCH_JVMGC_FAILURE'
-
-const fetchJvmGCList = (clusterID, apmID, query) => ({
-  apmID,
-  query,
-  [CALL_API]: {
-    types: [ FETCH_JVMGC_REQUEST, FETCH_JVMGC_SUCCESS, FETCH_JVMGC_FAILURE ],
-    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/jvmGC/?${toQuerystring(query)}`,
-    schema: {},
-  },
-})
-export const fetchJVMGCData = (clusterID, apmID, query) => dispatch => {
-  return dispatch(fetchJvmGCList(clusterID, apmID, query))
-}
-
 export const TRANSACTION_INFO_REQUEST = 'TRANSACTION_INFO_REQUEST'
 export const TRANSACTION_INFO_SUCCESS = 'TRANSACTION_INFO_SUCCESS'
 export const TRANSACTION_INFO_FAILURE = 'TRANSACTION_INFO_FAILURE'
@@ -170,6 +153,23 @@ const fetchTransactionInfo = (clusterID, apmID, query) => ({
 // Relies on Redux Thunk middleware.
 export const loadTransactionInfo = (clusterID, apmID, query) => dispatch => {
   return dispatch(fetchTransactionInfo(clusterID, apmID, query))
+}
+
+export const FETCH_JVMGC_REQUEST = 'FETCH_JVMGC_REQUEST'
+export const FETCH_JVMGC_SUCCESS = 'FETCH_JVMGC_SUCCESS'
+export const FETCH_JVMGC_FAILURE = 'FETCH_JVMGC_FAILURE'
+
+const fetchJvmGCList = (clusterID, apmID, query) => ({
+  apmID,
+  query,
+  [CALL_API]: {
+    types: [ FETCH_JVMGC_REQUEST, FETCH_JVMGC_SUCCESS, FETCH_JVMGC_FAILURE ],
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/jvmGC/?${toQuerystring(query)}`,
+    schema: {},
+  },
+})
+export const fetchJVMGCData = (clusterID, apmID, query) => dispatch => {
+  return dispatch(fetchJvmGCList(clusterID, apmID, query))
 }
 
 export const FETCH_JVMCPU_REQUEST = 'FETCH_JVMCPU_REQUEST'
@@ -198,7 +198,7 @@ const fetchJvmTRANList = (clusterID, apmID, query) => ({
   query,
   [CALL_API]: {
     types: [ FETCH_JVMTRAN_REQUEST, FETCH_JVMTRAN_SUCCESS, FETCH_JVMTRAN_FAILURE ],
-    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/transaction/${toQuerystring(query)}`,
+    endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/agentStat/transaction/?${toQuerystring(query)}`,
     schema: {},
   },
 })
