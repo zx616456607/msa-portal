@@ -192,9 +192,9 @@ class CallLinkTracking extends React.Component {
     } = this.state
     const columns = [{
       title: '#',
-      dataIndex: '#',
-      key: '#',
-      render: (text, record, index) => <a href="#">{index}</a>,
+      dataIndex: 'index',
+      key: 'index',
+      render: text => <a href="#">{text}</a>,
     }, {
       title: 'Stat time',
       dataIndex: 'startTime',
@@ -233,6 +233,9 @@ class CallLinkTracking extends React.Component {
     }]
 
     const data = transaction[application] && transaction[application].metadata || []
+    data.forEach((item, index) => {
+      item.index = index
+    })
     return (
       <div className="call-link-tracking">
         <div className="layout-content-btns">
@@ -287,7 +290,10 @@ class CallLinkTracking extends React.Component {
             <Table
               columns={columns}
               dataSource={data}
-              pagination={false}
+              pagination={{
+                size: 'small',
+                pageSize: 50,
+              }}
               rowKey={row => row.spanId}
               loading={loading}
               onRowClick={this.handleRowClick}
