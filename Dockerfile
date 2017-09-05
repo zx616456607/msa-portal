@@ -9,7 +9,6 @@ ADD . /usr/src/app/
 RUN npm run build
 
 RUN rm -rf /usr/src/app/client \
-  /usr/src/app/config \
   /usr/src/app/webpack_config \
   /usr/src/app/index.debug.html \
   /usr/src/app/Dockerfile*
