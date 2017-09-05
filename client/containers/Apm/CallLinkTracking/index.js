@@ -13,6 +13,8 @@
 import React from 'react'
 import { Select, Button, DatePicker, Card, Table, message, Icon } from 'antd'
 import { connect } from 'react-redux'
+import { parse as parseQuerystring } from 'query-string'
+import moment from 'moment'
 import Dock from '../../../components/Dock'
 import TransactionInspector from '../../../components/TransactionInspector'
 import { formatDate } from '../../../common/utils'
@@ -48,8 +50,17 @@ class CallLinkTracking extends React.Component {
   }
 
   componentWillMount() {
-    const { loadPPApps, clusterID, apmID } = this.props
+    const { loadPPApps, clusterID, apmID, location } = this.props
     loadPPApps(clusterID, apmID)
+    const { application, from, to } = location.query || {}
+    if (application && from && to) {
+      this.setState({
+        application,
+        rangeDateTime: [ moment(from), moment(to) ],
+      }, () => {
+        this.loadData()
+      })
+    }
   }
 
   componentDidMount() {
@@ -306,7 +317,7 @@ class CallLinkTracking extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const { current, queryApms, pinpoint, entities } = state
   const { cluster } = current.config
   const clusterID = cluster.id
@@ -316,12 +327,15 @@ const mapStateToProps = state => {
   const { ppApps } = entities
   const appIDs = apps[apmID] && apps[apmID].ids || []
   apps = appIDs.map(id => ppApps[id])
+  const { location } = ownProps
+  location.query = parseQuerystring(location.search)
   return {
     clusterID,
     apmID,
     apps,
     transaction: queryTransaction[apmID] || {},
     transactionInfo,
+    location,
   }
 }
 
