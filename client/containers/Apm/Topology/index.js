@@ -46,7 +46,7 @@ class Topology extends React.Component {
       width: 100,
       height: 450,
       plotCfg: {
-        margin: [ 20, 80, 90, 80 ],
+        margin: [ 20, 80, 90, 100 ],
         background: {
           stroke: '#ccc',
           lineWidth: 1,
@@ -313,14 +313,14 @@ class Topology extends React.Component {
       chart.setMode('select') // 开启框选模式
       chart.select('rangeX') // 设置 X 轴范围的框选
       chart.col('x', {
-        alias: ' ',
+        alias: '请求时刻',
         nice: false, // 不对最大最小值优化
         // tickInterval: 10000,
-        // min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
-        // max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
+        min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
+        max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
       })
       chart.col('y', {
-        alias: ' ',
+        alias: '响应时间',
         nice: false,
         max: 10000,
         tickInterval: 2500,
@@ -346,9 +346,7 @@ class Topology extends React.Component {
       })
       chart.legend(false)
       chart.tooltip({
-        map: {
-          title: 'y',
-        },
+        title: null,
       })
       chart.point().position('x*y').size('x', 3, 3)
         .color('#3182bd')
@@ -356,9 +354,19 @@ class Topology extends React.Component {
         .shape('circle')
         .tooltip('x*y')
       chart.render()
+      chart.on('rangeselectend', ev => {
+        const selectRange = ev.selected.x
+        const start = new Date(parseInt(selectRange[0])).toISOString()
+        const end = new Date(parseInt(selectRange[1])).toISOString()
+        window.open(`${window.location.origin}/apms/call-link-tracking?application=${application}&from=${start}&to=${end}`)
+      })
       // 监听双击事件，这里用于复原图表
       chart.on('plotdblclick', function() {
         chart.get('options').filters = {} // 清空 filters
+        chart.repaint()
+      })
+      chart.on('rangeselectend', () => {
+        chart.get('options').filters = {}
         chart.repaint()
       })
     })
@@ -382,14 +390,17 @@ class Topology extends React.Component {
         },
       })
       chart.col('reqTime', {
-        alias: ' ',
+        alias: '请求时间',
       })
       chart.col('countNum', {
-        alias: ' ',
+        alias: '请求数量',
         max: this.state.totalCount + 10,
       })
       chart.legend(false)
-      chart.interval().position('reqTime*countNum').tooltip('countNum')
+      chart.tooltip({
+        title: null,
+      })
+      chart.interval().position('reqTime*countNum').tooltip('reqTime*countNum')
         .color('reqTime', countNum => colorSet[countNum])
       chart.render()
     })
@@ -409,6 +420,9 @@ class Topology extends React.Component {
       })
       chart.col('time', {
         alias: ' ',
+      })
+      chart.tooltip({
+        title: null,
       })
       chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
         .size(9)
