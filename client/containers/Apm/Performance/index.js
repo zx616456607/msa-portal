@@ -246,7 +246,7 @@ class Performance extends React.Component {
       <LayoutContent className="content">
         <div className="capability">
           <div className="layout-content-btns">
-            <Select defaultValue="选择微服务" style={{ width: 120 }} onChange={this.handleSelect}>
+            <Select placeholder="选择微服务" style={{ width: 150 }} onChange={this.handleSelect}>
               {
                 apps.map(app => (
                   <Option key={app.applicationName}>{app.applicationName}</Option>

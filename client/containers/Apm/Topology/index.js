@@ -435,7 +435,7 @@ class Topology extends React.Component {
         <div className="layout-content-btns">
           <Select
             showSearch
-            style={{ width: 200 }}
+            style={{ width: 150 }}
             placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
@@ -447,8 +447,8 @@ class Topology extends React.Component {
               ))
             }
           </Select>
-          <Button onClick={this.getData}>
-            <i className="fa fa-refresh"/> 刷新
+          <Button icon="reload" onClick={this.getData}>
+            刷新
           </Button>
           <ButtonGroup>
             <Button type="primary" onClick={this.changeTimeShow}><Icon type="calendar"/> 自定义日期</Button>
