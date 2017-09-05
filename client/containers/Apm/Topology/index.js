@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Icon, DatePicker, Radio, Row, Col, Checkbox, Select } from 'antd'
+import { Button, Icon, DatePicker, Row, Col, Checkbox, Select, message } from 'antd'
 import '../style/topology.less'
 import RelationSchema from '../../../components/RelationSchema'
 const { RangePicker } = DatePicker
@@ -23,7 +23,9 @@ import { formatDate } from '../../../common/utils'
 import createG2 from 'g2-react'
 const G2 = require('g2')
 import keys from 'lodash/keys'
+import classNames from 'classnames'
 const Option = Select.Option
+const ButtonGroup = Button.Group
 
 // 点图
 // 设置鼠标 hove 至气泡的样式
@@ -33,30 +35,12 @@ G2.Global.activeShape.point = {
   shadowColor: '#3182bd',
 }
 
-// 柱状筛选
-const Chart3 = createG2(chart => {
-  chart.legend({
-    position: 'top',
-  })
-  chart.axis('请求时间', {
-    title: null,
-  })
-  chart.axis('请求数量', {
-    // titleOffset: 75,
-    formatter(val) {
-      return val
-    },
-    // position: 'right',
-  })
-  chart.intervalStack().position('State*请求数量').color('请求时间', [ '#98ABC5', '#8A89A6', '#7B6888', '#6B486B', '#A05D56', '#D0743C', '#FF8C00' ])
-    .size(9)
-  chart.render()
-})
+
 class Topology extends React.Component {
   constructor() {
     super()
     this.state = {
-      size: 'defalut',
+      configTime: true,
       firstData: [],
       forceFit: true,
       width: 100,
@@ -64,13 +48,18 @@ class Topology extends React.Component {
       plotCfg: {
         margin: [ 20, 80, 90, 80 ],
         background: {
-          stroke: '#ccc', // 边颜色
-          lineWidth: 1, // 边框粗细
-        }, // 绘图区域背景设置
+          stroke: '#ccc',
+          lineWidth: 1,
+        },
+      },
+      sortPlotCfg: {
+        margin: [ 60, 80, 90, 80 ],
+        background: '#ccc',
+        lineWidth: 1,
       },
       secondData: [],
       thirdData: [],
-      application: null,
+      application: undefined,
       rangeDateTime: [],
       agentList: [],
       currentAgent: 'all,0',
@@ -80,6 +69,7 @@ class Topology extends React.Component {
       checkFailed: true,
       totalCount: 0,
       errorCount: 0,
+      currentBtn: '',
     }
   }
   componentDidMount() {
@@ -116,21 +106,15 @@ class Topology extends React.Component {
       })
     })
   }
+  // 散点图数据
   formatScatterData = () => {
     const { dotList, from, currentAgent, checkSuccess, checkFailed } = this.state
     const data = []
     let objFirst
-    let objSecond
-    let oneSenc = 0
-    let threeSenc = 0
-    let fiveSenc = 0
-    let slow = 0
-    let error = 0
     for (let i = 0; i < dotList.length; i++) {
       for (let j = 0; j < dotList[i].length; j++) {
         const time = dotList[i][0]
         const req = dotList[i][1]
-        const isError = dotList[i][4]
         if (currentAgent && (currentAgent.split(',')[1] !== '0')) {
           if (parseInt(currentAgent.split(',')[1]) !== dotList[i][2]) {
             continue
@@ -151,54 +135,92 @@ class Topology extends React.Component {
             y: req,
           })
         }
-        objSecond = Object.assign({
-          '1s': req < 1000 && j === 1 && isError ? ++oneSenc : oneSenc || 0,
-          '3s': req >= 1000 && req < 3000 && j === 1 && isError ? ++threeSenc : threeSenc || 0,
-          '5s': req >= 3000 && req < 5000 && j === 1 && isError ? ++fiveSenc : fiveSenc || 0,
-          '10s': req >= 5000 && j === 1 && isError ? ++slow : slow || 0,
-          '100s': !isError && j === 4 ? ++error : error || 0,
-        })
       }
-      data.unshift(objFirst)
+      if (objFirst) {
+        data.unshift(objFirst)
+        objFirst = null
+      }
     }
+    this.setState({
+      firstData: data,
+    })
+  }
+  // 柱状图数据
+  getSecondChart = name => {
+    const { currentNode } = this.state
+    const { histogram, agentHistogram } = currentNode
+    const FrameSecond = G2.Frame
     let secondData = []
+    let objSecond
+    if (name === 'all') {
+      objSecond = histogram
+    } else {
+      objSecond = agentHistogram[name]
+    }
     for (const i in objSecond) {
       secondData.push({
         reqTime: i,
         countNum: objSecond[i],
       })
     }
-    const FrameSecond = G2.Frame
     secondData = new FrameSecond(secondData)
     this.setState({
-      firstData: data,
       secondData,
     })
   }
-  getAgentList = arr => {
-    const { application } = this.state
-    const currentNode = arr.filter(item => item.applicationName === application)
-    const { agentHistogram, totalCount, errorCount, timeSeriesHistogram } = currentNode[0]
-    const thirdData = []
-    if (timeSeriesHistogram && timeSeriesHistogram.length) {
-      timeSeriesHistogram.forEach(item => {
-        const obj = {}
-        Object.assign(obj, { key: item.key })
-        const data = item.values
-        data.forEach(record => {
-          Object.assign(obj, { [record[0]]: record[1] })
-        })
-        thirdData.push(obj)
-      })
+  // 分类柱状图数据
+  getSortGroupChart = name => {
+    const { currentNode } = this.state
+    const { timeSeriesHistogram, agentTimeSeriesHistogram } = currentNode
+    if (name === 'all') {
+      this.getSortData(timeSeriesHistogram)
+      return
     }
+    this.getSortData(agentTimeSeriesHistogram)
+  }
+  getSortData = arr => {
+    const thirdData = []
+    arr[0].values.forEach(item => {
+      thirdData.push({
+        time: item[0],
+        '1s': 0,
+        '3s': 0,
+        '5s': 0,
+        Slow: 0,
+        Error: 0,
+      })
+    })
+    thirdData.forEach(record => {
+      arr.forEach(item => {
+        const reqTime = item.key
+        const values = item.values
+        values.forEach(timeWithCount => {
+          if (timeWithCount[0] === record.time) {
+            Object.assign(record, { [reqTime]: record[reqTime] + timeWithCount[1] })
+          }
+        })
+      })
+    })
     const Frame = G2.Frame
     let frame = new Frame(thirdData)
-    frame = Frame.combinColumns(frame, [ '1s', '3s', '5s', 'slow', 'error' ], '请求数量', '请求时间')
+    frame = Frame.combinColumns(frame, [ '1s', '3s', '5s', 'Slow', 'Error' ], '请求数量', '请求时间')
+    this.setState({
+      thirdData: frame,
+    })
+  }
+  getAgentList = arr => {
+    if (!arr.length) { return }
+    const { application } = this.state
+    const currentNode = arr.filter(item => item.applicationName === application)
+    const { agentHistogram, totalCount, errorCount } = currentNode[0]
     this.setState({
       totalCount,
       errorCount,
       agentList: keys(agentHistogram),
-      thirdData: frame,
+      currentNode: currentNode[0],
+    }, () => {
+      this.getSecondChart('all')
+      this.getSortGroupChart('all')
     })
   }
   getPinpointMap = () => {
@@ -214,27 +236,60 @@ class Topology extends React.Component {
     })
     loadPinpointMap(clusterID, apmID, {
       applicationName: application,
-      from: Date.parse(rangeDateTime[0]),
-      to: Date.parse(rangeDateTime[1]),
+      from: rangeDateTime[0].valueOf(),
+      to: rangeDateTime[1].valueOf(),
       callerRange: 4,
       calleeRange: 4,
       serviceTypeName,
     }).then(() => {
       const { pinpoint } = this.props
-      const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData
+      const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [] }
       this.getAgentList(nodeDataArray)
     })
   }
   getData = () => {
+    const { application, rangeDateTime } = this.state
+    if (!application) {
+      message.warning('请选择服务')
+      return
+    }
+    if (!rangeDateTime || !rangeDateTime[0]) {
+      message.warning('请选择开始跟结束时间')
+      return
+    }
     this.loadData()
     this.getPinpointMap()
   }
-  handleSizeChange = e => {
-    this.setState({ size: e.target.value })
+  // 获取一段时间内的时间戳
+  getTimeArr = time => {
+    const now = Date.parse(new Date())
+    let startTime
+    if (time === 'fiveMin') {
+      startTime = now - (5 * 60 * 1000)
+    } else if (time === 'threeHour') {
+      startTime = now - (3 * 60 * 60 * 1000)
+    } else if (time === 'today') {
+      startTime = new Date(new Date().setHours(0, 0, 0, 0))
+    } else if (time === 'yesterday') {
+      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)).valueOf()
+    } else if (time === 'beforeYes') {
+      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
+    }
+    this.setState({
+      rangeDateTime: [ startTime, now ],
+      currentBtn: time,
+    }, () => {
+      this.getData()
+    })
+  }
+  changeTimeShow = () => {
+    const { configTime } = this.state
+    this.setState({ configTime: !configTime, rangeDateTime: [] })
   }
   selectAgent = currentAgent => {
     this.setState({ currentAgent }, () => {
       this.formatScatterData()
+      this.getSecondChart(currentAgent.split(',')[0])
     })
   }
   checkSuccess = e => {
@@ -252,7 +307,7 @@ class Topology extends React.Component {
     })
   }
   render() {
-    const { size, application, rangeDateTime, agentList, currentAgent } = this.state
+    const { configTime, application, rangeDateTime, agentList, currentAgent, currentBtn } = this.state
     const { apps } = this.props
     const Chart1 = createG2(chart => {
       chart.setMode('select') // 开启框选模式
@@ -261,8 +316,8 @@ class Topology extends React.Component {
         alias: ' ',
         nice: false, // 不对最大最小值优化
         // tickInterval: 10000,
-        min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
-        max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
+        // min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
+        // max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
       })
       chart.col('y', {
         alias: ' ',
@@ -299,7 +354,7 @@ class Topology extends React.Component {
         .color('#3182bd')
         .opacity(0.5)
         .shape('circle')
-        .tooltip('y')
+        .tooltip('x*y')
       chart.render()
       // 监听双击事件，这里用于复原图表
       chart.on('plotdblclick', function() {
@@ -312,13 +367,13 @@ class Topology extends React.Component {
       '1s': '#5bb85d',
       '3s': '#2db7f5',
       '5s': '#8e68fc',
-      '10s': '#ffc000',
-      '100s': '#f85a5b',
+      Slow: '#ffc000',
+      Error: '#f85a5b',
     }
     const Chart2 = createG2(chart => {
       chart.axis('reqTime', {
         formatter(val) {
-          return val === '10s' ? 'slow' : (val === '100s' ? 'error' : val)
+          return val
         },
       })
       chart.axis('countNum', {
@@ -338,13 +393,50 @@ class Topology extends React.Component {
         .color('reqTime', countNum => colorSet[countNum])
       chart.render()
     })
+    // 柱状筛选
+    const Chart3 = createG2(chart => {
+      chart.legend({
+        position: 'top',
+      })
+      chart.axis('time', {
+        title: null,
+        formatter(val) {
+          return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+        },
+      })
+      chart.col('请求数量', {
+        alias: ' ',
+      })
+      chart.col('time', {
+        alias: ' ',
+      })
+      chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
+        .size(9)
+      chart.render()
+    })
+    const btnArr = [{
+      key: 'fiveMin',
+      text: '最近5分钟',
+    }, {
+      key: 'threeHour',
+      text: '最近3小时',
+    }, {
+      key: 'today',
+      text: '今天',
+    }, {
+      key: 'yesterday',
+      text: '昨天',
+    }, {
+      key: 'beforeYes',
+      text: '最近2天',
+    }]
     return (
       <div className="topology">
         <div className="layout-content-btns">
           <Select
             showSearch
             style={{ width: 200 }}
-            placeholder="选择微服务 （展示其所在链路拓扑）"
+            placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
             onChange={application => this.setState({ application })}
@@ -355,25 +447,27 @@ class Topology extends React.Component {
               ))
             }
           </Select>
-          <Button>
+          <Button onClick={this.getData}>
             <i className="fa fa-refresh"/> 刷新
           </Button>
-          <RangePicker
-            showTime={{ format: 'HH:mm' }}
-            format="YYYY-MM-DD HH:mm"
-            placeholder={[ '开始日期', '结束日期' ]}
-            value={rangeDateTime}
-            onChange={rangeDateTime => this.setState({ rangeDateTime })}
-            onOk={this.getData}
-          />
-          <Radio.Group value={size} onChange={this.handleSizeChange}>
-            <Radio.Button value="option"><Icon type="calendar" /> 自定义日期</Radio.Button>
-            <Radio.Button value="fiveMin">最近5分钟</Radio.Button>
-            <Radio.Button value="threeHour">3小时</Radio.Button>
-            <Radio.Button value="today">今天</Radio.Button>
-            <Radio.Button value="yesterday">昨天</Radio.Button>
-            <Radio.Button value="sevenDay">最近7天</Radio.Button>
-          </Radio.Group>
+          <ButtonGroup>
+            <Button type="primary" onClick={this.changeTimeShow}><Icon type="calendar"/> 自定义日期</Button>
+            {
+              configTime ?
+                <RangePicker
+                  showTime={{ format: 'HH:mm' }}
+                  format="YYYY-MM-DD HH:mm"
+                  placeholder={[ '开始日期', '结束日期' ]}
+                  value={rangeDateTime}
+                  onChange={rangeDateTime => this.setState({ rangeDateTime })}
+                  onOk={this.getData}
+                />
+                :
+                btnArr.map(item => {
+                  return <Button key={item.key} className={classNames({ 'topology-btn-active': currentBtn === item.key })} onClick={() => this.getTimeArr(item.key)}>{item.text}</Button>
+                })
+            }
+          </ButtonGroup>
         </div>
         <Row className="topology-body layout-content-body">
           <Col span={14} className="topology-body-relation-schema">
@@ -451,7 +545,7 @@ class Topology extends React.Component {
                   data={this.state.thirdData}
                   width={this.state.width}
                   height={this.state.height}
-                  plotCfg={this.state.plotCfg}
+                  plotCfg={this.state.sortPlotCfg}
                   forceFit={this.state.forceFit} />
               </div>
             </div>
