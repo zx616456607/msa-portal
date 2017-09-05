@@ -17,8 +17,7 @@ import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 import { formatDate } from '../../../common/utils.js'
-// import SynchronizedG2Group from '../../../components/CreateG2Group/demo/SynchronizedG2Group'
-import CreateG2Group from '../../../components/CreateG2Group/index.js'
+import CreateG2Group from '../../../components/CreateG2Group'
 
 const LayoutContent = Layout.Content
 const Option = Select.Option
@@ -26,14 +25,12 @@ const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
 
-
 let visib = 'hidden'
 const Chart = chart => {
   chart.line().position('time*count').size(2)
   chart.setMode('select')
   chart.select('rangeX')
   chart.on('rangeselectstart', () => {
-    console.log(1234)
     visib = 'initial'
   })
   chart.tooltip({
@@ -114,22 +111,6 @@ class Performance extends React.Component {
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     loadPPApps(clusterID, apmID)
-  }
-  componentDidMount() {
-    const Ary = [
-      { time: '10:10', call: 4, waiting: 2 },
-      { time: '10:15', call: 2, waiting: 6 },
-      { time: '10:20', call: 13, waiting: 2 },
-      { time: '10:25', call: 9, waiting: 9 },
-      { time: '10:30', call: 5, waiting: 2 },
-      { time: '10:35', call: 8, waiting: 2 },
-      { time: '10:40', call: 13, waiting: 1 },
-    ]
-    let frame = new Frame(Ary)
-    frame = Frame.combinColumns(frame, [ 'call' ], 'count')// , [ 'call' ], 'count', 'type'
-    this.setState({
-      data: frame,
-    })
   }
 
   /**
