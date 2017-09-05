@@ -72,13 +72,17 @@ class App extends React.Component {
   }
 
   renderErrorMessage = () => {
-    const { errorMessage } = this.props
+    const { errorMessage, resetErrorMessage } = this.props
     if (!errorMessage) {
       return null
     }
-    notification.error({
-      message: errorMessage,
+    setTimeout(() => {
+      notification.error({
+        message: errorMessage,
+        onClose: resetErrorMessage,
+      })
     })
+    setTimeout(() => resetErrorMessage(), 4500)
   }
 
   renderLoading = tip => (

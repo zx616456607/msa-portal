@@ -60,6 +60,11 @@ const callApi = (endpoint, options, schema) => {
         return Object.assign({},
           normalize(json, schema),
         )
+      }).catch(() => {
+        const { status, statusText } = response
+        const error = new Error(statusText)
+        error.status = status
+        return Promise.reject(error)
       })
     )
 }
