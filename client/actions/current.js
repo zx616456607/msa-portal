@@ -45,6 +45,7 @@ export const CURRENT_USER_FAILURE = 'CURRENT_USER_FAILURE'
 // Relies on the custom API middleware defined in ../middleware/api.js.
 const fetchCurrentUser = userID => {
   return {
+    userID,
     [CALL_API]: {
       types: [ CURRENT_USER_REQUEST, CURRENT_USER_SUCCESS, CURRENT_USER_FAILURE ],
       endpoint: `/users/${userID}`,
