@@ -12,20 +12,18 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Icon, DatePicker, Row, Col, Checkbox, Select, message } from 'antd'
+import { Row, Col, Checkbox, Select, message } from 'antd'
 import '../style/topology.less'
 import RelationSchema from '../../../components/RelationSchema'
-const { RangePicker } = DatePicker
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
+import ApmButtonGroup from '../../../components/ApmButtonGroup'
 import createG2 from 'g2-react'
 const G2 = require('g2')
 import keys from 'lodash/keys'
-import classNames from 'classnames'
 const Option = Select.Option
-const ButtonGroup = Button.Group
 
 // 点图
 // 设置鼠标 hove 至气泡的样式
@@ -40,7 +38,6 @@ class Topology extends React.Component {
   constructor() {
     super()
     this.state = {
-      configTime: true,
       firstData: [],
       forceFit: true,
       width: 100,
@@ -64,15 +61,19 @@ class Topology extends React.Component {
       agentList: [],
       currentAgent: 'all,0',
       dotList: [],
-      from: null,
+      from: undefined,
       checkSuccess: true,
       checkFailed: true,
       totalCount: 0,
       errorCount: 0,
-      currentBtn: '',
     }
   }
-  componentDidMount() {
+  componentWillMount() {
+    const now = Date.parse(new Date())
+    const startTime = now - (5 * 60 * 1000)
+    this.setState({
+      rangeDateTime: [ startTime, now ],
+    })
   }
   loadData = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
@@ -94,7 +95,10 @@ class Topology extends React.Component {
       yGroupUnit: Y_GROUP_UNIT,
       limit: PINPOINT_LIMIT,
     }
-    loadScatterData(clusterID, apmID, query).then(() => {
+    loadScatterData(clusterID, apmID, query).then(res => {
+      if (res.error) {
+        return
+      }
       const { pinpoint } = this.props
       const { scatter, from } = pinpoint.queryScatter[apmID][application]
       const { dotList } = scatter
@@ -226,7 +230,7 @@ class Topology extends React.Component {
   getPinpointMap = () => {
     const { clusterID, apmID, loadPinpointMap, apps } = this.props
     const { rangeDateTime, application } = this.state
-    let serviceTypeName
+    let serviceTypeName = ''
     apps.every(app => {
       if (app.applicationName === application) {
         serviceTypeName = app.serviceType
@@ -241,7 +245,10 @@ class Topology extends React.Component {
       callerRange: 4,
       calleeRange: 4,
       serviceTypeName,
-    }).then(() => {
+    }).then(res => {
+      if (res.error) {
+        return
+      }
       const { pinpoint } = this.props
       const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [] }
       this.getAgentList(nodeDataArray)
@@ -259,32 +266,6 @@ class Topology extends React.Component {
     }
     this.loadData()
     this.getPinpointMap()
-  }
-  // 获取一段时间内的时间戳
-  getTimeArr = time => {
-    const now = Date.parse(new Date())
-    let startTime
-    if (time === 'fiveMin') {
-      startTime = now - (5 * 60 * 1000)
-    } else if (time === 'threeHour') {
-      startTime = now - (3 * 60 * 60 * 1000)
-    } else if (time === 'today') {
-      startTime = new Date(new Date().setHours(0, 0, 0, 0))
-    } else if (time === 'yesterday') {
-      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)).valueOf()
-    } else if (time === 'beforeYes') {
-      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
-    }
-    this.setState({
-      rangeDateTime: [ startTime, now ],
-      currentBtn: time,
-    }, () => {
-      this.getData()
-    })
-  }
-  changeTimeShow = () => {
-    const { configTime } = this.state
-    this.setState({ configTime: !configTime, rangeDateTime: [] })
   }
   selectAgent = currentAgent => {
     this.setState({ currentAgent }, () => {
@@ -306,9 +287,25 @@ class Topology extends React.Component {
       this.formatScatterData()
     })
   }
+  getCurrentApp = application => {
+    this.setState({
+      application,
+    }, () => {
+      this.getData()
+    })
+  }
+  getTimeRange = rangeDateTime => {
+    this.setState({
+      rangeDateTime,
+    }, () => {
+      this.getData()
+    })
+  }
   render() {
-    const { configTime, application, rangeDateTime, agentList, currentAgent, currentBtn } = this.state
-    const { apps } = this.props
+    const { application, rangeDateTime, agentList, currentAgent } = this.state
+    const { apmID, pinpoint } = this.props
+    const sub = pinpoint.queryScatter[apmID]
+    const isEmpty = sub && sub[application] && sub[application].scatter && sub[application].scatter.length
     const Chart1 = createG2(chart => {
       chart.setMode('select') // 开启框选模式
       chart.select('rangeX') // 设置 X 轴范围的框选
@@ -428,143 +425,118 @@ class Topology extends React.Component {
         .size(9)
       chart.render()
     })
-    const btnArr = [{
-      key: 'fiveMin',
-      text: '最近5分钟',
-    }, {
-      key: 'threeHour',
-      text: '最近3小时',
-    }, {
-      key: 'today',
-      text: '今天',
-    }, {
-      key: 'yesterday',
-      text: '昨天',
-    }, {
-      key: 'beforeYes',
-      text: '最近2天',
-    }]
     return (
       <div className="topology">
-        <div className="layout-content-btns">
-          <Select
-            showSearch
-            style={{ width: 150 }}
-            placeholder="选择微服务"
-            optionFilterProp="children"
-            value={application}
-            onChange={application => this.setState({ application })}
-          >
-            {
-              apps.map(app => (
-                <Option key={app.applicationName}>{app.applicationName}</Option>
-              ))
-            }
-          </Select>
-          <Button icon="reload" onClick={this.getData}>
-            刷新
-          </Button>
-          <ButtonGroup>
-            <Button type="primary" onClick={this.changeTimeShow}><Icon type="calendar"/> 自定义日期</Button>
-            {
-              configTime ?
-                <RangePicker
-                  showTime={{ format: 'HH:mm' }}
-                  format="YYYY-MM-DD HH:mm"
-                  placeholder={[ '开始日期', '结束日期' ]}
-                  value={rangeDateTime}
-                  onChange={rangeDateTime => this.setState({ rangeDateTime })}
-                  onOk={this.getData}
-                />
-                :
-                btnArr.map(item => {
-                  return <Button key={item.key} className={classNames({ 'topology-btn-active': currentBtn === item.key })} onClick={() => this.getTimeArr(item.key)}>{item.text}</Button>
-                })
-            }
-          </ButtonGroup>
-        </div>
-        <Row className="topology-body layout-content-body">
-          <Col span={14} className="topology-body-relation-schema">
-            <RelationSchema data={[]}/>
-          </Col>
-          <Col span={10} className="topology-body-service-detail">
-            <Row className="service-info">
-              <Col span={6}>
-              image
-              </Col>
-              <Col span={18}>
-                <div className="service-info-name">service-micro#1</div>
-                <div className="service-info-app">application-micro#0</div>
-                <div className="service-info-status">状态：在线</div>
-                <div className="service-info-example">实例数量：2/2</div>
-              </Col>
-            </Row>
-            <div className="service-chart-wrapper">
-              <Row style={{ margin: '10px 0' }}>
-                <Col span={6} style={{ lineHeight: '32px' }}>
-                  服务实例
-                </Col>
-                <Col span={18}>
-                  <Select
-                    showSearch
-                    style={{ width: 200 }}
-                    placeholder="选择微服务"
-                    optionFilterProp="children"
-                    value={currentAgent}
-                    onChange={this.selectAgent}
-                  >
-                    <Option key="all,0">All</Option>
-                    {
-                      agentList.map((item, index) => (
-                        <Option key={`${item},${index + 1}`}>{item}</Option>
-                      ))
-                    }
-                  </Select>
-                </Col>
-              </Row>
-              <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
-              <Row style={{ margin: '10px 0' }}>
-                <Col span={6} offset={6}>
-                  <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
-                </Col>
-                <Col span={6}>
-                  <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
-                </Col>
-              </Row>
-              <div>
-                <Chart1
-                  data={this.state.firstData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  plotCfg={this.state.plotCfg}
-                  forceFit={this.state.forceFit}
-                />
-              </div>
-              <div>
-                请求响应时间摘要（2 day）：{this.state.totalCount}
-              </div>
-              <div>
-                <Chart2
-                  data={this.state.secondData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  forceFit={this.state.forceFit}
-                />
-              </div>
-              <div>
-                请求分时段负载（2 day）：{this.state.totalCount}
-              </div>
-              <div>
-                <Chart3
-                  data={this.state.thirdData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  plotCfg={this.state.sortPlotCfg}
-                  forceFit={this.state.forceFit} />
-              </div>
+        <ApmButtonGroup
+          getCurrentApp={this.getCurrentApp}
+          loadData={this.getData}
+          getTimeRange={this.getTimeRange}
+          rangeDateTime={rangeDateTime}
+          application={application}
+        />
+        {
+          (!application || !rangeDateTime.length)
+            ?
+            <div className="topology-default">
+              <img src={require('../../../assets/img/apm/topology-default.png')}/>
+              <p>请选择上述申请和期限</p>
             </div>
-          </Col>
-        </Row>
+            :
+            <Row className="topology-body layout-content-body">
+              <Col span={14} className="topology-body-relation-schema">
+                {
+                  isEmpty
+                    ?
+                    <div className="topology-body-empty">
+                      <img src={require('../../../assets/img/apm/topology-empty.png')}/>
+                      <p>暂时无数据</p>
+                    </div>
+                    :
+                    <RelationSchema data={[]}/>
+                }
+              </Col>
+              {
+                isEmpty ? '' :
+                  <Col span={10} className="topology-body-service-detail">
+                    <Row className="service-info">
+                      <Col span={6}>
+                        image
+                      </Col>
+                      <Col span={18}>
+                        <div className="service-info-name">service-micro#1</div>
+                        <div className="service-info-app">application-micro#0</div>
+                        <div className="service-info-status">状态：在线</div>
+                        <div className="service-info-example">实例数量：2/2</div>
+                      </Col>
+                    </Row>
+                    <div className="service-chart-wrapper">
+                      <Row style={{ margin: '10px 0' }}>
+                        <Col span={6} style={{ lineHeight: '32px' }}>
+                          服务实例
+                        </Col>
+                        <Col span={18}>
+                          <Select
+                            showSearch
+                            style={{ width: 200 }}
+                            placeholder="选择微服务"
+                            optionFilterProp="children"
+                            value={currentAgent}
+                            onChange={this.selectAgent}
+                          >
+                            <Option key="all,0">All</Option>
+                            {
+                              agentList.map((item, index) => (
+                                <Option key={`${item},${index + 1}`}>{item}</Option>
+                              ))
+                            }
+                          </Select>
+                        </Col>
+                      </Row>
+                      <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
+                      <Row style={{ margin: '10px 0' }}>
+                        <Col span={6} offset={6}>
+                          <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
+                        </Col>
+                        <Col span={6}>
+                          <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
+                        </Col>
+                      </Row>
+                      <div>
+                        <Chart1
+                          data={this.state.firstData}
+                          width={this.state.width}
+                          height={this.state.height}
+                          plotCfg={this.state.plotCfg}
+                          forceFit={this.state.forceFit}
+                        />
+                      </div>
+                      <div>
+                        请求响应时间摘要（2 day）：{this.state.totalCount}
+                      </div>
+                      <div>
+                        <Chart2
+                          data={this.state.secondData}
+                          width={this.state.width}
+                          height={this.state.height}
+                          forceFit={this.state.forceFit}
+                        />
+                      </div>
+                      <div>
+                        请求分时段负载（2 day）：{this.state.totalCount}
+                      </div>
+                      <div>
+                        <Chart3
+                          data={this.state.thirdData}
+                          width={this.state.width}
+                          height={this.state.height}
+                          plotCfg={this.state.sortPlotCfg}
+                          forceFit={this.state.forceFit} />
+                      </div>
+                    </div>
+                  </Col>
+              }
+            </Row>
+        }
       </div>
     )
   }
