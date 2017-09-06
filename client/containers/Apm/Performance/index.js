@@ -39,7 +39,7 @@ class Performance extends React.Component {
     agentData: [],
     exampleData: [],
     timer: [],
-    timers: null,
+    timers: {},
     serviceName: '',
     heapData: [],
     gcData: [],
@@ -48,7 +48,7 @@ class Performance extends React.Component {
     tranData: [],
     isRowData: false,
     sTimer: '',
-    fiveTimer: '',
+    customTimer: '',
   }
 
   componentWillMount() {
@@ -56,7 +56,7 @@ class Performance extends React.Component {
     loadPPApps(clusterID, apmID)
     this.setState({
       sTimer: Date.parse(new Date()),
-      fiveTimer: Date.parse(new Date(new Date() - 300 * 1000)),
+      customTimer: Date.parse(new Date(new Date() - 300 * 1000)),
     })
   }
 
@@ -81,23 +81,25 @@ class Performance extends React.Component {
    */
   handleCustomTimer = () => {
     const { Timer, serviceName } = this.state
-    const curTimer = {
-      sTimer: Date.parse(Timer[0]),
-      eTimer: Date.parse(Timer[1]),
+    if (serviceName === null) {
+      const curTimer = {
+        sTimer: Date.parse(Timer[0]),
+        eTimer: Date.parse(Timer[1]),
+      }
+      this.setState({
+        timers: curTimer,
+      })
+      serviceName ? this.handleSelect(serviceName) : ''
     }
-    this.setState({
-      timers: curTimer,
-    })
-    serviceName ? this.handleSelect(serviceName) : ''
   }
 
   handleSelect = value => {
     const { clusterID, apmID, fetchAgentData, loadPinpointMap } = this.props
-    const { timers, fiveTimer, sTimer } = this.state
+    const { timers, customTimer, sTimer } = this.state
     const query = {
       applicationName: value,
-      from: Object.keys(timers).length > 0 ? timers.sTimer : sTimer,
-      to: Object.keys(timers).length > 0 ? timers.eTimer : fiveTimer,
+      from: Object.keys(timers).length > 0 ? timers.sTimer : customTimer,
+      to: Object.keys(timers).length > 0 ? timers.eTimer : sTimer,
       calleeRange: 4,
       callerRange: 4,
       serviceTypeName: 'STAND_ALONE',
@@ -135,12 +137,12 @@ class Performance extends React.Component {
   }
 
   loadChartData = value => {
-    const { timers, fiveTimer, sTimer } = this.state
+    const { timers, customTimer, sTimer } = this.state
     const { clusterID, apmID, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } = this.props
     const query = {
       agentId: value,
-      from: Object.keys(timers).length > 0 ? timers.sTimer : sTimer,
-      to: Object.keys(timers).length > 0 ? timers.eTimer : fiveTimer,
+      from: Object.keys(timers).length > 0 ? timers.sTimer : customTimer,
+      to: Object.keys(timers).length > 0 ? timers.eTimer : sTimer,
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
       if (res.error) {
@@ -152,31 +154,26 @@ class Performance extends React.Component {
         permGenMax: res.response.result.charts.JVM_MEMORY_NON_HEAP_MAX, // PermGen Usage
         permGenSued: res.response.result.charts.JVM_MEMORY_NON_HEAP_USED,
       }
-      let heapObj = null
-      const heapAry = []
-      chartJVM.heapMax.points.forEach((item, index) => {
-        heapObj = Object.assign({
+
+      const heapAry = chartJVM.heapMax.points.map((item, index) => (
+        {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
           yVal: chartJVM.heapSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
-        })
-        heapAry.push(heapObj)
-      })
+        }
+      ))
       let frame = new Frame(heapAry)
       frame = Frame.combinColumns(frame, [ 'xVal' ], 'count')
       this.setState({
         heapData: frame,
       })
-      let permObj = null
-      const permAry = []
-      chartJVM.permGenMax.points.forEach((item, index) => {
-        permObj = {
+      const permAry = chartJVM.permGenMax.points.map((item, index) => (
+        {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.permGenSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
         }
-        permAry.push(permObj)
-      })
+      ))
       let frames = new Frame(permAry)
       frames = Frame.combinColumns(frames, [ 'xVal' ], 'count')
       this.setState({
@@ -192,16 +189,13 @@ class Performance extends React.Component {
         system: res.response.result.charts.CPU_LOAD_SYSTEM,
         jvm: res.response.result.charts.CPU_LOAD_JVM,
       }
-      let cpuObj = null
-      const cpumAry = []
-      chartJVM.system.points.forEach((item, index) => {
-        cpuObj = {
+      const cpumAry = chartJVM.system.points.map((item, index) => (
+        {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.jvm.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
         }
-        cpumAry.push(cpuObj)
-      })
+      ))
       let frame = new Frame(cpumAry)
       frame = Frame.combinColumns(frame, [ 'yVal', 'xVal' ], 'value')
       this.setState({
@@ -220,18 +214,16 @@ class Performance extends React.Component {
         total: res.response.result.charts.TPS_TOTAL,
         sampled_n: res.response.result.charts.TPS_SAMPLED_NEW,
       }
-      let tranObj = null
-      const tranAry = []
-      chartJVM.unsampled_c.points.forEach((item, index) => {
-        tranObj = {
+
+      const tranAry = chartJVM.unsampled_c.points.map((item, index) => (
+        {
           time: this.dateFtt(item.xVal),
           total: chartJVM.total.points[index].maxYVal === -1 ? 0 : chartJVM.total.points[index].maxYVal,
           unsampledNew: chartJVM.unsampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.unsampled_n.points[index].maxYVal,
           sampledContinuation: chartJVM.sampled.points[index].maxYVal === -1 ? 0 : chartJVM.sampled.points[index].maxYVal,
           sampledNew: chartJVM.sampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.sampled_n.points[index].maxYVal,
         }
-        tranAry.push(tranObj)
-      })
+      ))
       let frame = new Frame(tranAry)
       frame = Frame.combinColumns(frame, [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ], 'count')
       this.setState({
@@ -266,17 +258,40 @@ class Performance extends React.Component {
     }
   }
   handleLatelyTimer = timer => {
-    switch (timer) {
-      case 'five':
-        return Date.parse(new Date(new Date() - 300 * 1000))
-      case 'yesterday':
-        return Date.parse(new Date(new Date() - 24 * 60 * 60 * 1000))
-      case 'three':
-        return Date.parse(new Date(new Date() - 180 * 60 * 1000))
-      case 'seven':
-        return Date.parse(new Date(new Date() - 168 * 60 * 60 * 1000))
-      default:
-        return Date.parse(new Date())
+    const { serviceName } = this.state
+    if (serviceName) {
+      switch (timer) {
+        case 'five':
+          this.setState({
+            customTimer: Date.parse(new Date(new Date() - 300 * 1000)),
+          })
+          this.handleSelect(serviceName)
+          break
+        case 'yesterday':
+          this.setState({
+            customTimer: Date.parse(new Date(new Date() - 24 * 60 * 60 * 1000)),
+          })
+          this.handleSelect(serviceName)
+          break
+        case 'three':
+          this.setState({
+            customTimer: Date.parse(new Date(new Date() - 180 * 60 * 1000)),
+          })
+          this.handleSelect(serviceName)
+          break
+        case 'seven':
+          this.setState({
+            customTimer: Date.parse(new Date(new Date() - 168 * 60 * 60 * 1000)),
+          })
+          this.handleSelect(serviceName)
+          break
+        default:
+          this.setState({
+            customTimer: Date.parse(new Date()),
+          })
+          this.handleSelect(serviceName)
+          break
+      }
     }
   }
 
@@ -286,15 +301,16 @@ class Performance extends React.Component {
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
     nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
-      nodeData.applicationMapData.nodeDataArray.forEach(item => {
-        if (item.applicationName === serviceName) {
-          if (Object.keys(item.agentHistogram).length !== 0) {
-            for (const node in item.agentHistogram) {
-              nodeName.push(node)
+      nodeData.applicationMapData.nodeDataArray.length > 0 ?
+        nodeData.applicationMapData.nodeDataArray.forEach(item => {
+          if (item.applicationName === serviceName) {
+            if (Object.keys(item.agentHistogram).length !== 0) {
+              for (const node in item.agentHistogram) {
+                nodeName.push(node)
+              }
             }
           }
-        }
-      }) : '' : ''
+        }) : '' : '' : ''
 
     const Charts = chart => {
       chart.line().position('time*count')
@@ -470,11 +486,11 @@ class Performance extends React.Component {
                 {
                   isTimerShow ?
                     <Row>
-                      <Button className="btn" onClick={this.handleLatelyTimer('five')} >最近5分钟</Button>
-                      <Button className="btn" onClick={this.handleLatelyTimer('three')}>3小时</Button>
-                      <Button className="btn" onClick={this.handleLatelyTimer('today')}>今天</Button>
-                      <Button className="btn" onClick={this.handleLatelyTimer('yesterday')}>昨天</Button>
-                      <Button className="btn" onClick={this.handleLatelyTimer('seven')}>最近7天</Button>
+                      <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
+                      <Button className="btn" onClick={() => this.handleLatelyTimer('three')}>3小时</Button>
+                      <Button className="btn" onClick={() => this.handleLatelyTimer('today')}>今天</Button>
+                      <Button className="btn" onClick={() => this.handleLatelyTimer('yesterday')}>昨天</Button>
+                      <Button className="btn" onClick={() => this.handleLatelyTimer('seven')}>最近7天</Button>
                     </Row> :
                     <Row>
                       <RangePicker
