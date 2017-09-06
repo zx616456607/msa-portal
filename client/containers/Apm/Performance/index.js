@@ -16,14 +16,19 @@ import G2 from 'g2'
 import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
-import { formatDate } from '../../../common/utils.js'
 import CreateG2Group from '../../../components/CreateG2Group'
+import performance from '../../../assets/img/apm/performance.png'
 
 const LayoutContent = Layout.Content
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
+const images = [
+  { src: require('../../../assets/img/apm/service/Java.svg') },
+  { src: require('../../../assets/img/apm/service/mysql.svg') },
+  { src: require('../../../assets/img/apm/service/tomcat.svg') },
+]
 
 class Performance extends React.Component {
   state = {
@@ -34,18 +39,25 @@ class Performance extends React.Component {
     agentData: [],
     exampleData: [],
     timer: [],
-    Timers: [],
+    timers: null,
     serviceName: '',
     heapData: [],
     gcData: [],
     permData: [],
     cpuData: [],
     tranData: [],
+    isRowData: false,
+    sTimer: '',
+    fiveTimer: '',
   }
 
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     loadPPApps(clusterID, apmID)
+    this.setState({
+      sTimer: Date.parse(new Date()),
+      fiveTimer: Date.parse(new Date(new Date() - 300 * 1000)),
+    })
   }
 
   /**
@@ -68,24 +80,24 @@ class Performance extends React.Component {
    * 已定义日期
    */
   handleCustomTimer = () => {
-    const { Timers, serviceName } = this.state
+    const { Timer, serviceName } = this.state
     const curTimer = {
-      sTimer: Date.parse(Timers[0]),
-      eTimer: Date.parse(Timers[1]),
+      sTimer: Date.parse(Timer[0]),
+      eTimer: Date.parse(Timer[1]),
     }
     this.setState({
-      timer: curTimer,
+      timers: curTimer,
     })
     serviceName ? this.handleSelect(serviceName) : ''
   }
 
   handleSelect = value => {
     const { clusterID, apmID, fetchAgentData, loadPinpointMap } = this.props
-    const { Timers } = this.state
+    const { timers, fiveTimer, sTimer } = this.state
     const query = {
       applicationName: value,
-      from: Timers.length > 0 ? Timers[0] : '1504610853000',
-      to: Timers.length > 0 ? Timers[1] : '1504611153000',
+      from: Object.keys(timers).length > 0 ? timers.sTimer : sTimer,
+      to: Object.keys(timers).length > 0 ? timers.eTimer : fiveTimer,
       calleeRange: 4,
       callerRange: 4,
       serviceTypeName: 'STAND_ALONE',
@@ -105,6 +117,9 @@ class Performance extends React.Component {
       Object.keys(res.response.result).length > 0 ?
         this.loadChartData(res.response.result[value][0].agentId) : null
     })
+    this.setState({
+      isRowData: true,
+    })
   }
 
   handleOnExample = value => {
@@ -121,12 +136,12 @@ class Performance extends React.Component {
   }
 
   loadChartData = value => {
-    const { Timers } = this.state
+    const { timers, fiveTimer, sTimer } = this.state
     const { clusterID, apmID, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } = this.props
     const query = {
       agentId: value,
-      from: Timers.length > 0 ? Timers[0] : '1504610853000',
-      to: Timers.length > 0 ? Timers[1] : '1504611153000',
+      from: Object.keys(timers).length > 0 ? timers.sTimer : sTimer,
+      to: Object.keys(timers).length > 0 ? timers.eTimer : fiveTimer,
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
       const chartJVM = {
@@ -139,7 +154,7 @@ class Performance extends React.Component {
       const heapAry = []
       chartJVM.heapMax.points.map((item, index) => {
         heapObj = Object.assign({
-          timer: this.dateFtt(item.xVal), // formatDate(Number(item.xVal), 'HH:mm:ss')
+          time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
           yVal: chartJVM.heapSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
         })
@@ -155,7 +170,7 @@ class Performance extends React.Component {
       const permAry = []
       chartJVM.permGenMax.points.map((item, index) => {
         permObj = {
-          timer: formatDate(Number(item.maxYVal), 'HH:mm:ss'),
+          time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.permGenSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
         }
@@ -178,7 +193,7 @@ class Performance extends React.Component {
       const cpumAry = []
       chartJVM.system.points.map((item, index) => {
         cpuObj = {
-          timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
+          time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.jvm.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
         }
@@ -204,7 +219,7 @@ class Performance extends React.Component {
       const tranAry = []
       chartJVM.unsampled_c.points.map((item, index) => {
         tranObj = {
-          timer: formatDate(Number(item.xVal), 'HH:mm:ss'),
+          time: this.dateFtt(item.xVal),
           total: chartJVM.total.points[index].maxYVal === -1 ? 0 : chartJVM.total.points[index].maxYVal,
           unsampledNew: chartJVM.unsampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.unsampled_n.points[index].maxYVal,
           sampledContinuation: chartJVM.sampled.points[index].maxYVal === -1 ? 0 : chartJVM.sampled.points[index].maxYVal,
@@ -214,7 +229,7 @@ class Performance extends React.Component {
         return null
       })
       let frame = new Frame(tranAry)
-      frame = Frame.combinColumns(frame, [ 'total' ], 'count')
+      frame = Frame.combinColumns(frame, [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ], 'count')
       this.setState({
         tranData: frame,
       })
@@ -228,32 +243,58 @@ class Performance extends React.Component {
     return Number((bytes / Math.pow(k, i)).toFixed(1))
   }
   dateFtt = value => {
-    const d = Date(value)
-    return d.toLocaleDateString().replace(/\//g, '-') + ' ' + d.toTimeString().substr(0, 8)
+    const date = new Date(value)
+    const dd = date.toLocaleDateString().replace(/\//g, '/') + ' ' + date.toTimeString().substr(0, 8)
+    return dd
+  }
+  handleRefresh = () => {
+    const { serverName } = this.state
+    serverName ? this.handleSelect(serverName) : ''
+  }
+  serverType = type => {
+    switch (type) {
+      case 'MYSQL':
+        return images[1].src
+      case 'TOMCAT':
+        return images[2].src
+      default:
+        return images[0].src
+    }
+  }
+  handleLatelyTimer = timer => {
+    switch (timer) {
+      case 'five':
+        return Date.parse(new Date(new Date() - 300 * 1000))
+      case 'yesterday':
+        return Date.parse(new Date(new Date() - 24 * 60 * 60 * 1000))
+      case 'three':
+        return Date.parse(new Date(new Date() - 180 * 60 * 1000))
+      case 'seven':
+        return Date.parse(new Date(new Date() - 168 * 60 * 60 * 1000))
+      default:
+        return Date.parse(new Date())
+    }
   }
 
-  handleRefresh = () => { }
-
   render() {
-    const { isTimerShow, timer, exampleData, serviceName, heapData } = this.state
+    const { isTimerShow, timer, exampleData, agentData, serviceName, heapData, cpuData, gcData, tranData, isRowData } = this.state
     const { apps, serverName } = this.props
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
     nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
-      nodeData.applicationMapData.nodeDataArray.length > 0 ?
-        nodeData.applicationMapData.nodeDataArray.map(item => {
-          if (item.applicationName === serviceName) {
-            if (Object.keys(item.agentHistogram).length !== 0) {
-              for (const node in item.agentHistogram) {
-                nodeName.push(node)
-              }
+      nodeData.applicationMapData.nodeDataArray.map(item => {
+        if (item.applicationName === serviceName) {
+          if (Object.keys(item.agentHistogram).length !== 0) {
+            for (const node in item.agentHistogram) {
+              nodeName.push(node)
             }
           }
-          return null
-        }) : '' : '' : ''
+        }
+        return null
+      }) : '' : ''
 
     const Charts = chart => {
-      chart.line().position('timer*count')
+      chart.line().position('time*count')
       chart.setMode('select')
       chart.select('rangeX')
       chart.on('rangeselectstart', () => {
@@ -261,18 +302,18 @@ class Performance extends React.Component {
       chart.tooltip({
         crosshairs: true,
       })
-      chart.axis('timer', {
+      chart.axis('time', {
         title: null,
       })
       chart.source(heapData, {
         time: {
-          type: 'timer',
-          tickCount: 3,
-          mask: 'hh:MM',
+          type: 'time',
+          tickCount: 10,
+          mask: 'hh:mm:ss',
         },
       })
       chart.col('count', {
-        alias: 'Memory（bytes）',
+        alias: 'Memory (bytes)',
         formatter: val => {
           return val + 'G'
         },
@@ -280,9 +321,15 @@ class Performance extends React.Component {
           tickInterval: 3,
         },
       })
+      chart.col('yVal', {
+        alias: 'Used',
+        formatter: val => {
+          return val + 'M'
+        },
+      })
       chart.legend(false)
-      chart.area().position('timer*yVal').color('type', [ '#43b5d8' ])
-      chart.intervalStack().position('timer*count')
+      chart.area().position('time*yVal').color('type', [ '#43b5d8' ])
+      chart.intervalStack().position('time*count')
       chart.render()
       chart.on('plotdblclick', () => {
         chart.get('options').filters = {} // 清空 filters
@@ -292,18 +339,25 @@ class Performance extends React.Component {
     const Charts1 = chart => {
       chart.setMode('select')
       chart.select('rangeX')
-      chart.axis('timer', {
+      chart.axis('time', {
         title: null,
       })
       chart.tooltip({
         crosshairs: true,
       })
+      chart.source(cpuData, {
+        time: {
+          type: 'time',
+          tickCount: 10,
+          mask: 'hh:mm:ss',
+        },
+      })
       chart.col('value', {
         alias: 'Cpu Usage (%)',
       })
       chart.legend(false)
-      chart.area().position('timer*value').color('type')
-      chart.line().position('timer*value').color('type').
+      chart.area().position('time*value').color('type')
+      chart.line().position('time*value').color('type').
         size(2)
       chart.render()
       chart.on('plotdblclick', () => {
@@ -312,23 +366,34 @@ class Performance extends React.Component {
       })
     }
     const Charts2 = chart => {
-      chart.line().position('timer*count').size(2).
-        shape('smooth')
+      // chart.line().position('time*count').color('type').
+      //   size(2).
+      //   shape('smooth')
       chart.setMode('select')
       chart.select('rangeX')
       chart.tooltip({
         crosshairs: true,
       })
-      chart.axis('timer', {
+      chart.axis('time', {
         title: null,
+      })
+      chart.source(tranData, {
+        time: {
+          type: 'time',
+          tickCount: 10,
+          mask: 'hh:mm:ss',
+        },
       })
       chart.col('count', {
         alias: 'TPS',
       })
       chart.legend(false)
-      chart.area().position('timer*count').color('type', [ '#43b5d8' ]).
+      chart.area().position('time*count').color('type', [ '#43b5d8' ]).
         size(2).
         shape('smooth')
+      // chart.line().position('time*unsampledNew')
+      // chart.line().position('time*sampledContinuation')
+      // chart.line().position('time*sampledNew')
       chart.render()
       chart.on('plotdblclick', () => {
         chart.get('options').filters = {} // 清空 filters
@@ -336,7 +401,7 @@ class Performance extends React.Component {
       })
     }
     const Charts3 = chart => {
-      chart.line().position('timer*count')
+      chart.line().position('time*count')
       chart.setMode('select')
       chart.select('rangeX')
       chart.on('rangeselectstart', () => {
@@ -344,18 +409,34 @@ class Performance extends React.Component {
       chart.tooltip({
         crosshairs: true,
       })
-      chart.axis('timer', {
+      chart.axis('time', {
         title: null,
       })
+      chart.source(gcData, {
+        time: {
+          type: 'time',
+          tickCount: 10,
+          mask: 'hh:mm:ss',
+        },
+      })
       chart.col('count', {
-        alias: 'Memory（bytes）',
+        alias: 'Memory (bytes)',
+        formatter: val => {
+          return val + 'M'
+        },
+        release: {
+          tickInterval: 3,
+        },
+      })
+      chart.col('yVal', {
+        alias: 'Used',
         formatter: val => {
           return val + 'M'
         },
       })
       chart.legend(false)
-      chart.area().position('timer*yVal').color('type', [ '#43b5d8' ])
-      chart.intervalStack().position('timer*count')
+      chart.area().position('time*yVal').color('type', [ '#43b5d8' ])
+      chart.intervalStack().position('time*count')
       chart.render()
       chart.on('plotdblclick', () => {
         chart.get('options').filters = {} // 清空 filters
@@ -377,7 +458,7 @@ class Performance extends React.Component {
                 ))
               }
             </Select>
-            <Button className="" onClick={this.handleRefresh}><Icon type="reload" />刷新</Button>
+            <Button onClick={this.handleRefresh}><Icon type="reload" />刷新</Button>
             <div className="timer">
               <ButtonGroup className="call-link-tracking-date">
                 <Button icon="calendar" type="primary" onClick={() => this.handleTimer()}>
@@ -386,11 +467,11 @@ class Performance extends React.Component {
                 {
                   isTimerShow ?
                     <Row>
-                      <Button className="btn" >最近5分钟</Button>
-                      <Button className="btn" >3小时</Button>
-                      <Button className="btn" >今天</Button>
-                      <Button className="btn" >昨天</Button>
-                      <Button className="btn" >最近7天</Button>
+                      <Button className="btn" onClick={this.handleLatelyTimer('five')} >最近5分钟</Button>
+                      <Button className="btn" onClick={this.handleLatelyTimer('three')}>3小时</Button>
+                      <Button className="btn" onClick={this.handleLatelyTimer('today')}>今天</Button>
+                      <Button className="btn" onClick={this.handleLatelyTimer('yesterday')}>昨天</Button>
+                      <Button className="btn" onClick={this.handleLatelyTimer('seven')}>最近7天</Button>
                     </Row> :
                     <Row>
                       <RangePicker
@@ -413,65 +494,71 @@ class Performance extends React.Component {
               }
             </Select>
           </div>
-          <Row className="layout-content-body">
-            <div className="section">
-              {/* <img src=""/> */}
-              <div className="left">
-                <span style={{ fontSize: 16 }}>微服务名称 {exampleData.applicationName}</span><br />
-                <span>Agent Id： {exampleData.agentId}</span><br />
-                <span>hostname： {exampleData.applicationName}</span><br />
-                <span>IP： {exampleData.ip}</span><br />
-                <span>Service Type： {exampleData.serviceType}</span><br />
-                <span>End Status Runing： (last checked: 2017-08-07)</span>
-              </div>
-              <div className="rigth">
-                <span>Agent Version： </span><br />
-                <span>PID： {exampleData.pid}</span><br />
-                <span>JSM(GC Type)：</span><br />
-                <span>Start Time： {exampleData.startTimestamp}</span>
-              </div>
-            </div>
-          </Row>
-          <Row>
-            <div className="footer">
-              <div className="left">
-                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 1</span>
-                  <Button className="btn">重置</Button>
-                </div>
-                <Chart
-                  data={this.state.heapData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  forceFit={this.state.forceFit} />
-                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 2</span>
-                  <Button className="btn">重置</Button>
-                </div>
-                <Chart1
-                  data={this.state.cpuData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  forceFit={this.state.forceFit} />
-              </div>
-              <div className="rigth">
-                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 3</span>
-                  <Button className="btn">重置</Button>
-                </div>
-                <Chart3
-                  data={this.state.gcData}
-                  width={this.state.width}
-                  height={this.state.height}
-                  forceFit={this.state.forceFit} />
-                <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage 4</span>
-                  <Button className="btn">重置</Button>
-                </div>
-                <Chart2
-                  data={this.state.data}
-                  width={this.state.width}
-                  height={this.state.height}
-                  forceFit={this.state.forceFit} />
-              </div>
-            </div>
-          </Row>
+          {
+            isRowData ?
+              <div>
+                <Row className="layout-content-body">
+                  <div className="section">
+                    <img src={this.serverType(agentData.serverType)} />
+                    <div className="left">
+                      <span style={{ fontSize: 16 }}>微服务名称 {exampleData.applicationName}</span><br />
+                      <span>Agent Id： {exampleData.agentId}</span><br />
+                      <span>hostname： {exampleData.applicationName}</span><br />
+                      <span>IP： {exampleData.ip}</span><br />
+                      <span>Service Type： {exampleData.serviceType}</span><br />
+                      <span>End Status Runing： (last checked: )</span>
+                    </div>
+                    <div className="rigth">
+                      <span>Agent Version： {exampleData.vmVersion}</span><br />
+                      <span>PID： {exampleData.pid}</span><br />
+                      <span>JSM(GC Type)：</span><br />
+                      <span>Start Time： {this.dateFtt(exampleData.startTimestamp)}</span>
+                    </div>
+                  </div>
+                </Row>
+                <Row>
+                  <div className="footer">
+                    <div className="left">
+                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage</span>
+                        {/* <Button className="btn">重置</Button> */}
+                      </div>
+                      <Chart
+                        data={this.state.heapData}
+                        width={this.state.width}
+                        height={this.state.height}
+                        forceFit={this.state.forceFit} />
+                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>JVM/System Cpu Usage</span>
+                        {/* <Button className="btn">重置</Button> */}
+                      </div>
+                      <Chart1
+                        data={this.state.cpuData}
+                        width={this.state.width}
+                        height={this.state.height}
+                        forceFit={this.state.forceFit} />
+                    </div>
+                    <div className="rigth">
+                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>PermGen Usage</span>
+                        {/* <Button className="btn">重置</Button> */}
+                      </div>
+                      <Chart3
+                        data={this.state.gcData}
+                        width={this.state.width}
+                        height={this.state.height}
+                        forceFit={this.state.forceFit} />
+                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Transactions Per Second</span>
+                        {/* <Button className="btn">重置</Button> */}
+                      </div>
+                      <Chart2
+                        data={this.state.tranData}
+                        width={this.state.width}
+                        height={this.state.height}
+                        forceFit={this.state.forceFit} />
+                    </div>
+                  </div>
+                </Row>
+              </div> :
+              <div><img style={{ marginTop: 7 + '%', marginLeft: 33 + '%' }} src={performance} /> </div>
+          }
         </div>
       </LayoutContent>
     )
