@@ -83,6 +83,12 @@ export default class Header extends React.Component {
       getProjectClusters,
     } = this.props
     getUserProjects(userID).then(res => {
+      if (res.error) {
+        notification.error({
+          message: '获取用户项目失败，请刷新页面重试',
+        })
+        return
+      }
       let namespace
       let clusterID
       let setCurrentConfigFlag
