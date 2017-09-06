@@ -25,7 +25,8 @@ function config(state, action) {
 }
 
 function user(state, action) {
-  switch (action.type) {
+  const { userID, type } = action
+  switch (type) {
     case ActionTypes.CURRENT_USER_REQUEST:
       return {
         ...state,
@@ -35,7 +36,7 @@ function user(state, action) {
       return {
         ...state,
         isFetching: false,
-        info: action.response.result.data,
+        info: Object.assign({ userID }, action.response.result.data),
       }
     case ActionTypes.CURRENT_USER_FAILURE:
       return {

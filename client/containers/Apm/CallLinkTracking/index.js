@@ -136,6 +136,9 @@ class CallLinkTracking extends React.Component {
       this.setState({
         loading: false,
       })
+      if (res.error) {
+        return
+      }
       if (agent === ALL) {
         const agentListObj = {}
         res.response.result.metadata.map(agent => (agentListObj[agent.agentId] = true))
