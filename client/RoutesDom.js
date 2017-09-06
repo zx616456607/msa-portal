@@ -19,6 +19,8 @@ import Apm from './containers/Apm'
 import Topology from './containers/Apm/Topology'
 import Performance from './containers/Apm/Performance'
 import CallLinkTracking from './containers/Apm/CallLinkTracking'
+import Setting from './containers/Setting'
+import ApmSetting from './containers/Setting/Apm'
 
 export const appChildRoutes = [
   {
@@ -37,6 +39,11 @@ export const appChildRoutes = [
     path: '/apms',
     component: Apm,
     key: 'apms',
+  },
+  {
+    path: '/setting',
+    component: Setting,
+    key: 'setting',
   },
 ]
 
@@ -64,6 +71,21 @@ export const apmChildRoutes = [
     component: CallLinkTracking,
     exact: true,
     key: 'call-link-tracking',
+  },
+]
+
+export const settingChildRoutes = [
+  {
+    path: '/setting',
+    exact: true,
+    render: () => <Redirect to="/setting/apms" component={ApmSetting} />,
+    key: 'index',
+  },
+  {
+    path: '/setting/apms',
+    component: ApmSetting,
+    exact: true,
+    key: 'apms',
   },
 ]
 
