@@ -8,17 +8,34 @@
 
 .layout-content-btns {
   .header {
-    height: 50px;
+    height: 60px;
     background: #fff;
   }
   .content {
-    height: 30%;
+    height: 40%;
+    border: 1px solid #e9e9e9;
+    margin-right: 10px;
     background: #fff;
-    ul {
-      margin: 20px;
-      li {
-        margin: 10px;
+    .left {
+      width: 50%;
+      display: inline-block;
+      span {
+        font-size: 14px;
       }
+      ul {
+        margin: 0 20px 20px 10%;
+        padding: 10px;
+        li {
+          margin: 10px;
+        }
+      }
+    }
+    .rigth {
+      width: 40%;
+      float: right;
+      padding: 10px;
+      display: inline-block;
+      border: 1px solid #e9e9e9;
     }
   }
 }
