@@ -41,9 +41,8 @@ const menus = [
     disabled: true,
   },
   {
-    to: '/test3',
+    to: '/setting',
     text: '系统设置',
-    disabled: true,
   },
 ]
 const MY_PORJECT = '我的个人项目'

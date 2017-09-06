@@ -30,7 +30,7 @@ const menus = [
   {
     to: '/apms/topology',
     icon: (
-      <svg className="apm-icon">
+      <svg className="menu-icon">
         <use xlinkHref={topologyIcon.url} />
       </svg>
     ),
@@ -39,7 +39,7 @@ const menus = [
   {
     to: '/apms/performance',
     icon: (
-      <svg className="apm-icon">
+      <svg className="menu-icon">
         <use xlinkHref={performanceIcon.url} />
       </svg>
     ),
@@ -48,7 +48,7 @@ const menus = [
   {
     to: '/apms/call-link-tracking',
     icon: (
-      <svg className="apm-icon">
+      <svg className="menu-icon">
         <use xlinkHref={callLinkTrackingIcon.url} />
       </svg>
     ),
@@ -115,6 +115,7 @@ class Apm extends React.Component {
       <Layout className="apm">
         <Sider>
           <Card
+            className="left-menu-card"
             title={title}
             noHovering={false}
           >
