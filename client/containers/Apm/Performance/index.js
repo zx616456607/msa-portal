@@ -124,13 +124,12 @@ class Performance extends React.Component {
 
   handleOnExample = value => {
     const { agentData, serviceName } = this.state
-    agentData[serviceName].map(values => {
+    agentData[serviceName].forEach(values => {
       if (values.agentId === value) {
         this.setState({
           exampleData: values,
         })
       }
-      return null
     })
     this.loadChartData(serviceName)
   }
@@ -144,6 +143,9 @@ class Performance extends React.Component {
       to: Object.keys(timers).length > 0 ? timers.eTimer : fiveTimer,
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
+      if (res.error) {
+        return
+      }
       const chartJVM = {
         heapMax: res.response.result.charts.JVM_MEMORY_HEAP_MAX, // Heap Usage
         heapSued: res.response.result.charts.JVM_MEMORY_HEAP_USED,
@@ -152,14 +154,13 @@ class Performance extends React.Component {
       }
       let heapObj = null
       const heapAry = []
-      chartJVM.heapMax.points.map((item, index) => {
+      chartJVM.heapMax.points.forEach((item, index) => {
         heapObj = Object.assign({
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
           yVal: chartJVM.heapSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
         })
         heapAry.push(heapObj)
-        return null
       })
       let frame = new Frame(heapAry)
       frame = Frame.combinColumns(frame, [ 'xVal' ], 'count')
@@ -168,14 +169,13 @@ class Performance extends React.Component {
       })
       let permObj = null
       const permAry = []
-      chartJVM.permGenMax.points.map((item, index) => {
+      chartJVM.permGenMax.points.forEach((item, index) => {
         permObj = {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.permGenSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
         }
         permAry.push(permObj)
-        return null
       })
       let frames = new Frame(permAry)
       frames = Frame.combinColumns(frames, [ 'xVal' ], 'count')
@@ -185,20 +185,22 @@ class Performance extends React.Component {
     })
 
     fetchJVMCPUData(clusterID, apmID, query).then(res => {
+      if (res.error) {
+        return
+      }
       const chartJVM = {
         system: res.response.result.charts.CPU_LOAD_SYSTEM,
         jvm: res.response.result.charts.CPU_LOAD_JVM,
       }
       let cpuObj = null
       const cpumAry = []
-      chartJVM.system.points.map((item, index) => {
+      chartJVM.system.points.forEach((item, index) => {
         cpuObj = {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
           yVal: chartJVM.jvm.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
         }
         cpumAry.push(cpuObj)
-        return null
       })
       let frame = new Frame(cpumAry)
       frame = Frame.combinColumns(frame, [ 'yVal', 'xVal' ], 'value')
@@ -208,6 +210,9 @@ class Performance extends React.Component {
     })
 
     fetchJVMTRANData(clusterID, apmID, query).then(res => {
+      if (res.error) {
+        return
+      }
       const chartJVM = {
         unsampled_c: res.response.result.charts.TPS_UNSAMPLED_CONTINUATION,
         unsampled_n: res.response.result.charts.TPS_UNSAMPLED_NEW,
@@ -217,7 +222,7 @@ class Performance extends React.Component {
       }
       let tranObj = null
       const tranAry = []
-      chartJVM.unsampled_c.points.map((item, index) => {
+      chartJVM.unsampled_c.points.forEach((item, index) => {
         tranObj = {
           time: this.dateFtt(item.xVal),
           total: chartJVM.total.points[index].maxYVal === -1 ? 0 : chartJVM.total.points[index].maxYVal,
@@ -226,7 +231,6 @@ class Performance extends React.Component {
           sampledNew: chartJVM.sampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.sampled_n.points[index].maxYVal,
         }
         tranAry.push(tranObj)
-        return null
       })
       let frame = new Frame(tranAry)
       frame = Frame.combinColumns(frame, [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ], 'count')
@@ -282,7 +286,7 @@ class Performance extends React.Component {
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
     nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
-      nodeData.applicationMapData.nodeDataArray.map(item => {
+      nodeData.applicationMapData.nodeDataArray.forEach(item => {
         if (item.applicationName === serviceName) {
           if (Object.keys(item.agentHistogram).length !== 0) {
             for (const node in item.agentHistogram) {
@@ -290,7 +294,6 @@ class Performance extends React.Component {
             }
           }
         }
-        return null
       }) : '' : ''
 
     const Charts = chart => {
