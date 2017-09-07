@@ -16,7 +16,7 @@ import G2 from 'g2'
 import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
-import CreateG2Group from '../../../components/CreateG2Group'
+import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
 
 const LayoutContent = Layout.Content
@@ -586,9 +586,10 @@ class Performance extends React.Component {
 
 const mapStateToProps = state => {
   const { current, queryApms, pinpoint, entities } = state
-  const { cluster } = current.config
+  const { project, cluster } = current.config
+  const namespace = project.namespace
   const clusterID = cluster.id
-  const apmID = queryApms[clusterID].ids[0]
+  const apmID = queryApms[namespace][clusterID].ids[0]
   let { apps, serviceMap } = pinpoint
   const { ppApps } = entities
   const serverName = serviceMap[apmID]

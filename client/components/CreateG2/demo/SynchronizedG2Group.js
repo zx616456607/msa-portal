@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import CreateG2Group from '../'
+import CreateG2Group from '../Group'
 
 const chartsOpreations = []
 for (let i = 0; i < 4; i++) {

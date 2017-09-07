@@ -20,7 +20,8 @@ import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
-import createG2 from 'g2-react'
+// import createG2 from 'g2-react'
+import createG2 from '../../../components/CreateG2'
 const G2 = require('g2')
 import keys from 'lodash/keys'
 import classNames from 'classnames'
@@ -574,7 +575,8 @@ class Topology extends React.Component {
 const mapStateToProps = state => {
   const { current, queryApms, pinpoint, entities } = state
   const clusterID = current.config.cluster.id
-  const apms = queryApms[clusterID]
+  const namespace = current.config.project.namespace
+  const apms = queryApms[namespace][clusterID]
   // @Todo: not support other apm yet
   const apmID = apms.ids[0]
   let apps = []

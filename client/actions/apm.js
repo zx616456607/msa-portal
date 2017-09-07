@@ -20,19 +20,27 @@ export const APMS_FAILURE = 'APMS_FAILURE'
 
 // Fetches a page of apms.
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchApms = clusterID => ({
-  clusterID,
-  [CALL_API]: {
-    types: [ APMS_REQUEST, APMS_SUCCESS, APMS_FAILURE ],
-    endpoint: `/clusters/${clusterID}/apms`,
-    schema: Schemas.APM_ARRAY_DATA,
-  },
-})
+const fetchApms = (clusterID, namespace) => {
+  let headers
+  if (namespace) {
+    headers = { namespace }
+  }
+  return {
+    clusterID,
+    namespace,
+    [CALL_API]: {
+      types: [ APMS_REQUEST, APMS_SUCCESS, APMS_FAILURE ],
+      endpoint: `/clusters/${clusterID}/apms`,
+      schema: Schemas.APM_ARRAY_DATA,
+      options: { headers },
+    },
+  }
+}
 
 // Fetches a page of apms.
 // Relies on Redux Thunk middleware.
-export const loadApms = clusterID => dispatch => {
-  return dispatch(fetchApms(clusterID))
+export const loadApms = (clusterID, namespace) => dispatch => {
+  return dispatch(fetchApms(clusterID, namespace))
 }
 
 export const FETCH_APMLIST_REQUEST = 'FETCH_APMLIST_REQUEST'
