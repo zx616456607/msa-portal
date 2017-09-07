@@ -1,17 +1,47 @@
-@slider-line-color: #e3e7ea;
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * topology style
+ *
+ * 2017-08-28
+ * @author zhangxuan
+ */
+
+@import '../../../assets/style/core/index.less';
+
 .topology {
-  &-btn-active {
-    color: #2db7f5;
-    border: 1px solid #2db7f5;
+  &-default {
+    width: 260px;
+    height: 200px;
+    display: block;
+    margin: 120px auto;
+    text-align: center;
+    p {
+      color: @primaryColor;
+    }
   }
   &-body {
     background-color: white;
-    .topology-body-relation-schema {
-      border-right: 1px solid @slider-line-color;
+    min-height: 960px !important;
+    &-empty {
+      width: 160px;
+      height: 160px;
+      display: block;
+      margin: 120px auto;
+      text-align: center;
+      p {
+        color: @primaryColor;
+      }
+    }
+    &-relation-schema {
+      border-right: 1px solid @borderColor;
     }
     .service-info {
       padding: 20px 30px;
-      border-bottom: 1px solid @slider-line-color;
+      border-bottom: 1px solid @borderColor;
       &-name {
         font-size: 14px;
       }
