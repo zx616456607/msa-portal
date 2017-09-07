@@ -98,9 +98,6 @@ export default class ApmTimePicker extends React.Component {
     } else if (time === 'beforeYes') {
       startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
     }
-    this.setState({
-      currentRadio: time,
-    })
     return [ moment(startTime), moment(now) ]
   }
   onChange = value => {
@@ -117,8 +114,12 @@ export default class ApmTimePicker extends React.Component {
   }
   handleClick = time => {
     const value = this.getTimeArr(time)
+    this.setState({
+      currentRadio: time,
+    })
     this.onChange(value)
     setTimeout(this.onOk, 0)
+    this.changeTimeInterval(time)
   }
   changeTimeInterval = time => {
     clearInterval(this.timeInterval)

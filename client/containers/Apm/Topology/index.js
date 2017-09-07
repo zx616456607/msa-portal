@@ -124,6 +124,10 @@ const Chart2 = createG2(chart => {
   chart.col('reqTime', {
     alias: '请求时间',
   })
+  // chart.col('countNum', {
+  //   alias: '请求数量',
+  //   // max: this.state.totalCount + 10,
+  // })
   chart.legend(false)
   chart.tooltip({
     title: null,
@@ -151,7 +155,7 @@ const Chart3 = createG2(chart => {
     alias: ' ',
   })
   chart.tooltip({
-    // title: null,
+    title: null,
   })
   chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
     .size(9)
@@ -298,6 +302,11 @@ class Topology extends React.Component {
     secondData = new FrameSecond(secondData)
     this.setState({
       secondData,
+    }, () => {
+      duplicateC2 && duplicateC2.col('countNum', {
+        alias: '请求数量',
+        max: this.state.totalCount + 10,
+      })
     })
   }
   // 分类柱状图数据
@@ -353,10 +362,6 @@ class Topology extends React.Component {
     }, () => {
       this.getSecondChart('all')
       this.getSortGroupChart('all')
-      duplicateC2.col('countNum', {
-        alias: '请求数量',
-        max: this.state.totalCount + 10,
-      })
     })
   }
   getPinpointMap = () => {
@@ -441,9 +446,7 @@ class Topology extends React.Component {
   }
   render() {
     const { application, rangeDateTime, agentList, currentAgent } = this.state
-    const { apmID, pinpoint, apps } = this.props
-    const sub = pinpoint.queryScatter[apmID]
-    const isEmpty = sub && sub[application] && sub[application].scatter && sub[application].scatter.length
+    const { apps } = this.props
     return (
       <div className="topology">
         <div className="layout-content-btns">
@@ -480,97 +483,85 @@ class Topology extends React.Component {
             :
             <Row className="topology-body layout-content-body">
               <Col span={14} className="topology-body-relation-schema">
-                {
-                  isEmpty
-                    ?
-                    <div className="topology-body-empty">
-                      <img src={require('../../../assets/img/apm/topology-empty.png')}/>
-                      <p>暂时无数据</p>
-                    </div>
-                    :
-                    <RelationSchema data={[]}/>
-                }
+                <RelationSchema data={[]}/>
               </Col>
-              {
-                isEmpty ? '' :
-                  <Col span={10} className="topology-body-service-detail">
-                    <Row className="service-info">
-                      <Col span={6}>
-                        image
-                      </Col>
-                      <Col span={18}>
-                        <div className="service-info-name">service-micro#1</div>
-                        <div className="service-info-app">application-micro#0</div>
-                        <div className="service-info-status">状态：在线</div>
-                        <div className="service-info-example">实例数量：2/2</div>
-                      </Col>
-                    </Row>
-                    <div className="service-chart-wrapper">
-                      <Row style={{ margin: '10px 0' }}>
-                        <Col span={6} style={{ lineHeight: '32px' }}>
-                          服务实例
-                        </Col>
-                        <Col span={18}>
-                          <Select
-                            showSearch
-                            style={{ width: 200 }}
-                            placeholder="选择微服务"
-                            optionFilterProp="children"
-                            value={currentAgent}
-                            onChange={this.selectAgent}
-                          >
-                            <Option key="all,0">All</Option>
-                            {
-                              agentList.map((item, index) => (
-                                <Option key={`${item},${index + 1}`}>{item}</Option>
-                              ))
-                            }
-                          </Select>
-                        </Col>
-                      </Row>
-                      <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
-                      <Row style={{ margin: '10px 0' }}>
-                        <Col span={6} offset={6}>
-                          <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
-                        </Col>
-                        <Col span={6}>
-                          <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
-                        </Col>
-                      </Row>
-                      <div>
-                        <Chart1
-                          data={this.state.firstData}
-                          width={this.state.width}
-                          height={this.state.height}
-                          plotCfg={this.state.plotCfg}
-                          forceFit={this.state.forceFit}
-                        />
-                      </div>
-                      <div>
-                        请求响应时间摘要（2 day）：{this.state.totalCount}
-                      </div>
-                      <div>
-                        <Chart2
-                          data={this.state.secondData}
-                          width={this.state.width}
-                          height={this.state.height}
-                          forceFit={this.state.forceFit}
-                        />
-                      </div>
-                      <div>
-                        请求分时段负载（2 day）：{this.state.totalCount}
-                      </div>
-                      <div>
-                        <Chart3
-                          data={this.state.thirdData}
-                          width={this.state.width}
-                          height={this.state.height}
-                          plotCfg={this.state.sortPlotCfg}
-                          forceFit={this.state.forceFit} />
-                      </div>
-                    </div>
+              <Col span={10} className="topology-body-service-detail">
+                <Row className="service-info">
+                  <Col span={6}>
+                    image
                   </Col>
-              }
+                  <Col span={18}>
+                    <div className="service-info-name">service-micro#1</div>
+                    <div className="service-info-app">application-micro#0</div>
+                    <div className="service-info-status">状态：在线</div>
+                    <div className="service-info-example">实例数量：2/2</div>
+                  </Col>
+                </Row>
+                <div className="service-chart-wrapper">
+                  <Row style={{ margin: '10px 0' }}>
+                    <Col span={6} style={{ lineHeight: '32px' }}>
+                      服务实例
+                    </Col>
+                    <Col span={18}>
+                      <Select
+                        showSearch
+                        style={{ width: 200 }}
+                        placeholder="选择微服务"
+                        optionFilterProp="children"
+                        value={currentAgent}
+                        onChange={this.selectAgent}
+                      >
+                        <Option key="all,0">All</Option>
+                        {
+                          agentList.map((item, index) => (
+                            <Option key={`${item},${index + 1}`}>{item}</Option>
+                          ))
+                        }
+                      </Select>
+                    </Col>
+                  </Row>
+                  <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
+                  <Row style={{ margin: '10px 0' }}>
+                    <Col span={6} offset={6}>
+                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
+                    </Col>
+                    <Col span={6}>
+                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
+                    </Col>
+                  </Row>
+                  <div>
+                    <Chart1
+                      data={this.state.firstData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      plotCfg={this.state.plotCfg}
+                      forceFit={this.state.forceFit}
+                    />
+                  </div>
+                  <div>
+                    请求响应时间摘要（2 day）：{this.state.totalCount}
+                  </div>
+                  <div>
+                    <Chart2
+                      data={this.state.secondData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      forceFit={this.state.forceFit}
+                    />
+                  </div>
+                  <div>
+                    请求分时段负载（2 day）：{this.state.totalCount}
+                  </div>
+                  <div>
+                    <Chart3
+                      data={this.state.thirdData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      plotCfg={this.state.sortPlotCfg}
+                      forceFit={this.state.forceFit} />
+                  </div>
+                </div>
+              </Col>
             </Row>
         }
       </div>
