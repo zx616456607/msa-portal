@@ -39,6 +39,10 @@ const Chart1 = createG2(chart => {
   duplicateC1 = chart
   chart.setMode('select') // 开启框选模式
   chart.select('rangeX') // 设置 X 轴范围的框选
+  chart.col('x', {
+    alias: '请求时刻',
+    nice: false, // 不对最大最小值优化
+  })
   chart.col('y', {
     alias: '响应时间',
     nice: false,
@@ -88,6 +92,11 @@ const Chart1 = createG2(chart => {
   chart.on('rangeselectend', () => {
     chart.get('options').filters = {}
     chart.repaint()
+  })
+  chart.on('tooltipchange', function(ev) {
+    const item = ev.items[0] // 获取tooltip要显示的内容
+    item.name = '请求时刻'
+    item.value = formatDate(parseInt(item.value), TIMES_WITHOUT_YEAR)
   })
 })
 
@@ -142,7 +151,7 @@ const Chart3 = createG2(chart => {
     alias: ' ',
   })
   chart.tooltip({
-    title: null,
+    // title: null,
   })
   chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
     .size(9)
@@ -189,8 +198,6 @@ class Topology extends React.Component {
       rangeDateTime: [ startTime, now ],
     }, () => {
       duplicateC1 && duplicateC1.col('x', {
-        alias: '请求时刻',
-        nice: false, // 不对最大最小值优化
         min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
         max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
       })
@@ -424,12 +431,12 @@ class Topology extends React.Component {
     this.setState({
       rangeDateTime,
     }, () => {
-      duplicateC1 && duplicateC1.col('x', {
-        alias: '请求时刻',
-        nice: false, // 不对最大最小值优化
-        min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
-        max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
-      })
+      if (rangeDateTime.length) {
+        duplicateC1 && duplicateC1.col('x', {
+          min: rangeDateTime[0].valueOf(), // 自定义最大值
+          max: rangeDateTime[1].valueOf(), // 自定义最小值
+        })
+      }
     })
   }
   render() {
@@ -454,7 +461,7 @@ class Topology extends React.Component {
               ))
             }
           </Select>
-          <Button icon="reload" onClick={this.loadData}>
+          <Button icon="reload" onClick={this.getData}>
             刷新
           </Button>
           <ApmTimePicker

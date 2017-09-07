@@ -47,6 +47,7 @@ export default class ApmTimePicker extends React.Component {
   state = {
     value: [],
     configTime: true,
+    currentRadio: 'fiveMin',
   }
   componentWillMount() {
     const now = Date.parse(new Date())
@@ -91,6 +92,9 @@ export default class ApmTimePicker extends React.Component {
     } else if (time === 'beforeYes') {
       startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
     }
+    this.setState({
+      currentRadio: time,
+    })
     return [ startTime, now ]
   }
   onChange = value => {
@@ -112,10 +116,15 @@ export default class ApmTimePicker extends React.Component {
   toogleTimePicker = () => {
     const { configTime } = this.state
     this.setState({ configTime: !configTime })
+    if (configTime) {
+      this.setState({
+        currentRadio: '',
+      })
+    }
     this.onChange([])
   }
   render() {
-    const { value, configTime } = this.state
+    const { value, configTime, currentRadio } = this.state
     return (
       <span className="apm-timepicker">
         <Button className="type-change-btn" type="primary" onClick={this.toogleTimePicker}><Icon type="calendar"/> 自定义日期</Button>
@@ -132,7 +141,7 @@ export default class ApmTimePicker extends React.Component {
               onOk={this.onOk}
             />
             :
-            <RadioGroup className="apm-timepicker-btns" onChange={e => this.handleClick(e.target.value)} defaultValue="fiveMin">
+            <RadioGroup className="apm-timepicker-btns" onChange={e => this.handleClick(e.target.value)} value={currentRadio} defaultValue="fiveMin">
               {
                 btnArr.map(item => {
                   return <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
