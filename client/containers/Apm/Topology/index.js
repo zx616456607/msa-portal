@@ -20,7 +20,7 @@ import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/p
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
 import ApmButtonGroup from '../../../components/ApmButtonGroup'
-import createG2 from 'g2-react'
+import createG2 from '../../../components/CreateG2'
 const G2 = require('g2')
 import keys from 'lodash/keys'
 const Option = Select.Option

@@ -16,7 +16,7 @@ import G2 from 'g2'
 import { connect } from 'react-redux'
 import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
-import CreateG2Group from '../../../components/CreateG2Group'
+import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
 
 const LayoutContent = Layout.Content

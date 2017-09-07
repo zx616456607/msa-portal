@@ -10,7 +10,7 @@
  * @author zhangpc
  */
 
-import createG2 from 'g2-react'
+import createG2 from './'
 
 /**
  * Create g2 chart group
@@ -34,6 +34,14 @@ export default function CreateG2Group(__operations = [], isSynchronized) {
           Object.keys(charts).forEach(key => {
             if (key !== index) {
               charts[key].showTooltip(point)
+            }
+          })
+        })
+        // For hide other charts's tooltip when mouse leave the chart
+        chart.on('plotleave', () => {
+          Object.keys(charts).forEach(key => {
+            if (key !== index) {
+              charts[key].repaint()
             }
           })
         })
