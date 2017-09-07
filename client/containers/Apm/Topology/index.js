@@ -12,14 +12,14 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Row, Col, Checkbox, Select, message } from 'antd'
+import { Button, Row, Col, Checkbox, Select, message } from 'antd'
 import '../style/topology.less'
 import RelationSchema from '../../../components/RelationSchema'
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
-import ApmButtonGroup from '../../../components/ApmButtonGroup'
+import ApmButtonGroup from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
 const G2 = require('g2')
 import keys from 'lodash/keys'
@@ -303,7 +303,7 @@ class Topology extends React.Component {
   }
   render() {
     const { application, rangeDateTime, agentList, currentAgent } = this.state
-    const { apmID, pinpoint } = this.props
+    const { apmID, pinpoint, apps } = this.props
     const sub = pinpoint.queryScatter[apmID]
     const isEmpty = sub && sub[application] && sub[application].scatter && sub[application].scatter.length
     const Chart1 = createG2(chart => {
@@ -427,13 +427,31 @@ class Topology extends React.Component {
     })
     return (
       <div className="topology">
-        <ApmButtonGroup
-          getCurrentApp={this.getCurrentApp}
-          loadData={this.getData}
-          getTimeRange={this.getTimeRange}
-          rangeDateTime={rangeDateTime}
-          application={application}
-        />
+        <div className="layout-content-btns">
+          <Select
+            showSearch
+            style={{ width: 150 }}
+            placeholder="选择微服务"
+            optionFilterProp="children"
+            value={application}
+            onChange={application => this.getCurrentApp(application)}
+          >
+            {
+              apps.map(app => (
+                <Option key={app.applicationName}>{app.applicationName}</Option>
+              ))
+            }
+          </Select>
+          <Button icon="reload" onClick={this.loadData}>
+            刷新
+          </Button>
+          <ApmButtonGroup
+            loadData={this.getData}
+            getTimeRange={this.getTimeRange}
+            rangeDateTime={rangeDateTime}
+            application={application}
+          />
+        </div>
         {
           (!application || !rangeDateTime.length)
             ?

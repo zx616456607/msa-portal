@@ -4,19 +4,19 @@
  */
 
 /**
- * ApmButtonGroup
+ * ApmTimePicker
  *
  * 2017-09-06
  * @author zhangxuan
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { Button, Icon, DatePicker, Select, message, Radio } from 'antd'
+import PropTypes from 'prop-types'
+import { Button, Icon, DatePicker, message, Radio } from 'antd'
 const { RangePicker } = DatePicker
-const Option = Select.Option
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
+import './style/index.less'
 
 const btnArr = [{
   key: 'fiveMin',
@@ -35,7 +35,17 @@ const btnArr = [{
   text: '最近2天',
 }]
 
-class ApmButtonGroup extends React.Component {
+export default class ApmTimePicker extends React.Component {
+  static propTypes = {
+    // 时间范围
+    rangeDateTime: PropTypes.array,
+    // 应用名称
+    application: PropTypes.string,
+    // 获取选中的时间范围
+    getTimeRange: PropTypes.func,
+    // 回调
+    loadData: PropTypes.func,
+  }
   state = {
     application: undefined,
     rangeDateTime: [],
@@ -63,23 +73,6 @@ class ApmButtonGroup extends React.Component {
       this.setState({
         application,
       })
-    }
-  }
-  selectApp = application => {
-    const { rangeDateTime } = this.state
-    const { getCurrentApp } = this.props
-    this.setState({ application })
-    if (!rangeDateTime || !rangeDateTime[0]) {
-      message.warning('请选择开始跟结束时间')
-      return
-    }
-    /**
-     * getCurrentApp 获取当前选中的应用
-     * 
-     * @param {string} 应用名称
-     */
-    if (getCurrentApp) {
-      getCurrentApp(application)
     }
   }
   loadData = () => {
@@ -135,70 +128,32 @@ class ApmButtonGroup extends React.Component {
     this.setState({ configTime: !configTime, rangeDateTime: [] })
   }
   render() {
-    const { application, rangeDateTime, configTime } = this.state
-    const { apps } = this.props
+    const { rangeDateTime, configTime } = this.state
     return (
-      <div className="layout-content-btns">
-        <Select
-          showSearch
-          style={{ width: 150 }}
-          placeholder="选择微服务"
-          optionFilterProp="children"
-          value={application}
-          onChange={application => this.selectApp(application)}
-        >
-          {
-            apps.map(app => (
-              <Option key={app.applicationName}>{app.applicationName}</Option>
-            ))
-          }
-        </Select>
-        <Button icon="reload" onClick={this.loadData}>
-          刷新
-        </Button>
-        <span>
-          <Button type="primary" onClick={this.toogleTimePicker}><Icon type="calendar"/> 自定义日期</Button>
-          {
-            !configTime ?
-              <RangePicker
-                key="timePicker"
-                showTime={{ format: 'HH:mm' }}
-                format="YYYY-MM-DD HH:mm"
-                placeholder={[ '开始日期', '结束日期' ]}
-                value={rangeDateTime}
-                onChange={rangeDateTime => this.getRangeDate(rangeDateTime)}
-                onOk={this.getData}
-              />
-              :
-              <RadioGroup onChange={e => this.getTimeArr(e.target.value)} defaultValue="fiveMin">
-                {
-                  btnArr.map(item => {
-                    return <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
-                  })
-                }
-              </RadioGroup>
-          }
-        </span>
-      </div>
+      <span className="apm-timepicker">
+        <Button className="type-change-btn" type="primary" onClick={this.toogleTimePicker}><Icon type="calendar"/> 自定义日期</Button>
+        {
+          !configTime ?
+            <RangePicker
+              className="apm-timepicker-component"
+              key="timePicker"
+              showTime={{ format: 'HH:mm' }}
+              format="YYYY-MM-DD HH:mm"
+              placeholder={[ '开始日期', '结束日期' ]}
+              value={rangeDateTime}
+              onChange={rangeDateTime => this.getRangeDate(rangeDateTime)}
+              onOk={this.loadData}
+            />
+            :
+            <RadioGroup className="apm-timepicker-btns" onChange={e => this.getTimeArr(e.target.value)} defaultValue="fiveMin">
+              {
+                btnArr.map(item => {
+                  return <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
+                })
+              }
+            </RadioGroup>
+        }
+      </span>
     )
   }
 }
-
-const mapStateToProps = state => {
-  const { current, queryApms, pinpoint, entities } = state
-  const clusterID = current.config.cluster.id
-  const apms = queryApms[clusterID]
-  // @Todo: not support other apm yet
-  const apmID = apms.ids[0]
-  let apps = []
-  if (pinpoint.apps[apmID]) {
-    apps = pinpoint.apps[apmID].ids || []
-    apps = apps.map(id => entities.ppApps[id])
-  }
-  return {
-    apps,
-  }
-}
-
-export default connect(mapStateToProps, {
-})(ApmButtonGroup)
