@@ -328,10 +328,11 @@ class CallLinkTracking extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { current, queryApms, pinpoint, entities } = state
-  const { cluster } = current.config
+  const { project, cluster } = current.config
+  const namespace = project.namespace
   const clusterID = cluster.id
   // @Todo: not support other apm yet
-  const apmID = queryApms[clusterID].ids[0]
+  const apmID = queryApms[namespace][clusterID].ids[0]
   let { apps, queryTransaction, transactionInfo } = pinpoint
   const { ppApps } = entities
   const appIDs = apps[apmID] && apps[apmID].ids || []

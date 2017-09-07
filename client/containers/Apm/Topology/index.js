@@ -582,7 +582,8 @@ class Topology extends React.Component {
 const mapStateToProps = state => {
   const { current, queryApms, pinpoint, entities } = state
   const clusterID = current.config.cluster.id
-  const apms = queryApms[clusterID]
+  const namespace = current.config.project.namespace
+  const apms = queryApms[namespace][clusterID]
   // @Todo: not support other apm yet
   const apmID = apms.ids[0]
   let apps = []
