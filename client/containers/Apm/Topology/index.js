@@ -25,7 +25,6 @@ const G2 = require('g2')
 import keys from 'lodash/keys'
 const Option = Select.Option
 
-// 点图
 // 设置鼠标 hove 至气泡的样式
 G2.Global.activeShape.point = {
   lineWidth: 2,
@@ -33,7 +32,122 @@ G2.Global.activeShape.point = {
   shadowColor: '#3182bd',
 }
 
+// 点图
+let duplicateC1
+let appName = ''
+const Chart1 = createG2(chart => {
+  duplicateC1 = chart
+  chart.setMode('select') // 开启框选模式
+  chart.select('rangeX') // 设置 X 轴范围的框选
+  chart.col('y', {
+    alias: '响应时间',
+    nice: false,
+    max: 10000,
+    tickInterval: 2500,
+  })
+  chart.axis('x', {
+    formatter(val) {
+      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+    },
+    grid: {
+      line: {
+        stroke: '#e6e6e6',
+        lineWidth: 1,
+      },
+    },
+  })
+  chart.axis('y', {
+    titleOffset: 80, // 设置标题距离坐标轴的距离
+    formatter(val) {
+      if (val > 0) {
+        return val + '(ms)'
+      }
+    },
+  })
+  chart.legend(false)
+  chart.tooltip({
+    title: null,
+  })
+  chart.point().position('x*y').size('x', 3, 3)
+    .color('#3182bd')
+    .opacity(0.5)
+    .shape('circle')
+    .tooltip('x*y')
+  chart.render()
+  chart.on('rangeselectend', ev => {
+    const selectRange = ev.selected.x
+    const start = new Date(parseInt(selectRange[0])).toISOString()
+    const end = new Date(parseInt(selectRange[1])).toISOString()
+    window.open(`${window.location.origin}/apms/call-link-tracking?application=${appName}&from=${start}&to=${end}`)
+  })
+  // 监听双击事件，这里用于复原图表
+  chart.on('plotdblclick', function() {
+    chart.get('options').filters = {} // 清空 filters
+    chart.repaint()
+  })
+  chart.on('rangeselectend', () => {
+    chart.get('options').filters = {}
+    chart.repaint()
+  })
+})
 
+// 柱状图
+const colorSet = {
+  '1s': '#5bb85d',
+  '3s': '#2db7f5',
+  '5s': '#8e68fc',
+  Slow: '#ffc000',
+  Error: '#f85a5b',
+}
+let duplicateC2
+const Chart2 = createG2(chart => {
+  duplicateC2 = chart
+  chart.axis('reqTime', {
+    formatter(val) {
+      return val
+    },
+  })
+  chart.axis('countNum', {
+    formatter(val) {
+      return val
+    },
+  })
+  chart.col('reqTime', {
+    alias: '请求时间',
+  })
+  chart.legend(false)
+  chart.tooltip({
+    title: null,
+  })
+  chart.interval().position('reqTime*countNum').tooltip('reqTime*countNum')
+    .color('reqTime', countNum => colorSet[countNum])
+  chart.render()
+})
+
+// 柱状筛选
+const Chart3 = createG2(chart => {
+  chart.legend({
+    position: 'top',
+  })
+  chart.axis('time', {
+    title: null,
+    formatter(val) {
+      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+    },
+  })
+  chart.col('请求数量', {
+    alias: ' ',
+  })
+  chart.col('time', {
+    alias: ' ',
+  })
+  chart.tooltip({
+    title: null,
+  })
+  chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
+    .size(9)
+  chart.render()
+})
 class Topology extends React.Component {
   constructor() {
     super()
@@ -73,6 +187,13 @@ class Topology extends React.Component {
     const startTime = now - (5 * 60 * 1000)
     this.setState({
       rangeDateTime: [ startTime, now ],
+    }, () => {
+      duplicateC1 && duplicateC1.col('x', {
+        alias: '请求时刻',
+        nice: false, // 不对最大最小值优化
+        min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
+        max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
+      })
     })
   }
   loadData = () => {
@@ -225,6 +346,10 @@ class Topology extends React.Component {
     }, () => {
       this.getSecondChart('all')
       this.getSortGroupChart('all')
+      duplicateC2.col('countNum', {
+        alias: '请求数量',
+        max: this.state.totalCount + 10,
+      })
     })
   }
   getPinpointMap = () => {
@@ -288,6 +413,7 @@ class Topology extends React.Component {
     })
   }
   getCurrentApp = application => {
+    appName = application
     this.setState({
       application,
     }, () => {
@@ -298,6 +424,12 @@ class Topology extends React.Component {
     this.setState({
       rangeDateTime,
     }, () => {
+      duplicateC1.col('x', {
+        alias: '请求时刻',
+        nice: false, // 不对最大最小值优化
+        min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
+        max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
+      })
       this.getData()
     })
   }
@@ -306,125 +438,6 @@ class Topology extends React.Component {
     const { apmID, pinpoint, apps } = this.props
     const sub = pinpoint.queryScatter[apmID]
     const isEmpty = sub && sub[application] && sub[application].scatter && sub[application].scatter.length
-    const Chart1 = createG2(chart => {
-      chart.setMode('select') // 开启框选模式
-      chart.select('rangeX') // 设置 X 轴范围的框选
-      chart.col('x', {
-        alias: '请求时刻',
-        nice: false, // 不对最大最小值优化
-        // tickInterval: 10000,
-        min: rangeDateTime.length && rangeDateTime[0].valueOf(), // 自定义最大值
-        max: rangeDateTime.length && rangeDateTime[1].valueOf(), // 自定义最小值
-      })
-      chart.col('y', {
-        alias: '响应时间',
-        nice: false,
-        max: 10000,
-        tickInterval: 2500,
-      })
-      chart.axis('x', {
-        formatter(val) {
-          return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
-        },
-        grid: {
-          line: {
-            stroke: '#e6e6e6',
-            lineWidth: 1,
-          },
-        },
-      })
-      chart.axis('y', {
-        titleOffset: 80, // 设置标题距离坐标轴的距离
-        formatter(val) {
-          if (val > 0) {
-            return val + '(ms)'
-          }
-        },
-      })
-      chart.legend(false)
-      chart.tooltip({
-        title: null,
-      })
-      chart.point().position('x*y').size('x', 3, 3)
-        .color('#3182bd')
-        .opacity(0.5)
-        .shape('circle')
-        .tooltip('x*y')
-      chart.render()
-      chart.on('rangeselectend', ev => {
-        const selectRange = ev.selected.x
-        const start = new Date(parseInt(selectRange[0])).toISOString()
-        const end = new Date(parseInt(selectRange[1])).toISOString()
-        window.open(`${window.location.origin}/apms/call-link-tracking?application=${application}&from=${start}&to=${end}`)
-      })
-      // 监听双击事件，这里用于复原图表
-      chart.on('plotdblclick', function() {
-        chart.get('options').filters = {} // 清空 filters
-        chart.repaint()
-      })
-      chart.on('rangeselectend', () => {
-        chart.get('options').filters = {}
-        chart.repaint()
-      })
-    })
-    // 柱状图
-    const colorSet = {
-      '1s': '#5bb85d',
-      '3s': '#2db7f5',
-      '5s': '#8e68fc',
-      Slow: '#ffc000',
-      Error: '#f85a5b',
-    }
-    const Chart2 = createG2(chart => {
-      chart.axis('reqTime', {
-        formatter(val) {
-          return val
-        },
-      })
-      chart.axis('countNum', {
-        formatter(val) {
-          return val
-        },
-      })
-      chart.col('reqTime', {
-        alias: '请求时间',
-      })
-      chart.col('countNum', {
-        alias: '请求数量',
-        max: this.state.totalCount + 10,
-      })
-      chart.legend(false)
-      chart.tooltip({
-        title: null,
-      })
-      chart.interval().position('reqTime*countNum').tooltip('reqTime*countNum')
-        .color('reqTime', countNum => colorSet[countNum])
-      chart.render()
-    })
-    // 柱状筛选
-    const Chart3 = createG2(chart => {
-      chart.legend({
-        position: 'top',
-      })
-      chart.axis('time', {
-        title: null,
-        formatter(val) {
-          return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
-        },
-      })
-      chart.col('请求数量', {
-        alias: ' ',
-      })
-      chart.col('time', {
-        alias: ' ',
-      })
-      chart.tooltip({
-        title: null,
-      })
-      chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
-        .size(9)
-      chart.render()
-    })
     return (
       <div className="topology">
         <div className="layout-content-btns">
