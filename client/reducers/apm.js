@@ -12,31 +12,39 @@
 
 import union from 'lodash/union'
 import * as ActionTypes from '../actions/apm'
+import { DEFAULT } from '../constants'
 
 export const queryApms = (state = {}, action) => {
   const { type, clusterID } = action
+  const namespace = action.namespace || DEFAULT
   switch (type) {
     case ActionTypes.APMS_REQUEST:
       return {
         ...state,
-        [clusterID]: Object.assign({}, state[clusterID], {
-          isFetching: true,
+        [namespace]: Object.assign({}, state[namespace], {
+          [clusterID]: {
+            isFetching: true,
+          },
         }),
       }
     case ActionTypes.APMS_SUCCESS:
       return {
         ...state,
-        [clusterID]: {
-          isFetching: false,
-          ids: union(state.ids, action.response.result.data.apms),
-        },
+        [namespace]: Object.assign({}, state[namespace], {
+          [clusterID]: {
+            isFetching: false,
+            ids: union(state.ids, action.response.result.data.apms),
+          },
+        }),
       }
     case ActionTypes.APMS_FAILURE:
       return {
         ...state,
-        [clusterID]: {
-          isFetching: false,
-        },
+        [namespace]: Object.assign({}, state[namespace], {
+          [clusterID]: {
+            isFetching: false,
+          },
+        }),
       }
     default:
       return state

@@ -14,7 +14,7 @@ import React from 'react'
 import { Layout, Menu, Dropdown, Icon, Button, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import { getDefaultSelectedKeys } from '../../common/utils'
-import { USER_CURRENT_CONFIG } from '../../constants'
+import { USER_CURRENT_CONFIG, DEFAULT } from '../../constants'
 import './style/index.less'
 
 // const MenuItemGroup = Menu.ItemGroup
@@ -107,7 +107,7 @@ export default class Header extends React.Component {
       }
       const projects = res.response.entities.projects || {}
       if (!namespace || !clusterID) {
-        namespace = 'default'
+        namespace = DEFAULT
       }
       let projectsText
       let clustersText
@@ -143,7 +143,7 @@ export default class Header extends React.Component {
           })
         }
       }
-      if (namespace === 'default') {
+      if (namespace === DEFAULT) {
         projectsText = MY_PORJECT
         getDefaultClusters().then(res => {
           if (res.error) {
@@ -179,7 +179,7 @@ export default class Header extends React.Component {
       projectsText: item.props.children,
       clustersDropdownVisible: true,
     })
-    if (key === 'default') {
+    if (key === DEFAULT) {
       getDefaultClusters()
     } else {
       getProjectClusters(key)

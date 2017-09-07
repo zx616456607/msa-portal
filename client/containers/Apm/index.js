@@ -143,12 +143,18 @@ class Apm extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  errorMessage: state.errorMessage,
-  auth: state.entities.auth,
-  current: state.current || {},
-  apms: state.queryApms[state.current.config.cluster.id],
-})
+const mapStateToProps = state => {
+  const { current, queryApms } = state
+  const { project, cluster } = current.config
+  let apms = queryApms[project.namespace] || {}
+  apms = apms[cluster.id] || {}
+  return {
+    errorMessage: state.errorMessage,
+    auth: state.entities.auth,
+    current: current || {},
+    apms,
+  }
+}
 
 export default connect(mapStateToProps, {
   loadApms,

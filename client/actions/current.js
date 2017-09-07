@@ -13,7 +13,7 @@
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
-import { USER_CURRENT_CONFIG } from '../constants'
+import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
 
 export const SET_CURRENT_CONFIG = 'SET_CURRENT_CONFIG'
 
@@ -112,7 +112,7 @@ export const DEFAULT_CLUSTERS_FAILURE = 'DEFAULT_CLUSTERS_FAILURE'
 // Get clusters of project.
 // Relies on the custom API middleware defined in ../middleware/api.js.
 const fetchDefaultClusters = query => {
-  const namespace = 'default'
+  const namespace = DEFAULT
   return {
     namespace,
     [CALL_API]: {
