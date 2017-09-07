@@ -12,12 +12,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Icon, DatePicker, Radio } from 'antd'
+import { Button, DatePicker, Radio } from 'antd'
+import moment from 'moment'
+import './style/index.less'
+
 const { RangePicker } = DatePicker
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
-import './style/index.less'
-
 const btnArr = [{
   key: 'fiveMin',
   text: '最近5分钟',
@@ -46,20 +47,16 @@ export default class ApmTimePicker extends React.Component {
   }
   state = {
     value: [],
-    configTime: true,
+    isRangeTime: false,
     currentRadio: 'fiveMin',
   }
-  componentWillMount() {
-    const now = Date.parse(new Date())
-    const startTime = now - (5 * 60 * 1000)
-    this.setState({
-      value: [ startTime, now ],
-    })
+  componentDidMount() {
+    this.setDefaultTime()
   }
   componentWillReceiveProps(nextProps) {
     /**
      * 设置时间范围
-     *  
+     *
      */
     const { value } = nextProps
     if (value[0] !== this.props.value[0] || value[1] !== this.props.value[1]) {
@@ -67,6 +64,15 @@ export default class ApmTimePicker extends React.Component {
         value,
       })
     }
+  }
+  componentWillUnmount() {
+    clearInterval(this.timeInterval)
+  }
+  setDefaultTime = () => {
+    const time = 'fiveMin'
+    const value = this.getTimeArr(time)
+    this.onChange(value)
+    this.changeTimeInterval(time)
   }
   onOk = () => {
     const { onOk } = this.props
@@ -95,7 +101,7 @@ export default class ApmTimePicker extends React.Component {
     this.setState({
       currentRadio: time,
     })
-    return [ startTime, now ]
+    return [ moment(startTime), moment(now) ]
   }
   onChange = value => {
     const { onChange } = this.props
@@ -110,26 +116,42 @@ export default class ApmTimePicker extends React.Component {
     }
   }
   handleClick = time => {
-    this.onChange(this.getTimeArr(time))
+    const value = this.getTimeArr(time)
+    this.onChange(value)
     setTimeout(this.onOk, 0)
   }
+  changeTimeInterval = time => {
+    clearInterval(this.timeInterval)
+    let value = this.getTimeArr(time)
+    this.timeInterval = setInterval(() => {
+      value = this.getTimeArr(time)
+      this.onChange(value)
+    }, 1000)
+  }
   toogleTimePicker = () => {
-    const { configTime } = this.state
-    this.setState({ configTime: !configTime })
-    if (configTime) {
+    const { isRangeTime } = this.state
+    if (!isRangeTime) {
+      clearInterval(this.timeInterval)
       this.setState({
-        currentRadio: '',
+        currentRadio: null,
       })
     }
-    this.onChange([])
+    this.setState({ isRangeTime: !isRangeTime })
   }
   render() {
-    const { value, configTime, currentRadio } = this.state
+    const { value, isRangeTime, currentRadio } = this.state
     return (
       <span className="apm-timepicker">
-        <Button className="type-change-btn" type="primary" onClick={this.toogleTimePicker}><Icon type="calendar"/> 自定义日期</Button>
+        <Button
+          className="type-change-btn"
+          type="primary"
+          onClick={this.toogleTimePicker}
+          icon="calendar"
+        >
+          自定义日期
+        </Button>
         {
-          !configTime ?
+          isRangeTime ?
             <RangePicker
               className="apm-timepicker-component"
               key="timePicker"
@@ -141,11 +163,15 @@ export default class ApmTimePicker extends React.Component {
               onOk={this.onOk}
             />
             :
-            <RadioGroup className="apm-timepicker-btns" onChange={e => this.handleClick(e.target.value)} value={currentRadio} defaultValue="fiveMin">
+            <RadioGroup
+              className="apm-timepicker-btns"
+              onChange={e => this.handleClick(e.target.value)}
+              value={currentRadio}
+            >
               {
-                btnArr.map(item => {
-                  return <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
-                })
+                btnArr.map(item => (
+                  <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
+                ))
               }
             </RadioGroup>
         }
