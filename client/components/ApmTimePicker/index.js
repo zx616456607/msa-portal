@@ -111,8 +111,10 @@ export default class ApmTimePicker extends React.Component {
     setTimeout(onOk, 0)
   }
   toogleTimePicker = () => {
+    const { onChange } = this.props
     const { configTime } = this.state
     this.setState({ configTime: !configTime, value: [] })
+    onChange([])
   }
   render() {
     const { value, configTime } = this.state

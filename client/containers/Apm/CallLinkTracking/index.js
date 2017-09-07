@@ -268,7 +268,7 @@ class CallLinkTracking extends React.Component {
               format="YYYY-MM-DD HH:mm"
               placeholder={[ '开始日期', '结束日期' ]}
               value={rangeDateTime}
-              onChange={rangeDateTime => { this.setState({ rangeDateTime }); console.log(rangeDateTime) }}
+              onChange={rangeDateTime => this.setState({ rangeDateTime })}
               onOk={this.loadData}
             />
             <Button icon="search" onClick={this.loadData} />
