@@ -12,7 +12,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Icon, DatePicker, message, Radio } from 'antd'
+import { Button, Icon, DatePicker, Radio } from 'antd'
 const { RangePicker } = DatePicker
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
@@ -38,60 +38,43 @@ const btnArr = [{
 export default class ApmTimePicker extends React.Component {
   static propTypes = {
     // 时间范围
-    rangeDateTime: PropTypes.array,
-    // 应用名称
-    application: PropTypes.string,
+    value: PropTypes.array,
     // 获取选中的时间范围
-    getTimeRange: PropTypes.func,
+    onChange: PropTypes.func,
     // 回调
-    loadData: PropTypes.func,
+    onOk: PropTypes.func.isRequired,
   }
   state = {
-    application: undefined,
-    rangeDateTime: [],
+    value: [],
     configTime: true,
   }
   componentWillMount() {
     const now = Date.parse(new Date())
     const startTime = now - (5 * 60 * 1000)
     this.setState({
-      rangeDateTime: [ startTime, now ],
+      value: [ startTime, now ],
     })
   }
   componentWillReceiveProps(nextProps) {
     /**
-     * 设置时间范围以及应用
+     * 设置时间范围
      *  
      */
-    const { rangeDateTime, application } = nextProps
-    if (rangeDateTime[0] !== this.props.rangeDateTime[0] || rangeDateTime[1] !== this.props.rangeDateTime[1]) {
+    const { value } = nextProps
+    if (value[0] !== this.props.value[0] || value[1] !== this.props.value[1]) {
       this.setState({
-        rangeDateTime,
-      })
-    }
-    if (application !== this.props.application) {
-      this.setState({
-        application,
+        value,
       })
     }
   }
-  loadData = () => {
-    const { application, rangeDateTime } = this.state
-    const { loadData } = this.props
-    if (!application) {
-      message.warning('请选择服务')
-      return
-    }
-    if (!rangeDateTime || !rangeDateTime[0]) {
-      message.warning('请选择开始跟结束时间')
-      return
-    }
+  onOk = () => {
+    const { onOk } = this.props
     /**
      * loadData 点击刷新时的回调
      *
      */
-    if (loadData) {
-      loadData()
+    if (onOk) {
+      onOk()
     }
   }
   getTimeArr = time => {
@@ -108,27 +91,31 @@ export default class ApmTimePicker extends React.Component {
     } else if (time === 'beforeYes') {
       startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
     }
-    this.getRangeDate([ startTime, now ])
+    return [ startTime, now ]
   }
-  getRangeDate = rangeDateTime => {
-    const { getTimeRange } = this.props
-    this.setState({ rangeDateTime }, () => {
-      /**
-       * getTimeRange 获取时间范围
-       * 
-       * @param {array} [开始时间，结束时间]
-       */
-      if (getTimeRange) {
-        getTimeRange(this.state.rangeDateTime)
-      }
-    })
+  onChange = value => {
+    const { onChange } = this.props
+    this.setState({ value })
+    /**
+     * getTimeRange 获取时间范围
+     *
+     * @param {array} [开始时间，结束时间]
+     */
+    if (onChange) {
+      onChange(value)
+    }
+  }
+  handleClick = time => {
+    const { onOk, onChange } = this.props
+    onChange(this.getTimeArr(time))
+    setTimeout(onOk, 0)
   }
   toogleTimePicker = () => {
     const { configTime } = this.state
-    this.setState({ configTime: !configTime, rangeDateTime: [] })
+    this.setState({ configTime: !configTime, value: [] })
   }
   render() {
-    const { rangeDateTime, configTime } = this.state
+    const { value, configTime } = this.state
     return (
       <span className="apm-timepicker">
         <Button className="type-change-btn" type="primary" onClick={this.toogleTimePicker}><Icon type="calendar"/> 自定义日期</Button>
@@ -140,12 +127,12 @@ export default class ApmTimePicker extends React.Component {
               showTime={{ format: 'HH:mm' }}
               format="YYYY-MM-DD HH:mm"
               placeholder={[ '开始日期', '结束日期' ]}
-              value={rangeDateTime}
-              onChange={rangeDateTime => this.getRangeDate(rangeDateTime)}
-              onOk={this.loadData}
+              value={value}
+              onChange={this.onChange}
+              onOk={this.onOk}
             />
             :
-            <RadioGroup className="apm-timepicker-btns" onChange={e => this.getTimeArr(e.target.value)} defaultValue="fiveMin">
+            <RadioGroup className="apm-timepicker-btns" onChange={e => this.handleClick(e.target.value)} defaultValue="fiveMin">
               {
                 btnArr.map(item => {
                   return <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>

@@ -19,7 +19,7 @@ import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
-import ApmButtonGroup from '../../../components/ApmTimePicker'
+import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
 const G2 = require('g2')
 import keys from 'lodash/keys'
@@ -430,7 +430,6 @@ class Topology extends React.Component {
         min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
         max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
       })
-      this.getData()
     })
   }
   render() {
@@ -458,11 +457,10 @@ class Topology extends React.Component {
           <Button icon="reload" onClick={this.loadData}>
             刷新
           </Button>
-          <ApmButtonGroup
-            loadData={this.getData}
-            getTimeRange={this.getTimeRange}
-            rangeDateTime={rangeDateTime}
-            application={application}
+          <ApmTimePicker
+            onOk={this.getData}
+            onChange={this.getTimeRange}
+            value={rangeDateTime}
           />
         </div>
         {
