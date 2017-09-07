@@ -1,3 +1,15 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Create g2 chart
+ *
+ * 2017-09-07
+ * @author zhangpc
+ */
+
 import G2 from 'g2'
 import React from 'react'
 import PropTypes from 'prop-types'
