@@ -424,7 +424,7 @@ class Topology extends React.Component {
     this.setState({
       rangeDateTime,
     }, () => {
-      duplicateC1.col('x', {
+      duplicateC1 && duplicateC1.col('x', {
         alias: '请求时刻',
         nice: false, // 不对最大最小值优化
         min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值

@@ -106,15 +106,13 @@ export default class ApmTimePicker extends React.Component {
     }
   }
   handleClick = time => {
-    const { onOk, onChange } = this.props
-    onChange(this.getTimeArr(time))
-    setTimeout(onOk, 0)
+    this.onChange(this.getTimeArr(time))
+    setTimeout(this.onOk, 0)
   }
   toogleTimePicker = () => {
-    const { onChange } = this.props
     const { configTime } = this.state
-    this.setState({ configTime: !configTime, value: [] })
-    onChange([])
+    this.setState({ configTime: !configTime })
+    this.onChange([])
   }
   render() {
     const { value, configTime } = this.state
