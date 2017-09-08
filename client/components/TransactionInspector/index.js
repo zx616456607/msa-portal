@@ -92,6 +92,18 @@ export default class TransactionInspector extends React.Component {
     return percentage
   }
 
+  changeDockSize = () => {
+    const { dockSize, defaultDockSize, maxDockSize, changeDockSize: changeSize } = this.props
+    if (!changeSize) {
+      return
+    }
+    if (dockSize < defaultDockSize || dockSize === maxDockSize) {
+      changeSize(defaultDockSize)
+    } else if (dockSize >= defaultDockSize && dockSize < maxDockSize) {
+      changeSize(maxDockSize)
+    }
+  }
+
   render() {
     const { dataSource } = this.props
     const { expandedRowKeys } = this.state
@@ -189,8 +201,11 @@ export default class TransactionInspector extends React.Component {
     return (
       <div className="transaction-inspector">
         <Spin spinning={dataSource.isFetching}>
-          <div className="transaction-inspector-toggler">
-            <div className="transaction-inspector-toggler-center"></div>
+          <div className="transaction-inspector-toggler" onDoubleClick={this.changeDockSize}>
+            <div
+              className="transaction-inspector-toggler-center"
+              onClick={this.changeDockSize}
+            ></div>
           </div>
           <Row className="transaction-inspector-title">
             <Col span={6}>
