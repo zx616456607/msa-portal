@@ -26,7 +26,7 @@ export default function createG2(__operation) {
     static propTypes = {
       data: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.object),
-        PropTypes.object,
+        PropTypes.instanceOf(G2.Frame),
       ]).isRequired,
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired,
