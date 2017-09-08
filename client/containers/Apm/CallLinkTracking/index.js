@@ -11,12 +11,13 @@
  */
 
 import React from 'react'
-import { Select, Button, DatePicker, Card, Table, message, Icon } from 'antd'
+import { Select, Button, Card, Table, message, Icon } from 'antd'
 import { connect } from 'react-redux'
 import { parse as parseQuerystring } from 'query-string'
 import moment from 'moment'
 import Dock from '../../../components/Dock'
 import TransactionInspector from '../../../components/TransactionInspector'
+import ApmTimePicker from '../../../components/ApmTimePicker'
 import { formatDate } from '../../../common/utils'
 import {
   loadPPApps,
@@ -34,8 +35,6 @@ import {
 import './style/index.less'
 
 const Option = Select.Option
-const ButtonGroup = Button.Group
-const { RangePicker } = DatePicker
 const DEFAULT_DOCK_SIZE = 0.5
 
 class CallLinkTracking extends React.Component {
@@ -45,7 +44,7 @@ class CallLinkTracking extends React.Component {
     application: undefined,
     agent: ALL,
     agentList: [],
-    rangeDateTime: null,
+    rangeDateTime: [],
     loading: false,
   }
 
@@ -149,6 +148,12 @@ class CallLinkTracking extends React.Component {
     })
   }
 
+  onApplicationChange = application => {
+    this.setState({ application }, () => {
+      this.loadData()
+    })
+  }
+
   onAgentChange = agent => {
     this.setState({ agent }, () => {
       this.loadData()
@@ -248,7 +253,7 @@ class CallLinkTracking extends React.Component {
             placeholder="选择微服务"
             optionFilterProp="children"
             value={application}
-            onChange={application => this.setState({ application })}
+            onChange={this.onApplicationChange}
           >
             {
               apps.map(app => (
@@ -259,20 +264,11 @@ class CallLinkTracking extends React.Component {
           <Button icon="reload" onClick={this.loadData}>
             刷新
           </Button>
-          <ButtonGroup className="call-link-tracking-date">
-            <Button icon="calendar" type="primary">
-              自定义日期
-            </Button>
-            <RangePicker
-              showTime={{ format: 'HH:mm' }}
-              format="YYYY-MM-DD HH:mm"
-              placeholder={[ '开始日期', '结束日期' ]}
-              value={rangeDateTime}
-              onChange={rangeDateTime => this.setState({ rangeDateTime })}
-              onOk={this.loadData}
-            />
-            <Button icon="search" onClick={this.loadData} />
-          </ButtonGroup>
+          <ApmTimePicker
+            value={rangeDateTime}
+            onChange={rangeDateTime => this.setState({ rangeDateTime })}
+            onOk={this.loadData}
+          />
           <Select
             className="float-right"
             showSearch
