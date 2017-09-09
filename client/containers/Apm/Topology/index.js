@@ -544,7 +544,7 @@ class Topology extends React.Component {
             ?
             <div className="topology-default">
               <img src={require('../../../assets/img/apm/topology-default.png')}/>
-              <p>请选择上述申请和期限</p>
+              <p>请选择微服务</p>
             </div>
             :
             <Row className="topology-body layout-content-body">

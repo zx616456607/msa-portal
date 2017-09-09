@@ -31,6 +31,16 @@ export default class Dock extends React.Component {
     size: this.props.defaultSize || DEFAULT_SIZE,
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { size: newSize } = nextProps
+    const { size: oldSize } = this.props
+    if (newSize !== oldSize) {
+      this.setState({
+        size: newSize,
+      })
+    }
+  }
+
   onSizeChange = size => {
     const { minSize, maxSize } = this.props
     if (size >= minSize && size <= maxSize) {

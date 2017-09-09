@@ -49,7 +49,7 @@ export default function createG2(__operation) {
       const { data: newData, width: newWidth, height: newHeight, plotCfg: newPlotCfg } = newProps
       const { data: oldData, width: oldWidth, height: oldHeight, plotCfg: oldPlotCfg } = this.props
 
-      if (newPlotCfg !== oldPlotCfg) {
+      if (!isEqual(newPlotCfg, oldPlotCfg)) {
         console.warn('plotCfg 不支持修改')
       }
 
