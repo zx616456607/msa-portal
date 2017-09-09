@@ -119,11 +119,11 @@ export default store => next => action => {
   }
   options.headers = Object.assign({}, { Authorization: `Bearer ${jwtToken}` }, options.headers)
 
-  // Set namespace to headers
+  // Set project to headers
   const currentConfig = store.getState().current.config
-  const namespace = currentConfig.project && currentConfig.project.namespace
-  if (namespace && namespace !== 'default') {
-    options.headers = Object.assign({}, { namespace }, options.headers)
+  const project = currentConfig.project && currentConfig.project.namespace
+  if (project && project !== 'default') {
+    options.headers = Object.assign({}, { project }, options.headers)
   }
   return callApi(endpoint, options, schema).then(
     response => next(actionWith({
