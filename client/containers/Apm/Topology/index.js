@@ -14,15 +14,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Row, Col, Checkbox, Select, message } from 'antd'
 import '../style/topology.less'
-import RelationSchema from '../../../components/RelationSchema'
 import { loadApms } from '../../../actions/apm'
-import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
+import { loadPinpointMap, loadPPApps, loadScatterData, fetchAgentData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
+import createG6 from '../../../components/CreateG6'
 const G2 = require('g2')
-import keys from 'lodash/keys'
+import classNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
+import flatten from 'lodash/flatten'
 const Option = Select.Option
 
 // 设置鼠标 hove 至气泡的样式
@@ -108,9 +110,7 @@ const colorSet = {
   Slow: '#ffc000',
   Error: '#f85a5b',
 }
-let duplicateC2
 const Chart2 = createG2(chart => {
-  duplicateC2 = chart
   chart.axis('reqTime', {
     formatter(val) {
       return val
@@ -124,10 +124,9 @@ const Chart2 = createG2(chart => {
   chart.col('reqTime', {
     alias: '请求时间',
   })
-  // chart.col('countNum', {
-  //   alias: '请求数量',
-  //   // max: this.state.totalCount + 10,
-  // })
+  chart.col('countNum', {
+    alias: '请求数量',
+  })
   chart.legend(false)
   chart.tooltip({
     title: null,
@@ -157,10 +156,12 @@ const Chart3 = createG2(chart => {
   chart.tooltip({
     title: null,
   })
-  chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
+  chart.intervalStack().position('time*请求数量')
+    .color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
     .size(9)
   chart.render()
 })
+let Chart4
 class Topology extends React.Component {
   constructor() {
     super()
@@ -181,6 +182,7 @@ class Topology extends React.Component {
         background: '#ccc',
         lineWidth: 1,
       },
+      grid: null,
       secondData: [],
       thirdData: [],
       application: undefined,
@@ -193,7 +195,27 @@ class Topology extends React.Component {
       checkFailed: true,
       totalCount: 0,
       errorCount: 0,
+      topologyData: {},
+      isNode: true,
     }
+  }
+  componentDidMount() {
+    const { application } = this.state
+    Chart4 = createG6(chart => {
+      chart.render()
+      chart.on('click', ev => {
+        if (ev.itemType !== 'node') {
+          return
+        }
+        const app = ev.item._attrs.model.label
+        if (app !== application) {
+          this.setState({
+            isNode: false,
+          })
+        }
+        this.getCurrentNode(app)
+      })
+    })
   }
   loadData = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
@@ -290,11 +312,6 @@ class Topology extends React.Component {
     secondData = new FrameSecond(secondData)
     this.setState({
       secondData,
-    }, () => {
-      duplicateC2 && duplicateC2.col('countNum', {
-        alias: '请求数量',
-        max: this.state.totalCount + 10,
-      })
     })
   }
   // 分类柱状图数据
@@ -305,7 +322,7 @@ class Topology extends React.Component {
       this.getSortData(timeSeriesHistogram)
       return
     }
-    this.getSortData(agentTimeSeriesHistogram)
+    this.getSortData(agentTimeSeriesHistogram[name])
   }
   getSortData = arr => {
     const thirdData = []
@@ -337,15 +354,13 @@ class Topology extends React.Component {
       thirdData: frame,
     })
   }
-  getAgentList = arr => {
-    if (!arr.length) { return }
-    const { application } = this.state
-    const currentNode = arr.filter(item => item.applicationName === application)
-    const { agentHistogram, totalCount, errorCount } = currentNode[0]
+  getCurrentNode = app => {
+    const { nodeDataArray } = this.state
+    const currentNode = nodeDataArray.filter(item => item.applicationName === app)
+    const { totalCount, errorCount } = currentNode[0]
     this.setState({
       totalCount,
       errorCount,
-      agentList: keys(agentHistogram),
       currentNode: currentNode[0],
     }, () => {
       this.getSecondChart('all')
@@ -374,9 +389,46 @@ class Topology extends React.Component {
       if (res.error) {
         return
       }
-      const { pinpoint } = this.props
-      const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [] }
-      this.getAgentList(nodeDataArray)
+      this.getNodeAndLinkData()
+    })
+  }
+  getNodeAndLinkData = () => {
+    const { apmID, pinpoint } = this.props
+    const { application } = this.state
+    const { nodeDataArray, linkDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [], linkDataArray: [] }
+    this.setState({
+      nodeDataArray,
+      linkDataArray,
+    }, () => {
+      this.getCurrentNode(application)
+      this.getTopologyData()
+    })
+  }
+  getTopologyData = () => {
+    const { nodeDataArray, linkDataArray } = this.state
+    const node = []
+    const edge = []
+    console.log(nodeDataArray, linkDataArray)
+    nodeDataArray.length && nodeDataArray.forEach(item => {
+      node.push({
+        shape: 'rect',
+        label: item.applicationName,
+        size: [ 100, 80 ],
+        id: item.key,
+      })
+    })
+    linkDataArray.length && linkDataArray.forEach(item => {
+      edge.push({
+        shape: 'arrow',
+        source: item.from,
+        target: item.to,
+        label: item.totalCount,
+      })
+    })
+    console.log(node, edge)
+    const topologyData = { nodes: node, edges: edge }
+    this.setState({
+      topologyData,
     })
   }
   getData = () => {
@@ -391,11 +443,34 @@ class Topology extends React.Component {
     }
     this.loadData()
     this.getPinpointMap()
+    this.getAgentList()
+  }
+  getAgentList = () => {
+    const { fetchAgentData, apmID, clusterID } = this.props
+    const { application, rangeDateTime } = this.state
+    fetchAgentData(clusterID, apmID, {
+      application,
+      from: rangeDateTime[0].valueOf(),
+      to: rangeDateTime[1].valueOf(),
+    }).then(r => {
+      if (r.error) {
+        return
+      }
+      const agentList = flatten(Object.values(r.response.result), true)
+      this.setState({
+        agentList,
+        currentAgentDetail: agentList[0],
+      })
+    })
   }
   selectAgent = currentAgent => {
-    this.setState({ currentAgent }, () => {
+    const { agentList } = this.state
+    this.setState({ currentAgent,
+      currentAgentDetail: agentList.filter(item => item.agentId === currentAgent.split(',')[0]),
+    }, () => {
       this.formatScatterData()
       this.getSecondChart(currentAgent.split(',')[0])
+      this.getSortGroupChart(currentAgent.split(',')[0])
     })
   }
   checkSuccess = e => {
@@ -432,8 +507,11 @@ class Topology extends React.Component {
       }
     })
   }
+  getAgentStatus = code => {
+    return <span className={classNames({ 'success-status': code === 100, 'error-status': code !== 100 })}>{code === 100 ? '在线' : '离线'}</span>
+  }
   render() {
-    const { application, rangeDateTime, agentList, currentAgent } = this.state
+    const { application, rangeDateTime, agentList, currentAgent, topologyData, currentAgentDetail } = this.state
     const { apps } = this.props
     return (
       <div className="topology">
@@ -471,7 +549,15 @@ class Topology extends React.Component {
             :
             <Row className="topology-body layout-content-body">
               <Col span={14} className="topology-body-relation-schema">
-                <RelationSchema data={[]}/>
+                {
+                  !isEmpty(topologyData) &&
+                  <Chart4
+                    data={topologyData}
+                    width={900}
+                    height={this.state.height}
+                    grid={this.state.grid}
+                  />
+                }
               </Col>
               <Col span={10} className="topology-body-service-detail">
                 <Row className="service-info">
@@ -479,10 +565,10 @@ class Topology extends React.Component {
                     image
                   </Col>
                   <Col span={18}>
-                    <div className="service-info-name">service-micro#1</div>
-                    <div className="service-info-app">application-micro#0</div>
-                    <div className="service-info-status">状态：在线</div>
-                    <div className="service-info-example">实例数量：2/2</div>
+                    <div className="service-info-name">{currentAgentDetail && currentAgentDetail.agentId}</div>
+                    <div className="service-info-app">所属应用：{currentAgentDetail && currentAgentDetail.applicationName}</div>
+                    <div className="service-info-status">状态：{this.getAgentStatus(currentAgentDetail && currentAgentDetail.status && currentAgentDetail.status.state.code)}</div>
+                    <div className="service-info-example">实例数量：{`1 / ${agentList.length}`}</div>
                   </Col>
                 </Row>
                 <div className="service-chart-wrapper">
@@ -494,7 +580,6 @@ class Topology extends React.Component {
                       <Select
                         showSearch
                         style={{ width: 200 }}
-                        placeholder="选择微服务"
                         optionFilterProp="children"
                         value={currentAgent}
                         onChange={this.selectAgent}
@@ -502,7 +587,7 @@ class Topology extends React.Component {
                         <Option key="all,0">All</Option>
                         {
                           agentList.map((item, index) => (
-                            <Option key={`${item},${index + 1}`}>{item}</Option>
+                            <Option key={`${item.agentId},${index + 1}`}>{item.agentId}</Option>
                           ))
                         }
                       </Select>
@@ -511,10 +596,10 @@ class Topology extends React.Component {
                   <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
                   <Row style={{ margin: '10px 0' }}>
                     <Col span={6} offset={6}>
-                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
+                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span className="success-status">Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
                     </Col>
                     <Col span={6}>
-                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
+                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span className="error-status">Failed: {this.state.errorCount}</span></Checkbox>
                     </Col>
                   </Row>
                   <div>
@@ -585,4 +670,5 @@ export default connect(mapStateToProps, {
   loadPinpointMap,
   loadPPApps,
   loadScatterData,
+  fetchAgentData,
 })(Topology)

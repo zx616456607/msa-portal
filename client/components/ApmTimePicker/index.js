@@ -52,12 +52,7 @@ export default class ApmTimePicker extends React.Component {
   }
   componentDidMount() {
     const { value } = this.props
-    this.setDefaultTime()
-    if (value && value.length === 2) {
-      this.setState({
-        isRangeTime: true,
-      })
-    }
+    this.setDefaultTime(value)
   }
   componentWillReceiveProps(nextProps) {
     /**
@@ -74,11 +69,17 @@ export default class ApmTimePicker extends React.Component {
   componentWillUnmount() {
     clearInterval(this.timeInterval)
   }
-  setDefaultTime = () => {
+  setDefaultTime = value => {
     const time = 'fiveMin'
-    const value = this.getTimeArr(time)
+    if (value && value.length === 2) {
+      this.setState({
+        isRangeTime: true,
+      })
+    } else {
+      value = this.getTimeArr(time)
+      this.changeTimeInterval(time)
+    }
     this.onChange(value)
-    this.changeTimeInterval(time)
   }
   onOk = () => {
     const { onOk } = this.props
