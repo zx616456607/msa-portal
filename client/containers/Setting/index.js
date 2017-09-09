@@ -68,6 +68,7 @@ class Setting extends React.Component {
           <Card
             className="left-menu-card"
             noHovering={false}
+            title="系统设置"
           >
             <Menu mode="inline"
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
