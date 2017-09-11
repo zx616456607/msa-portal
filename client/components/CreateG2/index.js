@@ -13,7 +13,6 @@
 import G2 from 'g2'
 import React from 'react'
 import PropTypes from 'prop-types'
-import isEqual from 'lodash/isEqual'
 
 let uniqueId = 0
 function generateUniqueId() {
@@ -49,13 +48,14 @@ export default function createG2(__operation) {
       const { data: newData, width: newWidth, height: newHeight, plotCfg: newPlotCfg } = newProps
       const { data: oldData, width: oldWidth, height: oldHeight, plotCfg: oldPlotCfg } = this.props
 
-      if (!isEqual(newPlotCfg, oldPlotCfg)) {
+      if (newPlotCfg !== oldPlotCfg) {
         console.warn('plotCfg 不支持修改')
       }
 
-      if (!isEqual(newData, oldData)) {
+      if (newData !== oldData) {
         this.chart.changeData(newData)
       }
+
       if (newWidth !== oldWidth || newHeight !== oldHeight) {
         this.chart.changeSize(newWidth, newHeight)
       }

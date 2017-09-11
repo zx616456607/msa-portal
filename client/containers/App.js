@@ -68,6 +68,14 @@ class App extends React.Component {
     })
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { pathname } = nextProps.location
+    // Scroll to top when pathname change
+    if (pathname !== this.props.location.pathname) {
+      document.body.scrollTop = 0
+    }
+  }
+
   renderErrorMessage = () => {
     const { errorMessage, resetErrorMessage } = this.props
     if (!errorMessage) {
