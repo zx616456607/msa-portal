@@ -13,7 +13,6 @@
 import G2 from 'g2'
 import React from 'react'
 import PropTypes from 'prop-types'
-import isEqual from 'lodash/isEqual'
 
 let uniqueId = 0
 function generateUniqueId() {
@@ -26,7 +25,7 @@ export default function createG2(__operation) {
     static propTypes = {
       data: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.object),
-        PropTypes.object,
+        PropTypes.instanceOf(G2.Frame),
       ]).isRequired,
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired,
@@ -53,9 +52,10 @@ export default function createG2(__operation) {
         console.warn('plotCfg 不支持修改')
       }
 
-      if (!isEqual(newData, oldData)) {
+      if (newData !== oldData) {
         this.chart.changeData(newData)
       }
+
       if (newWidth !== oldWidth || newHeight !== oldHeight) {
         this.chart.changeSize(newWidth, newHeight)
       }

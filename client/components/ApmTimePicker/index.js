@@ -51,7 +51,13 @@ export default class ApmTimePicker extends React.Component {
     currentRadio: 'fiveMin',
   }
   componentDidMount() {
+    const { value } = this.props
     this.setDefaultTime()
+    if (value && value.length === 2) {
+      this.setState({
+        isRangeTime: true,
+      })
+    }
   }
   componentWillReceiveProps(nextProps) {
     /**

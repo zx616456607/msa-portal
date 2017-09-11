@@ -195,18 +195,6 @@ class Topology extends React.Component {
       errorCount: 0,
     }
   }
-  componentWillMount() {
-    const now = Date.parse(new Date())
-    const startTime = now - (5 * 60 * 1000)
-    this.setState({
-      rangeDateTime: [ startTime, now ],
-    }, () => {
-      duplicateC1 && duplicateC1.col('x', {
-        min: this.state.rangeDateTime[0].valueOf(), // 自定义最大值
-        max: this.state.rangeDateTime[1].valueOf(), // 自定义最小值
-      })
-    })
-  }
   loadData = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
     const { application, rangeDateTime } = this.state
@@ -436,7 +424,7 @@ class Topology extends React.Component {
     this.setState({
       rangeDateTime,
     }, () => {
-      if (rangeDateTime.length) {
+      if (rangeDateTime.length && this.state.application) {
         duplicateC1 && duplicateC1.col('x', {
           min: rangeDateTime[0].valueOf(), // 自定义最大值
           max: rangeDateTime[1].valueOf(), // 自定义最小值
@@ -478,7 +466,7 @@ class Topology extends React.Component {
             ?
             <div className="topology-default">
               <img src={require('../../../assets/img/apm/topology-default.png')}/>
-              <p>请选择上述申请和期限</p>
+              <p>请选择微服务</p>
             </div>
             :
             <Row className="topology-body layout-content-body">

@@ -36,6 +36,7 @@ import './style/index.less'
 
 const Option = Select.Option
 const DEFAULT_DOCK_SIZE = 0.5
+const DEFAULT_MAX_DOCK_SIZE = 0.95
 
 class CallLinkTracking extends React.Component {
   state = {
@@ -46,6 +47,7 @@ class CallLinkTracking extends React.Component {
     agentList: [],
     rangeDateTime: [],
     loading: false,
+    dockSize: DEFAULT_DOCK_SIZE,
   }
 
   componentWillMount() {
@@ -186,7 +188,12 @@ class CallLinkTracking extends React.Component {
   onDockSizeChange = size => {
     this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
     this.appDom.style.overflow = 'auto'
+    this.setState({
+      dockSize: size,
+    })
   }
+
+  changeDockSize = dockSize => this.setState({ dockSize })
 
   render() {
     const { apps, transaction, transactionInfo } = this.props
@@ -305,7 +312,8 @@ class CallLinkTracking extends React.Component {
             isVisible={this.state.isVisible}
             dimMode="transparent"
             dimStyle={{ backgroundColor: 'transparent' }}
-            defaultSize={DEFAULT_DOCK_SIZE}
+            maxSize={DEFAULT_MAX_DOCK_SIZE}
+            size={this.state.dockSize}
             onSizeChange={this.onDockSizeChange}
           >
             <TransactionInspector
@@ -314,6 +322,10 @@ class CallLinkTracking extends React.Component {
                 && transactionInfo[currentRecord.agentId][currentRecord.spanId]
                 || {}
               }
+              changeDockSize={this.changeDockSize}
+              dockSize={this.state.dockSize}
+              defaultDockSize={DEFAULT_DOCK_SIZE}
+              maxDockSize={DEFAULT_MAX_DOCK_SIZE}
             />
           </Dock>
         </div>
