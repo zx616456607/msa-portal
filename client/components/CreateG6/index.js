@@ -54,7 +54,9 @@ export default function createG6(__operation) {
         this.net.changeSize(newWidth, newHeight)
       }
       if (!isEqual(newData, oldData)) {
-        this.net.changeData(newData)
+        const nodes = newData.nodes
+        const edges = newData.edges
+        this.net.changeData(nodes, edges)
       }
     }
 
@@ -96,7 +98,6 @@ export default function createG6(__operation) {
       __operation(net)
       this.net = net
     }
-
     render() {
       return (<div id={this.graphId}/>)
     }
