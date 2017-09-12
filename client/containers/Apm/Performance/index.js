@@ -53,7 +53,7 @@ class Performance extends React.Component {
 
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
-    loadPPApps(clusterID, apmID)
+    apmID && loadPPApps(clusterID, apmID)
     this.setState({
       sTimer: Date.parse(new Date()),
       customTimer: Date.parse(new Date(new Date() - 300 * 1000)),
@@ -589,7 +589,8 @@ const mapStateToProps = state => {
   const { project, cluster } = current.config
   const namespace = project.namespace
   const clusterID = cluster.id
-  const apmID = queryApms[namespace][clusterID].ids[0]
+  const apms = queryApms[namespace][clusterID]
+  const apmID = apms.ids && apms.ids[0]
   let { apps, serviceMap } = pinpoint
   const { ppApps } = entities
   const serverName = serviceMap[apmID]

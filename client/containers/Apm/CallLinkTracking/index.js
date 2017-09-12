@@ -52,7 +52,7 @@ class CallLinkTracking extends React.Component {
 
   componentWillMount() {
     const { loadPPApps, clusterID, apmID, location } = this.props
-    loadPPApps(clusterID, apmID)
+    apmID && loadPPApps(clusterID, apmID)
     const { application, from, to } = location.query || {}
     if (application && from && to) {
       this.setState({
@@ -340,7 +340,8 @@ const mapStateToProps = (state, ownProps) => {
   const namespace = project.namespace
   const clusterID = cluster.id
   // @Todo: not support other apm yet
-  const apmID = queryApms[namespace][clusterID].ids[0]
+  const apms = queryApms[namespace][clusterID]
+  const apmID = apms.ids && apms.ids[0]
   let { apps, queryTransaction, transactionInfo } = pinpoint
   const { ppApps } = entities
   const appIDs = apps[apmID] && apps[apmID].ids || []

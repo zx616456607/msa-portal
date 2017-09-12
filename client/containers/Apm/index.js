@@ -16,7 +16,6 @@ import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import { loadApms } from '../../actions/apm'
-import { loadPPApps } from '../../actions/pinpoint'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
@@ -57,14 +56,9 @@ const menus = [
 
 class Apm extends React.Component {
   componentWillMount() {
-    const { loadApms, current, loadPPApps } = this.props
+    const { loadApms, current } = this.props
     const clusterID = current.config.cluster.id
-    loadApms(clusterID).then(res => {
-      if (!res.error) {
-        const { apms } = res.response.result.data
-        return loadPPApps(clusterID, apms[0])
-      }
-    })
+    loadApms(clusterID)
   }
 
   renderLoading = tip => (
@@ -75,7 +69,7 @@ class Apm extends React.Component {
 
   renderChildren = () => {
     const { apms, children } = this.props
-    if (!apms || !apms.ids) {
+    if (!apms || !apms.ids || apms.isFetching) {
       return this.renderLoading('加载 APM 中 ...')
     }
     return [
@@ -156,5 +150,4 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   loadApms,
-  loadPPApps,
 })(Apm)

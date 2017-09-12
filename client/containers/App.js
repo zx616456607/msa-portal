@@ -16,21 +16,26 @@ import { connect } from 'react-redux'
 import { Layout, Spin, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
+import NamespaceSwitch from './NamespaceSwitch'
 import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
 import {
-  setCurrentConfig,
   getCurrentUser,
-  getUserProjects,
-  getProjectClusters,
-  getDefaultClusters,
 } from '../actions/current'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
 
 const { Footer } = Layout
+let errorMessageBefore
+let errorMessageBeforeDateTime
+const errorMessageCloseObj = {}
 
 class App extends React.Component {
+  state = {
+    switchProjectOrCluster: false,
+    switchProjectOrClusterText: null,
+  }
+
   static propTypes = {
     // Injected by React Redux
     errorMessage: PropTypes.string,
@@ -69,10 +74,38 @@ class App extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { pathname } = nextProps.location
+    const {
+      location: newLocation,
+      currentConfig: newCurrentConfig,
+    } = nextProps
+    const {
+      location: oldLocation,
+      currentConfig: oldCurrentConfig,
+    } = this.props
     // Scroll to top when pathname change
-    if (pathname !== this.props.location.pathname) {
+    if (newLocation.pathname !== oldLocation.pathname) {
       document.body.scrollTop = 0
+    }
+    // Show switch project/cluster
+    const switchProjectOrClusterText = '切换项目/集群中 ...'
+    const { project: newProject, cluster: newCluster } = newCurrentConfig
+    const { project: oldProject, cluster: oldCluster } = oldCurrentConfig
+    if (!newProject || !newCluster) {
+      return
+    }
+    if (newProject.namespace !== oldProject.namespace
+      || newCluster.id !== oldCluster.id) {
+      clearTimeout(this.switchProjectOrClusterTimeout)
+      this.setState({
+        switchProjectOrCluster: true,
+        switchProjectOrClusterText,
+      }, () => {
+        this.switchProjectOrClusterTimeout = setTimeout(() => {
+          this.setState({
+            switchProjectOrCluster: false,
+          })
+        }, 500)
+      })
     }
   }
 
@@ -81,10 +114,21 @@ class App extends React.Component {
     if (!errorMessage) {
       return null
     }
+    if (!errorMessageCloseObj[errorMessageBeforeDateTime]
+      && errorMessageBefore === errorMessage
+      && (Date.now() - errorMessageBeforeDateTime) < 4500
+    ) {
+      return
+    }
+    errorMessageBefore = errorMessage
+    errorMessageBeforeDateTime = Date.now()
     setTimeout(() => {
       notification.error({
         message: errorMessage,
-        onClose: resetErrorMessage,
+        onClose: () => {
+          resetErrorMessage()
+          errorMessageCloseObj[errorMessageBeforeDateTime] = true
+        },
       })
     })
     setTimeout(() => resetErrorMessage(), 4500)
@@ -98,6 +142,7 @@ class App extends React.Component {
 
   renderChildren = () => {
     const { current, children } = this.props
+    const { switchProjectOrCluster, switchProjectOrClusterText } = this.state
     const { config, user } = current
     if (!config.project || !config.project.namespace) {
       return this.renderLoading('加载基础配置中 ...')
@@ -107,6 +152,9 @@ class App extends React.Component {
     }
     if (!user || !user.info) {
       return this.renderLoading('加载用户信息中 ...')
+    }
+    if (switchProjectOrCluster) {
+      return this.renderLoading(switchProjectOrClusterText)
     }
     return [
       children,
@@ -122,13 +170,7 @@ class App extends React.Component {
     const {
       auth,
       location,
-      setCurrentConfig,
       current,
-      projects,
-      projectClusters,
-      getUserProjects,
-      getProjectClusters,
-      getDefaultClusters,
     } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
@@ -138,17 +180,10 @@ class App extends React.Component {
       <Layout id="app">
         {this.renderErrorMessage()}
         <Header
-          userID={jwt.userID}
           location={location}
-          setCurrentConfig={setCurrentConfig}
           currentUser={current.user.info || {}}
-          currentConfig={current.config || {}}
-          projects={projects}
-          getUserProjects={getUserProjects}
-          getProjectClusters={getProjectClusters}
-          getDefaultClusters={getDefaultClusters}
-          projectClusters={projectClusters}
         />
+        <NamespaceSwitch userID={jwt.userID} />
         { this.renderChildren() }
         <Footer style={{ textAlign: 'center' }}>
           Tenxcloud ©2017 Created by Tenxcloud UED
@@ -159,30 +194,19 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { entities, current } = state
-  const { auth, projects, clusters } = entities
-  const userProjects = current.projects && current.projects.ids || []
-  const currentClusters = current.clusters || {}
-  const projectClusters = {}
-  Object.keys(currentClusters).forEach(namespace => {
-    const clusterList = currentClusters[namespace].ids || []
-    projectClusters[namespace] = clusterList.map(id => clusters[id])
-  })
+  const { entities } = state
+  const { auth } = entities
+  const current = state.current || {}
   return {
     errorMessage: state.errorMessage,
     auth,
-    current: current || {},
-    projects: userProjects.map(namespace => projects[namespace]),
-    projectClusters,
+    current,
+    currentConfig: current.config || {},
   }
 }
 
 export default connect(mapStateToProps, {
   resetErrorMessage,
   getAuth,
-  setCurrentConfig,
   getCurrentUser,
-  getUserProjects,
-  getProjectClusters,
-  getDefaultClusters,
 })(App)
