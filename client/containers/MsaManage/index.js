@@ -30,7 +30,7 @@ const menus = [
   {
     to: '/msa-manage',
     text: '微服务列表',
-    icon: <Icon type="bars" />,
+    icon: <Icon type="bars" style={{ fontSize: 16 }} />,
   },
   {
     to: '/msa-manage/config-center',
