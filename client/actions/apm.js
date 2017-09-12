@@ -43,52 +43,116 @@ export const loadApms = (clusterID, project) => dispatch => {
   return dispatch(fetchApms(clusterID, project))
 }
 
+export const ADD_APM_REQUEST = 'ADD_APM_REQUEST'
+export const ADD_APM_SUCCESS = 'ADD_APM_SUCCESS'
+export const ADD_APM_FAILURE = 'ADD_APM_FAILURE'
+
+const addApms = (body, clusterID, project) => {
+  let headers
+  if (project) {
+    headers = { project }
+  }
+  return {
+    body,
+    clusterID,
+    [CALL_API]: {
+      types: [ ADD_APM_REQUEST, ADD_APM_SUCCESS, ADD_APM_FAILURE ],
+      endpoint: `/clusters/${clusterID}/apms`,
+      options: {
+        method: 'POST',
+        body,
+        headers,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const postApm = (body, clusterID, project) => dispatch => {
+  return dispatch(addApms(body, clusterID, project))
+}
+
+export const FETCH_APMSATTE_REQUEST = 'FETCH_APMSATTE_REQUEST'
+export const FETCH_APMSTATE_SUCCESS = 'FETCH_APMSTATE_SUCCESS'
+export const FETCH_APMSTATE_FAILURE = 'FETCH_APMSTATE_FAILURE'
+
+const fetchApmState = body => ({
+  body,
+  [CALL_API]: {
+    types: [ FETCH_APMSATTE_REQUEST, FETCH_APMSTATE_SUCCESS, FETCH_APMSTATE_FAILURE ],
+    endpoint: `/clusters/${body.cluster}/apms/${body.id}/state`,
+    schema: {},
+  },
+})
+export const getApmState = id => dispatch => {
+  return dispatch(fetchApmState(id))
+}
+
+export const DELETE_APM_REQUEST = 'DELETE_APM_REQUEST'
+export const DELETE_APM_SUCCESS = 'DELETE_APM_SUCCESS'
+export const DELETE_APM_FAILURE = 'DELETE_APM_FAILURE'
+
+const delApmRow = (body, project) => {
+  let headers
+  if (project) {
+    headers = { project }
+  }
+  return {
+    body,
+    project,
+    [CALL_API]: {
+      types: [ DELETE_APM_REQUEST, DELETE_APM_SUCCESS, DELETE_APM_FAILURE ],
+      endpoint: `/clusters/${body.cluster}/apms/${body.id}`,
+      options: {
+        method: 'DELETE',
+        headers,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const removeApmRow = (body, project) => dispatch => {
+  return dispatch(delApmRow(body, project))
+}
+
 export const FETCH_APMLIST_REQUEST = 'FETCH_APMLIST_REQUEST'
 export const FETCH_APMLIST_SUCCESS = 'FETCH_APMLIST_SUCCESS'
 export const FETCH_APMLIST_FAILURE = 'FETCH_APMLIST_FAILURE'
 
-const fetchApmList = id => ({
-  id,
-  [CALL_API]: {
-    types: [ FETCH_APMLIST_REQUEST, FETCH_APMLIST_SUCCESS, FETCH_APMLIST_FAILURE ],
-    endpoint: `clusters/:cluster/apms/${id}/state`,
-    schema: {},
-  },
-})
-export const fetchApmData = id => dispatch => {
-  return dispatch(fetchApmList(id))
-}
-
-export const DELETE_APMLIST_REQUEST = 'DELETE_APMLIST_REQUEST'
-export const DELETE_APMLIST_SUCCESS = 'DELETE_APMLIST_SUCCESS'
-export const DELETE_APMLIST_FAILURE = 'DELETE_APMLIST_FAILURE'
-
-const delApmInfo = id => ({
-  id,
-  [CALL_API]: {
-    types: [ DELETE_APMLIST_REQUEST, DELETE_APMLIST_SUCCESS, DELETE_APMLIST_FAILURE ],
-    endpoint: `/clusters/:cluster/apms/${id}`,
-    schema: {},
-  },
-})
-
-export const delApmRow = id => dispatch => {
-  return dispatch(delApmInfo(id))
-}
-
-export const FETCH_APMSLIST_REQUEST = 'FETCH_APMSLIST_REQUEST'
-export const FETCH_APMSLIST_SUCCESS = 'FETCH_APMSLIST_SUCCESS'
-export const FETCH_APMSLIST_FAILURE = 'FETCH_APMSLIST_FAILURE'
-
-const fetchApmsInfo = cluster => ({
+const fetchApmInfo = cluster => ({
   cluster,
   [CALL_API]: {
-    types: [ FETCH_APMSLIST_REQUEST, FETCH_APMSLIST_SUCCESS, FETCH_APMSLIST_FAILURE ],
-    endpoint: `clusters/${cluster}/apms`,
+    types: [ FETCH_APMLIST_REQUEST, FETCH_APMLIST_SUCCESS, FETCH_APMLIST_FAILURE ],
+    endpoint: `/clusters/${cluster}/apms`,
+    options: {
+      method: 'GET',
+    },
+    schema: {},
   },
 })
 
-export const fetcheApms = cluster => dispatch => {
-  return dispatch(fetchApmsInfo(cluster))
+export const getApms = cluster => dispatch => {
+  return dispatch(fetchApmInfo(cluster))
+}
+
+export const FETCH_APMSERVICE_REQUEST = 'FETCH_APMSERVICE_REQUEST'
+export const FETCH_APMSERVICE_SUCCESS = 'FETCH_APMSERVICE_SUCCESS'
+export const FETCH_APMSERVICE_FAILURE = 'FETCH_APMSERVICE_FAILURE'
+
+const fetchAPMService = body => ({
+  body,
+  [CALL_API]: {
+    types: [ FETCH_APMSERVICE_REQUEST, FETCH_APMSERVICE_SUCCESS, FETCH_APMSERVICE_FAILURE ],
+    endpoint: `/clusters/${body.id}/apms/deployed?type=${body.pinpoint}`,
+    options: {
+      method: 'GET',
+    },
+    schema: {},
+  },
+})
+
+export const getApmService = body => dispatch => {
+  return dispatch(fetchAPMService(body))
 }
 
