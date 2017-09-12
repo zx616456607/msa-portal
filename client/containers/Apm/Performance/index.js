@@ -589,7 +589,8 @@ const mapStateToProps = state => {
   const { project, cluster } = current.config
   const namespace = project.namespace
   const clusterID = cluster.id
-  const apmID = queryApms[namespace][clusterID].ids[0]
+  const apms = queryApms[namespace][clusterID]
+  const apmID = apms.ids && apms.ids[0]
   let { apps, serviceMap } = pinpoint
   const { ppApps } = entities
   const serverName = serviceMap[apmID]

@@ -708,7 +708,7 @@ const mapStateToProps = state => {
   const namespace = current.config.project.namespace
   const apms = queryApms[namespace][clusterID]
   // @Todo: not support other apm yet
-  const apmID = apms.ids[0]
+  const apmID = apms.ids && apms.ids[0]
   let apps = []
   if (pinpoint.apps[apmID]) {
     apps = pinpoint.apps[apmID].ids || []
