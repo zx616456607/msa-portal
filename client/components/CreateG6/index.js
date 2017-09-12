@@ -94,6 +94,12 @@ export default function createG6(__operation) {
         width,
         height,
       })
+      net.edge()
+        .shape('smooth')
+        .style({
+          arrow: true,
+        })
+        .size(2)
       net.source(nodes, edges)
       __operation(net)
       this.net = net
