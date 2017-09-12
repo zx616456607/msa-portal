@@ -19,6 +19,10 @@ import Sider from '../../components/Sider'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
+import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
+import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
+import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
 
 const { Content } = Layout
 
@@ -26,26 +30,48 @@ const menus = [
   {
     to: '/msa-manage',
     text: '微服务列表',
+    icon: <Icon type="bars" />,
   },
   {
     to: '/msa-manage/config-center',
     text: '配置中心',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={configCenterIcon.url} />
+      </svg>
+    ),
   },
   {
     to: '/msa-manage/call-link-tracking',
     text: '服务调用链',
+    icon: <Icon type="link" />,
   },
   {
     to: '/msa-manage/routing-manage',
     text: '路由管理',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={routingManageIcon.url} />
+      </svg>
+    ),
   },
   {
     to: '/msa-manage/api-gateway',
     text: '服务限流',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={apiGatewayIcon.url} />
+      </svg>
+    ),
   },
   {
     to: '/msa-manage/api-gateway-monitoring',
     text: 'API 网关监控',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={apiGatewayMonitoringIcon.url} />
+      </svg>
+    ),
   },
 ]
 
