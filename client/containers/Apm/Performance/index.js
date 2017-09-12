@@ -53,7 +53,7 @@ class Performance extends React.Component {
 
   componentWillMount() {
     const { clusterID, apmID, loadPPApps } = this.props
-    loadPPApps(clusterID, apmID)
+    apmID && loadPPApps(clusterID, apmID)
     this.setState({
       sTimer: Date.parse(new Date()),
       customTimer: Date.parse(new Date(new Date() - 300 * 1000)),

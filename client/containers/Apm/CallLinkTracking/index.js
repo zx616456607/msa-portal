@@ -52,7 +52,7 @@ class CallLinkTracking extends React.Component {
 
   componentWillMount() {
     const { loadPPApps, clusterID, apmID, location } = this.props
-    loadPPApps(clusterID, apmID)
+    apmID && loadPPApps(clusterID, apmID)
     const { application, from, to } = location.query || {}
     if (application && from && to) {
       this.setState({
