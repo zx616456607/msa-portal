@@ -23,7 +23,6 @@ import { getDefaultSelectedKeys } from '../../common/utils'
 import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
 import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
-import './style/index.less'
 
 const { Content } = Layout
 const menus = [
@@ -98,7 +97,7 @@ class Apm extends React.Component {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="logout">
+                <Menu.Item key="PinPoint">
                   PinPoint
                 </Menu.Item>
               </Menu>
@@ -149,7 +148,6 @@ const mapStateToProps = state => {
   let apms = queryApms[project.namespace] || {}
   apms = apms[cluster.id] || {}
   return {
-    errorMessage: state.errorMessage,
     auth: state.entities.auth,
     current: current || {},
     apms,

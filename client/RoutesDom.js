@@ -15,6 +15,13 @@ import { Route, Redirect } from 'react-router-dom'
 import App from './containers/App'
 import IndexPage from './containers/IndexPage'
 import TestPage from './containers/TestPage'
+import MsaManage from './containers/MsaManage'
+import MsaList from './containers/MsaManage/MsaList'
+import MsaConfigCenter from './containers/MsaManage/ConfigCenter'
+import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking'
+import MsaRoutingManage from './containers/MsaManage/RoutingManage'
+import ApiGateway from './containers/MsaManage/ApiGateway'
+import ApiGatewayMonitoring from './containers/MsaManage/ApiGatewayMonitoring'
 import Apm from './containers/Apm'
 import Topology from './containers/Apm/Topology'
 import Performance from './containers/Apm/Performance'
@@ -36,6 +43,11 @@ export const appChildRoutes = [
     key: 'test',
   },
   {
+    path: '/msa-manage',
+    component: MsaManage,
+    key: 'msa-manage',
+  },
+  {
     path: '/apms',
     component: Apm,
     key: 'apms',
@@ -44,6 +56,45 @@ export const appChildRoutes = [
     path: '/setting',
     component: Setting,
     key: 'setting',
+  },
+]
+
+export const msaManageChildRoutes = [
+  {
+    path: '/msa-manage',
+    exact: true,
+    component: MsaList,
+    key: 'index',
+  },
+  {
+    path: '/msa-manage/config-center',
+    exact: true,
+    component: MsaConfigCenter,
+    key: 'config-center',
+  },
+  {
+    path: '/msa-manage/call-link-tracking',
+    exact: true,
+    component: MsaCallLinkTracking,
+    key: 'call-link-tracking',
+  },
+  {
+    path: '/msa-manage/routing-manage',
+    exact: true,
+    component: MsaRoutingManage,
+    key: 'routing-manage',
+  },
+  {
+    path: '/msa-manage/api-gateway',
+    exact: true,
+    component: ApiGateway,
+    key: 'api-gateway',
+  },
+  {
+    path: '/msa-manage/api-gateway-monitoring',
+    exact: true,
+    component: ApiGatewayMonitoring,
+    key: 'api-gateway-monitoring',
   },
 ]
 
