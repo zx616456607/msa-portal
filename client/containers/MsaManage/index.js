@@ -4,85 +4,85 @@
  */
 
 /**
- * Apm container
+ * Msa manage container
  *
- * 2017-08-23
+ * 2017-09-12
  * @author zhangpc
  */
 
+
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
+import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
-import { loadApms } from '../../actions/apm'
-import { loadPPApps } from '../../actions/pinpoint'
 import { Route, Switch } from 'react-router-dom'
-import { apmChildRoutes } from '../../RoutesDom'
+import { msaManageChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
-import topologyIcon from '../../assets/img/apm/topology.svg'
-import performanceIcon from '../../assets/img/apm/performance.svg'
-import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
+import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
+import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
+import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
+import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
 
 const { Content } = Layout
+
 const menus = [
   {
-    to: '/apms/topology',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={topologyIcon.url} />
-      </svg>
-    ),
-    text: '微服务拓扑',
+    to: '/msa-manage',
+    text: '微服务列表',
+    icon: <Icon type="bars" style={{ fontSize: 16 }} />,
   },
   {
-    to: '/apms/performance',
+    to: '/msa-manage/config-center',
+    text: '配置中心',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={performanceIcon.url} />
+        <use xlinkHref={configCenterIcon.url} />
       </svg>
     ),
-    text: '微服务性能',
   },
   {
-    to: '/apms/call-link-tracking',
+    to: '/msa-manage/call-link-tracking',
+    text: '服务调用链',
+    icon: <Icon type="link" />,
+  },
+  {
+    to: '/msa-manage/routing-manage',
+    text: '路由管理',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={callLinkTrackingIcon.url} />
+        <use xlinkHref={routingManageIcon.url} />
       </svg>
     ),
-    text: '调用链路跟踪',
+  },
+  {
+    to: '/msa-manage/api-gateway',
+    text: '服务限流',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={apiGatewayIcon.url} />
+      </svg>
+    ),
+  },
+  {
+    to: '/msa-manage/api-gateway-monitoring',
+    text: 'API 网关监控',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={apiGatewayMonitoringIcon.url} />
+      </svg>
+    ),
   },
 ]
 
-class Apm extends React.Component {
-  componentWillMount() {
-    const { loadApms, current, loadPPApps } = this.props
-    const clusterID = current.config.cluster.id
-    loadApms(clusterID).then(res => {
-      if (!res.error) {
-        const { apms } = res.response.result.data
-        return loadPPApps(clusterID, apms[0])
-      }
-    })
-  }
-
-  renderLoading = tip => (
-    <div className="loading">
-      <Spin size="large" tip={tip} />
-    </div>
-  )
-
+class MsaManage extends React.Component {
   renderChildren = () => {
-    const { apms, children } = this.props
-    if (!apms || !apms.ids) {
-      return this.renderLoading('加载 APM 中 ...')
-    }
+    const { children } = this.props
     return [
       children,
       <Switch key="switch">
         {
-          apmChildRoutes.map(routeProps => <Route {...routeProps} />)
+          msaManageChildRoutes.map(routeProps => <Route {...routeProps} />)
         }
       </Switch>,
     ]
@@ -92,26 +92,26 @@ class Apm extends React.Component {
     const { location } = this.props
     const title = (
       <div>
-        性能管理 APM
+        微服务治理
         <div className="apm-switch">
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="PinPoint">
-                  PinPoint
+                <Menu.Item key="SpringCloud">
+                  SpringCloud
                 </Menu.Item>
               </Menu>
             }
             trigger={[ 'click' ]}>
             <a className="ant-dropdown-link" href="#">
-              基于 PinPoint <Icon type="down" />
+              基于 SpringCloud <Icon type="down" />
             </a>
           </Dropdown>
         </div>
       </div>
     )
     return (
-      <Layout className="apm">
+      <Layout className="msa-manage">
         <Sider>
           <Card
             className="left-menu-card"
@@ -143,18 +143,13 @@ class Apm extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current, queryApms } = state
-  const { project, cluster } = current.config
-  let apms = queryApms[project.namespace] || {}
-  apms = apms[cluster.id] || {}
+  const { current } = state
   return {
     auth: state.entities.auth,
     current: current || {},
-    apms,
   }
 }
 
 export default connect(mapStateToProps, {
-  loadApms,
-  loadPPApps,
-})(Apm)
+  //
+})(MsaManage)

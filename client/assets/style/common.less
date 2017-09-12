@@ -56,6 +56,18 @@ body {
       float: right;
     }
     .left-menu-card {
+      .ant-card-head {
+        height: 80px;
+        line-height: initial;
+        .ant-card-head-title {
+          margin-top: 20px;
+          .apm-switch {
+            font-size: 12px;
+            font-weight: initial;
+            margin-top: 5px;
+          }
+        }
+      }
       .ant-card-body {
         padding-right: 0;
         padding-left: 0;
@@ -82,6 +94,12 @@ body {
           }
         }
       }
+    }
+    .success-status {
+      color: #4aac47;
+    }
+    .error-status {
+      color: #f76565;
     }
   }
 }

@@ -14,17 +14,26 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Row, Col, Checkbox, Select, message } from 'antd'
 import '../style/topology.less'
-import RelationSchema from '../../../components/RelationSchema'
 import { loadApms } from '../../../actions/apm'
-import { loadPinpointMap, loadPPApps, loadScatterData } from '../../../actions/pinpoint'
+import { loadPinpointMap, loadPPApps, loadScatterData, fetchAgentData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
 import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
+import createG6 from '../../../components/CreateG6'
 const G2 = require('g2')
-import keys from 'lodash/keys'
+import G6 from '@antv/g6'
+import classNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
+import flatten from 'lodash/flatten'
 const Option = Select.Option
 
+const images = {
+  JAVA: require('../../../assets/img/apm/service/Java.svg'),
+  MYSQL: require('../../../assets/img/apm/service/mysql.svg'),
+  TOMCAT: require('../../../assets/img/apm/service/tomcat.svg'),
+  USER: require('../../../assets/img/apm/service/user.svg'),
+}
 // 设置鼠标 hove 至气泡的样式
 G2.Global.activeShape.point = {
   lineWidth: 2,
@@ -108,9 +117,7 @@ const colorSet = {
   Slow: '#ffc000',
   Error: '#f85a5b',
 }
-let duplicateC2
 const Chart2 = createG2(chart => {
-  duplicateC2 = chart
   chart.axis('reqTime', {
     formatter(val) {
       return val
@@ -124,10 +131,9 @@ const Chart2 = createG2(chart => {
   chart.col('reqTime', {
     alias: '请求时间',
   })
-  // chart.col('countNum', {
-  //   alias: '请求数量',
-  //   // max: this.state.totalCount + 10,
-  // })
+  chart.col('countNum', {
+    alias: '请求数量',
+  })
   chart.legend(false)
   chart.tooltip({
     title: null,
@@ -157,10 +163,12 @@ const Chart3 = createG2(chart => {
   chart.tooltip({
     title: null,
   })
-  chart.intervalStack().position('time*请求数量').color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
+  chart.intervalStack().position('time*请求数量')
+    .color('请求时间', [ '#5db75d', '#2db7f6', '#8d67fb', '#ffc000', '#f85a5b' ])
     .size(9)
   chart.render()
 })
+let Chart4
 class Topology extends React.Component {
   constructor() {
     super()
@@ -181,6 +189,7 @@ class Topology extends React.Component {
         background: '#ccc',
         lineWidth: 1,
       },
+      grid: null,
       secondData: [],
       thirdData: [],
       application: undefined,
@@ -193,9 +202,29 @@ class Topology extends React.Component {
       checkFailed: true,
       totalCount: 0,
       errorCount: 0,
+      topologyData: {},
     }
   }
-  loadData = () => {
+  componentDidMount() {
+    Chart4 = createG6(chart => {
+      chart.render()
+      chart.edge()
+        .shape('smooth')
+        .style({
+          stroke: '#00A263',
+          strokeOpacity: 0.6,
+          arrow: true,
+        })
+      chart.on('click', ev => {
+        if (ev.itemType !== 'node') {
+          return
+        }
+        const app = ev.item._attrs.model.label
+        this.getCurrentNode(app)
+      })
+    })
+  }
+  loadScatter = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
     const { application, rangeDateTime } = this.state
     let serviceTypeName
@@ -272,7 +301,7 @@ class Topology extends React.Component {
   // 柱状图数据
   getSecondChart = name => {
     const { currentNode } = this.state
-    const { histogram, agentHistogram } = currentNode
+    const { histogram, agentHistogram } = currentNode || { histogram: {}, agentHistogram: {} }
     const FrameSecond = G2.Frame
     let secondData = []
     let objSecond
@@ -290,26 +319,21 @@ class Topology extends React.Component {
     secondData = new FrameSecond(secondData)
     this.setState({
       secondData,
-    }, () => {
-      duplicateC2 && duplicateC2.col('countNum', {
-        alias: '请求数量',
-        max: this.state.totalCount + 10,
-      })
     })
   }
   // 分类柱状图数据
   getSortGroupChart = name => {
     const { currentNode } = this.state
-    const { timeSeriesHistogram, agentTimeSeriesHistogram } = currentNode
+    const { timeSeriesHistogram, agentTimeSeriesHistogram } = currentNode || { timeSeriesHistogram: {}, agentTimeSeriesHistogram: {} }
     if (name === 'all') {
       this.getSortData(timeSeriesHistogram)
       return
     }
-    this.getSortData(agentTimeSeriesHistogram)
+    this.getSortData(agentTimeSeriesHistogram[name])
   }
   getSortData = arr => {
     const thirdData = []
-    arr[0].values.forEach(item => {
+    arr[0] && arr[0].values.forEach(item => {
       thirdData.push({
         time: item[0],
         '1s': 0,
@@ -337,19 +361,20 @@ class Topology extends React.Component {
       thirdData: frame,
     })
   }
-  getAgentList = arr => {
-    if (!arr.length) { return }
-    const { application } = this.state
-    const currentNode = arr.filter(item => item.applicationName === application)
-    const { agentHistogram, totalCount, errorCount } = currentNode[0]
+  getCurrentNode = app => {
+    const { nodeDataArray } = this.state
+    const currentNode = nodeDataArray.filter(item => item.applicationName === app)
+    const { totalCount, errorCount, agentHistogram } = currentNode[0] || { totalCount: 0, errorCount: 0, agentHistogram: {} }
     this.setState({
       totalCount,
       errorCount,
-      agentList: keys(agentHistogram),
       currentNode: currentNode[0],
+      agentList: Object.keys(agentHistogram),
     }, () => {
-      this.getSecondChart('all')
-      this.getSortGroupChart('all')
+      const { agentList } = this.state
+      if (agentList.length) {
+        this.selectAgent('all,0')
+      }
     })
   }
   getPinpointMap = () => {
@@ -374,9 +399,61 @@ class Topology extends React.Component {
       if (res.error) {
         return
       }
-      const { pinpoint } = this.props
-      const { nodeDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [] }
-      this.getAgentList(nodeDataArray)
+      this.getNodeAndLinkData()
+    })
+  }
+  getNodeAndLinkData = () => {
+    const { apmID, pinpoint } = this.props
+    const { application } = this.state
+    const { nodeDataArray, linkDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [], linkDataArray: [] }
+    this.setState({
+      nodeDataArray,
+      linkDataArray,
+    }, () => {
+      this.getCurrentNode(application)
+      this.getTopologyData()
+    })
+  }
+  getTopologyData = () => {
+    const origin = window.location.origin
+    const { nodeDataArray, linkDataArray } = this.state
+    const iconArr = [ 'user', 'mysql', 'tomcat', 'java' ]
+    let nodes = []
+    const edges = []
+    nodeDataArray.length && nodeDataArray.forEach(item => {
+      const shape = iconArr.includes(item.serviceType.toLowerCase()) ? `${origin}/img/service/${item.serviceType.toLowerCase()}.svg` : `${origin}/img/service/java.svg`
+      nodes.push({
+        shape,
+        label: item.applicationName,
+        size: [ 50, 50 ],
+        id: item.key,
+      })
+    })
+    linkDataArray.length && linkDataArray.forEach(item => {
+      edges.push({
+        shape: 'arrow',
+        source: item.from,
+        target: item.to,
+        label: item.totalCount,
+      })
+    })
+    const margin = 60
+    const height1 = 800 - 2 * margin
+    const width1 = 500 - 2 * margin
+    const layout = new G6.Layout.Flow({
+      nodes,
+      edges,
+    })
+    nodes = layout.getNodes()
+    nodes.forEach(node => {
+      const x = node.x * width1 + margin
+      const y = node.y * height1 + margin
+      node.x = y
+      node.y = x
+    })
+    const topologyData = { nodes, edges }
+    this.setState({
+      topologyData,
     })
   }
   getData = () => {
@@ -389,13 +466,42 @@ class Topology extends React.Component {
       message.warning('请选择开始跟结束时间')
       return
     }
-    this.loadData()
+    this.loadScatter()
     this.getPinpointMap()
+    this.getAgentListWithStatus()
+  }
+  getAgentListWithStatus = () => {
+    const { fetchAgentData, apmID, clusterID } = this.props
+    const { application, rangeDateTime } = this.state
+    fetchAgentData(clusterID, apmID, {
+      application,
+      from: rangeDateTime[0].valueOf(),
+      to: rangeDateTime[1].valueOf(),
+    }).then(r => {
+      if (r.error) {
+        return
+      }
+      const agentListWithStatus = flatten(Object.values(r.response.result), true)
+      this.setState({
+        agentListWithStatus,
+      })
+    })
   }
   selectAgent = currentAgent => {
+    const { agentListWithStatus } = this.state
+    if (currentAgent.split(',')[0] !== 'all') {
+      this.setState({
+        currentAgentDetail: agentListWithStatus.filter(item => item.agentId === currentAgent.split(',')[0])[0],
+      })
+    } else {
+      this.setState({
+        currentAgentDetail: {},
+      })
+    }
     this.setState({ currentAgent }, () => {
       this.formatScatterData()
       this.getSecondChart(currentAgent.split(',')[0])
+      this.getSortGroupChart(currentAgent.split(',')[0])
     })
   }
   checkSuccess = e => {
@@ -432,8 +538,31 @@ class Topology extends React.Component {
       }
     })
   }
+  getAgentStatus = code => {
+    return (
+      <span className={classNames({ 'success-status': code === 100, 'error-status': code !== 100 })}>
+        {code === 100 ? '在线' : ''}
+        {code === 200 ? '关闭' : ''}
+        {code === 201 ? '意外关闭' : ''}
+        {code === 300 ? '断电' : ''}
+        {code === -1 ? '未知错误' : ''}
+      </span>
+    )
+  }
+  getServiceType = type => {
+    switch (type) {
+      case 'MYSQL':
+        return images.MYSQL
+      case 'TOMCAT':
+        return images.TOMCAT
+      case 'USER':
+        return images.USER
+      default:
+        return images.JAVA
+    }
+  }
   render() {
-    const { application, rangeDateTime, agentList, currentAgent } = this.state
+    const { application, rangeDateTime, agentList, currentAgent, topologyData, currentAgentDetail, currentNode, totalCount, errorCount } = this.state
     const { apps } = this.props
     return (
       <div className="topology">
@@ -471,50 +600,65 @@ class Topology extends React.Component {
             :
             <Row className="topology-body layout-content-body">
               <Col span={14} className="topology-body-relation-schema">
-                <RelationSchema data={[]}/>
+                {
+                  !isEmpty(topologyData) &&
+                  <Chart4
+                    data={topologyData}
+                    width={900}
+                    height={this.state.height}
+                    grid={this.state.grid}
+                  />
+                }
               </Col>
               <Col span={10} className="topology-body-service-detail">
                 <Row className="service-info">
                   <Col span={6}>
-                    image
+                    <img className="service-info-type" src={this.getServiceType(currentNode && currentNode.serviceType)}/>
                   </Col>
                   <Col span={18}>
-                    <div className="service-info-name">service-micro#1</div>
-                    <div className="service-info-app">application-micro#0</div>
-                    <div className="service-info-status">状态：在线</div>
-                    <div className="service-info-example">实例数量：2/2</div>
+                    <div className="service-info-name">{currentNode && currentNode.applicationName}</div>
+                    {
+                      !isEmpty(currentAgentDetail) &&
+                      <div className="service-info-status">状态：{this.getAgentStatus(currentAgentDetail.status && currentAgentDetail.status.state.code)}</div>
+                    }
+                    {
+                      currentNode && currentNode.isWas &&
+                      <div className="service-info-example">实例数量：{agentList.length}</div>
+                    }
                   </Col>
                 </Row>
                 <div className="service-chart-wrapper">
-                  <Row style={{ margin: '10px 0' }}>
-                    <Col span={6} style={{ lineHeight: '32px' }}>
-                      服务实例
-                    </Col>
-                    <Col span={18}>
-                      <Select
-                        showSearch
-                        style={{ width: 200 }}
-                        placeholder="选择微服务"
-                        optionFilterProp="children"
-                        value={currentAgent}
-                        onChange={this.selectAgent}
-                      >
-                        <Option key="all,0">All</Option>
-                        {
-                          agentList.map((item, index) => (
-                            <Option key={`${item},${index + 1}`}>{item}</Option>
-                          ))
-                        }
-                      </Select>
-                    </Col>
-                  </Row>
-                  <div>请求响应时间分布（2 day）：{this.state.totalCount}</div>
+                  {
+                    currentNode && currentNode.isWas &&
+                    <Row style={{ margin: '10px 0' }}>
+                      <Col span={6} style={{ lineHeight: '32px' }}>
+                        服务实例
+                      </Col>
+                      <Col span={18}>
+                        <Select
+                          showSearch
+                          style={{ width: 200 }}
+                          optionFilterProp="children"
+                          value={currentAgent}
+                          onChange={app => this.selectAgent(app)}
+                        >
+                          <Option key="all,0">All</Option>
+                          {
+                            agentList.map((item, index) => (
+                              <Option key={`${item},${index + 1}`}>{item}</Option>
+                            ))
+                          }
+                        </Select>
+                      </Col>
+                    </Row>
+                  }
+                  <div>请求响应时间分布（2 day）：{totalCount}</div>
                   <Row style={{ margin: '10px 0' }}>
                     <Col span={6} offset={6}>
-                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span style={{ color: '#4aac47' }}>Success: {this.state.totalCount - this.state.errorCount}</span></Checkbox>
+                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span className="success-status">Success: {totalCount - errorCount}</span></Checkbox>
                     </Col>
                     <Col span={6}>
-                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span style={{ color: '#f76565' }}>Failed: {this.state.errorCount}</span></Checkbox>
+                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span className="error-status">Failed: {errorCount}</span></Checkbox>
                     </Col>
                   </Row>
                   <div>
@@ -527,7 +671,7 @@ class Topology extends React.Component {
                     />
                   </div>
                   <div>
-                    请求响应时间摘要（2 day）：{this.state.totalCount}
+                    请求响应时间摘要（2 day）：{totalCount}
                   </div>
                   <div>
                     <Chart2
@@ -538,7 +682,7 @@ class Topology extends React.Component {
                     />
                   </div>
                   <div>
-                    请求分时段负载（2 day）：{this.state.totalCount}
+                    请求分时段负载（2 day）：{totalCount}
                   </div>
                   <div>
                     <Chart3
@@ -585,4 +729,5 @@ export default connect(mapStateToProps, {
   loadPinpointMap,
   loadPPApps,
   loadScatterData,
+  fetchAgentData,
 })(Topology)

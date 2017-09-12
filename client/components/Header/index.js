@@ -27,9 +27,8 @@ const menus = [
     disabled: true,
   },
   {
-    to: '/test1',
+    to: '/msa-manage',
     text: '微服务治理',
-    disabled: true,
   },
   {
     to: '/apms',
