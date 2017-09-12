@@ -10,7 +10,6 @@
  * @author zhangpc
  */
 
-
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Card, Dropdown } from 'antd'

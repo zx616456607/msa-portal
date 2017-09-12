@@ -60,7 +60,7 @@ export default class ApmTimePicker extends React.Component {
      *
      */
     const { value } = nextProps
-    if (value[0] !== this.props.value[0] || value[1] !== this.props.value[1]) {
+    if (value && (value[0] !== this.props.value[0] || value[1] !== this.props.value[1])) {
       this.setState({
         value,
       })
