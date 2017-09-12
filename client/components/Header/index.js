@@ -17,7 +17,6 @@ import { getDefaultSelectedKeys } from '../../common/utils'
 import { USER_CURRENT_CONFIG, DEFAULT } from '../../constants'
 import './style/index.less'
 
-// const MenuItemGroup = Menu.ItemGroup
 const SubMenu = Menu.SubMenu
 const LayoutHeader = Layout.Header
 const menus = [
@@ -46,17 +45,6 @@ const menus = [
 ]
 const MY_PORJECT = '我的个人项目'
 
-const testClusters = [
-  {
-    clusterID: 'CID-fe23111d77cb',
-    clusterName: '时速云测试环境',
-  },
-  {
-    clusterID: 'CID-fe23111d7test',
-    clusterName: '不要删除修改测试集群',
-  },
-]
-
 export default class Header extends React.Component {
   state = {
     projectsText: '切换项目',
@@ -65,15 +53,6 @@ export default class Header extends React.Component {
   }
 
   componentDidMount() {
-    const [ firstCluster ] = testClusters
-    this.setState({
-      clustersText: firstCluster.clusterName,
-    })
-    this.props.setCurrentConfig({
-      cluster: {
-        id: firstCluster.clusterID,
-      },
-    })
     const {
       userID,
       getUserProjects,
