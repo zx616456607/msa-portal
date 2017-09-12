@@ -314,6 +314,7 @@ class Performance extends React.Component {
 
     const Charts = chart => {
       chart.line().position('time*count')
+      chart.forceFit(true)
       chart.setMode('select')
       chart.select('rangeX')
       chart.on('rangeselectstart', () => {
@@ -327,8 +328,8 @@ class Performance extends React.Component {
       chart.source(heapData, {
         time: {
           type: 'time',
-          tickCount: 10,
-          mask: 'hh:mm:ss',
+          tickCount: 20,
+          mask: 'hh:MM:ss',
         },
       })
       chart.col('count', {
@@ -367,8 +368,8 @@ class Performance extends React.Component {
       chart.source(cpuData, {
         time: {
           type: 'time',
-          tickCount: 10,
-          mask: 'hh:mm:ss',
+          tickCount: 20,
+          mask: 'hh:MM:ss',
         },
       })
       chart.col('value', {
@@ -399,8 +400,8 @@ class Performance extends React.Component {
       chart.source(tranData, {
         time: {
           type: 'time',
-          tickCount: 10,
-          mask: 'hh:mm:ss',
+          tickCount: 20,
+          mask: 'hh:MM:ss',
         },
       })
       chart.col('count', {
@@ -434,8 +435,8 @@ class Performance extends React.Component {
       chart.source(gcData, {
         time: {
           type: 'time',
-          tickCount: 10,
-          mask: 'hh:mm:ss',
+          tickCount: 20,
+          mask: 'hh:MM:ss',
         },
       })
       chart.col('count', {
