@@ -15,7 +15,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export const JWT = 'jwt'
 export const API_PREFIX = '/api/v2'
 export const API_PROTOCOL = isProd ? 'http' : 'http'
-export const API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
+export const API_HOST = isProd ? '192.168.1.246:3080' : '192.168.1.103:48000'
 export const API_URL = `${API_PROTOCOL}://${API_HOST}${API_PREFIX}`
 export const SPI_PREFIX = '/spi/v2'
 export const SPI_URL = `${API_PROTOCOL}://${API_HOST}${SPI_PREFIX}`
