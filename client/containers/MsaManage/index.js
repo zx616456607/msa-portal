@@ -22,8 +22,10 @@ import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
+import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 
 const { Content } = Layout
+const SubMenu = Menu.SubMenu
 
 const menus = [
   {
@@ -72,6 +74,30 @@ const menus = [
       </svg>
     ),
   },
+  {
+    type: 'SubMenu',
+    text: '认证管理',
+    to: '/msa-manage/certification-manage',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={certificationManageIcon.url} />
+      </svg>
+    ),
+    children: [
+      {
+        to: '/msa-manage/certification-manage/clients',
+        text: '客户端管理',
+      },
+      {
+        to: '/msa-manage/certification-manage/auth-mode',
+        text: '授权方式查看',
+      },
+      {
+        to: '/msa-manage/certification-manage/auth-scope',
+        text: '授权范围查看',
+      },
+    ],
+  },
 ]
 
 class MsaManage extends React.Component {
@@ -85,6 +111,32 @@ class MsaManage extends React.Component {
         }
       </Switch>,
     ]
+  }
+
+  renderMenu = menu => {
+    if (menu.type === 'SubMenu') {
+      return (
+        <SubMenu
+          key={menu.to}
+          title={
+            <span>
+              {menu.icon}
+              <span className="nav-text">{menu.text}</span>
+            </span>
+          }
+        >
+          {menu.children.map(this.renderMenu)}
+        </SubMenu>
+      )
+    }
+    return (
+      <Menu.Item key={menu.to}>
+        <Link to={menu.to}>
+          {menu.icon}
+          <span className="nav-text">{menu.text}</span>
+        </Link>
+      </Menu.Item>
+    )
   }
 
   render() {
@@ -121,14 +173,7 @@ class MsaManage extends React.Component {
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
             >
               {
-                menus.map(menu => (
-                  <Menu.Item key={menu.to}>
-                    <Link to={menu.to}>
-                      {menu.icon}
-                      <span className="nav-text">{menu.text}</span>
-                    </Link>
-                  </Menu.Item>
-                ))
+                menus.map(this.renderMenu)
               }
             </Menu>
           </Card>

@@ -1,0 +1,61 @@
+@import '../../../assets/style/core/index.less';
+
+.code-editor {
+  border-radius: 5px;
+  border: 1px solid #000;
+  &-title {
+    font-size: 14px;
+    height: 45px;
+    line-height: 45px;
+    color: @primaryColor;
+    padding: 0 20px;
+    background-color: #333;
+  }
+  .ReactCodeMirror {
+    .CodeMirror {
+      font-family: Consolas, Menlo, Courier, monospace;
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-button:vertical {
+    display: none;
+  }
+  ::-webkit-scrollbar-button:horizontal {
+    display: none;
+  }
+  ::-webkit-scrollbar-track:vertical {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  ::-webkit-scrollbar-track:horizontal {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  ::-webkit-scrollbar-track-piece {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  ::-webkit-scrollbar-thumb:vertical {
+    margin-right: 10px;
+    background-color: #a6a6a6;
+  }
+  ::-webkit-scrollbar-thumb:horizontal {
+    margin-right: 10px;
+    background-color: #a6a6a6;
+  }
+  ::-webkit-scrollbar-thumb:vertical:hover {
+    background-color: #aaa;
+  }
+  ::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: #aaa;
+  }
+  ::-webkit-scrollbar-corner:vertical {
+    background-color: #535353;
+  }
+  ::-webkit-scrollbar-corner:horizontal {
+    background-color: #535353;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+  }
+}
