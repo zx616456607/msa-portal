@@ -29,10 +29,10 @@ import flatten from 'lodash/flatten'
 const Option = Select.Option
 
 const images = {
-  JAVA: require('../../../assets/img/apm/service/Java.svg'),
-  MYSQL: require('../../../assets/img/apm/service/mysql.svg'),
-  TOMCAT: require('../../../assets/img/apm/service/tomcat.svg'),
-  USER: require('../../../assets/img/apm/service/user.svg'),
+  JAVA: '/img/service/java.svg',
+  MYSQL: '/img/service/mysql.svg',
+  TOMCAT: '/img/service/tomcat.svg',
+  USER: '/img/service/user.svg',
 }
 // 设置鼠标 hove 至气泡的样式
 G2.Global.activeShape.point = {
@@ -81,7 +81,7 @@ const Chart1 = createG2(chart => {
   chart.tooltip({
     title: null,
   })
-  chart.point().position('x*y').size('x', 3, 3)
+  chart.point().position('x*y').size('x', 2, 2)
     .color('#3182bd')
     .opacity(0.5)
     .shape('circle')
@@ -176,7 +176,7 @@ class Topology extends React.Component {
       firstData: [],
       forceFit: true,
       width: 100,
-      height: 450,
+      height: 300,
       plotCfg: {
         margin: [ 20, 80, 90, 100 ],
         background: {
@@ -218,28 +218,38 @@ class Topology extends React.Component {
         .size(2)
       chart.on('click', ev => {
         let key = ''
-        if (ev.itemType === 'node') {
-          key = ev.item._attrs.model.id
+        const item = ev.item
+        if (chart.isNode(item)) {
+          key = item._attrs.model.id
           this.getCurrentNode(key)
-        } else if (ev.itemType === 'edge') {
-          key = ev.item._attrs.model.source
+          chart.setItemActived(item, true)
+        } else if (chart.isEdge(item)) {
+          key = item._attrs.model.source
+          const group = item.getShapeCfg()
+          const { source, target } = group
           this.getCurrentNode(key)
+          chart.setItemActived(source, true)
+          chart.setItemActived(target, true)
         }
         chart.refresh()
       })
       chart.on('itemmouseenter', ev => {
         const item = ev.item
-        chart.update(item, {
-          color: '#2db7f5',
-        })
-        chart.refresh()
+        if (chart.isEdge(item)) {
+          chart.update(item, {
+            color: '#2db7f5',
+          })
+          chart.refresh()
+        }
       })
       chart.on('itemmouseleave', ev => {
         const item = ev.item
-        chart.update(item, {
-          color: '#999',
-        })
-        chart.refresh()
+        if (chart.isEdge(item)) {
+          chart.update(item, {
+            color: '#999',
+          })
+          chart.refresh()
+        }
       })
     })
   }
@@ -468,8 +478,8 @@ class Topology extends React.Component {
     if (!nodes.length && !edges.length) {
       return
     }
-    const margin = 60
-    const height1 = 800 - 2 * margin
+    const margin = 10
+    const height1 = 600 - 2 * margin
     const width1 = 500 - 2 * margin
     const layout = new G6.Layout.Flow({
       nodes,
@@ -479,21 +489,9 @@ class Topology extends React.Component {
     nodes.forEach(node => {
       const x = node.x * width1 + margin
       const y = node.y * height1 + margin
-      node.x = y
-      node.y = x
+      node.x = x
+      node.y = y
     })
-    // 注册图形
-    // const Util = G6.Util
-    // G6.registNode('customHtml2', {
-    //   cssSize: true, // 该配置项设置为 true 时，则节点不受 node size 控制
-    //   getHtml: cfg => {
-    //     const model = cfg.model
-    //     console.log(model)
-    //     // const src = iconArr.includes(model.serviceType.toLowerCase()) ? `${origin}/img/service/${model.serviceType.toLowerCase()}.svg` : `${origin}/img/service/java.svg`
-    //     const dom = Util.createDOM('<ul class="customNode2">xxx</ul>')
-    //     return dom
-    //   },
-    // }, 'html')
     const topologyData = { nodes, edges }
     this.setState({
       topologyData,
@@ -648,8 +646,8 @@ class Topology extends React.Component {
                   !isEmpty(topologyData) &&
                   <Chart4
                     data={topologyData}
-                    width={900}
-                    height={this.state.height}
+                    // width={800}
+                    height={1000}
                     grid={this.state.grid}
                   />
                 }

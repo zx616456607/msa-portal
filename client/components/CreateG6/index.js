@@ -30,7 +30,7 @@ export default function createG6(__operation) {
       width: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,
-      ]).isRequired,
+      ]),
       height: PropTypes.number.isRequired,
       plotCfg: PropTypes.object,
       forceFit: PropTypes.bool,
@@ -72,8 +72,8 @@ export default function createG6(__operation) {
 
     initGraph(props) {
       const { width, height, data } = props
-      const margin = 60
-      const height1 = 800 - 2 * margin
+      const margin = 10
+      const height1 = 600 - 2 * margin
       const width1 = 500 - 2 * margin
       let nodes = data.nodes
       const edges = data.edges
@@ -85,8 +85,8 @@ export default function createG6(__operation) {
       nodes.forEach(node => {
         const x = node.x * width1 + margin
         const y = node.y * height1 + margin
-        node.x = y
-        node.y = x
+        node.x = x
+        node.y = y
       })
       const net = new G6.Net({
         id: this.graphId,

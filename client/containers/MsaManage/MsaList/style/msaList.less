@@ -20,6 +20,7 @@
   &-table {
     background-color: white;
     position: relative;
+    padding: 14px 0 40px;
     table {
       thead {
         tr {
@@ -33,10 +34,46 @@
     &-edit {
       margin-right: 12px;
     }
+    &-status-box {
+      display: inline-flex;
+      align-items: center;
+    }
+    &-status {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    &-running {
+      color: #30b967;
+      .msa-table-status {
+        background-color: #30b967;
+      }
+    }
+    &-error {
+      color: #979797;
+      .msa-table-status {
+        background-color: #979797;
+      }
+    }
     .ant-pagination {
       position: absolute;
       right: 0;
-      top: -60px;
+      top: -72px;
+    }
+    &-service {
+      &-del {
+        display: none;
+        margin-left: 10px;
+      }
+      &:hover {
+        .msa-table-service-del {
+          display: inline-block;
+        }
+        color: @primaryColor;
+      }
     }
   }
 }
