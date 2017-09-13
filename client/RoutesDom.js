@@ -17,7 +17,8 @@ import IndexPage from './containers/IndexPage'
 import TestPage from './containers/TestPage'
 import MsaManage from './containers/MsaManage'
 import MsaList from './containers/MsaManage/MsaList/MsaList'
-import MsaConfigCenter from './containers/MsaManage/ConfigCenter'
+import MsaConfigCenter from './containers/MsaManage/ConfigCenter/ConfigCenter'
+import CreateConfig from './containers/MsaManage/ConfigCenter/CreateConfig'
 import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking'
 import MsaRoutingManage from './containers/MsaManage/RoutingManage/RoutingManage'
 import ApiGateway from './containers/MsaManage/ApiGateway'
@@ -31,6 +32,7 @@ import Performance from './containers/Apm/Performance'
 import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import Setting from './containers/Setting'
 import ApmSetting from './containers/Setting/Apm'
+import MsaConfig from './containers/Setting/msaConfig'
 
 export const appChildRoutes = [
   {
@@ -74,6 +76,18 @@ export const msaManageChildRoutes = [
     exact: true,
     component: MsaConfigCenter,
     key: 'config-center',
+  },
+  {
+    path: '/msa-manage/config-center/config/create',
+    component: CreateConfig,
+    exact: true,
+    key: 'create-config',
+  },
+  {
+    path: '/msa-manage/config-center/:id',
+    component: CreateConfig,
+    exact: true,
+    key: 'config-detail',
   },
   {
     path: '/msa-manage/call-link-tracking',
@@ -162,6 +176,11 @@ export const settingChildRoutes = [
   {
     path: '/setting/apms',
     component: ApmSetting,
+    exact: true,
+    key: 'apms',
+  }, {
+    path: '/setting/msa-config',
+    component: MsaConfig,
     exact: true,
     key: 'apms',
   },

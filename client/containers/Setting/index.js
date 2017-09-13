@@ -24,6 +24,14 @@ import './style/index.less'
 const { Content } = Layout
 const menus = [
   {
+    to: '/setting/msa-config',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={topologyIcon.url} />
+      </svg>
+    ),
+    text: '微服务配置',
+  }, {
     to: '/setting/apms',
     icon: (
       <svg className="menu-icon">
