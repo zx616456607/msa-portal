@@ -31,7 +31,7 @@ export default class MsaList extends React.Component {
     const columns = [{
       title: '微服务名称',
       dataIndex: 'name',
-      render: text => <Link to={`/msa-manage/${text}`}>{text}</Link>,
+      render: text => <Link to={`/msa-manage/detail/${text}`}>{text}</Link>,
     }, {
       title: '微服务 实例ID',
       dataIndex: 'id',
