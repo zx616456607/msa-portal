@@ -262,7 +262,7 @@ class ApmSetting extends React.Component {
               </li>
               <li>
                 <span>基础服务</span>
-                <Select style={{ width: 57 + '%', marginLeft: 5 + '%' }} >
+                <Select style={{ width: 57 + '%', marginLeft: 7 + '%' }} >
                   <Option value="pinpoint">Pinpoint</Option>
                   {/* {
                     serviceData.map((item, index) => (
