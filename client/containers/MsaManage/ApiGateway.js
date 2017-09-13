@@ -78,7 +78,7 @@ class ApiGateway extends React.Component {
       </div>,
     }, {
       title: '操作',
-      dataIndex: 'comment',
+      dataIndex: 'operation',
       render: () => <div>
         {
           <Dropdown.Button overlay={menu} type="ghost">
@@ -112,7 +112,7 @@ class ApiGateway extends React.Component {
     return (
       <Row className="layout-content-btns">
         <div className="top" style={{ marginRight: 0 }}>
-          <Button className="add" size="large" style={{ backgroundColor: '#2db7f5' }} onClick={() => this.handleAdd()}>
+          <Button className="add" size="large" type="primary" onClick={() => this.handleAdd()}>
             <Icon type="plus" style={{ color: '#fff' }} />
             <span style={{ color: '#fff' }}>添加限流规则</span>
           </Button>
