@@ -17,10 +17,10 @@ export default class MsaConfig extends React.Component {
   render() {
     return (
       <Row className="layout-content-btns">
-        <div className="title">
+        <div className="title" style={{ marginRight: 0 }}>
           <span>微服务配置</span>
         </div>
-        <div className="content">
+        <div className="conten">
           <ul>
             <li>
               <span className="server">云服务中心 API Server</span>

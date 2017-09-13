@@ -236,7 +236,7 @@ class ApmSetting extends React.Component {
         <div className="header" style={{ marginRight: 0 }}>
           <p className="" style={{ fontSize: 16, padding: 10 }}>APM配置</p>
         </div>
-        <div className="content">
+        <div className="contents">
           <div className="left">
             <ul>
               <li>
