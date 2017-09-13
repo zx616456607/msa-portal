@@ -10,19 +10,16 @@
  * @author zhangxuan
  */
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Button, Icon, Input, Table } from 'antd'
 const Search = Input.Search
 import './style/msaList.less'
 import RegisterMsa from './RegisterMsa'
+import classNames from 'classnames'
 
 export default class MsaList extends React.Component {
   state = {
     msaModal: false,
-  }
-  editMsa = () => {
-    this.setState({
-      msaModal: true,
-    })
   }
   registerMsa = () => {
     this.setState({
@@ -34,9 +31,11 @@ export default class MsaList extends React.Component {
     const columns = [{
       title: '微服务名称',
       dataIndex: 'name',
+      render: text => <Link to={`/msa-manage/${text}`}>{text}</Link>,
     }, {
       title: '微服务 实例ID',
       dataIndex: 'id',
+      render: text => <div className="msa-table-service">{text}<Icon type="close-square-o" className="msa-table-service-del pointer"/></div>,
     }, {
       title: '实例状态',
       dataIndex: 'agentStatus',
@@ -55,6 +54,10 @@ export default class MsaList extends React.Component {
     }, {
       title: '状态',
       dataIndex: 'status',
+      render: text =>
+        <span className={classNames('msa-table-status-box', { 'msa-table-running': text, 'msa-table-error': !text })}>
+          <i className="msa-table-status"/>{text ? '可被发现' : '不可被发现'}
+        </span>,
     }, {
       title: '操作',
       render: record => {
@@ -72,44 +75,44 @@ export default class MsaList extends React.Component {
     }]
     const data = [{
       key: '1',
-      name: '08/07 15:25:31 667',
+      name: 'service1',
       id: '/greeting',
-      status: '可被发现',
+      status: true,
       agentStatus: 'running',
       port: 'agent55-app',
       address: '192.168.0.33',
       type: '自动注册',
-      serStatus: 'agent55-app^15',
+      serStatus: '1/2',
     }, {
       key: '2',
-      name: '08/07 15:25:31 667',
+      name: 'service2',
       id: '/greeting',
-      status: '不可被发现',
+      status: false,
       agentStatus: 'running',
       port: 'agent55-app',
       address: '192.168.0.33',
       type: '自动注册',
-      serStatus: 'agent55-app^15',
+      serStatus: '1/1',
     }, {
       key: '3',
-      name: '08/07 15:25:31 667',
+      name: 'service3',
       id: '/greeting',
-      status: '可被发现',
+      status: true,
       agentStatus: 'running',
       port: 'agent55-app',
       address: '192.168.0.33',
       type: '手动注册',
-      serStatus: 'agent55-app^15',
+      serStatus: '1/2',
     }, {
       key: '4',
-      name: '08/07 15:25:31 667',
+      name: 'service4',
       id: '/greeting',
-      status: '可被发现',
+      status: true,
       agentStatus: 'running',
       port: 'agent55-app',
       address: '192.168.0.33',
       type: '手动注册',
-      serStatus: 'agent55-app^15',
+      serStatus: '1/2',
     }]
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {

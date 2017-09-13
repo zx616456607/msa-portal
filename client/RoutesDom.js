@@ -16,7 +16,8 @@ import App from './containers/App'
 import IndexPage from './containers/IndexPage'
 import TestPage from './containers/TestPage'
 import MsaManage from './containers/MsaManage'
-import MsaList from './containers/MsaManage/MsaList/MsaList'
+import MsaList from './containers/MsaManage/MsaList/index'
+import MsaDetail from './containers/MsaManage/MsaList/MsaDetail'
 import MsaConfigCenter from './containers/MsaManage/ConfigCenter'
 import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking'
 import MsaRoutingManage from './containers/MsaManage/RoutingManage/RoutingManage'
@@ -65,6 +66,12 @@ export const msaManageChildRoutes = [
     exact: true,
     component: MsaList,
     key: 'index',
+  },
+  {
+    path: '/msa-manage/:id',
+    exact: true,
+    component: MsaDetail,
+    key: 'msa-detail',
   },
   {
     path: '/msa-manage/config-center',

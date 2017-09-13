@@ -25,7 +25,7 @@ const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
 const images = [
-  { src: require('../../../assets/img/apm/service/Java.svg') },
+  { src: require('../../../assets/img/apm/service/java.svg') },
   { src: require('../../../assets/img/apm/service/mysql.svg') },
   { src: require('../../../assets/img/apm/service/tomcat.svg') },
 ]
