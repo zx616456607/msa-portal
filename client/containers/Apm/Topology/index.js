@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Row, Col, Checkbox, Select, message } from 'antd'
-import '../style/topology.less'
+import './style/topology.less'
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData, fetchAgentData } from '../../../actions/pinpoint'
 import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
@@ -206,21 +206,40 @@ class Topology extends React.Component {
     }
   }
   componentDidMount() {
+    const { loadPPApps, clusterID, apmID } = this.props
+    apmID && loadPPApps(clusterID, apmID)
     Chart4 = createG6(chart => {
       chart.render()
       chart.edge()
         .shape('smooth')
         .style({
-          stroke: '#00A263',
-          strokeOpacity: 0.6,
           arrow: true,
         })
+        .size(2)
       chart.on('click', ev => {
-        if (ev.itemType !== 'node') {
-          return
+        let key = ''
+        if (ev.itemType === 'node') {
+          key = ev.item._attrs.model.id
+          this.getCurrentNode(key)
+        } else if (ev.itemType === 'edge') {
+          key = ev.item._attrs.model.source
+          this.getCurrentNode(key)
         }
-        const app = ev.item._attrs.model.label
-        this.getCurrentNode(app)
+        chart.refresh()
+      })
+      chart.on('itemmouseenter', ev => {
+        const item = ev.item
+        chart.update(item, {
+          color: '#2db7f5',
+        })
+        chart.refresh()
+      })
+      chart.on('itemmouseleave', ev => {
+        const item = ev.item
+        chart.update(item, {
+          color: '#999',
+        })
+        chart.refresh()
       })
     })
   }
@@ -361,9 +380,9 @@ class Topology extends React.Component {
       thirdData: frame,
     })
   }
-  getCurrentNode = app => {
+  getCurrentNode = key => {
     const { nodeDataArray } = this.state
-    const currentNode = nodeDataArray.filter(item => item.applicationName === app)
+    const currentNode = nodeDataArray.filter(item => item.key === key)
     const { totalCount, errorCount, agentHistogram } = currentNode[0] || { totalCount: 0, errorCount: 0, agentHistogram: {} }
     this.setState({
       totalCount,
@@ -410,7 +429,14 @@ class Topology extends React.Component {
       nodeDataArray,
       linkDataArray,
     }, () => {
-      this.getCurrentNode(application)
+      let key = ''
+      for (let i = 0; i < nodeDataArray.length; i++) {
+        if (nodeDataArray[i].applicationName === application) {
+          key = nodeDataArray[i].key
+          break
+        }
+      }
+      this.getCurrentNode(key)
       this.getTopologyData()
     })
   }
@@ -427,16 +453,21 @@ class Topology extends React.Component {
         label: item.applicationName,
         size: [ 50, 50 ],
         id: item.key,
+        serviceType: item.serviceType,
       })
     })
     linkDataArray.length && linkDataArray.forEach(item => {
+      const label = `${item.errorCount}/${item.totalCount}(失败/总共)`
       edges.push({
         shape: 'arrow',
         source: item.from,
         target: item.to,
-        label: item.totalCount,
+        label,
       })
     })
+    if (!nodes.length && !edges.length) {
+      return
+    }
     const margin = 60
     const height1 = 800 - 2 * margin
     const width1 = 500 - 2 * margin
@@ -451,6 +482,18 @@ class Topology extends React.Component {
       node.x = y
       node.y = x
     })
+    // 注册图形
+    // const Util = G6.Util
+    // G6.registNode('customHtml2', {
+    //   cssSize: true, // 该配置项设置为 true 时，则节点不受 node size 控制
+    //   getHtml: cfg => {
+    //     const model = cfg.model
+    //     console.log(model)
+    //     // const src = iconArr.includes(model.serviceType.toLowerCase()) ? `${origin}/img/service/${model.serviceType.toLowerCase()}.svg` : `${origin}/img/service/java.svg`
+    //     const dom = Util.createDOM('<ul class="customNode2">xxx</ul>')
+    //     return dom
+    //   },
+    // }, 'html')
     const topologyData = { nodes, edges }
     this.setState({
       topologyData,
@@ -527,10 +570,11 @@ class Topology extends React.Component {
     })
   }
   getTimeRange = rangeDateTime => {
+    const { currentNode, application } = this.state
     this.setState({
       rangeDateTime,
     }, () => {
-      if (rangeDateTime.length && this.state.application) {
+      if (rangeDateTime.length && application && currentNode && currentNode.isWas) {
         duplicateC1 && duplicateC1.col('x', {
           min: rangeDateTime[0].valueOf(), // 自定义最大值
           max: rangeDateTime[1].valueOf(), // 自定义最小值
@@ -630,68 +674,67 @@ class Topology extends React.Component {
                 <div className="service-chart-wrapper">
                   {
                     currentNode && currentNode.isWas &&
-                    <Row style={{ margin: '10px 0' }}>
-                      <Col span={6} style={{ lineHeight: '32px' }}>
-                        服务实例
-                      </Col>
-                      <Col span={18}>
-                        <Select
-                          showSearch
-                          style={{ width: 200 }}
-                          optionFilterProp="children"
-                          value={currentAgent}
-                          onChange={app => this.selectAgent(app)}
-                        >
-                          <Option key="all,0">All</Option>
-                          {
-                            agentList.map((item, index) => (
-                              <Option key={`${item},${index + 1}`}>{item}</Option>
-                            ))
-                          }
-                        </Select>
-                      </Col>
-                    </Row>
+                    [
+                      <Row key="agentSelect" style={{ margin: '10px 0' }}>
+                        <Col span={6} style={{ lineHeight: '32px' }}>
+                          服务实例
+                        </Col>
+                        <Col span={18}>
+                          <Select
+                            showSearch
+                            style={{ width: 200 }}
+                            optionFilterProp="children"
+                            value={currentAgent}
+                            onChange={app => this.selectAgent(app)}
+                          >
+                            <Option key="all,0">All</Option>
+                            {
+                              agentList.map((item, index) => (
+                                <Option key={`${item},${index + 1}`}>{item}</Option>
+                              ))
+                            }
+                          </Select>
+                        </Col>
+                      </Row>,
+                      <div key="chart1">
+                        <div>请求响应时间分布（2 day）：{totalCount}</div>
+                        <Row style={{ margin: '10px 0' }}>
+                          <Col span={6} offset={6}>
+                            <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span className="success-status">Success: {totalCount - errorCount}</span></Checkbox>
+                          </Col>
+                          <Col span={6}>
+                            <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span className="error-status">Failed: {errorCount}</span></Checkbox>
+                          </Col>
+                        </Row>
+                        <Chart1
+                          data={this.state.firstData}
+                          width={this.state.width}
+                          height={this.state.height}
+                          plotCfg={this.state.plotCfg}
+                          forceFit={this.state.forceFit}
+                        />
+                      </div>,
+                    ]
                   }
-                  <div>请求响应时间分布（2 day）：{totalCount}</div>
-                  <Row style={{ margin: '10px 0' }}>
-                    <Col span={6} offset={6}>
-                      <Checkbox checked={this.state.checkSuccess} onChange={this.checkSuccess}><span className="success-status">Success: {totalCount - errorCount}</span></Checkbox>
-                    </Col>
-                    <Col span={6}>
-                      <Checkbox checked={this.state.checkFailed} onChange={this.checkFailed}><span className="error-status">Failed: {errorCount}</span></Checkbox>
-                    </Col>
-                  </Row>
-                  <div>
-                    <Chart1
-                      data={this.state.firstData}
-                      width={this.state.width}
-                      height={this.state.height}
-                      plotCfg={this.state.plotCfg}
-                      forceFit={this.state.forceFit}
-                    />
-                  </div>
                   <div>
                     请求响应时间摘要（2 day）：{totalCount}
                   </div>
-                  <div>
-                    <Chart2
-                      data={this.state.secondData}
-                      width={this.state.width}
-                      height={this.state.height}
-                      forceFit={this.state.forceFit}
-                    />
-                  </div>
+                  <Chart2
+                    data={this.state.secondData}
+                    width={this.state.width}
+                    height={this.state.height}
+                    forceFit={this.state.forceFit}
+                  />
                   <div>
                     请求分时段负载（2 day）：{totalCount}
                   </div>
-                  <div>
-                    <Chart3
-                      data={this.state.thirdData}
-                      width={this.state.width}
-                      height={this.state.height}
-                      plotCfg={this.state.sortPlotCfg}
-                      forceFit={this.state.forceFit} />
-                  </div>
+                  <Chart3
+                    data={this.state.thirdData}
+                    width={this.state.width}
+                    height={this.state.height}
+                    plotCfg={this.state.sortPlotCfg}
+                    forceFit={this.state.forceFit}
+                  />
                 </div>
               </Col>
             </Row>
