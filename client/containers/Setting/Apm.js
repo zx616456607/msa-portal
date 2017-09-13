@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/apm.less'
-import { Row, Select, Button, Progress, Modal, Icon } from 'antd'
+import { Row, Col, Select, Button, Progress, Modal, Icon } from 'antd'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
@@ -238,20 +238,22 @@ class ApmSetting extends React.Component {
         </div>
         <div className="contents">
           <div className="left">
-            <ul>
-              <li>
-                <span>项目</span>
-                <Select style={{ width: 57 + '%', marginLeft: 11 + '%' }} onChange={this.handleProject}>
+            <Row className="apms">
+              <Col span={6}>项目</Col>
+              <Col span={18}>
+                <Select style={{ width: 300 }} onChange={this.handleProject}>
                   {
                     projectsData.map((item, index) => (
                       <Option key={index} value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
                     ))
                   }
                 </Select>
-              </li>
-              <li>
-                <span>集群</span>
-                <Select style={{ width: 57 + '%', marginLeft: 11 + '%' }} onChange={this.handleColony}>
+              </Col>
+            </Row>
+            <Row className="apms">
+              <Col span={6}>集群</Col>
+              <Col span={18}>
+                <Select style={{ width: 300 }} onChange={this.handleColony}>
                   {
                     colonyData ?
                       colonyData.map((item, index) => (
@@ -259,10 +261,12 @@ class ApmSetting extends React.Component {
                       )) : ''
                   }
                 </Select>
-              </li>
-              <li>
-                <span>基础服务</span>
-                <Select style={{ width: 57 + '%', marginLeft: 7 + '%' }} >
+              </Col>
+            </Row>
+            <Row className="apms">
+              <Col span={6}>基础服务</Col>
+              <Col span={8}>
+                <Select style={{ width: 300 }} >
                   <Option value="pinpoint">Pinpoint</Option>
                   {/* {
                     serviceData.map((item, index) => (
@@ -270,9 +274,11 @@ class ApmSetting extends React.Component {
                     ))
                   } */}
                 </Select>
-              </li>
-              <li>
-                <span>安装情况</span>
+              </Col>
+            </Row>
+            <Row className="apms">
+              <Col span={6}>安装情况</Col>
+              <Col span={18}>
                 {
                   apmState ?
                     <Row className="install">
@@ -286,18 +292,22 @@ class ApmSetting extends React.Component {
                         <span>安装中</span>
                         <Progress percent={percent} showInfo={false} status="active"></Progress>
                       </Row> :
-                      <Button type='primary' style={{ marginLeft: 5 + '%' }} onClick={this.handleInstall}>安装</Button>
+                      <Button type='primary' onClick={this.handleInstall}>安装</Button>
                 }
-              </li>
-              <li>
-                <span>组件状态</span>
-                <span style={{ marginLeft: 5 + '%' }}>健康</span>
-              </li>
-              <li>
-                <span>组件版本</span>
-                <span style={{ marginLeft: 5 + '%' }}>{this.state.version.version}</span>
-              </li>
-            </ul>
+              </Col>
+            </Row>
+            <Row className="apms">
+              <Col span={6}>组件状态</Col>
+              <Col span={18}>
+                <span>健康</span>
+              </Col>
+            </Row>
+            <Row className="apms">
+              <Col span={6}>组件版本</Col>
+              <Col span={18}>
+                <span>{this.state.version.version}</span>
+              </Col>
+            </Row>
           </div>
           <div className="rigth">
             <div className="header">

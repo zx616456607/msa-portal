@@ -112,20 +112,19 @@ class ApiGateway extends React.Component {
     return (
       <Row className="layout-content-btns">
         <div className="top" style={{ marginRight: 0 }}>
-          <Button className="add" size="large" type="primary" onClick={() => this.handleAdd()}>
+          <Button className="add" type="primary" onClick={() => this.handleAdd()}>
             <Icon type="plus" style={{ color: '#fff' }} />
             <span style={{ color: '#fff' }}>添加限流规则</span>
           </Button>
-          <Button className="search" size="large">
+          <Button className="search">
             <Icon type="sync" />
             <span>刷新</span>
           </Button>
-          <Button className="del" size="large">
+          <Button className="del">
             <Icon type="delete" />
             <span>删除</span>
           </Button>
           <Search
-            size="large"
             placeholder="按微服务名称搜索"
             style={{ width: 200 }}
             onSearch={value => console.log(value)}
