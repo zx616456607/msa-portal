@@ -37,22 +37,22 @@ export default class AuthMode extends React.Component {
       {
         key: 1,
         authMode: 'authorization_code',
-        desc: '我是说明',
+        desc: '标准服务端授权模式',
       },
       {
         key: 2,
         authMode: 'refresh_token',
-        desc: '我是说明',
+        desc: '刷新 accessToken 授权模式',
       },
       {
         key: 3,
         authMode: 'password',
-        desc: '我是说明',
+        desc: '用户密码授权模式',
       },
       {
         key: 4,
         authMode: 'client_credentials',
-        desc: '我是说明',
+        desc: '应用端密钥授权模式',
       },
     ]
     return (

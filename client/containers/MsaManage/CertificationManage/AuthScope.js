@@ -37,17 +37,17 @@ export default class AuthScope extends React.Component {
       {
         key: 1,
         authScope: 'read',
-        desc: '我是说明',
+        desc: '读权限',
       },
       {
         key: 2,
         authScope: 'write',
-        desc: '我是说明',
+        desc: '写权限',
       },
       {
         key: 3,
         authScope: 'trust',
-        desc: '我是说明',
+        desc: '信任权限',
       },
     ]
     return (

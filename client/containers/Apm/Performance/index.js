@@ -503,6 +503,7 @@ class Performance extends React.Component {
                       <Button icon="search" onClick={() => this.handleCustomTimer()} />
                     </Row>
                 }
+                <Button className="type-change-btn">自动刷新</Button>
               </ButtonGroup>
             </div>
             <Select className="example" value={exampleData.agentId} style={{ width: 120 }} onChange={this.handleOnExample}>

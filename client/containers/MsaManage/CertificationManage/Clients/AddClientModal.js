@@ -46,34 +46,28 @@ export default class AddClientModal extends React.Component {
         <FormItem {...formItemLayout} label="RefreshToken 有效时间">
           <Input placeholder="请填写 RefreshToken 有效时间" addonAfter="秒" />
         </FormItem>
-        <FormItem {...formItemLayout} label="限流间隔时间">
-          <Input placeholder="请填写限流间隔时间" addonAfter="秒" />
-        </FormItem>
-        <FormItem {...formItemLayout} label="限流间隔次数">
-          <Input placeholder="请填写限流间隔次数" addonAfter="次" />
-        </FormItem>
         <FormItem {...formItemLayout} label="授权方式">
           <CheckboxGroup
             options={authModeOpts}
           />
         </FormItem>
-        <FormItem className="auth-scope" {...formItemLayout} label="授权范围">
+        <FormItem {...formItemLayout} label="授权范围">
           <Select style={{ width: '100%' }} placeholder="请选择授权范围">
             {
               authScopes.map(scope => <Option key={scope}>{scope}</Option>)
             }
           </Select>
         </FormItem>
-        <FormItem className="auto-auth" {...formItemLayout} label=" ">
+        {/* <FormItem className="auto-auth" {...formItemLayout} label=" ">
           <Checkbox>全范围自动授权</Checkbox>
-        </FormItem>
+        </FormItem> */}
         <FormItem {...formItemLayout} label="可用资源 ID">
           <Select style={{ width: '100%' }} placeholder="请选择可用资源 ID">
             <Option key="test">test</Option>
           </Select>
         </FormItem>
         <FormItem {...formItemLayout} label="注册跳转 URL">
-          <Input placeholder="英文逗号分隔" />
+          <Input.TextArea placeholder="一行输入一个地址" />
         </FormItem>
       </Modal>
     )

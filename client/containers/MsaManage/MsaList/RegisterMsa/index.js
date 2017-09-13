@@ -56,7 +56,7 @@ class RegisterMsa extends React.Component {
         </FormItem>
         <div>微服务实例信息</div>
         <div className="dotted"/>
-        <FormItem {...formItemLayout} label="host | IP">
+        <FormItem {...formItemLayout} label="服务地址">
           {getFieldDecorator('routerPath', {
             rules: [{
               require: true,
@@ -66,7 +66,7 @@ class RegisterMsa extends React.Component {
             <Input placeholder="请确保 ip 可被当前集群访问（如 192.168.0.1）" />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="微服务端口">
+        <FormItem {...formItemLayout} label="服务端口">
           {getFieldDecorator('routerUrl', {
             rules: [{
               require: true,
@@ -76,7 +76,7 @@ class RegisterMsa extends React.Component {
             <Input placeholder="如 8080" />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="健康检查 URL">
+        <FormItem {...formItemLayout} label="健康检查地址">
           {getFieldDecorator('routerRule', {
             rules: [{
               require: true,

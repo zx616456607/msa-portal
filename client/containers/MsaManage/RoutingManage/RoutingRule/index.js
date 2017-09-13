@@ -104,14 +104,17 @@ class RoutingRule extends React.Component {
           )}
         </FormItem>
         <FormItem {...formItemLayout} label="路由策略">
-          {getFieldDecorator('tactics', {})(
+          {getFieldDecorator('tactics', { initialValue: '1' })(
             <Select
-              placeholder="路由顺序"
               onChange={this.handleSelectChange}
               style={{ width: 200 }}
             >
-              <Option value="male">male</Option>
-              <Option value="female">female</Option>
+              <Option value="1">顺序路由</Option>
+              <Option value="2">随机路由</Option>
+              <Option value="3">粘性路由</Option>
+              <Option value="4">加权平均路由</Option>
+              <Option value="5">基于负载路由</Option>
+              <Option value="6">基于连接数路由</Option>
             </Select>
           )}
         </FormItem>

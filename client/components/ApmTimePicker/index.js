@@ -183,6 +183,9 @@ export default class ApmTimePicker extends React.Component {
               }
             </RadioGroup>
         }
+        <Button
+          className="type-change-btn"
+        >自动刷新</Button>
       </span>
     )
   }

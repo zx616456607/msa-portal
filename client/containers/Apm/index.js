@@ -86,7 +86,7 @@ class Apm extends React.Component {
     const { location } = this.props
     const title = (
       <div>
-        性能管理 APM
+        性能管理（APM）
         <div className="apm-switch">
           <Dropdown
             overlay={

@@ -29,7 +29,7 @@ const menus = [
   },
   {
     to: '/apms',
-    text: '性能管理 APM',
+    text: '性能管理（APM）',
   },
   {
     to: '/test2',
