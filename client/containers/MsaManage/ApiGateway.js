@@ -90,16 +90,16 @@ class ApiGateway extends React.Component {
 
     const data = [{
       key: '1',
-      name: 'John Brown',
+      name: 'demo-provider',
       type: 'user',
-      object: 'asdas',
+      object: 'service1',
       valve: '100',
       cycle: '20',
     }, {
       key: '2',
-      name: 'Jim Green',
+      name: 'demo-consumer',
       type: 'user',
-      object: 'asdas',
+      object: 'service2',
       valve: '100',
       cycle: '20',
     }]

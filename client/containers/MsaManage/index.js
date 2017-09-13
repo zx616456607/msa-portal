@@ -65,7 +65,7 @@ const menus = [
       </svg>
     ),
   },
-  {
+  /* {
     to: '/msa-manage/api-gateway-monitoring',
     text: 'API 网关监控',
     icon: (
@@ -73,7 +73,7 @@ const menus = [
         <use xlinkHref={apiGatewayMonitoringIcon.url} />
       </svg>
     ),
-  },
+  }, */
   {
     type: 'SubMenu',
     text: '认证管理',
