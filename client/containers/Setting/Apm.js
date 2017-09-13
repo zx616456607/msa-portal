@@ -124,16 +124,19 @@ class ApmSetting extends React.Component {
         serviceAry.push(nameAry)
       }
     })
-    if (serviceAry[0].space === nameSpace) {
-      this.setState({
-        apmState: true,
-        version: serviceAry[0].version,
-      })
-    } else {
-      this.setState({
-        apmState: false,
-      })
+    if (serviceAry.length > 0) {
+      if (serviceAry[0].space === nameSpace) {
+        this.setState({
+          apmState: true,
+          version: serviceAry[0].version,
+        })
+      } else {
+        this.setState({
+          apmState: false,
+        })
+      }
     }
+
     this.setState({
       project: nameSpace,
     })
@@ -216,8 +219,8 @@ class ApmSetting extends React.Component {
     const { projectID } = this.props
     return (
       <Row className="layout-content-btns">
-        <div className="header">
-          <p className="" style={{ fontSize: 16, padding: 15 }}>APM配置</p>
+        <div className="header" style={{ marginRight: 0 }}>
+          <p className="" style={{ fontSize: 16, padding: 10 }}>APM配置</p>
         </div>
         <div className="content">
           <div className="left">
@@ -302,7 +305,7 @@ class ApmSetting extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="bottom">
+            <div className="already">
               <div className="yes">
                 <span style={{ fontSize: 14 }}>已安装项目</span>
                 <div className="yesInstalled" style={{ marginTop: 5 }}>
@@ -318,7 +321,7 @@ class ApmSetting extends React.Component {
             </div>
           </div>
         </div>
-        <Modal title="卸载" visible={this.state.uninstall} onCancel={ this.handleCancel }
+        <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleClose}>  取 消 </Button>,
             <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
