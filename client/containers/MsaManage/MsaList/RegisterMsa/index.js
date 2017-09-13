@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Input, Modal, Form, Icon } from 'antd'
+import { Input, Modal, Form, Icon, Row, Col } from 'antd'
 const FormItem = Form.Item
 import './style/index.less'
 
@@ -32,8 +32,12 @@ class RegisterMsa extends React.Component {
     const { form, visible } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 16 },
+      labelCol: { span: 5 },
+      wrapperCol: { span: 15 },
+    }
+    const formItemLayoutLast = {
+      labelCol: { span: 5 },
+      wrapperCol: { span: 19 },
     }
     return (
       <Modal
@@ -54,7 +58,7 @@ class RegisterMsa extends React.Component {
             <Input placeholder="填写手动注册微服务名称" />
           )}
         </FormItem>
-        <div>微服务实例信息</div>
+        <div style={{ paddingLeft: '36px' }}>微服务实例信息</div>
         <div className="dotted"/>
         <FormItem {...formItemLayout} label="服务地址">
           {getFieldDecorator('routerPath', {
@@ -76,18 +80,23 @@ class RegisterMsa extends React.Component {
             <Input placeholder="如 8080" />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="健康检查地址">
+        <FormItem {...formItemLayoutLast} label="健康检查地址">
           {getFieldDecorator('routerRule', {
             rules: [{
               require: true,
               message: 'rule',
             }],
           })(
-            <Input placeholder="如 192.168.0.1:8080/healthcheck.html" />
+            <Row gutter={16}>
+              <Col span={19}>
+                <Input placeholder="如 192.168.0.1:8080/healthcheck.html" />
+              </Col>
+              <Col span={5} className="primary-color pointer">测试健康状态</Col>
+            </Row>
           )}
         </FormItem>
         <div className="dotted"/>
-        <span className="msa-modal-add">
+        <span className="msa-modal-add pointer primary-color">
           <Icon type="plus-circle-o" />继续添加微服务实例
         </span>
       </Modal>

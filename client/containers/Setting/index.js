@@ -18,12 +18,21 @@ import Sider from '../../components/Sider'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
-import topologyIcon from '../../assets/img/apm/topology.svg'
+import topologyIcon from '../../assets/img/apm/apm.svg'
+import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import './style/index.less'
 
 const { Content } = Layout
 const menus = [
   {
+    to: '/setting/msa-config',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={msaconfig.url} />
+      </svg>
+    ),
+    text: '微服务配置',
+  }, {
     to: '/setting/apms',
     icon: (
       <svg className="menu-icon">

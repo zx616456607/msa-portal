@@ -1,0 +1,56 @@
+@import '../../../assets/style/core/index.less';
+
+.index-page {
+  margin-top: 115px;
+  padding: 0 50px;
+  & > * {
+    margin-bottom: 16px;
+  }
+  &-overview {
+    &-left {
+      height: 60px;
+      line-height: 60px;
+      border-right: 1px solid @borderColor;
+      position: relative;
+      clear: both;
+      svg, .icon-box {
+        float: left;
+        width: 60px;
+        height: 60px;
+        fill: @primaryColor;
+      }
+      i {
+        font-size: 60px;
+        color: @primaryColor;
+      }
+      &-title {
+        margin-left: 16px;
+        float: left;
+      }
+      &-num {
+        font-size: 20px;
+        margin-right: 16px;
+        float: right;
+      }
+    }
+    &-right-row {
+      height: 30px;
+      line-height: 30px;
+      & > div + div {
+        text-align: right;
+      }
+    }
+  }
+  &-top-call {
+    &-failed {
+      padding-left: 5px;
+      margin-bottom: 8px;
+      border-left: 3px solid red;
+    }
+    &-timeout {
+      padding-left: 5px;
+      margin-bottom: 8px;
+      border-left: 3px solid orange;
+    }
+  }
+}

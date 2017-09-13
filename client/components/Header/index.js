@@ -21,7 +21,6 @@ const menus = [
   {
     to: '/',
     text: '总览',
-    disabled: true,
   },
   {
     to: '/msa-manage',
@@ -57,20 +56,20 @@ export default class Header extends React.Component {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="logout">
-                  退 出
+                <Menu.Item key="apm-setting">
+                  <Link to="/setting/apms">
+                  APM 配置
+                  </Link>
                 </Menu.Item>
-                <Menu.Item key="test1">
-                  test1
-                </Menu.Item>
-                <Menu.Divider />
                 <Menu.Item key="test2">
-                  test2
+                  <Link to="/setting/msa-config">
+                  微服务配置
+                  </Link>
                 </Menu.Item>
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link" href="#">
+            <a className="ant-dropdown-link">
               {currentUser.userName || '...'} <Icon type="down" />
             </a>
           </Dropdown>

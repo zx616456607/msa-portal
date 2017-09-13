@@ -51,6 +51,7 @@ class ApmSetting extends React.Component {
       this.setState({
         serviceData: res.response.result.data,
       })
+
     })
   }
   projectList = () => {
@@ -70,6 +71,19 @@ class ApmSetting extends React.Component {
           projectsData: projects,
         })
       }
+    })
+  }
+  filters = () => {
+    const { projectID } = this.props
+    const { serviceData } = this.state
+    projectID.forEach((item, index) => {
+      const value = serviceData[index].namespace
+      if (item === value) {
+        // projectID.splice(0, index)
+      }
+    })
+    this.setState({
+      projectID,
     })
   }
   /**
@@ -222,7 +236,7 @@ class ApmSetting extends React.Component {
         <div className="header" style={{ marginRight: 0 }}>
           <p className="" style={{ fontSize: 16, padding: 10 }}>APM配置</p>
         </div>
-        <div className="content">
+        <div className="contents">
           <div className="left">
             <ul>
               <li>
@@ -248,7 +262,7 @@ class ApmSetting extends React.Component {
               </li>
               <li>
                 <span>基础服务</span>
-                <Select style={{ width: 57 + '%', marginLeft: 5 + '%' }} >
+                <Select style={{ width: 57 + '%', marginLeft: 7 + '%' }} >
                   <Option value="pinpoint">Pinpoint</Option>
                   {/* {
                     serviceData.map((item, index) => (
@@ -291,7 +305,7 @@ class ApmSetting extends React.Component {
                 <Option value="pinpoint">Pinpoint</Option>
               </Select>
             </div>
-            <div className="connent">
+            <div className="projet">
               <div className="not">
                 <span style={{ fontSize: 14 }}>未安装项目</span>
                 <div className="notInstalled" style={{ marginTop: 5, height: 80 }}>
@@ -304,18 +318,18 @@ class ApmSetting extends React.Component {
                   }
                 </div>
               </div>
-            </div>
-            <div className="already">
-              <div className="yes">
-                <span style={{ fontSize: 14 }}>已安装项目</span>
-                <div className="yesInstalled" style={{ marginTop: 5 }}>
-                  {
-                    serviceData.map((item, index) => (
-                      <div key={index} style={{ width: 90, display: 'inline-block' }}>
-                        <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                      </div>
-                    ))
-                  }
+              <div className="already">
+                <div className="yes">
+                  <span style={{ fontSize: 14 }}>已安装项目</span>
+                  <div className="yesInstalled" style={{ marginTop: 5 }}>
+                    {
+                      serviceData.map((item, index) => (
+                        <div key={index} style={{ width: 90, display: 'inline-block' }}>
+                          <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
+                        </div>
+                      ))
+                    }
+                  </div>
                 </div>
               </div>
             </div>

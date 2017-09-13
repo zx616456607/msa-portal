@@ -120,7 +120,8 @@ export const getDefaultSelectedKeys = (location, menus) => {
       }
       return true
     }
-    if (location.pathname.indexOf(menu.to) === 0) {
+    if (location.pathname === menu.to) {
+      // if (location.pathname.indexOf(menu.to) === 0) {
       defaultSelectedKeys.push(menu.to)
       return false
     }
