@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import './style/apm.less'
 import { Row, Col, Select, Button, Progress, Modal, Icon } from 'antd'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
+import { MY_PORJECT } from '../../constants'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
 
@@ -28,12 +29,12 @@ class ApmSetting extends React.Component {
     uninstall: false,
     colony: '',
     project: '',
+    isProject: false,
     colonyData: [],
     projectsData: [],
     serviceData: [],
     installSate: false,
   }
-
   componentWillMount() {
     const { loadApms, clusterID } = this.props
     loadApms(clusterID)
@@ -51,7 +52,7 @@ class ApmSetting extends React.Component {
       this.setState({
         serviceData: res.response.result.data,
       })
-
+      this.filters()
     })
   }
   projectList = () => {
@@ -76,14 +77,17 @@ class ApmSetting extends React.Component {
   filters = () => {
     const { projectID } = this.props
     const { serviceData } = this.state
-    projectID.forEach((item, index) => {
-      const value = serviceData[index].namespace
-      if (item === value) {
-        // projectID.splice(0, index)
+    const DataAry = []
+    if (serviceData.length <= 0) return
+    serviceData.forEach(item => {
+      if (projectID.indexOf(item.namespace) > -1) {
+        projectID.splice(projectID.indexOf(item.namespace), 1)
+        console.log(projectID)
       }
     })
+    DataAry.push(projectID)
     this.setState({
-      projectID,
+      projectID: DataAry,
     })
   }
   /**
@@ -91,7 +95,7 @@ class ApmSetting extends React.Component {
    */
   handleInstall = () => {
     const { clusterID, postApm } = this.props
-    const { project } = this.state
+    const { project, isProject } = this.state
     // const apmId = this.fetchApmID()
     // if (apmId !== '') {
     //   const body = {
@@ -105,6 +109,7 @@ class ApmSetting extends React.Component {
     //     })
     //   })
     // }
+    if (isProject === false) return
     this.play()
     const body = {
       type: 'pinpoint',
@@ -144,15 +149,16 @@ class ApmSetting extends React.Component {
           apmState: true,
           version: serviceAry[0].version,
         })
-      } else {
-        this.setState({
-          apmState: false,
-        })
       }
+    } else {
+      this.setState({
+        apmState: false,
+      })
     }
 
     this.setState({
       project: nameSpace,
+      isProject: true,
     })
     getProjectClusters(projectName).then(res => {
       if (res.error) return
@@ -241,7 +247,7 @@ class ApmSetting extends React.Component {
             <Row className="apms">
               <Col span={6}>项目</Col>
               <Col span={18}>
-                <Select style={{ width: 300 }} onChange={this.handleProject}>
+                <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
                   {
                     projectsData.map((item, index) => (
                       <Option key={index} value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
@@ -282,9 +288,9 @@ class ApmSetting extends React.Component {
                 {
                   apmState ?
                     <Row className="install">
-                      <Icon className="ico" type="check-circle-o" style={{ color: '#5cb85c', fontSize: 14 }} />&nbsp;
-                      <span style={{ color: '#5cb85c' }}>已安装</span>
-                      <span className="again" onClick={this.handleInstall}>重新安装</span>
+                      <Icon className="ico" type="check-circle-o" />&nbsp;
+                      <span className="existence" >已安装</span>
+                      {/* <span className="again" onClick={this.handleReinstall}>重新安装</span> */}
                       <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
                     </Row> :
                     installSate ?
@@ -332,6 +338,9 @@ class ApmSetting extends React.Component {
                 <div className="yes">
                   <span style={{ fontSize: 14 }}>已安装项目</span>
                   <div className="yesInstalled" style={{ marginTop: 5 }}>
+                    <div style={{ width: 90, display: 'inline-block' }}>
+                      <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
+                    </div>
                     {
                       serviceData.map((item, index) => (
                         <div key={index} style={{ width: 90, display: 'inline-block' }}>
@@ -347,9 +356,15 @@ class ApmSetting extends React.Component {
         </div>
         <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
           footer={[
-            <Button key="back" type="ghost" onClick={this.handleClose}>  取 消 </Button>,
+            <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
             <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
           ]}>
+          <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+            <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后改项目内应用，将无法继续使用 APM 部分功能</span>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+          </div>
         </Modal>
       </Row>
     )
