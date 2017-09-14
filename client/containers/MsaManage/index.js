@@ -21,7 +21,7 @@ import { getDefaultSelectedKeys } from '../../common/utils'
 import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
-import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
+// import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 
 const { Content } = Layout
