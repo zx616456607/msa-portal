@@ -31,3 +31,4 @@ export const ALL = 'all'
 export const NORMAL = 0
 export const ERROR = 1
 export const USER_CURRENT_CONFIG = 'msa_user_current_config'
+export const MY_PORJECT = '我的个人项目'
