@@ -29,6 +29,12 @@ module.exports = {
     main: [
       './client/entry/index.js',
     ],
+    vendor: [
+      'g2',
+      '@antv/g6',
+      'moment',
+      'codemirror',
+    ],
   },
 
   resolve: {
@@ -147,6 +153,14 @@ module.exports = {
       test: /\.(js|css|svg)$/,
       threshold: 10240,
       minRatio: 0.8,
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendor.[chunkhash:8].js',
+      // (Give the chunk a different name)
+      minChunks: Infinity,
+      // (with more entries, this ensures that no other module
+      //  goes into the vendor chunk)
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',
