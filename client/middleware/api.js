@@ -58,7 +58,7 @@ const callApi = (endpoint, options, schema) => {
         }
 
         return Object.assign({},
-          normalize(json, schema),
+          normalize(json, schema)
         )
       }).catch(() => {
         const { status, statusText } = response
