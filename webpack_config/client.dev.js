@@ -29,6 +29,13 @@ module.exports = {
       'react-hot-loader/patch',
       './client/entry/index.js',
     ],
+    vendor: [
+      'babel-polyfill',
+      'g2',
+      '@antv/g6',
+      'moment',
+      'codemirror',
+    ],
   },
 
   resolve: {
@@ -107,6 +114,14 @@ module.exports = {
     new webpack.DllReferencePlugin({
       context: __dirname,
       manifest: require('../manifest.json'),
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendor.js',
+      // (Give the chunk a different name)
+      minChunks: Infinity,
+      // (with more entries, this ensures that no other module
+      //  goes into the vendor chunk)
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',

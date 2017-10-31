@@ -9,3 +9,5 @@
  * 2017-08-16
  * @author zhangpc
  */
+
+import 'babel-polyfill'

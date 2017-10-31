@@ -5,6 +5,15 @@
 
 require('babel-register')({
   babelrc: false,
-  presets: [ 'es2015' ],
+  presets: [
+    [
+      'env',
+      {
+        targets: {
+          node: 'current',
+        },
+      },
+    ],
+  ],
 })
 require('./server')

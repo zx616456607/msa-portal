@@ -1,8 +1,18 @@
 {
   "presets": [
     [
-      "es2015",
+      "env",
       {
+        "targets": {
+          "browsers": [
+            "last 2 versions",
+            "iOS >= 9",
+            "safari >= 7",
+            "IE 11"
+          ]
+        },
+        "debug": true,
+        "useBuiltIns": "entry",
         "modules": false
       }
     ],
