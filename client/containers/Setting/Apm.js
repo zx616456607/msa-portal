@@ -61,16 +61,18 @@ class ApmSetting extends React.Component {
       if (res.error) return
       if (res.response.result.code === 200) {
         const projects = []
-        res.response.result.data.forEach(item => {
-          const curProjects = {
-            namespace: this.props.projects[0][item].namespace,
-            projectName: res.response.entities.projects[item].namespace,
-          }
-          projects.push(curProjects)
-        })
-        this.setState({
-          projectsData: projects,
-        })
+        if (res.response.result.data !== undefined) {
+          res.response.result.data.forEach(item => {
+            const curProjects = {
+              namespace: this.props.projects[0][item].namespace,
+              projectName: res.response.entities.projects[item].namespace,
+            }
+            projects.push(curProjects)
+          })
+          this.setState({
+            projectsData: projects,
+          })
+        }
       }
     })
   }
@@ -78,11 +80,12 @@ class ApmSetting extends React.Component {
     const { projectID } = this.props
     const { serviceData } = this.state
     const DataAry = []
-    if (serviceData.length <= 0) return
+    if (Object.keys(serviceData).length === 0) return
     serviceData.forEach(item => {
-      if (projectID.indexOf(item.namespace) > -1) {
-        projectID.splice(projectID.indexOf(item.namespace), 1)
-        console.log(projectID)
+      if (projectID !== undefined) {
+        if (projectID.indexOf(item.namespace) > -1) {
+          projectID.splice(projectID.indexOf(item.namespace), 1)
+        }
       }
     })
     DataAry.push(projectID)
@@ -249,9 +252,10 @@ class ApmSetting extends React.Component {
               <Col span={18}>
                 <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
                   {
-                    projectsData.map((item, index) => (
-                      <Option key={index} value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
-                    ))
+                    projectsData ?
+                      projectsData.map((item, index) => (
+                        <Option key={index} value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
+                      )) : ''
                   }
                 </Select>
               </Col>
@@ -326,11 +330,12 @@ class ApmSetting extends React.Component {
                 <span style={{ fontSize: 14 }}>未安装项目</span>
                 <div className="notInstalled" style={{ marginTop: 5, height: 80 }}>
                   {
-                    projectID.map((item, index) => (
-                      <div key={index} style={{ width: 90, display: 'inline-block' }}>
-                        <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                      </div>
-                    ))
+                    projectID ?
+                      projectID.map((item, index) => (
+                        <div key={index} style={{ width: 90, display: 'inline-block' }}>
+                          <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
+                        </div>
+                      )) : ''
                   }
                 </div>
               </div>
@@ -342,11 +347,12 @@ class ApmSetting extends React.Component {
                       <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
                     </div>
                     {
-                      serviceData.map((item, index) => (
-                        <div key={index} style={{ width: 90, display: 'inline-block' }}>
-                          <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                        </div>
-                      ))
+                      serviceData ?
+                        serviceData.map((item, index) => (
+                          <div key={index} style={{ width: 90, display: 'inline-block' }}>
+                            <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
+                          </div>
+                        )) : ''
                     }
                   </div>
                 </div>
