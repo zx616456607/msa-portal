@@ -302,7 +302,7 @@ class ApmSetting extends React.Component {
                         <span>安装中</span>
                         <Progress percent={percent} showInfo={false} status="active"></Progress>
                       </Row> :
-                      <Button type='primary' onClick={this.handleInstall}>安装</Button>
+                      <Button type="primary" onClick={this.handleInstall}>安装</Button>
                 }
               </Col>
             </Row>

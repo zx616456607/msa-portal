@@ -94,7 +94,8 @@ class App extends React.Component {
       return
     }
     if (newProject.namespace !== oldProject.namespace
-      || newCluster.id !== oldCluster.id) {
+      || newCluster.id !== oldCluster.id
+    ) {
       clearTimeout(this.switchProjectOrClusterTimeout)
       this.setState({
         switchProjectOrCluster: true,
@@ -104,7 +105,7 @@ class App extends React.Component {
           this.setState({
             switchProjectOrCluster: false,
           })
-        }, 500)
+        }, 200)
       })
     }
   }

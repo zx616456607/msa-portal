@@ -42,7 +42,7 @@ class CreateConfig extends React.Component {
           <div className="text">
             <span>配置内容</span>
           </div>
-          <YamlEditor className="yaml" value='kind: Deployment'/>
+          <YamlEditor className="yaml" value="kind: Deployment"/>
         </div>
         <div className="operation">
           {

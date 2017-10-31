@@ -49,6 +49,6 @@ module.exports = {
       name: '[name]',
       context: __dirname,
     }),
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
   ],
 }
