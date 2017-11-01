@@ -24,7 +24,7 @@ export default class Sider extends React.Component {
   render() {
     const { children } = this.props
     return (
-      <LayoutSider className="layout-sider" style={{ position: 'fixed', height: '100vh' }}>
+      <LayoutSider className="layout-sider" style={{ position: 'fixed' }}>
         { children }
       </LayoutSider>
     )
