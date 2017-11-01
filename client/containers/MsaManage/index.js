@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
+import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
@@ -24,7 +25,6 @@ import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 // import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 
-const { Content } = Layout
 const SubMenu = Menu.SubMenu
 
 const menus = [
@@ -178,7 +178,7 @@ class MsaManage extends React.Component {
             </Menu>
           </Card>
         </Sider>
-        <Content className="layout-content">
+        <Content>
           {this.renderChildren()}
         </Content>
       </Layout>

@@ -149,7 +149,7 @@ export default class ApmTimePicker extends React.Component {
   render() {
     const { value, isRangeTime, currentRadio } = this.state
     return (
-      <span className="apm-timepicker">
+      <div className="apm-timepicker">
         <Button
           className="type-change-btn"
           type="primary"
@@ -183,10 +183,10 @@ export default class ApmTimePicker extends React.Component {
               }
             </RadioGroup>
         }
-        <Button
+        {/* <Button
           className="type-change-btn"
-        >自动刷新</Button>
-      </span>
+        >自动刷新</Button> */}
+      </div>
     )
   }
 }

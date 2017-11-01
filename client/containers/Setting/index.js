@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import { Layout, Menu, Card } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
+import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
@@ -22,7 +23,6 @@ import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import './style/index.less'
 
-const { Content } = Layout
 const menus = [
   {
     to: '/setting/msa-config',
@@ -95,7 +95,7 @@ class Setting extends React.Component {
             </Menu>
           </Card>
         </Sider>
-        <Content className="layout-content">
+        <Content>
           {this.renderChildren()}
         </Content>
       </Layout>

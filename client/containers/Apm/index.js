@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
+import Content from '../../components/Content'
 import { loadApms } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
@@ -23,7 +24,6 @@ import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
 import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
 
-const { Content } = Layout
 const menus = [
   {
     to: '/apms/topology',
@@ -128,7 +128,7 @@ class Apm extends React.Component {
             </Menu>
           </Card>
         </Sider>
-        <Content className="layout-content">
+        <Content>
           {this.renderChildren()}
         </Content>
       </Layout>

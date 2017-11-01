@@ -13,8 +13,7 @@
 import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import Sider from '../../components/Sider'
-
-const { Content } = Layout
+import Content from '../../components/Content'
 
 export default class TestPage extends React.Component {
   render() {
@@ -48,7 +47,7 @@ export default class TestPage extends React.Component {
             </Menu.Item>
           </Menu>
         </Sider>
-        <Content className="layout-content">
+        <Content>
           <div>
             <h1>TestPage33</h1>
           </div>

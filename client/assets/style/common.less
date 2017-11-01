@@ -19,14 +19,32 @@ body {
     height: 100%;
     .ant-layout {
       background-color: @backgroudColor;
-      min-width: @bodyMinWidth;
       .ant-layout-header {
         background-color: @navigationBackgroudColor;
         min-width: @bodyMinWidth;
+        padding: 0 @bodyMarginWidth;
+      }
+      .layout-sider {
+        background: @backgroudColor;
+        left: 0;
+        margin-top: 115px;
+        margin-left: @bodyMarginWidth;
+        .ant-menu {
+          .ant-menu-item-selected.ant-menu-item {
+            background-color: @primaryColor;
+            a {
+              color: #fff;
+            }
+          }
+          .ant-menu-item::after {
+            border: 0;
+          }
+        }
       }
       .layout-content {
-        padding-right: 50px;
-        margin-left: 270px;
+        padding-right: @bodyMarginWidth;
+        padding-left: 20px;
+        margin-left: 200px + @bodyMarginWidth;
         min-height: 520px;
         margin-top: 115px;
         &-btns {
@@ -100,7 +118,7 @@ body {
       position: fixed;
       width: 100%;
       margin-top: 64px;
-      padding: 5px 50px;
+      padding: 5px @bodyMarginWidth;
       background-color: #fff;
       z-index: 3;
       & > *:not(:last-child) {

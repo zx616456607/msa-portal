@@ -4,9 +4,9 @@
  */
 
 /**
- * Sider component
+ * Content component
  *
- * 2017-08-16
+ * 2017-11-01
  * @author zhangpc
  */
 
@@ -14,9 +14,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Layout } from 'antd'
 
-const LayoutSider = Layout.Sider
+const LayoutContent = Layout.Content
 
-export default class Sider extends React.Component {
+export default class Content extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
   }
@@ -24,9 +24,11 @@ export default class Sider extends React.Component {
   render() {
     const { children } = this.props
     return (
-      <LayoutSider className="layout-sider" style={{ position: 'fixed', height: '100vh' }}>
-        { children }
-      </LayoutSider>
+      <Layout className="layout-content">
+        <LayoutContent>
+          { children }
+        </LayoutContent>
+      </Layout>
     )
   }
 }
