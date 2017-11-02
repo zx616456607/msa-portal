@@ -59,7 +59,7 @@ export const Schemas = {
   },
   CLUSTER_ARRAY_DATA: {
     data: {
-      cluster: [ clusterSchema ],
+      clusters: [ clusterSchema ],
     },
   },
   CLUSTERS_ARRAY_DATA: {

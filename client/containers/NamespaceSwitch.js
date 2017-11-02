@@ -137,6 +137,7 @@ class NamespaceSwitch extends React.Component {
     this.setState({
       projectsText: item.props.children,
       clustersDropdownVisible: true,
+      clustersText: '请选择集群',
     })
     if (key === DEFAULT) {
       getDefaultClusters()
@@ -219,6 +220,13 @@ class NamespaceSwitch extends React.Component {
                     {cluster.clusterName}
                   </Menu.Item>
                 ))
+              }
+              {
+                currentProjectClusters.length === 0 && (
+                  <Menu.Item key="no-cluster" disabled>
+                    暂无集群
+                  </Menu.Item>
+                )
               }
             </Menu>
           }

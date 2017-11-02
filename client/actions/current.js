@@ -93,7 +93,7 @@ const fetchProjectClusters = (namespace, query) => {
     namespace,
     [CALL_API]: {
       types: [ PROJECT_CLUSTERS_REQUEST, PROJECT_CLUSTERS_SUCCESS, PROJECT_CLUSTERS_FAILURE ],
-      endpoint: `/projects/${namespace}/clusters?${toQuerystring(query)}`,
+      endpoint: `/projects/${namespace}/visible-clusters?${toQuerystring(query)}`,
       schema: Schemas.CLUSTER_ARRAY_DATA,
     },
   }

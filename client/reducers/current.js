@@ -87,7 +87,7 @@ function clusters(state = {}, action) {
         ...state,
         [namespace]: {
           isFetching: false,
-          ids: action.response.result.data.cluster,
+          ids: action.response.result.data.clusters,
         },
       }
     case ActionTypes.DEFAULT_CLUSTERS_SUCCESS:
