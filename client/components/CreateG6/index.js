@@ -14,6 +14,9 @@ import G6 from '@antv/g6'
 import React from 'react'
 import PropTypes from 'prop-types'
 import isEqual from 'lodash/isEqual'
+
+// 关闭 G6 的体验改进计划打点请求
+G6.track(false)
 let uniqueId = 0
 
 function generateUniqueId() {

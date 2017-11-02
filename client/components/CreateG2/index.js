@@ -14,6 +14,9 @@ import G2 from 'g2'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// 关闭 G2 的体验改进计划打点请求
+G2.track(false)
+
 let uniqueId = 0
 function generateUniqueId() {
   return `rc-g2-${uniqueId++}`
