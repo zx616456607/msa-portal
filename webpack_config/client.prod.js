@@ -22,6 +22,9 @@ const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 
 console.log('Use production webpack config ...')
 
+const publicPath = '/public/'
+const svgHash = +new Date()
+
 module.exports = {
   devtool: '#cheap-source-map',
 
@@ -52,7 +55,7 @@ module.exports = {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].[chunkhash:8].js',
     chunkFilename: '[id].chunk.[chunkhash:8].js',
-    publicPath: '/public/',
+    publicPath,
   },
 
   // https://webpack.js.org/plugins/uglifyjs-webpack-plugin/
@@ -70,10 +73,19 @@ module.exports = {
             loader: 'svg-sprite-loader',
             options: {
               extract: true,
-              spriteFilename: 'sprite-[hash:6].svg',
+              spriteFilename: `sprite.${svgHash}.svg`,
+              runtimeGenerator: require.resolve('./svg_runtime_generator'),
             },
           },
-          'svgo-loader',
+          {
+            loader: 'svgo-loader',
+            options: {
+              plugins: [
+                { removeTitle: true },
+                { removeStyleElement: true },
+              ],
+            },
+          },
         ],
       },
       {
@@ -139,6 +151,8 @@ module.exports = {
       title: '<%= title %>',
       filename: path.join(__dirname, '../index.html'),
       template: path.join(__dirname, '../client/index.html'),
+      svgHash,
+      publicPath,
     }),
     new SpriteLoaderPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),

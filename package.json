@@ -11,7 +11,7 @@
     "build:pro": "cross-env NODE_ENV=production npm run build",
     "build-server": "webpack --config webpack_config/server.js --progress --colors",
     "build-server:pro": "cross-env NODE_ENV=production npm run build-server",
-    "clean": "rm -rf dist static/public",
+    "clean": "rm -rf dist static/public index.html",
     "client": "cross-env NODE_ENV=development node server/index.js",
     "dev": "cross-env NODE_ENV=development npm start",
     "i": "npm install --registry=https://registry.npm.taobao.org",

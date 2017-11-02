@@ -128,34 +128,37 @@ http://localhost:8989/?username=carrot&token=zchmontlredemzmftnmgqvxmtzwfyzcovsk
 
 #### 2.如何引入 SVG 图片？
 
-网站已集成 [svg-sprite-loader](https://github.com/kisenka/svg-sprite-loader)，有两种方式引入 SVG：
-* CSS 中引入，特点是会保留原有 SVG 图片的配色，适用于多色 SVG 图片，例如 logo 等:
-
-```css
-.logo {
-  width: 120px;
-  height: 41px;
-  background: url('../../../assets/img/logo.svg') no-repeat;
-  border-radius: 6px;
-  margin: 11px 24px 11px 0;
-  float: left;
-}
-```
-* JS 中引入，特点是可以通过 `fill` 控制 SVG 图片颜色，只适用于单色 SVG 图片，例如图标等：
+网站已集成 [svg-sprite-loader](https://github.com/kisenka/svg-sprite-loader)，统一在 JS 中引入 svg：
+* JS 中引入：
 
 ```js
 import React from 'react'
-import settingIcon from '../../assets/img/setting.svg'
+import logo from '../../assets/img/logo.svg'
 
-class IndexPage extends React.Component {
+class Header extends React.Component {
   render() {
     return (
       <div>
-        <svg>
-          <use xlinkHref={settingIcon.url} />
+        <svg className="logo">
+          <use xlinkHref={`#${logo.id}`} />
         </svg>
       </div>
     )
+  }
+}
+```
+```less
+// common.less
+// 一般通过 id 选择器控制多色图片的样式，单色图片在引用 svg 的地方通过 class 选择器控制
+#logo {
+  .st0 {
+    fill: #008bd5;
+  }
+  .st1 {
+    fill: #00aedc;
+  }
+  .st2 {
+    fill: #fff;
   }
 }
 ```

@@ -38,7 +38,7 @@ const menus = [
     text: '配置中心',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={configCenterIcon.url} />
+        <use xlinkHref={`#${configCenterIcon.id}`} />
       </svg>
     ),
   },
@@ -52,7 +52,7 @@ const menus = [
     text: '路由管理',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={routingManageIcon.url} />
+        <use xlinkHref={`#${routingManageIcon.id}`} />
       </svg>
     ),
   },
@@ -61,7 +61,7 @@ const menus = [
     text: '服务限流',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={apiGatewayIcon.url} />
+        <use xlinkHref={`#${apiGatewayIcon.id}`} />
       </svg>
     ),
   },
@@ -70,7 +70,7 @@ const menus = [
     text: 'API 网关监控',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={apiGatewayMonitoringIcon.url} />
+        <use xlinkHref={`#${apiGatewayMonitoringIcon.id}`} />
       </svg>
     ),
   }, */
@@ -80,7 +80,7 @@ const menus = [
     to: '/msa-manage/certification-manage',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={certificationManageIcon.url} />
+        <use xlinkHref={`#${certificationManageIcon.id}`} />
       </svg>
     ),
     children: [

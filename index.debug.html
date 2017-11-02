@@ -13,6 +13,21 @@
 </head>
 
 <body spellcheck="false">
+  <script>
+    // load svg
+    var div = document.createElement('div');
+    div.style.display = 'none';
+    document.body.appendChild(div);
+    var svgUrl = '/public/sprite.svg';
+    var xhr = new XMLHttpRequest();
+    xhr.open('get', svgUrl);
+    xhr.onload = function() {
+      if (xhr.responseText) {
+        div.innerHTML = xhr.responseText;
+      }
+    };
+    xhr.send(null);
+  </script>
   <div id="root">
   </div>
   <script type="text/javascript" src="/public/webpack_dll/lib.js"></script>

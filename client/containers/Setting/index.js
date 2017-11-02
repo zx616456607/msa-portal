@@ -28,7 +28,7 @@ const menus = [
     to: '/setting/msa-config',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={msaconfig.url} />
+        <use xlinkHref={`#${msaconfig.id}`} />
       </svg>
     ),
     text: '微服务配置',
@@ -36,7 +36,7 @@ const menus = [
     to: '/setting/apms',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={topologyIcon.url} />
+        <use xlinkHref={`#${topologyIcon.id}`} />
       </svg>
     ),
     text: 'APM 配置',

@@ -71,9 +71,18 @@ module.exports = {
             options: {
               extract: true,
               esModule: false,
+              runtimeGenerator: require.resolve('./svg_runtime_generator'),
             },
           },
-          'svgo-loader',
+          {
+            loader: 'svgo-loader',
+            options: {
+              plugins: [
+                { removeTitle: true },
+                { removeStyleElement: true },
+              ],
+            },
+          },
         ],
       },
       {

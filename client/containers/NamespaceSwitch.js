@@ -202,7 +202,7 @@ class NamespaceSwitch extends React.Component {
           trigger={[ 'click' ]}>
           <a href="javascrip:void(0)">
             <svg className="menu-icon">
-              <use xlinkHref={projectIcon.url} />
+              <use xlinkHref={`#${projectIcon.id}`} />
             </svg>
             {projectsText}
             <Icon type="down" />
@@ -225,7 +225,7 @@ class NamespaceSwitch extends React.Component {
           trigger={[ 'click' ]}>
           <a href="javascrip:void(0)">
             <svg className="menu-icon">
-              <use xlinkHref={clusterIcon.url} />
+              <use xlinkHref={`#${clusterIcon.id}`} />
             </svg>
             {clustersText}
             <Icon type="down" />

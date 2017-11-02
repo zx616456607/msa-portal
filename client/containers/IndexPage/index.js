@@ -118,7 +118,7 @@ class IndexPage extends React.Component {
                 <Col span={15}>
                   <div className="index-page-overview-left">
                     <svg>
-                      <use xlinkHref={msaIcon.url} />
+                      <use xlinkHref={`#${msaIcon.id}`} />
                     </svg>
                     <div className="index-page-overview-left-title">
                     微服务数量
@@ -155,7 +155,7 @@ class IndexPage extends React.Component {
                 <Col span={15}>
                   <div className="index-page-overview-left">
                     <svg>
-                      <use xlinkHref={configCenterIcon.url} />
+                      <use xlinkHref={`#${configCenterIcon.id}`} />
                     </svg>
                     <div className="index-page-overview-left-title">
                     配置数量
@@ -228,7 +228,7 @@ class IndexPage extends React.Component {
                 <Col span={15}>
                   <div className="index-page-overview-left">
                     <svg>
-                      <use xlinkHref={apiGatewayIcon.url} />
+                      <use xlinkHref={`#${apiGatewayIcon.id}`} />
                     </svg>
                     <div className="index-page-overview-left-title">
                     限流规则
@@ -265,7 +265,7 @@ class IndexPage extends React.Component {
                 <Col span={15}>
                   <div className="index-page-overview-left">
                     <svg>
-                      <use xlinkHref={routingManageIcon.url} />
+                      <use xlinkHref={`#${routingManageIcon.id}`} />
                     </svg>
                     <div className="index-page-overview-left-title">
                     路由数量

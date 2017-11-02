@@ -29,7 +29,7 @@ const menus = [
     to: '/apms/topology',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={topologyIcon.url} />
+        <use xlinkHref={`#${topologyIcon.id}`} />
       </svg>
     ),
     text: '微服务拓扑',
@@ -38,7 +38,7 @@ const menus = [
     to: '/apms/performance',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={performanceIcon.url} />
+        <use xlinkHref={`#${performanceIcon.id}`} />
       </svg>
     ),
     text: '微服务性能',
@@ -47,7 +47,7 @@ const menus = [
     to: '/apms/call-link-tracking',
     icon: (
       <svg className="menu-icon">
-        <use xlinkHref={callLinkTrackingIcon.url} />
+        <use xlinkHref={`#${callLinkTrackingIcon.id}`} />
       </svg>
     ),
     text: '调用链路跟踪',
