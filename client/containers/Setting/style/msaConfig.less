@@ -23,15 +23,55 @@
     border-top: 1px solid #ccc;
     background-color: #fff;
     padding: 20px;
-    .apiServer {
-      margin-top: 20px;
-      margin-bottom: 20px;
-      & > div:first-child {
-        text-align: right;
-        padding-right: 17px;
-      }
-      & > div + div > * {
-        margin-right: 8px;
+    .info {
+      width: 76%;
+      .msa {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-right: 10px;
+        & > div:first-child {
+          text-align: right;
+          padding-right: 17px;
+          line-height: 25px;
+        }
+        & > div + div > * {
+          margin-right: 8px;
+        }
+        .btn_save {
+          display: inline-block;
+          .close {
+            margin-right: 10px;
+          }
+        }
+        .desc {
+          line-height: 2;
+        }
+        .install {
+          .ico {
+            color: #5cb85c;
+          }
+          .existence {
+            color: #5cb85c;
+          }
+          .again {
+            cursor: pointer;
+            color: #2db7f5;
+            margin-left: 10px;
+          }
+          .unload {
+            cursor: pointer;
+            color: #f85a5a;
+            margin-left: 10px;
+          }
+          .loding {
+            width: 57%;
+            display: inline-block;
+            margin-left: 5%;
+            span {
+              color: #2db7f5;
+            }
+          }
+        }
       }
     }
   }
