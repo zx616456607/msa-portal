@@ -10,5 +10,4 @@
  * @author zhangpc
  */
 
-import 'normalize.css/normalize.css'
 import '../assets/style/common.less'

@@ -50,7 +50,7 @@ export default class Header extends React.Component {
     } = this.props
     return (
       <LayoutHeader className="layout-header">
-        <Link to="/apms">
+        <Link to="/">
           <svg className="logo">
             <use xlinkHref={`#${logo.id}`} />
           </svg>

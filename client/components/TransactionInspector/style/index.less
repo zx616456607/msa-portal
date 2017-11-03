@@ -27,11 +27,11 @@
   &-toggler {
     width: 100%;
     height: 8px;
-    border-bottom: 1px solid @borderColor;
+    border-bottom: 1px solid @border-color-base;
     cursor: pointer;
     text-align: center;
     &:hover {
-      background-color: @primaryColor;
+      background-color: @primary-color;
       .transaction-inspector-toggler-center {
         background-color: #ffbe00;
       }
@@ -41,8 +41,8 @@
       width: 100px;
       margin: 0 auto;
       background-color: #d3d7da;
-      border-right: 1px solid @borderColor;
-      border-left: 1px solid @borderColor;
+      border-right: 1px solid @border-color-base;
+      border-left: 1px solid @border-color-base;
       &:hover {
         background-color: #ffbe00;
       }
@@ -56,7 +56,7 @@
     padding-bottom: 12px;
     &-cell {
       text-align: center;
-      border-right: 1px solid @borderColor;
+      border-right: 1px solid @border-color-base;
     }
   }
   &-call-stack {
@@ -64,8 +64,8 @@
     height: 100%;
     &-header {
       height: 32px;
-      border-top: 1px solid @borderColor;
-      border-bottom: 1px solid @borderColor;
+      border-top: 1px solid @border-color-base;
+      border-bottom: 1px solid @border-color-base;
       background-color: #f8f8f8;
       color: #666;
       table {
@@ -79,7 +79,7 @@
             text-align: left;
           }
           & > tr > th:not(:last-child) {
-            border-right: 1px solid @borderColor;
+            border-right: 1px solid @border-color-base;
           }
         }
       }
@@ -91,7 +91,7 @@
         .ant-table-tbody {
           .ant-table-row-level-0 {
             background-color: #ebf2fc;
-            color: @primaryColor;
+            color: @primary-color;
           }
         }
       }
