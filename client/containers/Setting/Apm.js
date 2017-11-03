@@ -293,7 +293,7 @@ class ApmSetting extends React.Component {
               </Col>
             </Row> */}
             <Row className="apms">
-              <Col span={6}>基础服务</Col>
+              <Col span={4}>基础服务</Col>
               <Col span={8}>
                 <Select className="select" >
                   <Option value="pinpoint">Pinpoint</Option>
@@ -301,7 +301,7 @@ class ApmSetting extends React.Component {
               </Col>
             </Row>
             <Row className="apms">
-              <Col span={6}>安装情况</Col>
+              <Col span={4}>安装情况</Col>
               <Col span={18}>
                 {
                   apmState ?
@@ -320,24 +320,22 @@ class ApmSetting extends React.Component {
               </Col>
             </Row>
             <Row className="apms">
-              <Col span={6}>组件状态</Col>
+              <Col span={4}>组件状态</Col>
               <Col span={18}>
                 <span className="desc">健康</span>
               </Col>
             </Row>
             <Row className="apms">
-              <Col span={6}>组件版本</Col>
+              <Col span={4}>组件版本</Col>
               <Col span={18}>
                 <span>{this.state.version.version}</span>
               </Col>
             </Row>
           </div>
           <div className="rigth">
-            <div className="header">
-              <Select className="select">
-                <Option value="pinpoint">Pinpoint</Option>
-              </Select>
-            </div>
+            <Select className="select">
+              <Option value="pinpoint">Pinpoint</Option>
+            </Select>
             <div className="projet">
               <div className="not">
                 <span className="des">未安装项目</span>
