@@ -17,7 +17,6 @@ console.log('Build webpack dll ...')
 
 const vendors = [
   'antd',
-  'isomorphic-fetch',
   'lodash',
   'normalizr',
   'query-string',

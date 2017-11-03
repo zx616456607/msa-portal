@@ -11,7 +11,6 @@
  */
 
 import { normalize } from 'normalizr'
-import fetch from 'isomorphic-fetch'
 import { JWT, API_URL, SPI_URL, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring } from '../common/utils'
 
