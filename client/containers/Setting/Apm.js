@@ -39,7 +39,10 @@ class ApmSetting extends React.Component {
     const { loadApms, clusterID } = this.props
     loadApms(clusterID)
     this.apmService()
-    this.projectList()
+    // this.projectList()
+  }
+  componentDidMount() {
+    this.fetchState()
   }
   apmService = () => {
     const { clusterID, getApmService } = this.props
@@ -52,6 +55,7 @@ class ApmSetting extends React.Component {
       this.setState({
         serviceData: res.response.result.data,
       })
+      this.fetchState(res.response.result.data)
       this.filters()
     })
   }
@@ -76,6 +80,34 @@ class ApmSetting extends React.Component {
       }
     })
   }
+
+  fetchState = data => {
+    if (data === undefined) return
+    // const { serviceData } = this.state
+    const { project } = this.props
+    const serviceAry = []
+    data.forEach(item => {
+      if (item.namespace === project.namespace) {
+        const nameAry = {
+          space: project.namespace,
+          version: JSON.parse(item.configDetail),
+        }
+        serviceAry.push(nameAry)
+      }
+    })
+    if (serviceAry.length > 0) {
+      if (serviceAry[0].space === project.namespace) {
+        this.setState({
+          apmState: true,
+          version: serviceAry[0].version,
+        })
+      }
+    } else {
+      this.setState({
+        apmState: false,
+      })
+    }
+  }
   filters = () => {
     const { projectID } = this.props
     const { serviceData } = this.state
@@ -98,21 +130,8 @@ class ApmSetting extends React.Component {
    */
   handleInstall = () => {
     const { clusterID, postApm } = this.props
-    const { project, isProject } = this.state
-    // const apmId = this.fetchApmID()
-    // if (apmId !== '') {
-    //   const body = {
-    //     id: apmId,
-    //     cluster: clusterID,
-    //   }
-    //   getApmState(body).then(res => {
-    //     if (res.error) return
-    //     this.setState({
-    //       apmState: res,
-    //     })
-    //   })
-    // }
-    if (isProject === false) return
+    const { project } = this.state
+    // if (isProject === false) return
     this.play()
     const body = {
       type: 'pinpoint',
@@ -238,7 +257,7 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { percent, installSate, apmState, projectsData, colonyData, serviceData } = this.state
+    const { percent, installSate, apmState, serviceData } = this.state
     const { projectID } = this.props
     return (
       <Row className="layout-content-btns">
@@ -247,7 +266,7 @@ class ApmSetting extends React.Component {
         </div>
         <div className="contents">
           <div className="left">
-            <Row className="apms">
+            {/* <Row className="apms">
               <Col span={6}>项目</Col>
               <Col span={18}>
                 <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
@@ -272,17 +291,12 @@ class ApmSetting extends React.Component {
                   }
                 </Select>
               </Col>
-            </Row>
+            </Row> */}
             <Row className="apms">
               <Col span={6}>基础服务</Col>
               <Col span={8}>
-                <Select style={{ width: 300 }} >
+                <Select className="select" >
                   <Option value="pinpoint">Pinpoint</Option>
-                  {/* {
-                    serviceData.map((item, index) => (
-                      <Option key={index} value={item}>{item}</Option>
-                    ))
-                  } */}
                 </Select>
               </Col>
             </Row>
@@ -294,7 +308,6 @@ class ApmSetting extends React.Component {
                     <Row className="install">
                       <Icon className="ico" type="check-circle-o" />&nbsp;
                       <span className="existence" >已安装</span>
-                      {/* <span className="again" onClick={this.handleReinstall}>重新安装</span> */}
                       <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
                     </Row> :
                     installSate ?
@@ -309,7 +322,7 @@ class ApmSetting extends React.Component {
             <Row className="apms">
               <Col span={6}>组件状态</Col>
               <Col span={18}>
-                <span>健康</span>
+                <span className="desc">健康</span>
               </Col>
             </Row>
             <Row className="apms">
@@ -321,18 +334,18 @@ class ApmSetting extends React.Component {
           </div>
           <div className="rigth">
             <div className="header">
-              <Select style={{ width: 70 + '%', marginLeft: 16 + '%' }}>
+              <Select className="select">
                 <Option value="pinpoint">Pinpoint</Option>
               </Select>
             </div>
             <div className="projet">
               <div className="not">
-                <span style={{ fontSize: 14 }}>未安装项目</span>
-                <div className="notInstalled" style={{ marginTop: 5, height: 80 }}>
+                <span className="des">未安装项目</span>
+                <div className="notInstalled">
                   {
                     projectID ?
                       projectID.map((item, index) => (
-                        <div key={index} style={{ width: 90, display: 'inline-block' }}>
+                        <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                           <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
                         </div>
                       )) : ''
@@ -341,7 +354,7 @@ class ApmSetting extends React.Component {
               </div>
               <div className="already">
                 <div className="yes">
-                  <span style={{ fontSize: 14 }}>已安装项目</span>
+                  <span className="des">已安装项目</span>
                   <div className="yesInstalled" style={{ marginTop: 5 }}>
                     <div style={{ width: 90, display: 'inline-block' }}>
                       <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
@@ -349,7 +362,7 @@ class ApmSetting extends React.Component {
                     {
                       serviceData ?
                         serviceData.map((item, index) => (
-                          <div key={index} style={{ width: 90, display: 'inline-block' }}>
+                          <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                             <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
                           </div>
                         )) : ''
@@ -398,6 +411,7 @@ const mapStateToProps = state => {
     apmID,
     userId,
     colony,
+    project,
     projects,
     clusters,
     clusterID,
