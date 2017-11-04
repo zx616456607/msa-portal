@@ -10,16 +10,22 @@
  * @author zhangxuan
  */
 import React from 'react'
+import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Input, Table } from 'antd'
 const Search = Input.Search
 import './style/msaList.less'
 import RegisterMsa from './RegisterMsa'
 import classNames from 'classnames'
+import { getMsaList } from '../../../actions/msa'
 
-export default class MsaList extends React.Component {
+class MsaList extends React.Component {
   state = {
     msaModal: false,
+  }
+  componentWillMount() {
+    const { getMsaList, clusterID } = this.props
+    getMsaList(clusterID)
   }
   registerMsa = () => {
     this.setState({
@@ -148,3 +154,15 @@ export default class MsaList extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { current } = state
+  const { id } = current.config.cluster
+  return {
+    clusterID: id,
+  }
+}
+
+export default connect(mapStateToProps, {
+  getMsaList,
+})(MsaList)

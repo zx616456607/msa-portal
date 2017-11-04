@@ -17,6 +17,7 @@ import { combineReducers } from 'redux'
 import current from './current'
 import * as apm from './apm'
 import pinpoint from './pinpoint'
+import msa from './msa'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
   current,
   ...apm,
   pinpoint,
+  msa,
 })
 
 export default rootReducer
