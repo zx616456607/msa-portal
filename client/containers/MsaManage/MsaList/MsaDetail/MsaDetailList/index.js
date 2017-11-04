@@ -71,7 +71,11 @@ class MsaDetailList extends React.Component {
         return (
           <div>
             {
-              record.type === 'automatic' ? record.discoverable ? <Button>隐藏服务</Button> : <Button>取消隐藏</Button> : ''
+              record.type === 'automatic' && (
+                record.discoverable
+                  ? <Button>隐藏服务</Button>
+                  : <Button>取消隐藏</Button>
+              )
             }
             {
               record.type !== 'automatic' ? <Button>移除注册</Button> : ''
