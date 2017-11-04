@@ -34,7 +34,7 @@ class RoutingRule extends React.Component {
     })
   }
   render() {
-    const { form, visible } = this.props
+    const { form, visible, ...otherProps } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -47,6 +47,7 @@ class RoutingRule extends React.Component {
         visible={visible}
         onOk={this.confirmModal}
         onCancel={this.cancelModal}
+        {...otherProps}
       >
         <FormItem {...formItemLayout} label="路由名称">
           {getFieldDecorator('routerName', {
