@@ -33,3 +33,5 @@ export const NORMAL = 0
 export const ERROR = 1
 export const USER_CURRENT_CONFIG = 'msa_user_current_config'
 export const MY_PORJECT = '我的个人项目'
+// RegExp
+export const APP_NAME = /^[a-zA-Z][a-zA-Z0-9]{1,49}$/

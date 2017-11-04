@@ -11,25 +11,14 @@
  */
 
 import React from 'react'
-import { Input, Modal, Form, Icon, Row, Col } from 'antd'
-const FormItem = Form.Item
+import { Input, Form, Icon, Row, Col, Card } from 'antd'
 import './style/index.less'
 
+const FormItem = Form.Item
+
 class RegisterMsa extends React.Component {
-  confirmModal = () => {
-    const { scope } = this.props
-    scope.setState({
-      msaModal: false,
-    })
-  }
-  cancelModal = () => {
-    const { scope } = this.props
-    scope.setState({
-      msaModal: false,
-    })
-  }
   render() {
-    const { form, visible } = this.props
+    const { form } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -40,13 +29,9 @@ class RegisterMsa extends React.Component {
       wrapperCol: { span: 19 },
     }
     return (
-      <Modal
-        className="msa-modal"
+      <Card
+        className="msa-register"
         title="注册微服务"
-        width={560}
-        visible={visible}
-        onOk={this.confirmModal}
-        onCancel={this.cancelModal}
       >
         <FormItem {...formItemLayout} label="微服务名称">
           {getFieldDecorator('routerName', {
@@ -99,7 +84,7 @@ class RegisterMsa extends React.Component {
         <span className="msa-modal-add pointer primary-color">
           <Icon type="plus-circle-o" />继续添加微服务实例
         </span>
-      </Modal>
+      </Card>
     )
   }
 }

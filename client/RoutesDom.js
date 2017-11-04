@@ -16,6 +16,7 @@ import App from './containers/App'
 import IndexPage from './containers/IndexPage'
 import TestPage from './containers/TestPage'
 import MsaManage from './containers/MsaManage'
+import RegisterMsa from './containers/MsaManage/MsaList/RegisterMsa'
 import MsaList from './containers/MsaManage/MsaList/index'
 import MsaDetail from './containers/MsaManage/MsaList/MsaDetail'
 import MsaConfigCenter from './containers/MsaManage/ConfigCenter/ConfigCenter'
@@ -71,6 +72,12 @@ export const msaManageChildRoutes = [
     exact: true,
     component: MsaList,
     key: 'index',
+  },
+  {
+    path: '/msa-manage/register',
+    exact: true,
+    component: RegisterMsa,
+    key: 'register',
   },
   {
     path: '/msa-manage/detail/:id',

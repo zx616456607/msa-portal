@@ -15,25 +15,21 @@ import { Link } from 'react-router-dom'
 import { Button, Icon, Input, Table } from 'antd'
 const Search = Input.Search
 import './style/msaList.less'
-import RegisterMsa from './RegisterMsa'
 import classNames from 'classnames'
 import { getMsaList } from '../../../actions/msa'
 
 class MsaList extends React.Component {
   state = {
-    msaModal: false,
+    //
   }
   componentWillMount() {
     const { getMsaList, clusterID } = this.props
     getMsaList(clusterID)
   }
   registerMsa = () => {
-    this.setState({
-      msaModal: true,
-    })
+    this.props.history.push('/msa-manage/register')
   }
   render() {
-    const { msaModal } = this.state
     const columns = [{
       title: '微服务名称',
       dataIndex: 'name',
@@ -143,7 +139,6 @@ class MsaList extends React.Component {
           />
           <span className="float-right msa-btn-box-total">共计 3 条</span>
         </div>
-        <RegisterMsa visible={msaModal} scope={this}/>
         <Table
           className="msa-table"
           pagination={pagination}
