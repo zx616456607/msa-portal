@@ -50,8 +50,8 @@ export default class MsaDetail extends React.Component {
         <Tabs className="msa-detail-tabs" defaultActiveKey="1" onChange={this.callback}>
           <TabPane tab="实例列表" key="1"><MsaDetailList/></TabPane>
           <TabPane tab="环境信息" key="2"><MsaDetailEnv/></TabPane>
-          <TabPane tab="日志信息" key="3"><MsaDetailLogs/></TabPane>
-          <TabPane tab="监控" key="4">
+          <TabPane tab="日志信息" key="3" disabled><MsaDetailLogs/></TabPane>
+          <TabPane tab="监控" key="4" disabled>
             <img width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
           </TabPane>
           <TabPane tab="配置" key="5"><MsaDetailConfig/></TabPane>
