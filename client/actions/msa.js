@@ -12,22 +12,29 @@
 
 import { CALL_API } from '../middleware/api'
 import { SPRING_CLOUD_URL } from '../constants'
+import { toQuerystring } from '../common/utils'
 
 export const MSA_LIST_REQUEST = 'MSA_LIST_REQUEST'
 export const MSA_LIST_SUCCESS = 'MSA_LIST_SUCCESS'
 export const MSA_LIST_FAILURE = 'MSA_LIST_FAILURE'
 
 // Fetches a page of msa.
-const fetchMsaList = clusterID => ({
-  [CALL_API]: {
-    types: [ MSA_LIST_REQUEST, MSA_LIST_SUCCESS, MSA_LIST_FAILURE ],
-    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/services`,
-    schema: {},
-  },
-})
+const fetchMsaList = (clusterID, query) => {
+  let endpoint = `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/services`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [ MSA_LIST_REQUEST, MSA_LIST_SUCCESS, MSA_LIST_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
 
-export function getMsaList(clusterID) {
+export function getMsaList(clusterID, query) {
   return dispatch => {
-    return dispatch(fetchMsaList(clusterID))
+    return dispatch(fetchMsaList(clusterID, query))
   }
 }

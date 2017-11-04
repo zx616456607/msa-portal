@@ -40,7 +40,7 @@ const msa = (state = {
   msaList: {},
 }, action) => {
   return {
-    msaList: msaList(state, action),
+    msaList: msaList(state.msaList, action),
   }
 }
 
