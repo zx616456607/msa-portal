@@ -18,7 +18,7 @@ import { toQuerystring } from '../common/utils'
 // This makes every API response have the same shape, regardless of how nested it was.
 const callApi = (endpoint, options, schema) => {
   let fullUrl
-  if (!/^https?\/\//.test(endpoint)) {
+  if (/^https?:\/\//.test(endpoint)) {
     fullUrl = endpoint
   } else {
     fullUrl = API_URL + endpoint
