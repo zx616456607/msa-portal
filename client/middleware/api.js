@@ -17,7 +17,12 @@ import { toQuerystring } from '../common/utils'
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 const callApi = (endpoint, options, schema) => {
-  let fullUrl = (endpoint.indexOf(API_URL) === -1) ? API_URL + endpoint : endpoint
+  let fullUrl
+  if (!/^https?\/\//.test(endpoint)) {
+    fullUrl = endpoint
+  } else {
+    fullUrl = API_URL + endpoint
+  }
 
   // Support spi
   if (options.isSpi) {
