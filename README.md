@@ -83,7 +83,7 @@ Node.js >= 7.6.0 required.
 * 第一次运行项目时需要先安装项目依赖，然后构建 dll 依赖
 
 ```
-npm run install
+npm run i
 npm run build:dll
 ```
 * 开发模式启动项目

@@ -20,35 +20,14 @@ import { getMsaList } from '../../../../../actions/msa'
 
 const Search = Input.Search
 
-const result = {
-  status: 'success',
-  code: 200,
-  data: [
-    {
-      serviceName: 'hystrix-turbine',
-      discoverable: true,
-      type: 'automatic',
-      instances: [
-        {
-          name: 'HYSTRIX-TURBINE',
-          instanceId: 'hystrix:hystrix-turbine:8031',
-          status: 'UP',
-          ip: '10.31.65.185',
-          port: 8031,
-          type: 'automatic',
-          discoverable: true,
-        },
-      ],
-    },
-  ],
-}
 class MsaDetailList extends React.Component {
   componentDidMount() {
-    const { getMsaList, clusterId, name } = this.props
-    getMsaList(clusterId, { name })
+    const { getMsaList, clusterID, name } = this.props
+    getMsaList(clusterID, { name })
   }
+
   render() {
-    // const { instancesList } = this.props
+    const { instancesList } = this.props
     const pagination = {
       simple: true,
     }
@@ -111,7 +90,7 @@ class MsaDetailList extends React.Component {
           className="msaDetailList-table"
           pagination={pagination}
           columns={columns}
-          dataSource={result.data[0].instances} /> /* 部署完直接用props里面的 instancesList.instances */
+          dataSource={instancesList} />
       </div>
     )
   }
@@ -126,7 +105,7 @@ const mapStateToProps = state => {
   return {
     clusterID: id,
     name,
-    instancesList: msaList.data, // 部署完此方法可删掉，直接取store里面的masList
+    instancesList: msaList && msaList.data && msaList.data[0].instances || [],
   }
 }
 

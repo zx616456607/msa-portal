@@ -38,3 +38,47 @@ export function getMsaList(clusterID, query) {
     return dispatch(fetchMsaList(clusterID, query))
   }
 }
+
+export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
+export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
+export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'
+
+const fetchAddManualrule = (clusterID, body) => ({
+  [CALL_API]: {
+    types: [ MSA_ADD_MANUALRULE_REQUEST, MSA_ADD_MANUALRULE_SUCCESS, MSA_ADD_MANUALRULE_FAILURE ],
+    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/manualrule`,
+    options: {
+      method: 'POST',
+      body,
+    },
+    schema: {},
+  },
+})
+
+export function addManualrule(clusterID, body) {
+  return dispatch => {
+    return dispatch(fetchAddManualrule(clusterID, body))
+  }
+}
+
+export const MSA_DISCOVERY_PING_REQUEST = 'MSA_DISCOVERY_PING_REQUEST'
+export const MSA_DISCOVERY_PING_SUCCESS = 'MSA_DISCOVERY_PING_SUCCESS'
+export const MSA_DISCOVERY_PING_FAILURE = 'MSA_DISCOVERY_PING_FAILURE'
+
+const fetchDiscoveryPing = (clusterID, body) => ({
+  [CALL_API]: {
+    types: [ MSA_DISCOVERY_PING_REQUEST, MSA_DISCOVERY_PING_SUCCESS, MSA_DISCOVERY_PING_FAILURE ],
+    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/ping`,
+    options: {
+      method: 'POST',
+      body,
+    },
+    schema: {},
+  },
+})
+
+export function discoveryPing(clusterID, body) {
+  return dispatch => {
+    return dispatch(fetchDiscoveryPing(clusterID, body))
+  }
+}

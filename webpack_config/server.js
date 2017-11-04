@@ -28,8 +28,16 @@ rules[0] = {
   ],
   options: {
     babelrc: false,
-    presets: [ 'es2015', 'react', 'stage-0' ],
-    plugins: [ 'transform-runtime' ],
+    presets: [
+      [
+        'env',
+        {
+          targets: {
+            node: 'current',
+          },
+        },
+      ],
+    ],
   },
 }
 
