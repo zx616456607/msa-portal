@@ -93,7 +93,7 @@
     "pre-commit": "^1.2.2",
     "prop-types": "^15.5.10",
     "react": "^15.6.2",
-    "react-codemirror": "^1.0.0",
+    "react-codemirror2": "^3.0.7",
     "react-dock": "^0.2.4",
     "react-dom": "^15.6.2",
     "react-helmet": "^4.0.0",

@@ -12,7 +12,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import CodeMirror from 'react-codemirror'
+import { Controlled as CodeMirror } from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 import './style/index.less'
@@ -74,9 +74,12 @@ export default class Editor extends React.Component {
         }
         <CodeMirror
           ref="CodeMirror"
-          value={value}
           options={options}
           {...otherProps}
+          value={value}
+          onBeforeChange={(editor, data, value) => {
+            this.setState({ value })
+          }}
         />
       </div>
     )

@@ -19,6 +19,7 @@ export default class YamlEditor extends React.Component {
     const options = {
       mode: 'yaml',
     }
-    return <Editor title="Yaml" options={options} />
+    const { title, ...otherProps } = this.props
+    return <Editor title={ title || 'Yaml' } {...otherProps} options={options} />
   }
 }
