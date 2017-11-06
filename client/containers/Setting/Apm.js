@@ -15,7 +15,6 @@ import { connect } from 'react-redux'
 import './style/apm.less'
 import { Row, Col, Select, Button, Progress, Modal, Icon } from 'antd'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
-import { MY_PORJECT } from '../../constants'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
 
@@ -23,7 +22,7 @@ class ApmSetting extends React.Component {
   state = {
     apms: [],
     percent: 0,
-    states: '',
+    state: '',
     version: '',
     apmState: false,
     uninstall: false,
@@ -42,7 +41,17 @@ class ApmSetting extends React.Component {
     // this.projectList()
   }
   componentDidMount() {
-    this.fetchState()
+    const { getApmState, apmID, clusterID } = this.props
+    const query = {
+      id: apmID,
+      cluster: clusterID,
+    }
+    getApmState(query).then(res => {
+      if (res.error) return
+      this.setState({
+        state: res.response.result.data ? res.response.result.data.running : '',
+      })
+    })
   }
   apmService = () => {
     const { clusterID, getApmService } = this.props
@@ -84,19 +93,19 @@ class ApmSetting extends React.Component {
   fetchState = data => {
     if (data === undefined) return
     // const { serviceData } = this.state
-    const { project } = this.props
+    const { pinpointName } = this.props
     const serviceAry = []
     data.forEach(item => {
-      if (item.namespace === project.namespace) {
+      if (item.namespace === pinpointName) {
         const nameAry = {
-          space: project.namespace,
+          space: pinpointName,
           version: JSON.parse(item.configDetail),
         }
         serviceAry.push(nameAry)
       }
     })
     if (serviceAry.length > 0) {
-      if (serviceAry[0].space === project.namespace) {
+      if (serviceAry[0].space === pinpointName) {
         this.setState({
           apmState: true,
           version: serviceAry[0].version,
@@ -257,8 +266,9 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { percent, installSate, apmState, serviceData } = this.state
+    const { percent, installSate, apmState, serviceData, state } = this.state
     const { projectID } = this.props
+    console.log(state)
     return (
       <Row className="layout-content-btns">
         <div className="header" style={{ marginRight: 0 }}>
@@ -322,13 +332,17 @@ class ApmSetting extends React.Component {
             <Row className="apms">
               <Col span={4}>组件状态</Col>
               <Col span={18}>
-                <span className="desc">健康</span>
+                {
+                  state ? state.running === true ?
+                    <span className="desc">健康</span> :
+                    <span className="descs">不健康</span> : ''
+                }
               </Col>
             </Row>
             <Row className="apms">
               <Col span={4}>组件版本</Col>
               <Col span={18}>
-                <span>{this.state.version.version}</span>
+                <span className="version">{this.state.version.version}</span>
               </Col>
             </Row>
           </div>
@@ -354,11 +368,11 @@ class ApmSetting extends React.Component {
                 <div className="yes">
                   <span className="des">已安装项目</span>
                   <div className="yesInstalled" style={{ marginTop: 5 }}>
-                    <div style={{ width: 90, display: 'inline-block' }}>
+                    {/* <div style={{ width: 90, display: 'inline-block' }}>
                       <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
-                    </div>
+                    </div> */}
                     {
-                      serviceData ?
+                      Object.keys(serviceData).length > 0 ?
                         serviceData.map((item, index) => (
                           <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                             <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
