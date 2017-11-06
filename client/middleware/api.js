@@ -70,6 +70,12 @@ const callApi = (endpoint, options, schema) => {
       }).catch(json => {
         const { message } = json || {}
         const { status, statusText } = response
+        if (status < 300) {
+          return Promise.reject({
+            status,
+            message: message || statusText,
+          })
+        }
         const error = new Error(message || statusText)
         error.status = status
         return Promise.reject(error)

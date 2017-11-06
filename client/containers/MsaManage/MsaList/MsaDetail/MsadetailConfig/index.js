@@ -12,14 +12,28 @@
 
 import React from 'react'
 import { Row, Col, Select, Button, Icon, Table } from 'antd'
+import { connect } from 'react-redux'
+import {
+  getMsaEnv,
+} from '../../../../../actions/msa'
 import './style/index.less'
 
 const Option = Select.Option
 
-export default class MsaDetailConfig extends React.Component {
+class MsaDetailConfig extends React.Component {
   handleChange = value => {
     console.log(value)
   }
+
+  loadMsaConfig = () => {
+    // const { getMsaEnv, clusterID, name } = this.props
+    // getMsaEnv(clusterID, name)
+  }
+
+  componentDidMount() {
+    this.loadMsaConfig()
+  }
+
   render() {
     const columns = [{
       title: '配置名称',
@@ -77,3 +91,11 @@ export default class MsaDetailConfig extends React.Component {
     )
   }
 }
+
+const mapStateToProps = () => {
+  return {}
+}
+
+export default connect(mapStateToProps, {
+  getMsaEnv,
+})(MsaDetailConfig)

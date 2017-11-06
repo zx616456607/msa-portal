@@ -25,9 +25,7 @@ import './style/index.less'
 const TabPane = Tabs.TabPane
 
 class MsaDetail extends React.Component {
-  callback = key => {
-    console.log(key)
-  }
+  callback = () => {}
 
   loadMsaDetail = () => {
     const { getMsaList, clusterID, name } = this.props

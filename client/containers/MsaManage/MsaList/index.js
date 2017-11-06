@@ -156,14 +156,14 @@ class MsaList extends React.Component {
         )
       },
     }]
-    /* const rowSelection = {
+    const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
       },
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User',
       }),
-    } */
+    }
     const pagination = {
       simple: true,
     }
@@ -171,7 +171,7 @@ class MsaList extends React.Component {
       <div className="msa">
         <div className="msa-btn-box layout-content-btns">
           <Button type="primary" onClick={this.registerMsa}><Icon type="plus"/>注册微服务</Button>
-          {/* <Button icon="poweroff">注销微服务</Button> */}
+          <Button icon="poweroff">注销微服务</Button>
           <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
           <Search
             placeholder="按微服务名称搜索"
@@ -183,7 +183,7 @@ class MsaList extends React.Component {
           <Table
             className="msa-table"
             pagination={pagination}
-            // rowSelection={rowSelection}
+            rowSelection={rowSelection}
             columns={columns}
             dataSource={msaList}
             loading={msaListLoading}

@@ -52,7 +52,6 @@ const msaEnv = (state = {}, action) => {
       }
     case ActionTypes.MSA_ENV_FAILURE:
       return {
-        ...state,
         isFetching: false,
       }
     default:
