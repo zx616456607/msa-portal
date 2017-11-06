@@ -134,7 +134,7 @@ class ConfigCenter extends React.Component {
   }
 
   render() {
-    const { envData, branchData, loading, defaultValue, branchName } = this.state
+    const { envData, branchData, loading, branchName } = this.state
     const columns = [{
       id: 'id',
       title: '配置名称',
@@ -163,6 +163,7 @@ class ConfigCenter extends React.Component {
       defaultCurrent: 1,
       defaultPageSize: 10,
     }
+    const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
 
     return (
       <Row className="layout-content-btns">

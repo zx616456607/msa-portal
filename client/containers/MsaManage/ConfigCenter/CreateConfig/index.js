@@ -147,10 +147,10 @@ class CreateConfig extends React.Component {
         return
       }
       if (res.response.status === 200) {
-        notification.error({
+        notification.success({
           message: '发布成功',
         })
-
+        this.props.history.push('/msa-manage/config-center')
       }
     })
   }
@@ -177,6 +177,7 @@ class CreateConfig extends React.Component {
         notification.success({
           message: '添加成功',
         })
+        this.props.history.push('/msa-manage/config-center')
       }
     })
   }
