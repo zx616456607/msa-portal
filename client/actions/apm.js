@@ -76,16 +76,16 @@ export const FETCH_APMSATTE_REQUEST = 'FETCH_APMSATTE_REQUEST'
 export const FETCH_APMSTATE_SUCCESS = 'FETCH_APMSTATE_SUCCESS'
 export const FETCH_APMSTATE_FAILURE = 'FETCH_APMSTATE_FAILURE'
 
-const fetchApmState = body => ({
-  body,
+const fetchApmState = query => ({
+  query,
   [CALL_API]: {
     types: [ FETCH_APMSATTE_REQUEST, FETCH_APMSTATE_SUCCESS, FETCH_APMSTATE_FAILURE ],
-    endpoint: `/clusters/${body.cluster}/apms/${body.id}/state`,
+    endpoint: `/clusters/${query.cluster}/apms/${query.id}/state`,
     schema: {},
   },
 })
-export const getApmState = id => dispatch => {
-  return dispatch(fetchApmState(id))
+export const getApmState = query => dispatch => {
+  return dispatch(fetchApmState(query))
 }
 
 export const DELETE_APM_REQUEST = 'DELETE_APM_REQUEST'
