@@ -17,8 +17,9 @@ import rootReducer from '../reducers'
 import { composeWithDevTools } from 'redux-devtools-extension/logOnlyInProduction'
 import { routerMiddleware } from 'react-router-redux'
 
-const configureStore = history => createStore(
+const configureStore = (history, preloadedState) => createStore(
   rootReducer,
+  preloadedState,
   composeWithDevTools(applyMiddleware(routerMiddleware(history), thunk, api))
 )
 

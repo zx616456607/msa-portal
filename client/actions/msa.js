@@ -11,8 +11,10 @@
  */
 
 import { CALL_API } from '../middleware/api'
-import { SPRING_CLOUD_URL } from '../constants'
+import { API_CONFIG } from '../constants'
 import { toQuerystring } from '../common/utils'
+
+const { SPRING_CLOUD_API_URL } = API_CONFIG
 
 export const MSA_LIST_REQUEST = 'MSA_LIST_REQUEST'
 export const MSA_LIST_SUCCESS = 'MSA_LIST_SUCCESS'
@@ -20,7 +22,7 @@ export const MSA_LIST_FAILURE = 'MSA_LIST_FAILURE'
 
 // Fetches a page of msa.
 const fetchMsaList = (clusterID, query) => {
-  let endpoint = `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/services`
+  let endpoint = `${SPRING_CLOUD_API_URL}/clusters/${clusterID}/discovery/services`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
@@ -46,7 +48,7 @@ export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'
 const fetchAddManualrule = (clusterID, body) => ({
   [CALL_API]: {
     types: [ MSA_ADD_MANUALRULE_REQUEST, MSA_ADD_MANUALRULE_SUCCESS, MSA_ADD_MANUALRULE_FAILURE ],
-    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/manualrule`,
+    endpoint: `${SPRING_CLOUD_API_URL}/clusters/${clusterID}/discovery/manualrule`,
     options: {
       method: 'POST',
       body,
@@ -68,7 +70,7 @@ export const MSA_DISCOVERY_PING_FAILURE = 'MSA_DISCOVERY_PING_FAILURE'
 const fetchDiscoveryPing = (clusterID, body) => ({
   [CALL_API]: {
     types: [ MSA_DISCOVERY_PING_REQUEST, MSA_DISCOVERY_PING_SUCCESS, MSA_DISCOVERY_PING_FAILURE ],
-    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/ping`,
+    endpoint: `${SPRING_CLOUD_API_URL}/clusters/${clusterID}/discovery/ping`,
     options: {
       method: 'POST',
       body,
@@ -90,7 +92,7 @@ export const MSA_DELETE_MANUALRULE_FAILURE = 'MSA_DELETE_MANUALRULE_FAILURE'
 const fetchDelManualrule = (clusterID, ruleIDs) => ({
   [CALL_API]: {
     types: [ MSA_DELETE_MANUALRULE_REQUEST, MSA_DELETE_MANUALRULE_SUCCESS, MSA_DELETE_MANUALRULE_FAILURE ],
-    endpoint: `${SPRING_CLOUD_URL}/clusters/${clusterID}/discovery/manualrule/${ruleIDs}`,
+    endpoint: `${SPRING_CLOUD_API_URL}/clusters/${clusterID}/discovery/manualrule/${ruleIDs}`,
     options: {
       method: 'DELETE',
     },

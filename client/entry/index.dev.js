@@ -21,7 +21,8 @@ import '../common/style'
 
 // Create a history of your choosing (we're using a browser history in this case)
 const history = createHistory()
-const store = configureStore(history)
+const initialState = window.__INITIAL_STATE__
+const store = configureStore(history, initialState)
 
 const render = Component => {
   ReactDOM.render(

@@ -12,14 +12,31 @@
 
 const isProd = process.env.NODE_ENV === 'production'
 
+/* api config */
+// dev api config
+const API_PROTOCOL = isProd ? 'http:' : 'http:'
+const API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
+const API_PREFIX = '/api/v2'
+const SPI_PREFIX = '/spi/v2'
+const API_URL = `${API_PROTOCOL}//${API_HOST}${API_PREFIX}`
+const SPI_URL = `${API_PROTOCOL}//${API_HOST}${SPI_PREFIX}`
+const SPRING_CLOUD_API_URL = 'http://192.168.1.58:8000/api/v1'
+let apiConfig = {
+  API_PROTOCOL,
+  API_HOST,
+  API_PREFIX,
+  SPI_PREFIX,
+  API_URL,
+  SPI_URL,
+  SPRING_CLOUD_API_URL,
+}
+// prod api config
+if (isProd) {
+  apiConfig = window.__INITIAL_STATE__.config
+}
+export const API_CONFIG = apiConfig
+
 export const JWT = 'jwt'
-export const API_PREFIX = '/api/v2'
-export const API_PROTOCOL = isProd ? 'http' : 'http'
-export const API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
-export const API_URL = `${API_PROTOCOL}://${API_HOST}${API_PREFIX}`
-export const SPI_PREFIX = '/spi/v2'
-export const SPI_URL = `${API_PROTOCOL}://${API_HOST}${SPI_PREFIX}`
-export const SPRING_CLOUD_URL = 'http://192.168.1.58:8000/api/v1'
 export const DEFAULT = 'default'
 export const TIMES_WITHOUT_YEAR = 'MM-DD HH:mm:ss'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'

@@ -46,9 +46,12 @@ const errorMessage = (state = null, action) => {
   return state
 }
 
+const config = (state = {}) => state
+
 const rootReducer = combineReducers({
   entities,
   errorMessage,
+  config,
   routing,
   current,
   ...apm,

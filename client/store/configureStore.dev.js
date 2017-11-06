@@ -19,10 +19,11 @@ import rootReducer from '../reducers'
 
 // Use redux-devtools-extension
 // https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
-const configureStore = history => {
+const configureStore = (history, preloadedState) => {
   const middlewares = [ routerMiddleware(history), thunk, api ]
   const store = createStore(
     rootReducer,
+    preloadedState,
     composeWithDevTools(
       applyMiddleware(...middlewares)
     )

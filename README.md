@@ -4,6 +4,16 @@
 
 Node.js >= 7.6.0 required.
 
+### 环境变量说明
+
+变量名 | 默认值 | 说明 | 可选值
+---|---|---|---
+NODE_ENV | `'development'` | Node 运行模式 | `'development'`, `'staging'`, `'production'`
+API | `'http://192.168.1.103:48000'` | api 地址 |
+API_PREFIX | `'/api/v2'` | api 前缀 |
+SPI_PREFIX | `'/spi/v2'` | spi 前缀 |
+SPRING_CLOUD_API_URL | `'http://192.168.1.58:8000/api/v1'` | spring cloud api url |
+
 ### 项目结构
 ```
 .
