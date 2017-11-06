@@ -130,6 +130,7 @@ export const CENTER_UPDATE_SUCCESS = 'CENTER_UPDATE_SUCCESS'
 export const CENTER_UPDATE_FAILURE = 'CENTER_UPDATE_FAILURE'
 
 const UpdateCenter = query => {
+  const body = query.yaml
   return {
     query,
     [CALL_API]: {
@@ -137,6 +138,7 @@ const UpdateCenter = query => {
       endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
       schema: {},
       options: {
+        body,
         method: 'PUT',
       },
     },
@@ -145,5 +147,51 @@ const UpdateCenter = query => {
 
 export const putCenterConfig = query => dispatch => {
   return dispatch(UpdateCenter(query))
+}
+
+export const CENTER_ADD_REQUEST = 'CENTER_ADD_REQUEST'
+export const CENTER_ADD_SUCCESS = 'CENTER_ADD_SUCCESS'
+export const CENTER_ADD_FAILURE = 'CENTER_ADD_FAILURE'
+
+const addCenter = query => {
+  const body = query.yaml
+  return {
+    query,
+    [CALL_API]: {
+      types: [ CENTER_ADD_REQUEST, CENTER_ADD_SUCCESS, CENTER_ADD_FAILURE ],
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      schema: {},
+      options: {
+        body,
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const addCenterConfig = query => dispatch => {
+  return dispatch(addCenter(query))
+}
+
+export const CENTER_RELEASE_REQUEST = 'CENTER_RELEASE_REQUEST'
+export const CENTER_RELEASE_SUCCESS = 'CENTER_RELEASE_SUCCESS'
+export const CENTER_RELEASE_FAILURE = 'CENTER_RELEASE_FAILURE'
+
+const ReleaseCenter = clusterID => {
+  return {
+    clusterID,
+    [CALL_API]: {
+      types: [ CENTER_RELEASE_REQUEST, CENTER_RELEASE_SUCCESS, CENTER_RELEASE_FAILURE ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/configserver/bus/refresh`,
+      schema: {},
+      options: {
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const releaseConfigService = clusterID => dispatch => {
+  return dispatch(ReleaseCenter(clusterID))
 }
 

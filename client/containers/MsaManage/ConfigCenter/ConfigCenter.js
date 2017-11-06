@@ -27,6 +27,7 @@ class ConfigCenter extends React.Component {
     message: '',
     configName: '',
     branchName: '',
+    defaultValue: '',
     configGitUrl: '',
     deleteVisible: false,
     branchData: [],
@@ -56,10 +57,11 @@ class ConfigCenter extends React.Component {
           if (res.response.result.code === 200) {
             this.setState({
               branchData: res.response.result.data,
+              defaultValue: res.response.result.data[0].name,
             })
             const evnQuery = {
               url: this.state.configGitUrl,
-              branchName: res.response.result.data[1].name,
+              branchName: res.response.result.data[0].name,
               clusterId: clusterID,
             }
             getCenterEvn(evnQuery).then(res => {
@@ -87,6 +89,7 @@ class ConfigCenter extends React.Component {
     this.setState({
       branchName: value,
     })
+    this.loadData()
   }
 
   handleDelVisible = name => {
@@ -131,7 +134,7 @@ class ConfigCenter extends React.Component {
   }
 
   render() {
-    const { envData, branchData, loading } = this.state
+    const { envData, branchData, loading, defaultValue, branchName } = this.state
     const columns = [{
       id: 'id',
       title: '配置名称',
@@ -143,6 +146,7 @@ class ConfigCenter extends React.Component {
     }, {
       title: '更新时间',
       dataIndex: 'time',
+      render: () => <span>1分钟</span>,
     }, {
       id: 'id',
       title: '操作',
@@ -154,7 +158,6 @@ class ConfigCenter extends React.Component {
         <div className="desc" style={{ color: '#f85a5a' }} onClick={() => this.handleDelVisible(record.name)}>删除</div>
       </div>,
     }]
-
     const pagination = {
       simple: true,
       defaultCurrent: 1,
@@ -165,7 +168,7 @@ class ConfigCenter extends React.Component {
       <Row className="layout-content-btns">
         <Row className="branch">
           <span>版本分支：</span>
-          <Select style={{ width: 200 }} onChange={this.handleChang} defaultValue="dev">
+          <Select style={{ width: 200 }} onChange={this.handleChang} defaultValue={defaultValue}>
             {
               branchData ?
                 branchData.map((item, index) => (
@@ -178,7 +181,7 @@ class ConfigCenter extends React.Component {
           <TabPane tab="开发环境" key="evn">
             <div className="exploit">
               <div className="headers">
-                <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create#evn')}>
+                <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create#detal=false&branch=${branchName}`)}>
                   <Icon type="plus" style={{ color: '#fff' }} />
                   <span className="font">添加配置</span>
                 </Button>

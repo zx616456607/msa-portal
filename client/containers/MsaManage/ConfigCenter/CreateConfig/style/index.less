@@ -10,64 +10,36 @@
  * @author zhaoyb
  */
 
- .layout-content-btns {
-  .name {
-    height: 100px;
-    margin-right: 0;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
-    span {
-      margin-left: 13%;
-    }
-    .ipt {
-      width: 40%;
-      margin-left: 20px;
-      margin-top: 3%;
-    }
-  }
-  .version {
-    height: 100px;
-    margin-right: 0;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
-    span {
-      margin-left: 13%;
-    }
-    .sel {
-      width: 40%;
-      margin-left: 20px;
-      margin-top: 3%;
-     }
-  }
+ .info {
   .connent {
-    height: 400px;
-    margin-right: 0;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
-    .text {
-      position: absolute;
-      top: 34%;
-      margin-left: 13%;
-      display: inline-block;
-      span {
-        margin-top: 10%;
-      }
+    margin-top: 20px;
+    margin-bottom: 20px;
+    & > div:first-child {
+      text-align: right;
+      padding-right: 10px;
+      line-height: 3.5;
     }
-
+    & > div + div > * {
+      margin-right: 8px;
+    }
     .code-editor {
       width: 60%;
-      border: none;
-      margin-top: 20px;
-      margin-left: 18.8%;
-      display: inline-block;
+      margin-left: 1%;
+    }
+  }
+  .connents {
+    .text {
+      text-align: right;
+    }
+    .textArea {
+      margin-left: 1%;
     }
   }
   .operation {
-    height: 60px;
-    background-color: #fff;
-    border-bottom: 1px solid #ccc;
+    margin-left: 17.5%;
+    margin-top: 30px;
     .close {
-      margin: 15px 10px 10px 19%;
+      margin-right: 10px;
     }
   }
  }
