@@ -12,22 +12,31 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Input, Icon, Table } from 'antd'
+import { Button, Input, Icon, Table, notification } from 'antd'
 import classNames from 'classnames'
-import { parse as parseQuerystring } from 'query-string'
+import {
+  delManualrule,
+} from '../../../../../actions/msa'
 import './style/index.less'
-import { getMsaList } from '../../../../../actions/msa'
 
 const Search = Input.Search
 
 class MsaDetailList extends React.Component {
-  componentDidMount() {
-    const { getMsaList, clusterID, name } = this.props
-    getMsaList(clusterID, { name })
+  removeRegister = record => {
+    const { delManualrule, clusterID, loadMsaDetail } = this.props
+    delManualrule(clusterID, record.id).then(res => {
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '移除注册成功',
+      })
+      loadMsaDetail()
+    })
   }
 
   render() {
-    const { instancesList } = this.props
+    const { instances } = this.props
     const pagination = {
       simple: true,
     }
@@ -70,15 +79,18 @@ class MsaDetailList extends React.Component {
       render: record => {
         return (
           <div>
-            {
+            {/* {
               record.type === 'automatic' && (
                 record.discoverable
                   ? <Button>隐藏服务</Button>
                   : <Button>取消隐藏</Button>
               )
-            }
+            } */}
             {
-              record.type !== 'automatic' ? <Button>移除注册</Button> : ''
+              record.type !== 'automatic' &&
+              <Button onClick={this.removeRegister.bind(this, record)}>
+              移除注册
+              </Button>
             }
           </div>
         )
@@ -94,25 +106,18 @@ class MsaDetailList extends React.Component {
           className="msaDetailList-table"
           pagination={pagination}
           columns={columns}
-          dataSource={instancesList} />
+          dataSource={instances}
+          rowKey={row => row.instanceId}
+        />
       </div>
     )
   }
 }
 
-const mapStateToProps = state => {
-  const { current, msa, routing } = state
-  const { id } = current.config.cluster
-  const { msaList } = msa
-  const { search } = routing.location
-  const { name } = parseQuerystring(search)
-  return {
-    clusterID: id,
-    name,
-    instancesList: msaList && msaList.data && msaList.data[0].instances || [],
-  }
+const mapStateToProps = () => {
+  return {}
 }
 
 export default connect(mapStateToProps, {
-  getMsaList,
+  delManualrule,
 })(MsaDetailList)

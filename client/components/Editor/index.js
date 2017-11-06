@@ -50,7 +50,7 @@ export default class Editor extends React.Component {
   }
 
   render() {
-    let { title, options, ...otherProps } = this.props
+    let { title, options, onChange, ...otherProps } = this.props
     const { value } = this.state
     options = options || {}
     options.theme = 'monokai'
@@ -79,6 +79,7 @@ export default class Editor extends React.Component {
           value={value}
           onBeforeChange={(editor, data, value) => {
             this.setState({ value })
+            onChange && onChange(value)
           }}
         />
       </div>

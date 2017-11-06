@@ -40,6 +40,7 @@ const FormItem = Form.Item
 class RegisterMsa extends React.Component {
   state = {
     ping: {},
+    submitLoading: false,
   }
 
   uuid = 0
@@ -56,6 +57,9 @@ class RegisterMsa extends React.Component {
       if (err) {
         return
       }
+      this.setState({
+        submitLoading: true,
+      })
       const { appName, keys } = values
       const body = keys.map(k => {
         const host = getFieldValue(`host-${k}`)
@@ -70,6 +74,9 @@ class RegisterMsa extends React.Component {
         }
       })
       addManualrule(clusterID, body).then(res => {
+        this.setState({
+          submitLoading: false,
+        })
         if (res.error) {
           return
         }

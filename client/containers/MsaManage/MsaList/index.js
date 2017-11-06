@@ -12,8 +12,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, Icon, Input, Table, Card, notification } from 'antd'
-import './style/msaList.less'
+import { Button, Icon, Input, Table, Card, notification, Tooltip } from 'antd'
 import classNames from 'classnames'
 import {
   getMsaList,
@@ -21,8 +20,12 @@ import {
   addManualrule,
 } from '../../../actions/msa'
 import {
+  msaListSlt,
+} from '../../../selectors/msa'
+import {
   MSA_RULE_EXP,
 } from '../../../constants'
+import './style/msaList.less'
 
 const Search = Input.Search
 
@@ -41,7 +44,7 @@ class MsaList extends React.Component {
 
   loadMsaList = () => {
     const { getMsaList, clusterID } = this.props
-    getMsaList(clusterID).then(res => console.log('res', res))
+    getMsaList(clusterID)
   }
 
   hideService = record => {
@@ -61,13 +64,23 @@ class MsaList extends React.Component {
     })
   }
 
-  cancelHideService = record => console.log(record)
+  cancelHideService = record => {
+    const { delManualrule, clusterID } = this.props
+    delManualrule(clusterID, record.instances[0].id).then(res => {
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '取消隐藏成功',
+      })
+      this.loadMsaList()
+    })
+  }
 
   removeRegister = record => {
     const { delManualrule, clusterID } = this.props
     const ruleIds = record.instances.map(instance => instance.id)
     delManualrule(clusterID, ruleIds).then(res => {
-      console.log('res', res)
       if (res.error) {
         return
       }
@@ -84,11 +97,21 @@ class MsaList extends React.Component {
       title: '微服务名称',
       dataIndex: 'serviceName',
       width: '20%',
-      render: text => <Link to={`/msa-manage/detail/${text}?name=${text}`}>{text}</Link>,
+      render: (text, record) => {
+        if (record.discoverable) {
+          return <Link to={`/msa-manage/detail/${text}`}>{text}</Link>
+        }
+        return (
+          <Tooltip title="不可被发现">
+            <span>{text}</span>
+          </Tooltip>
+        )
+      },
     }, {
       title: '服务状态',
-      dataIndex: 'status',
+      dataIndex: 'upSum',
       width: '20%',
+      render: (text, record) => `${text}/${record.instances.length}`,
     }, {
       title: '注册类型',
       dataIndex: 'type',
@@ -125,7 +148,9 @@ class MsaList extends React.Component {
             }
             {
               record.type !== 'automatic' &&
-              <Button onClick={this.removeRegister.bind(this, record)}>移除注册</Button>
+              <Button onClick={this.removeRegister.bind(this, record)}>
+              移除注册
+              </Button>
             }
           </div>
         )
@@ -171,28 +196,11 @@ class MsaList extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current, msa } = state
+  const { current } = state
   const { id } = current.config.cluster
-  const msaList = msa.msaList || {}
-  function getServiceStatus(data) {
-    // if (!data.length) result
-    let upNum = 0
-    data.forEach(item => {
-      if (item.status === 'UP') {
-        upNum++
-      }
-    })
-    return `${upNum}/${data.length}`
-  }
-  function formateList(source) {
-    return source.map(item => {
-      return Object.assign(item, { status: getServiceStatus(item.instances) })
-    })
-  }
   return {
     clusterID: id,
-    msaList: formateList(msaList.data || []), // 部署完此方法可删掉，直接取store里面的masList
-    msaListLoading: msaList.isFetching,
+    ...msaListSlt(state),
   }
 }
 

@@ -11,19 +11,36 @@
  */
 import React from 'react'
 import { Row, Col, Tabs } from 'antd'
-import './style/index.less'
+import { connect } from 'react-redux'
+import { getMsaList } from '../../../../actions/msa'
+import {
+  msaListSlt,
+} from '../../../../selectors/msa'
 import MsaDetailList from './MsaDetailList'
 import MsaDetailEnv from './MsaDetailEnv'
 import MsaDetailConfig from './MsadetailConfig'
 import MsaDetailLogs from './MsaDetailLogs'
+import './style/index.less'
 
 const TabPane = Tabs.TabPane
 
-export default class MsaDetail extends React.Component {
+class MsaDetail extends React.Component {
   callback = key => {
     console.log(key)
   }
+
+  loadMsaDetail = () => {
+    const { getMsaList, clusterID, name } = this.props
+    getMsaList(clusterID, { name })
+  }
+
+  componentDidMount() {
+    this.loadMsaDetail()
+  }
+
   render() {
+    const { name, msaDetail, clusterID } = this.props
+    const instances = msaDetail.instances || []
     return (
       <div className="msa-detail">
         <Row className="msa-detail-header">
@@ -32,23 +49,31 @@ export default class MsaDetail extends React.Component {
           </Col>
           <Col span={21} className="msa-detail-header-right">
             <div className="msa-detail-header-name">
-              APPinCPKuService
+              {msaDetail.serviceName}
             </div>
             <div className="msa-detail-header-address">
-              服务地址：https://10.123.12.133:9003/
+              服务地址：-
             </div>
             <div className="msa-detail-header-time">
-              注册时间：2017.07.08
+              注册时间：-
             </div>
             <div className="msa-detail-header-status">
               实例状态：
-              <span className="success-status">在线/</span>
-              失败（12/13）
+              <span className="success-status">在线</span>/总数
+              （{<span className="success-status">{msaDetail.upSum}</span>}/
+              {instances.length}）
             </div>
           </Col>
         </Row>
         <Tabs className="msa-detail-tabs" defaultActiveKey="1" onChange={this.callback}>
-          <TabPane tab="实例列表" key="1"><MsaDetailList/></TabPane>
+          <TabPane tab="实例列表" key="1">
+            <MsaDetailList
+              name={name}
+              instances={instances}
+              loadMsaDetail={this.loadMsaDetail}
+              clusterID={clusterID}
+            />
+          </TabPane>
           <TabPane tab="环境信息" key="2"><MsaDetailEnv/></TabPane>
           <TabPane tab="日志信息" key="3" disabled><MsaDetailLogs/></TabPane>
           <TabPane tab="监控" key="4" disabled>
@@ -60,3 +85,21 @@ export default class MsaDetail extends React.Component {
     )
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const { current } = state
+  const { id } = current.config.cluster
+  const { match } = ownProps
+  const { name } = match.params
+  const { msaList } = msaListSlt(state)
+  const msaDetail = msaList[0] || {}
+  return {
+    clusterID: id,
+    name,
+    msaDetail,
+  }
+}
+
+export default connect(mapStateToProps, {
+  getMsaList,
+})(MsaDetail)

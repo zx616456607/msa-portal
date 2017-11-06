@@ -19,12 +19,23 @@ import { Row, Button, Select, Input } from 'antd'
 class CreateConfig extends React.Component {
   state = {
     detal: false,
+    value: 'kind: Deployment',
   }
   componentWillMount() {
     const hash = this.props.location.hash.split('=')
     this.setState({
       detal: hash[1],
     })
+    setTimeout(() => {
+      this.setState({
+        value: 'ddddddddddddddd',
+      })
+    }, 2000)
+    setTimeout(() => {
+      this.setState({
+        value: '1111111111',
+      })
+    }, 5000)
   }
   render() {
     const { detal } = this.state
@@ -42,7 +53,7 @@ class CreateConfig extends React.Component {
           <div className="text">
             <span>配置内容</span>
           </div>
-          <YamlEditor className="yaml" value="kind: Deployment"/>
+          <YamlEditor className="yaml" value={this.state.value} />
         </div>
         <div className="operation">
           {
