@@ -75,7 +75,7 @@ class MsaConfig extends React.Component {
       })
       return
     }
-    const namespace = project.namespace === 'defalt' ? '' : project.namespace
+    const namespace = project.namespace === 'default' ? '' : project.namespace
     installMsaConfig(body, cluster.id, namespace).then(res => {
       if (res.error) return
       this.play()
