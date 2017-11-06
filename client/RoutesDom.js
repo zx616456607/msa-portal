@@ -80,7 +80,7 @@ export const msaManageChildRoutes = [
     key: 'register',
   },
   {
-    path: '/msa-manage/detail/:id',
+    path: '/msa-manage/detail/:name',
     exact: true,
     component: MsaDetail,
     key: 'msa-detail',
@@ -184,17 +184,18 @@ export const settingChildRoutes = [
   {
     path: '/setting',
     exact: true,
-    render: () => <Redirect to="/setting/apms" component={ApmSetting} />,
+    render: () => <Redirect to="/setting/msa-config" component={MsaConfig} />,
     key: 'index',
+  },
+  {
+    path: '/setting/msa-config',
+    component: MsaConfig,
+    exact: true,
+    key: 'apms',
   },
   {
     path: '/setting/apms',
     component: ApmSetting,
-    exact: true,
-    key: 'apms',
-  }, {
-    path: '/setting/msa-config',
-    component: MsaConfig,
     exact: true,
     key: 'apms',
   },
