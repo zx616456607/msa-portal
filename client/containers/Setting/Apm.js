@@ -268,7 +268,6 @@ class ApmSetting extends React.Component {
   render() {
     const { percent, installSate, apmState, serviceData, state } = this.state
     const { projectID } = this.props
-    console.log(state)
     return (
       <Row className="layout-content-btns">
         <div className="header" style={{ marginRight: 0 }}>
