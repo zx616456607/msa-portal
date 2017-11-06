@@ -9,7 +9,7 @@
  * @author zhangpc
  * @date 2017-11-06
  */
-import url from 'url'
+const url = require('url')
 
 const { env } = process
 const api = env.API || 'http://192.168.1.103:48000'
