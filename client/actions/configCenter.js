@@ -13,7 +13,7 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 
-const { SPRING_CLOUD_API_URL } = API_CONFIG
+const { MSA_API_URL } = API_CONFIG
 
 export const CENTER_SERVICE_URL_REQUEST = 'CENTER_SERVICE_URL_REQUEST'
 export const CENTER_SERVICE_URL_SUCCESS = 'CENTER_SERVICE_URL_SUCCESS'
@@ -24,7 +24,7 @@ const fetchServiceUrl = clusterId => {
     clusterId,
     [CALL_API]: {
       types: [ CENTER_SERVICE_URL_REQUEST, CENTER_SERVICE_URL_SUCCESS, CENTER_SERVICE_URL_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${clusterId}/configserver/env`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/configserver/env`,
       schema: {},
       options: {
         method: 'GET',
@@ -46,7 +46,7 @@ const fetchBranch = query => {
     query,
     [CALL_API]: {
       types: [ CENTER_BRANCH_LIST_REQUEST, CENTER_BRANCH_LIST_SUCCESS, CENTER_BRANCH_LIST_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${query.clusterId}/configserver/branches?project_url=${query.url}`,
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/branches?project_url=${query.url}`,
       schema: {},
       options: {
         method: 'GET',
@@ -68,7 +68,7 @@ const fetchCenterEvn = query => {
     query,
     [CALL_API]: {
       types: [ CENTER_SERVICE_INFO_REQUEST, CENTER_SERVICE_INFO_SUCCESS, CENTER_SERVICE_INFO_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}`,
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}`,
       schema: {},
       options: {
         method: 'GET',
@@ -90,7 +90,7 @@ const fetchCenterConfig = query => {
     query,
     [CALL_API]: {
       types: [ CENTER_CONFIG_INFO_REQUEST, CENTER_CONGIG_INFO_SUCCESS, CENTER_CONFIG_INFO_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${query.clusterId}/configserver/files/${query.id}?project_url=${query.url}`,
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files/${query.id}?project_url=${query.url}`,
       schema: {},
       options: {
         method: 'GET',
@@ -112,7 +112,7 @@ const DeleteCenter = query => {
     query,
     [CALL_API]: {
       types: [ CENTER_DELETE_REQUEST, CENTER_DELETE_SUCCESS, CENTER_DELETE_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
       schema: {},
       options: {
         method: 'DELETE',
@@ -134,7 +134,7 @@ const UpdateCenter = query => {
     query,
     [CALL_API]: {
       types: [ CENTER_UPDATE_REQUEST, CENTER_UPDATE_SUCCESS, CENTER_UPDATE_FAILURE ],
-      endpoint: `${SPRING_CLOUD_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
       schema: {},
       options: {
         method: 'PUT',

@@ -14,21 +14,24 @@ const isProd = process.env.NODE_ENV === 'production'
 
 /* api config */
 // dev api config
-const API_PROTOCOL = isProd ? 'http:' : 'http:'
-const API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
-const API_PREFIX = '/api/v2'
-const SPI_PREFIX = '/spi/v2'
-const API_URL = `${API_PROTOCOL}//${API_HOST}${API_PREFIX}`
-const SPI_URL = `${API_PROTOCOL}//${API_HOST}${SPI_PREFIX}`
-const SPRING_CLOUD_API_URL = 'http://192.168.1.58:8000/api/v1'
+const PASS_API_PROTOCOL = isProd ? 'http:' : 'http:'
+const PASS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
+const PASS_API_PREFIX = '/api/v2'
+const PASS_SPI_PREFIX = '/spi/v2'
+const PASS_API_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_API_PREFIX}`
+const PASS_SPI_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_SPI_PREFIX}`
+const MSA_API = 'http://192.168.1.58:8000'
+const MSA_API_PREFIX = '/api/v1'
+const MSA_API_URL = MSA_API + MSA_API_PREFIX
 let apiConfig = {
-  API_PROTOCOL,
-  API_HOST,
-  API_PREFIX,
-  SPI_PREFIX,
-  API_URL,
-  SPI_URL,
-  SPRING_CLOUD_API_URL,
+  PASS_API_PROTOCOL,
+  PASS_API_HOST,
+  PASS_API_PREFIX,
+  PASS_SPI_PREFIX,
+  PASS_API_URL,
+  PASS_SPI_URL,
+  MSA_API_PREFIX,
+  MSA_API_URL,
 }
 // prod api config
 if (isProd) {

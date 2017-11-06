@@ -11,17 +11,30 @@
  */
 const url = require('url')
 
+// get config from env for prod
 const { env } = process
-const api = env.API || 'http://192.168.1.103:48000'
+const api = env.PAAS_API || 'http://192.168.1.103:48000'
 const {
-  protocol: API_PROTOCOL,
-  host: API_HOST,
+  protocol: PASS_API_PROTOCOL,
+  host: PASS_API_HOST,
 } = url.parse(api)
-const API_PREFIX = env.API_PREFIX || '/api/v2'
-const SPI_PREFIX = env.SPI_PREFIX || '/spi/v2'
-const API_URL = `${API_PROTOCOL}//${API_HOST}${API_PREFIX}`
-const SPI_URL = `${API_PROTOCOL}//${API_HOST}${SPI_PREFIX}`
-const SPRING_CLOUD_API_URL = env.SPRING_CLOUD_API_URL || 'http://192.168.1.58:8000/api/v1'
+const PASS_API_PREFIX = env.PASS_API_PREFIX || '/api/v2'
+const PASS_SPI_PREFIX = env.PASS_SPI_PREFIX || '/spi/v2'
+const PASS_API_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_API_PREFIX}`
+const PASS_SPI_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_SPI_PREFIX}`
+const MSA_API = env.MSA_API || 'http://192.168.1.58:8000'
+const MSA_API_PREFIX = env.MSA_API_PREFIX || '/api/v1'
+const MSA_API_URL = MSA_API + MSA_API_PREFIX
+const initialConfig = {
+  PASS_API_PROTOCOL,
+  PASS_API_HOST,
+  PASS_API_PREFIX,
+  PASS_SPI_PREFIX,
+  PASS_API_URL,
+  PASS_SPI_URL,
+  MSA_API_PREFIX,
+  MSA_API_URL,
+}
 
 const config = {
   port: 8989,
@@ -35,15 +48,7 @@ const config = {
     level: 'debug' || env.LOG_LEVEL,
     ignoreUrlReg: /^\/(favicon\.ico|__webpack_hmr|img\/|public\/)/i,
   },
-  initialConfig: {
-    API_PROTOCOL,
-    API_HOST,
-    API_PREFIX,
-    SPI_PREFIX,
-    API_URL,
-    SPI_URL,
-    SPRING_CLOUD_API_URL,
-  },
+  initialConfig,
 }
 
 module.exports = config

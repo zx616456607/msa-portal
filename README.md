@@ -9,10 +9,11 @@ Node.js >= 7.6.0 required.
 变量名 | 默认值 | 说明 | 可选值
 ---|---|---|---
 NODE_ENV | `'development'` | Node 运行模式 | `'development'`, `'staging'`, `'production'`
-API | `'http://192.168.1.103:48000'` | api 地址 |
-API_PREFIX | `'/api/v2'` | api 前缀 |
-SPI_PREFIX | `'/spi/v2'` | spi 前缀 |
-SPRING_CLOUD_API_URL | `'http://192.168.1.58:8000/api/v1'` | spring cloud api url |
+PAAS_API | `'http://192.168.1.103:48000'` | pass api 地址 |
+PAAS_API_PREFIX | `'/api/v2'` | pass api 前缀 |
+PAAS_SPI_PREFIX | `'/spi/v2'` | pass spi 前缀 |
+MSA_API | `'http://192.168.1.58:8000'` | spring cloud api 地址 |
+MSA_API_PREFIX | `'/api/v1'` | pass api 前缀 |
 
 ### 项目结构
 ```
