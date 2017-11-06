@@ -11,62 +11,66 @@
  */
 
 import React from 'react'
-import { Button, Icon, Table } from 'antd'
+import { Button, Table } from 'antd'
+import { connect } from 'react-redux'
+import {
+  getMsaEnv,
+} from '../../../../../actions/msa'
 import './style/index.less'
 
-export default class MsaDetailEnv extends React.Component {
+class MsaDetailEnv extends React.Component {
+  loadMsaEnv = () => {
+    const { getMsaEnv, clusterID, name, instances } = this.props
+    getMsaEnv(clusterID, `${name}:${instances[0].port}`)
+  }
+
+  componentDidMount() {
+    this.loadMsaEnv()
+  }
+
   render() {
+    const { msaEnv } = this.props
+    const { isFetching: loading, data } = msaEnv
+    const dataKeys = Object.keys(data || {})
+    const dataSource = dataKeys.map(key => ({
+      key,
+      value: data[key],
+    }))
     const columns = [{
       title: 'key',
-      dataIndex: 'keys',
+      dataIndex: 'key',
       width: '40%',
     }, {
       title: 'value',
       dataIndex: 'value',
       width: '60%',
     }]
-    const data = [{
-      key: '1',
-      keys: 'profiles',
-      value: '[]',
-    }, {
-      key: '2',
-      keys: 'service.ports',
-      value: '{local.server.port:9003}',
-    }, {
-      key: '3',
-      keys: 'configService:configClient',
-      value: '{config.client.version:"asdfgghjjllfadfafsdfasdfadsf"}',
-    }, {
-      key: '4',
-      keys: 'commandLineArgs',
-      value: '{"spring.output.ansi.enabled":"always"}',
-    }, {
-      key: '5',
-      keys: 'systemProfiles',
-      value: '{\ncom.sun.management.jmxremote.authenticate:false,\n' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name:Java(TM) SE Runtime Environment' +
-      'java.runtime.name: Java(TM) SE Runtime Environment' +
-      '}',
-    }]
     return (
       <div className="msaDetailEnv">
         <div className="layout-content-btns">
-          <Button type="primary"><Icon type="sync"/>刷新</Button>
+          <Button onClick={this.loadMsaEnv} type="primary" icon="sync">
+            刷新
+          </Button>
         </div>
         <Table
           bordered
           className="msaDetailEnv-table"
           pagination={false}
           columns={columns}
-          dataSource={data} />
+          dataSource={dataSource}
+          loading={loading}
+        />
       </div>
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    msaEnv: state.msa.msaEnv || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  getMsaEnv,
+})(MsaDetailEnv)

@@ -105,3 +105,28 @@ export function delManualrule(clusterID, ruleIDs) {
     return dispatch(fetchDelManualrule(clusterID, ruleIDs))
   }
 }
+
+export const MSA_ENV_REQUEST = 'MSA_ENV_REQUEST'
+export const MSA_ENV_SUCCESS = 'MSA_ENV_SUCCESS'
+export const MSA_ENV_FAILURE = 'MSA_ENV_FAILURE'
+
+// Fetches a page of msa.
+const fetchMsaEnv = (clusterID, serviceName) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceName}/env`
+  /* if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  } */
+  return {
+    [CALL_API]: {
+      types: [ MSA_ENV_REQUEST, MSA_ENV_SUCCESS, MSA_ENV_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+
+export function getMsaEnv(clusterID, serviceName) {
+  return dispatch => {
+    return dispatch(fetchMsaEnv(clusterID, serviceName))
+  }
+}

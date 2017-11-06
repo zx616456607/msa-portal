@@ -31,6 +31,8 @@ const callApi = (endpoint, options, schema) => {
     delete options.isSpi
   }
 
+  fullUrl = encodeURI(fullUrl)
+
   if (options.method) {
     options.method = options.method.toUpperCase()
   }
