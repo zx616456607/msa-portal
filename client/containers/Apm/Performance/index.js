@@ -56,6 +56,7 @@ class Performance extends React.Component {
     isRowData: false,
     sTimer: '',
     customTimer: '',
+    nodeName: [],
   }
 
   componentWillMount() {
@@ -330,34 +331,48 @@ class Performance extends React.Component {
     }
   }
 
+  nodeData = () => {
+    const { serviceName } = this.state
+    const { serverName } = this.props
+    const nodeName = []
+    if (serverName !== undefined && serviceName) {
+      const nodeData = serverName[serviceName]
+      if (nodeData !== undefined) {
+        if (nodeData.isFetching === false) {
+          if (nodeData.applicationMapData.nodeDataArray.length > 0) {
+            nodeData.applicationMapData.nodeDataArray.forEach(item => {
+              if (item.applicationName === serviceName) {
+                if (Object.keys(item.agentHistogram).length !== 0) {
+                  for (const node in item.agentHistogram) {
+                    nodeName.push(node)
+                  }
+                  this.setState({
+                    nodeName,
+                  })
+                }
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+
   render() {
     const {
       isTimerShow,
       timer,
       exampleData,
       agentData,
-      serviceName,
       heapData,
       cpuData,
       gcData,
       tranData,
       isRowData,
+      nodeName,
     } = this.state
-    const { apps, serverName } = this.props
-    const nodeName = []
-    const nodeData = serverName === undefined ? '' : serverName[serviceName]
-    nodeData === undefined ? null : nodeData !== undefined ? nodeData.isFetching === false ?
-      nodeData.applicationMapData.nodeDataArray.length > 0 ?
-        nodeData.applicationMapData.nodeDataArray.forEach(item => {
-          if (item.applicationName === serviceName) {
-            if (Object.keys(item.agentHistogram).length !== 0) {
-              for (const node in item.agentHistogram) {
-                nodeName.push(node)
-              }
-            }
-          }
-        }) : '' : '' : ''
-
+    const { apps } = this.props
+    this.nodeData()
     const Charts = chart => {
       chart.line().position('time*count')
       chart.forceFit(true)

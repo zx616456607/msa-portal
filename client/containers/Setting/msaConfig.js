@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import './style/msaConfig.less'
 import { getMsaState, installMsaConfig, uninstallMsaConfig } from '../../actions/msaConfig'
-import { Row, Col, Select, Button, Progress, Icon, Modal, Input, notification } from 'antd'
+import { Row, Col, Select, Button, Icon, Modal, Input, notification } from 'antd'
 const Option = Select.Option
 
 class MsaConfig extends React.Component {
@@ -123,7 +123,7 @@ class MsaConfig extends React.Component {
   }
 
   render() {
-    const { percent, installSate, msaState } = this.state
+    const { msaState } = this.state
     return (
       <div className="layout-content-btns">
         <div className="title" style={{ marginRight: 0 }}>
@@ -163,12 +163,7 @@ class MsaConfig extends React.Component {
                       <span className="existence" >已安装</span>
                       <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
                     </Row> :
-                    installSate ?
-                      <Row className="loding">
-                        <span>安装中</span>
-                        <Progress percent={percent} showInfo={false} status="active"></Progress>
-                      </Row> :
-                      <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                    <Button type="primary" onClick={this.handleInstall}>安装</Button>
                 }
               </Col>
             </Row>
