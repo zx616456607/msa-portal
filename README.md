@@ -212,7 +212,7 @@ export default connect(mapStateToProps, {
 
 每个子标签必须带 key，如果未设置 key 将不执行动画。
 
-```jsx
+```js
 import QueueAnim from 'rc-queue-anim'
 
 export default class Apm extends React.Component {
