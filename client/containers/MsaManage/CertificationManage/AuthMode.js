@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Card, Table } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import './style/AuthMode.less'
 
 export default class AuthMode extends React.Component {
@@ -56,13 +57,15 @@ export default class AuthMode extends React.Component {
       },
     ]
     return (
-      <Card className="auth-mode">
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-        />
-      </Card>
+      <QueueAnim>
+        <Card className="auth-mode" key="bdoy" noHovering>
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+          />
+        </Card>
+      </QueueAnim>
     )
   }
 }

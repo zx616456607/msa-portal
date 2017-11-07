@@ -116,8 +116,8 @@ export const MSA_ENV_SUCCESS = 'MSA_ENV_SUCCESS'
 export const MSA_ENV_FAILURE = 'MSA_ENV_FAILURE'
 
 // Fetches a page of msa.
-const fetchMsaEnv = (clusterID, serviceName) => {
-  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceName}/env`
+const fetchMsaEnv = (clusterID, serviceInfo) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/env`
   /* if (query) {
     endpoint += `?${toQuerystring(query)}`
   } */
@@ -130,8 +130,33 @@ const fetchMsaEnv = (clusterID, serviceName) => {
   }
 }
 
-export function getMsaEnv(clusterID, serviceName) {
+export function getMsaEnv(clusterID, serviceInfo) {
   return dispatch => {
-    return dispatch(fetchMsaEnv(clusterID, serviceName))
+    return dispatch(fetchMsaEnv(clusterID, serviceInfo))
+  }
+}
+
+export const MSA_CONFIG_REQUEST = 'MSA_CONFIG_REQUEST'
+export const MSA_CONFIG_SUCCESS = 'MSA_CONFIG_SUCCESS'
+export const MSA_CONFIG_FAILURE = 'MSA_CONFIG_FAILURE'
+
+// Fetches a page of msa.
+const fetchMsaConfig = (clusterID, serviceInfo) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/config`
+  /* if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  } */
+  return {
+    [CALL_API]: {
+      types: [ MSA_CONFIG_REQUEST, MSA_CONFIG_SUCCESS, MSA_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+
+export function getMsaConfig(clusterID, serviceInfo) {
+  return dispatch => {
+    return dispatch(fetchMsaConfig(clusterID, serviceInfo))
   }
 }

@@ -10,10 +10,13 @@
  * @author zhangxuan
  */
 import React from 'react'
-import { Button, Icon, Input, Table, Dropdown, Menu } from 'antd'
-const Search = Input.Search
+import QueueAnim from 'rc-queue-anim'
+import { Button, Icon, Input, Table, Dropdown, Menu, Card } from 'antd'
 import './style/index.less'
 import RoutingRule from './RoutingRule'
+
+const Search = Input.Search
+
 export default class RoutingManage extends React.Component {
   state = {
     ruleModal: false,
@@ -119,8 +122,8 @@ export default class RoutingManage extends React.Component {
       simple: true,
     }
     return (
-      <div className="router-manage">
-        <div className="router-manage-btn-box layout-content-btns">
+      <QueueAnim className="router-manage">
+        <div className="router-manage-btn-box layout-content-btns" key="btns">
           <Button type="primary" onClick={this.addRoutingRule}><Icon type="plus"/>添加路由</Button>
           <Button><Icon type="sync"/>刷新</Button>
           <Button><Icon type="delete"/>删除</Button>
@@ -130,13 +133,18 @@ export default class RoutingManage extends React.Component {
           />
         </div>
         <RoutingRule visible={ruleModal} scope={this}/>
-        <Table
-          className="router-manage-table"
-          pagination={pagination}
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data} />
-      </div>
+        <div className="layout-content-body" key="body">
+          <Card noHovering>
+            <Table
+              className="router-manage-table"
+              pagination={pagination}
+              rowSelection={rowSelection}
+              columns={columns}
+              dataSource={data}
+            />
+          </Card>
+        </div>
+      </QueueAnim>
     )
   }
 }

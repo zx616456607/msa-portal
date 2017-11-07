@@ -22,10 +22,10 @@ export default class Content extends React.Component {
   }
 
   render() {
-    const { children } = this.props
+    const { children, ...otherProps } = this.props
     return (
-      <Layout className="layout-content">
-        <LayoutContent>
+      <Layout className="layout-content" {...otherProps}>
+        <LayoutContent key="layout-content">
           { children }
         </LayoutContent>
       </Layout>

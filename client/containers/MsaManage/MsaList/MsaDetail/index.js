@@ -83,7 +83,13 @@ class MsaDetail extends React.Component {
           <TabPane tab="监控" key="4" disabled>
             <img width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
           </TabPane>
-          <TabPane tab="配置" key="5"><MsaDetailConfig/></TabPane>
+          <TabPane tab="配置" key="5">
+            <MsaDetailConfig
+              name={name}
+              instances={instances}
+              clusterID={clusterID}
+            />
+          </TabPane>
         </Tabs>
       </div>
     )

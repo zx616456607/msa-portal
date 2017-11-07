@@ -148,3 +148,21 @@ export function formatDate(timestamp, format) {
   }
   return moment(timestamp).format(format)
 }
+
+/**
+ * Scroll to top
+ *
+ * @export
+ * @param {string} selector date
+ * @return {any} undefined
+ */
+export function scrollToTop(selector) {
+  if (typeof window !== 'undefined') {
+    if (!selector) {
+      return window.scrollTo(0, 0)
+    }
+    // IE, Edge, UC not support `scrollTo` in other element except `window`
+    const target = document.querySelector(selector)
+    target && (target.scrollTop = 0)
+  }
+}

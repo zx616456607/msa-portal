@@ -12,8 +12,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import QueueAnim from 'rc-queue-anim'
 import './style/apiGateway.less'
-import { Button, Icon, Table, Pagination, Modal, Dropdown, Row, Input, Menu, Select, Switch, InputNumber } from 'antd'
+import { Button, Icon, Table, Pagination, Modal, Dropdown, Card, Input, Menu, Select, Switch, InputNumber } from 'antd'
 const Search = Input.Search
 
 class ApiGateway extends React.Component {
@@ -110,9 +111,9 @@ class ApiGateway extends React.Component {
     }
 
     return (
-      <Row className="layout-content-btns">
-        <div className="top" style={{ marginRight: 0 }}>
-          <Button className="add" type="primary" onClick={() => this.handleAdd()}>
+      <QueueAnim className="api-gateway">
+        <div className="layout-content-btns" key="btns">
+          <Button type="primary" onClick={() => this.handleAdd()}>
             <Icon type="plus" style={{ color: '#fff' }} />
             <span style={{ color: '#fff' }}>添加限流规则</span>
           </Button>
@@ -120,7 +121,7 @@ class ApiGateway extends React.Component {
             <Icon type="sync" />
             <span>刷新</span>
           </Button>
-          <Button className="del">
+          <Button>
             <Icon type="delete" />
             <span>删除</span>
           </Button>
@@ -134,13 +135,15 @@ class ApiGateway extends React.Component {
             <Pagination simple defaultCurrent={0} total={5} />
           </div>
         </div>
-        <div className="bottom">
-          <Table
-            rowSelection={rowSelection}
-            columns={columns}
-            dataSource={data}
-            pagination={false}
-          />
+        <div className="layout-content-body" key="body">
+          <Card noHovering>
+            <Table
+              rowSelection={rowSelection}
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+            />
+          </Card>
         </div>
         <Modal
           title="添加限流规则"
@@ -175,7 +178,7 @@ class ApiGateway extends React.Component {
             </li>
           </ul>
         </Modal>
-      </Row>
+      </QueueAnim>
     )
   }
 }

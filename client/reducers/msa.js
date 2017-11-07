@@ -41,7 +41,6 @@ const msaEnv = (state = {}, action) => {
   switch (type) {
     case ActionTypes.MSA_ENV_REQUEST:
       return {
-        ...state,
         isFetching: true,
       }
     case ActionTypes.MSA_ENV_SUCCESS:
@@ -59,13 +58,37 @@ const msaEnv = (state = {}, action) => {
   }
 }
 
+const msaConfig = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.MSA_CONFIG_REQUEST:
+      return {
+        isFetching: true,
+      }
+    case ActionTypes.MSA_CONFIG_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ...action.response.result,
+      }
+    case ActionTypes.MSA_CONFIG_FAILURE:
+      return {
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
   msaEnv: {},
+  msaConfig: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
     msaEnv: msaEnv(state.msaEnv, action),
+    msaConfig: msaConfig(state.msaConfig, action),
   }
 }
 

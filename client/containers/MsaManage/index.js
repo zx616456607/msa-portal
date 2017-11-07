@@ -163,7 +163,7 @@ class MsaManage extends React.Component {
     )
     return (
       <Layout className="msa-manage">
-        <Sider>
+        <Sider key="sider">
           <Card
             className="left-menu-card"
             title={title}
@@ -178,7 +178,7 @@ class MsaManage extends React.Component {
             </Menu>
           </Card>
         </Sider>
-        <Content>
+        <Content key="content">
           {this.renderChildren()}
         </Content>
       </Layout>
