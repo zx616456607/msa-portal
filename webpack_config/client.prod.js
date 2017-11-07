@@ -180,7 +180,7 @@ module.exports = {
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',
-      filename: 'commons.[chunkhash:8].js',
+      filename: 'commons.[hash:8].js',
     }),
     new webpack.NoEmitOnErrorsPlugin(),
   ],
