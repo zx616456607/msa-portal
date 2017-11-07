@@ -11,6 +11,7 @@
  */
 
 import { CALL_API } from '../middleware/api'
+import { Schemas } from '../middleware/schemas'
 import { API_CONFIG } from '../constants'
 import { toQuerystring } from '../common/utils'
 
@@ -30,7 +31,7 @@ const fetchMsaList = (clusterID, query) => {
     [CALL_API]: {
       types: [ MSA_LIST_REQUEST, MSA_LIST_SUCCESS, MSA_LIST_FAILURE ],
       endpoint,
-      schema: {},
+      schema: Schemas.MSALIST_ARRAY_DATA,
     },
   }
 }

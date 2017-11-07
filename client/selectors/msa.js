@@ -13,13 +13,16 @@
 import { createSelector } from 'reselect'
 
 const getMsa = state => state.msa
+const getEntities = state => state.entities
 
 export const msaListSlt = createSelector(
-  [ getMsa ],
-  msa => {
-    const msaList = msa.msaList || {}
+  [ getMsa, getEntities ],
+  (msa, entities) => {
+    const { msaNameList } = msa || {}
+    const { data } = msaNameList || { data: [] }
+    const { msaList } = entities || {}
     function getServiceUpSum(data) {
-      // if (!data.length) result
+      if (!data.length) return
       let upSum = 0
       data.forEach(item => {
         if (item.status === 'UP') {
@@ -34,8 +37,8 @@ export const msaListSlt = createSelector(
       })
     }
     return {
-      msaList: formateList(msaList.data || []),
-      msaListLoading: msaList.isFetching,
+      msaList: formateList(data && data.length && data.map(item => msaList[item]) || []),
+      msaListLoading: msaNameList.isFetching,
     }
   }
 )

@@ -12,7 +12,7 @@
 
 import * as ActionTypes from '../actions/msa'
 
-const msaList = (state = {}, action) => {
+const msaNameList = (state = {}, action) => {
   const { type } = action
   switch (type) {
     case ActionTypes.MSA_LIST_REQUEST:
@@ -60,11 +60,11 @@ const msaEnv = (state = {}, action) => {
 }
 
 const msa = (state = {
-  msaList: {},
+  msaNameList: {},
   msaEnv: {},
 }, action) => {
   return {
-    msaList: msaList(state.msaList, action),
+    msaNameList: msaNameList(state.msaNameList, action),
     msaEnv: msaEnv(state.msaEnv, action),
   }
 }
