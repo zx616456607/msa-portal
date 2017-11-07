@@ -14,7 +14,7 @@ import { normalize } from 'normalizr'
 import { JWT, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring } from '../common/utils'
 
-const { PASS_API_URL, PASS_SPI_URL } = API_CONFIG
+const { PAAS_API_URL, PAAS_SPI_URL } = API_CONFIG
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 const callApi = (endpoint, options, schema) => {
@@ -22,12 +22,12 @@ const callApi = (endpoint, options, schema) => {
   if (/^https?:\/\//.test(endpoint)) {
     fullUrl = endpoint
   } else {
-    fullUrl = PASS_API_URL + endpoint
+    fullUrl = PAAS_API_URL + endpoint
   }
 
   // Support spi
   if (options.isSpi) {
-    fullUrl = (endpoint.indexOf(PASS_SPI_URL) === -1) ? PASS_SPI_URL + endpoint : endpoint
+    fullUrl = (endpoint.indexOf(PAAS_SPI_URL) === -1) ? PAAS_SPI_URL + endpoint : endpoint
     delete options.isSpi
   }
 

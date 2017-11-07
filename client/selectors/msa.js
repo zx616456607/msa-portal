@@ -22,7 +22,7 @@ export const msaListSlt = createSelector(
     const { data } = msaNameList || { data: [] }
     const { msaList } = entities || {}
     function getServiceUpSum(data) {
-      if (!data.length) return
+      if (!data.length) return 0
       let upSum = 0
       data.forEach(item => {
         if (item.status === 'UP') {

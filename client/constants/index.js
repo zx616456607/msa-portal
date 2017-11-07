@@ -14,22 +14,22 @@ const isProd = process.env.NODE_ENV === 'production'
 
 /* api config */
 // dev api config
-const PASS_API_PROTOCOL = isProd ? 'http:' : 'http:'
-const PASS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
-const PASS_API_PREFIX = '/api/v2'
-const PASS_SPI_PREFIX = '/spi/v2'
-const PASS_API_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_API_PREFIX}`
-const PASS_SPI_URL = `${PASS_API_PROTOCOL}//${PASS_API_HOST}${PASS_SPI_PREFIX}`
+const PAAS_API_PROTOCOL = isProd ? 'http:' : 'http:'
+const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.103:48000'
+const PAAS_API_PREFIX = '/api/v2'
+const PAAS_SPI_PREFIX = '/spi/v2'
+const PAAS_API_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_API_PREFIX}`
+const PAAS_SPI_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_SPI_PREFIX}`
 const MSA_API = 'http://192.168.1.58:8080'
 const MSA_API_PREFIX = '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
 let apiConfig = {
-  PASS_API_PROTOCOL,
-  PASS_API_HOST,
-  PASS_API_PREFIX,
-  PASS_SPI_PREFIX,
-  PASS_API_URL,
-  PASS_SPI_URL,
+  PAAS_API_PROTOCOL,
+  PAAS_API_HOST,
+  PAAS_API_PREFIX,
+  PAAS_SPI_PREFIX,
+  PAAS_API_URL,
+  PAAS_SPI_URL,
   MSA_API_PREFIX,
   MSA_API_URL,
 }
