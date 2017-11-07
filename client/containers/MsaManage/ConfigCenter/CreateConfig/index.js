@@ -13,6 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/index.less'
+import { parse } from 'query-string'
 import { putCenterConfig, getCenterConfig, getService, getBranchList, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
 import YamlEditor from '../../../../components/Editor/Yaml'
 import { Row, Button, Select, Input, notification, Col, Card } from 'antd'
@@ -32,12 +33,12 @@ class CreateConfig extends React.Component {
     currentYaml: '',
   }
   componentWillMount() {
-    const isDatail = (this.props.location.hash.split('&')[0]).split('=')[1]
+    const { detal } = parse(location.search)
     this.setState({
-      detal: isDatail,
+      detal,
     })
     this.version()
-    if (isDatail === 'true') {
+    if (detal === 'true') {
       this.fetchYaml()
     }
   }
@@ -69,8 +70,9 @@ class CreateConfig extends React.Component {
   fetchYaml = () => {
     const { getCenterConfig, clusterID } = this.props
     const { configGitUrl } = this.state
+    const { id } = parse(location.search)
     const query = {
-      id: /([^=\s]+)=([^=\s]+)/g.exec(this.props.location.hash.split('&')[1])[2],
+      id,
       url: configGitUrl,
       clusterId: clusterID,
     }
@@ -217,7 +219,7 @@ class CreateConfig extends React.Component {
         <Row className="connents">
           <Col className="text" span={4}>添加备注</Col>
           <Col span={20}>
-            <TextArea className="textArea" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
+            <TextArea className="textArea" placeholder="添加一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
           </Col>
         </Row>
         <div className="operation" >
