@@ -21,6 +21,7 @@ import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
 import {
   getCurrentUser,
 } from '../actions/current'
+import { scrollToTop } from '../common/utils'
 import { JWT } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -85,6 +86,13 @@ class App extends React.Component {
     // Scroll to top when pathname change
     if (newLocation.pathname !== oldLocation.pathname) {
       document.body.scrollTop = 0
+    }
+    const { pathname: newPathname, search: newSearch } = newLocation
+    const { pathname: oldPathname, search: oldSearch } = oldLocation
+    const newPath = newPathname + newSearch
+    const oldPath = oldPathname + oldSearch
+    if (newPath !== oldPath) {
+      scrollToTop()
     }
     // Show switch project/cluster
     const switchProjectOrClusterText = '切换项目/集群中 ...'

@@ -12,6 +12,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import QueueAnim from 'rc-queue-anim'
 import { Button, Icon, Input, Table, Card, notification, Tooltip } from 'antd'
 import classNames from 'classnames'
 import {
@@ -168,8 +169,8 @@ class MsaList extends React.Component {
       simple: true,
     }
     return (
-      <div className="msa">
-        <div className="msa-btn-box layout-content-btns">
+      <QueueAnim className="msa">
+        <div className="msa-btn-box layout-content-btns" key="btns">
           <Button type="primary" onClick={this.registerMsa}><Icon type="plus"/>注册微服务</Button>
           <Button icon="poweroff">注销微服务</Button>
           <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
@@ -179,18 +180,20 @@ class MsaList extends React.Component {
           />
           <span className="float-right msa-btn-box-total">共计 {msaList.length} 条</span>
         </div>
-        <Card noHovering>
-          <Table
-            className="msa-table"
-            pagination={pagination}
-            rowSelection={rowSelection}
-            columns={columns}
-            dataSource={msaList}
-            loading={msaListLoading}
-            rowKey={row => row.serviceName}
-          />
-        </Card>
-      </div>
+        <div className="layout-content-body" key="body">
+          <Card noHovering>
+            <Table
+              className="msa-table"
+              pagination={pagination}
+              rowSelection={rowSelection}
+              columns={columns}
+              dataSource={msaList}
+              loading={msaListLoading}
+              rowKey={row => row.serviceName}
+            />
+          </Card>
+        </div>
+      </QueueAnim>
     )
   }
 }

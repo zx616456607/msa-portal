@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Card, Table, Button, Input, Dropdown, Menu } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import AddClientModal from './AddClientModal'
 import './style/index.less'
 
@@ -117,8 +118,8 @@ export default class Clients extends React.Component {
     }
     const { visible } = this.state
     return (
-      <div className="certification-clients">
-        <div className="layout-content-btns">
+      <QueueAnim className="certification-clients">
+        <div className="layout-content-btns" key="btns">
           <Button icon="plus" type="primary" onClick={this.toggleVisible}>
             添加客户端
           </Button>
@@ -133,7 +134,7 @@ export default class Clients extends React.Component {
             style={{ width: 200 }}
           />
         </div>
-        <div className="layout-content-body">
+        <div className="layout-content-body" key="body">
           <Card>
             <Table
               columns={columns}
@@ -147,7 +148,7 @@ export default class Clients extends React.Component {
           onCancel={this.toggleVisible}
           onOk={this.toggleVisible}
         />
-      </div>
+      </QueueAnim>
     )
   }
 }

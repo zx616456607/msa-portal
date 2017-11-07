@@ -11,14 +11,12 @@
  */
 
 import React from 'react'
-import { Row, Col, Select, Button, Icon, Table } from 'antd'
+import { Button, Table } from 'antd'
 import { connect } from 'react-redux'
 import {
-  getMsaEnv,
+  getMsaConfig,
 } from '../../../../../actions/msa'
 import './style/index.less'
-
-const Option = Select.Option
 
 class MsaDetailConfig extends React.Component {
   handleChange = value => {
@@ -26,8 +24,8 @@ class MsaDetailConfig extends React.Component {
   }
 
   loadMsaConfig = () => {
-    // const { getMsaEnv, clusterID, name } = this.props
-    // getMsaEnv(clusterID, name)
+    const { getMsaConfig, clusterID, name, instances } = this.props
+    getMsaConfig(clusterID, `${name}:${instances[0].port}`)
   }
 
   componentDidMount() {
@@ -68,20 +66,9 @@ class MsaDetailConfig extends React.Component {
     }]
     return (
       <div className="msaDetailConfig">
-        <Row type="flex" align="middle">
-          <Col span={2}>
-            版本分支
-          </Col>
-          <Col span={22}>
-            <Select defaultValue="project-1" style={{ width: 320 }} onChange={this.handleChange}>
-              <Option value="project-1">project-1</Option>
-              <Option value="project-2">project-2</Option>
-              <Option value="project-3">project-3</Option>
-              <Option value="project-4">project-4</Option>
-            </Select>
-          </Col>
-        </Row>
-        <Button type="primary" className="msaDetailConfig-refresh"><Icon type="sync"/>刷新</Button>
+        <Button type="primary" icon="sync" onClick={this.loadMsaConfig}>
+        刷新
+        </Button>
         <Table
           className="msaDetailConfig-table"
           pagination={false}
@@ -97,5 +84,5 @@ const mapStateToProps = () => {
 }
 
 export default connect(mapStateToProps, {
-  getMsaEnv,
+  getMsaConfig,
 })(MsaDetailConfig)

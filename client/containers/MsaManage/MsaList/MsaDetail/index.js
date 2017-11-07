@@ -12,6 +12,7 @@
 import React from 'react'
 import { Row, Col, Tabs } from 'antd'
 import { connect } from 'react-redux'
+import QueueAnim from 'rc-queue-anim'
 import { getMsaList } from '../../../../actions/msa'
 import {
   msaListSlt,
@@ -40,8 +41,8 @@ class MsaDetail extends React.Component {
     const { name, msaDetail, clusterID } = this.props
     const instances = msaDetail.instances || []
     return (
-      <div className="msa-detail">
-        <Row className="msa-detail-header">
+      <QueueAnim className="msa-detail">
+        <Row className="msa-detail-header" key="header">
           <Col span={3}>
             <img className="msa-detail-header-icon" src="/img/service/java.svg"/>
           </Col>
@@ -63,7 +64,12 @@ class MsaDetail extends React.Component {
             </div>
           </Col>
         </Row>
-        <Tabs className="msa-detail-tabs" defaultActiveKey="1" onChange={this.callback}>
+        <Tabs
+          className="msa-detail-tabs"
+          defaultActiveKey="1"
+          onChange={this.callback}
+          key="tabs"
+        >
           <TabPane tab="实例列表" key="1">
             <MsaDetailList
               name={name}
@@ -83,9 +89,15 @@ class MsaDetail extends React.Component {
           <TabPane tab="监控" key="4" disabled>
             <img width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
           </TabPane>
-          <TabPane tab="配置" key="5"><MsaDetailConfig/></TabPane>
+          <TabPane tab="配置" key="5">
+            <MsaDetailConfig
+              name={name}
+              instances={instances}
+              clusterID={clusterID}
+            />
+          </TabPane>
         </Tabs>
-      </div>
+      </QueueAnim>
     )
   }
 }

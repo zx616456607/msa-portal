@@ -207,3 +207,26 @@ export default connect(mapStateToProps, {
   loadPPApps,
 })(Apm)
 ```
+
+#### 4.如何写页面进出场动画？
+
+每个子标签必须带 key，如果未设置 key 将不执行动画。
+
+```jsx
+import QueueAnim from 'rc-queue-anim'
+
+export default class Apm extends React.Component {
+  render() {
+    return (
+      <QueueAnim className="apm">
+        <div className="layout-content-btns" key="btns">
+        btn...
+        </div>
+        <div className="layout-content-body" key="body">
+        body...
+        </div>
+      </QueueAnim>
+    )
+  }
+}
+```

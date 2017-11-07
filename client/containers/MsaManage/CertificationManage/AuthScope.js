@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Card, Table } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import './style/AuthScope.less'
 
 export default class AuthScope extends React.Component {
@@ -51,13 +52,15 @@ export default class AuthScope extends React.Component {
       },
     ]
     return (
-      <Card className="auth-scope">
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-        />
-      </Card>
+      <QueueAnim>
+        <Card className="auth-scope" key="body" noHovering>
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+          />
+        </Card>
+      </QueueAnim>
     )
   }
 }

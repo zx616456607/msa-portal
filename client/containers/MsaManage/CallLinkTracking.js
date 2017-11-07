@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Select, Button, Card, Table } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import ApmTimePicker from '../../components/ApmTimePicker'
 import { formatDate } from '../../common/utils'
 import {
@@ -65,8 +66,8 @@ export default class CallLinkTracking extends React.Component {
       key: 'traceId',
     }]
     return (
-      <div className="call-link-tracking">
-        <div className="layout-content-btns">
+      <QueueAnim className="call-link-tracking">
+        <div className="layout-content-btns" key="btns">
           <Select
             showSearch
             style={{ width: 150 }}
@@ -89,7 +90,7 @@ export default class CallLinkTracking extends React.Component {
             <Option value={ALL}>{ALL}</Option>
           </Select>
         </div>
-        <div className="layout-content-body">
+        <div className="layout-content-body" key="body">
           <Card className="call-link-tracking-table">
             <Table
               columns={columns}
@@ -101,7 +102,7 @@ export default class CallLinkTracking extends React.Component {
             />
           </Card>
         </div>
-      </div>
+      </QueueAnim>
     )
   }
 }
