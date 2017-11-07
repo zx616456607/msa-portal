@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/apm.less'
-import { Row, Col, Select, Button, Progress, Modal, Icon } from 'antd'
+import { Row, Col, Select, Button, Modal, Icon } from 'antd'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
@@ -24,6 +24,7 @@ class ApmSetting extends React.Component {
     percent: 0,
     state: '',
     version: '',
+    apmsId: '',
     apmState: false,
     uninstall: false,
     colony: '',
@@ -35,24 +36,43 @@ class ApmSetting extends React.Component {
     installSate: false,
   }
   componentWillMount() {
-    const { loadApms, clusterID } = this.props
-    loadApms(clusterID)
-    this.apmService()
+    const { pinpointName } = this.props
+    if (pinpointName !== '') {
+      this.fetchapmsId()
+      this.apmService()
+    }
     // this.projectList()
   }
-  componentDidMount() {
-    const { getApmState, apmID, clusterID } = this.props
-    const query = {
-      id: apmID,
-      cluster: clusterID,
-    }
-    getApmState(query).then(res => {
+
+  fetchapmsId = () => {
+    const { loadApms, clusterID } = this.props
+    loadApms(clusterID).then(res => {
       if (res.error) return
-      this.setState({
-        state: res.response.result.data ? res.response.result.data.running : '',
-      })
+      if (res.response.result.code === 200) {
+        this.setState({
+          apmsId: res.response.result.data.apms[0],
+        })
+        this.assemblyState(res.response.result.data.apms[0])
+      }
     })
   }
+
+  assemblyState = ids => {
+    const { getApmState, apmID, clusterID } = this.props
+    if (ids) {
+      const query = {
+        id: ids !== '' ? ids : apmID,
+        cluster: clusterID,
+      }
+      getApmState(query).then(res => {
+        if (res.error) return
+        this.setState({
+          state: res.response.result.data ? res.response.result.data.running : '',
+        })
+      })
+    }
+  }
+
   apmService = () => {
     const { clusterID, getApmService } = this.props
     const body = {
@@ -91,21 +111,20 @@ class ApmSetting extends React.Component {
   }
 
   fetchState = data => {
-    if (data === undefined) return
-    // const { serviceData } = this.state
-    const { pinpointName } = this.props
+    const { pinpointName, defaultName } = this.props
+    const nameSpace = pinpointName === 'default' ? defaultName : pinpointName
     const serviceAry = []
     data.forEach(item => {
-      if (item.namespace === pinpointName) {
+      if (item.namespace === nameSpace) {
         const nameAry = {
-          space: pinpointName,
+          space: nameSpace,
           version: JSON.parse(item.configDetail),
         }
         serviceAry.push(nameAry)
       }
     })
     if (serviceAry.length > 0) {
-      if (serviceAry[0].space === pinpointName) {
+      if (serviceAry[0].space === nameSpace) {
         this.setState({
           apmState: true,
           version: serviceAry[0].version,
@@ -141,6 +160,9 @@ class ApmSetting extends React.Component {
     const { clusterID, postApm } = this.props
     const { project } = this.state
     // if (isProject === false) return
+    this.setState({
+      installSate: true,
+    })
     this.play()
     const body = {
       type: 'pinpoint',
@@ -151,10 +173,7 @@ class ApmSetting extends React.Component {
       if (res.error) return
       this.apmService()
       this.projectList()
-      this.setState({
-        installSate: true,
-        apmState: true,
-      })
+      this.fetchapmsId()
     })
   }
 
@@ -199,17 +218,6 @@ class ApmSetting extends React.Component {
     })
   }
 
-  handleColony = value => {
-    const { colony } = this.props
-    colony.forEach(item => {
-      if (item === value) {
-        this.setState({
-          colony: item,
-        })
-      }
-    })
-  }
-
   handleUnload = () => {
     this.setState({
       uninstall: true,
@@ -231,6 +239,8 @@ class ApmSetting extends React.Component {
         installSate: false,
         apmState: false,
         uninstall: false,
+        state: '',
+        version: '',
       })
     })
   }
@@ -256,8 +266,11 @@ class ApmSetting extends React.Component {
       })
       if (i === 90) {
         clearInterval(timer)
+        this.setState({
+          installSate: false,
+        })
       }
-    })
+    }, 100)
   }
   handleCancel = () => {
     this.setState({
@@ -266,8 +279,16 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { percent, installSate, apmState, serviceData, state } = this.state
+    const { apmState, serviceData, state } = this.state
     const { projectID } = this.props
+    let healthy = null
+    if (state !== '') {
+      healthy = state.running ? <span className="desc">健康</span> :
+        <span className="descs">不健康</span>
+    } else {
+      healthy = <span className="descs">未安装</span>
+    }
+
     return (
       <Row className="layout-content-btns">
         <div className="header" style={{ marginRight: 0 }}>
@@ -304,7 +325,7 @@ class ApmSetting extends React.Component {
             <Row className="apms">
               <Col span={4}>基础服务</Col>
               <Col span={8}>
-                <Select className="select" >
+                <Select className="select" defaultValue="Pinpoint">
                   <Option value="pinpoint">Pinpoint</Option>
                 </Select>
               </Col>
@@ -319,23 +340,14 @@ class ApmSetting extends React.Component {
                       <span className="existence" >已安装</span>
                       <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
                     </Row> :
-                    installSate ?
-                      <Row className="loding">
-                        <span>安装中</span>
-                        <Progress percent={percent} showInfo={false} status="active"></Progress>
-                      </Row> :
-                      <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                    <Button type="primary" onClick={this.handleInstall}>安装</Button>
                 }
               </Col>
             </Row>
             <Row className="apms">
               <Col span={4}>组件状态</Col>
               <Col span={18}>
-                {
-                  state ? state.running === true ?
-                    <span className="desc">健康</span> :
-                    <span className="descs">不健康</span> : ''
-                }
+                {healthy}
               </Col>
             </Row>
             <Row className="apms">
@@ -346,7 +358,7 @@ class ApmSetting extends React.Component {
             </Row>
           </div>
           <div className="rigth">
-            <Select className="select">
+            <Select className="select" defaultValue="Pinpoint">
               <Option value="pinpoint">Pinpoint</Option>
             </Select>
             <div className="projet">
@@ -406,14 +418,14 @@ const mapStateToProps = state => {
   const aryApmID = []
   const { current, entities, queryApms } = state
   const { cluster, project } = current.config
-  const colony = current.clusters[project.namespace] ? current.clusters[project.namespace].isFetching === false ?
-    current.clusters[project.namespace].ids : [] : []
   const projectID = current.projects.ids
   const clusterID = cluster.id
   const clusters = entities.clusters ? entities.clusters[clusterID] : ''
-  const apmID = queryApms[project.namespace] ? queryApms[project.namespace][clusterID] ? queryApms[project.namespace][clusterID].isFetching === false ?
-    queryApms[project.namespace][clusterID].ids[0] : '' : '' : ''
-  const pinpointName = entities.apms[apmID] ? entities.apms[apmID].namespace : ''
+  const apmIds = queryApms[project.namespace] ? queryApms[project.namespace][clusterID] : ''
+  const c_isFetching = apmIds ? apmIds.isFetching : true
+  const apmID = c_isFetching === false ? queryApms[project.namespace][clusterID].ids[0] : ''
+  const pinpointName = current ? current.config.project.namespace : ''
+  const defaultName = current ? current.user.info.namespace : ''
   aryApmID.push(apmID)
   projects.push(entities.projects)
   const { info } = current.user
@@ -421,13 +433,13 @@ const mapStateToProps = state => {
   return {
     apmID,
     userId,
-    colony,
     project,
     projects,
     clusters,
     clusterID,
     projectID,
     aryApmID,
+    defaultName,
     pinpointName,
   }
 }
