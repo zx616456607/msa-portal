@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Card, Select, Icon, Table } from 'antd'
 import CreateG2 from '../../components/CreateG2'
 import msaIcon from '../../assets/img/msa-manage/msa.svg'
@@ -110,8 +111,8 @@ class IndexPage extends React.Component {
       },
     ]
     return (
-      <div className="index-page">
-        <Row gutter={16}>
+      <QueueAnim className="index-page">
+        <Row gutter={16} key="row1">
           <Col span={8} className="index-page-overview">
             <Card>
               <Row gutter={16}>
@@ -221,7 +222,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
         </Row>
-        <Row gutter={16}>
+        <Row gutter={16} key="row2">
           <Col span={8}>
             <Card>
               <Row gutter={16}>
@@ -334,7 +335,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
         </Row>
-        <Row gutter={16}>
+        <Row gutter={16} key="row3">
           <Col span={12}>
             <Card title="TOP 20 调用情况" style={{ height: 560 }}>
               <Row gutter={16}>
@@ -372,7 +373,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
         </Row>
-      </div>
+      </QueueAnim>
     )
   }
 }

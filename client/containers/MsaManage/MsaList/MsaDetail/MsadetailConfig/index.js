@@ -11,14 +11,12 @@
  */
 
 import React from 'react'
-import { Row, Col, Select, Button, Icon, Table } from 'antd'
+import { Button, Table } from 'antd'
 import { connect } from 'react-redux'
 import {
   getMsaConfig,
 } from '../../../../../actions/msa'
 import './style/index.less'
-
-const Option = Select.Option
 
 class MsaDetailConfig extends React.Component {
   handleChange = value => {

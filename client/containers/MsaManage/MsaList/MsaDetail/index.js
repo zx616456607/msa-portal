@@ -12,6 +12,7 @@
 import React from 'react'
 import { Row, Col, Tabs } from 'antd'
 import { connect } from 'react-redux'
+import QueueAnim from 'rc-queue-anim'
 import { getMsaList } from '../../../../actions/msa'
 import {
   msaListSlt,
@@ -40,8 +41,8 @@ class MsaDetail extends React.Component {
     const { name, msaDetail, clusterID } = this.props
     const instances = msaDetail.instances || []
     return (
-      <div className="msa-detail">
-        <Row className="msa-detail-header">
+      <QueueAnim className="msa-detail">
+        <Row className="msa-detail-header" key="header">
           <Col span={3}>
             <img className="msa-detail-header-icon" src="/img/service/java.svg"/>
           </Col>
@@ -63,7 +64,12 @@ class MsaDetail extends React.Component {
             </div>
           </Col>
         </Row>
-        <Tabs className="msa-detail-tabs" defaultActiveKey="1" onChange={this.callback}>
+        <Tabs
+          className="msa-detail-tabs"
+          defaultActiveKey="1"
+          onChange={this.callback}
+          key="tabs"
+        >
           <TabPane tab="实例列表" key="1">
             <MsaDetailList
               name={name}
@@ -91,7 +97,7 @@ class MsaDetail extends React.Component {
             />
           </TabPane>
         </Tabs>
-      </div>
+      </QueueAnim>
     )
   }
 }
