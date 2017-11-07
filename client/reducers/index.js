@@ -25,6 +25,7 @@ const entities = (state = {
   apms: {},
   projects: {},
   ppApps: {},
+  msaList: {},
 }, action) => {
   if (action.response && action.response.entities) {
     return merge({}, state, action.response.entities)

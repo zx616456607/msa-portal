@@ -42,6 +42,10 @@ const ppAppsSchema = new schema.Entity('ppApps', {}, {
   idAttribute: 'applicationName',
 })
 
+// MsaList 
+const MsaList = new schema.Entity('msaList', {}, {
+  idAttribute: 'serviceName',
+})
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -71,4 +75,7 @@ export const Schemas = {
   },
   PP_APPS: ppAppsSchema,
   PP_APPS_ARRAY: [ ppAppsSchema ],
+  MSALIST_ARRAY_DATA: {
+    data: [ MsaList ],
+  },
 }

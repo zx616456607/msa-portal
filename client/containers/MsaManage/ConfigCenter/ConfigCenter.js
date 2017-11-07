@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import './style/configCenter.less'
 import { getService, getBranchList, getCenterEvn, getCenterConfig, delCenterConfig, putCenterConfig } from '../../../actions/configCenter'
-import { Row, Tabs, Button, Icon, Table, Pagination, Modal, Select, Input, notification } from 'antd'
+import { Row, Tabs, Button, Icon, Table, Pagination, Modal, Select, Input, notification, Card } from 'antd'
 const TabPane = Tabs.TabPane
 const Option = Select.Option
 const { TextArea } = Input
@@ -27,7 +27,7 @@ class ConfigCenter extends React.Component {
     message: '',
     configName: '',
     branchName: '',
-    defaultValue: '',
+    value: '',
     configGitUrl: '',
     deleteVisible: false,
     branchData: [],
@@ -57,7 +57,7 @@ class ConfigCenter extends React.Component {
           if (res.response.result.code === 200) {
             this.setState({
               branchData: res.response.result.data,
-              defaultValue: res.response.result.data[0].name,
+              value: res.response.result.data[0].name,
             })
             const evnQuery = {
               url: this.state.configGitUrl,
@@ -86,10 +86,10 @@ class ConfigCenter extends React.Component {
   }
 
   handleChang = value => {
+    this.loadData()
     this.setState({
       branchName: value,
     })
-    this.loadData()
   }
 
   handleDelVisible = name => {
@@ -140,7 +140,7 @@ class ConfigCenter extends React.Component {
       title: '配置名称',
       dataIndex: 'name',
       render: (text, record) =>
-        <Link to={`/msa-manage/config-center/${text}#detal=true&id=${record.id}`}>
+        <Link to={`/msa-manage/config-center/${text}?detal=true&id=${record.id}`}>
           {text}
         </Link>,
     }, {
@@ -152,7 +152,7 @@ class ConfigCenter extends React.Component {
       title: '操作',
       dataIndex: 'operation',
       render: (text, record) => <div>
-        <Link to={`/msa-manage/config-center/${record.name}#detal=true&id=${record.id}`}>
+        <Link to={`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`}>
           <div className="desc" style={{ color: '#2db7f5' }}>查看详情</div>&nbsp; | &nbsp;
         </Link>
         <div className="desc" style={{ color: '#f85a5a' }} onClick={() => this.handleDelVisible(record.name)}>删除</div>
@@ -163,26 +163,21 @@ class ConfigCenter extends React.Component {
       defaultCurrent: 1,
       defaultPageSize: 10,
     }
-    const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
+    const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 
     return (
-      <Row className="layout-content-btns">
+      <Card className="layout-content-btns">
         <Row className="branch">
           <span>版本分支：</span>
-          <Select style={{ width: 200 }} onChange={this.handleChang} defaultValue={defaultValue}>
-            {
-              branchData ?
-                branchData.map((item, index) => (
-                  <Option key={index} value={item.name}>{item.name}</Option>
-                )) : ''
-            }
+          <Select style={{ width: 200 }} onChange={this.handleChang} defaultValue="master" >
+            {data}
           </Select>
         </Row>
-        <Tabs onChange={this.handleChang} type="card">
-          <TabPane tab="开发环境" key="evn">
+        <Tabs onChange={this.handleChang} type="card" >
+          <TabPane tab="开发环境" key="1" >
             <div className="exploit">
               <div className="headers">
-                <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create#detal=false&branch=${branchName}`)}>
+                <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
                   <Icon type="plus" style={{ color: '#fff' }} />
                   <span className="font">添加配置</span>
                 </Button>
@@ -200,10 +195,10 @@ class ConfigCenter extends React.Component {
               </div>
             </div>
           </TabPane>
-          <TabPane tab="测试环境" key="config">
+          <TabPane tab="测试环境" key="2">
             <div className="exploit">
               <div className="headers">
-                <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create#config')}>
+                <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?config')}>
                   <Icon type="plus" style={{ color: '#fff' }} />
                   <span className="font">添加配置</span>
                 </Button>
@@ -220,10 +215,10 @@ class ConfigCenter extends React.Component {
               </div>
             </div>
           </TabPane>
-          <TabPane tab="生成环境" key="pt">
+          <TabPane tab="生成环境" key="3">
             <div className="exploit">
               <div className="headers">
-                <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create#pt')}>
+                <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?pt')}>
                   <Icon type="plus" style={{ color: '#fff' }} />
                   <span className="font">添加配置</span>
                 </Button>
@@ -257,7 +252,7 @@ class ConfigCenter extends React.Component {
             </div>
           </div>
         </Modal>
-      </Row>
+      </Card>
     )
   }
 }
