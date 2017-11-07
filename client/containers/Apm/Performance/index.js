@@ -14,7 +14,14 @@ import React from 'react'
 import './style/index.less'
 import G2 from 'g2'
 import { connect } from 'react-redux'
-import { loadPPApps, fetchAgentData, loadPinpointMap, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } from '../../../actions/pinpoint'
+import {
+  loadPPApps,
+  fetchAgentData,
+  loadPinpointMap,
+  fetchJVMGCData,
+  fetchJVMCPUData,
+  fetchJVMTRANData,
+} from '../../../actions/pinpoint'
 import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
 import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
@@ -111,7 +118,9 @@ class Performance extends React.Component {
       loadPinpointMap(clusterID, apmID, query)
       if (Object.keys(res.response.entities).length === 0) {
         this.setState({
-          exampleData: Object.keys(res.response.result).length > 0 ? res.response.result[value][0] : [],
+          exampleData: Object.keys(res.response.result).length > 0
+            ? res.response.result[value][0]
+            : [],
           agentData: res.response.result,
           serviceName: value,
         })
@@ -138,7 +147,13 @@ class Performance extends React.Component {
 
   loadChartData = value => {
     const { timers, customTimer, sTimer } = this.state
-    const { clusterID, apmID, fetchJVMGCData, fetchJVMCPUData, fetchJVMTRANData } = this.props
+    const {
+      clusterID,
+      apmID,
+      fetchJVMGCData,
+      fetchJVMCPUData,
+      fetchJVMTRANData,
+    } = this.props
     const query = {
       agentId: value,
       from: Object.keys(timers).length > 0 ? timers.sTimer : customTimer,
@@ -159,7 +174,9 @@ class Performance extends React.Component {
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
-          yVal: chartJVM.heapSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
+          yVal: chartJVM.heapSued.points[index].maxYVal === -1
+            ? 0
+            : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
         }
       ))
       let frame = new Frame(heapAry)
@@ -171,7 +188,9 @@ class Performance extends React.Component {
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
-          yVal: chartJVM.permGenSued.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
+          yVal: chartJVM.permGenSued.points[index].maxYVal === -1
+            ? 0
+            : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
         }
       ))
       let frames = new Frame(permAry)
@@ -193,7 +212,9 @@ class Performance extends React.Component {
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
-          yVal: chartJVM.jvm.points[index].maxYVal === -1 ? 0 : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
+          yVal: chartJVM.jvm.points[index].maxYVal === -1
+            ? 0
+            : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
         }
       ))
       let frame = new Frame(cpumAry)
@@ -218,14 +239,26 @@ class Performance extends React.Component {
       const tranAry = chartJVM.unsampled_c.points.map((item, index) => (
         {
           time: this.dateFtt(item.xVal),
-          total: chartJVM.total.points[index].maxYVal === -1 ? 0 : chartJVM.total.points[index].maxYVal,
-          unsampledNew: chartJVM.unsampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.unsampled_n.points[index].maxYVal,
-          sampledContinuation: chartJVM.sampled.points[index].maxYVal === -1 ? 0 : chartJVM.sampled.points[index].maxYVal,
-          sampledNew: chartJVM.sampled_n.points[index].maxYVal === -1 ? 0 : chartJVM.sampled_n.points[index].maxYVal,
+          total: chartJVM.total.points[index].maxYVal === -1
+            ? 0
+            : chartJVM.total.points[index].maxYVal,
+          unsampledNew: chartJVM.unsampled_n.points[index].maxYVal === -1
+            ? 0
+            : chartJVM.unsampled_n.points[index].maxYVal,
+          sampledContinuation: chartJVM.sampled.points[index].maxYVal === -1
+            ? 0
+            : chartJVM.sampled.points[index].maxYVal,
+          sampledNew: chartJVM.sampled_n.points[index].maxYVal === -1
+            ? 0
+            : chartJVM.sampled_n.points[index].maxYVal,
         }
       ))
       let frame = new Frame(tranAry)
-      frame = Frame.combinColumns(frame, [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ], 'count')
+      frame = Frame.combinColumns(
+        frame,
+        [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ],
+        'count'
+      )
       this.setState({
         tranData: frame,
       })
@@ -240,7 +273,9 @@ class Performance extends React.Component {
   }
   dateFtt = value => {
     const date = new Date(value)
-    const dd = date.toLocaleDateString().replace(/\//g, '/') + ' ' + date.toTimeString().substr(0, 8)
+    const dd = date.toLocaleDateString().replace(/\//g, '/')
+      + ' '
+      + date.toTimeString().substr(0, 8)
     return dd
   }
   handleRefresh = () => {
@@ -296,7 +331,18 @@ class Performance extends React.Component {
   }
 
   render() {
-    const { isTimerShow, timer, exampleData, agentData, serviceName, heapData, cpuData, gcData, tranData, isRowData } = this.state
+    const {
+      isTimerShow,
+      timer,
+      exampleData,
+      agentData,
+      serviceName,
+      heapData,
+      cpuData,
+      gcData,
+      tranData,
+      isRowData,
+    } = this.state
     const { apps, serverName } = this.props
     const nodeName = []
     const nodeData = serverName === undefined ? '' : serverName[serviceName]
@@ -522,7 +568,10 @@ class Performance extends React.Component {
                   <div className="section">
                     <img src={this.serverType(agentData.serverType)} />
                     <div className="left">
-                      <span style={{ fontSize: 16 }}>微服务名称 {exampleData.applicationName}</span><br />
+                      <span style={{ fontSize: 16 }}>
+                        微服务名称 {exampleData.applicationName}
+                      </span>
+                      <br />
                       <span>Agent Id： {exampleData.agentId}</span><br />
                       <span>hostname： {exampleData.applicationName}</span><br />
                       <span>IP： {exampleData.ip}</span><br />

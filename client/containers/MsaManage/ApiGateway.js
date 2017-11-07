@@ -135,7 +135,12 @@ class ApiGateway extends React.Component {
           </div>
         </div>
         <div className="bottom">
-          <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={false} />
+          <Table
+            rowSelection={rowSelection}
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+          />
         </div>
         <Modal
           title="添加限流规则"

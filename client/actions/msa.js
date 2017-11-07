@@ -91,7 +91,11 @@ export const MSA_DELETE_MANUALRULE_FAILURE = 'MSA_DELETE_MANUALRULE_FAILURE'
 
 const fetchDelManualrule = (clusterID, ruleIDs) => ({
   [CALL_API]: {
-    types: [ MSA_DELETE_MANUALRULE_REQUEST, MSA_DELETE_MANUALRULE_SUCCESS, MSA_DELETE_MANUALRULE_FAILURE ],
+    types: [
+      MSA_DELETE_MANUALRULE_REQUEST,
+      MSA_DELETE_MANUALRULE_SUCCESS,
+      MSA_DELETE_MANUALRULE_FAILURE,
+    ],
     endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrule/${ruleIDs}`,
     options: {
       method: 'DELETE',

@@ -39,6 +39,22 @@
       "error",
       "never"
     ],
+    "max-len": [
+      "error",
+      100,
+      {
+        "comments": 100,
+        "ignoreComments": true,
+        "ignoreTrailingComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreRegExpLiterals": true
+      }
+    ],
+    "no-nested-ternary": [
+      "error"
+    ],
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error"
   },

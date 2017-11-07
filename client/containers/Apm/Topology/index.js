@@ -353,7 +353,10 @@ class Topology extends React.Component {
   // 分类柱状图数据
   getSortGroupChart = name => {
     const { currentNode } = this.state
-    const { timeSeriesHistogram, agentTimeSeriesHistogram } = currentNode || { timeSeriesHistogram: {}, agentTimeSeriesHistogram: {} }
+    const {
+      timeSeriesHistogram,
+      agentTimeSeriesHistogram,
+    } = currentNode || { timeSeriesHistogram: {}, agentTimeSeriesHistogram: {} }
     if (name === 'all') {
       this.getSortData(timeSeriesHistogram)
       return
@@ -393,7 +396,11 @@ class Topology extends React.Component {
   getCurrentNode = key => {
     const { nodeDataArray } = this.state
     const currentNode = nodeDataArray.filter(item => item.key === key)
-    const { totalCount, errorCount, agentHistogram } = currentNode[0] || { totalCount: 0, errorCount: 0, agentHistogram: {} }
+    const {
+      totalCount,
+      errorCount,
+      agentHistogram,
+    } = currentNode[0] || { totalCount: 0, errorCount: 0, agentHistogram: {} }
     this.setState({
       totalCount,
       errorCount,
@@ -434,7 +441,11 @@ class Topology extends React.Component {
   getNodeAndLinkData = () => {
     const { apmID, pinpoint } = this.props
     const { application } = this.state
-    const { nodeDataArray, linkDataArray } = pinpoint.serviceMap[apmID][application].applicationMapData || { nodeDataArray: [], linkDataArray: [] }
+    const applicationMapData = pinpoint.serviceMap[apmID][application].applicationMapData
+    const {
+      nodeDataArray,
+      linkDataArray,
+    } = applicationMapData || { nodeDataArray: [], linkDataArray: [] }
     this.setState({
       nodeDataArray,
       linkDataArray,
@@ -604,7 +615,17 @@ class Topology extends React.Component {
     }
   }
   render() {
-    const { application, rangeDateTime, agentList, currentAgent, topologyData, currentAgentDetail, currentNode, totalCount, errorCount } = this.state
+    const {
+      application,
+      rangeDateTime,
+      agentList,
+      currentAgent,
+      topologyData,
+      currentAgentDetail,
+      currentNode,
+      totalCount,
+      errorCount,
+    } = this.state
     const { apps } = this.props
     return (
       <div className="topology">

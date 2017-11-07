@@ -67,7 +67,11 @@ const fetchCenterEvn = query => {
   return {
     query,
     [CALL_API]: {
-      types: [ CENTER_SERVICE_INFO_REQUEST, CENTER_SERVICE_INFO_SUCCESS, CENTER_SERVICE_INFO_FAILURE ],
+      types: [
+        CENTER_SERVICE_INFO_REQUEST,
+        CENTER_SERVICE_INFO_SUCCESS,
+        CENTER_SERVICE_INFO_FAILURE,
+      ],
       endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}`,
       schema: {},
       options: {

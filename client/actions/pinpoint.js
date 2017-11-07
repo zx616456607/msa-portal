@@ -98,7 +98,11 @@ const fetchTransactionMetadata = (clusterID, apmID, application, body) => ({
   apmID,
   application,
   [CALL_API]: {
-    types: [ TRANSACTION_METADATA_REQUEST, TRANSACTION_METADATA_SUCCESS, TRANSACTION_METADATA_FAILURE ],
+    types: [
+      TRANSACTION_METADATA_REQUEST,
+      TRANSACTION_METADATA_SUCCESS,
+      TRANSACTION_METADATA_FAILURE,
+    ],
     endpoint: `/clusters/${clusterID}/apms/pinpoint/${apmID}/transactionMetadata`,
     schema: {},
     options: {

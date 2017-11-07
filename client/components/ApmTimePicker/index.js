@@ -101,9 +101,14 @@ export default class ApmTimePicker extends React.Component {
     } else if (time === 'today') {
       startTime = new Date(new Date().setHours(0, 0, 0, 0))
     } else if (time === 'yesterday') {
-      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)).valueOf()
+      startTime = new Date(new Date(new Date()
+        .setDate(new Date().getDate() - 1))
+        .setHours(0, 0, 0, 0))
+        .valueOf()
     } else if (time === 'beforeYes') {
-      startTime = new Date(new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)).valueOf()
+      startTime = new Date(new Date().setDate(new Date().getDate() - 2))
+        .setHours(0, 0, 0, 0)
+      startTime = new Date(startTime).valueOf()
     }
     return [ moment(startTime), moment(now) ]
   }
