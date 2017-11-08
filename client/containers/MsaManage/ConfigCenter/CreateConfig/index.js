@@ -14,6 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import './style/index.less'
 import { parse } from 'query-string'
+import QueueAnim from 'rc-queue-anim'
 import { putCenterConfig, getCenterConfig, getService, getBranchList, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
 import YamlEditor from '../../../../components/Editor/Yaml'
 import { Row, Button, Select, Input, notification, Col, Card } from 'antd'
@@ -185,61 +186,64 @@ class CreateConfig extends React.Component {
   }
 
   render() {
-    const { detal, yaml, branchData, btnVasible } = this.state
+    const { detal, yaml, branchData, btnVasible, currentYaml } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
 
     return (
-      <Card className="info">
-        <Row className="connent">
-          <Col className="text" span={4}>配置名称</Col>
-          <Col span={20}>
-            <Input style={{ width: '60%', margin: '10px' }} defaultValue={detal === 'true' ? projectName : ''} onChange={this.handleInput} />
-          </Col>
-        </Row>
-        <Row className="connent">
-          <Col className="text" span={4}>配置版本</Col>
-          <Col span={20}>
-            <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage}>
-              {
-                branchData ?
-                  branchData.map((item, index) => (
-                    <Option key={index} value={item.name}>{item.name}</Option>
-                  )) : ''
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row className="connent">
-          <Col className="text" span={4}>配置内容</Col>
-          <Col span={20}>
-            <YamlEditor style={{ width: '60%' }} value={yaml} onChange={this.handleYamlEditor} />
-          </Col>
-        </Row>
-        <Row className="connents">
-          <Col className="text" span={4}>添加备注</Col>
-          <Col span={20}>
-            <TextArea className="textArea" placeholder="添加一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
-          </Col>
-        </Row>
-        <div className="operation" >
-          {
-            detal === 'true' ?
-              <div>
+      <QueueAnim className="create">
+        <Card className="info" key="body">
+          <Row className="connent">
+            <Col className="text" span={4}>配置名称</Col>
+            <Col span={20}>
+              <Input style={{ width: '60%', margin: '10px' }} defaultValue={detal === 'true' ? projectName : ''} onChange={this.handleInput} />
+            </Col>
+          </Row>
+          <Row className="connent">
+            <Col className="text" span={4}>配置版本</Col>
+            <Col span={20}>
+              <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage}>
                 {
-                  btnVasible ?
-                    <Button className="close" type="primary" onClick={this.handleSaveUpdate}>保存更新</Button> :
-                    <Button className="close" onClick={this.handleSaveUpdate}>保存更新</Button>
+                  branchData ?
+                    branchData.map((item, index) => (
+                      <Option key={index} value={item.name}>{item.name}</Option>
+                    )) : ''
                 }
-                <Button className="ok" type="primary" disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
-              </div> :
-              <div>
-                <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
-                <Button className="ok" type="primary" onClick={this.handleAdd}>确认</Button>
-              </div>
-          }
-        </div>
-      </Card>
+              </Select>
+            </Col>
+          </Row>
+          <Row className="connent">
+            <Col className="text" span={4}>配置内容</Col>
+            <Col span={20}>
+              <YamlEditor style={{ width: '60%' }} value={currentYaml === '' ? yaml : currentYaml} onChange={this.handleYamlEditor} />
+            </Col>
+          </Row>
+          <Row className="connents">
+            <Col className="text" span={4}>添加备注</Col>
+            <Col span={20}>
+              <TextArea className="textArea" placeholder="添加一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
+            </Col>
+          </Row>
+          <div className="operation" >
+            {
+              detal === 'true' ?
+                <div>
+                  {
+                    btnVasible ?
+                      <Button className="close" type="primary" onClick={this.handleSaveUpdate}>保存更新</Button> :
+                      <Button className="close" onClick={this.handleSaveUpdate}>保存更新</Button>
+                  }
+                  <Button className="ok" type="primary" disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
+                </div> :
+                <div>
+                  <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
+                  <Button className="ok" type="primary" onClick={this.handleAdd}>确认</Button>
+                </div>
+            }
+          </div>
+        </Card>
+      </QueueAnim>
+
     )
   }
 }
