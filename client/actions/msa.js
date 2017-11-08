@@ -115,7 +115,6 @@ export const MSA_ENV_REQUEST = 'MSA_ENV_REQUEST'
 export const MSA_ENV_SUCCESS = 'MSA_ENV_SUCCESS'
 export const MSA_ENV_FAILURE = 'MSA_ENV_FAILURE'
 
-// Fetches a page of msa.
 const fetchMsaEnv = (clusterID, serviceInfo) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/env`
   /* if (query) {
@@ -140,7 +139,6 @@ export const MSA_CONFIG_REQUEST = 'MSA_CONFIG_REQUEST'
 export const MSA_CONFIG_SUCCESS = 'MSA_CONFIG_SUCCESS'
 export const MSA_CONFIG_FAILURE = 'MSA_CONFIG_FAILURE'
 
-// Fetches a page of msa.
 const fetchMsaConfig = (clusterID, serviceInfo) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/config`
   /* if (query) {
@@ -158,5 +156,29 @@ const fetchMsaConfig = (clusterID, serviceInfo) => {
 export function getMsaConfig(clusterID, serviceInfo) {
   return dispatch => {
     return dispatch(fetchMsaConfig(clusterID, serviceInfo))
+  }
+}
+
+export const MSA_CONFIG_REFRESH_REQUEST = 'MSA_CONFIG_REFRESH_REQUEST'
+export const MSA_CONFIG_REFRESH_SUCCESS = 'MSA_CONFIG_REFRESH_SUCCESS'
+export const MSA_CONFIG_REFRESH_FAILURE = 'MSA_CONFIG_REFRESH_FAILURE'
+
+const fetchRefreshMsaConfig = (clusterID, serviceInfo) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/bus/refresh`
+  return {
+    [CALL_API]: {
+      types: [ MSA_CONFIG_REFRESH_REQUEST, MSA_CONFIG_REFRESH_SUCCESS, MSA_CONFIG_REFRESH_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export function refreshMsaConfig(clusterID, serviceInfo) {
+  return dispatch => {
+    return dispatch(fetchRefreshMsaConfig(clusterID, serviceInfo))
   }
 }
