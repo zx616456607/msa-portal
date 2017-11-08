@@ -33,36 +33,23 @@ class MsaDetailConfig extends React.Component {
   }
 
   render() {
+    const { msaConfig } = this.props
+    const { isFetching: loading, data } = msaConfig
+    const dataKeys = Object.keys(data || {})
+    const dataSource = dataKeys.map(key => ({
+      key: data[key].key,
+      url: key,
+      updateTime: '-',
+    }))
     const columns = [{
       title: '配置名称',
-      dataIndex: 'name',
+      dataIndex: 'key',
     }, {
       title: '更新时间',
-      dataIndex: 'time',
+      dataIndex: 'updateTime',
     }, {
       title: '操作',
-      render: () => <a href="#">查看</a>,
-    }]
-    const data = [{
-      key: '1',
-      name: 'config.client.properties',
-      time: '19天前',
-    }, {
-      key: '2',
-      name: 'config.client.properties',
-      time: '12小时前',
-    }, {
-      key: '3',
-      name: 'config.client.properties',
-      time: '10小时前',
-    }, {
-      key: '4',
-      name: 'config.client.properties',
-      time: '6小时前',
-    }, {
-      key: '5',
-      name: 'config.client.properties',
-      time: '5小时前',
+      render: (text, record) => <a target="blank" href={record.url}>查看</a>,
     }]
     return (
       <div className="msaDetailConfig">
@@ -73,14 +60,18 @@ class MsaDetailConfig extends React.Component {
           className="msaDetailConfig-table"
           pagination={false}
           columns={columns}
-          dataSource={data} />
+          dataSource={dataSource}
+          loading={loading}
+        />
       </div>
     )
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  return {
+    msaConfig: state.msa.msaConfig || {},
+  }
 }
 
 export default connect(mapStateToProps, {
