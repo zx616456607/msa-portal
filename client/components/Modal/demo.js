@@ -3,7 +3,7 @@ import confirm from './confirm'
 function showConfirm() {
   confirm({
     modalTitle: 'Confirm delete',
-    message: 'Do you want to delete these items?',
+    title: 'Do you want to delete these items?',
     content: 'When clicked the OK button, this dialog will be closed after 1 second',
     onOk() {
       return new Promise((resolve, reject) => {
