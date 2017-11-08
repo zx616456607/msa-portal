@@ -13,6 +13,7 @@
 import React from 'react'
 import './style/index.less'
 import G2 from 'g2'
+import QueueAnim from 'rc-queue-anim'
 import { connect } from 'react-redux'
 import {
   loadPPApps,
@@ -22,11 +23,10 @@ import {
   fetchJVMCPUData,
   fetchJVMTRANData,
 } from '../../../actions/pinpoint'
-import { Row, Icon, Button, Layout, Select, DatePicker } from 'antd'
+import { Row, Icon, Button, Select, DatePicker } from 'antd'
 import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
 
-const LayoutContent = Layout.Content
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
@@ -529,123 +529,121 @@ class Performance extends React.Component {
     const [ Chart, Chart1, Chart2, Chart3 ] = ChartGroup
 
     return (
-      <LayoutContent className="content">
-        <div className="capability">
-          <div className="layout-content-btns">
-            <Select placeholder="选择微服务" style={{ width: 150 }} onChange={this.handleSelect}>
+      <QueueAnim className="apm-performance">
+        <div className="layout-content-btns" key="btns">
+          <Select placeholder="选择微服务" style={{ width: 150 }} onChange={this.handleSelect}>
+            {
+              apps.map(app => (
+                <Option key={app.applicationName}>{app.applicationName}</Option>
+              ))
+            }
+          </Select>
+          <Button onClick={this.handleRefresh}><Icon type="reload" />刷新</Button>
+          <div className="timer">
+            <ButtonGroup className="call-link-tracking-date">
+              <Button icon="calendar" type="primary" onClick={() => this.handleTimer()}>
+                自定义日期
+              </Button>
               {
-                apps.map(app => (
-                  <Option key={app.applicationName}>{app.applicationName}</Option>
-                ))
+                isTimerShow ?
+                  <Row>
+                    <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
+                    <Button className="btn" onClick={() => this.handleLatelyTimer('three')}>3小时</Button>
+                    <Button className="btn" onClick={() => this.handleLatelyTimer('today')}>今天</Button>
+                    <Button className="btn" onClick={() => this.handleLatelyTimer('yesterday')}>昨天</Button>
+                    <Button className="btn" onClick={() => this.handleLatelyTimer('seven')}>最近7天</Button>
+                  </Row> :
+                  <Row>
+                    <RangePicker
+                      showTime={{ format: 'HH:mm' }}
+                      format="YYYY-MM-DD HH:mm"
+                      value={timer}
+                      onChange={timer => this.setState({ timer })}
+                    />
+                    <Button icon="search" onClick={() => this.handleCustomTimer()} />
+                  </Row>
               }
-            </Select>
-            <Button onClick={this.handleRefresh}><Icon type="reload" />刷新</Button>
-            <div className="timer">
-              <ButtonGroup className="call-link-tracking-date">
-                <Button icon="calendar" type="primary" onClick={() => this.handleTimer()}>
-                  自定义日期
-                </Button>
-                {
-                  isTimerShow ?
-                    <Row>
-                      <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                      <Button className="btn" onClick={() => this.handleLatelyTimer('three')}>3小时</Button>
-                      <Button className="btn" onClick={() => this.handleLatelyTimer('today')}>今天</Button>
-                      <Button className="btn" onClick={() => this.handleLatelyTimer('yesterday')}>昨天</Button>
-                      <Button className="btn" onClick={() => this.handleLatelyTimer('seven')}>最近7天</Button>
-                    </Row> :
-                    <Row>
-                      <RangePicker
-                        showTime={{ format: 'HH:mm' }}
-                        format="YYYY-MM-DD HH:mm"
-                        value={timer}
-                        onChange={timer => this.setState({ timer })}
-                      />
-                      <Button icon="search" onClick={() => this.handleCustomTimer()} />
-                    </Row>
-                }
-                <Button className="type-change-btn">自动刷新</Button>
-              </ButtonGroup>
-            </div>
-            <Select className="example" value={exampleData.agentId} style={{ width: 120 }} onChange={this.handleOnExample}>
-              {
-                nodeName ?
-                  nodeName.map(value => (
-                    <Option key={value}>{value}</Option>
-                  )) : ''
-              }
-            </Select>
+              <Button className="type-change-btn">自动刷新</Button>
+            </ButtonGroup>
           </div>
-          {
-            isRowData ?
-              <div>
-                <Row className="layout-content-body">
-                  <div className="section">
-                    <img src={this.serverType(agentData.serverType)} />
-                    <div className="left">
-                      <span style={{ fontSize: 16 }}>
-                        微服务名称 {exampleData.applicationName}
-                      </span>
-                      <br />
-                      <span>Agent Id： {exampleData.agentId}</span><br />
-                      <span>hostname： {exampleData.applicationName}</span><br />
-                      <span>IP： {exampleData.ip}</span><br />
-                      <span>Service Type： {exampleData.serviceType}</span><br />
-                      <span>End Status Runing： (last checked: )</span>
-                    </div>
-                    <div className="rigth">
-                      <span>Agent Version： {exampleData.vmVersion}</span><br />
-                      <span>PID： {exampleData.pid}</span><br />
-                      <span>JSM(GC Type)：</span><br />
-                      <span>Start Time： {this.dateFtt(exampleData.startTimestamp)}</span>
-                    </div>
-                  </div>
-                </Row>
-                <Row>
-                  <div className="footer">
-                    <div className="left">
-                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage</span>
-                        {/* <Button className="btn">重置</Button> */}
-                      </div>
-                      <Chart
-                        data={this.state.heapData}
-                        width={this.state.width}
-                        height={this.state.height}
-                        forceFit={this.state.forceFit} />
-                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>JVM/System Cpu Usage</span>
-                        {/* <Button className="btn">重置</Button> */}
-                      </div>
-                      <Chart1
-                        data={this.state.cpuData}
-                        width={this.state.width}
-                        height={this.state.height}
-                        forceFit={this.state.forceFit} />
-                    </div>
-                    <div className="rigth">
-                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>PermGen Usage</span>
-                        {/* <Button className="btn">重置</Button> */}
-                      </div>
-                      <Chart3
-                        data={this.state.gcData}
-                        width={this.state.width}
-                        height={this.state.height}
-                        forceFit={this.state.forceFit} />
-                      <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Transactions Per Second</span>
-                        {/* <Button className="btn">重置</Button> */}
-                      </div>
-                      <Chart2
-                        data={this.state.tranData}
-                        width={this.state.width}
-                        height={this.state.height}
-                        forceFit={this.state.forceFit} />
-                    </div>
-                  </div>
-                </Row>
-              </div> :
-              <div><img style={{ marginTop: 7 + '%', marginLeft: 33 + '%' }} src={performance} /> </div>
-          }
+          <Select className="example" value={exampleData.agentId} style={{ width: 120 }} onChange={this.handleOnExample}>
+            {
+              nodeName ?
+                nodeName.map(value => (
+                  <Option key={value}>{value}</Option>
+                )) : ''
+            }
+          </Select>
         </div>
-      </LayoutContent>
+        {
+          isRowData ?
+            <div key="data">
+              <Row className="layout-content-body">
+                <div className="section">
+                  <img src={this.serverType(agentData.serverType)} />
+                  <div className="left">
+                    <span style={{ fontSize: 16 }}>
+                      微服务名称 {exampleData.applicationName}
+                    </span>
+                    <br />
+                    <span>Agent Id： {exampleData.agentId}</span><br />
+                    <span>hostname： {exampleData.applicationName}</span><br />
+                    <span>IP： {exampleData.ip}</span><br />
+                    <span>Service Type： {exampleData.serviceType}</span><br />
+                    <span>End Status Runing： (last checked: )</span>
+                  </div>
+                  <div className="rigth">
+                    <span>Agent Version： {exampleData.vmVersion}</span><br />
+                    <span>PID： {exampleData.pid}</span><br />
+                    <span>JSM(GC Type)：</span><br />
+                    <span>Start Time： {this.dateFtt(exampleData.startTimestamp)}</span>
+                  </div>
+                </div>
+              </Row>
+              <Row>
+                <div className="footer">
+                  <div className="left">
+                    <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Heap Usage</span>
+                      {/* <Button className="btn">重置</Button> */}
+                    </div>
+                    <Chart
+                      data={this.state.heapData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      forceFit={this.state.forceFit} />
+                    <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>JVM/System Cpu Usage</span>
+                      {/* <Button className="btn">重置</Button> */}
+                    </div>
+                    <Chart1
+                      data={this.state.cpuData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      forceFit={this.state.forceFit} />
+                  </div>
+                  <div className="rigth">
+                    <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>PermGen Usage</span>
+                      {/* <Button className="btn">重置</Button> */}
+                    </div>
+                    <Chart3
+                      data={this.state.gcData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      forceFit={this.state.forceFit} />
+                    <div className="titleinfo"><span style={{ color: '#2db7f5', fontSize: 16 }}>Transactions Per Second</span>
+                      {/* <Button className="btn">重置</Button> */}
+                    </div>
+                    <Chart2
+                      data={this.state.tranData}
+                      width={this.state.width}
+                      height={this.state.height}
+                      forceFit={this.state.forceFit} />
+                  </div>
+                </div>
+              </Row>
+            </div> :
+            <div key="no-data"><img style={{ marginTop: 7 + '%', marginLeft: 33 + '%' }} src={performance} /> </div>
+        }
+      </QueueAnim>
     )
   }
 }

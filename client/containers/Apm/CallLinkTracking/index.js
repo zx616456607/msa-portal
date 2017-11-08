@@ -15,6 +15,7 @@ import { Select, Button, Card, Table, message, Icon } from 'antd'
 import { connect } from 'react-redux'
 import { parse as parseQuerystring } from 'query-string'
 import moment from 'moment'
+import QueueAnim from 'rc-queue-anim'
 import Dock from '../../../components/Dock'
 import TransactionInspector from '../../../components/TransactionInspector'
 import ApmTimePicker from '../../../components/ApmTimePicker'
@@ -252,8 +253,8 @@ class CallLinkTracking extends React.Component {
       item.index = index
     })
     return (
-      <div className="call-link-tracking">
-        <div className="layout-content-btns">
+      <QueueAnim className="call-link-tracking">
+        <div className="layout-content-btns" key="btns">
           <Select
             showSearch
             style={{ width: 150 }}
@@ -291,7 +292,7 @@ class CallLinkTracking extends React.Component {
             }
           </Select>
         </div>
-        <div className="layout-content-body">
+        <div className="layout-content-body" key="body">
           <Card className="call-link-tracking-table">
             <Table
               columns={columns}
@@ -329,7 +330,7 @@ class CallLinkTracking extends React.Component {
             />
           </Dock>
         </div>
-      </div>
+      </QueueAnim>
     )
   }
 }

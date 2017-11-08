@@ -13,6 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Row, Col, Checkbox, Select, message } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import './style/topology.less'
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData, fetchAgentData } from '../../../actions/pinpoint'
@@ -628,8 +629,8 @@ class Topology extends React.Component {
     } = this.state
     const { apps } = this.props
     return (
-      <div className="topology">
-        <div className="layout-content-btns">
+      <QueueAnim className="topology">
+        <div className="layout-content-btns" key="btns">
           <Select
             showSearch
             style={{ width: 150 }}
@@ -656,12 +657,12 @@ class Topology extends React.Component {
         {
           (!application || !rangeDateTime.length)
             ?
-            <div className="topology-default">
+            <div className="topology-default" key="topology">
               <img src={require('../../../assets/img/apm/topology-default.png')}/>
               <p>请选择微服务</p>
             </div>
             :
-            <Row className="topology-body layout-content-body">
+            <Row className="topology-body layout-content-body" key="body">
               <Col span={14} className="topology-body-relation-schema">
                 {
                   !isEmpty(topologyData) &&
@@ -758,7 +759,7 @@ class Topology extends React.Component {
               </Col>
             </Row>
         }
-      </div>
+      </QueueAnim>
     )
   }
 }
