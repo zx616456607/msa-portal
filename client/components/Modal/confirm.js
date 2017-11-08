@@ -48,6 +48,8 @@ export default function confirm(config) {
 
   type = type || 'confirm'
 
+  modalTitle = modalTitle || '确认操作'
+
   // 默认为 false，保持旧版默认行为
   maskClosable = maskClosable === undefined ? false : maskClosable
 

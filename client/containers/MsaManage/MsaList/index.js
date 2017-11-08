@@ -26,6 +26,7 @@ import {
 import {
   MSA_RULE_EXP,
 } from '../../../constants'
+import confirm from '../../../components/Modal/confirm'
 import './style/msaList.less'
 
 const Search = Input.Search
@@ -50,45 +51,75 @@ class MsaList extends React.Component {
 
   hideService = record => {
     const { addManualrule, clusterID } = this.props
-    const body = [{
-      appName: record.serviceName,
-      rule: MSA_RULE_EXP,
-    }]
-    addManualrule(clusterID, body).then(res => {
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: '隐藏服务成功',
-      })
-      this.loadMsaList()
+    const self = this
+    confirm({
+      title: `确认将服务 ${record.serviceName} 隐藏吗？`,
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          const body = [{
+            appName: record.serviceName,
+            rule: MSA_RULE_EXP,
+          }]
+          addManualrule(clusterID, body).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '隐藏服务成功',
+            })
+            self.loadMsaList()
+          })
+        })
+      },
     })
   }
 
   cancelHideService = record => {
     const { delManualrule, clusterID } = this.props
-    delManualrule(clusterID, record.instances[0].id).then(res => {
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: '取消隐藏成功',
-      })
-      this.loadMsaList()
+    const self = this
+    confirm({
+      title: `确认将服务 ${record.serviceName} 取消隐藏吗？`,
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          delManualrule(clusterID, record.instances[0].id).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '隐藏服务成功',
+            })
+            self.loadMsaList()
+          })
+        })
+      },
     })
   }
 
   removeRegister = record => {
     const { delManualrule, clusterID } = this.props
     const ruleIds = record.instances.map(instance => instance.id)
-    delManualrule(clusterID, ruleIds).then(res => {
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: '移除注册成功',
-      })
-      this.loadMsaList()
+    const self = this
+    confirm({
+      title: `确认将服务 ${record.serviceName} 移除注册吗？`,
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          delManualrule(clusterID, ruleIds).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '移除注册成功',
+            })
+            self.loadMsaList()
+          })
+        })
+      },
     })
   }
 

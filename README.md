@@ -230,3 +230,36 @@ export default class Apm extends React.Component {
   }
 }
 ```
+
+#### 5.confirm 组件用法
+
+注意在 Promise 中 `this` 对象的指向
+
+```js
+hideService = record => {
+  const { addManualrule, clusterID } = this.props
+  const self = this
+  confirm({
+    title: `确认将服务 ${record.serviceName} 隐藏吗？`,
+    content: '',
+    onOk() {
+      return new Promise((resolve, reject) => {
+        const body = [{
+          appName: record.serviceName,
+          rule: MSA_RULE_EXP,
+        }]
+        addManualrule(clusterID, body).then(res => {
+          if (res.error) {
+            return reject()
+          }
+          resolve()
+          notification.success({
+            message: '隐藏服务成功',
+          })
+          self.loadMsaList()
+        })
+      })
+    },
+  })
+}
+```
