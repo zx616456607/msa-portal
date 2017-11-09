@@ -42,9 +42,14 @@ const ppAppsSchema = new schema.Entity('ppApps', {}, {
   idAttribute: 'applicationName',
 })
 
-// MsaList 
+// MsaList
 const MsaList = new schema.Entity('msaList', {}, {
   idAttribute: 'serviceName',
+})
+
+// GatewayAllPolicesList
+const gatewayPolicies = new schema.Entity('gatewayPolicies', {}, {
+  idAttribute: 'id',
 })
 // Schemas for tce API responses.
 export const Schemas = {
@@ -77,5 +82,8 @@ export const Schemas = {
   PP_APPS_ARRAY: [ ppAppsSchema ],
   MSALIST_ARRAY_DATA: {
     data: [ MsaList ],
+  },
+  GATEWAY_ALL_POLICIES_LIST_DATA: {
+    data: [ gatewayPolicies ],
   },
 }
