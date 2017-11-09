@@ -12,20 +12,20 @@
 
 import * as ActionTyps from '../actions/gateway'
 
-function gatewayList(state, action) {
+function allPolicesList(state, action) {
   switch (action.type) {
-    case ActionTyps.GATEWAY_LIST_REQUEST:
+    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_REQUEST:
       return {
         ...state,
         isFetching: true,
       }
-    case ActionTyps.GATEWAY_LIST_SUCCESS:
+    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_SUCCESS:
       return {
         ...state,
         isFetching: false,
         ...action.response.result,
       }
-    case ActionTyps.GATEWAY_LIST_FAILURE:
+    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_FAILURE:
       return {
         ...state,
         isFetching: false,
@@ -36,10 +36,10 @@ function gatewayList(state, action) {
 }
 
 const gateway = (state = {
-  gatewayList: {},
+  allPolicesList: {},
 }, action) => {
   return {
-    gatewayList: gatewayList(state.gatewayList, action),
+    allPolicesList: allPolicesList(state.allPolicesList, action),
   }
 }
 

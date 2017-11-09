@@ -6,7 +6,7 @@
 /**
  * Gateway
  *
- * 2017-11-0
+ * 2017-11-09
  * @author zhangcz
  */
 
@@ -16,19 +16,23 @@ import { Schemas } from '../middleware/schemas'
 
 const { MSA_API_URL } = API_CONFIG
 
-export const GATEWAY_LIST_REQUEST = 'GATEWAY_LIST_REQUEST'
-export const GATEWAY_LIST_SUCCESS = 'GATEWAY_LIST_SUCCESS'
-export const GATEWAY_LIST_FAILURE = 'GATEWAY_LIST_FAILURE'
+export const GATEWAY_ALL_POLICIES_LIST_REQUEST = 'GATEWAY_ALL_POLICIES_LIST_REQUEST'
+export const GATEWAY_ALL_POLICIES_LIST_SUCCESS = 'GATEWAY_ALL_POLICIES_LIST_SUCCESS'
+export const GATEWAY_ALL_POLICIES_LIST_FAILURE = 'GATEWAY_ALL_POLICIES_LIST_FAILURE'
 
 const fetchGatewayList = clusterID => {
   return {
     [CALL_API]: {
-      types: [ GATEWAY_LIST_REQUEST, GATEWAY_LIST_SUCCESS, GATEWAY_LIST_FAILURE ],
+      types: [
+        GATEWAY_ALL_POLICIES_LIST_REQUEST,
+        GATEWAY_ALL_POLICIES_LIST_SUCCESS,
+        GATEWAY_ALL_POLICIES_LIST_FAILURE,
+      ],
       endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/policy/all`,
       options: {
         method: 'GET',
       },
-      schema: Schemas.GATEWAY_LIST_DATA,
+      schema: Schemas.GATEWAY_ALL_POLICIES_LIST_DATA,
     },
   }
 }

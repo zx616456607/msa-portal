@@ -18,6 +18,7 @@ import current from './current'
 import * as apm from './apm'
 import pinpoint from './pinpoint'
 import msa from './msa'
+import gateway from './gateway'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -26,6 +27,7 @@ const entities = (state = {
   projects: {},
   ppApps: {},
   msaList: {},
+  gatewayPolicies: {},
 }, action) => {
   if (action.response && action.response.entities) {
     return merge({}, state, action.response.entities)
@@ -58,6 +60,7 @@ const rootReducer = combineReducers({
   ...apm,
   pinpoint,
   msa,
+  gateway,
 })
 
 export default rootReducer
