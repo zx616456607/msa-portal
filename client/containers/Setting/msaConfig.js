@@ -29,7 +29,7 @@ class MsaConfig extends React.Component {
   }
 
   componentWillMount() {
-    this.fetchState()
+    // this.fetchState()
   }
   /**
    * 获取Spring Cloud状态
