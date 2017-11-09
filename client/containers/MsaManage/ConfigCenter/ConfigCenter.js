@@ -29,6 +29,7 @@ class ConfigCenter extends React.Component {
     configName: '',
     branchName: '',
     value: '',
+    branchValue: '',
     configGitUrl: '',
     deleteVisible: false,
     branchData: [],
@@ -50,10 +51,9 @@ class ConfigCenter extends React.Component {
           configGitUrl: res.response.result.data.configGitUrl,
         })
         const branchQuery = {
-          url: res.response.result.data.configGitUrl,
-          clusterId: clusterID,
+          project_url: res.response.result.data.configGitUrl,
         }
-        getBranchList(branchQuery).then(res => {
+        getBranchList(clusterID, branchQuery).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
             this.setState({
@@ -61,11 +61,10 @@ class ConfigCenter extends React.Component {
               value: res.response.result.data[0].name,
             })
             const evnQuery = {
-              url: this.state.configGitUrl,
-              branchName: res.response.result.data[0].name,
-              clusterId: clusterID,
+              project_url: this.state.configGitUrl,
+              branch_name: res.response.result.data[0].name,
             }
-            getCenterEvn(evnQuery).then(res => {
+            getCenterEvn(clusterID, evnQuery).then(res => {
               if (res.error) return
               if (res.response.result.code === 200) {
                 this.setState({
@@ -104,13 +103,12 @@ class ConfigCenter extends React.Component {
     const { configGitUrl, configName, message } = this.state
     const { delCenterConfig, clusterID } = this.props
     const query = {
-      url: configGitUrl,
-      clusterId: clusterID,
-      branchName: 'master',
-      configName,
-      message,
+      project_url: configGitUrl,
+      branch_name: 'master',
+      file_path: configName,
+      commit_message: message === '' ? '删除一个配置' : message,
     }
-    delCenterConfig(query).then(res => {
+    delCenterConfig(clusterID, query).then(res => {
       if (res.error) {
         notification.error({
           message: `删除失败 ${configName}`,
@@ -140,12 +138,20 @@ class ConfigCenter extends React.Component {
 
   render() {
     const { envData, branchData, loading, branchName } = this.state
+    let branch = ''
+    if (branchName) {
+      branch = branchName
+    } else {
+      if (Object.keys(branchData).length > 0) {
+        branch = branchData[0].name
+      }
+    }
     const columns = [{
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
       render: (text, record) =>
-        <Link to={`/msa-manage/config-center/${text}?detal=true&id=${record.id}`}>
+        <Link to={`/msa-manage/config-center/${text}?detal=true&id=${record.id}&branch=${branch}`}>
           {text}
         </Link>,
     }, {
@@ -168,7 +174,6 @@ class ConfigCenter extends React.Component {
       defaultCurrent: 1,
       defaultPageSize: 30,
     }
-
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 
     return (
@@ -176,11 +181,11 @@ class ConfigCenter extends React.Component {
         <Card className="layout-content-btns" key="body">
           <Row className="branch">
             <span>版本分支：</span>
-            <Select style={{ width: 200 }} onChange={this.handleChang} defaultValue="master" >
+            <Select style={{ width: 200 }} onChange={this.handleChang} value={branch}>
               {data}
             </Select>
           </Row>
-          <Tabs onChange={this.handleChang} type="card" >
+          <Tabs type="card" >
             <TabPane tab="开发环境" key="1" >
               <div className="exploit">
                 <div className="headers">
@@ -224,7 +229,7 @@ class ConfigCenter extends React.Component {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="生成环境" key="3">
+            <TabPane tab="生产环境" key="3">
               <div className="exploit">
                 <div className="headers">
                   <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?pt')}>

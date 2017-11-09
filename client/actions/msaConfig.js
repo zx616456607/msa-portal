@@ -18,12 +18,13 @@ export const MSA_STATE_SUCCESS = 'MSA_STATE_SUCCESS'
 export const MSA_STATE_FAILURE = 'MSA_STATE_FAILURE'
 
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchMsaState = query => {
+const fetchMsaState = (clusterID, id) => {
   return {
-    query,
+    id,
+    clusterID,
     [CALL_API]: {
       types: [ MSA_STATE_REQUEST, MSA_STATE_SUCCESS, MSA_STATE_FAILURE ],
-      endpoint: `/clusters/${query.clusterID}/springcloud/${query.id}/state`,
+      endpoint: `/clusters/${clusterID}/springcloud/${id}/state`,
       schema: {},
       options: {
         method: 'GET',
@@ -34,8 +35,8 @@ const fetchMsaState = query => {
 
 // Fetches a page of apms.
 // Relies on Redux Thunk middleware.
-export const getMsaState = (clusterID, project) => dispatch => {
-  return dispatch(fetchMsaState(clusterID, project))
+export const getMsaState = (clusterID, id) => dispatch => {
+  return dispatch(fetchMsaState(clusterID, id))
 }
 
 export const MSA_INSTALL_REQUEST = 'MSA_INSTALL_REQUEST'
@@ -74,11 +75,13 @@ export const MSA_UNINSTALL_SUCCESS = 'MSA_INSTALL_SUCCESS'
 export const MSA_UNINSTALL_FAILURE = 'MSA_INSTALL_FAILURE'
 
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const uninstallMsa = query => {
+const uninstallMsa = (clusterID, id) => {
   return {
+    id,
+    clusterID,
     [CALL_API]: {
       types: [ MSA_UNINSTALL_REQUEST, MSA_UNINSTALL_SUCCESS, MSA_UNINSTALL_FAILURE ],
-      endpoint: `/clusters/${query.clusterID}/springcloud/${query.id}`,
+      endpoint: `/clusters/${clusterID}/springcloud/${id}`,
       schema: {},
       options: {
         method: 'DELETE',
@@ -88,6 +91,6 @@ const uninstallMsa = query => {
 }
 
 // Relies on Redux Thunk middleware.
-export const uninstallMsaConfig = clusterID => dispatch => {
-  return dispatch(uninstallMsa(clusterID))
+export const uninstallMsaConfig = (clusterID, id) => dispatch => {
+  return dispatch(uninstallMsa(clusterID, id))
 }
