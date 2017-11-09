@@ -134,7 +134,7 @@ class MsaConfig extends React.Component {
             <Row className="msa">
               <Col span={6}>基础服务</Col>
               <Col span={8}>
-                <Select style={{ width: 300 }} >
+                <Select style={{ width: 300 }} defaultValue="SpringCloud">
                   <Option value="pinpoint">SpringCloud</Option>
                 </Select>
               </Col>

@@ -12,6 +12,7 @@
 
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
+import { toQuerystring } from '../common/utils'
 
 const { MSA_API_URL } = API_CONFIG
 
@@ -41,12 +42,14 @@ export const CENTER_BRANCH_LIST_REQUEST = 'CENTER_BRANCH_LIST_REQUEST'
 export const CENTER_BRANCH_LIST_SUCCESS = 'CENTER_BRANCH_LIST_SUCCESS'
 export const CENTER_BRANCH_LIST_FAILURE = 'CENTER_BRANCH_LIST_FAILURE'
 
-const fetchBranch = query => {
+const fetchBranch = (clusterId, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/branches?${toQuerystring(query)}`
   return {
     query,
+    clusterId,
     [CALL_API]: {
       types: [ CENTER_BRANCH_LIST_REQUEST, CENTER_BRANCH_LIST_SUCCESS, CENTER_BRANCH_LIST_FAILURE ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/branches?project_url=${query.url}`,
+      endpoint,
       schema: {},
       options: {
         method: 'GET',
@@ -55,24 +58,26 @@ const fetchBranch = query => {
   }
 }
 
-export const getBranchList = query => dispatch => {
-  return dispatch(fetchBranch(query))
+export const getBranchList = (clusterId, query) => dispatch => {
+  return dispatch(fetchBranch(clusterId, query))
 }
 
 export const CENTER_SERVICE_INFO_REQUEST = 'CENTER_SERVICE_INFO_REQUEST'
 export const CENTER_SERVICE_INFO_SUCCESS = 'CENTER_SERVICE_INFO_SUCCESS'
 export const CENTER_SERVICE_INFO_FAILURE = 'CENTER_SERVICE_INFO_FAILURE'
 
-const fetchCenterEvn = query => {
+const fetchCenterEvn = (clusterId, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files?${toQuerystring(query)}`
   return {
     query,
+    clusterId,
     [CALL_API]: {
       types: [
         CENTER_SERVICE_INFO_REQUEST,
         CENTER_SERVICE_INFO_SUCCESS,
         CENTER_SERVICE_INFO_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}`,
+      endpoint,
       schema: {},
       options: {
         method: 'GET',
@@ -81,20 +86,21 @@ const fetchCenterEvn = query => {
   }
 }
 
-export const getCenterEvn = query => dispatch => {
-  return dispatch(fetchCenterEvn(query))
+export const getCenterEvn = (clusterId, query) => dispatch => {
+  return dispatch(fetchCenterEvn(clusterId, query))
 }
 
 export const CENTER_CONFIG_INFO_REQUEST = 'CENTER_CONFIG_INFO_REQUEST'
 export const CENTER_CONGIG_INFO_SUCCESS = 'CENTER_CONGIG_INFO_SUCCESS'
 export const CENTER_CONFIG_INFO_FAILURE = 'CENTER_CONFIG_INFO_FAILURE'
 
-const fetchCenterConfig = query => {
+const fetchCenterConfig = (clusterId, id, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files/${id}?${toQuerystring(query)}`
   return {
     query,
     [CALL_API]: {
       types: [ CENTER_CONFIG_INFO_REQUEST, CENTER_CONGIG_INFO_SUCCESS, CENTER_CONFIG_INFO_FAILURE ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files/${query.id}?project_url=${query.url}`,
+      endpoint,
       schema: {},
       options: {
         method: 'GET',
@@ -103,20 +109,22 @@ const fetchCenterConfig = query => {
   }
 }
 
-export const getCenterConfig = query => dispatch => {
-  return dispatch(fetchCenterConfig(query))
+export const getCenterConfig = (clusterId, id, query) => dispatch => {
+  return dispatch(fetchCenterConfig(clusterId, id, query))
 }
 
 export const CENTER_DELETE_REQUEST = 'CENTER_DELETE_REQUEST'
 export const CENTER_DELETE_SUCCESS = 'CENTER_DELETE_SUCCESS'
 export const CENTER_DELETE_FAILURE = 'CENTER_DELETE_FAILURE'
 
-const DeleteCenter = query => {
+const DeleteCenter = (clusterId, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files?${toQuerystring(query)}`
   return {
     query,
+    clusterId,
     [CALL_API]: {
       types: [ CENTER_DELETE_REQUEST, CENTER_DELETE_SUCCESS, CENTER_DELETE_FAILURE ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      endpoint,
       schema: {},
       options: {
         method: 'DELETE',
@@ -125,21 +133,22 @@ const DeleteCenter = query => {
   }
 }
 
-export const delCenterConfig = query => dispatch => {
-  return dispatch(DeleteCenter(query))
+export const delCenterConfig = (clusterId, query) => dispatch => {
+  return dispatch(DeleteCenter(clusterId, query))
 }
 
 export const CENTER_UPDATE_REQUEST = 'CENTER_UPDATE_REQUEST'
 export const CENTER_UPDATE_SUCCESS = 'CENTER_UPDATE_SUCCESS'
 export const CENTER_UPDATE_FAILURE = 'CENTER_UPDATE_FAILURE'
 
-const UpdateCenter = query => {
-  const body = query.yaml
+const UpdateCenter = (clusterId, yaml, query) => {
+  const body = yaml
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files?${toQuerystring(query)}`
   return {
     query,
     [CALL_API]: {
       types: [ CENTER_UPDATE_REQUEST, CENTER_UPDATE_SUCCESS, CENTER_UPDATE_FAILURE ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      endpoint,
       schema: {},
       options: {
         body,
@@ -149,21 +158,22 @@ const UpdateCenter = query => {
   }
 }
 
-export const putCenterConfig = query => dispatch => {
-  return dispatch(UpdateCenter(query))
+export const putCenterConfig = (clusterId, yaml, query) => dispatch => {
+  return dispatch(UpdateCenter(clusterId, yaml, query))
 }
 
 export const CENTER_ADD_REQUEST = 'CENTER_ADD_REQUEST'
 export const CENTER_ADD_SUCCESS = 'CENTER_ADD_SUCCESS'
 export const CENTER_ADD_FAILURE = 'CENTER_ADD_FAILURE'
 
-const addCenter = query => {
-  const body = query.yaml
+const addCenter = (clusterId, yaml, query) => {
+  const body = yaml
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files?${toQuerystring(query)}`
   return {
     query,
     [CALL_API]: {
       types: [ CENTER_ADD_REQUEST, CENTER_ADD_SUCCESS, CENTER_ADD_FAILURE ],
-      endpoint: `${MSA_API_URL}/clusters/${query.clusterId}/configserver/files?project_url=${query.url}&branch_name=${query.branchName}&file_path=${query.configName}&commit_message=${query.message}`,
+      endpoint,
       schema: {},
       options: {
         body,
@@ -173,8 +183,8 @@ const addCenter = query => {
   }
 }
 
-export const addCenterConfig = query => dispatch => {
-  return dispatch(addCenter(query))
+export const addCenterConfig = (clusterId, yaml, query) => dispatch => {
+  return dispatch(addCenter(clusterId, yaml, query))
 }
 
 export const CENTER_RELEASE_REQUEST = 'CENTER_RELEASE_REQUEST'
