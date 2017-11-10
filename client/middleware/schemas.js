@@ -83,7 +83,9 @@ export const Schemas = {
   MSALIST_ARRAY_DATA: {
     data: [ MsaList ],
   },
-  GATEWAY_ALL_POLICIES_LIST_DATA: {
-    data: [ gatewayPolicies ],
+  GATEWAY_POLICIES_LIST_DATA: {
+    data: {
+      content: [ gatewayPolicies ],
+    },
   },
 }

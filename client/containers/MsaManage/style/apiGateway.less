@@ -9,20 +9,33 @@
  * 2017-08-24
  * @author zhaoyb
  */
+@import '../../../assets/style/core/index.less';
+
  .api-gateway {
   .page {
-    width: 20%;
+    //width: 20%;
     display: inline-block;
     float: right;
     .ant-pagination {
       float: right;
-      margin-top: 8px;
+      margin-top: 2px;
       margin-left: 20px;
     }
     .total {
-      margin-top: 7px;
-      margin-top: 8px;
+      margin-top: 6px;
       float: left;
     }
   }
+   .able_background {
+     background-color: @success-color;
+   }
+   .disable_background {
+     background-color: @error-color;
+   }
+   .icon_style {
+     border-radius: 50%;
+     width: 10px;
+     height: 10px;
+     display: inline-block;
+   }
  }

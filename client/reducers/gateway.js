@@ -14,18 +14,20 @@ import * as ActionTyps from '../actions/gateway'
 
 function allPolicesList(state, action) {
   switch (action.type) {
-    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_REQUEST:
+    case ActionTyps.GET_GATEWAY_POLICIES_LIST_REQUEST:
       return {
         ...state,
         isFetching: true,
       }
-    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_SUCCESS:
+    case ActionTyps.GET_GATEWAY_POLICIES_LIST_SUCCESS:
       return {
         ...state,
         isFetching: false,
-        ...action.response.result,
+        code: action.response.result.code,
+        status: action.response.result.status,
+        ...action.response.result.data,
       }
-    case ActionTyps.GATEWAY_ALL_POLICIES_LIST_FAILURE:
+    case ActionTyps.GET_GATEWAY_POLICIES_LIST_FAILURE:
       return {
         ...state,
         isFetching: false,

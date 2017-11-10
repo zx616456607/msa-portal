@@ -13,33 +13,38 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 import { Schemas } from '../middleware/schemas'
+import { toQuerystring } from '../common/utils'
 
 const { MSA_API_URL } = API_CONFIG
 
-export const GATEWAY_ALL_POLICIES_LIST_REQUEST = 'GATEWAY_ALL_POLICIES_LIST_REQUEST'
-export const GATEWAY_ALL_POLICIES_LIST_SUCCESS = 'GATEWAY_ALL_POLICIES_LIST_SUCCESS'
-export const GATEWAY_ALL_POLICIES_LIST_FAILURE = 'GATEWAY_ALL_POLICIES_LIST_FAILURE'
+export const GET_GATEWAY_POLICIES_LIST_REQUEST = 'GET_GATEWAY_POLICIES_LIST_REQUEST'
+export const GET_GATEWAY_POLICIES_LIST_SUCCESS = 'GET_GATEWAY_POLICIES_LIST_SUCCESS'
+export const GET_GATEWAY_POLICIES_LIST_FAILURE = 'GET_GATEWAY_POLICIES_LIST_FAILURE'
 
-const fetchGatewayList = clusterID => {
+const fetchGatewayPagePoliciesList = (clusterID, query) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/policy`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
   return {
     [CALL_API]: {
       types: [
-        GATEWAY_ALL_POLICIES_LIST_REQUEST,
-        GATEWAY_ALL_POLICIES_LIST_SUCCESS,
-        GATEWAY_ALL_POLICIES_LIST_FAILURE,
+        GET_GATEWAY_POLICIES_LIST_REQUEST,
+        GET_GATEWAY_POLICIES_LIST_SUCCESS,
+        GET_GATEWAY_POLICIES_LIST_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/policy/all`,
+      endpoint,
       options: {
         method: 'GET',
       },
-      schema: Schemas.GATEWAY_ALL_POLICIES_LIST_DATA,
+      schema: Schemas.GATEWAY_POLICIES_LIST_DATA,
     },
   }
 }
 
-export function gatewayList(clusterID) {
+export function gatewayPagePoliciesList(clusterID, query) {
   return dispatch => {
-    return dispatch(fetchGatewayList(clusterID))
+    return dispatch(fetchGatewayPagePoliciesList(clusterID, query))
   }
 }
 
@@ -71,6 +76,34 @@ export function createGatewayPolicy(clusterID, body) {
   }
 }
 
+export const EDIT_GATEWAY_POLICY_REQUEST = 'EDIT_GATEWAY_POLICY_REQUEST'
+export const EDIT_GATEWAY_POLICY_SUCCESS = 'EDIT_GATEWAY_POLICY_SUCCESS'
+export const EDIT_GATEWAY_POLICY_FALIURE = 'EDIT_GATEWAY_POLICY_FALIURE'
+
+function fetchEditGatewayPolicy(clusterID, policyID, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        EDIT_GATEWAY_POLICY_REQUEST,
+        EDIT_GATEWAY_POLICY_SUCCESS,
+        EDIT_GATEWAY_POLICY_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/policy/${policyID}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function editGatewayPolicy(clusterID, policyID, body) {
+  return dispatch => {
+    return dispatch(fetchEditGatewayPolicy(clusterID, policyID, body))
+  }
+}
+
 export const DELETE_GATEWAY_POLICY_REQUEST = 'DELETE_GATEWAY_POLICY_REQUEST'
 export const DELETE_GATEWAY_POLICY_SUCCESS = 'DELETE_GATEWAY_POLICY_SUCCESS'
 export const DELETE_GATEWAY_POLICY_FALIURE = 'DELETE_GATEWAY_POLICY_FALIURE'
@@ -85,7 +118,7 @@ function fetchDeleteGatewatPolicy(clusterID, policyID) {
       ],
       endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/policy/${policyID}`,
       options: {
-        method: 'POST',
+        method: 'DELETE',
       },
       schema: {},
     },

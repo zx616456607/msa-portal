@@ -19,17 +19,21 @@ export const allPolicesListSlt = createSelector(
   [ gateway, getEntities ],
   (gateway, getEntities) => {
     const { allPolicesList } = gateway
-    const { isFetching, data } = allPolicesList
-    if (!data || !data.length) {
+    const { isFetching, content, totalPages, totalElements } = allPolicesList
+    if (!content || !content.length) {
       return {
         isFetching,
-        data: [],
+        allPolicesList: [],
+        totalPages: 0,
+        totalElements: 0,
       }
     }
     const { gatewayPolicies } = getEntities
     return {
-      allPolicesList: data.map(id => gatewayPolicies[id]),
       isFetching,
+      allPolicesList: content.map(id => gatewayPolicies[id]),
+      totalPages,
+      totalElements,
     }
   }
 )
