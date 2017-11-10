@@ -12,8 +12,8 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Icon, Input, Table, Dropdown, Menu, Card } from 'antd'
+import RoutingRuleModal from './RoutingRuleModal'
 import './style/index.less'
-import RoutingRule from './RoutingRule'
 
 const Search = Input.Search
 
@@ -132,7 +132,7 @@ export default class RoutingManage extends React.Component {
             style={{ width: 200 }}
           />
         </div>
-        <RoutingRule visible={ruleModal} scope={this}/>
+        <RoutingRuleModal visible={ruleModal} scope={this}/>
         <div className="layout-content-body" key="body">
           <Card noHovering>
             <Table

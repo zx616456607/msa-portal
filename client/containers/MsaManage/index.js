@@ -23,6 +23,7 @@ import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 // import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
+import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 
 const SubMenu = Menu.SubMenu
@@ -74,6 +75,15 @@ const menus = [
       </svg>
     ),
   }, */
+  {
+    to: '/msa-manage/blown-monitoring',
+    text: '熔断监控',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${blownMonitoringIcon.id}`} />
+      </svg>
+    ),
+  },
   {
     type: 'SubMenu',
     text: '认证管理',

@@ -50,7 +50,7 @@ class MsaDetailConfig extends React.Component {
         return
       }
       notification.success({
-        message: '刷新配置成功',
+        message: '更新配置成功',
       })
       this.loadMsaConfig()
     })

@@ -14,7 +14,6 @@ import React from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import App from './containers/App'
 import IndexPage from './containers/IndexPage'
-import TestPage from './containers/TestPage'
 import MsaManage from './containers/MsaManage'
 import RegisterMsa from './containers/MsaManage/MsaList/RegisterMsa'
 import MsaList from './containers/MsaManage/MsaList/index'
@@ -25,6 +24,7 @@ import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking'
 import MsaRoutingManage from './containers/MsaManage/RoutingManage/RoutingManage'
 import ApiGateway from './containers/MsaManage/ApiGateway'
 import ApiGatewayMonitoring from './containers/MsaManage/ApiGatewayMonitoring'
+import BlownMonitoring from './containers/MsaManage/BlownMonitoring'
 import CertificationManageClients from './containers/MsaManage/CertificationManage/Clients'
 import CertificationManageAuthMode from './containers/MsaManage/CertificationManage/AuthMode'
 import CertificationManageAuthScope from './containers/MsaManage/CertificationManage/AuthScope'
@@ -32,6 +32,8 @@ import Apm from './containers/Apm'
 import Topology from './containers/Apm/Topology'
 import Performance from './containers/Apm/Performance'
 import CallLinkTracking from './containers/Apm/CallLinkTracking'
+import MsaOm from './containers/MsaOm'
+import MsaOmLogs from './containers/MsaOm/Logs'
 import Setting from './containers/Setting'
 import ApmSetting from './containers/Setting/Apm'
 import MsaConfig from './containers/Setting/msaConfig'
@@ -44,10 +46,9 @@ export const appChildRoutes = [
     key: 'index',
   },
   {
-    path: '/test',
-    component: TestPage,
-    exact: true,
-    key: 'test',
+    path: '/msa-om',
+    component: MsaOm,
+    key: 'msa-om',
   },
   {
     path: '/msa-manage',
@@ -128,6 +129,12 @@ export const msaManageChildRoutes = [
     key: 'api-gateway-monitoring',
   },
   {
+    path: '/msa-manage/blown-monitoring',
+    exact: true,
+    component: BlownMonitoring,
+    key: 'blown-monitoring',
+  },
+  {
     path: '/msa-manage/certification-manage',
     exact: true,
     render: () => <Redirect to="/msa-manage/certification-manage/clients" component={CertificationManageClients} />,
@@ -177,6 +184,21 @@ export const apmChildRoutes = [
     component: CallLinkTracking,
     exact: true,
     key: 'call-link-tracking',
+  },
+]
+
+export const msaOmChildRoutes = [
+  {
+    path: '/msa-om',
+    exact: true,
+    render: () => <Redirect to="/msa-om/logs" component={MsaOmLogs} />,
+    key: 'index',
+  },
+  {
+    path: '/msa-om/logs',
+    component: MsaOmLogs,
+    exact: true,
+    key: 'msa-om-logs',
   },
 ]
 
