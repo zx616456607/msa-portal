@@ -32,9 +32,8 @@ const menus = [
     text: '性能管理（APM）',
   },
   {
-    to: '/test2',
+    to: '/msa-om',
     text: '微服务运维',
-    disabled: true,
   },
   {
     to: '/setting',

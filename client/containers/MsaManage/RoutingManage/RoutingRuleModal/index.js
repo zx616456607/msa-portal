@@ -14,7 +14,7 @@ import { Input, Modal, Form, Switch, Select } from 'antd'
 const FormItem = Form.Item
 const Option = Select.Option
 
-class RoutingRule extends React.Component {
+class RoutingRuleModal extends React.Component {
   confirmModal = () => {
     const { scope } = this.props
     scope.setState({
@@ -124,4 +124,4 @@ class RoutingRule extends React.Component {
   }
 }
 
-export default Form.create()(RoutingRule)
+export default Form.create()(RoutingRuleModal)
