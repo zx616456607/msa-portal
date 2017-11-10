@@ -43,7 +43,7 @@ class ConfigCenter extends React.Component {
   }
 
   loadData = () => {
-    const { clusterID, getService, getBranchList, getCenterEvn } = this.props
+    const { clusterID, getService, getBranchList } = this.props
     getService(clusterID).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
@@ -60,20 +60,26 @@ class ConfigCenter extends React.Component {
               branchData: res.response.result.data,
               value: res.response.result.data[0].name,
             })
-            const evnQuery = {
-              project_url: this.state.configGitUrl,
-              branch_name: res.response.result.data[0].name,
-            }
-            getCenterEvn(clusterID, evnQuery).then(res => {
-              if (res.error) return
-              if (res.response.result.code === 200) {
-                this.setState({
-                  loading: false,
-                  envData: res.response.result.data,
-                })
-              }
-            })
+            this.fetchList()
           }
+        })
+      }
+    })
+  }
+
+  fetchList = branch => {
+    const { getCenterEvn, clusterID } = this.props
+    const { configGitUrl, value } = this.state
+    const evnQuery = {
+      project_url: configGitUrl,
+      branch_name: branch === undefined ? value : branch,
+    }
+    getCenterEvn(clusterID, evnQuery).then(res => {
+      if (res.error) return
+      if (res.response.result.code === 200) {
+        this.setState({
+          loading: false,
+          envData: res.response.result.data,
         })
       }
     })
@@ -86,7 +92,7 @@ class ConfigCenter extends React.Component {
   }
 
   handleChang = value => {
-    this.loadData()
+    this.fetchList(value)
     this.setState({
       branchName: value,
     })
@@ -133,7 +139,14 @@ class ConfigCenter extends React.Component {
   }
 
   handleRefresh = () => {
-    this.loadData()
+    const { branchName } = this.state
+    if (branchName) {
+      this.fetchList(branchName)
+    }
+  }
+
+  handleButtonClick = record => {
+    this.props.history(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`)
   }
 
   render() {
@@ -163,10 +176,8 @@ class ConfigCenter extends React.Component {
       title: '操作',
       dataIndex: 'operation',
       render: (text, record) => <div>
-        <Link to={`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`}>
-          <div className="desc" style={{ color: '#2db7f5' }}>查看详情</div>&nbsp; | &nbsp;
-        </Link>
-        <div className="desc" style={{ color: '#f85a5a' }} onClick={() => this.handleDelVisible(record.name)}>删除</div>
+        <Button className="detail" type="primary" onClick={() => this.props.history(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`)}>查看详情</Button>
+        <Button onClick={() => this.handleDelVisible(record.name)}>删除</Button>
       </div>,
     }]
     const pagination = {
@@ -177,7 +188,7 @@ class ConfigCenter extends React.Component {
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 
     return (
-      <QueueAnim className="center">
+      <QueueAnim className="center" >
         <Card className="layout-content-btns" key="body">
           <Row className="branch">
             <span>版本分支：</span>
@@ -204,7 +215,8 @@ class ConfigCenter extends React.Component {
                     columns={columns}
                     dataSource={envData}
                     pagination={false}
-                    loading={loading} />
+                    loading={loading}
+                    rowKey={row => row.name}/>
                 </div>
               </div>
             </TabPane>
@@ -225,7 +237,8 @@ class ConfigCenter extends React.Component {
                   <Table
                     columns={columns}
                     dataSource={envData}
-                    pagination={false} />
+                    pagination={false}
+                    rowKey={row => row.name} />
                 </div>
               </div>
             </TabPane>
@@ -246,7 +259,8 @@ class ConfigCenter extends React.Component {
                   <Table
                     columns={columns}
                     dataSource={envData}
-                    pagination={false} />
+                    pagination={false}
+                    rowKey={row => row.name}/>
                 </div>
               </div>
             </TabPane>
