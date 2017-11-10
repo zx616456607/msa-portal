@@ -17,8 +17,9 @@ import { parse } from 'query-string'
 import QueueAnim from 'rc-queue-anim'
 import { putCenterConfig, getCenterConfig, getService, getBranchList, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
 import YamlEditor from '../../../../components/Editor/Yaml'
-import { Row, Button, Select, Input, notification, Col, Card } from 'antd'
+import { Row, Button, Select, Input, notification, Col, Card, Form } from 'antd'
 const Option = Select.Option
+const FormItem = Form.Item
 const { TextArea } = Input
 
 class CreateConfig extends React.Component {
@@ -35,8 +36,10 @@ class CreateConfig extends React.Component {
   }
   componentWillMount() {
     const { detal } = parse(location.search)
+    const { branch } = parse(location.search)
     this.setState({
       detal,
+      branchName: branch,
     })
     this.version()
     if (detal === 'true') {
@@ -53,10 +56,9 @@ class CreateConfig extends React.Component {
           configGitUrl: res.response.result.data.configGitUrl,
         })
         const branchQuery = {
-          url: res.response.result.data.configGitUrl,
-          clusterId: clusterID,
+          project_url: res.response.result.data.configGitUrl,
         }
-        getBranchList(branchQuery).then(res => {
+        getBranchList(clusterID, branchQuery).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
             this.setState({
@@ -73,15 +75,13 @@ class CreateConfig extends React.Component {
     const { configGitUrl } = this.state
     const { id } = parse(location.search)
     const query = {
-      id,
-      url: configGitUrl,
-      clusterId: clusterID,
+      project_url: configGitUrl,
     }
-    getCenterConfig(query).then(res => {
+    getCenterConfig(clusterID, id, query).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
-          yaml: res.response.result.data.content,
+          yaml: res.response.result.data.content.replace(/\"/g, '').replace('\\n', ' \n '),
         })
       }
     })
@@ -91,28 +91,30 @@ class CreateConfig extends React.Component {
     const { configGitUrl, branchName, inputValue, textAreaValue, currentYaml, yaml } = this.state
     const { putCenterConfig, clusterID } = this.props
     const query = {
-      branchName,
-      configName: inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue,
-      message: textAreaValue,
-      url: configGitUrl,
-      clusterId: clusterID,
-      yaml: currentYaml === '' ? yaml : currentYaml,
+      branch_name: branchName,
+      file_path: inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue,
+      commit_message: textAreaValue === '' ? '添加一个配置' : textAreaValue,
+      project_url: configGitUrl,
     }
-    putCenterConfig(query).then(res => {
-      if (res.error) {
-        notification.error({
-          message: '保存失败',
-        })
-        return
-      }
-      if (res.response.result.code === 200) {
-        notification.success({
-          message: '保存成功',
-        })
-        this.setState({
-          btnVasible: false,
-        })
-      }
+    const yamls = currentYaml === '' ? yaml : currentYaml
+    this.props.form.validateFields(err => {
+      if (err) return
+      putCenterConfig(clusterID, yamls, query).then(res => {
+        if (res.error) {
+          notification.error({
+            message: '保存失败',
+          })
+          return
+        }
+        if (res.response.result.code === 200) {
+          notification.success({
+            message: '保存成功',
+          })
+          this.setState({
+            btnVasible: false,
+          })
+        }
+      })
     })
   }
 
@@ -162,14 +164,12 @@ class CreateConfig extends React.Component {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
     const { addCenterConfig, clusterID } = this.props
     const query = {
-      branchName,
-      configName: inputValue,
-      message: textAreaValue,
-      url: configGitUrl,
-      clusterId: clusterID,
-      yaml: currentYaml,
+      branch_name: branchName,
+      file_path: inputValue,
+      commit_message: textAreaValue,
+      project_url: configGitUrl,
     }
-    addCenterConfig(query).then(res => {
+    addCenterConfig(clusterID, currentYaml, query).then(res => {
       if (res.error) {
         notification.error({
           message: '添加失败',
@@ -186,10 +186,10 @@ class CreateConfig extends React.Component {
   }
 
   render() {
-    const { detal, yaml, branchData, btnVasible, currentYaml } = this.state
+    const { detal, yaml, branchData, btnVasible, currentYaml, branchName } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
-
+    const { getFieldDecorator } = this.props.form
     return (
       <QueueAnim className="create">
         <Card className="info" key="body">
@@ -202,7 +202,7 @@ class CreateConfig extends React.Component {
           <Row className="connent">
             <Col className="text" span={4}>配置版本</Col>
             <Col span={20}>
-              <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage}>
+              <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage} value={branchName}>
                 {
                   branchData ?
                     branchData.map((item, index) => (
@@ -221,7 +221,13 @@ class CreateConfig extends React.Component {
           <Row className="connents">
             <Col className="text" span={4}>添加备注</Col>
             <Col span={20}>
-              <TextArea className="textArea" placeholder="添加一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
+              <FormItem>
+                {getFieldDecorator('area', {
+                  rules: [{ required: true, message: '请填写备注信息' }],
+                })(
+                  <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
+                )}
+              </FormItem>
             </Col>
           </Row>
           <div className="operation" >
@@ -264,4 +270,4 @@ export default connect(mapStateToProps, {
   putCenterConfig,
   getCenterConfig,
   releaseConfigService,
-})(CreateConfig)
+})(Form.create()(CreateConfig))
