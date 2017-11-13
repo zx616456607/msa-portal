@@ -30,7 +30,7 @@ import {
 } from '../../actions/gateway'
 import { getMsaList } from '../../actions/msa'
 import { msaListSlt } from '../../selectors/msa'
-import { allPolicesListSlt } from '../../selectors/gateway'
+import { gatewayPolicesListSlt } from '../../selectors/gateway'
 import confirm from '../../components/Modal/confirm'
 
 const Search = Input.Search
@@ -318,7 +318,7 @@ class ApiGateway extends React.Component {
 
   render() {
     const {
-      form, allPolicesList, isFetching,
+      form, policesList, isFetching,
       totalElements,
     } = this.props
     const {
@@ -327,8 +327,8 @@ class ApiGateway extends React.Component {
     } = this.state
     const { getFieldDecorator } = form
     let menu = []
-    if (allPolicesList && allPolicesList.length) {
-      menu = allPolicesList.map(item => {
+    if (policesList && policesList.length) {
+      menu = policesList.map(item => {
         return <Menu
           style={{ width: '79px' }}
           onClick={this.menuClick.bind(this, item)}
@@ -431,7 +431,7 @@ class ApiGateway extends React.Component {
             <Table
               // rowSelection={rowSelection}
               columns={columns}
-              dataSource={allPolicesList}
+              dataSource={policesList}
               loading={isFetching}
               pagination={false}
               rowKey={record => record.id}
@@ -576,12 +576,12 @@ const mapStateToProps = state => {
   const { current } = state
   const { id } = current.config.cluster
   const { msaList, msaListLoading } = msaListSlt(state)
-  const { allPolicesList, isFetching, totalElements } = allPolicesListSlt(state)
+  const { policesList, isFetching, totalElements } = gatewayPolicesListSlt(state)
   return {
     clusterID: id,
     msaList,
     msaListLoading,
-    allPolicesList,
+    policesList,
     isFetching,
     totalElements,
   }
