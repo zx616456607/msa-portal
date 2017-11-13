@@ -11,98 +11,46 @@
  */
 
 import React from 'react'
-import { Select, Button, Card, Table } from 'antd'
+import { connect } from 'react-redux'
+import { Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import ApmTimePicker from '../../components/ApmTimePicker'
-import { formatDate } from '../../common/utils'
-import {
-  ALL,
-  ERROR,
-} from '../../constants'
+import { DEFAULT, API_CONFIG } from '../../constants'
+import { toQuerystring } from '../../common/utils'
+import './style/CallLinkTracking.less'
 
-const Option = Select.Option
-
-export default class CallLinkTracking extends React.Component {
+class CallLinkTracking extends React.Component {
   render() {
-    const columns = [{
-      title: '#',
-      dataIndex: 'index',
-      key: 'index',
-      render: text => <a href="#">{text}</a>,
-    }, {
-      title: 'Stat time',
-      dataIndex: 'startTime',
-      key: 'startTime',
-      render: text => formatDate(text),
-    }, {
-      title: 'Path',
-      dataIndex: 'application',
-      key: 'application',
-    }, {
-      title: 'Res.(ms)',
-      dataIndex: 'elapsed',
-      key: 'elapsed',
-    }, {
-      title: 'Exception',
-      dataIndex: 'exception',
-      key: 'exception',
-      render: text => {
-        if (text === ERROR) {
-          return <Icon type="close-circle-o" className="error"/>
-        }
-        return
-      },
-    }, {
-      title: 'Agent',
-      dataIndex: 'agentId',
-      key: 'agentId',
-    }, {
-      title: 'Client IP',
-      dataIndex: 'remoteAddr',
-      key: 'remoteAddr',
-    }, {
-      title: 'Transaction',
-      dataIndex: 'traceId',
-      key: 'traceId',
-    }]
+    const { currentConfig, currentUser } = this.props
+    const query = {
+      clusterId: currentConfig.cluster.id,
+      namespace: currentUser.namespace,
+    }
+    const iframeSrc = `${API_CONFIG.MSA_API}/zipkin/?${toQuerystring(query)}`
     return (
-      <QueueAnim className="call-link-tracking">
-        <div className="layout-content-btns" key="btns">
-          <Select
-            showSearch
-            style={{ width: 150 }}
-            placeholder="选择微服务"
-            optionFilterProp="children"
-          >
-            <Option value="test">test</Option>
-          </Select>
-          <Button icon="reload" onClick={this.loadData}>
-            刷新
-          </Button>
-          <ApmTimePicker onOk={() => {}} />
-          <Select
-            className="float-right"
-            showSearch
-            style={{ width: 150 }}
-            placeholder="选择一个实例"
-            optionFilterProp="children"
-          >
-            <Option value={ALL}>{ALL}</Option>
-          </Select>
-        </div>
+      <QueueAnim className="msa-call-link-tracking">
         <div className="layout-content-body" key="body">
-          <Card className="call-link-tracking-table">
-            <Table
-              columns={columns}
-              dataSource={[]}
-              pagination={{
-                size: 'small',
-                pageSize: 50,
-              }}
-            />
+          <Card>
+            <iframe src={iframeSrc} />
           </Card>
         </div>
       </QueueAnim>
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { current } = state
+  const currentConfig = current.config
+  const currentUser = current.user.info
+  if (currentConfig.project.namespace === DEFAULT) {
+    currentConfig.project.namespace = currentUser.namespace
+  }
+  return {
+    currentConfig,
+    currentUser,
+  }
+}
+
+export default connect(mapStateToProps, {
+  //
+})(CallLinkTracking)

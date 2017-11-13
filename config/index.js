@@ -32,6 +32,7 @@ const initialConfig = {
   PAAS_SPI_PREFIX,
   PAAS_API_URL,
   PAAS_SPI_URL,
+  MSA_API,
   MSA_API_PREFIX,
   MSA_API_URL,
 }
