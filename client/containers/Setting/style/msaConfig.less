@@ -11,6 +11,9 @@
  */
 
 .layout-content-btns {
+  .ant-card-head {
+    margin-right: 0 !important;
+  }
   .title {
     height: 40px;
     padding: 10px;
@@ -21,17 +24,22 @@
   }
   .conten {
     height: 310px;
-    border-top: 1px solid #ccc;
     background-color: #fff;
+    .ant-col-6 {
+      width: 140px;
+      text-align: left;
+      padding-left: 20px;
+    }
+    .ant-col-8,
+    .ant-col-18 {
+      width: calc(~"100% - 140px");
+    }
     .info {
-      margin-left: 40px;
-      margin-top: 30px;
       .msa {
         margin-top: 20px;
         margin-bottom: 20px;
         margin-right: 10px;
         & > div:first-child {
-          text-align: right;
           padding-right: 17px;
           line-height: 25px;
         }

@@ -21,10 +21,19 @@ import { settingChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
+import globalSetting from '../../assets/img/system-settings/global-setting.svg'
 import './style/index.less'
 
 const menus = [
   {
+    to: '/setting/global-setting',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${globalSetting.id}`} />
+      </svg>
+    ),
+    text: '全局配置',
+  }, {
     to: '/setting/msa-config',
     icon: (
       <svg className="menu-icon">
