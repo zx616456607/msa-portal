@@ -15,15 +15,15 @@ import { createSelector } from 'reselect'
 const gateway = state => state.gateway
 const getEntities = state => state.entities
 
-export const allPolicesListSlt = createSelector(
+export const gatewayPolicesListSlt = createSelector(
   [ gateway, getEntities ],
   (gateway, getEntities) => {
-    const { allPolicesList } = gateway
-    const { isFetching, content, totalPages, totalElements } = allPolicesList
+    const { policesList } = gateway
+    const { isFetching, content, totalPages, totalElements } = policesList
     if (!content || !content.length) {
       return {
         isFetching,
-        allPolicesList: [],
+        policesList: [],
         totalPages: 0,
         totalElements: 0,
       }
@@ -31,7 +31,7 @@ export const allPolicesListSlt = createSelector(
     const { gatewayPolicies } = getEntities
     return {
       isFetching,
-      allPolicesList: content.map(id => gatewayPolicies[id]),
+      policesList: content.map(id => gatewayPolicies[id]),
       totalPages,
       totalElements,
     }

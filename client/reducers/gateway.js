@@ -12,7 +12,7 @@
 
 import * as ActionTyps from '../actions/gateway'
 
-function allPolicesList(state, action) {
+function policesList(state, action) {
   switch (action.type) {
     case ActionTyps.GET_GATEWAY_POLICIES_LIST_REQUEST:
       return {
@@ -38,10 +38,10 @@ function allPolicesList(state, action) {
 }
 
 const gateway = (state = {
-  allPolicesList: {},
+  policesList: {},
 }, action) => {
   return {
-    allPolicesList: allPolicesList(state.allPolicesList, action),
+    policesList: policesList(state.policesList, action),
   }
 }
 
