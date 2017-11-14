@@ -38,7 +38,7 @@ class MsaDetail extends React.Component {
   }
 
   render() {
-    const { name, msaDetail, clusterID } = this.props
+    const { name, msaDetail, msaListLoading, clusterID } = this.props
     const instances = msaDetail.instances || []
     return (
       <QueueAnim className="msa-detail">
@@ -75,6 +75,7 @@ class MsaDetail extends React.Component {
               name={name}
               instances={instances}
               loadMsaDetail={this.loadMsaDetail}
+              loading={msaListLoading}
               clusterID={clusterID}
             />
           </TabPane>
@@ -107,12 +108,13 @@ const mapStateToProps = (state, ownProps) => {
   const { id } = current.config.cluster
   const { match } = ownProps
   const { name } = match.params
-  const { msaList } = msaListSlt(state)
+  const { msaList, msaListLoading } = msaListSlt(state)
   const msaDetail = msaList[0] || {}
   return {
     clusterID: id,
     name,
     msaDetail,
+    msaListLoading,
   }
 }
 

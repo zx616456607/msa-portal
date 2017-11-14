@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Input, Icon, Table, notification } from 'antd'
+import { Button, Input, Table, notification } from 'antd'
 import classNames from 'classnames'
 import {
   delManualrule,
@@ -36,7 +36,7 @@ class MsaDetailList extends React.Component {
   }
 
   render() {
-    const { instances } = this.props
+    const { instances, loadMsaDetail, loading } = this.props
     const pagination = {
       simple: true,
     }
@@ -99,7 +99,9 @@ class MsaDetailList extends React.Component {
     return (
       <div className="msaDetailList">
         <div className="layout-content-btns">
-          <Button type="primary"><Icon type="sync"/>刷新</Button>
+          <Button type="primary" icon="sync" onClick={loadMsaDetail}>
+          刷新
+          </Button>
           <Search placeholder="按服务名称搜索" style={{ width: '200px' }}/>
         </div>
         <Table
@@ -108,6 +110,7 @@ class MsaDetailList extends React.Component {
           columns={columns}
           dataSource={instances}
           rowKey={row => row.instanceId}
+          loading={loading}
         />
       </div>
     )
