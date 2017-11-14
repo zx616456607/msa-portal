@@ -45,6 +45,7 @@ export const DEFAULT = 'default'
 export const TIMES_WITHOUT_YEAR = 'MM-DD HH:mm:ss'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const CONTENT_TYPE_JSON = 'application/json'
+export const CONTENT_TYPE_TEXT = 'text/plain'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
 export const PINPOINT_LIMIT = 5000
 export const X_GROUP_UNIT = 284211
