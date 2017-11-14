@@ -33,7 +33,7 @@ const Search = Input.Search
 
 class MsaList extends React.Component {
   state = {
-    //
+    keyword: '',
   }
 
   componentWillMount() {
@@ -125,6 +125,8 @@ class MsaList extends React.Component {
 
   render() {
     const { msaList, msaListLoading } = this.props
+    const { keyword } = this.state
+    const msaData = msaList.filter(msa => msa.serviceName.indexOf(keyword) > -1)
     const columns = [{
       title: '微服务名称',
       dataIndex: 'serviceName',
@@ -206,10 +208,11 @@ class MsaList extends React.Component {
           <Button icon="poweroff">注销微服务</Button>
           <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
           <Search
+            className="msa-search"
             placeholder="按微服务名称搜索"
-            style={{ width: 200 }}
+            onSearch={keyword => this.setState({ keyword })}
           />
-          <span className="float-right msa-btn-box-total">共计 {msaList.length} 条</span>
+          <span className="float-right msa-btn-box-total">共计 {msaData.length} 条</span>
         </div>
         <div className="layout-content-body" key="body">
           <Card noHovering>
@@ -218,7 +221,7 @@ class MsaList extends React.Component {
               pagination={pagination}
               rowSelection={rowSelection}
               columns={columns}
-              dataSource={msaList}
+              dataSource={msaData}
               loading={msaListLoading}
               rowKey={row => row.serviceName}
             />

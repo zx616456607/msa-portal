@@ -22,6 +22,10 @@ import './style/index.less'
 const Search = Input.Search
 
 class MsaDetailList extends React.Component {
+  state = {
+    keyword: '',
+  }
+
   removeRegister = record => {
     const { delManualrule, clusterID, loadMsaDetail } = this.props
     delManualrule(clusterID, record.id).then(res => {
@@ -37,6 +41,8 @@ class MsaDetailList extends React.Component {
 
   render() {
     const { instances, loadMsaDetail, loading } = this.props
+    const { keyword } = this.state
+    const instancesData = instances.filter(instance => instance.name.indexOf(keyword) > -1)
     const pagination = {
       simple: true,
     }
@@ -97,18 +103,22 @@ class MsaDetailList extends React.Component {
       },
     }]
     return (
-      <div className="msaDetailList">
+      <div className="msa-detail-list">
         <div className="layout-content-btns">
           <Button type="primary" icon="sync" onClick={loadMsaDetail}>
           刷新
           </Button>
-          <Search placeholder="按服务名称搜索" style={{ width: '200px' }}/>
+          <Search
+            className="msa-detail-list-search"
+            placeholder="按实例名称搜索"
+            onSearch={keyword => this.setState({ keyword })}
+          />
         </div>
         <Table
-          className="msaDetailList-table"
+          className="msa-detail-list-table"
           pagination={pagination}
           columns={columns}
-          dataSource={instances}
+          dataSource={instancesData}
           rowKey={row => row.instanceId}
           loading={loading}
         />
