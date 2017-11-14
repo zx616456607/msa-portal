@@ -6,6 +6,12 @@
  */
 
 .layout-content-btns {
+  .ant-card-head {
+    margin-right: 0 !important;
+  }
+  .ant-card-body {
+    padding-top: 1px !important;
+  }
   .header {
     height: 40px;
     margin-right: 0;
@@ -13,17 +19,16 @@
   }
   .contents {
     height: 310px;
-    border-top: 1px solid #ccc;
     background: #fff;
     .left {
-      width: 452px;
-      padding: 10px 40px;
-      display: inline-block;
+      padding: 10px 40px 10px 20px;
+      .ant-col-4 {
+        text-align: left;
+      }
       .apms {
         margin-top: 20px;
         margin-bottom: 20px;
         & > div:first-child {
-          text-align: right;
           padding-right: 10px;
           line-height: 25px;
         }
@@ -74,9 +79,7 @@
       }
     }
     .rigth {
-      width: 40%;
       height: 310px;
-      float: right;
       padding: 10px;
       display: inline-block;
       border-left: 1px solid #ccc;

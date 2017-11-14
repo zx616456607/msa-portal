@@ -35,6 +35,7 @@ import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import MsaOm from './containers/MsaOm'
 import MsaOmLogs from './containers/MsaOm/Logs'
 import Setting from './containers/Setting'
+import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
 import MsaConfig from './containers/Setting/msaConfig'
 
@@ -206,8 +207,14 @@ export const settingChildRoutes = [
   {
     path: '/setting',
     exact: true,
-    render: () => <Redirect to="/setting/msa-config" component={MsaConfig} />,
+    render: () => <Redirect to="/setting/global-setting" component={GlobalSetting} />,
     key: 'index',
+  },
+  {
+    path: '/setting/global-setting',
+    component: GlobalSetting,
+    exact: true,
+    key: 'global_setting',
   },
   {
     path: '/setting/msa-config',

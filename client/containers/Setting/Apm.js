@@ -13,7 +13,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/apm.less'
-import { Row, Col, Select, Button, Modal, Icon } from 'antd'
+import { Row, Col, Select, Button, Modal, Icon, Card } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
@@ -290,125 +291,131 @@ class ApmSetting extends React.Component {
     }
 
     return (
-      <Row className="layout-content-btns">
-        <div className="header" style={{ marginRight: 0 }}>
-          <p className="" style={{ fontSize: 16, padding: 10 }}>APM配置</p>
-        </div>
-        <div className="contents">
-          <div className="left">
-            {/* <Row className="apms">
-              <Col span={6}>项目</Col>
-              <Col span={18}>
-                <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
-                  {
-                    projectsData ?
-                      projectsData.map((item, index) => (
-                        <Option key={index} value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
-                      )) : ''
-                  }
-                </Select>
+      <QueueAnim>
+        <div key="layout-content-btns">
+          <Card
+            title="APM配置"
+            className="layout-content-btns"
+            noHovering
+          >
+            <Row className="contents">
+              <Col className="left" span="12">
+                {/* <Row className="apms">
+                  <Col span={6}>项目</Col>
+                  <Col span={18}>
+                    <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
+                      {
+                        projectsData ?
+                          projectsData.map((item, index) => (
+                            <Option key={index}
+                              value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
+                          )): ''
+                      }
+                    </Select>
+                  </Col>
+                </Row>
+                <Row className="apms">
+                  <Col span={6}>集群</Col>
+                  <Col span={18}>
+                    <Select style={{ width: 300 }} onChange={this.handleColony}>
+                      {
+                        colonyData ?
+                          colonyData.map((item, index) => (
+                            <Option key={index} value={item.cluster.clusterID}>{item.cluster.clusterName}</Option>
+                          )): ''
+                      }
+                    </Select>
+                  </Col>
+                </Row> */}
+                <Row className="apms">
+                  <Col span={4}>基础服务</Col>
+                  <Col span={8}>
+                    <Select className="select" defaultValue="Pinpoint">
+                      <Option value="pinpoint">Pinpoint</Option>
+                    </Select>
+                  </Col>
+                </Row>
+                <Row className="apms">
+                  <Col span={4}>安装情况</Col>
+                  <Col span={18}>
+                    {
+                      apmState ?
+                        <Row className="install">
+                          <Icon className="ico" type="check-circle-o" />&nbsp;
+                          <span className="existence" >已安装</span>
+                          <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
+                        </Row> :
+                        <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                    }
+                  </Col>
+                </Row>
+                <Row className="apms">
+                  <Col span={4}>组件状态</Col>
+                  <Col span={18}>
+                    {healthy}
+                  </Col>
+                </Row>
+                <Row className="apms">
+                  <Col span={4}>组件版本</Col>
+                  <Col span={18}>
+                    <span className="version">{this.state.version.version}</span>
+                  </Col>
+                </Row>
               </Col>
-            </Row>
-            <Row className="apms">
-              <Col span={6}>集群</Col>
-              <Col span={18}>
-                <Select style={{ width: 300 }} onChange={this.handleColony}>
-                  {
-                    colonyData ?
-                      colonyData.map((item, index) => (
-                        <Option key={index} value={item.cluster.clusterID}>{item.cluster.clusterName}</Option>
-                      )) : ''
-                  }
-                </Select>
-              </Col>
-            </Row> */}
-            <Row className="apms">
-              <Col span={4}>基础服务</Col>
-              <Col span={8}>
+              <Col className="rigth" span="12">
                 <Select className="select" defaultValue="Pinpoint">
                   <Option value="pinpoint">Pinpoint</Option>
                 </Select>
-              </Col>
-            </Row>
-            <Row className="apms">
-              <Col span={4}>安装情况</Col>
-              <Col span={18}>
-                {
-                  apmState ?
-                    <Row className="install">
-                      <Icon className="ico" type="check-circle-o" />&nbsp;
-                      <span className="existence" >已安装</span>
-                      <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
-                    </Row> :
-                    <Button type="primary" onClick={this.handleInstall}>安装</Button>
-                }
-              </Col>
-            </Row>
-            <Row className="apms">
-              <Col span={4}>组件状态</Col>
-              <Col span={18}>
-                {healthy}
-              </Col>
-            </Row>
-            <Row className="apms">
-              <Col span={4}>组件版本</Col>
-              <Col span={18}>
-                <span className="version">{this.state.version.version}</span>
-              </Col>
-            </Row>
-          </div>
-          <div className="rigth">
-            <Select className="select" defaultValue="Pinpoint">
-              <Option value="pinpoint">Pinpoint</Option>
-            </Select>
-            <div className="projet">
-              <div className="not">
-                <span className="des">未安装项目</span>
-                <div className="notInstalled">
-                  {
-                    projectID ?
-                      projectID.map((item, index) => (
-                        <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                          <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                        </div>
-                      )) : ''
-                  }
-                </div>
-              </div>
-              <div className="already">
-                <div className="yes">
-                  <span className="des">已安装项目</span>
-                  <div className="yesInstalled" style={{ marginTop: 5 }}>
-                    {/* <div style={{ width: 90, display: 'inline-block' }}>
-                      <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
-                    </div> */}
-                    {
-                      Object.keys(serviceData).length > 0 ?
-                        serviceData.map((item, index) => (
-                          <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                            <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                          </div>
-                        )) : ''
-                    }
+                <div className="projet">
+                  <div className="not">
+                    <span className="des">未安装项目</span>
+                    <div className="notInstalled">
+                      {
+                        projectID ?
+                          projectID.map((item, index) => (
+                            <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                              <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
+                            </div>
+                          )) : ''
+                      }
+                    </div>
+                  </div>
+                  <div className="already">
+                    <div className="yes">
+                      <span className="des">已安装项目</span>
+                      <div className="yesInstalled" style={{ marginTop: 5 }}>
+                        {/* <div style={{ width: 90, display: 'inline-block' }}>
+                         <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
+                         </div> */}
+                        {
+                          Object.keys(serviceData).length > 0 ?
+                            serviceData.map((item, index) => (
+                              <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                                <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
+                              </div>
+                            )) : ''
+                        }
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </Col>
+            </Row>
+            <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
+              footer={[
+                <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
+                <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
+              ]}>
+              <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+                <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后改项目内应用，将无法继续使用 APM 部分功能</span>
               </div>
-            </div>
-          </div>
+              <div style={{ marginTop: 10 }}>
+                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+              </div>
+            </Modal>
+          </Card>
         </div>
-        <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
-          ]}>
-          <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-            <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后改项目内应用，将无法继续使用 APM 部分功能</span>
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
-          </div>
-        </Modal>
-      </Row>
+      </QueueAnim>
     )
   }
 }
