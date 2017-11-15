@@ -44,7 +44,7 @@ const ppAppsSchema = new schema.Entity('ppApps', {}, {
 
 // MsaList
 const MsaList = new schema.Entity('msaList', {}, {
-  idAttribute: 'serviceName',
+  idAttribute: 'appName',
 })
 
 // GatewayAllPolicesList

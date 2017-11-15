@@ -291,10 +291,10 @@ class ApiGateway extends React.Component {
     }
     return msaList.map(item => {
       return <Option
-        value={item.serviceName}
-        key={`list${item.serviceName}`}
+        value={item.appName}
+        key={`list${item.appName}`}
       >
-        {item.serviceName}
+        {item.appName}
       </Option>
     })
   }
@@ -376,7 +376,7 @@ class ApiGateway extends React.Component {
       dataIndex: 'operation',
       render: (text, record, index) => <div>
         {
-          <Dropdown.Button overlay={menu[index]} type="ghost" onClick={ this.editGateway.bind(this, record) }>
+          <Dropdown.Button overlay={menu[index]} type="ghost" onClick={this.editGateway.bind(this, record) }>
             编辑
           </Dropdown.Button>
         }

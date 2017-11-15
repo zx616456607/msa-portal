@@ -29,8 +29,8 @@ class MsaDetail extends React.Component {
   callback = () => {}
 
   loadMsaDetail = () => {
-    const { getMsaList, clusterID, name } = this.props
-    getMsaList(clusterID, { name })
+    const { getMsaList, clusterID } = this.props
+    getMsaList(clusterID)
   }
 
   componentDidMount() {
@@ -38,7 +38,7 @@ class MsaDetail extends React.Component {
   }
 
   render() {
-    const { name, msaDetail, msaListLoading, clusterID } = this.props
+    const { name, msaDetail, msaListLoading, clusterID, history } = this.props
     const instances = msaDetail.instances || []
     return (
       <QueueAnim className="msa-detail">
@@ -48,7 +48,7 @@ class MsaDetail extends React.Component {
           </Col>
           <Col span={21} className="msa-detail-header-right">
             <div className="msa-detail-header-name">
-              {msaDetail.serviceName}
+              {msaDetail.appName}
             </div>
             <div className="msa-detail-header-address">
               服务地址：-
@@ -73,10 +73,12 @@ class MsaDetail extends React.Component {
           <TabPane tab="实例列表" key="1">
             <MsaDetailList
               name={name}
+              msaDetail={msaDetail}
               instances={instances}
               loadMsaDetail={this.loadMsaDetail}
               loading={msaListLoading}
               clusterID={clusterID}
+              history={history}
             />
           </TabPane>
           <TabPane tab="环境信息" key="2">
@@ -109,7 +111,14 @@ const mapStateToProps = (state, ownProps) => {
   const { match } = ownProps
   const { name } = match.params
   const { msaList, msaListLoading } = msaListSlt(state)
-  const msaDetail = msaList[0] || {}
+  let msaDetail = {}
+  msaList.every(msa => {
+    if (msa.appName === name) {
+      msaDetail = msa
+      return false
+    }
+    return true
+  })
   return {
     clusterID: id,
     name,

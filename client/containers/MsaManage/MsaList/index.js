@@ -13,23 +13,32 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Table, Card, notification, Tooltip } from 'antd'
+import {
+  Button, Icon, Input, Table, Card, notification, Tooltip,
+  Dropdown, Menu,
+} from 'antd'
 import classNames from 'classnames'
 import {
   getMsaList,
-  delManualrule,
-  addManualrule,
+  delManualrules,
+  addExpulsionsManualrules,
+  delExpulsionsManualrules,
 } from '../../../actions/msa'
 import {
   msaListSlt,
 } from '../../../selectors/msa'
 import {
-  MSA_RULE_EXP,
+  MSA_TYPE_MAN,
+  MSA_TYPE_AUTO,
+  MSA_TYPES_TEXT,
 } from '../../../constants'
 import confirm from '../../../components/Modal/confirm'
+import { toQuerystring } from '../../../common/utils'
 import './style/msaList.less'
 
 const Search = Input.Search
+const DropdownButton = Dropdown.Button
+const MenuItem = Menu.Item
 
 class MsaList extends React.Component {
   state = {
@@ -50,18 +59,17 @@ class MsaList extends React.Component {
   }
 
   hideService = record => {
-    const { addManualrule, clusterID } = this.props
+    const { addExpulsionsManualrules, clusterID } = this.props
     const self = this
     confirm({
-      title: `确认将服务 ${record.serviceName} 隐藏吗？`,
+      title: `确认将服务 ${record.appName} 隐藏吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
           const body = [{
-            appName: record.serviceName,
-            rule: MSA_RULE_EXP,
+            appName: record.appName,
           }]
-          addManualrule(clusterID, body).then(res => {
+          addExpulsionsManualrules(clusterID, body).then(res => {
             if (res.error) {
               return reject()
             }
@@ -77,14 +85,14 @@ class MsaList extends React.Component {
   }
 
   cancelHideService = record => {
-    const { delManualrule, clusterID } = this.props
+    const { delExpulsionsManualrules, clusterID } = this.props
     const self = this
     confirm({
-      title: `确认将服务 ${record.serviceName} 取消隐藏吗？`,
+      title: `确认将服务 ${record.appName} 取消隐藏吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
-          delManualrule(clusterID, record.instances[0].id).then(res => {
+          delExpulsionsManualrules(clusterID, record.id).then(res => {
             if (res.error) {
               return reject()
             }
@@ -100,15 +108,15 @@ class MsaList extends React.Component {
   }
 
   removeRegister = record => {
-    const { delManualrule, clusterID } = this.props
+    const { delManualrules, clusterID } = this.props
     const ruleIds = record.instances.map(instance => instance.id)
     const self = this
     confirm({
-      title: `确认将服务 ${record.serviceName} 移除注册吗？`,
+      title: `确认将服务 ${record.appName} 移除注册吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
-          delManualrule(clusterID, ruleIds).then(res => {
+          delManualrules(clusterID, ruleIds).then(res => {
             if (res.error) {
               return reject()
             }
@@ -123,19 +131,24 @@ class MsaList extends React.Component {
     })
   }
 
+  handleMenuClick = (record, { key }) => {
+    if (key === 'add') {
+      const query = {
+        mode: 'add',
+        id: record.id,
+        appName: record.appName,
+      }
+      this.props.history.push(`/msa-manage/register?${toQuerystring(query)}`)
+    }
+  }
+
   render() {
     const { msaList, msaListLoading } = this.props
     const { keyword } = this.state
-    let msaData = []
-    msaList.forEach(item => {
-      if (item.serviceName !== undefined) {
-        msaData = msaList.filter(msa => msa.serviceName.indexOf(keyword) > -1)
-      }
-    })
-
+    const msaData = msaList.filter(msa => msa.appName.indexOf(keyword) > -1)
     const columns = [{
       title: '微服务名称',
-      dataIndex: 'serviceName',
+      dataIndex: 'appName',
       width: '20%',
       render: (text, record) => {
         if (record.discoverable) {
@@ -156,9 +169,7 @@ class MsaList extends React.Component {
       title: '注册类型',
       dataIndex: 'type',
       width: '20%',
-      render: text => {
-        return <div>{text === 'automatic' ? '自动注册' : '手动注册'}</div>
-      },
+      render: text => MSA_TYPES_TEXT[text],
     }, {
       title: '状态',
       dataIndex: 'discoverable',
@@ -178,19 +189,47 @@ class MsaList extends React.Component {
       title: '操作',
       width: '20%',
       render: record => {
+        const isMsaAutomatic = record.type === MSA_TYPE_AUTO
+        const menu = (
+          <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 103 }}>
+            <MenuItem key="add" disabled={isMsaAutomatic}>
+              <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
+                添加实例
+              </Tooltip>
+            </MenuItem>
+          </Menu>
+        )
         return (
           <div>
             {
-              record.type === 'automatic' &&
+              isMsaAutomatic &&
               (record.discoverable
-                ? <Button onClick={this.hideService.bind(this, record)}>隐藏服务</Button>
-                : <Button onClick={this.cancelHideService.bind(this, record)}>取消隐藏</Button>)
+                ? (
+                  <DropdownButton
+                    overlay={menu}
+                    onClick={this.hideService.bind(this, record)}
+                  >
+                  隐藏服务
+                  </DropdownButton>
+                )
+                : (
+                  <DropdownButton
+                    overlay={menu}
+                    onClick={this.cancelHideService.bind(this, record)}
+                  >
+                  取消隐藏
+                  </DropdownButton>
+                )
+              )
             }
             {
-              record.type !== 'automatic' &&
-              <Button onClick={this.removeRegister.bind(this, record)}>
-                移除注册
-              </Button>
+              record.type === MSA_TYPE_MAN &&
+              <DropdownButton
+                overlay={menu}
+                onClick={this.removeRegister.bind(this, record)}
+              >
+              移除注册
+              </DropdownButton>
             }
           </div>
         )
@@ -229,7 +268,7 @@ class MsaList extends React.Component {
               columns={columns}
               dataSource={msaData}
               loading={msaListLoading}
-              rowKey={row => row.serviceName}
+              rowKey={row => row.appName}
             />
           </Card>
         </div>
@@ -249,6 +288,7 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   getMsaList,
-  delManualrule,
-  addManualrule,
+  delManualrules,
+  addExpulsionsManualrules,
+  delExpulsionsManualrules,
 })(MsaList)
