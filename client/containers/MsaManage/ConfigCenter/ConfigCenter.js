@@ -189,99 +189,102 @@ class ConfigCenter extends React.Component {
 
     return (
       <QueueAnim className="center" >
-        <Card className="layout-content-btns" key="body">
-          <Row className="branch">
-            <span>版本分支：</span>
-            <Select style={{ width: 200 }} onChange={this.handleChang} value={branch}>
-              {data}
-            </Select>
-          </Row>
-          <Tabs type="card" >
-            <TabPane tab="开发环境" key="1" >
-              <div className="exploit">
-                <div className="headers">
-                  <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
-                    <Icon type="plus" style={{ color: '#fff' }} />
-                    <span className="font">添加配置</span>
-                  </Button>
-                  <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
-                  <div className="pages">
-                    <span className="total">共计{envData.length}条</span>
-                    <Pagination {...pagination} />
+        <div key="body">
+          <Card className="config-center">
+            <Row className="branch">
+              <span>版本分支：</span>
+              <Select style={{ width: 200 }} onChange={this.handleChang} value={branch}>
+                {data}
+              </Select>
+            </Row>
+            <Tabs type="card" >
+              <TabPane tab="开发环境" key="1" >
+                <div className="exploit">
+                  <div className="headers">
+                    <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
+                      <Icon type="plus" style={{ color: '#fff' }} />
+                      <span className="font">添加配置</span>
+                    </Button>
+                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <div className="pages">
+                      <span className="total">共计{envData.length}条</span>
+                      <Pagination {...pagination} />
+                    </div>
+                  </div>
+                  <div className="bottom">
+                    <Table
+                      columns={columns}
+                      dataSource={envData}
+                      pagination={false}
+                      loading={loading}
+                      rowKey={row => row.name}/>
                   </div>
                 </div>
-                <div className="bottom">
-                  <Table
-                    columns={columns}
-                    dataSource={envData}
-                    pagination={false}
-                    loading={loading}
-                    rowKey={row => row.name}/>
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab="测试环境" key="2">
-              <div className="exploit">
-                <div className="headers">
-                  <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?config')}>
-                    <Icon type="plus" style={{ color: '#fff' }} />
-                    <span className="font">添加配置</span>
-                  </Button>
-                  <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
-                  <div className="pages">
-                    <span className="total">共计{envData.length}条</span>
-                    <Pagination {...pagination} />
+              </TabPane>
+              <TabPane tab="测试环境" key="2">
+                <div className="exploit">
+                  <div className="headers">
+                    <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?config')}>
+                      <Icon type="plus" style={{ color: '#fff' }} />
+                      <span className="font">添加配置</span>
+                    </Button>
+                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <div className="pages">
+                      <span className="total">共计{envData.length}条</span>
+                      <Pagination {...pagination} />
+                    </div>
+                  </div>
+                  <div className="bottom">
+                    <Table
+                      columns={columns}
+                      dataSource={envData}
+                      pagination={false}
+                      rowKey={row => row.name} />
                   </div>
                 </div>
-                <div className="bottom">
-                  <Table
-                    columns={columns}
-                    dataSource={envData}
-                    pagination={false}
-                    rowKey={row => row.name} />
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab="生产环境" key="3">
-              <div className="exploit">
-                <div className="headers">
-                  <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?pt')}>
-                    <Icon type="plus" style={{ color: '#fff' }} />
-                    <span className="font">添加配置</span>
-                  </Button>
-                  <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
-                  <div className="pages">
-                    <span className="total">共计{envData.length}条</span>
-                    <Pagination {...pagination} />
+              </TabPane>
+              <TabPane tab="生产环境" key="3">
+                <div className="exploit">
+                  <div className="headers">
+                    <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?pt')}>
+                      <Icon type="plus" style={{ color: '#fff' }} />
+                      <span className="font">添加配置</span>
+                    </Button>
+                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <div className="pages">
+                      <span className="total">共计{envData.length}条</span>
+                      <Pagination {...pagination} />
+                    </div>
+                  </div>
+                  <div className="bottom">
+                    <Table
+                      columns={columns}
+                      dataSource={envData}
+                      pagination={false}
+                      rowKey={row => row.name}/>
                   </div>
                 </div>
-                <div className="bottom">
-                  <Table
-                    columns={columns}
-                    dataSource={envData}
-                    pagination={false}
-                    rowKey={row => row.name}/>
+              </TabPane>
+            </Tabs>
+            <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
+              footer={[
+                <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
+                <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
+              ]}>
+              <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+                <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认删除该配置 ?</span>
+                <div className="remark">
+                  <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
+                  <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
                 </div>
               </div>
-            </TabPane>
-          </Tabs>
-          <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
-            footer={[
-              <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-              <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
-            ]}>
-            <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-              <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
-            </div>
-            <div style={{ marginTop: 10 }}>
-              <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认删除该配置 ?</span>
-              <div className="remark">
-                <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
-                <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
-              </div>
-            </div>
-          </Modal>
-        </Card>
+            </Modal>
+          </Card>
+        </div>
+
       </QueueAnim>
     )
   }

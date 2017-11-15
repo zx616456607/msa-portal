@@ -35,7 +35,7 @@ class CallLinkTracking extends React.Component {
       <QueueAnim className="msa-call-link-tracking">
         <div className="router-manage-btn-box layout-content-btns" key="btns">
           <Button onClick={() => window.open(iframeSrc)} type="dashed" icon="export">
-          新窗口打开
+          新页签打开
           </Button>
         </div>
         <div className="layout-content-body" key="body">
