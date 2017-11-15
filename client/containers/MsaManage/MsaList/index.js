@@ -126,7 +126,13 @@ class MsaList extends React.Component {
   render() {
     const { msaList, msaListLoading } = this.props
     const { keyword } = this.state
-    const msaData = msaList.filter(msa => msa.serviceName.indexOf(keyword) > -1)
+    let msaData = []
+    msaList.forEach(item => {
+      if (item.serviceName !== undefined) {
+        msaData = msaList.filter(msa => msa.serviceName.indexOf(keyword) > -1)
+      }
+    })
+
     const columns = [{
       title: '微服务名称',
       dataIndex: 'serviceName',
@@ -166,7 +172,7 @@ class MsaList extends React.Component {
             )
           }
         >
-          <i className="msa-table-status"/>{text ? '可被发现' : '不可被发现'}
+          <i className="msa-table-status" />{text ? '可被发现' : '不可被发现'}
         </span>,
     }, {
       title: '操作',
@@ -183,7 +189,7 @@ class MsaList extends React.Component {
             {
               record.type !== 'automatic' &&
               <Button onClick={this.removeRegister.bind(this, record)}>
-              移除注册
+                移除注册
               </Button>
             }
           </div>
@@ -204,7 +210,7 @@ class MsaList extends React.Component {
     return (
       <QueueAnim className="msa">
         <div className="msa-btn-box layout-content-btns" key="btns">
-          <Button type="primary" onClick={this.registerMsa}><Icon type="plus"/>注册微服务</Button>
+          <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
           <Button icon="poweroff">注销微服务</Button>
           <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
           <Search
