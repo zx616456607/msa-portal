@@ -36,27 +36,28 @@ class CreateConfig extends React.Component {
   }
   componentWillMount() {
     const { detal } = parse(location.search)
-    const { branch } = parse(location.search)
     this.setState({
       detal,
-      branchName: branch,
     })
     this.version()
-    if (detal === 'true') {
-      this.fetchYaml()
-    }
   }
 
   version = () => {
+    const { branch, detal } = parse(location.search)
     const { getService, getBranchList, clusterID } = this.props
     getService(clusterID).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
+        const url = res.response.result.data.configGitUrl
         this.setState({
-          configGitUrl: res.response.result.data.configGitUrl,
+          branchName: branch,
+          configGitUrl: url,
         })
+        if (detal === 'true') {
+          this.fetchYaml(branch, url)
+        }
         const branchQuery = {
-          project_url: res.response.result.data.configGitUrl,
+          project_url: url,
         }
         getBranchList(clusterID, branchQuery).then(res => {
           if (res.error) return
@@ -70,12 +71,13 @@ class CreateConfig extends React.Component {
     })
   }
 
-  fetchYaml = () => {
+  fetchYaml = (branch, url) => {
     const { getCenterConfig, clusterID } = this.props
-    const { configGitUrl } = this.state
     const { id } = parse(location.search)
     const query = {
-      project_url: configGitUrl,
+      file_path: this.props.location.pathname.split('/')[3],
+      branch_name: branch,
+      project_url: url,
     }
     getCenterConfig(clusterID, id, query).then(res => {
       if (res.error) return
