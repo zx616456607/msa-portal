@@ -13,6 +13,7 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 import { toQuerystring } from '../common/utils'
+import { CONTENT_TYPE_URLENCODED } from '../constants'
 
 const { MSA_API_URL } = API_CONFIG
 
@@ -104,6 +105,9 @@ const fetchCenterConfig = (clusterId, id, query) => {
       schema: {},
       options: {
         method: 'GET',
+        headers: {
+          'Content-Type': CONTENT_TYPE_URLENCODED,
+        },
       },
     },
   }
@@ -207,5 +211,53 @@ const ReleaseCenter = clusterID => {
 
 export const releaseConfigService = clusterID => dispatch => {
   return dispatch(ReleaseCenter(clusterID))
+}
+
+export const CENTER_ENCRYPT_REQUEST = 'CENTER_ENCRYPT_REQUEST'
+export const CENTER_ENCRYPT_SUCCESS = 'CENTER_ENCRYPT_SUCCESS'
+export const CENTER_ENCRYPT_FAILURE = 'CENTER_ENCRYPT_FAILURE'
+
+const fileEncrypt = (clusterId, body) => {
+  return {
+    body,
+    clusterId,
+    [CALL_API]: {
+      types: [ CENTER_ENCRYPT_REQUEST, CENTER_ENCRYPT_SUCCESS, CENTER_ENCRYPT_FAILURE ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/configserver/encrypt`,
+      schema: {},
+      options: {
+        body,
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const postEncrypt = (clusterId, body) => dispatch => {
+  return dispatch(fileEncrypt(clusterId, body))
+}
+
+export const CENTER_DECRYPT_REQUEST = 'CENTER_DECRYPT_REQUEST'
+export const CENTER_DECRYPT_SUCCESS = 'CENTER_DECRYPT_SUCCESS'
+export const CENTER_DECRYPT_FAILURE = 'CENTER_DECRYPT_FAILURE'
+
+const fileDecrypt = (clusterId, body) => {
+  return {
+    body,
+    clusterId,
+    [CALL_API]: {
+      types: [ CENTER_DECRYPT_REQUEST, CENTER_DECRYPT_SUCCESS, CENTER_DECRYPT_FAILURE ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/configserver/decrypt`,
+      schema: {},
+      options: {
+        body,
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const postDecrypt = (clusterId, body) => dispatch => {
+  return dispatch(fileDecrypt(clusterId, body))
 }
 

@@ -81,7 +81,7 @@ class CreateConfig extends React.Component {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
-          yaml: res.response.result.data.content.replace(/\"/g, '').replace('\\n', ' \n '),
+          yaml: res.response.result.data.content,
         })
       }
     })
