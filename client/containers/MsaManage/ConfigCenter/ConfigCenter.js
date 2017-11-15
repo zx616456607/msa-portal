@@ -182,8 +182,9 @@ class ConfigCenter extends React.Component {
     }]
     const pagination = {
       simple: true,
+      total: 1,
       defaultCurrent: 1,
-      defaultPageSize: 30,
+      defaultPageSize: 50,
     }
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 
