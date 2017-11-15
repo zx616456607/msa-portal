@@ -176,14 +176,15 @@ class ConfigCenter extends React.Component {
       title: '操作',
       dataIndex: 'operation',
       render: (text, record) => <div>
-        <Button className="detail" type="primary" onClick={() => this.props.history(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`)}>查看详情</Button>
+        <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
         <Button onClick={() => this.handleDelVisible(record.name)}>删除</Button>
       </div>,
     }]
     const pagination = {
       simple: true,
+      total: 1,
       defaultCurrent: 1,
-      defaultPageSize: 30,
+      defaultPageSize: 50,
     }
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 

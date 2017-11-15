@@ -13,7 +13,7 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 import { toQuerystring } from '../common/utils'
-import { CONTENT_TYPE_URLENCODED } from '../constants'
+import { CONTENT_TYPE_TEXT } from '../constants'
 
 const { MSA_API_URL } = API_CONFIG
 
@@ -96,7 +96,7 @@ export const CENTER_CONGIG_INFO_SUCCESS = 'CENTER_CONGIG_INFO_SUCCESS'
 export const CENTER_CONFIG_INFO_FAILURE = 'CENTER_CONFIG_INFO_FAILURE'
 
 const fetchCenterConfig = (clusterId, id, query) => {
-  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/files/${id}?${toQuerystring(query)}`
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/filecontent?${toQuerystring(query)}`
   return {
     query,
     [CALL_API]: {
@@ -105,9 +105,6 @@ const fetchCenterConfig = (clusterId, id, query) => {
       schema: {},
       options: {
         method: 'GET',
-        headers: {
-          'Content-Type': CONTENT_TYPE_URLENCODED,
-        },
       },
     },
   }
@@ -157,6 +154,9 @@ const UpdateCenter = (clusterId, yaml, query) => {
       options: {
         body,
         method: 'PUT',
+        headers: {
+          'Content-Type': CONTENT_TYPE_TEXT,
+        },
       },
     },
   }
