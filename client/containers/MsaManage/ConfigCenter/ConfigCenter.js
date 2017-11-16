@@ -138,11 +138,13 @@ class ConfigCenter extends React.Component {
     })
   }
 
-  handleRefresh = () => {
+  handleRefresh = branch => {
     const { branchName } = this.state
-    if (branchName) {
-      this.fetchList(branchName)
-    }
+    const value = branchName === '' ? branch : branchName
+    this.setState({
+      loading: true,
+    })
+    this.fetchList(value)
   }
 
   handleButtonClick = record => {
@@ -206,7 +208,7 @@ class ConfigCenter extends React.Component {
                       <Icon type="plus" style={{ color: '#fff' }} />
                       <span className="font">添加配置</span>
                     </Button>
-                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
                     <div className="pages">
                       <span className="total">共计{envData.length}条</span>
                       <Pagination {...pagination} />
@@ -218,7 +220,7 @@ class ConfigCenter extends React.Component {
                       dataSource={envData}
                       pagination={false}
                       loading={loading}
-                      rowKey={row => row.name}/>
+                      rowKey={row => row.name} />
                   </div>
                 </div>
               </TabPane>
@@ -229,7 +231,7 @@ class ConfigCenter extends React.Component {
                       <Icon type="plus" style={{ color: '#fff' }} />
                       <span className="font">添加配置</span>
                     </Button>
-                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
                     <div className="pages">
                       <span className="total">共计{envData.length}条</span>
                       <Pagination {...pagination} />
@@ -251,7 +253,7 @@ class ConfigCenter extends React.Component {
                       <Icon type="plus" style={{ color: '#fff' }} />
                       <span className="font">添加配置</span>
                     </Button>
-                    <Button className="refresh" icon="sync" onClick={this.handleRefresh}>刷新</Button>
+                    <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
                     <div className="pages">
                       <span className="total">共计{envData.length}条</span>
                       <Pagination {...pagination} />
@@ -262,7 +264,7 @@ class ConfigCenter extends React.Component {
                       columns={columns}
                       dataSource={envData}
                       pagination={false}
-                      rowKey={row => row.name}/>
+                      rowKey={row => row.name} />
                   </div>
                 </div>
               </TabPane>
