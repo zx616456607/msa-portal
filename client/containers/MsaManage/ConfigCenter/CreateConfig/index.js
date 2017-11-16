@@ -17,7 +17,7 @@ import { parse } from 'query-string'
 import QueueAnim from 'rc-queue-anim'
 import { putCenterConfig, getCenterConfig, getService, getBranchList, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
 import YamlEditor from '../../../../components/Editor/Yaml'
-import { Row, Button, Select, Input, notification, Col, Card, Form } from 'antd'
+import { Row, Button, Select, Input, notification, Card, Form } from 'antd'
 const Option = Select.Option
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -195,60 +195,59 @@ class CreateConfig extends React.Component {
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
     const { getFieldDecorator } = this.props.form
+    const fromLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 20 },
+    }
 
     return (
       <QueueAnim className="create">
         <Card className="info" key="body">
           <Row className="connent">
-            <Col className="text" span={4}>配置名称</Col>
-            <Col span={20}>
-              <FormItem>
-                {getFieldDecorator('configName', {
-                  initialValue: detal === 'true' ? projectName : undefined,
-                  rules: [{ required: true, message: '请填写配置名称' }],
-                })(
-                  <Input style={{ width: '60%', margin: '10px' }} onChange={this.handleInput} />
-                )}
-              </FormItem>
-            </Col>
+            <FormItem {...fromLayout} label="配置名称">
+              {getFieldDecorator('configName', {
+                initialValue: detal === 'true' ? projectName : undefined,
+                rules: [{ required: true, whitespace: true, message: '请填写配置名称' }],
+              })(
+                <Input className="selects" onChange={this.handleInput} />
+              )}
+            </FormItem>
           </Row>
           <Row className="connent">
-            <Col className="text" span={4}>配置版本</Col>
-            <Col span={20}>
-              <FormItem>
-                {getFieldDecorator('configEdition', {
-                  initialValue: branchName,
-                  rules: [{ required: true, message: '请选择配置版本' }],
-                })(
-                  <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage}>
-                    {
-                      branchData ?
-                        branchData.map((item, index) => (
-                          <Option key={index} value={item.name}>{item.name}</Option>
-                        )) : ''
-                    }
-                  </Select>
-                )}
-              </FormItem>
-            </Col>
+            <FormItem {...fromLayout} label="配置版本">
+              {getFieldDecorator('edition', {
+                initialValue: branchName,
+                rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
+              })(
+                <Select className="selects" onChange={this.handlechage}>
+                  {
+                    branchData ?
+                      branchData.map((item, index) => (
+                        <Option key={index} value={item.name}>{item.name}</Option>
+                      )) : ''
+                  }
+                </Select>
+              )}
+            </FormItem>
           </Row>
           <Row className="connent">
-            <Col className="text" span={4}>配置内容</Col>
-            <Col span={20}>
-              <YamlEditor style={{ width: '60%' }} value={currentYaml === '' ? yaml : currentYaml} onChange={this.handleYamlEditor} />
-            </Col>
+            <FormItem {...fromLayout} label="配置内容">
+              {getFieldDecorator('info', {
+                initialValue: currentYaml === '' ? yaml : currentYaml,
+                rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
+              })(
+                <YamlEditor style={{ width: '60%' }} onChange={this.handleYamlEditor} />
+              )}
+            </FormItem>
           </Row>
           <Row className="connents">
-            <Col className="text" span={4}>添加备注</Col>
-            <Col span={20}>
-              <FormItem>
-                {getFieldDecorator('area', {
-                  rules: [{ required: true, message: '请填写备注信息' }],
-                })(
-                  <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '60%' }} onChange={this.handleTextArea} />
-                )}
-              </FormItem>
-            </Col>
+            <FormItem {...fromLayout} label="添加备注">
+              {getFieldDecorator('configArea', {
+                rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
+              })(
+                <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 2, maxRows: 6 }} onChange={this.handleTextArea} />
+              )}
+            </FormItem>
           </Row>
           <div className="operation" >
             {
