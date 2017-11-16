@@ -11,7 +11,7 @@
  */
 
 import * as ActionTypes from '../actions'
-import merge from 'lodash/merge'
+// import merge from 'lodash/merge'
 import { routerReducer as routing } from 'react-router-redux'
 import { combineReducers } from 'redux'
 import current from './current'
@@ -30,7 +30,11 @@ const entities = (state = {
   gatewayPolicies: {},
 }, action) => {
   if (action.response && action.response.entities) {
-    return merge({}, state, action.response.entities)
+    const entities = action.response.entities
+    Object.keys(entities).forEach(key => {
+      entities[key] = Object.assign({}, state[key], entities[key])
+    })
+    return Object.assign({}, state, entities)
   }
 
   return state

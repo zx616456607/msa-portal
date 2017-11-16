@@ -55,9 +55,13 @@ export const NORMAL = 0
 export const ERROR = 1
 export const USER_CURRENT_CONFIG = 'msa_user_current_config'
 export const MY_PORJECT = '我的个人项目'
-export const MSA_RULE_ADM = 'admission' // 手动注册
-export const MSA_RULE_EXP = 'expulsion' // 手动剔除
+export const MSA_TYPE_MAN = 'manual' // 手动注册
+export const MSA_TYPE_AUTO = 'automatic' // 自动注册
+export const MSA_TYPES_TEXT = {
+  [MSA_TYPE_MAN]: '手动注册',
+  [MSA_TYPE_AUTO]: '自动注册',
+}
 // RegExp
-export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,49}$/
-export const HOST_REG = /^[0-9.\-A-Za-z]+$/
-export const URL_REG = /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&?[a-zA-Z0-9_-](\?)?)*)*$/i
+export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z\-]{1,48}[a-zA-Z]$/
+export const HOST_REG = /^(([a-zA-Z0-9_-])+\.)(([a-zA-Z0-9_-])+(\.)?)*(([a-zA-Z0-9_-])+)(:\d+)?$/
+export const URL_REG = /^https?:\/\/(([a-zA-Z0-9_-])+\.)(([a-zA-Z0-9_-])+(\.)?)*(([a-zA-Z0-9_-])+)(:\d+)?$/

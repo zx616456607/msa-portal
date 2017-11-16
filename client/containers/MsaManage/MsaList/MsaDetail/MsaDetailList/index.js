@@ -12,11 +12,19 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Input, Table, notification } from 'antd'
-import classNames from 'classnames'
+import { Button, Input, Table, notification, Tooltip } from 'antd'
+import confirm from '../../../../../components/Modal/confirm'
 import {
-  delManualrule,
+  delManualrules,
 } from '../../../../../actions/msa'
+import {
+  MSA_TYPE_MAN,
+  MSA_TYPE_AUTO,
+  MSA_TYPES_TEXT,
+} from '../../../../../constants'
+import {
+  toQuerystring,
+} from '../../../../../common/utils'
 import './style/index.less'
 
 const Search = Input.Search
@@ -27,33 +35,49 @@ class MsaDetailList extends React.Component {
   }
 
   removeRegister = record => {
-    const { delManualrule, clusterID, loadMsaDetail } = this.props
-    delManualrule(clusterID, record.id).then(res => {
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: '移除注册成功',
-      })
-      loadMsaDetail()
+    const { delManualrules, clusterID, loadMsaDetail } = this.props
+    console.log(record.id)
+    confirm({
+      title: `确认将实例 ${record.instanceId} 移除注册吗？`,
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          delManualrules(clusterID, record.id).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            notification.success({
+              message: '移除注册成功',
+            })
+            resolve()
+            loadMsaDetail()
+          })
+        })
+      },
     })
   }
 
+  addInstances = () => {
+    const { msaDetail, history } = this.props
+    const query = {
+      mode: 'add',
+      id: msaDetail.id,
+      appName: msaDetail.appName,
+    }
+    history.push(`/msa-manage/register?${toQuerystring(query)}`)
+  }
+
   render() {
-    const { instances, loadMsaDetail, loading } = this.props
+    const { instances, loadMsaDetail, msaDetail, loading } = this.props
     const { keyword } = this.state
-    const instancesData = instances.filter(instance => instance.name.indexOf(keyword) > -1)
+    const instancesData = instances.filter(instance => instance.instanceId.indexOf(keyword) > -1)
     const pagination = {
       simple: true,
     }
     const columns = [{
-      title: '实例名称',
-      dataIndex: 'name',
-      width: '15%',
-    }, {
-      title: '微服务 实例ID',
+      title: '微服务实例 ID',
       dataIndex: 'instanceId',
-      width: '15%',
+      width: '25%',
     }, {
       title: '实例状态',
       dataIndex: 'status',
@@ -61,7 +85,7 @@ class MsaDetailList extends React.Component {
     }, {
       title: '服务地址',
       dataIndex: 'ip',
-      width: '10%',
+      width: '15%',
     }, {
       title: '服务端口',
       dataIndex: 'port',
@@ -69,31 +93,16 @@ class MsaDetailList extends React.Component {
     }, {
       title: '注册类型',
       dataIndex: 'type',
-      width: '10%',
-      render: text => (text === 'automatic' ? '自动注册' : '手动注册'),
-    }, {
-      title: '状态',
-      dataIndex: 'discoverable',
-      width: '10%',
-      render: text =>
-        <span className={classNames('msa-table-status-box', { 'msa-table-running': text, 'msa-table-error': !text })}>
-          <i className="msa-table-status"/>{text ? '可被发现' : '不可被发现'}
-        </span>,
+      width: '15%',
+      render: () => MSA_TYPES_TEXT[msaDetail.type],
     }, {
       title: '操作',
-      width: '10%',
+      width: '15%',
       render: record => {
         return (
           <div>
-            {/* {
-              record.type === 'automatic' && (
-                record.discoverable
-                  ? <Button>隐藏服务</Button>
-                  : <Button>取消隐藏</Button>
-              )
-            } */}
             {
-              record.type !== 'automatic' &&
+              msaDetail.type === MSA_TYPE_MAN &&
               <Button onClick={this.removeRegister.bind(this, record)}>
               移除注册
               </Button>
@@ -102,15 +111,26 @@ class MsaDetailList extends React.Component {
         )
       },
     }]
+    const isMsaAutomatic = msaDetail.type === MSA_TYPE_AUTO
     return (
       <div className="msa-detail-list">
         <div className="layout-content-btns">
-          <Button type="primary" icon="sync" onClick={loadMsaDetail}>
+          <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
+            <Button
+              type="primary"
+              icon="plus"
+              onClick={this.addInstances}
+              disabled={isMsaAutomatic}
+            >
+            添加实例
+            </Button>
+          </Tooltip>
+          <Button icon="sync" onClick={loadMsaDetail}>
           刷新
           </Button>
           <Search
             className="msa-detail-list-search"
-            placeholder="按实例名称搜索"
+            placeholder="按实例 ID 搜索"
             onSearch={keyword => this.setState({ keyword })}
           />
         </div>
@@ -132,5 +152,5 @@ const mapStateToProps = () => {
 }
 
 export default connect(mapStateToProps, {
-  delManualrule,
+  delManualrules,
 })(MsaDetailList)

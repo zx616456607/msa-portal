@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { parse as parseQuerystring } from 'query-string'
 import {
   Input,
   Form,
@@ -27,11 +28,11 @@ import {
   APP_NAME_REG,
   HOST_REG,
   URL_REG,
-  MSA_RULE_ADM,
 } from '../../../../constants'
 import {
-  addManualrule,
+  addManualrules,
   discoveryPing,
+  addInstancesIntoManualrules,
 } from '../../../../actions/msa'
 import './style/index.less'
 
@@ -41,18 +42,32 @@ class RegisterMsa extends React.Component {
   state = {
     ping: {},
     submitLoading: false,
+    mode: 'create',
+    ruleId: null,
   }
 
   uuid = 0
 
   componentDidMount() {
+    const { location, form } = this.props
+    const { appName, id, mode } = parseQuerystring(location.search)
+    if (appName && id && mode) {
+      this.setState({
+        mode,
+        ruleId: id,
+      })
+    }
+    form.setFieldsValue({
+      appName,
+    })
+
     this.add()
   }
 
   handleSubmit = e => {
     e.preventDefault()
-    const { form, addManualrule, clusterID, history } = this.props
-    const { validateFields, getFieldValue } = form
+    const { form } = this.props
+    const { validateFields } = form
     validateFields((err, values) => {
       if (err) {
         return
@@ -60,32 +75,86 @@ class RegisterMsa extends React.Component {
       this.setState({
         submitLoading: true,
       })
-      const { appName, keys } = values
-      const body = keys.map(k => {
-        const host = getFieldValue(`host-${k}`)
-        const port = getFieldValue(`port-${k}`)
-        const healthProbe = getFieldValue(`healthProbe-${k}`)
-        return {
-          appName,
+      if (this.state.mode === 'add') {
+        this.addInstances(values)
+        return
+      }
+      this.createManualrules(values)
+    })
+  }
+
+  createManualrules = values => {
+    const { form, addManualrules, clusterID, history } = this.props
+    const { getFieldValue } = form
+    const { appName, keys } = values
+    const instances = keys.map(k => {
+      const host = getFieldValue(`host-${k}`)
+      const port = getFieldValue(`port-${k}`)
+      const healthProbe = getFieldValue(`healthProbe-${k}`)
+      return {
+        instanceId: `${host}:${appName}:${port}`,
+        detail: JSON.stringify({
           host,
+          ip: host,
           port,
           healthProbe,
-          rule: MSA_RULE_ADM,
-        }
+          secure: false,
+        }),
+      }
+    })
+    const body = [
+      {
+        appName,
+        instances,
+      },
+    ]
+    addManualrules(clusterID, body).then(res => {
+      this.setState({
+        submitLoading: false,
       })
-      addManualrule(clusterID, body).then(res => {
-        this.setState({
-          submitLoading: false,
-        })
-        if (res.error) {
-          return
-        }
-        notification.success({
-          message: '注册成功',
-          description: '手动注册完成，将在数秒内展示在微服务列表',
-        })
-        history.push('/msa-manage')
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '注册成功',
+        description: '手动注册完成，将在数秒内展示在微服务列表',
       })
+      history.push('/msa-manage')
+    })
+  }
+
+  addInstances = values => {
+    const { form, addInstancesIntoManualrules, clusterID, history } = this.props
+    const { getFieldValue } = form
+    const { appName, keys } = values
+    const { ruleId } = this.state
+    const body = keys.map(k => {
+      const host = getFieldValue(`host-${k}`)
+      const port = getFieldValue(`port-${k}`)
+      const healthProbe = getFieldValue(`healthProbe-${k}`)
+      return {
+        instanceId: `${host}:${appName}:${port}`,
+        detail: JSON.stringify({
+          host,
+          ip: host,
+          port,
+          healthProbe,
+          secure: false,
+        }),
+        ruleId,
+      }
+    })
+    addInstancesIntoManualrules(clusterID, body).then(res => {
+      this.setState({
+        submitLoading: false,
+      })
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '添加实例成功',
+      })
+      history.push('/msa-manage')
     })
   }
 
@@ -171,7 +240,7 @@ class RegisterMsa extends React.Component {
 
   render() {
     const { form } = this.props
-    const { ping } = this.state
+    const { ping, mode } = this.state
     const { getFieldDecorator, getFieldValue } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -245,10 +314,15 @@ class RegisterMsa extends React.Component {
         </div>
       )
     })
+    const isAddMode = mode === 'add'
     return (
       <Card
         className="msa-register"
-        title="注册微服务"
+        title={
+          isAddMode
+            ? '添加实例'
+            : '注册微服务'
+        }
         noHovering
       >
         <Form onSubmit={this.handleSubmit}>
@@ -261,7 +335,7 @@ class RegisterMsa extends React.Component {
                 message: `请填写正确的微服务名称，格式要求为：${APP_NAME_REG.toString()}`,
               }],
             })(
-              <Input placeholder="填写手动注册微服务名称" />
+              <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>
             )}
           </FormItem>
           <div style={{ paddingLeft: '36px' }}>微服务实例信息</div>
@@ -297,6 +371,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  addManualrule,
+  addManualrules,
   discoveryPing,
+  addInstancesIntoManualrules,
 })(Form.create()(RegisterMsa))
