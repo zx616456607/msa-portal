@@ -42,35 +42,14 @@ const menus = [
 ]
 
 export default class Header extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      currentSelectedKeys: [ '/' ],
-    }
-  }
-  formatCurrentSelectedKeys = props => {
-    const { location } = props
-    const { pathname } = location
-    const pathArray = pathname.split('/')
-    const currentSelectedKeys = [ `/${pathArray[1]}` ]
-    this.setState({
-      currentSelectedKeys,
-    })
-  }
-  componentWillMount() {
-    this.formatCurrentSelectedKeys(this.props)
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.formatCurrentSelectedKeys(nextProps)
-    }
-  }
   render() {
     const {
       location,
       currentUser,
     } = this.props
-    const { currentSelectedKeys } = this.state
+    const { pathname } = location
+    const pathArray = pathname.split('/')
+    const selectedKeys = [ `/${pathArray[1]}` ]
     return (
       <LayoutHeader className="layout-header">
         <Link to="/">
@@ -105,7 +84,7 @@ export default class Header extends React.Component {
           mode="horizontal"
           defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
           className="layout-header-menu"
-          selectedKeys={currentSelectedKeys}
+          selectedKeys={selectedKeys}
         >
           {
             menus.map(menu => (
