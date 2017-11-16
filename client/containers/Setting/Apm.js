@@ -295,7 +295,7 @@ class ApmSetting extends React.Component {
         <div key="layout-content-btns">
           <Card
             title="APM配置"
-            className="layout-content-btns"
+            className="apm_config_style"
             noHovering
           >
             <Row className="contents">
