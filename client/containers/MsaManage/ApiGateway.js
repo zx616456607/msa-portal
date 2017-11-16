@@ -281,7 +281,17 @@ class ApiGateway extends React.Component {
     this.setState({
       currentPage: page,
     })
-    this.loadGatewayPoliciesList({ page: page - 1 })
+    const { searchValue } = this.state
+    let query = {
+      page: page - 1,
+      size: 10,
+    }
+    if (searchValue) {
+      query = Object.assign({}, query, {
+        service_id: searchValue,
+      })
+    }
+    this.loadGatewayPoliciesList(query)
   }
 
   renderMsaOption = () => {
@@ -300,20 +310,38 @@ class ApiGateway extends React.Component {
   }
 
   reloadGatewayPolicyList = () => {
-    const { currentPage } = this.state
-    const query = Object.assign({}, DEFAULT_QUERY, { page: currentPage - 1 })
+    const { currentPage, searchValue } = this.state
+    let query = {
+      page: currentPage - 1,
+      size: 10,
+    }
+    if (searchValue) {
+      query = Object.assign({}, query, {
+        service_id: searchValue,
+      })
+    }
     this.loadGatewayPoliciesList(query)
   }
 
-  searchGateway = value => {
-    const searchValue = value.trim()
-    const { currentPage } = this.state
+  searchGateway = () => {
+    const { searchValue } = this.state
+    this.setState({
+      currentPage: 1,
+    })
     const query = {
-      page: currentPage - 1,
+      page: 0,
       size: 10,
       service_id: searchValue,
     }
     this.loadGatewayPoliciesList(query)
+  }
+
+  searchInputChange = e => {
+    const value = e.target.value
+    const searchValue = value ? value.trim() : ''
+    this.setState({
+      searchValue,
+    })
   }
 
   render() {
@@ -410,7 +438,8 @@ class ApiGateway extends React.Component {
           <Search
             placeholder="按微服务名称搜索"
             style={{ width: 200 }}
-            onSearch={value => this.searchGateway(value)}
+            onSearch={this.searchGateway}
+            onChange={this.searchInputChange}
           />
           {
             totalElements !== 0 && <div className="page">
