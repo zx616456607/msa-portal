@@ -165,25 +165,28 @@ class CreateConfig extends React.Component {
   handleAdd = () => {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
     const { addCenterConfig, clusterID } = this.props
-    const query = {
-      branch_name: branchName,
-      file_path: inputValue,
-      commit_message: textAreaValue,
-      project_url: configGitUrl,
-    }
-    addCenterConfig(clusterID, currentYaml, query).then(res => {
-      if (res.error) {
-        notification.error({
-          message: '添加失败',
-        })
-        return
+    this.props.form.validateFields(err => {
+      if (err) return
+      const query = {
+        branch_name: branchName,
+        file_path: inputValue,
+        commit_message: textAreaValue,
+        project_url: configGitUrl,
       }
-      if (res.response.result.code === 200) {
-        notification.success({
-          message: '添加成功',
-        })
-        this.props.history.push('/msa-manage/config-center')
-      }
+      addCenterConfig(clusterID, currentYaml, query).then(res => {
+        if (res.error) {
+          notification.error({
+            message: '添加失败',
+          })
+          return
+        }
+        if (res.response.result.code === 200) {
+          notification.success({
+            message: '添加成功',
+          })
+          this.props.history.push('/msa-manage/config-center')
+        }
+      })
     })
   }
 
@@ -192,26 +195,41 @@ class CreateConfig extends React.Component {
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
     const { getFieldDecorator } = this.props.form
+
     return (
       <QueueAnim className="create">
         <Card className="info" key="body">
           <Row className="connent">
             <Col className="text" span={4}>配置名称</Col>
             <Col span={20}>
-              <Input style={{ width: '60%', margin: '10px' }} defaultValue={detal === 'true' ? projectName : ''} onChange={this.handleInput} />
+              <FormItem>
+                {getFieldDecorator('configName', {
+                  initialValue: detal === 'true' ? projectName : undefined,
+                  rules: [{ required: true, message: '请填写配置名称' }],
+                })(
+                  <Input style={{ width: '60%', margin: '10px' }} onChange={this.handleInput} />
+                )}
+              </FormItem>
             </Col>
           </Row>
           <Row className="connent">
             <Col className="text" span={4}>配置版本</Col>
             <Col span={20}>
-              <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage} value={branchName}>
-                {
-                  branchData ?
-                    branchData.map((item, index) => (
-                      <Option key={index} value={item.name}>{item.name}</Option>
-                    )) : ''
-                }
-              </Select>
+              <FormItem>
+                {getFieldDecorator('configEdition', {
+                  initialValue: branchName,
+                  rules: [{ required: true, message: '请选择配置版本' }],
+                })(
+                  <Select style={{ width: '60%', margin: '10px' }} onChange={this.handlechage}>
+                    {
+                      branchData ?
+                        branchData.map((item, index) => (
+                          <Option key={index} value={item.name}>{item.name}</Option>
+                        )) : ''
+                    }
+                  </Select>
+                )}
+              </FormItem>
             </Col>
           </Row>
           <Row className="connent">
@@ -251,7 +269,6 @@ class CreateConfig extends React.Component {
           </div>
         </Card>
       </QueueAnim>
-
     )
   }
 }
