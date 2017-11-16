@@ -134,12 +134,12 @@ class MsaConfig extends React.Component {
         <div key="layout-content-btns">
           <Card
             title="微服务配置"
-            className="layout-content-btns"
+            className="msa_config_style"
             noHovering
           >
             <div className="conten">
               <div className="info">
-                <Row className="msa">
+                <Row className="msa first_row">
                   <Col span={6}>基础服务</Col>
                   <Col span={8}>
                     <Select style={{ width: 300 }} defaultValue="SpringCloud">
