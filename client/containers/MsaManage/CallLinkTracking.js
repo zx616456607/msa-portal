@@ -16,6 +16,7 @@ import { Card, Icon } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { DEFAULT, API_CONFIG } from '../../constants'
 import { toQuerystring } from '../../common/utils'
+import cloneDeep from 'lodash/cloneDeep'
 import './style/CallLinkTracking.less'
 
 export function getZipkinSrc(currentConfig, currentUser) {
@@ -48,7 +49,7 @@ class CallLinkTracking extends React.Component {
 
 const mapStateToProps = state => {
   const { current } = state
-  const currentConfig = current.config
+  const currentConfig = cloneDeep(current.config)
   const currentUser = current.user.info
   if (currentConfig.project.namespace === DEFAULT) {
     currentConfig.project.namespace = currentUser.namespace
