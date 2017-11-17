@@ -16,8 +16,7 @@ import { Link } from 'react-router-dom'
 import './style/configCenter.less'
 import QueueAnim from 'rc-queue-anim'
 import { getService, getBranchList, getCenterEvn, getCenterConfig, delCenterConfig, putCenterConfig } from '../../../actions/configCenter'
-import { Row, Tabs, Button, Icon, Table, Pagination, Modal, Select, Input, notification, Card } from 'antd'
-const TabPane = Tabs.TabPane
+import { Button, Icon, Table, Pagination, Modal, Select, Input, notification, Card } from 'antd'
 const Option = Select.Option
 const { TextArea } = Input
 
@@ -186,7 +185,6 @@ class ConfigCenter extends React.Component {
       simple: true,
       total: 1,
       defaultCurrent: 1,
-      defaultPageSize: 50,
     }
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
 
@@ -194,37 +192,33 @@ class ConfigCenter extends React.Component {
       <QueueAnim className="center" >
         <div key="body">
           <Card className="config-center">
-            <Row className="branch">
+            <div className="branch">
               <span>版本分支：</span>
               <Select style={{ width: 200 }} onChange={this.handleChang} value={branch}>
                 {data}
               </Select>
-            </Row>
-            <Tabs type="card" >
-              <TabPane tab="开发环境" key="1" >
-                <div className="exploit">
-                  <div className="headers">
-                    <Button className="add" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
-                      <Icon type="plus" style={{ color: '#fff' }} />
-                      <span className="font">添加配置</span>
-                    </Button>
-                    <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
-                    <div className="pages">
-                      <span className="total">共计{envData.length}条</span>
-                      <Pagination {...pagination} />
-                    </div>
-                  </div>
-                  <div className="bottom">
-                    <Table
-                      columns={columns}
-                      dataSource={envData}
-                      pagination={false}
-                      loading={loading}
-                      rowKey={row => row.name} />
+            </div>
+            <div type="card" >
+              <div className="exploit">
+                <div className="headers">
+                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
+                    <Icon type="plus" style={{ color: '#fff' }} />
+                    <span className="font">添加配置</span>
+                  </Button>
+                  <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
+                  <div className="pages">
+                    <span className="total">共计{envData.length}条</span>
+                    <Pagination {...pagination} />
                   </div>
                 </div>
-              </TabPane>
-              <TabPane tab="测试环境" key="2">
+              </div>
+              <Table
+                columns={columns}
+                dataSource={envData}
+                pagination={false}
+                loading={loading}
+                rowKey={row => row.name} />
+              {/* <TabPane tab="测试环境" key="2">
                 <div className="exploit">
                   <div className="headers">
                     <Button className="add" type="primary" onClick={() => this.props.history.push('/msa-manage/config-center/config/create?config')}>
@@ -267,8 +261,8 @@ class ConfigCenter extends React.Component {
                       rowKey={row => row.name} />
                   </div>
                 </div>
-              </TabPane>
-            </Tabs>
+              </TabPane> */}
+            </div>
             <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
               footer={[
                 <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
@@ -287,7 +281,6 @@ class ConfigCenter extends React.Component {
             </Modal>
           </Card>
         </div>
-
       </QueueAnim>
     )
   }

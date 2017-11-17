@@ -8,9 +8,9 @@ class LogComponent extends React.Component {
     bigLog: false,
   }
 
-  componentWillMount() {}
+  componentWillMount() { }
 
-  handleDown = () => {}
+  handleDown = () => { }
 
   onChangeBigLog = () => {
     this.setState({
@@ -23,8 +23,10 @@ class LogComponent extends React.Component {
       <div className="body">
         <div className="title">
           <span className="desc">结果查询页</span>
-          <Icon type="download" className="down" />
-          <span className="download" onClick={this.handleDown}>下载</span>
+          <div>
+            <Icon type="download" className="down" />
+            <span className="download" onClick={this.handleDown}>下载</span>
+          </div>
           <i className={this.state.bigLog ? 'fa-right fa fa-compress' : 'fa-right fa fa-expand'} onClick={this.onChangeBigLog} />
         </div>
         <div className="connent">
