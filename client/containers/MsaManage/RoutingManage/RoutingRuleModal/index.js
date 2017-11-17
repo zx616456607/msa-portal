@@ -43,7 +43,7 @@ class RoutingRuleModal extends React.Component {
       const { setFieldsValue, resetFields } = form
       resetFields()
       const {
-        routeId, path, serviceName, url, description, stripPrefix,
+        routeId, path, serviceId, url, description, stripPrefix,
         retryable, status,
       } = currentRoute
       const msaUrlType = url ? 'url' : 'id'
@@ -51,7 +51,7 @@ class RoutingRuleModal extends React.Component {
       const values = {
         routeId,
         path,
-        serviceName,
+        serviceId,
         url,
         description,
         stripPrefix,
@@ -193,7 +193,7 @@ class RoutingRuleModal extends React.Component {
         {
           getFieldValue('msa-url-type') === 'id'
             ? <FormItem {...formItemLayout} label="微服务 ID">
-              {getFieldDecorator('serviceName', {
+              {getFieldDecorator('serviceId', {
                 rules: [{
                   required: true,
                   message: 'url',

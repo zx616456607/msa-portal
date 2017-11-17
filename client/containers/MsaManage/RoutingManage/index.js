@@ -118,7 +118,7 @@ class RoutingManage extends React.Component {
     }, {
       title: '微服务 ID / 路由 URL',
       dataIndex: 'url',
-      render: (text, record) => (record.serviceName || record.url || '-'),
+      render: (text, record) => (record.serviceId || record.url || '-'),
     }, {
       title: '路由规则描述',
       dataIndex: 'description',
