@@ -190,6 +190,8 @@ class MsaList extends React.Component {
       width: '20%',
       render: record => {
         const isMsaAutomatic = record.type === MSA_TYPE_AUTO
+        const isShow = !record.id || (record.id && record.deletedAt)
+        const isHide = record.id && !record.deletedAt
         const menu = (
           <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 103 }}>
             <MenuItem key="add" disabled={isMsaAutomatic}>
@@ -202,24 +204,23 @@ class MsaList extends React.Component {
         return (
           <div>
             {
-              isMsaAutomatic &&
-              (record.discoverable
-                ? (
-                  <DropdownButton
-                    overlay={menu}
-                    onClick={this.hideService.bind(this, record)}
-                  >
-                  隐藏服务
-                  </DropdownButton>
-                )
-                : (
-                  <DropdownButton
-                    overlay={menu}
-                    onClick={this.cancelHideService.bind(this, record)}
-                  >
-                  取消隐藏
-                  </DropdownButton>
-                )
+              isMsaAutomatic && isShow && (
+                <DropdownButton
+                  overlay={menu}
+                  onClick={this.hideService.bind(this, record)}
+                >
+                隐藏服务
+                </DropdownButton>
+              )
+            }
+            {
+              isMsaAutomatic && isHide && (
+                <DropdownButton
+                  overlay={menu}
+                  onClick={this.cancelHideService.bind(this, record)}
+                >
+                取消隐藏
+                </DropdownButton>
               )
             }
             {
