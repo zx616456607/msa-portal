@@ -73,11 +73,14 @@ class MsaList extends React.Component {
             if (res.error) {
               return reject()
             }
-            resolve()
-            notification.success({
-              message: '隐藏服务成功',
-            })
-            self.loadMsaList()
+            // 1s timeout for backend
+            setTimeout(() => {
+              resolve()
+              notification.success({
+                message: '隐藏服务成功',
+              })
+              self.loadMsaList()
+            }, 1000)
           })
         })
       },
@@ -96,11 +99,14 @@ class MsaList extends React.Component {
             if (res.error) {
               return reject()
             }
-            resolve()
-            notification.success({
-              message: '隐藏服务成功',
-            })
-            self.loadMsaList()
+            // 1s timeout for backend
+            setTimeout(() => {
+              resolve()
+              notification.success({
+                message: '隐藏服务成功',
+              })
+              self.loadMsaList()
+            }, 1000)
           })
         })
       },
