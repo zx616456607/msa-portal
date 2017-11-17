@@ -37,11 +37,38 @@ function policesList(state, action) {
   }
 }
 
+function routesList(state, action) {
+  switch (action.type) {
+    case ActionTyps.GET_GATEWAY_ROUTES_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTyps.GET_GATEWAY_ROUTES_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        code: action.response.result.code,
+        status: action.response.result.status,
+        ...action.response.result.data,
+      }
+    case ActionTyps.GET_GATEWAY_ROUTES_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const gateway = (state = {
   policesList: {},
+  routesList: {},
 }, action) => {
   return {
     policesList: policesList(state.policesList, action),
+    routesList: routesList(state.routesList, action),
   }
 }
 

@@ -47,10 +47,16 @@ const MsaList = new schema.Entity('msaList', {}, {
   idAttribute: 'appName',
 })
 
-// GatewayAllPolicesList
+// GatewayPolicies
 const gatewayPolicies = new schema.Entity('gatewayPolicies', {}, {
   idAttribute: 'id',
 })
+
+// GatewayRoutes
+const gatewayRoutesSchema = new schema.Entity('gatewayRoutes', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -86,6 +92,11 @@ export const Schemas = {
   GATEWAY_POLICIES_LIST_DATA: {
     data: {
       content: [ gatewayPolicies ],
+    },
+  },
+  GATEWAY_ROUTES_LIST_DATA: {
+    data: {
+      content: [ gatewayRoutesSchema ],
     },
   },
 }

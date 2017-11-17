@@ -37,3 +37,27 @@ export const gatewayPolicesListSlt = createSelector(
     }
   }
 )
+
+
+export const gatewayRoutesListSlt = createSelector(
+  [ gateway, getEntities ],
+  (gateway, getEntities) => {
+    const { routesList } = gateway
+    const { isFetching, content, totalPages, totalElements } = routesList
+    if (!content || !content.length) {
+      return {
+        isFetching,
+        routesList: [],
+        totalPages: 0,
+        totalElements: 0,
+      }
+    }
+    const { gatewayRoutes } = getEntities
+    return {
+      isFetching,
+      routesList: content.map(id => gatewayRoutes[id]),
+      totalPages,
+      totalElements,
+    }
+  }
+)

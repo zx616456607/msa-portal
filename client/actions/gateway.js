@@ -130,3 +130,120 @@ export function deleteGatewayPolicy(clusterID, policyID) {
     return dispatch(fetchDeleteGatewatPolicy(clusterID, policyID))
   }
 }
+
+export const GET_GATEWAY_ROUTES_LIST_REQUEST = 'GET_GATEWAY_ROUTES_LIST_REQUEST'
+export const GET_GATEWAY_ROUTES_LIST_SUCCESS = 'GET_GATEWAY_ROUTES_LIST_SUCCESS'
+export const GET_GATEWAY_ROUTES_LIST_FAILURE = 'GET_GATEWAY_ROUTES_LIST_FAILURE'
+
+const fetchGatewayRoutes = (clusterID, query) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GATEWAY_ROUTES_LIST_REQUEST,
+        GET_GATEWAY_ROUTES_LIST_SUCCESS,
+        GET_GATEWAY_ROUTES_LIST_FAILURE,
+      ],
+      endpoint,
+      options: {
+        method: 'GET',
+      },
+      schema: Schemas.GATEWAY_ROUTES_LIST_DATA,
+    },
+  }
+}
+
+export function getGatewayRoutes(clusterID, query) {
+  return dispatch => {
+    return dispatch(fetchGatewayRoutes(clusterID, query))
+  }
+}
+
+export const ADD_GATEWAY_ROUTE_REQUEST = 'ADD_GATEWAY_ROUTE_REQUEST'
+export const ADD_GATEWAY_ROUTE_SUCCESS = 'ADD_GATEWAY_ROUTE_SUCCESS'
+export const ADD_GATEWAY_ROUTE_FAILURE = 'ADD_GATEWAY_ROUTE_FAILURE'
+
+const fetchAddGatewayRoute = (clusterID, body) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route`
+  return {
+    [CALL_API]: {
+      types: [
+        ADD_GATEWAY_ROUTE_REQUEST,
+        ADD_GATEWAY_ROUTE_SUCCESS,
+        ADD_GATEWAY_ROUTE_FAILURE,
+      ],
+      endpoint,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function addGatewayRoute(clusterID, body) {
+  return dispatch => {
+    return dispatch(fetchAddGatewayRoute(clusterID, body))
+  }
+}
+
+export const DELETE_GATEWAY_ROUTE_REQUEST = 'DELETE_GATEWAY_ROUTE_REQUEST'
+export const DELETE_GATEWAY_ROUTE_SUCCESS = 'DELETE_GATEWAY_ROUTE_SUCCESS'
+export const DELETE_GATEWAY_ROUTE_FAILURE = 'DELETE_GATEWAY_ROUTE_FAILURE'
+
+const fetchDeleteGatewayRoute = (clusterID, routeID) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route/${routeID}`
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_GATEWAY_ROUTE_REQUEST,
+        DELETE_GATEWAY_ROUTE_SUCCESS,
+        DELETE_GATEWAY_ROUTE_FAILURE,
+      ],
+      endpoint,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export function delGatewayRoute(clusterID, routeID) {
+  return dispatch => {
+    return dispatch(fetchDeleteGatewayRoute(clusterID, routeID))
+  }
+}
+
+export const UPDATE_GATEWAY_ROUTE_REQUEST = 'UPDATE_GATEWAY_ROUTE_REQUEST'
+export const UPDATE_GATEWAY_ROUTE_SUCCESS = 'UPDATE_GATEWAY_ROUTE_SUCCESS'
+export const UPDATE_GATEWAY_ROUTE_FAILURE = 'UPDATE_GATEWAY_ROUTE_FAILURE'
+
+const fetchUpdateGatewayRoute = (clusterID, routeID, body) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route/${routeID}`
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_GATEWAY_ROUTE_REQUEST,
+        UPDATE_GATEWAY_ROUTE_SUCCESS,
+        UPDATE_GATEWAY_ROUTE_FAILURE,
+      ],
+      endpoint,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function updateGatewayRoute(clusterID, routeID, body) {
+  return dispatch => {
+    return dispatch(fetchUpdateGatewayRoute(clusterID, routeID, body))
+  }
+}
