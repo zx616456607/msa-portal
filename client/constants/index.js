@@ -41,6 +41,7 @@ if (isProd) {
 export const API_CONFIG = apiConfig
 
 export const JWT = 'jwt'
+export const AUTH_URL = 'auth_url'
 export const DEFAULT = 'default'
 export const TIMES_WITHOUT_YEAR = 'MM-DD HH:mm:ss'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'

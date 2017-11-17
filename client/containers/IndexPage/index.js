@@ -379,7 +379,7 @@ class IndexPage extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  errorMessage: state.errorMessage,
+  errorObject: state.errorObject,
   auth: state.entities.auth,
 })
 

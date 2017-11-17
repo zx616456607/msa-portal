@@ -128,11 +128,11 @@ export default store => next => action => {
 
   // Set jwt token to headers
   const jwtAuth = store.getState().entities.auth[JWT] || {}
-  let jwtToken = jwtAuth.token
-  if (!jwtToken && localStorage) {
-    jwtToken = localStorage.getItem(JWT)
+  let jwt = jwtAuth.token
+  if (!jwt && localStorage) {
+    jwt = localStorage.getItem(JWT)
   }
-  options.headers = Object.assign({}, { Authorization: `Bearer ${jwtToken}` }, options.headers)
+  options.headers = Object.assign({}, { Authorization: `Bearer ${jwt}` }, options.headers)
 
   // Set project to headers
   const currentConfig = store.getState().current.config
@@ -148,6 +148,7 @@ export default store => next => action => {
     error => next(actionWith({
       type: failureType,
       error: error.message || 'Something bad happened',
+      status: error.status,
     }))
   )
 }

@@ -41,13 +41,13 @@ const entities = (state = {
 }
 
 // Updates error message to notify about the failed fetches.
-const errorMessage = (state = null, action) => {
-  const { type, error } = action
+const errorObject = (state = null, action) => {
+  const { type, error, status } = action
 
   if (type === ActionTypes.RESET_ERROR_MESSAGE) {
     return null
   } else if (error) {
-    return error
+    return { message: error, status }
   }
 
   return state
@@ -57,7 +57,7 @@ const config = (state = {}) => state
 
 const rootReducer = combineReducers({
   entities,
-  errorMessage,
+  errorObject,
   config,
   routing,
   current,

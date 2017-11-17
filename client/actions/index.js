@@ -19,12 +19,16 @@ export const AUTH_FAILURE = 'AUTH_FAILURE'
 
 // Get Auth info.
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchAuth = ({ username, token }) => {
+const fetchAuth = ({ username, token, jwt }) => {
   let headers
   if (username && token) {
     headers = {
       username,
       Authorization: `token ${token}`,
+    }
+  } else if (jwt) {
+    headers = {
+      Authorization: `Bearer ${jwt}`,
     }
   }
   return {
@@ -41,8 +45,8 @@ const fetchAuth = ({ username, token }) => {
 
 // Fetches Auth info.
 // Relies on Redux Thunk middleware.
-export const getAuth = ({ username, token }) => dispatch => {
-  return dispatch(fetchAuth(({ username, token })))
+export const getAuth = ({ username, token, jwt }) => dispatch => {
+  return dispatch(fetchAuth(({ username, token, jwt })))
 }
 
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE'
