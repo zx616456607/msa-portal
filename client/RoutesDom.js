@@ -25,7 +25,7 @@ import MsaRoutingManage from './containers/MsaManage/RoutingManage/RoutingManage
 import ApiGateway from './containers/MsaManage/ApiGateway'
 import ApiGatewayMonitoring from './containers/MsaManage/ApiGatewayMonitoring'
 import BlownMonitoring from './containers/MsaManage/BlownMonitoring'
-import CertificationManageClients from './containers/MsaManage/CertificationManage/Clients'
+// import CertificationManageClients from './containers/MsaManage/CertificationManage/Clients'
 import CertificationManageAuthMode from './containers/MsaManage/CertificationManage/AuthMode'
 import CertificationManageAuthScope from './containers/MsaManage/CertificationManage/AuthScope'
 import Apm from './containers/Apm'
@@ -138,15 +138,15 @@ export const msaManageChildRoutes = [
   {
     path: '/msa-manage/certification-manage',
     exact: true,
-    render: () => <Redirect to="/msa-manage/certification-manage/clients" component={CertificationManageClients} />,
+    render: () => <Redirect to="/msa-manage/certification-manage/auth-mode" component={CertificationManageAuthMode} />,
     key: 'certification-manage',
   },
-  {
+  /* {
     path: '/msa-manage/certification-manage/clients',
     exact: true,
     component: CertificationManageClients,
     key: 'certification-manage',
-  },
+  }, */
   {
     path: '/msa-manage/certification-manage/auth-mode',
     exact: true,

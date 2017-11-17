@@ -97,6 +97,7 @@ const menus = [
       {
         to: '/msa-manage/certification-manage/clients',
         text: '客户端管理',
+        disabled: true,
       },
       {
         to: '/msa-manage/certification-manage/auth-mode',
@@ -124,26 +125,28 @@ class MsaManage extends React.Component {
   }
 
   renderMenu = menu => {
-    if (menu.type === 'SubMenu') {
+    const { type, to, icon, text, children, ...otherProps } = menu
+    if (type === 'SubMenu') {
       return (
         <SubMenu
-          key={menu.to}
+          key={to}
           title={
             <span>
-              {menu.icon}
-              <span className="nav-text">{menu.text}</span>
+              {icon}
+              <span className="nav-text">{text}</span>
             </span>
           }
+          {...otherProps}
         >
-          {menu.children.map(this.renderMenu)}
+          {children.map(this.renderMenu)}
         </SubMenu>
       )
     }
     return (
-      <Menu.Item key={menu.to}>
-        <Link to={menu.to}>
-          {menu.icon}
-          <span className="nav-text">{menu.text}</span>
+      <Menu.Item key={to} {...otherProps}>
+        <Link to={to}>
+          {icon}
+          <span className="nav-text">{text}</span>
         </Link>
       </Menu.Item>
     )
