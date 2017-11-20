@@ -79,6 +79,7 @@ class RoutingRuleModal extends React.Component {
       if (err) {
         return
       }
+      delete values['msa-url-type']
       this.setState({
         confirmLoading: true,
       })
@@ -99,7 +100,6 @@ class RoutingRuleModal extends React.Component {
         return
       }
       const body = {}
-      delete values['msa-url-type']
       Object.keys(values).forEach(key => {
         if (values[key] !== currentRoute[key]) {
           body[key] = values[key]
