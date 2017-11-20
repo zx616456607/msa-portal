@@ -12,7 +12,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Table, Dropdown, Menu, Card, notification } from 'antd'
+import {
+  Button, Input, Table, Dropdown, Menu, Card, notification,
+  Pagination,
+} from 'antd'
 import RoutingRuleModal from './RoutingRuleModal'
 import confirm from '../../../components/Modal/confirm'
 import {
@@ -31,6 +34,13 @@ class RoutingManage extends React.Component {
   state = {
     ruleModal: false,
     currentRoute: null,
+    currentPage: 1, // component start on page 1
+    routeid: '',
+  }
+
+  defaultQuery = {
+    page: 0, // api start on page 0
+    size: 10,
   }
 
   componentDidMount() {
@@ -97,14 +107,40 @@ class RoutingManage extends React.Component {
     }
   }
 
-  loadRoutesList = () => {
+  loadRoutesList = query => {
     const { getGatewayRoutes, clusterID } = this.props
-    getGatewayRoutes(clusterID)
+    const { currentPage, routeid } = this.state
+    query = Object.assign(
+      {},
+      this.defaultQuery,
+      {
+        page: currentPage - 1,
+        routeid,
+      },
+      query
+    )
+    if (!query.routeid) {
+      delete query.routeid
+    }
+    getGatewayRoutes(clusterID, query)
+  }
+
+  onPageChange = currentPage => {
+    this.setState({
+      currentPage,
+    }, this.loadRoutesList)
+  }
+
+  onSearch = routeid => {
+    this.setState({
+      routeid,
+      currentPage: 1,
+    }, this.loadRoutesList)
   }
 
   render() {
-    const { isFetching, routesList } = this.props
-    const { ruleModal, currentRoute } = this.state
+    const { isFetching, routesList, totalElements } = this.props
+    const { ruleModal, currentRoute, currentPage } = this.state
     const columns = [{
       title: '路由名称',
       dataIndex: 'routeId',
@@ -150,50 +186,63 @@ class RoutingManage extends React.Component {
         )
       },
     }]
-    const rowSelection = {
+    /* const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
       },
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User',
       }),
-    }
-    const pagination = {
-      simple: true,
-    }
+    } */
     return (
       <QueueAnim className="router-manage">
         <div className="router-manage-btn-box layout-content-btns" key="btns">
-          <Button type="primary" onClick={this.addRoutingRule}><Icon type="plus"/>添加路由</Button>
-          <Button icon="sync" onClick={this.loadRoutesList} loading={isFetching}>
+          <Button type="primary" icon="plus" onClick={this.addRoutingRule}>
+          添加路由
+          </Button>
+          <Button icon="sync" onClick={this.loadRoutesList.bind(this, {})} loading={isFetching}>
           刷新
           </Button>
-          <Button><Icon type="delete"/>删除</Button>
+          {/* <Button><Icon type="delete"/>删除</Button> */}
           <Search
             placeholder="按路由名称搜索"
             style={{ width: 200 }}
+            onChange={e => this.setState({ routeid: e.target.value })}
+            onSearch={this.onSearch}
           />
+          {
+            totalElements > 0 && <div className="page">
+              <span className="total">共 { totalElements } 条</span>
+              <Pagination
+                simple
+                current={currentPage}
+                total={totalElements}
+                pageSize={this.defaultQuery.size}
+                onChange={this.onPageChange}
+              />
+            </div>
+          }
         </div>
-        {
-          ruleModal && <RoutingRuleModal
-            visible={ruleModal}
-            onCancel={() => this.setState({ ruleModal: false })}
-            loadRoutesList={this.loadRoutesList}
-            currentRoute={currentRoute}
-          />
-        }
         <div className="layout-content-body" key="body">
           <Card noHovering>
             <Table
               className="router-manage-table"
-              pagination={pagination}
-              rowSelection={rowSelection}
+              pagination={false}
+              // rowSelection={rowSelection}
               columns={columns}
               dataSource={routesList}
               loading={isFetching}
               rowKey={record => record.id}
             />
           </Card>
+          {
+            ruleModal && <RoutingRuleModal
+              visible={ruleModal}
+              onCancel={() => this.setState({ ruleModal: false })}
+              loadRoutesList={this.loadRoutesList}
+              currentRoute={currentRoute}
+            />
+          }
         </div>
       </QueueAnim>
     )

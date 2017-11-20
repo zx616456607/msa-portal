@@ -166,3 +166,17 @@ export function scrollToTop(selector) {
     target && (target.scrollTop = 0)
   }
 }
+
+/**
+ * Get the type of var
+ *
+ * @export
+ * @param {any} param var
+ * @return {string} type
+ */
+export function getType(param) {
+  let type = Object.prototype.toString.call(param)
+  type = type.replace(/\[object /, '')
+  type = type.replace(/\]/, '')
+  return type.toLowerCase()
+}
