@@ -8,7 +8,6 @@ class LogComponent extends React.Component {
     bigLog: false,
   }
 
-
   componentWillMount() { }
 
   handleDown = () => { }
@@ -22,7 +21,7 @@ class LogComponent extends React.Component {
   render() {
     return (
       <Card className="info bigLogBox">
-        <div className="body">
+        <div className="body" style={{ padding: 0 }}>
           <div className="title">
             <span className="desc">结果查询页</span>
             <div>
