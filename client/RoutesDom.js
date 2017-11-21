@@ -33,7 +33,8 @@ import Topology from './containers/Apm/Topology'
 import Performance from './containers/Apm/Performance'
 import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import MsaOm from './containers/MsaOm'
-import MsaOmLogs from './containers/MsaOm/Logs'
+import MsaOmLogs from './containers/MsaOm/Log'
+import MsaComponents from './containers/MsaOm/Components'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
@@ -192,14 +193,20 @@ export const msaOmChildRoutes = [
   {
     path: '/msa-om',
     exact: true,
-    render: () => <Redirect to="/msa-om/logs" component={MsaOmLogs} />,
+    render: () => <Redirect to="/msa-om/components" component={MsaComponents} />,
     key: 'index',
   },
   {
-    path: '/msa-om/logs',
+    path: '/msa-om/log',
     component: MsaOmLogs,
     exact: true,
     key: 'msa-om-logs',
+  },
+  {
+    path: '/msa-om/components',
+    component: MsaComponents,
+    exact: true,
+    key: 'msa-om-components',
   },
 ]
 

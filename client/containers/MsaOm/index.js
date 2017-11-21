@@ -17,10 +17,20 @@ import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import msaComponent from '../../assets/img/log/msa-component.svg'
 
 const menus = [
   {
-    to: '/msa-om/logs',
+    to: '/msa-om/components',
+    text: '微服务组件',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${msaComponent.id}`} />
+      </svg>
+    ),
+  },
+  {
+    to: '/msa-om/log',
     text: '日志查询',
     icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
   },
