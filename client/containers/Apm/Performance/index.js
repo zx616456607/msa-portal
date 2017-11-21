@@ -32,9 +32,9 @@ const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
 const images = [
-  { src: require('../../../assets/img/apm/service/java.svg') },
-  { src: require('../../../assets/img/apm/service/mysql.svg') },
-  { src: require('../../../assets/img/apm/service/tomcat.svg') },
+  '/img/service/java.svg',
+  '/img/service/mysql.svg',
+  '/img/service/tomcat.svg',
 ]
 
 class Performance extends React.Component {
@@ -286,11 +286,11 @@ class Performance extends React.Component {
   serverType = type => {
     switch (type) {
       case 'MYSQL':
-        return images[1].src
+        return images[1]
       case 'TOMCAT':
-        return images[2].src
+        return images[2]
       default:
-        return images[0].src
+        return images[0]
     }
   }
   handleLatelyTimer = timer => {
@@ -580,7 +580,7 @@ class Performance extends React.Component {
             <div key="data">
               <Row className="layout-content-body">
                 <div className="section">
-                  <img src={this.serverType(agentData.serverType)} />
+                  <img className="imgs" src={this.serverType(agentData.serverType)} />
                   <div className="left">
                     <span style={{ fontSize: 16 }}>
                       微服务名称 {exampleData.applicationName}

@@ -13,7 +13,7 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Select, Button, Form, Input, DatePicker } from 'antd'
-import LogComponent from './log'
+import LogComponent from './LogsDetail'
 import select from '../../assets/img/msa-pam/select.svg'
 const FormItem = Form.Item
 const { RangePicker } = DatePicker

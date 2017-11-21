@@ -1,0 +1,89 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * LOG
+ *
+ * 2017-11-10
+ * @author zhaoyb
+ */
+
+ .info {
+  .ant-card-body {
+    padding: 0 !important;
+  }
+  .body {
+    .title {
+     width: 100%;
+     height: 40px;
+     line-height: 40px;
+     color: #5cb85c;
+     background-color: #333;
+     .desc {
+       padding: 0 15px;
+       display: inline-block;
+       width: auto;
+       height: 40px;
+       line-height: 40px;
+       font-size: 14px;
+       border-bottom: 2px solid #5cb85c;
+     }
+     .enlarge {
+       margin-left: 10px;
+       position: absolute;
+       top: 14px;
+       left: 97%;
+       font-size: 14px;
+     }
+     .download {
+       float: right;
+       margin-right: 15px;
+       line-height: 40px;
+       font-size: 14px;
+       cursor: pointer;
+     }
+     .down {
+       float: left;
+       font-size: 14px;
+       line-height: 40px;
+     }
+     & > div {
+       float: right;
+       margin-right: 30px;
+       display: inline-block;
+     }
+    }
+    .connent {
+     width: 100%;
+     height: 500px;
+     overflow-y: auto;
+     margin-bottom: 0;
+     margin-top: 0;
+     background-color: #1a1a1a;
+     .infos {
+       line-height: 50px;
+       text-align: center;
+       color: #d9d9d9;
+     }
+    }
+  }
+ }
+ .bigLogBox {
+  z-index: 100;
+  position: fixed;
+  margin-top: 0 !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  .ant-card-body {
+    height: 100%;
+  }
+  .msgBox {
+    height: calc(~"100% - 40px");
+  }
+}
+
