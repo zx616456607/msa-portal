@@ -6,14 +6,16 @@
 /**
  * Components
  *
- * 2017-11-10
+ * 2017-11-21
  * @author zhaoyb
  */
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
-import { Card, Button, Input, Table, Pagination, Progress, Dropdown, Menu, Modal, Icon, Row, Col, Slider, InputNumber } from 'antd'
+import classNames from 'classnames'
+import MsaModal from './modals'
+import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon } from 'antd'
 const Search = Input.Search
 
 const tooltip = [{
@@ -39,10 +41,9 @@ const tooltip = [{
 export default class MsaComponents extends React.Component {
   state = {
     Data: [],
-    inputValue: 0,
-    logsVisible: false,
+    tipsName: '',
     toopVisible: false,
-    extendVisible: false,
+    visible: false,
     tooltipTitle: '',
     tooltipContent: '',
     loading: false,
@@ -50,9 +51,8 @@ export default class MsaComponents extends React.Component {
 
   handleButtonClick = () => {
     this.setState({
-      extendVisible: true,
-      tooltipTitle: tooltip[3].title,
-      tooltipContent: tooltip[3].content,
+      tipsName: '水平扩展',
+      visible: true,
     })
   }
 
@@ -74,11 +74,18 @@ export default class MsaComponents extends React.Component {
   }
   handleMenuClick = key => {
     const tips = this.tooptic(key.key)
-    this.setState({
-      toopVisible: true,
-      tooltipTitle: tips.title,
-      tooltipContent: tips.content,
-    })
+    if (tips.title === '查看日志') {
+      this.setState({
+        visible: true,
+        tipsName: '查看日志',
+      })
+    } else {
+      this.setState({
+        toopVisible: true,
+        tooltipTitle: tips.title,
+        tooltipContent: tips.content,
+      })
+    }
   }
 
   handleRealNum = value => {
@@ -106,15 +113,15 @@ export default class MsaComponents extends React.Component {
   }
 
   render() {
-    const { loading, tooltipContent, tooltipTitle, extendVisible, toopVisible,
-      logsVisible } = this.state
+    const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
+      tipsName } = this.state
     const pagination = {
       simple: true,
       total: 1,
       defaultCurrent: 1,
     }
     const menu = (
-      <Menu onClick={this.handleMenuClick} style={{ width: 90 }}>
+      <Menu onClick={this.handleMenuClick} style={{ width: 100 }}>
         <Menu.Item key="重启组件">重启组件</Menu.Item>
         <Menu.Item key="停止组件">停止组件</Menu.Item>
         <Menu.Item key="3">高可用</Menu.Item>
@@ -136,7 +143,14 @@ export default class MsaComponents extends React.Component {
       title: '状态',
       dataIndex: 'state',
       render: () => <div>
-        <Progress percent={30} showInfo={false} />
+        {/* <Progress percent={30} showInfo={false} /> */}
+        <span
+          className={
+            classNames('msa-table-status-box msa-table-running')
+          }
+        >
+          <i className="msa-table-status" />运行中
+        </span>
       </div>,
     }, {
       key: 'count',
@@ -171,11 +185,13 @@ export default class MsaComponents extends React.Component {
       time: '1分钟',
     }]
 
+    const scope = this
+
     return (
       <QueueAnim className="info">
         <div className="nav" key="nav">
-          <Button type="primary" size="large"><Icon type="sync" />刷 新</Button>
-          <Search className="input" size="large" placeholder="按微服务名称搜索" />
+          <Button type="primary"><Icon type="sync" />刷 新</Button>
+          <Search className="input" placeholder="按微服务名称搜索" />
           <div className="pages">
             <span className="total">共计10条</span>
             <Pagination {...pagination} />
@@ -206,53 +222,7 @@ export default class MsaComponents extends React.Component {
             </div>
           </div>
         </Modal>
-        <Modal title={tooltipTitle} visible={extendVisible} onCancel={this.handleExtendCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleExtendCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
-          ]}>
-          <div>
-            <div className="prompt" style={{ height: 40, backgroundColor: '#d9edf6', border: '1px dashed #85d7fd', padding: 10, borderRadius: 4, marginBottom: 20 }}>
-              <span style={{ color: '#1a7db6' }}>{tooltipContent}</span>
-            </div>
-            <Row className="cardItem">
-              <Col className="itemTitle" span={4} style={{ textAlign: 'left' }}>组件名称</Col>
-              <Col className="itemBody" span={20}>qwqeqweqwe</Col>
-            </Row>
-            <Row className="cardItem">
-              <Col className="itemTitle" span={4} style={{ textAlign: 'left', lineHeight: 2.5 }}>
-                实例数量
-              </Col>
-              <Col className="itemBody" span={20}>
-                <Row>
-                  <Col span={12}>
-                    <Slider
-                      min={1}
-                      max={20}
-                      onChange={this.handleRealNum}
-                      value={this.state.inputValue} />
-                  </Col>
-                  <Col span={12}>
-                    <InputNumber
-                      min={1}
-                      max={20}
-                      style={{ marginLeft: '16px' }}
-                      value={this.state.inputValue}
-                    /> 个
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </div>
-        </Modal>
-        <Modal title={tooltipTitle} visible={logsVisible} onCancel={this.handleLogsCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleLogsCancel}>取 消</Button>,
-          ]}>
-          <div>
-
-          </div>
-        </Modal>
+        <MsaModal visible={visible} tipsType={tipsName} scope={scope}/>
       </QueueAnim>
     )
   }

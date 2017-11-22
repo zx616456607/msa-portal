@@ -167,7 +167,7 @@ class ApmSetting extends React.Component {
     this.play()
     const body = {
       type: 'pinpoint',
-      scope: 'team',
+      scope: 'namespace',
       displayName: '',
     }
     postApm(body, clusterID, project).then(res => {
