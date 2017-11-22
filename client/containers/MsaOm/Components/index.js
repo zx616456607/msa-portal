@@ -25,6 +25,15 @@ const tooltip = [{
 }, {
   title: '重新部署',
   content: '该操作将重新部署 SpringCloud 对应组件, 可能会影响微服务的正常运行。请谨慎操作！',
+}, {
+  title: '水平扩展',
+  content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
+}, {
+  title: '查看日志',
+  content: '',
+}, {
+  title: '高可用',
+  content: '',
 }]
 
 export default class MsaComponents extends React.Component {
@@ -42,18 +51,33 @@ export default class MsaComponents extends React.Component {
   handleButtonClick = () => {
     this.setState({
       extendVisible: true,
+      tooltipTitle: tooltip[3].title,
+      tooltipContent: tooltip[3].content,
     })
   }
 
+  tooptic = key => {
+    switch (key) {
+      case '重启组件':
+        return tooltip[0]
+      case '停止组件':
+        return tooltip[1]
+      case '重新部署':
+        return tooltip[2]
+      case '查看日志':
+        return tooltip[4]
+      case '高可用':
+        return tooltip[5]
+      default:
+        return
+    }
+  }
   handleMenuClick = key => {
-    tooltip.forEach(item => {
-      if (item.title === key.key) {
-        this.setState({
-          toopVisible: true,
-          tooltipTitle: item.title,
-          tooltipContent: item.content,
-        })
-      }
+    const tips = this.tooptic(key.key)
+    this.setState({
+      toopVisible: true,
+      tooltipTitle: tips.title,
+      tooltipContent: tips.content,
     })
   }
 
@@ -157,8 +181,8 @@ export default class MsaComponents extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card>
-          <div className="body" key="body">
+        <Card key="body">
+          <div className="body">
             <Table
               columns={columns}
               dataSource={dataSource}
@@ -182,14 +206,14 @@ export default class MsaComponents extends React.Component {
             </div>
           </div>
         </Modal>
-        <Modal title="水平扩展" visible={extendVisible} onCancel={this.handleExtendCancel}
+        <Modal title={tooltipTitle} visible={extendVisible} onCancel={this.handleExtendCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleExtendCancel}>取 消</Button>,
             <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
           ]}>
           <div>
             <div className="prompt" style={{ height: 40, backgroundColor: '#d9edf6', border: '1px dashed #85d7fd', padding: 10, borderRadius: 4, marginBottom: 20 }}>
-              <span style={{ color: '#1a7db6' }}>Tips：实例数量调整, 保存后系统将调整实例数量至设置预期</span>
+              <span style={{ color: '#1a7db6' }}>{tooltipContent}</span>
             </div>
             <Row className="cardItem">
               <Col className="itemTitle" span={4} style={{ textAlign: 'left' }}>组件名称</Col>
@@ -221,11 +245,12 @@ export default class MsaComponents extends React.Component {
             </Row>
           </div>
         </Modal>
-        <Modal title="查看日志" visible={logsVisible} onCancel={this.handleLogsCancel}
+        <Modal title={tooltipTitle} visible={logsVisible} onCancel={this.handleLogsCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleLogsCancel}>取 消</Button>,
           ]}>
           <div>
+
           </div>
         </Modal>
       </QueueAnim>
