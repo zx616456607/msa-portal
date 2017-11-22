@@ -283,7 +283,7 @@ class ApmSetting extends React.Component {
     const { apmState, serviceData, state } = this.state
     const { projectID } = this.props
     let healthy = null
-    if (state !== undefined) {
+    if (state !== '') {
       healthy = state ? <span className="desc">健康</span> :
         <span className="descs">不健康</span>
     } else {
