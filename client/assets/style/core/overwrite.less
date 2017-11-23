@@ -26,11 +26,16 @@
   }
 }
 
-.ant-card-wider-padding > .ant-card-body {
-  padding: @padding-medium;
-  & > .ant-table-wrapper {
-    margin-top: -16px;
-    margin-bottom: 16px;
+.ant-card-wider-padding {
+  & > .ant-card-head {
+    padding: 0 @padding-medium;
+  }
+  & > .ant-card-body {
+    padding: @padding-medium;
+    & > .ant-table-wrapper {
+      margin-top: -16px;
+      margin-bottom: 16px;
+    }
   }
 }
 
