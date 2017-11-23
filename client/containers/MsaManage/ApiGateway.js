@@ -378,7 +378,7 @@ class ApiGateway extends React.Component {
     //  title: '具体对象',
     //  dataIndex: 'object',
     }, {
-      title: '限流阀值（次）',
+      title: '限流阈值（次）',
       dataIndex: 'limits',
     }, {
       title: '窗口（秒）',
@@ -539,7 +539,7 @@ class ApiGateway extends React.Component {
               }
             </FormItem> */}
             <FormItem
-              label="限流阀值"
+              label="限流阈值"
               key="gatewayThreshold"
               {...formItemLayout}
             >
@@ -548,10 +548,10 @@ class ApiGateway extends React.Component {
                   initialValue: 1,
                   rules: [{
                     required: true,
-                    message: '请输入限流阀值',
+                    message: '请输入限流阈值',
                   }],
                 })(
-                  <InputNumber placeholder="请输入限流阀值"/>
+                  <InputNumber placeholder="请输入限流阈值"/>
                 )
               }
               次
