@@ -14,7 +14,7 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
 import classNames from 'classnames'
-import MsaModal from './modals'
+import MsaModal from './Modal'
 import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon } from 'antd'
 const Search = Input.Search
 
@@ -30,13 +30,15 @@ const tooltip = [{
 }, {
   title: '水平扩展',
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
-}, {
-  title: '查看日志',
-  content: '',
-}, {
-  title: '高可用',
-  content: '',
 }]
+
+// {
+//   title: '查看日志',
+//   content: '',
+// }, {
+//   title: '高可用',
+//   content: '',
+// }
 
 export default class MsaComponents extends React.Component {
   state = {
@@ -74,18 +76,11 @@ export default class MsaComponents extends React.Component {
   }
   handleMenuClick = key => {
     const tips = this.tooptic(key.key)
-    if (tips.title === '查看日志') {
-      this.setState({
-        visible: true,
-        tipsName: '查看日志',
-      })
-    } else {
-      this.setState({
-        toopVisible: true,
-        tooltipTitle: tips.title,
-        tooltipContent: tips.content,
-      })
-    }
+    this.setState({
+      toopVisible: true,
+      tooltipTitle: tips.title,
+      tooltipContent: tips.content,
+    })
   }
 
   handleRealNum = value => {
@@ -124,9 +119,7 @@ export default class MsaComponents extends React.Component {
       <Menu onClick={this.handleMenuClick} style={{ width: 100 }}>
         <Menu.Item key="重启组件">重启组件</Menu.Item>
         <Menu.Item key="停止组件">停止组件</Menu.Item>
-        <Menu.Item key="3">高可用</Menu.Item>
         <Menu.Item key="重新部署">重新部署</Menu.Item>
-        <Menu.Item key="查看日志">查看日志</Menu.Item>
       </Menu>
     )
     const columns = [{
@@ -222,7 +215,7 @@ export default class MsaComponents extends React.Component {
             </div>
           </div>
         </Modal>
-        <MsaModal visible={visible} tipsType={tipsName} scope={scope}/>
+        <MsaModal visible={visible} tipsType={tipsName} scope={scope} />
       </QueueAnim>
     )
   }

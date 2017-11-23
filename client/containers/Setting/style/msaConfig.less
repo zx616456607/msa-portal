@@ -11,12 +11,12 @@
  */
 
 .msa_config_style {
-  .ant-card-head {
-    margin-right: 0 !important;
+
+  .ant-card-body {
+    padding-top: 1px !important;
   }
   .title {
     height: 40px;
-    padding: 10px;
     background: #fff;
     span {
       font-size: 16px;
@@ -25,15 +25,11 @@
   .conten {
     height: 310px;
     background-color: #fff;
-    .ant-col-6 {
-      width: 140px;
-      text-align: left;
-    }
-    .ant-col-8,
-    .ant-col-18 {
-      width: calc(~"100% - 140px");
-    }
-    .info {
+    .left {
+      float: left;
+      margin-top: 24px;
+      margin-left: 10px;
+      display: inline-block;
       .msa {
         margin-top: 20px;
         margin-bottom: 20px;
@@ -45,10 +41,19 @@
           margin-right: 8px;
         }
         .btn_save {
+          width: 50%;
           display: inline-block;
+          position: absolute;
+          left: 105%;
+          top: 0;
           .close {
             margin-right: 10px;
           }
+        }
+        .btn_edit {
+          position: absolute;
+          left: 105%;
+          top: 0;
         }
         .desc {
           line-height: 2;
@@ -83,6 +88,51 @@
       .first_row {
         margin-top: 0;
       }
+    }
+    .rigth {
+      float: right;
+      height: 310px;
+      padding: 24px 0 0 24px;
+      display: inline-block;
+      border-left: 1px solid #ccc;
+      .select {
+        width: 400px;
+      }
+      .projet {
+        .des {
+          font-size: 14px;
+        }
+        .not {
+          width: 450px;
+          margin-top: 20px;
+          .notInstalled {
+            width: 400px;
+            height: 80px;
+            margin-top: 5px;
+            overflow-y: scroll;
+            word-wrap: break-word;
+          }
+        }
+      }
+      .already {
+        margin-top: 10px;
+        width: 450px;
+        .yes {
+          .yesInstalled {
+            width: 400px;
+            overflow-y: scroll;
+            word-wrap: break-word;
+          }
+        }
+      }
+    }
+    .ant-col-6 {
+      width: 140px;
+      text-align: left;
+    }
+    .ant-col-8,
+    .ant-col-18 {
+      width: calc(~"100% - 140px");
     }
   }
 }

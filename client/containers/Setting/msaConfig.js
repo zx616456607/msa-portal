@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/msaConfig.less'
-import { getMsaState, installMsaConfig, uninstallMsaConfig } from '../../actions/msaConfig'
+import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
 import {
   Row, Col, Select, Button,
   Icon, Modal, Input, notification,
@@ -31,22 +31,70 @@ class MsaConfig extends React.Component {
     msaState: false,
     uninstall: false,
     installSate: false,
+    springcloudID: [],
+    springclouds: [],
+    springcloudState: '',
   }
 
   componentWillMount() {
-    // this.fetchState()
+    this.load()
+    this.fetchSpingCloudState()
   }
+
+  load = () => {
+    const { loadSpringCloud, cluster, project } = this.props
+    const namespace = project.namespace === 'default' ? '' : project.namespace
+    loadSpringCloud(cluster.id, namespace).then(res => {
+      if (res.error) return
+      if (res.response.result.code === 200) {
+        this.setState({
+          springcloudID: res.response.result.data.springclouds,
+        })
+        this.fetchState(res.response.result.data.springclouds)
+      }
+    })
+  }
+
   /**
    * 获取Spring Cloud状态
    */
-  fetchState = () => {
-    const { getMsaState, cluster } = this.props
-    const query = {
-      id: cluster.id,
-      clusterID: cluster.id,
-    }
-    getMsaState(query).then(res => {
+
+  fetchState = ids => {
+    const { getMsaState, cluster, project, namespace } = this.props
+    const projectName = project.namespace === 'default' ? namespace : project.namespace
+    if (Object.keys(ids).length === 0) return
+    ids.forEach(item => {
+      if (item.namespace === projectName) {
+        this.setState({
+          gitLab: JSON.parse(item.configDetail).gitUrl,
+          version: JSON.parse(item.configDetail).version,
+        })
+        getMsaState(cluster.id, item.id).then(res => {
+          if (res.error) return
+          if (res.response.result.code === 200) {
+            this.setState({
+              springcloudState: res.response.result.data.running,
+            })
+          }
+        })
+      }
+    })
+  }
+
+  fetchSpingCloudState = () => {
+    const { fetchSpingCloud, cluster, project, namespace } = this.props
+    const projectName = project.namespace === 'default' ? namespace : project.namespace
+    fetchSpingCloud(cluster.id).then(res => {
       if (res.error) return
+      if (res.response.result.code === 200) {
+        res.response.result.data.forEach(item => {
+          if (item.namespace === projectName) {
+            this.setState({
+              msaState: true,
+            })
+          }
+        })
+      }
     })
   }
 
@@ -59,9 +107,20 @@ class MsaConfig extends React.Component {
     })
   }
   handleDel = () => {
-    const { uninstallMsaConfig, cluster, project } = this.props
-    uninstallMsaConfig(cluster.id, project.namespace).then(res => {
-      if (res.error) return
+    const { springcloudID } = this.state
+    const { uninstallMsaConfig, cluster, project, namespace } = this.props
+    springcloudID.forEach(item => {
+      if (item.namespace === project.namespace === 'default' ? namespace : project.namespace) {
+        uninstallMsaConfig(cluster.id, item.id).then(res => {
+          if (res.error) return
+          if (res.response.result.code === 200) {
+            this.setState({
+              msaState: false,
+              uninstall: false,
+            })
+          }
+        })
+      }
     })
   }
   /**
@@ -128,7 +187,14 @@ class MsaConfig extends React.Component {
   }
 
   render() {
-    const { msaState } = this.state
+    const { msaState, springcloudState, gitLab, version } = this.state
+    let healthy = null
+    if (springcloudState !== '') {
+      healthy = springcloudState ? <span className="desc">健康</span> :
+        <span className="descs">不健康</span>
+    } else {
+      healthy = <span className="descs">未安装</span>
+    }
     return (
       <QueueAnim>
         <div key="layout-content-btns">
@@ -137,33 +203,33 @@ class MsaConfig extends React.Component {
             className="msa_config_style"
             noHovering
           >
-            <div className="conten">
-              <div className="info">
+            <Row className="conten">
+              <Col className="left">
                 <Row className="msa first_row">
-                  <Col span={6}>基础服务</Col>
-                  <Col span={8}>
+                  <Col span={5}>基础服务</Col>
+                  <Col span={19}>
                     <Select style={{ width: 300 }} defaultValue="SpringCloud">
                       <Option value="pinpoint">SpringCloud</Option>
                     </Select>
                   </Col>
                 </Row>
                 <Row className="msa">
-                  <Col span={6}>Gitlab 地址</Col>
-                  <Col span={18}>
-                    <Input style={{ width: 300 }} disabled={!this.state.isEdit} className="gitlab" placeholder="请输入 Config Server Gitlab 地址（如 https://git.demo.com）" onChange={this.handlechange} />
+                  <Col span={5}>Gitlab 地址</Col>
+                  <Col span={19}>
+                    <Input style={{ width: 300 }} disabled={!this.state.isEdit} className="gitlab" placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
+                      onChange={this.handlechange} defaultValue={gitLab} />
                     {
                       this.state.isEdit ?
-                        <Row className="btn_save">
+                        <div className="btn_save">
                           <Button className="close" onClick={this.handleClose}>取消</Button>
                           <Button className="save" type="primary" onClick={this.handleClose}>保存</Button>
-                        </Row> :
-                        <Button className="edit" type="primary" onClick={this.handleEdit}>编辑</Button>
+                        </div> : <Button className="btn_edit" type="primary" onClick={this.handleEdit}>编辑</Button>
                     }
                   </Col>
                 </Row>
                 <Row className="msa">
-                  <Col span={6}>安装情况</Col>
-                  <Col span={18}>
+                  <Col span={5}>安装情况</Col>
+                  <Col span={19}>
                     {
                       msaState ?
                         <Row className="install">
@@ -176,26 +242,61 @@ class MsaConfig extends React.Component {
                   </Col>
                 </Row>
                 <Row className="msa">
-                  <Col span={6}>组件状态</Col>
-                  <Col span={18}>
-                    <span className="desc">健康</span>
+                  <Col span={5}>组件状态</Col>
+                  <Col span={19}>
+                    {healthy}
                   </Col>
                 </Row>
                 <Row className="msa">
-                  <Col span={6}>组件版本</Col>
-                  <Col span={18}>
-                    <span className="desc">{this.state.version.version}</span>
+                  <Col span={5}>组件版本</Col>
+                  <Col span={19}>
+                    <span className="desc">{version}</span>
                   </Col>
                 </Row>
-              </div>
-            </div>
+              </Col>
+              <Col className="rigth" span={12}>
+                <Select className="select" defaultValue="SpringCloud">
+                  <Option value="SpringCloud">SpringCloud</Option>
+                </Select>
+                <div className="projet">
+                  <div className="not">
+                    <span className="des">未安装项目</span>
+                    <div className="notInstalled">
+                      {
+                        // projectID ?
+                        //   projectID.map((item, index) => (
+                        //     <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                        //       <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
+                        //     </div>
+                        //   )) : ''
+                      }
+                    </div>
+                  </div>
+                  <div className="already">
+                    <div className="yes">
+                      <span className="des">已安装项目</span>
+                      <div className="yesInstalled" style={{ marginTop: 5 }}>
+                        {
+                          // Object.keys(serviceData).length > 0 ?
+                          //   serviceData.map((item, index) => (
+                          //     <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                          //       <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
+                          //     </div>
+                          //   )) : ''
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+            </Row>
             <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
               footer={[
                 <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
                 <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
               ]}>
               <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span >即将在当前项目内卸载 SpringCloud 基础服务卸载后改项目内应用，将无法继续使用 微服务 部分功能</span>
+                <span>即将在当前项目内卸载 SpringCloud 基础服务卸载后该项目内应用将, 无法继续使用 微服务 部分功能</span>
               </div>
               <div style={{ marginTop: 10 }}>
                 <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
@@ -210,15 +311,20 @@ class MsaConfig extends React.Component {
 
 const mapStateToProps = state => {
   const { current } = state
+  const { info } = current.user
+  const namespace = info.namespace
   const { project, cluster } = current.config
   return {
     project,
     cluster,
+    namespace,
   }
 }
 
 export default connect(mapStateToProps, {
   getMsaState,
+  loadSpringCloud,
+  fetchSpingCloud,
   installMsaConfig,
   uninstallMsaConfig,
 })(MsaConfig)

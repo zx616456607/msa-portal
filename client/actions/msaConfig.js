@@ -11,7 +11,54 @@
  */
 
 import { CALL_API } from '../middleware/api'
+import { Schemas } from '../middleware/schemas'
 // import { toQuerystring } from '../common/utils'
+
+export const SPRINGCLOUD_REQUEST = 'SPRINGCLOUD_REQUEST'
+export const SPRINGCLOUD_SUCCESS = 'SPRINGCLOUD_SUCCESS'
+export const SPRINGCLOUD_FAILURE = 'SPRINGCLOUD_FAILURE'
+
+const fetchSpringCloud = (clusterID, project) => {
+  let headers
+  if (project) {
+    headers = { project }
+  }
+  return {
+    clusterID,
+    [CALL_API]: {
+      types: [ SPRINGCLOUD_REQUEST, SPRINGCLOUD_SUCCESS, SPRINGCLOUD_FAILURE ],
+      endpoint: `/clusters/${clusterID}/springcloud`,
+      schema: Schemas.SPRINGCLOUD_ARRAY_DATA,
+      options: { headers },
+    },
+  }
+}
+
+export const loadSpringCloud = (clusterID, project) => dispatch => {
+  return dispatch(fetchSpringCloud(clusterID, project))
+}
+
+export const FETCH_SPRINGCLOUD_REQUEST = 'FETCH_SPRINGCLOUD_REQUEST'
+export const FETCH_SPRINGCLOUD_SUCCESS = 'FETCH_SPRINGCLOUD_SUCCESS'
+export const FETCH_SPRINGCLOUD_FAILURE = 'FETCH_SPRINGCLOUD_FAILURE'
+
+const fetchSpingCloudInfo = clusterID => {
+  return {
+    clusterID,
+    [CALL_API]: {
+      types: [ FETCH_SPRINGCLOUD_REQUEST, FETCH_SPRINGCLOUD_SUCCESS, FETCH_SPRINGCLOUD_FAILURE ],
+      endpoint: `/clusters/${clusterID}/springcloud/deployed`,
+      schema: {},
+      options: {
+        method: 'GET',
+      },
+    },
+  }
+}
+
+export const fetchSpingCloud = clusterID => dispatch => {
+  return dispatch(fetchSpingCloudInfo(clusterID))
+}
 
 export const MSA_STATE_REQUEST = 'MSA_STATE_REQUEST'
 export const MSA_STATE_SUCCESS = 'MSA_STATE_SUCCESS'
@@ -66,8 +113,8 @@ const installMsa = (body, clusterID, project) => {
 }
 
 // Relies on Redux Thunk middleware.
-export const installMsaConfig = (query, clusterID, project) => dispatch => {
-  return dispatch(installMsa(query, clusterID, project))
+export const installMsaConfig = (body, clusterID, project) => dispatch => {
+  return dispatch(installMsa(body, clusterID, project))
 }
 
 export const MSA_UNINSTALL_REQUEST = 'MSA_INSTALL_REQUEST'

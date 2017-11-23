@@ -30,6 +30,7 @@ class ApmSetting extends React.Component {
     uninstall: false,
     colony: '',
     project: '',
+    projectNames: [],
     isProject: false,
     colonyData: [],
     projectsData: [],
@@ -151,7 +152,7 @@ class ApmSetting extends React.Component {
     })
     DataAry.push(projectID)
     this.setState({
-      projectID: DataAry,
+      projectNames: DataAry,
     })
   }
   /**
@@ -225,24 +226,29 @@ class ApmSetting extends React.Component {
     })
   }
   handleDel = () => {
-    const { removeApmRow } = this.props
-    const { serviceData, project } = this.state
-    if (serviceData[0] === null) return
-    const body = {
-      id: serviceData[0].id,
-      cluster: serviceData[0].clusterID,
-    }
-    removeApmRow(body, project).then(res => {
-      if (res.error) return
-      this.apmService()
-      this.projectList()
-      this.setState({
-        installSate: false,
-        apmState: false,
-        uninstall: false,
-        state: '',
-        version: '',
-      })
+    const { removeApmRow, clusterID, defaultName, project } = this.props
+    const { serviceData } = this.state
+    if (Object.keys(serviceData).length === 0) return
+    serviceData.forEach(item => {
+      if (item.namespace === defaultName) {
+        const body = {
+          id: item.id,
+          cluster: clusterID,
+        }
+        const projectName = project === 'default' ? defaultName : project
+        removeApmRow(body, projectName).then(res => {
+          if (res.error) return
+          this.apmService()
+          this.projectList()
+          this.setState({
+            installSate: false,
+            apmState: false,
+            uninstall: false,
+            state: '',
+            version: '',
+          })
+        })
+      }
     })
   }
 
@@ -280,8 +286,7 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { apmState, serviceData, state } = this.state
-    const { projectID } = this.props
+    const { apmState, serviceData, state, projectNames } = this.state
     let healthy = null
     if (state !== '') {
       healthy = state ? <span className="desc">健康</span> :
@@ -299,7 +304,7 @@ class ApmSetting extends React.Component {
             noHovering
           >
             <Row className="contents">
-              <Col className="left" span="12">
+              <Col className="left">
                 {/* <Row className="apms">
                   <Col span={6}>项目</Col>
                   <Col span={18}>
@@ -328,16 +333,16 @@ class ApmSetting extends React.Component {
                   </Col>
                 </Row> */}
                 <Row className="apms">
-                  <Col span={4}>基础服务</Col>
-                  <Col span={8}>
+                  <Col span={5}>基础服务</Col>
+                  <Col span={19}>
                     <Select className="select" defaultValue="Pinpoint">
                       <Option value="pinpoint">Pinpoint</Option>
                     </Select>
                   </Col>
                 </Row>
                 <Row className="apms">
-                  <Col span={4}>安装情况</Col>
-                  <Col span={18}>
+                  <Col span={5}>安装情况</Col>
+                  <Col span={19}>
                     {
                       apmState ?
                         <Row className="install">
@@ -350,14 +355,14 @@ class ApmSetting extends React.Component {
                   </Col>
                 </Row>
                 <Row className="apms">
-                  <Col span={4}>组件状态</Col>
-                  <Col span={18}>
+                  <Col span={5}>组件状态</Col>
+                  <Col span={19}>
                     {healthy}
                   </Col>
                 </Row>
                 <Row className="apms">
-                  <Col span={4}>组件版本</Col>
-                  <Col span={18}>
+                  <Col span={5}>组件版本</Col>
+                  <Col span={19}>
                     <span className="version">{this.state.version.version}</span>
                   </Col>
                 </Row>
@@ -371,8 +376,8 @@ class ApmSetting extends React.Component {
                     <span className="des">未安装项目</span>
                     <div className="notInstalled">
                       {
-                        projectID ?
-                          projectID.map((item, index) => (
+                        Object.keys(projectNames).length > 0 ?
+                          projectNames[0].map((item, index) => (
                             <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                               <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
                             </div>
@@ -407,7 +412,7 @@ class ApmSetting extends React.Component {
                 <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
               ]}>
               <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后改项目内应用，将无法继续使用 APM 部分功能</span>
+                <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后该项目内应用将, 无法继续使用 APM 部分功能</span>
               </div>
               <div style={{ marginTop: 10 }}>
                 <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
