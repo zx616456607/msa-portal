@@ -158,7 +158,7 @@ class RoutingRuleModal extends React.Component {
               required: true,
               whitespace: true,
               pattern: APP_NAME_REG,
-              message: `请填写正确的路由名称，格式要求为：${APP_NAME_REG.toString()}`,
+              message: '请填写正确的路由名称，例如：route-1',
             }],
           })(
             <Input placeholder="请填写路由名称" />
@@ -196,7 +196,7 @@ class RoutingRuleModal extends React.Component {
               {getFieldDecorator('serviceId', {
                 rules: [{
                   required: true,
-                  message: 'url',
+                  message: '请选择一个微服务',
                 }],
               })(
                 <Select style={{ width: '100%' }} placeholder="请选择微服务">
@@ -215,7 +215,7 @@ class RoutingRuleModal extends React.Component {
                   message: '请填写正确的地址',
                 }],
               })(
-                <Input placeholder="请填写完整的路由 URL" />
+                <Input placeholder="请填写完整的路由 URL，如：http://192.168.0.1/rule" />
               )}
             </FormItem>
         }

@@ -271,7 +271,7 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: HOST_REG,
-                message: `请填写正确的服务地址，格式要求为：${HOST_REG.toString()}`,
+                message: '请填写正确的服务地址',
               }],
             })(
               <Input placeholder="请确保 IP 或主机名可被当前集群访问（如 192.168.0.1）" />
@@ -301,7 +301,7 @@ class RegisterMsa extends React.Component {
               <Row gutter={16}>
                 <Col span={19}>
                   <Input
-                    placeholder="如 192.168.0.1:8080/healthcheck.html"
+                    placeholder="如 http://192.168.0.1:8080/healthcheck.html"
                     disabled={ping[k] && ping[k].loading}
                   />
                 </Col>
@@ -332,7 +332,7 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: APP_NAME_REG,
-                message: `请填写正确的微服务名称，格式要求为：${APP_NAME_REG.toString()}`,
+                message: '请填写正确的微服务名称，例如：msa-service-1',
               }],
             })(
               <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>
