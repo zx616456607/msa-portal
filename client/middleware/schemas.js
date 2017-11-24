@@ -25,6 +25,10 @@ const apmSchema = new schema.Entity('apms', {}, {
   idAttribute: 'id',
 })
 
+const springcloudSchema = new schema.Entity('springcloud', {}, {
+  idAttribute: 'id',
+})
+
 const authSchema = new schema.Entity('auth', {}, {
   idAttribute: () => JWT,
 })
@@ -67,6 +71,11 @@ export const Schemas = {
   APM_ARRAY_DATA: {
     data: {
       apms: [ apmSchema ],
+    },
+  },
+  SPRINGCLOUD_ARRAY_DATA: {
+    data: {
+      springcloud: [ springcloudSchema ],
     },
   },
   PROJECT_ARRAY_DATA: {

@@ -31,6 +31,8 @@ class MsaConfig extends React.Component {
     msaState: false,
     uninstall: false,
     installSate: false,
+    notCurAry: [],
+    serviceData: [],
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -82,19 +84,31 @@ class MsaConfig extends React.Component {
   }
 
   fetchSpingCloudState = () => {
-    const { fetchSpingCloud, cluster, project, namespace } = this.props
-    const projectName = project.namespace === 'default' ? namespace : project.namespace
+    const { fetchSpingCloud, cluster } = this.props
     fetchSpingCloud(cluster.id).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
-        res.response.result.data.forEach(item => {
-          if (item.namespace === projectName) {
-            this.setState({
-              msaState: true,
-            })
-          }
+        this.setState({
+          serviceData: res.response.result.data,
         })
+        this.filters()
       }
+    })
+  }
+
+  filters = () => {
+    const { projectID } = this.props
+    const { serviceData } = this.state
+    const DataAry = []
+    if (Object.keys(serviceData).length === 0) return
+    serviceData.forEach(item => {
+      if (projectID.indexOf(item.namespace) > -1) {
+        projectID.splice(projectID.indexOf(item.namespace), 1)
+      }
+    })
+    DataAry.push(projectID)
+    this.setState({
+      notCurAry: DataAry,
     })
   }
 
@@ -187,7 +201,7 @@ class MsaConfig extends React.Component {
   }
 
   render() {
-    const { msaState, springcloudState, gitLab, version } = this.state
+    const { msaState, springcloudState, gitLab, version, serviceData, notCurAry } = this.state
     let healthy = null
     if (springcloudState !== '') {
       healthy = springcloudState ? <span className="desc">健康</span> :
@@ -263,12 +277,12 @@ class MsaConfig extends React.Component {
                     <span className="des">未安装项目</span>
                     <div className="notInstalled">
                       {
-                        // projectID ?
-                        //   projectID.map((item, index) => (
-                        //     <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                        //       <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                        //     </div>
-                        //   )) : ''
+                        Object.keys(notCurAry).length > 0 ?
+                          notCurAry[0].map((item, index) => (
+                            <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                              <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
+                            </div>
+                          )) : ''
                       }
                     </div>
                   </div>
@@ -277,12 +291,12 @@ class MsaConfig extends React.Component {
                       <span className="des">已安装项目</span>
                       <div className="yesInstalled" style={{ marginTop: 5 }}>
                         {
-                          // Object.keys(serviceData).length > 0 ?
-                          //   serviceData.map((item, index) => (
-                          //     <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                          //       <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                          //     </div>
-                          //   )) : ''
+                          Object.keys(serviceData).length > 0 ?
+                            serviceData.map((item, index) => (
+                              <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
+                                <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
+                              </div>
+                            )) : ''
                         }
                       </div>
                     </div>
@@ -310,13 +324,17 @@ class MsaConfig extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, entities } = state
+  const { projects } = entities
   const { info } = current.user
+  const projectID = current.projects.ids
   const namespace = info.namespace
   const { project, cluster } = current.config
   return {
     project,
     cluster,
+    projects,
+    projectID,
     namespace,
   }
 }
