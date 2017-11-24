@@ -1,0 +1,88 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * modal
+ *
+ * 2017-11-21
+ * @author zhaoyb
+ */
+.modal {
+  .extend {
+    .prompt {
+      height: 40px;
+      background-color: #d9edf6;
+      border: 1px dashed #85d7fd;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      span {
+        color: #1a7db6;
+      }
+    }
+    .itemTitle {
+      text-align: left;
+    }
+    .inputn {
+      margin-left: 16px;
+    }
+  }
+  .body {
+    .title {
+     width: 100%;
+     height: 40px;
+     line-height: 40px;
+     color: #5cb85c;
+     background-color: #333;
+     .desc {
+       padding: 0 15px;
+       display: inline-block;
+       width: auto;
+       height: 40px;
+       line-height: 40px;
+       font-size: 14px;
+       border-bottom: 2px solid #5cb85c;
+     }
+     .enlarge {
+       margin-left: 10px;
+       position: absolute;
+       top: 14px;
+       left: 97%;
+       font-size: 14px;
+     }
+     .download {
+       float: right;
+       margin-right: 15px;
+       line-height: 40px;
+       font-size: 14px;
+       cursor: pointer;
+     }
+     .down {
+       float: left;
+       font-size: 14px;
+       line-height: 40px;
+     }
+     & > div {
+       float: right;
+       margin-right: 30px;
+       display: inline-block;
+     }
+    }
+    .connent {
+     width: 100%;
+     height: 500px;
+     overflow-y: auto;
+     margin-bottom: 0;
+     margin-top: 0;
+     background-color: #1a1a1a;
+     .infos {
+       line-height: 50px;
+       text-align: center;
+       color: #d9d9d9;
+     }
+    }
+  }
+}
+

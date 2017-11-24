@@ -30,7 +30,7 @@ class Logs extends React.Component {
                 {getFieldDecorator('project', {
                   rules: [{ required: true, message: '请选择项目' }],
                 })(
-                  <Select style={{ width: '100%' }} placeholder="选择项目"></Select>
+                  <Select style={{ width: '100%' }} placeholder="选择项目" size="default"></Select>
                 )}
               </FormItem>
             </Col>
@@ -39,7 +39,7 @@ class Logs extends React.Component {
                 {getFieldDecorator('colony', {
                   rules: [{ required: true, message: '请选择集群' }],
                 })(
-                  <Select style={{ width: '100%' }} placeholder="选择集群"></Select>
+                  <Select style={{ width: '100%' }} placeholder="选择集群" size="default"></Select>
                 )}
               </FormItem>
             </Col>
@@ -48,7 +48,7 @@ class Logs extends React.Component {
                 {getFieldDecorator('server', {
                   rules: [{ required: true, message: '请选择服务' }],
                 })(
-                  <Select style={{ width: '100%' }} placeholder="选择服务"></Select>
+                  <Select style={{ width: '100%' }} placeholder="选择服务" size="default"></Select>
                 )}
               </FormItem>
             </Col>
@@ -57,7 +57,7 @@ class Logs extends React.Component {
                 {getFieldDecorator('example', {
                   rules: [{ required: true, message: '请选择实例' }],
                 })(
-                  <Select style={{ width: '100%' }} placeholder="选择实例"></Select>
+                  <Select style={{ width: '100%' }} placeholder="选择实例" size="default"></Select>
                 )}
               </FormItem>
             </Col>
@@ -67,6 +67,7 @@ class Logs extends React.Component {
                   rules: [{ required: true, message: '请选择时间' }],
                 })(
                   <RangePicker
+                    size="default"
                     key="timePicker"
                     showTime={{ format: 'HH:mm' }}
                     format="YYYY-MM-DD HH:mm"
@@ -84,12 +85,12 @@ class Logs extends React.Component {
                 {getFieldDecorator('search', {
                   rules: [{ required: true, message: '请填写关键词' }],
                 })(
-                  <Input placeholder="关键字" />
+                  <Input placeholder="关键字" size="default"/>
                 )}
               </FormItem>
             </Col>
-            <Col span={4}>
-              <Button type="primary" size="large">
+            <Col span={4} style={{ lineHeight: 2.6 }}>
+              <Button type="primary">
                 <svg className="select">
                   <use xlinkHref={`#${select.id}`} />
                 </svg>
