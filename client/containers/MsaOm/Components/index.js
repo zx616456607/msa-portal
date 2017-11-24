@@ -11,10 +11,13 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
 import classNames from 'classnames'
 import MsaModal from './Modal'
+import { fetchSpingCloud } from '../../../actions/msaConfig'
+import { fetchList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon } from 'antd'
 const Search = Input.Search
 
@@ -32,23 +35,107 @@ const tooltip = [{
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
 
-// {
-//   title: '查看日志',
-//   content: '',
-// }, {
-//   title: '高可用',
-//   content: '',
-// }
-
-export default class MsaComponents extends React.Component {
+class MsaComponents extends React.Component {
   state = {
-    Data: [],
+    metaData: [],
+    ApmID: [],
     tipsName: '',
     toopVisible: false,
     visible: false,
     tooltipTitle: '',
     tooltipContent: '',
     loading: false,
+  }
+
+  componentWillMount() {
+    this.fetchApmId()
+  }
+
+  fetchApmId = () => {
+    const { fetchSpingCloud, clusterId } = this.props
+    fetchSpingCloud(clusterId).then(res => {
+      if (res.error) return
+      if (res.response.result.code === 200) {
+        this.setState({
+          ApmID: res.response.result.data,
+        }, () => {
+          this.load()
+        })
+      }
+    })
+  }
+
+  load = () => {
+    const { ApmID } = this.state
+    const { fetchList, clusterId, nameSpace, info } = this.props
+    const project = nameSpace === 'default' ? info.namespace : nameSpace
+    ApmID.forEach(item => {
+      if (item.namespace === project) {
+        const query = {
+          id: item.id,
+        }
+        fetchList(clusterId, query, project).then(res => {
+          if (res.error) return
+          if (res.response.result.code === 200) {
+            this.filterData(res.response.result.data.services)
+          }
+        })
+      }
+    })
+  }
+
+  nameList = value => {
+    switch (value) {
+      case 'spring-cloud-auth':
+        return '认证服务'
+      case 'spring-cloud-config':
+        return '配置中心'
+      case 'spring-cloud-discovery':
+        return '注册中心'
+      case 'spring-cloud-gateway':
+        return '服务网关'
+      case 'spring-cloud-hystrix-turbine':
+        return '熔断监控'
+      case 'spring-cloud-mysql':
+        return '数据存储'
+      case 'spring-cloud-rabbitmq':
+        return '消息队列'
+      case 'spring-cloud-tracing':
+        return '服务调用链'
+      default:
+        return
+    }
+  }
+
+  filterData = data => {
+    const curData = []
+    data.forEach(item => {
+      const curColumns = {
+        id: item.deployment.metadata.uid,
+        name: this.nameList(item.deployment.metadata.name),
+        component: item.deployment.metadata.name,
+        state: this.filterState(item.deployment.status.replicas,
+          item.deployment.status.availableReplicas),
+        count: item.deployment.status.replicas,
+        time: item.deployment.metadata.creationTimestamp,
+      }
+      curData.push(curColumns)
+    })
+    this.setState({
+      metaData: curData,
+    })
+  }
+
+  filterState = (replicas, available) => {
+    if (replicas > 0 && available > 0) {
+      return '运行中'
+    } if (replicas === 0 && available > 0) {
+      return '停止中'
+    } if (replicas === 0 && available === 0) {
+      return '已停止'
+    } if (replicas > 0 && available <= 0) {
+      return '启动中'
+    }
   }
 
   handleButtonClick = () => {
@@ -109,7 +196,7 @@ export default class MsaComponents extends React.Component {
 
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
-      tipsName } = this.state
+      tipsName, metaData } = this.state
     const pagination = {
       simple: true,
       total: 1,
@@ -123,7 +210,7 @@ export default class MsaComponents extends React.Component {
       </Menu>
     )
     const columns = [{
-      id: 'id',
+      id: 'uid',
       key: 'component',
       title: '组件',
       dataIndex: 'component',
@@ -162,22 +249,6 @@ export default class MsaComponents extends React.Component {
       </div>,
     }]
 
-    const dataSource = [{
-      key: '1',
-      component: 'asasas',
-      name: '胡彦斌',
-      state: 32,
-      count: '12',
-      time: '1分钟',
-    }, {
-      key: '2',
-      component: 'asasas',
-      name: '胡斌',
-      state: 32,
-      count: '12',
-      time: '1分钟',
-    }]
-
     const scope = this
 
     return (
@@ -194,10 +265,10 @@ export default class MsaComponents extends React.Component {
           <div className="body">
             <Table
               columns={columns}
-              dataSource={dataSource}
+              dataSource={metaData}
               pagination={false}
               loading={loading}
-              rowKey={row => row.name} />
+              rowKey={row => row.id} />
           </div>
         </Card>
         <Modal title={tooltipTitle} visible={toopVisible} onCancel={this.handleToopCancel}
@@ -220,4 +291,25 @@ export default class MsaComponents extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { current } = state
+  const { cluster, project } = current.config
+  const { info } = current.user
+  const nameSpace = project.namespace
+  const clusterId = cluster.id
+  return {
+    info,
+    nameSpace,
+    clusterId,
+  }
+}
+
+export default connect(mapStateToProps, {
+  getStop,
+  getStart,
+  fetchList,
+  getRedeploy,
+  fetchSpingCloud,
+})(MsaComponents)
 
