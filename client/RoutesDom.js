@@ -38,7 +38,7 @@ import MsaComponents from './containers/MsaOm/Components'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
-import MsaConfig from './containers/Setting/msaConfig'
+import MsaConfig from './containers/Setting/MsaConfigs'
 
 export const appChildRoutes = [
   {

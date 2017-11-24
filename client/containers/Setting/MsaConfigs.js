@@ -12,13 +12,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import './style/msaConfig.less'
+import './style/MsaConfigs.less'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
-import {
-  Row, Col, Select, Button,
-  Icon, Modal, Input, notification,
-  Card,
-} from 'antd'
+import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 const Option = Select.Option
 
@@ -68,6 +64,7 @@ class MsaConfig extends React.Component {
     ids.forEach(item => {
       if (item.namespace === projectName) {
         this.setState({
+          msaState: true,
           gitLab: JSON.parse(item.configDetail).gitUrl,
           version: JSON.parse(item.configDetail).version,
         })
@@ -90,8 +87,9 @@ class MsaConfig extends React.Component {
       if (res.response.result.code === 200) {
         this.setState({
           serviceData: res.response.result.data,
+        }, () => {
+          this.filters()
         })
-        this.filters()
       }
     })
   }
