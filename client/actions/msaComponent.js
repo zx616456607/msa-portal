@@ -12,11 +12,11 @@
 
 import { CALL_API } from '../middleware/api'
 
-export const FETCH_LIST_REQUEST = 'FETCH_LIST_REQUEST'
-export const FETCH_LIST_SUCCESS = 'FETCH_LIST_SUCCESS'
-export const FETCH_LIST_FAILURE = 'FETCH_LIST_FAILURE'
+export const MSACOMPONENT_LIST_REQUEST = 'MSACOMPONENT_LIST_REQUEST'
+export const MSACOMPONENT_LIST_SUCCESS = 'MSACOMPONENT_LIST_SUCCESS'
+export const MSACOMPONENT_LIST_FAILURE = 'MSACOMPONENT_LIST_FAILURE'
 
-const fetchListInfo = (clusterID, apmID, project) => {
+const fetchMsaComponentInfo = (clusterID, apmID, project) => {
   let headers
   if (project) {
     headers = { project }
@@ -25,7 +25,7 @@ const fetchListInfo = (clusterID, apmID, project) => {
     apmID,
     clusterID,
     [CALL_API]: {
-      types: [ FETCH_LIST_REQUEST, FETCH_LIST_SUCCESS, FETCH_LIST_FAILURE ],
+      types: [ MSACOMPONENT_LIST_REQUEST, MSACOMPONENT_LIST_SUCCESS, MSACOMPONENT_LIST_FAILURE ],
       endpoint: `/clusters/${clusterID}/springcloud/${apmID.id}/components`,
       schema: {},
       options: {
@@ -36,8 +36,8 @@ const fetchListInfo = (clusterID, apmID, project) => {
   }
 }
 
-export const fetchList = (clusterID, apmID, project) => dispatch => {
-  return dispatch(fetchListInfo(clusterID, apmID, project))
+export const fetchMsaComponentList = (clusterID, apmID, project) => dispatch => {
+  return dispatch(fetchMsaComponentInfo(clusterID, apmID, project))
 }
 
 export const START_COMPONENT_REQUEST = 'START_COMPONENT_REQUEST'
@@ -53,7 +53,8 @@ const startComponent = (clusterID, query) => {
       endpoint: `/clusters/${clusterID}/springcloud/${query.apmID}/components/${query.componentName}/start`,
       schema: {},
       options: {
-        method: 'GET',
+        body: {},
+        method: 'PUT',
       },
     },
   }
@@ -76,7 +77,7 @@ const stopComponent = (clusterID, query) => {
       endpoint: `/clusters/${clusterID}/springcloud/${query.apmID}/components/${query.componentName}/stop`,
       schema: {},
       options: {
-        method: 'GET',
+        method: 'PUT',
       },
     },
   }
@@ -99,7 +100,7 @@ const redeployComponent = (clusterID, query) => {
       endpoint: `/clusters/${clusterID}/springcloud/${query.apmID}/components/${query.componentName}/redeploy`,
       schema: {},
       options: {
-        method: 'GET',
+        method: 'PUT',
       },
     },
   }

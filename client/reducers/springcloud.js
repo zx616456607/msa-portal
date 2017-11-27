@@ -11,40 +11,32 @@
  */
 
 import union from 'lodash/union'
-import * as ActionTypes from '../actions/msaConfig'
-import { DEFAULT } from '../constants'
+import * as ActionTypes from '../actions/msaComponent'
 
-export const querySringCloud = (state = {}, action) => {
+export const sringcloud = (state = {}, action) => {
   const { type, clusterID } = action
-  const namespace = action.namespace || DEFAULT
   switch (type) {
-    case ActionTypes.SPRINGCLOUD_REQUEST:
+    case ActionTypes.MSACOMPONENT_LIST_REQUEST:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
-          [clusterID]: {
-            isFetching: true,
-          },
-        }),
+        [clusterID]: {
+          isFetching: true,
+        },
       }
-    case ActionTypes.SPRINGCLOUD_SUCCESS:
+    case ActionTypes.MSACOMPONENT_LIST_SUCCESS:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
-          [clusterID]: {
-            isFetching: false,
-            ids: union(state.ids, action.response.result.data.springclouds),
-          },
-        }),
+        [clusterID]: {
+          isFetching: false,
+          meta: union(state.ids, action.response.result.data.services),
+        },
       }
-    case ActionTypes.SPRINGCLOUD_FAILURE:
+    case ActionTypes.MSACOMPONENT_LIST_FAILURE:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
-          [clusterID]: {
-            isFetching: false,
-          },
-        }),
+        [clusterID]: {
+          isFetching: false,
+        },
       }
     default:
       return state

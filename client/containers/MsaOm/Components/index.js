@@ -17,8 +17,10 @@ import './style/index.less'
 import classNames from 'classnames'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
-import { fetchList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
-import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon } from 'antd'
+import { DEFAULT_TIME_FORMAT } from '../../../constants'
+import { formatDuration, formatDate } from '../../../common/utils'
+import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
+import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, Progress, notification } from 'antd'
 const Search = Input.Search
 
 const tooltip = [{
@@ -34,21 +36,65 @@ const tooltip = [{
   title: '水平扩展',
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
+const running = (
+  <div>
+    <span className={classNames('msa-table-status-box msa-table-running')}>
+      <i className="msa-table-status" />运行中
+    </span>
+  </div>
+)
+const start = (
+  <div>
+    <span style={{ color: '#2db7f5' }}>正在重启中</span>
+    <Progress percent={30} showInfo={false} />
+  </div>
+)
+const restart = (
+  <div>
+    <span style={{ color: '#2db7f5' }}>正在扩展中</span>
+    <Progress percent={30} showInfo={false} />
+  </div>
+)
+const stop = (
+  <div>
+    <div className="stop"></div>
+    <span style={{ color: '#f85a5a', marginLeft: 5, verticalAlign: 'text-bottom' }}>
+      已停止
+    </span>
+  </div>
+)
+const remove = (
+  <div>
+    <span className={classNames('msa-table-status-box msa-table-error')}>
+      <i className="msa-table-status" />已删除
+    </span>
+  </div>
+)
 
-class MsaComponents extends React.Component {
+class msaComponents extends React.Component {
   state = {
     metaData: [],
     ApmID: [],
     tipsName: '',
+    componentName: '',
     toopVisible: false,
     visible: false,
     tooltipTitle: '',
     tooltipContent: '',
-    loading: false,
+    loading: true,
   }
 
   componentWillMount() {
     this.fetchApmId()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { meta } = nextProps
+    if (meta !== undefined) {
+      if (!meta.isFetching) {
+        this.filterData(meta.meta)
+      }
+    }
   }
 
   fetchApmId = () => {
@@ -67,19 +113,20 @@ class MsaComponents extends React.Component {
 
   load = () => {
     const { ApmID } = this.state
-    const { fetchList, clusterId, nameSpace, info } = this.props
+    const { fetchMsaComponentList, clusterId, nameSpace, info } = this.props
     const project = nameSpace === 'default' ? info.namespace : nameSpace
     ApmID.forEach(item => {
       if (item.namespace === project) {
         const query = {
           id: item.id,
         }
-        fetchList(clusterId, query, project).then(res => {
-          if (res.error) return
-          if (res.response.result.code === 200) {
-            this.filterData(res.response.result.data.services)
-          }
-        })
+        fetchMsaComponentList(clusterId, query, project)
+        // fetchMsaComponentList(clusterId, query, project).then(res => {
+        //   if (res.error) return
+        //   if (res.response.result.code === 200) {
+        //     this.filterData(res.response.result.data.services)
+        //   }
+        // })
       }
     })
   }
@@ -114,26 +161,34 @@ class MsaComponents extends React.Component {
         id: item.deployment.metadata.uid,
         name: this.nameList(item.deployment.metadata.name),
         component: item.deployment.metadata.name,
-        state: this.filterState(item.deployment.status.replicas,
+        state: this.filterState(item.deployment.spec.replicas,
           item.deployment.status.availableReplicas),
-        count: item.deployment.status.replicas,
-        time: item.deployment.metadata.creationTimestamp,
+        count: item.deployment.spec.replicas,
+        time: this.filterTimer(item.deployment.metadata.creationTimestamp),
       }
       curData.push(curColumns)
     })
     this.setState({
+      loading: false,
       metaData: curData,
     })
   }
 
+  filterTimer = value => {
+    if (value === undefined && !value) return
+    const end = formatDate(new Date(), DEFAULT_TIME_FORMAT)
+    const start = value.replace('T', ' ').replace('Z', '')
+    return formatDuration(start, end)
+  }
+
   filterState = (replicas, available) => {
-    if (replicas > 0 && available > 0) {
+    if (replicas > 0 || available > 0) {
       return '运行中'
-    } if (replicas === 0 && available > 0) {
+    } if (replicas === 0 || available > 0) {
       return '停止中'
-    } if (replicas === 0 && available === 0) {
+    } if (replicas === 0 || available === 0) {
       return '已停止'
-    } if (replicas > 0 && available <= 0) {
+    } if (replicas > 0 || available <= 0) {
       return '启动中'
     }
   }
@@ -161,12 +216,13 @@ class MsaComponents extends React.Component {
         return
     }
   }
-  handleMenuClick = key => {
-    const tips = this.tooptic(key.key)
+  handleMenuClick = (e, value) => {
+    const tips = this.tooptic(e.key)
     this.setState({
       toopVisible: true,
       tooltipTitle: tips.title,
       tooltipContent: tips.content,
+      componentName: value.component,
     })
   }
 
@@ -194,6 +250,106 @@ class MsaComponents extends React.Component {
     })
   }
 
+  handleCommit = () => {
+    const { componentName, tooltipTitle, ApmID } = this.state
+    const { clusterId, getStart, getStop, getRedeploy } = this.props
+    if (tooltipTitle === '重启组件') {
+      const query = {
+        apmID: ApmID[0].id,
+        componentName,
+      }
+      getStart(clusterId, query).then(res => {
+        if (res.error) {
+          notification.error({
+            message: `重启组件 ${componentName} 失败`,
+          })
+          return
+        }
+        if (res.response.result.code === 200) {
+          notification.success({
+            message: `重启组件 ${componentName} 成功`,
+          })
+          this.setState({
+            toopVisible: false,
+          })
+          setTimeout(() => {
+            this.fetchApmId()
+          }, 1000)
+        }
+      })
+    } if (tooltipTitle === '停止组件') {
+      const query = {
+        apmID: ApmID[0].id,
+        componentName,
+      }
+      getStop(clusterId, query).then(res => {
+        if (res.error) {
+          notification.error({
+            message: `停止组件 ${componentName} 失败`,
+          })
+          return
+        }
+        if (res.response.result.code === 200) {
+          notification.success({
+            message: `停止组件 ${componentName} 成功`,
+          })
+          this.setState({
+            toopVisible: false,
+          })
+          this.fetchApmId()
+        }
+      })
+    } if (tooltipTitle === '重新部署') {
+      const query = {
+        apmID: ApmID[0].id,
+        componentName,
+      }
+      getRedeploy(clusterId, query).then(res => {
+        if (res.error) {
+          notification.error({
+            message: `重新部署 ${componentName} 失败`,
+          })
+        }
+        if (res.response.result.code === 200) {
+          notification.success({
+            message: `重新部署 ${componentName} 成功`,
+          })
+          this.setState({
+            toopVisible: false,
+          })
+          this.fetchApmId()
+        }
+      })
+    }
+  }
+
+  fetchState = text => {
+    switch (text) {
+      case '运行中':
+        return running
+      case '停止中':
+        return stop
+      case '已停止':
+        return stop
+      case '已删除':
+        return remove
+      case '正在扩展中':
+        return restart
+      case '启动中':
+        return start
+      default:
+        return
+    }
+  }
+
+  handleRefresh = () => {
+    this.setState({
+      loading: true,
+    }, () => {
+      this.fetchApmId()
+    })
+  }
+
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
       tipsName, metaData } = this.state
@@ -202,15 +358,7 @@ class MsaComponents extends React.Component {
       total: 1,
       defaultCurrent: 1,
     }
-    const menu = (
-      <Menu onClick={this.handleMenuClick} style={{ width: 100 }}>
-        <Menu.Item key="重启组件">重启组件</Menu.Item>
-        <Menu.Item key="停止组件">停止组件</Menu.Item>
-        <Menu.Item key="重新部署">重新部署</Menu.Item>
-      </Menu>
-    )
     const columns = [{
-      id: 'uid',
       key: 'component',
       title: '组件',
       dataIndex: 'component',
@@ -222,16 +370,7 @@ class MsaComponents extends React.Component {
       key: 'state',
       title: '状态',
       dataIndex: 'state',
-      render: () => <div>
-        {/* <Progress percent={30} showInfo={false} /> */}
-        <span
-          className={
-            classNames('msa-table-status-box msa-table-running')
-          }
-        >
-          <i className="msa-table-status" />运行中
-        </span>
-      </div>,
+      render: text => (this.fetchState(text)),
     }, {
       key: 'count',
       title: '实例数量',
@@ -241,23 +380,27 @@ class MsaComponents extends React.Component {
       title: '启动时间',
       dataIndex: 'time',
     }, {
-      id: 'id',
       title: '操作',
-      dataIndex: 'operation',
-      render: () => <div>
-        <Dropdown.Button onClick={this.handleButtonClick} overlay={menu}>水平扩展</Dropdown.Button>
+      key: 'operation',
+      render: (text, record) => <div>
+        <Dropdown.Button onClick={this.handleButtonClick} overlay={
+          <Menu onClick={e => this.handleMenuClick(e, record)} style={{ width: 100 }}>
+            <Menu.Item key="重启组件">重启组件</Menu.Item>
+            <Menu.Item key="停止组件">停止组件</Menu.Item>
+            <Menu.Item key="重新部署">重新部署</Menu.Item>
+          </Menu>
+        }>水平扩展</Dropdown.Button>
       </div>,
     }]
-
     const scope = this
 
     return (
       <QueueAnim className="info">
         <div className="nav" key="nav">
-          <Button type="primary"><Icon type="sync" />刷 新</Button>
+          <Button type="primary" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
           <Search className="input" placeholder="按微服务名称搜索" />
           <div className="pages">
-            <span className="total">共计10条</span>
+            <span className="total">共计{metaData.length}条</span>
             <Pagination {...pagination} />
           </div>
         </div>
@@ -274,7 +417,7 @@ class MsaComponents extends React.Component {
         <Modal title={tooltipTitle} visible={toopVisible} onCancel={this.handleToopCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleToopCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
+            <Button key="submit" type="primary" onClick={this.handleCommit}>确 定</Button>,
           ]}>
           <div className="prompt" style={{ height: 70, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10, borderRadius: 4 }}>
             <div style={{ position: 'absolute', top: 90, left: 30 }}>
@@ -293,12 +436,14 @@ class MsaComponents extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, sringcloud } = state
   const { cluster, project } = current.config
+  const meta = sringcloud[cluster.id]
   const { info } = current.user
   const nameSpace = project.namespace
   const clusterId = cluster.id
   return {
+    meta,
     info,
     nameSpace,
     clusterId,
@@ -308,8 +453,8 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   getStop,
   getStart,
-  fetchList,
   getRedeploy,
   fetchSpingCloud,
-})(MsaComponents)
+  fetchMsaComponentList,
+})(msaComponents)
 
