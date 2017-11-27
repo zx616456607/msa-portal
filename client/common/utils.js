@@ -149,18 +149,9 @@ export function formatDate(timestamp, format) {
   return moment(timestamp).format(format)
 }
 
-export function formatDuration(begin, end) {
-  const start = toDate(begin)
-  const over = toDate(end)
-  const timer = moment.duration(over - start).humanize()
-  return `${timer}前`
-}
-
-function toDate(date) {
-  if (typeof date === 'string') {
-    return new Date(date)
-  }
-  return date
+export function formatDuration(begin) {
+  const time = moment(begin).fromNow()
+  return time
 }
 
 /**

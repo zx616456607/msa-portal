@@ -17,8 +17,7 @@ import './style/index.less'
 import classNames from 'classnames'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
-import { DEFAULT_TIME_FORMAT } from '../../../constants'
-import { formatDuration, formatDate } from '../../../common/utils'
+import { formatDuration } from '../../../common/utils'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, Progress, notification } from 'antd'
 const Search = Input.Search
@@ -71,7 +70,7 @@ const remove = (
   </div>
 )
 
-class msaComponents extends React.Component {
+class msaComponent extends React.Component {
   state = {
     metaData: [],
     ApmID: [],
@@ -176,9 +175,8 @@ class msaComponents extends React.Component {
 
   filterTimer = value => {
     if (value === undefined && !value) return
-    const end = formatDate(new Date(), DEFAULT_TIME_FORMAT)
     const start = value.replace('T', ' ').replace('Z', '')
-    return formatDuration(start, end)
+    return formatDuration(start)
   }
 
   filterState = (replicas, available) => {
@@ -436,9 +434,9 @@ class msaComponents extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current, sringcloud } = state
+  const { current, sringcloudComponent } = state
   const { cluster, project } = current.config
-  const meta = sringcloud[cluster.id]
+  const meta = sringcloudComponent[cluster.id]
   const { info } = current.user
   const nameSpace = project.namespace
   const clusterId = cluster.id
@@ -456,5 +454,5 @@ export default connect(mapStateToProps, {
   getRedeploy,
   fetchSpingCloud,
   fetchMsaComponentList,
-})(msaComponents)
+})(msaComponent)
 

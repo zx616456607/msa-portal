@@ -13,7 +13,7 @@
 import union from 'lodash/union'
 import * as ActionTypes from '../actions/msaComponent'
 
-export const sringcloud = (state = {}, action) => {
+export const sringcloudComponent = (state = {}, action) => {
   const { type, clusterID } = action
   switch (type) {
     case ActionTypes.MSACOMPONENT_LIST_REQUEST:
