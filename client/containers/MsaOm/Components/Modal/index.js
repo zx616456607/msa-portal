@@ -96,16 +96,6 @@ export default class MsaModal extends React.Component {
                 </Col>
               </Row>
             </div>
-            // <div className="body" style={{ padding: 0 }}>
-            //   <div className="title" style={{ color: '#333' }}>
-            //     <Icon type="arrows-alt" className="enlarge" />
-            //   </div>
-            //   <div className="connent">
-            //     <div className="infos">
-            //       <span>暂无日志记录</span>
-            //     </div>
-            //   </div>
-            // </div>
           }
         </Modal>
       </div>
