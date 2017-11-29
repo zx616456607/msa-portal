@@ -12,13 +12,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import './style/msaConfig.less'
+import './style/MsaConfig.less'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
-import {
-  Row, Col, Select, Button,
-  Icon, Modal, Input, notification,
-  Card,
-} from 'antd'
+import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 const Option = Select.Option
 
@@ -27,6 +23,7 @@ class MsaConfig extends React.Component {
     gitLab: '',
     percent: 0,
     version: '',
+    configDetail: '',
     isEdit: false,
     msaState: false,
     uninstall: false,
@@ -68,7 +65,8 @@ class MsaConfig extends React.Component {
     ids.forEach(item => {
       if (item.namespace === projectName) {
         this.setState({
-          gitLab: JSON.parse(item.configDetail).gitUrl,
+          msaState: true,
+          gitLab: JSON.parse(item.configDetail),
           version: JSON.parse(item.configDetail).version,
         })
         getMsaState(cluster.id, item.id).then(res => {
@@ -90,8 +88,9 @@ class MsaConfig extends React.Component {
       if (res.response.result.code === 200) {
         this.setState({
           serviceData: res.response.result.data,
+        }, () => {
+          this.filters()
         })
-        this.filters()
       }
     })
   }
@@ -100,16 +99,21 @@ class MsaConfig extends React.Component {
     const { projectID } = this.props
     const { serviceData } = this.state
     const DataAry = []
-    if (Object.keys(serviceData).length === 0) return
-    serviceData.forEach(item => {
-      if (projectID.indexOf(item.namespace) > -1) {
-        projectID.splice(projectID.indexOf(item.namespace), 1)
-      }
-    })
-    DataAry.push(projectID)
-    this.setState({
-      notCurAry: DataAry,
-    })
+    if (Object.keys(serviceData).length === 0) {
+      this.setState({
+        notCurAry: projectID,
+      })
+    } else {
+      serviceData.forEach(item => {
+        if (projectID.indexOf(item.namespace) > -1) {
+          projectID.splice(projectID.indexOf(item.namespace), 1)
+        }
+      })
+      DataAry.push(projectID)
+      this.setState({
+        notCurAry: DataAry,
+      })
+    }
   }
 
   /**
@@ -124,8 +128,12 @@ class MsaConfig extends React.Component {
     const { springcloudID } = this.state
     const { uninstallMsaConfig, cluster, project, namespace } = this.props
     springcloudID.forEach(item => {
-      if (item.namespace === project.namespace === 'default' ? namespace : project.namespace) {
-        uninstallMsaConfig(cluster.id, item.id).then(res => {
+      if (item.namespace === namespace) {
+        const query = {
+          id: item.id,
+        }
+        const projects = project.namespace === 'default' ? namespace : project.namespace
+        uninstallMsaConfig(cluster.id, projects, query).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
             this.setState({
@@ -141,13 +149,13 @@ class MsaConfig extends React.Component {
    * 安装 Spring Cloud
    */
   handleInstall = () => {
-    const { gitLab } = this.state
+    const { configDetail } = this.state
     const { installMsaConfig, cluster, project } = this.props
     const body = {
       type: 'springcloud',
-      configDetail: gitLab,
+      configDetail,
     }
-    if (gitLab === '') {
+    if (configDetail === '') {
       notification.error({
         message: 'Config Server Gitlab信息不可以空',
       })
@@ -161,6 +169,7 @@ class MsaConfig extends React.Component {
         msaState: true,
         installSate: true,
       })
+      this.fetchSpingCloudState()
     })
   }
 
@@ -196,12 +205,14 @@ class MsaConfig extends React.Component {
 
   handlechange = e => {
     this.setState({
-      gitLab: e.target.value,
+      configDetail: e.target.value,
     })
   }
 
   render() {
-    const { msaState, springcloudState, gitLab, version, serviceData, notCurAry } = this.state
+    const { msaState, springcloudState, gitLab, version, serviceData, notCurAry,
+      configDetail } = this.state
+    const gitUrl = gitLab.gitUrl
     let healthy = null
     if (springcloudState !== '') {
       healthy = springcloudState ? <span className="desc">健康</span> :
@@ -231,7 +242,7 @@ class MsaConfig extends React.Component {
                   <Col span={5}>Gitlab 地址</Col>
                   <Col span={19}>
                     <Input style={{ width: 300 }} disabled={!this.state.isEdit} className="gitlab" placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
-                      onChange={this.handlechange} defaultValue={gitLab} />
+                      onChange={this.handlechange} value={configDetail !== '' ? configDetail : gitUrl} />
                     {
                       this.state.isEdit ?
                         <div className="btn_save">

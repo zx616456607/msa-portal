@@ -19,6 +19,7 @@ import * as apm from './apm'
 import pinpoint from './pinpoint'
 import msa from './msa'
 import gateway from './gateway'
+import * as sringcloudComponent from './springcloud'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -63,6 +64,7 @@ const rootReducer = combineReducers({
   current,
   ...apm,
   pinpoint,
+  ...sringcloudComponent,
   msa,
   gateway,
 })

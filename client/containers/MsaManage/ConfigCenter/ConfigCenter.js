@@ -58,8 +58,9 @@ class ConfigCenter extends React.Component {
             this.setState({
               branchData: res.response.result.data,
               value: res.response.result.data[0].name,
+            }, () => {
+              this.fetchList()
             })
-            this.fetchList()
           }
         })
       }

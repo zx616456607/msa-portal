@@ -149,6 +149,11 @@ export function formatDate(timestamp, format) {
   return moment(timestamp).format(format)
 }
 
+export function formatDuration(begin) {
+  const time = moment(begin).fromNow()
+  return time
+}
+
 /**
  * Scroll to top
  *

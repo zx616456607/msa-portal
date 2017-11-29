@@ -34,11 +34,11 @@ import Performance from './containers/Apm/Performance'
 import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import MsaOm from './containers/MsaOm'
 import MsaOmLogs from './containers/MsaOm/Log'
-import MsaComponents from './containers/MsaOm/Components'
+import msaComponent from './containers/MsaOm/Components'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
-import MsaConfig from './containers/Setting/msaConfig'
+import MsaConfig from './containers/Setting/MsaConfig'
 
 export const appChildRoutes = [
   {
@@ -193,7 +193,7 @@ export const msaOmChildRoutes = [
   {
     path: '/msa-om',
     exact: true,
-    render: () => <Redirect to="/msa-om/components" component={MsaComponents} />,
+    render: () => <Redirect to="/msa-om/components" component={msaComponent} />,
     key: 'index',
   },
   {
@@ -204,7 +204,7 @@ export const msaOmChildRoutes = [
   },
   {
     path: '/msa-om/components',
-    component: MsaComponents,
+    component: msaComponent,
     exact: true,
     key: 'msa-om-components',
   },
