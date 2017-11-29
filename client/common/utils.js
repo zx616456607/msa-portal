@@ -149,7 +149,7 @@ export function formatDate(timestamp, format) {
   return moment(timestamp).format(format)
 }
 
-export function formatDuration(begin) {
+export function formatFromnow(begin) {
   const time = moment(begin).fromNow()
   return time
 }
