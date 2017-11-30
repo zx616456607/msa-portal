@@ -41,6 +41,15 @@ class ConfigCenter extends React.Component {
     this.loadData()
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.data !== undefined) {
+      this.setState({
+        loading: false,
+        envData: nextProps.data,
+      })
+    }
+  }
+
   loadData = () => {
     const { clusterID, getService, getBranchList } = this.props
     getService(clusterID).then(res => {
@@ -74,15 +83,7 @@ class ConfigCenter extends React.Component {
       project_url: configGitUrl,
       branch_name: branch === undefined ? value : branch,
     }
-    getCenterEvn(clusterID, evnQuery).then(res => {
-      if (res.error) return
-      if (res.response.result.code === 200) {
-        this.setState({
-          loading: false,
-          envData: res.response.result.data,
-        })
-      }
-    })
+    getCenterEvn(clusterID, evnQuery)
   }
 
   handleCancel = () => {
@@ -288,10 +289,12 @@ class ConfigCenter extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, configCenter } = state
+  const { data } = configCenter
   const { cluster } = current.config
   const clusterID = cluster.id
   return {
+    data,
     clusterID,
   }
 }

@@ -19,6 +19,7 @@ import * as apm from './apm'
 import pinpoint from './pinpoint'
 import msa from './msa'
 import gateway from './gateway'
+import * as configCenter from './configcenter'
 import * as sringcloudComponent from './springcloud'
 
 // Updates an entity cache in response to any action with response.entities.
@@ -67,6 +68,7 @@ const rootReducer = combineReducers({
   ...sringcloudComponent,
   msa,
   gateway,
+  ...configCenter,
 })
 
 export default rootReducer
