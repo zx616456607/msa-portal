@@ -12,13 +12,15 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
+import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { fetchSpingCloud } from '../../actions/msaConfig'
+import confirm from '../../components/Modal/confirm'
 import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
@@ -112,8 +114,58 @@ const menus = [
 ]
 
 class MsaManage extends React.Component {
+  state = {
+    isDeployed: false,
+  }
+
+  componentWillMount() {
+    const { current, fetchSpingCloud, history } = this.props
+    const clusterID = current.config.cluster.id
+    fetchSpingCloud(clusterID).then(res => {
+      let isDeployed = false
+      if (!res.error) {
+        const { config, user } = current
+        const projectNamespace = config.project.namespace
+        let namespace = config.project.namespace
+        if (projectNamespace === 'default') {
+          namespace = user.info.namespace
+        }
+        res.response.result.data.forEach(item => {
+          if (item.namespace === namespace) {
+            isDeployed = true
+          }
+        })
+      }
+      this.setState({ isDeployed })
+      if (!isDeployed) {
+        confirm({
+          modalTitle: '提示',
+          title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
+          okText: '前往安装',
+          cancelText: '返回首页',
+          onOk: () => {
+            history.push('/setting/msa-config')
+          },
+          onCancel: () => {
+            history.push('/')
+          },
+        })
+      }
+    })
+  }
+
+  renderLoading = tip => (
+    <div className="loading">
+      <Spin size="large" tip={tip} />
+    </div>
+  )
+
   renderChildren = () => {
     const { children } = this.props
+    const { isDeployed } = this.state
+    if (!isDeployed) {
+      return this.renderLoading('加载微服务中 ...')
+    }
     return [
       children,
       <Switch key="switch">
@@ -208,5 +260,5 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  //
+  fetchSpingCloud,
 })(MsaManage)
