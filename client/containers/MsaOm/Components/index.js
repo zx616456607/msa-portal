@@ -17,7 +17,7 @@ import './style/index.less'
 import classNames from 'classnames'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
-import { formatDuration } from '../../../common/utils'
+import { formatFromnow } from '../../../common/utils'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, Progress, notification } from 'antd'
 const Search = Input.Search
@@ -70,10 +70,10 @@ const remove = (
   </div>
 )
 
-class msaComponent extends React.Component {
+class MsaComponents extends React.Component {
   state = {
     metaData: [],
-    ApmID: [],
+    apmID: [],
     tipsName: '',
     componentName: '',
     toopVisible: false,
@@ -111,10 +111,10 @@ class msaComponent extends React.Component {
   }
 
   load = () => {
-    const { ApmID } = this.state
+    const { apmID } = this.state
     const { fetchMsaComponentList, clusterId, nameSpace, info } = this.props
     const project = nameSpace === 'default' ? info.namespace : nameSpace
-    ApmID.forEach(item => {
+    apmID.forEach(item => {
       if (item.namespace === project) {
         const query = {
           id: item.id,
@@ -155,18 +155,21 @@ class msaComponent extends React.Component {
 
   filterData = data => {
     const curData = []
-    data.forEach(item => {
-      const curColumns = {
-        id: item.deployment.metadata.uid,
-        name: this.nameList(item.deployment.metadata.name),
-        component: item.deployment.metadata.name,
-        state: this.filterState(item.deployment.spec.replicas,
-          item.deployment.status.availableReplicas),
-        count: item.deployment.spec.replicas,
-        time: this.filterTimer(item.deployment.metadata.creationTimestamp),
-      }
-      curData.push(curColumns)
-    })
+    if (Object.keys(data).length > 0) {
+      data.forEach(item => {
+        const curColumns = {
+          id: item.deployment.metadata.uid,
+          name: this.nameList(item.deployment.metadata.name),
+          component: item.deployment.metadata.name,
+          state: this.filterState(item.deployment.spec.replicas,
+            item.deployment.status.availableReplicas),
+          count: item.deployment.spec.replicas,
+          time: this.filterTimer(item.deployment.metadata.creationTimestamp),
+        }
+        curData.push(curColumns)
+      })
+    }
+
     this.setState({
       loading: false,
       metaData: curData,
@@ -176,7 +179,7 @@ class msaComponent extends React.Component {
   filterTimer = value => {
     if (value === undefined && !value) return
     const start = value.replace('T', ' ').replace('Z', '')
-    return formatDuration(start)
+    return formatFromnow(start)
   }
 
   filterState = (replicas, available) => {
@@ -454,5 +457,5 @@ export default connect(mapStateToProps, {
   getRedeploy,
   fetchSpingCloud,
   fetchMsaComponentList,
-})(msaComponent)
+})(MsaComponents)
 
