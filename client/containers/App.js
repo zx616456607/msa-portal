@@ -218,7 +218,7 @@ class App extends React.Component {
         />
         <NamespaceSwitch userID={jwt.userID} />
         { this.renderChildren() }
-        <Footer style={{ textAlign: 'center' }}>
+        <Footer style={{ textAlign: 'center' }} id="footer">
           © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
         </Footer>
       </Layout>
