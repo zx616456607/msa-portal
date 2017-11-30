@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import './style/Apm.less'
+import './style/apm.less'
 import { Row, Col, Select, Button, Modal, Icon, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'

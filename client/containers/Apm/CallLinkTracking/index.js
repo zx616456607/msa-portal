@@ -67,10 +67,12 @@ class CallLinkTracking extends React.Component {
 
   componentDidMount() {
     this.appDom = document.getElementById('app')
+    this.footerDom = document.getElementById('footer')
   }
 
   componentWillUnmount() {
     this.appDom.style.cssText = ''
+    this.footerDom.style.cssText = 'text-align: center;'
   }
 
   loadData = () => {
@@ -189,6 +191,7 @@ class CallLinkTracking extends React.Component {
   onDockSizeChange = size => {
     this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
     this.appDom.style.overflow = 'auto'
+    this.footerDom.style.display = 'none'
     this.setState({
       dockSize: size,
     })
@@ -293,7 +296,7 @@ class CallLinkTracking extends React.Component {
           </Select>
         </div>
         <div className="layout-content-body" key="body">
-          <Card className="call-link-tracking-table">
+          <Card className="call-link-tracking-table" noHovering>
             <Table
               columns={columns}
               dataSource={data}
