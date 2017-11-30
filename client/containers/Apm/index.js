@@ -16,13 +16,14 @@ import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
 import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
-import { loadApms } from '../../actions/apm'
+import { loadApms, getApmService } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
 import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
 import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
+import confirm from '../../components/Modal/confirm'
 
 const menus = [
   {
@@ -56,9 +57,47 @@ const menus = [
 
 class Apm extends React.Component {
   componentWillMount() {
-    const { loadApms, current } = this.props
+    const { loadApms, current, getApmService } = this.props
     const clusterID = current.config.cluster.id
-    loadApms(clusterID)
+    const body = {
+      id: clusterID,
+      pinpoint: 'pinpoint',
+    }
+    getApmService(body).then(res => {
+      if (res.error) {
+        return
+      }
+      const { config, user } = current
+      const projectNamespace = config.project.namespace
+      let namespace = config.project.namespace
+      if (projectNamespace === 'default') {
+        namespace = user.info.namespace
+      }
+      const ApmStatusArray = res.response.result.data
+      let currentNamespaceStatus = false
+      ApmStatusArray.forEach(item => {
+        if (item.namespace === namespace) {
+          currentNamespaceStatus = true
+        }
+      })
+      if (!currentNamespaceStatus) {
+        const { history } = this.props
+        confirm({
+          modalTitle: '提示',
+          title: '当前项目 & 集群：PinPoint 基础服务组件未安装',
+          okText: '前往安装',
+          cancelText: '返回首页',
+          onOk: () => {
+            history.push('/setting/apms')
+          },
+          onCancel: () => {
+            history.push('/')
+          },
+        })
+        return
+      }
+      loadApms(clusterID)
+    })
   }
 
   renderLoading = tip => (
@@ -150,4 +189,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   loadApms,
+  getApmService,
 })(Apm)
