@@ -102,7 +102,7 @@ class MsaComponents extends React.Component {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
-          ApmID: res.response.result.data,
+          apmID: res.response.result.data,
         }, () => {
           this.load()
         })
