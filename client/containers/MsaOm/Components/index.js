@@ -93,6 +93,10 @@ class MsaComponents extends React.Component {
       if (!meta.isFetching) {
         this.filterData(meta.meta)
       }
+    } else {
+      this.setState({
+        loading: false,
+      })
     }
   }
 
@@ -114,20 +118,17 @@ class MsaComponents extends React.Component {
     const { apmID } = this.state
     const { fetchMsaComponentList, clusterId, nameSpace, info } = this.props
     const project = nameSpace === 'default' ? info.namespace : nameSpace
-    apmID.forEach(item => {
-      if (item.namespace === project) {
-        const query = {
-          id: item.id,
+    if (Object.keys(apmID).length > 0) {
+      apmID.forEach(item => {
+        if (item.namespace === project) {
+          const query = {
+            id: item.id,
+          }
+          fetchMsaComponentList(clusterId, query, project)
         }
-        fetchMsaComponentList(clusterId, query, project)
-        // fetchMsaComponentList(clusterId, query, project).then(res => {
-        //   if (res.error) return
-        //   if (res.response.result.code === 200) {
-        //     this.filterData(res.response.result.data.services)
-        //   }
-        // })
-      }
-    })
+      })
+    }
+
   }
 
   nameList = value => {
@@ -169,7 +170,6 @@ class MsaComponents extends React.Component {
         curData.push(curColumns)
       })
     }
-
     this.setState({
       loading: false,
       metaData: curData,
