@@ -13,7 +13,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Layout, Spin, Modal, notification } from 'antd'
+import Classnames from 'classnames'
+import { Layout, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
 import NamespaceSwitch from './NamespaceSwitch'
@@ -22,6 +23,7 @@ import {
   getCurrentUser,
 } from '../actions/current'
 import { scrollToTop, toQuerystring } from '../common/utils'
+import { renderLoading } from '../components/utils'
 import { JWT, AUTH_URL } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
@@ -30,6 +32,11 @@ const { Footer } = Layout
 let errorMessageBefore
 let errorMessageBeforeDateTime
 const errorMessageCloseObj = {}
+
+// the routes need hide namespace switch
+const HIDE_NAMESPACE_SWITCH_ROUTES = [
+  /^\/csb/,
+]
 
 class App extends React.Component {
   state = {
@@ -167,27 +174,21 @@ class App extends React.Component {
     setTimeout(() => resetErrorMessage(), 4500)
   }
 
-  renderLoading = tip => (
-    <div className="loading">
-      <Spin size="large" tip={tip} />
-    </div>
-  )
-
   renderChildren = () => {
     const { current, children } = this.props
     const { switchProjectOrCluster, switchProjectOrClusterText } = this.state
     const { config, user } = current
     if (!config.project || !config.project.namespace) {
-      return this.renderLoading('加载基础配置中 ...')
+      return renderLoading('加载基础配置中 ...')
     }
     if (!config.cluster || !config.cluster.id) {
-      return this.renderLoading('加载集群配置中 ...')
+      return renderLoading('加载集群配置中 ...')
     }
     if (!user || !user.info) {
-      return this.renderLoading('加载用户信息中 ...')
+      return renderLoading('加载用户信息中 ...')
     }
     if (switchProjectOrCluster) {
-      return this.renderLoading(switchProjectOrClusterText)
+      return renderLoading(switchProjectOrClusterText)
     }
     return [
       children,
@@ -207,8 +208,19 @@ class App extends React.Component {
     } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
-      return this.renderLoading('Loading...')
+      return renderLoading('Loading...')
     }
+    let isHideNamespaceSwitch = false
+    HIDE_NAMESPACE_SWITCH_ROUTES.every(regExp => {
+      if (regExp.test(location.pathname)) {
+        isHideNamespaceSwitch = true
+        return false
+      }
+      return true
+    })
+    const namespaceSwitchClassname = Classnames({
+      hide: isHideNamespaceSwitch,
+    })
     return (
       <Layout id="app">
         {this.renderErrorMessage()}
@@ -216,7 +228,7 @@ class App extends React.Component {
           location={location}
           currentUser={current.user.info || {}}
         />
-        <NamespaceSwitch userID={jwt.userID} />
+        <NamespaceSwitch userID={jwt.userID} className={namespaceSwitchClassname} />
         { this.renderChildren() }
         <Footer style={{ textAlign: 'center' }} id="footer">
           © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0

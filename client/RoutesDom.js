@@ -39,6 +39,18 @@ import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
 import MsaConfig from './containers/Setting/MsaConfig'
+import CSBInstances from './containers/CSB/Instances'
+import AvailableInstances from './containers/CSB/Instances/Available'
+import PublicInstances from './containers/CSB/Instances/Public'
+import MyApproval from './containers/CSB/Instances/MyApproval'
+import MyApplication from './containers/CSB/Instances/MyApplication'
+import CSBInstanceDetail from './containers/CSB/InstanceDetail'
+import InstanceDetailOverview from './containers/CSB/InstanceDetail/Overview/'
+import MyPublishedServices from './containers/CSB/InstanceDetail/MyPublishedServices'
+import ServiceSubscriptionApproval from './containers/CSB/InstanceDetail/ServiceSubscriptionApproval'
+import MySubscribedService from './containers/CSB/InstanceDetail/MySubscribedService'
+import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionServices'
+import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
 
 export const appChildRoutes = [
   {
@@ -48,19 +60,29 @@ export const appChildRoutes = [
     key: 'index',
   },
   {
-    path: '/msa-om',
-    component: MsaOm,
-    key: 'msa-om',
-  },
-  {
     path: '/msa-manage',
     component: MsaManage,
     key: 'msa-manage',
   },
   {
+    path: '/csb-instances',
+    component: CSBInstances,
+    key: 'csb-instances',
+  },
+  {
+    path: '/csb-instances-available/:instanceID',
+    component: CSBInstanceDetail,
+    key: 'csb-instances',
+  },
+  {
     path: '/apms',
     component: Apm,
     key: 'apms',
+  },
+  {
+    path: '/msa-om',
+    component: MsaOm,
+    key: 'msa-om',
   },
   {
     path: '/setting',
@@ -221,7 +243,7 @@ export const settingChildRoutes = [
     path: '/setting/global-setting',
     component: GlobalSetting,
     exact: true,
-    key: 'global_setting',
+    key: 'global-setting',
   },
   {
     path: '/setting/msa-config',
@@ -234,6 +256,84 @@ export const settingChildRoutes = [
     component: ApmSetting,
     exact: true,
     key: 'apms',
+  },
+]
+
+export const csbInstancesChildRoutes = [
+  {
+    path: '/csb-instances',
+    exact: true,
+    render: () => <Redirect to="/csb-instances/available" component={AvailableInstances} />,
+    key: 'index',
+  },
+  {
+    path: '/csb-instances/available',
+    component: AvailableInstances,
+    exact: true,
+    key: 'available',
+  },
+  {
+    path: '/csb-instances/my-approval',
+    component: MyApproval,
+    exact: true,
+    key: 'my-approval',
+  },
+  {
+    path: '/csb-instances/public',
+    component: PublicInstances,
+    exact: true,
+    key: 'public',
+  },
+  {
+    path: '/csb-instances/my-application',
+    component: MyApplication,
+    exact: true,
+    key: 'my-application',
+  },
+]
+
+export const csbInstanceDetailChildRoutes = [
+  {
+    path: '/csb-instances-available',
+    exact: true,
+    render: () => <Redirect to="/csb-instances/available" component={AvailableInstances} />,
+    key: 'index',
+  },
+  {
+    path: '/csb-instances-available/:instanceID',
+    component: InstanceDetailOverview,
+    exact: true,
+    key: 'my-published-services',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/my-published-services',
+    component: MyPublishedServices,
+    exact: true,
+    key: 'my-published-services',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/service-subscription-approval',
+    component: ServiceSubscriptionApproval,
+    exact: true,
+    key: 'service-subscription-approval',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/my-subscribed-service',
+    component: MySubscribedService,
+    exact: true,
+    key: '',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/subscription-services',
+    component: SubscriptionServices,
+    exact: true,
+    key: '',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/consumer-vouchers',
+    component: ConsumerVouchers,
+    exact: true,
+    key: '',
   },
 ]
 

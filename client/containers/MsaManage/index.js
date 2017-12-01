@@ -12,13 +12,13 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
-import { Link } from 'react-router-dom'
+import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { renderMenu, renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import confirm from '../../components/Modal/confirm'
 import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
@@ -27,8 +27,6 @@ import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 // import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
 import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
-
-const SubMenu = Menu.SubMenu
 
 const menus = [
   {
@@ -154,17 +152,11 @@ class MsaManage extends React.Component {
     })
   }
 
-  renderLoading = tip => (
-    <div className="loading">
-      <Spin size="large" tip={tip} />
-    </div>
-  )
-
   renderChildren = () => {
     const { children } = this.props
     const { isDeployed } = this.state
     if (!isDeployed) {
-      return this.renderLoading('加载微服务中 ...')
+      return renderLoading('加载微服务中 ...')
     }
     return [
       children,
@@ -174,34 +166,6 @@ class MsaManage extends React.Component {
         }
       </Switch>,
     ]
-  }
-
-  renderMenu = menu => {
-    const { type, to, icon, text, children, ...otherProps } = menu
-    if (type === 'SubMenu') {
-      return (
-        <SubMenu
-          key={to}
-          title={
-            <span>
-              {icon}
-              <span className="nav-text">{text}</span>
-            </span>
-          }
-          {...otherProps}
-        >
-          {children.map(this.renderMenu)}
-        </SubMenu>
-      )
-    }
-    return (
-      <Menu.Item key={to} {...otherProps}>
-        <Link to={to}>
-          {icon}
-          <span className="nav-text">{text}</span>
-        </Link>
-      </Menu.Item>
-    )
   }
 
   render() {
@@ -238,7 +202,7 @@ class MsaManage extends React.Component {
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
             >
               {
-                menus.map(this.renderMenu)
+                menus.map(renderMenu)
               }
             </Menu>
           </Card>

@@ -12,11 +12,12 @@
 
 import React from 'react'
 import { Layout, Menu, Icon, Card } from 'antd'
-import { Route, Switch, Link } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { renderMenu } from '../../components/utils'
 import msaComponent from '../../assets/img/log/msa-component.svg'
 
 const menus = [
@@ -58,7 +59,7 @@ export default class MsaOm extends React.Component {
     )
     return (
       <Layout className="msa-om">
-        <Sider key="sider">
+        <Sider key="sider" extra={false}>
           <Card
             className="left-menu-card"
             title={title}
@@ -68,14 +69,7 @@ export default class MsaOm extends React.Component {
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
             >
               {
-                menus.map(menu => (
-                  <Menu.Item key={menu.to}>
-                    <Link to={menu.to}>
-                      {menu.icon}
-                      <span className="nav-text">{menu.text}</span>
-                    </Link>
-                  </Menu.Item>
-                ))
+                menus.map(renderMenu)
               }
             </Menu>
           </Card>

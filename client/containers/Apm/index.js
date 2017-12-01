@@ -12,14 +12,14 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown, Spin } from 'antd'
-import { Link } from 'react-router-dom'
+import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { renderMenu, renderLoading } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
 import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
@@ -100,16 +100,10 @@ class Apm extends React.Component {
     })
   }
 
-  renderLoading = tip => (
-    <div className="loading">
-      <Spin size="large" tip={tip} />
-    </div>
-  )
-
   renderChildren = () => {
     const { apms, children } = this.props
     if (!apms || !apms.ids || apms.isFetching) {
-      return this.renderLoading('加载 APM 中 ...')
+      return renderLoading('加载 APM 中 ...')
     }
     return [
       children,
@@ -155,14 +149,7 @@ class Apm extends React.Component {
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
             >
               {
-                menus.map(menu => (
-                  <Menu.Item key={menu.to}>
-                    <Link to={menu.to}>
-                      {menu.icon}
-                      <span className="nav-text">{menu.text}</span>
-                    </Link>
-                  </Menu.Item>
-                ))
+                menus.map(renderMenu)
               }
             </Menu>
           </Card>

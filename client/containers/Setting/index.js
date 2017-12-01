@@ -13,12 +13,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout, Menu, Card } from 'antd'
-import { Link } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
 import { getDefaultSelectedKeys } from '../../common/utils'
+import { renderMenu } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import globalSetting from '../../assets/img/system-settings/global-setting.svg'
@@ -57,16 +57,10 @@ class Setting extends React.Component {
     //
   }
 
-  // renderLoading = tip => (
-  //   <div className="loading">
-  //     <Spin size="large" tip={tip} />
-  //   </div>
-  // )
-
   renderChildren = () => {
     const { children } = this.props
     // if (!apms || !apms.ids) {
-    //   return this.renderLoading('加载 APM 中 ...')
+    //   return renderLoading('加载 APM 中 ...')
     // }
     return [
       children,
@@ -82,7 +76,7 @@ class Setting extends React.Component {
     const { location } = this.props
     return (
       <Layout className="apm-setting">
-        <Sider>
+        <Sider extra={false}>
           <Card
             className="left-menu-card"
             noHovering={false}
@@ -92,14 +86,7 @@ class Setting extends React.Component {
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
             >
               {
-                menus.map(menu => (
-                  <Menu.Item key={menu.to}>
-                    <Link to={menu.to}>
-                      {menu.icon}
-                      <span className="nav-text">{menu.text}</span>
-                    </Link>
-                  </Menu.Item>
-                ))
+                menus.map(renderMenu)
               }
             </Menu>
           </Card>

@@ -13,18 +13,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Layout } from 'antd'
+import Classnames from 'classnames'
 
 const LayoutSider = Layout.Sider
 
 export default class Sider extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
+    extra: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    extra: true,
   }
 
   render() {
-    const { children, ...otherProps } = this.props
+    const { extra, children, ...otherProps } = this.props
+    const classNames = Classnames({
+      'layout-sider': true,
+      'layout-sider-extra': extra,
+    })
     return (
-      <LayoutSider className="layout-sider" style={{ position: 'fixed' }} {...otherProps}>
+      <LayoutSider className={classNames} style={{ position: 'fixed' }} {...otherProps}>
         { children }
       </LayoutSider>
     )

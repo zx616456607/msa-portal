@@ -48,6 +48,20 @@ body {
         border: 0;
       }
     }
+    &.layout-sider-extra {
+      .ant-card-head {
+        height: 80px;
+        line-height: initial;
+        .ant-card-head-title {
+          margin-top: 20px;
+          .apm-switch {
+            font-size: 12px;
+            font-weight: initial;
+            margin-top: 5px;
+          }
+        }
+      }
+    }
   }
   .layout-content {
     padding-right: @padding-medium;
@@ -100,18 +114,6 @@ body {
   fill: #fff;
 }
 .left-menu-card {
-  .ant-card-head {
-    height: 80px;
-    line-height: initial;
-    .ant-card-head-title {
-      margin-top: 20px;
-      .apm-switch {
-        font-size: 12px;
-        font-weight: initial;
-        margin-top: 5px;
-      }
-    }
-  }
   .ant-card-body {
     padding-right: 0;
     padding-left: 0;
@@ -145,17 +147,10 @@ body {
     margin-right: 20px;
   }
 }
-.success-status {
-  color: @success-color;
-}
-.error-status {
-  color: @error-color;
-}
-.pointer {
-  cursor: pointer;
-}
-.primary-color {
-  color: @primary-color;
+.tenx-confirm-modal {
+  .ant-modal-header {
+    display: block;
+  }
 }
 #logo {
   .st0 {
@@ -168,11 +163,7 @@ body {
     fill: #fff;
   }
 }
-.tenx-confirm-modal {
-  .ant-modal-header {
-    display: block;
-  }
-}
+
 .first-title {
   height: 18px;
   font-size: 16px;
@@ -189,4 +180,22 @@ body {
   padding-left: 8px;
   margin-bottom: 20px;
   color: #2db7f5;
+}
+
+/* colors */
+.success-status {
+  color: @success-color;
+}
+.error-status {
+  color: @error-color;
+}
+.primary-color {
+  color: @primary-color;
+}
+
+.pointer {
+  cursor: pointer;
+}
+.hide {
+  display: none;
 }

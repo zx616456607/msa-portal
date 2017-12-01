@@ -21,22 +21,33 @@ const LayoutHeader = Layout.Header
 const menus = [
   {
     to: '/',
+    key: '/',
     text: '总览',
   },
   {
     to: '/msa-manage',
+    key: 'msa-manage',
     text: '微服务治理',
   },
   {
+    to: '/csb-instances',
+    key: 'csb-instances',
+    text: 'CSB',
+    title: 'Cloud Service Bus',
+  },
+  {
     to: '/apms',
+    key: 'apms',
     text: '性能管理（APM）',
   },
   {
     to: '/msa-om',
+    key: 'msa-om',
     text: '微服务运维',
   },
   {
     to: '/setting',
+    key: 'setting',
     text: '系统设置',
   },
 ]
@@ -49,7 +60,7 @@ export default class Header extends React.Component {
     } = this.props
     const { pathname } = location
     const pathArray = pathname.split('/')
-    const selectedKeys = [ `/${pathArray[1]}` ]
+    const selectedKeys = [ pathArray[1] || '/' ]
     return (
       <LayoutHeader className="layout-header">
         <Link to="/">
@@ -87,15 +98,19 @@ export default class Header extends React.Component {
           selectedKeys={selectedKeys}
         >
           {
-            menus.map(menu => (
-              <Menu.Item
-                key={menu.to}
-                disabled={menu.disabled}>
-                <Link to={menu.to}>
-                  {menu.text}
-                </Link>
-              </Menu.Item>
-            ))
+            menus.map(menu => {
+              const { key, to, text, ...otherProps } = menu
+              return (
+                <Menu.Item
+                  key={key}
+                  {...otherProps}
+                >
+                  <Link to={to}>
+                    {text}
+                  </Link>
+                </Menu.Item>
+              )
+            })
           }
         </Menu>
       </LayoutHeader>

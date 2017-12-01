@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import Classnames from 'classnames'
 import { Menu, Dropdown, Icon, notification } from 'antd'
 import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
 import {
@@ -169,13 +170,18 @@ class NamespaceSwitch extends React.Component {
       current,
       projects,
       projectClusters,
+      className,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
     const currentProjectClusters = projectClusters[project.namespace] || []
     const { projectsText, clustersText, clustersDropdownVisible } = this.state
+    const classNames = Classnames({
+      'namespace-switch': true,
+      [className]: !!className,
+    })
     return (
-      <div className="namespace-switch">
+      <div className={classNames}>
         <Dropdown
           overlay={
             <Menu selectable onSelect={this.handleProjectChange}>
