@@ -1,0 +1,53 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of PublishService
+ *
+ * 2017-12-04
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.publish-service {
+  background-color: #fff;
+  border: 1px @border-style-base @border-color-base;
+  border-radius: @border-radius-base;
+  &-steps {
+    height: 48px;
+    padding: 15px 10%;
+    border-bottom: 1px @border-style-base @border-color-split;
+    border-right: 1px @border-style-base @border-color-split;
+  }
+  &-body {
+    border-right: 1px @border-style-base @border-color-split;
+    padding: @padding-medium;
+    & > *:not(:first-child) {
+      padding-top: @padding-medium;
+    }
+    & > *:not(:last-child) {
+      border-bottom: 1px dashed @border-color-split;
+    }
+    &-endpoint, &-wsdl-address {
+      input {
+        width: calc(~"100% - 110px");
+      }
+      .right-btn {
+        float: right;
+        margin-top: 2px;
+        clear: both;
+      }
+    }
+  }
+  &-detail {
+    padding: 0 @padding-medium;
+    &-header {
+      font-size: @font-size-medium;
+      height: 48px;
+      line-height: 48px;
+    }
+  }
+}
