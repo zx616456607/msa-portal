@@ -15,7 +15,7 @@ export default class MyPublishedServices extends React.Component {
           this.state.visible &&
           <ServiceDetailDock
             visible={true}
-            onCancel={() => this.setState({ visible: false })}
+            onVisibleChange={visible => this.setState({ visible })}
           />
         }
       </div>

@@ -25,6 +25,9 @@ export default class Dock extends React.Component {
   static defaultProps = {
     minSize: 0.1,
     maxSize: 0.95,
+    dimStyle: {
+      backgroundColor: 'rgba(55, 55, 55, .6)',
+    },
   }
 
   state = {
@@ -42,15 +45,15 @@ export default class Dock extends React.Component {
   }
 
   onSizeChange = size => {
-    const { minSize, maxSize } = this.props
+    const { minSize, maxSize, onSizeChange } = this.props
     if (size >= minSize && size <= maxSize) {
       this.setState({ size })
-      this.props.onSizeChange(size)
+      onSizeChange && onSizeChange(size)
     }
   }
 
   render() {
-    const { children, position, isVisible, dimMode, dimStyle } = this.props
+    const { children, position, isVisible, dimMode, dimStyle, ...otherProps } = this.props
     const { size } = this.state
     return (
       <ReactDock
@@ -60,6 +63,7 @@ export default class Dock extends React.Component {
         dimStyle={dimStyle}
         size={size}
         onSizeChange={this.onSizeChange}
+        {...otherProps}
       >
         {children}
       </ReactDock>
