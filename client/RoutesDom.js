@@ -51,6 +51,7 @@ import ServiceSubscriptionApproval from './containers/CSB/InstanceDetail/Service
 import MySubscribedService from './containers/CSB/InstanceDetail/MySubscribedService'
 import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionServices'
 import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
+import PublishService from './containers/CSB/InstanceDetail/PublishService'
 
 export const appChildRoutes = [
   {
@@ -321,19 +322,25 @@ export const csbInstanceDetailChildRoutes = [
     path: '/csb-instances-available/:instanceID/my-subscribed-service',
     component: MySubscribedService,
     exact: true,
-    key: '',
+    key: 'my-subscribed-service',
   },
   {
     path: '/csb-instances-available/:instanceID/subscription-services',
     component: SubscriptionServices,
     exact: true,
-    key: '',
+    key: 'subscription-services',
   },
   {
     path: '/csb-instances-available/:instanceID/consumer-vouchers',
     component: ConsumerVouchers,
     exact: true,
-    key: '',
+    key: 'consumer-vouchers',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/publish-service',
+    component: PublishService,
+    exact: true,
+    key: 'publish-service',
   },
 ]
 
