@@ -48,13 +48,9 @@ body {
   .ant-card-body {
     padding-right: 0;
     padding-left: 0;
+    .ant-menu {
     .ant-menu-inline, .ant-menu-vertical {
       border-right: 0;
-    }
-    .ant-menu-item-selected > a {
-      & > .menu-icon, &:hover > .menu-icon {
-        fill: #fff;
-      }
     }
     .ant-menu-item > a, div.ant-menu-submenu-title {
       &:hover {
@@ -63,6 +59,21 @@ body {
         }
       }
     }
+    .ant-menu-item-selected.ant-menu-item > a {
+      & > .menu-icon, &:hover > .menu-icon {
+        fill: #fff;
+      }
+    }
+    .ant-menu-item-selected.ant-menu-item {
+      background-color: @primary-color;
+      a {
+        color: #fff;
+      }
+    }
+    .ant-menu-item::after {
+      border: 0;
+    }
+  }
   }
 }
 .ant-layout {
@@ -78,17 +89,6 @@ body {
     left: 0;
     margin-top: @content-margin-top;
     margin-left: @padding-medium;
-    .ant-menu {
-      .ant-menu-item-selected.ant-menu-item {
-        background-color: @primary-color;
-        a {
-          color: #fff;
-        }
-      }
-      .ant-menu-item::after {
-        border: 0;
-      }
-    }
     &.layout-sider-extra {
       .ant-card-head {
         .ant-card-head-title {
