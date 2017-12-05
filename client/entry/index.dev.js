@@ -36,7 +36,7 @@ const render = Component => {
 render(<Root store={store} history={history} />)
 
 if (module.hot) {
-  module.hot.accept('../containers/Root/', () => {
+  module.hot.accept('../containers/Root', () => {
     render(<Root store={store} history={history} />)
   })
 }
