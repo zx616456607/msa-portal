@@ -16,7 +16,7 @@ class BlownMonitoring extends React.Component {
     return (
       <QueueAnim className="blown-monitoring">
         <div className="layout-content-body" key="body">
-          <Card noHovering extra={extra}>
+          <Card hoverable={false} extra={extra}>
             <iframe src={iframeSrc} />
           </Card>
         </div>

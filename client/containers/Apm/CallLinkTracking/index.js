@@ -296,7 +296,7 @@ class CallLinkTracking extends React.Component {
           </Select>
         </div>
         <div className="layout-content-body" key="body">
-          <Card className="call-link-tracking-table" noHovering>
+          <Card className="call-link-tracking-table" hoverable={false}>
             <Table
               columns={columns}
               dataSource={data}
@@ -307,6 +307,9 @@ class CallLinkTracking extends React.Component {
               rowKey={row => row.spanId}
               loading={loading}
               onRowClick={this.handleRowClick}
+              onRow={record => ({
+                onClick: () => this.handleRowClick(record),
+              })}
             />
           </Card>
         </div>

@@ -12,6 +12,13 @@
 @import "../../../../assets/style/core/index.less";
 
 .router-manage {
+  &-table {
+    .ant-pagination {
+      position: absolute;
+      right: 0;
+      top: -60px;
+    }
+  }
   &-btn-box {
     .page {
       //width: 20%;
@@ -26,13 +33,6 @@
         margin-top: 6px;
         float: left;
       }
-    }
-  }
-  &-table {
-    .ant-pagination {
-      position: absolute;
-      right: 0;
-      top: -60px;
     }
   }
 }

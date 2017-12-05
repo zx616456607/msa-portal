@@ -17,16 +17,19 @@
   border: 1px @border-style-base @border-color-base;
   border-radius: @border-radius-base;
   &-steps {
-    height: 48px;
-    padding: 15px 10%;
+    // height: 48px;
+    padding: 17.5px 10%;
     border-bottom: 1px @border-style-base @border-color-split;
     border-right: 1px @border-style-base @border-color-split;
   }
   &-body {
     border-right: 1px @border-style-base @border-color-split;
     padding: @padding-medium;
-    & > *:not(:first-child) {
+    & > * {
       padding-top: @padding-medium;
+      .second-title {
+        margin-left: @padding-medium;
+      }
     }
     & > *:not(:last-child) {
       border-bottom: 1px dashed @border-color-split;
@@ -37,7 +40,6 @@
       }
       .right-btn {
         float: right;
-        margin-top: 2px;
         clear: both;
       }
     }
@@ -46,8 +48,8 @@
     padding: 0 @padding-medium;
     &-header {
       font-size: @font-size-medium;
-      height: 48px;
-      line-height: 48px;
+      height: 60px;
+      line-height: 60px;
     }
   }
 }

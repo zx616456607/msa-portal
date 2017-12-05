@@ -456,7 +456,7 @@ class ApiGateway extends React.Component {
           }
         </div>
         <div className="layout-content-body" key="body">
-          <Card noHovering>
+          <Card hoverable={false}>
             <Table
               // rowSelection={rowSelection}
               columns={columns}

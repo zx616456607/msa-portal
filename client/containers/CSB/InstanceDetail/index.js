@@ -95,7 +95,7 @@ class CSBInstanceDetail extends React.Component {
           <Sider extra={false}>
             <Card
               className="left-menu-card"
-              noHovering={false}
+              hoverable={false}
             >
               <Menu mode="inline"
                 defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}

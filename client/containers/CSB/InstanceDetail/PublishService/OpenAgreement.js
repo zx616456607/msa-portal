@@ -28,9 +28,13 @@ export default class OpenAgreement extends React.Component {
     let openUrlBefore = 'http://csbname:9081/'
     if (serviceName) {
       openUrlBefore += `${serviceName}/`
+    } else {
+      openUrlBefore += '<服务名称>/'
     }
     if (serviceVersion) {
       openUrlBefore += `${serviceVersion}/`
+    } else {
+      openUrlBefore += '<服务版本>/'
     }
     return (
       <div className="open-agreement">
@@ -71,6 +75,7 @@ export default class OpenAgreement extends React.Component {
             <Input
               addonBefore={openUrlBefore}
               size="default"
+              placeholder="请自定义 URL 地址"
             />
           )}
         </FormItem>
@@ -90,7 +95,7 @@ export default class OpenAgreement extends React.Component {
           key="responseType"
         >
           {getFieldDecorator('responseType')(
-            <Input size="default" type="textarea" placeholder="请输入描述，支持1-128个汉字或字符" />
+            <Input.TextArea size="default" placeholder="请输入描述，支持1-128个汉字或字符" />
           )}
         </FormItem>
       </div>

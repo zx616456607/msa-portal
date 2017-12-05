@@ -226,7 +226,7 @@ class MsaConfig extends React.Component {
           <Card
             title="微服务配置"
             className="msa_config_style"
-            noHovering
+            hoverable={false}
           >
             <Row className="conten">
               <Col className="left">

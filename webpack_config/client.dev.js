@@ -80,6 +80,7 @@ module.exports = {
               plugins: [
                 { removeTitle: true },
                 { removeStyleElement: true },
+                { removeAttrs: { attrs: 'path:fill' } },
               ],
             },
           },

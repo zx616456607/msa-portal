@@ -27,12 +27,12 @@
 }
 
 .ant-card-wider-padding {
-  & > .ant-card-head {
+  .ant-card-head {
     padding: 0 @padding-medium;
   }
-  & > .ant-card-body {
+  .ant-card-body {
     padding: @padding-medium;
-    & > .ant-table-wrapper {
+    & > div > .ant-table-wrapper {
       margin-top: -16px;
       margin-bottom: 16px;
     }
@@ -43,6 +43,14 @@
   font-weight: initial;
   background-color: #fff;
   border-bottom: 1px solid @border-color-base;
+}
+
+.ant-form-item {
+  margin-bottom: 24px;
+}
+
+.ant-form-item-with-help {
+  margin-bottom: 4px;
 }
 
 .ant-form-item-label {

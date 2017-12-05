@@ -41,7 +41,7 @@ class GlobalSetting extends Component {
         <Card
           id="GlobalSetting"
           title="全局配置"
-          noHovering
+          hoverable={false}
         >
           <div className="API_address">
             <div className="second-title">开放 API 地址</div>
