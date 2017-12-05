@@ -1,3 +1,15 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Overview
+ *
+ * 2017-12-05
+ * @author zhaoyb
+ */
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
@@ -10,7 +22,7 @@ export default class InstanceDetailOverview extends React.Component {
       { src: require('../../../../assets/img/csb/csb.png') },
     ]
     return (
-      <QueueAnim className="overview">
+      <QueueAnim className="msa-overview">
         <div className="top" key="top">
           <div className="imgs">
             <img src={images[0].src}/>
