@@ -53,7 +53,7 @@ export default class AuthScope extends React.Component {
     ]
     return (
       <QueueAnim>
-        <Card className="auth-scope" key="body" noHovering>
+        <Card className="auth-scope" key="body" hoverable={false}>
           <Table
             columns={columns}
             dataSource={data}

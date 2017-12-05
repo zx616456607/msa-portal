@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import './style/apm.less'
+import './style/Apm.less'
 import { Row, Col, Select, Button, Modal, Icon, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
@@ -301,7 +301,7 @@ class ApmSetting extends React.Component {
           <Card
             title="APM配置"
             className="apm_config_style"
-            noHovering
+            hoverable={false}
           >
             <Row className="contents">
               <Col className="left">

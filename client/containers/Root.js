@@ -4,7 +4,7 @@
  */
 
 /**
- * Root dev container
+ * Root container
  *
  * 2017-08-16
  * @author zhangpc
@@ -13,15 +13,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
-import { RoutesDom } from '../../RoutesDom'
 import { ConnectedRouter } from 'react-router-redux'
+import { LocaleProvider } from 'antd'
+import zhCN from 'antd/lib/locale-provider/zh_CN'
+import { RoutesDom } from '../RoutesDom'
 
 const Root = ({ store, history }) => (
   <Provider store={store}>
-    { /* ConnectedRouter will use the store from Provider automatically */ }
-    <ConnectedRouter history={history}>
-      <RoutesDom />
-    </ConnectedRouter>
+    <LocaleProvider locale={zhCN}>
+      { /* ConnectedRouter will use the store from Provider automatically */ }
+      <ConnectedRouter history={history}>
+        <RoutesDom />
+      </ConnectedRouter>
+    </LocaleProvider>
   </Provider>
 )
 
@@ -31,4 +35,3 @@ Root.propTypes = {
 }
 
 export default Root
-

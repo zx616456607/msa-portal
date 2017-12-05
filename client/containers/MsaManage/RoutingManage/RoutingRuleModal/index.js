@@ -221,7 +221,7 @@ class RoutingRuleModal extends React.Component {
         }
         <FormItem {...formItemLayout} label="路由规则描述">
           {getFieldDecorator('description')(
-            <Input placeholder="请填写路由规则描述" type="textarea" />
+            <Input.TextArea placeholder="请填写路由规则描述" />
           )}
         </FormItem>
         <FormItem {...formItemLayout} label="去掉路径前缀">

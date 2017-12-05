@@ -79,7 +79,7 @@ class Setting extends React.Component {
         <Sider extra={false}>
           <Card
             className="left-menu-card"
-            noHovering={false}
+            hoverable={false}
             title="系统设置"
           >
             <Menu mode="inline"

@@ -63,7 +63,7 @@ export default class MsaOm extends React.Component {
           <Card
             className="left-menu-card"
             title={title}
-            noHovering={false}
+            hoverable={false}
           >
             <Menu mode="inline"
               defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
