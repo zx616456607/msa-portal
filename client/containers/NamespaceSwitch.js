@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import Classnames from 'classnames'
+import ClassNames from 'classnames'
 import { Menu, Dropdown, Icon, notification } from 'antd'
 import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
 import {
@@ -176,7 +176,7 @@ class NamespaceSwitch extends React.Component {
     const project = currentConfig.project || {}
     const currentProjectClusters = projectClusters[project.namespace] || []
     const { projectsText, clustersText, clustersDropdownVisible } = this.state
-    const classNames = Classnames({
+    const classNames = ClassNames({
       'namespace-switch': true,
       [className]: !!className,
     })

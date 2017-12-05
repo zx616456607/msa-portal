@@ -13,7 +13,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import Classnames from 'classnames'
+import ClassNames from 'classnames'
 import { Layout, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
@@ -218,7 +218,7 @@ class App extends React.Component {
       }
       return true
     })
-    const namespaceSwitchClassname = Classnames({
+    const namespaceSwitchClassname = ClassNames({
       hide: isHideNamespaceSwitch,
     })
     return (

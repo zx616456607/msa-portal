@@ -12,20 +12,23 @@
 
 import React from 'react'
 import {
-  Form, Input, Select,
+  Form, Input, Select, Checkbox, Switch,
 } from 'antd'
+import ClassNames from 'classnames'
 import './style/OpenAgreement.less'
 
 const FormItem = Form.Item
-// const Option = Select.Option
+const CheckboxGroup = Checkbox.Group
+const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
   render() {
-    const { formItemLayout, form } = this.props
+    const { formItemLayout, form, className } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const serviceName = getFieldValue('serviceName')
     const serviceVersion = getFieldValue('serviceVersion')
-    let openUrlBefore = 'http://csbname:9081/'
+    const ssl = getFieldValue('ssl')
+    let openUrlBefore = `${ssl ? 'https' : 'http'}://csbname:9081/`
     if (serviceName) {
       openUrlBefore += `${serviceName}/`
     } else {
@@ -36,8 +39,13 @@ export default class OpenAgreement extends React.Component {
     } else {
       openUrlBefore += '<服务版本>/'
     }
+    const serviceProtocols = getFieldValue('serviceProtocols') || []
+    const classNames = ClassNames({
+      'open-agreement': true,
+      [className]: !!className,
+    })
     return (
-      <div className="open-agreement">
+      <div className={classNames}>
         <div className="second-title">服务开放协议配置</div>
         <FormItem
           {...formItemLayout}
@@ -60,7 +68,7 @@ export default class OpenAgreement extends React.Component {
               required: true, message: 'Please input serviceVersion!',
             }],
           })(
-            <Input size="default" placeholder="自定义版本" />
+            <Input placeholder="自定义版本" />
           )}
         </FormItem>
         <FormItem
@@ -74,7 +82,6 @@ export default class OpenAgreement extends React.Component {
           })(
             <Input
               addonBefore={openUrlBefore}
-              size="default"
               placeholder="请自定义 URL 地址"
             />
           )}
@@ -82,22 +89,62 @@ export default class OpenAgreement extends React.Component {
         <FormItem
           {...formItemLayout}
           label="所属服务组"
-          key="requestType"
+          key="serviceGroup"
         >
-          {getFieldDecorator('requestType')(
-            <Select size="default" placeholder="请选择">
+          {getFieldDecorator('serviceGroup', {
+            rules: [{
+              required: true, message: 'Please select serviceGroup!',
+            }],
+          })(
+            <Select placeholder="请选择">
+              <Option key="test">test</Option>
             </Select>
           )}
         </FormItem>
         <FormItem
           {...formItemLayout}
           label="服务描述"
-          key="responseType"
         >
-          {getFieldDecorator('responseType')(
-            <Input.TextArea size="default" placeholder="请输入描述，支持1-128个汉字或字符" />
+          {getFieldDecorator('seviceDesc')(
+            <Input.TextArea placeholder="请输入描述，支持1-128个汉字或字符" />
           )}
         </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="选择服务开放接口"
+          className="service-protocols"
+        >
+          {getFieldDecorator('serviceProtocols', {
+            rules: [{
+              required: true, message: 'Please check protocols!',
+            }],
+          })(
+            <CheckboxGroup options={[ 'Restful-API', 'WebService' ]}/>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="SSL 加密"
+          className="service-ssl"
+        >
+          {getFieldDecorator('ssl', {
+            valuePropName: 'checked',
+          })(
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          )}
+          开启后将提高 API 访问的安全性
+        </FormItem>
+        {
+          serviceProtocols.indexOf('Restful-API') > -1 &&
+          <FormItem
+            {...formItemLayout}
+            label="Restful Path"
+          >
+            {getFieldDecorator('restfulPath')(
+              <Input placeholder="请提供 Restful Path" />
+            )}
+          </FormItem>
+        }
       </div>
     )
   }

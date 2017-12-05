@@ -13,5 +13,18 @@
 @import '~assets/style/core/index.less';
 
 .open-agreement {
-  display: block;
+  .service-protocols {
+    .ant-checkbox-group {
+      height: 32px;
+      line-height: 32px;
+    }
+  }
+  .service-ssl {
+    .ant-switch {
+      margin-right: @padding-base;
+    }
+  }
+  & > *:last-child {
+    margin-bottom: 0;
+  }
 }

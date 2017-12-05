@@ -1,0 +1,57 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of ParameterSetting
+ *
+ * 2017-12-04
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.parameter-setting {
+  border-top-style: none !important;
+  &-body {
+    padding: 0 @padding-medium;
+  }
+  &-box {
+    border: 1px @border-style-base @border-color-split;
+    border-bottom-style: none;
+    border-radius: @border-radius-base;
+    .ant-form-item {
+      margin-bottom: 0;
+      .ant-form-item-control {
+        height: 48px;
+        line-height: 48px;
+      }
+    }
+    & > .ant-row {
+      height: 48px;
+      line-height: 48px;
+      padding: 0 @padding-base;
+      border-bottom: 1px @border-style-base @border-color-split;
+      .btns {
+        & > button {
+          width: 32px;
+        }
+        & > button + button {
+          margin-left: @padding-base;
+        }
+      }
+      & > * {
+        padding-right: @padding-small;
+      }
+    }
+    &-header {
+      background-color: @border-color-split;
+    }
+  }
+  &-add-btn {
+    display: block;
+    height: 32px;
+    line-height: 32px;
+  }
+}

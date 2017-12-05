@@ -25,14 +25,26 @@
   &-body {
     border-right: 1px @border-style-base @border-color-split;
     padding: @padding-medium;
-    & > * {
-      padding-top: @padding-medium;
-      .second-title {
-        margin-left: @padding-medium;
+    & > .fields {
+      padding-bottom: @padding-medium;
+      border-bottom: 1px @border-style-base @border-color-split;
+      & > * {
+        padding-top: @padding-medium;
+        .second-title {
+          margin-left: @padding-medium;
+        }
+      }
+      & > *:not(:first-child) {
+        border-top: 1px dashed @border-color-split;
       }
     }
-    & > *:not(:last-child) {
-      border-bottom: 1px dashed @border-color-split;
+    & > .btns {
+      height: 60px;
+      line-height: 60px;
+      text-align: center;
+      & > button + button {
+        margin-left: @padding-small;
+      }
     }
     &-endpoint, &-wsdl-address {
       input {
