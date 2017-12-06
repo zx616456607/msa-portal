@@ -23,15 +23,15 @@
     border-radius: @border-radius-base;
     .ant-form-item {
       margin-bottom: 0;
-      .ant-form-item-control {
-        height: 48px;
-        line-height: 48px;
-      }
     }
-    & > .ant-row {
+    &-header {
       height: 48px;
       line-height: 48px;
       padding: 0 @padding-base;
+      background-color: @border-color-split;
+    }
+    & > .ant-row:not(:first-child) {
+      padding: @padding-base;
       border-bottom: 1px @border-style-base @border-color-split;
       .btns {
         & > button {
@@ -45,11 +45,8 @@
         padding-right: @padding-small;
       }
     }
-    &-header {
-      background-color: @border-color-split;
-    }
   }
-  &-add-btn {
+  &-text, &-add-btn {
     display: block;
     height: 32px;
     line-height: 32px;

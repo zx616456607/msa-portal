@@ -27,25 +27,39 @@ export default class ParameterSetting extends React.Component {
   add = () => {
     this.uuid++
     const { form } = this.props
-    const keys = form.getFieldValue('keys')
+    const keys = form.getFieldValue('parameterKeys')
     const nextKeys = keys.concat(this.uuid)
-    form.setFieldsValue({
-      keys: nextKeys,
+    const validateKeys = []
+    keys.forEach(key => {
+      const errorCodeKey = `errorCode-${key}`
+      const errorCodeAdviceKey = `errorCodeAdvice-${key}`
+      const errorCodeDescKey = `errorCodeDesc-${key}`
+      validateKeys.push(errorCodeKey)
+      validateKeys.push(errorCodeAdviceKey)
+      validateKeys.push(errorCodeDescKey)
+    })
+    form.validateFields(validateKeys, errors => {
+      if (errors) {
+        return
+      }
+      form.setFieldsValue({
+        parameterKeys: nextKeys,
+      })
     })
   }
 
   remove = k => {
     const { form } = this.props
-    const keys = form.getFieldValue('keys')
+    const keys = form.getFieldValue('parameterKeys')
     form.setFieldsValue({
-      keys: keys.filter(key => key !== k),
+      parameterKeys: keys.filter(key => key !== k),
     })
   }
 
   toogleEdit = (key, isCancel) => {
     const { form } = this.props
     const { fields } = this.state
-    const { setFieldsValue, getFieldValue } = form
+    const { setFieldsValue, getFieldValue, validateFields } = form
     const isEditKey = `isEdit-${key}`
     const errorCodeKey = `errorCode-${key}`
     const errorCodeAdviceKey = `errorCodeAdvice-${key}`
@@ -54,32 +68,51 @@ export default class ParameterSetting extends React.Component {
     let fieldsValue = {
       [isEditKey]: !isEdit,
     }
-    if (!isEdit) {
-      // save fields
-      const errorCode = getFieldValue(errorCodeKey)
-      const errorCodeAdvice = getFieldValue(errorCodeAdviceKey)
-      const errorCodeDesc = getFieldValue(errorCodeDescKey)
-      this.setState({
-        fields: Object.assign(
-          {},
-          fields,
-          { [key]: { errorCode, errorCodeAdvice, errorCodeDesc } }
-        ),
-      })
-    } else if (isCancel === true) {
+    if (isEdit && isCancel === true) {
       // cancel the change
-      const currentField = fields[key] || []
-      fieldsValue = Object.assign(
-        {},
-        fieldsValue,
-        {
-          [errorCodeKey]: currentField.errorCode,
-          [errorCodeAdviceKey]: currentField.errorCodeAdvice,
-          [errorCodeDescKey]: currentField.errorCodeDesc,
-        }
-      )
+      const currentField = fields[key]
+      if (!currentField) {
+        this.remove(key)
+      } else {
+        fieldsValue = Object.assign(
+          {},
+          fieldsValue,
+          {
+            [errorCodeKey]: currentField.errorCode,
+            [errorCodeAdviceKey]: currentField.errorCodeAdvice,
+            [errorCodeDescKey]: currentField.errorCodeDesc,
+          }
+        )
+      }
+      setFieldsValue(fieldsValue)
+      return
     }
-    setFieldsValue(fieldsValue)
+    if (!isEdit) {
+      setFieldsValue(fieldsValue)
+    } else {
+      // validate fields
+      const validateKeys = [ errorCodeKey, errorCodeAdviceKey, errorCodeDescKey ]
+      validateFields(validateKeys, (errors, values) => {
+        if (errors) {
+          return
+        }
+        // save fields
+        this.setState({
+          fields: Object.assign(
+            {},
+            fields,
+            {
+              [key]: {
+                errorCode: values[errorCodeKey],
+                errorCodeAdvice: values[errorCodeAdviceKey],
+                errorCodeDesc: values[errorCodeDescKey],
+              },
+            }
+          ),
+        })
+        setFieldsValue(fieldsValue)
+      })
+    }
   }
 
   renderItem = key => {
@@ -94,15 +127,18 @@ export default class ParameterSetting extends React.Component {
     return [
       <Row key={`text-${key}`} className={isEdit ? 'hide' : ''}>
         <Col span={6}>
-          <div className="txt-of-ellipsis">{getFieldValue(errorCodeKey)}
+          <div className="parameter-setting-text txt-of-ellipsis">
+            {getFieldValue(errorCodeKey)}
           </div>
         </Col>
         <Col span={6}>
-          <div className="txt-of-ellipsis">{getFieldValue(errorCodeAdviceKey)}
+          <div className="parameter-setting-text txt-of-ellipsis">
+            {getFieldValue(errorCodeAdviceKey)}
           </div>
         </Col>
         <Col span={6}>
-          <div className="txt-of-ellipsis">{getFieldValue(errorCodeDescKey)}
+          <div className="parameter-setting-text txt-of-ellipsis">
+            {getFieldValue(errorCodeDescKey)}
           </div>
         </Col>
         <Col span={6} className="btns">
@@ -118,7 +154,7 @@ export default class ParameterSetting extends React.Component {
                 required: true, message: 'Please input errorCode!',
               }],
             })(
-              <Input />
+              <Input placeholder="请填写错误代码" />
             )}
           </FormItem>
         </Col>
@@ -129,18 +165,14 @@ export default class ParameterSetting extends React.Component {
                 required: true, message: 'Please input errorCodeAdvice!',
               }],
             })(
-              <Input />
+              <Input placeholder="请填写处置建议" />
             )}
           </FormItem>
         </Col>
         <Col span={6}>
           <FormItem>
-            {getFieldDecorator(errorCodeDescKey, {
-              rules: [{
-                required: true, message: 'Please input errorCodeDesc!',
-              }],
-            })(
-              <Input />
+            {getFieldDecorator(errorCodeDescKey)(
+              <Input placeholder="请填写说明" />
             )}
           </FormItem>
         </Col>
@@ -155,12 +187,13 @@ export default class ParameterSetting extends React.Component {
   render() {
     const { className, form } = this.props
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('keys', { initialValue: [] })
-    const keys = getFieldValue('keys')
+    getFieldDecorator('parameterKeys', { initialValue: [] })
+    const keys = getFieldValue('parameterKeys')
     const classNames = ClassNames({
       'parameter-setting': true,
       [className]: !!className,
     })
+    console.log('getFieldsValue', form.getFieldsValue())
     return (
       <div className={classNames}>
         <div className="second-title">编辑错误代码</div>
@@ -177,7 +210,7 @@ export default class ParameterSetting extends React.Component {
             }
             {
               keys.length === 0 &&
-              <Row>暂无</Row>
+              <Row className="empty-text">空空如也~</Row>
             }
           </div>
           <a className="parameter-setting-add-btn" onClick={this.add}>
