@@ -132,7 +132,7 @@ export default class OpenAgreement extends React.Component {
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
-          开启后将提高 API 访问的安全性
+          <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
         {
           serviceProtocols.indexOf('Restful-API') > -1 &&

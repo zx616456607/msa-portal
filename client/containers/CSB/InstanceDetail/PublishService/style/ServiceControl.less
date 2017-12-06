@@ -1,0 +1,42 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of ServiceControl
+ *
+ * 2017-12-06
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.service-control {
+  & > .ant-form-item:last-child {
+    margin-bottom: 0;
+  }
+  .ant-form-item-control {
+    margin-left: @padding-small;
+    .ant-switch {
+      margin-right: @padding-base;
+    }
+  }
+  .api-gateway-limit {
+    &-label {
+      & > i {
+        color: @font-color-3;
+        margin-left: 5px;
+      }
+    }
+    .ant-select {
+      width: calc(~"100% - 20px");
+      margin-left: @padding-base;
+      display: inline-block;
+    }
+    .ant-input {
+      width: calc(~"100% - 100px");
+      margin: 0 @padding-base;
+    }
+  }
+}

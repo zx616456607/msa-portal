@@ -26,7 +26,7 @@ const Step = Steps.Step
 
 class PublishService extends React.Component {
   state = {
-    currentStep: 1,
+    currentStep: 2,
   }
 
   validateFieldsAndGoNext = currentStep => {

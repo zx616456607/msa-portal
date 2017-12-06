@@ -12,17 +12,95 @@
 
 import React from 'react'
 import ClassNames from 'classnames'
+import {
+  Form, Input, Select, Switch, Icon, Tooltip, Row, Col,
+} from 'antd'
+import './style/ServiceControl.less'
+
+const FormItem = Form.Item
+const Option = Select.Option
+const API_GATEWAY_LIMIT_TYPES = [
+  {
+    key: 'second',
+    text: '秒',
+  },
+  {
+    key: 'minute',
+    text: '分钟',
+  },
+  {
+    key: 'hour',
+    text: '小时',
+  },
+  {
+    key: 'day',
+    text: '天',
+  },
+]
 
 export default class ServiceControl extends React.Component {
   render() {
-    const { className } = this.props
+    const { className, formItemLayout, form } = this.props
+    const { getFieldDecorator } = form
     const classNames = ClassNames({
       'service-control': true,
       [className]: !!className,
     })
     return (
       <div className={classNames}>
-        <h1>ServiceControl</h1>
+        <FormItem
+          {...formItemLayout}
+          label="API 流量限制"
+          className="api-gateway-limit"
+        >
+          <Row gutter={16}>
+            <Col span={6}>
+              每
+              {getFieldDecorator('apiGatewayLimitType', {
+                initialValue: API_GATEWAY_LIMIT_TYPES[0].key,
+              })(
+                <Select>
+                  {
+                    API_GATEWAY_LIMIT_TYPES.map(type =>
+                      <Option key={type.key}>{type.text}</Option>
+                    )
+                  }
+                </Select>
+              )}
+            </Col>
+            <Col span={12}>
+              最大调用
+              {getFieldDecorator('apiGatewayLimit')(
+                <Input placeholder="请填写整数" />
+              )}
+              次 <Tooltip title="设置为0或者为空时代表不限制访问频度">
+                <Icon type="question-circle-o" />
+              </Tooltip>
+            </Col>
+          </Row>
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="公开访问"
+        >
+          {getFieldDecorator('isPublicVisit', {
+            valuePropName: 'checked',
+          })(
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          )}
+          <span className="desc-text">此 API 无需授权即可访问</span>
+        </FormItem>
+        {/* <FormItem
+          {...formItemLayout}
+          label="可见域限制"
+        >
+          {getFieldDecorator('visibleDomain', {
+            valuePropName: 'checked',
+          })(
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          )}
+          <span className="desc-text">开启后，可设置谁可以看到并订阅消费该API</span>
+        </FormItem> */}
       </div>
     )
   }
