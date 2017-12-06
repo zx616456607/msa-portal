@@ -1,0 +1,126 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * vouchers
+ *
+ * 2017-12-05
+ * @author zhaoyb
+ */
+ @import '~assets/style/core/index.less';
+
+.csb-comsumer-vouchers {
+  .top {
+    width: 100%;
+    margin-bottom: 20px;
+    display: inline-block;
+    .topLeft {
+      float: left;
+      .vou {
+        margin-right: 10px;
+      }
+      .res {
+        margin-right: 10px;
+      }
+      .del {
+        margin-right: 10px;
+      }
+    }
+    .topRigth {
+      float: right;
+      display: inline-block;
+      span {
+        margin-right: 20px;
+      }
+      .ant-pagination {
+        display: inline;
+      }
+    }
+  }
+  .body {
+    .tip-value {
+      color: @primary-color;
+    }
+  }
+}
+.modal-add-vouchers {
+  margin-left: 30px;
+  .vouchers-name {
+    margin-right: 20px;
+  }
+  input {
+    width: 70%;
+  }
+}
+.modal-del-vouchers-tip {
+  .img {
+    position: absolute;
+    top: 86px;
+    left: 23px;
+    .ico {
+      font-size: 25px;
+      color: @primary-color;
+    }
+  }
+  .desc {
+    width: 90%;
+    margin-left: 40px;
+  }
+}
+.modal-del-vouchers {
+  height: 50px;
+  background-color: #fffaf0;
+  border: 1px dashed @warning-color;
+  padding: 10px;
+  border-radius: 4px;
+  .img {
+    position: absolute;
+    top: 90px;
+    left: 40px;
+    i {
+      font-size: 25px;
+      color: @warning-color;
+    }
+  }
+  .desc {
+    width: 90%;
+    margin-left: 40px;
+    margin-top: 3px;
+  }
+}
+.modal-up-vouchers {
+  div {
+    margin-bottom: 10px;
+  }
+  input {
+    width: 95%;
+    margin-top: 10px;
+  }
+  .dec {
+    margin: 30px 0 0 35px;
+    display: inline-block;
+    .decs-title {
+      color: @success-color;
+      vertical-align: super;
+    }
+  }
+  .as-left {
+    float: left;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+  .as-rigth {
+    float: right;
+    display: inline-block;
+  }
+  .as-current {
+    width: 50%;
+    margin-left: 20px;
+  }
+  .as-new {
+    width: 50%;
+    margin-left: 33px;
+  }
+}
