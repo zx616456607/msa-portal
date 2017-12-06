@@ -22,17 +22,19 @@ export default class InstanceDetailOverview extends React.Component {
       { src: require('../../../../assets/img/csb/csb.png') },
     ]
     return (
-      <QueueAnim className="msa-overview">
+      <QueueAnim className="csb-overview">
         <div className="top" key="top">
-          <div className="imgs">
-            <img src={images[0].src}/>
-          </div>
-          <div className="desc">
-            <h2>实例名称：</h2>
-            <div className="descs">
-              <div>创建人：小白</div>
-              <div>创建时间：2017-12-12</div>
-              <div>描述：Asia圣诞节</div>
+          <div className="topLeft">
+            <div className="imgs">
+              <img src={images[0].src} />
+            </div>
+            <div className="desc">
+              <h2>实例名称：</h2>
+              <div className="descs">
+                <div>创建人：小白</div>
+                <div>创建时间：2017-12-12</div>
+                <div>描述：Asia圣诞节</div>
+              </div>
             </div>
           </div>
           <div className="btn">
@@ -55,10 +57,12 @@ export default class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我发布的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <span>Card content</span>
               </Card>
             </Col>
             <Col span={9}>
               <Card title="服务订阅审批" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <span>Card content</span>
               </Card>
             </Col>
           </Row>
@@ -76,10 +80,12 @@ export default class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我订阅的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <span>Card content</span>
               </Card>
             </Col>
             <Col span={9}>
               <Card title="可订阅的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <span>Card content</span>
               </Card>
             </Col>
           </Row>

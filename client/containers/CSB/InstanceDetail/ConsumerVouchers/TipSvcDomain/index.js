@@ -27,23 +27,22 @@ class SvcTip extends React.Component {
     })
   }
   returnDefaultTooltip() {
-    const _this = this
     setTimeout(() => {
-      _this.setState({
+      this.setState({
         copyStatus: false,
       })
     }, 500)
   }
   render() {
+    const { copyStatus } = this.state
     const { svcDomain } = this.props
-    const scope = this
     const item = svcDomain.map(element => {
       return (
         <li>
           <span> ak:</span>
           <span> sk:</span>
-          <Tooltip placement="top" title={scope.state.copyStatus ? '复制成功' : '点击复制'}>
-            <Icon type="copy" onClick={this.servercopyCode} onMouseLeave={this.returnDefaultTooltip} onMouseEnter={() => this.startCopyCode(element.domain)}/>
+          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+            <Icon type="copy" onClick={this.servercopyCode} onMouseLeave={this.returnDefaultTooltip} onMouseEnter={() => this.startCopyCode(element.domain)} />
           </Tooltip>
         </li>
       )

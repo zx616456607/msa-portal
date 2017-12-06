@@ -12,7 +12,7 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Button, Icon, Input, Radio, Table, Pagination, Modal, Row, Col } from 'antd'
+import { Card, Button, Icon, Input, Radio, Table, Pagination, Modal, Row, Col, Tooltip } from 'antd'
 import './style/index.less'
 const { TextArea } = Input
 const Search = Input.Search
@@ -20,6 +20,8 @@ const RadioGroup = Radio.Group
 
 export default class ServiceSubscriptionApproval extends React.Component {
   state = {
+    isToo: false,
+    modalTitle: '',
     visible: false,
   }
 
@@ -29,13 +31,39 @@ export default class ServiceSubscriptionApproval extends React.Component {
     })
   }
 
-  handleVisible = () => {
-    this.setState({
-      visible: true,
-    })
+  handleVisible = key => {
+    if (key === 'too') {
+      this.setState({
+        isToo: true,
+        modalTitle: '通过订阅服务操作',
+        visible: true,
+      })
+    } if (key === 'reject') {
+      this.setState({
+        isToo: false,
+        modalTitle: '拒绝订阅服务操作',
+        visible: true,
+      })
+    }
+  }
+
+  filterState = key => {
+    switch (key) {
+      case '已通过':
+        return <span className="adopt"><div></div>已通过</span>
+      case '已退订':
+        return <span className="ub"><div></div>已退订</span>
+      case '待审批':
+        return <span className="eap"><div></div>待审批</span>
+      case '已拒绝':
+        return <span className="refuse"><div></div>已拒绝</span>
+      default:
+        return
+    }
   }
 
   render() {
+    const { modalTitle, isToo } = this.state
     const columns = [{
       id: 'id',
       title: '订阅人',
@@ -46,25 +74,73 @@ export default class ServiceSubscriptionApproval extends React.Component {
     }, {
       title: '状态',
       dataIndex: 'state',
+      filters: [
+        { text: '已通过', value: 'too' },
+        { text: '已拒绝', value: 'reject' },
+      ],
+      render: text => this.filterState(text),
     }, {
       title: '消费凭证',
       dataIndex: 'voucher',
     }, {
-      title: 'QPS',
+      title: <Tooltip title="希望最大每秒访问次数">
+        <span>QPS</span>
+      </Tooltip>,
       dataIndex: 'QPS',
     }, {
-      title: 'QPH',
+      title: <Tooltip title="希望最大每秒访问次数">
+        <span>QPS</span>
+      </Tooltip>,
       dataIndex: 'QPH',
+      filterIcon: <Icon type="smile-o" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }} />,
     }, {
       title: '申请订阅时间',
       dataIndex: 'time',
+      sorter: (a, b) => a.time - b.time,
     }, {
       title: '操作',
       dataIndex: 'operation',
       render: () => <div>
-        <Button className="detail" type="primary">通过</Button>
-        <Button>拒绝</Button>
+        <Button className="detail" type="primary" onClick={() => this.handleVisible('too')}>通过</Button>
+        <Button onClick={() => this.handleVisible('reject')}>拒绝</Button>
       </div>,
+    }]
+    const data = [{
+      id: '1',
+      QPS: 'QPS',
+      QPH: 'QPH',
+      name: '张三',
+      time: '2017-12-12 12:12:01',
+      state: '已通过',
+      voucher: '我的凭证',
+      serviceName: 'TradeCode',
+    }, {
+      id: '2',
+      QPS: 'QPS',
+      QPH: 'QPH',
+      name: '李四',
+      time: '2017-12-12 12:12:01',
+      state: '已退订',
+      voucher: '我的凭证',
+      serviceName: 'TradeCode',
+    }, {
+      id: '3',
+      QPS: 'QPS',
+      QPH: 'QPH',
+      name: '赵四',
+      time: '2017-12-12 12:12:01',
+      state: '待审批',
+      voucher: '我的凭证',
+      serviceName: 'TradeCode',
+    }, {
+      id: '4',
+      QPS: 'QPS',
+      QPH: 'QPH',
+      name: '小宝',
+      time: '2017-12-12 12:12:01',
+      state: '已拒绝',
+      voucher: '我的凭证',
+      serviceName: 'TradeCode',
     }]
     const pagination = {
       simple: true,
@@ -72,8 +148,8 @@ export default class ServiceSubscriptionApproval extends React.Component {
       defaultCurrent: 1,
     }
     return (
-      <QueueAnim className="msa-service-subscription-approval">
-        <Card noHovering className="layout-content-body" key="info">
+      <QueueAnim className="csb-service-subscription-approval">
+        <Card hoverable className="layout-content-body" key="info">
           <div>
             <span>审批状态：</span>
             <RadioGroup>
@@ -83,7 +159,7 @@ export default class ServiceSubscriptionApproval extends React.Component {
           </div>
           <div className="nav">
             <div className="left">
-              <Button className="refresh" type="primary" onClick={this.handleVisible}><Icon type="sync" /> 刷新</Button>
+              <Button className="refresh" type="primary"><Icon type="sync" /> 刷新</Button>
               <Search
                 placeholder="请输入订阅名搜索"
                 style={{ width: 200 }}
@@ -96,25 +172,28 @@ export default class ServiceSubscriptionApproval extends React.Component {
             </div>
           </div>
           <Table
+            hoverable={false}
             columns={columns}
             pagination={false}
+            dataSource={data}
+            rowKey={row => row.id}
           />
         </Card>
-        <Modal title="通过订阅服务操作" visible={this.state.visible} onCancel={this.handleCancel}
+        <Modal title={modalTitle} visible={this.state.visible} onCancel={this.handleCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}>通 过</Button>,
+            <Button key="submit" type="primary" onClick={this.handleDel}>{isToo ? '通 过' : '拒 绝'}</Button>,
           ]}>
-          <div style={{ padding: 10 }}>
-            <Row style={{ marginBottom: 10 }}>
+          <div className="modal-approval">
+            <Row className="modal-div">
               <Col span={4}>订阅服务</Col>
               <Col span={20}>abc</Col>
             </Row>
-            <Row style={{ marginBottom: 10 }}>
+            <Row className="modal-div">
               <Col span={4}>订阅人</Col>
               <Col span={20}>abc</Col>
             </Row>
-            <Row style={{ marginBottom: 10 }}>
+            <Row className="modal-div">
               <Col span={4}>消费凭证</Col>
               <Col span={20}>消费凭证</Col>
             </Row>

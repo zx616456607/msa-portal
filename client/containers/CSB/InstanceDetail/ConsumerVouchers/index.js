@@ -12,9 +12,11 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Pagination, Dropdown, Table, Card, Menu, Modal } from 'antd'
+import { Button, Icon, Input, Pagination, Dropdown, Table, Card, Menu, Modal, Row, Col, Radio, Tooltip, Popover } from 'antd'
 import './style/index.less'
 const Search = Input.Search
+const { TextArea } = Input
+const RadioGroup = Radio.Group
 
 export default class ConsumerVouchers extends React.Component {
 
@@ -23,7 +25,10 @@ export default class ConsumerVouchers extends React.Component {
     isUse: true,
     isAdd: false,
     delValue: '',
+    icoTip: false,
     voucherName: '',
+    copyStatus: false,
+    upVisible: false,
     delVisible: false,
     addVisible: false,
   }
@@ -54,7 +59,9 @@ export default class ConsumerVouchers extends React.Component {
 
   handleMenu = value => {
     if (value.key === '更新') {
-      this.setState({})
+      this.setState({
+        upVisible: true,
+      })
     } if (value.key === '删除') {
       this.setState({
         delValue: '',
@@ -62,11 +69,18 @@ export default class ConsumerVouchers extends React.Component {
       })
     }
   }
+
   handleDelOk = () => { }
 
   handleDelcancel = () => {
     this.setState({
       delVisible: false,
+    })
+  }
+
+  handleUpCancel = () => {
+    this.setState({
+      upVisible: false,
     })
   }
 
@@ -76,8 +90,64 @@ export default class ConsumerVouchers extends React.Component {
     })
   }
 
+  handleIco = value => {
+    if (value === 'minus') {
+      this.setState({
+        icoTip: false,
+      })
+    } if (value === 'plus') {
+      this.setState({
+        icoTip: true,
+      })
+    }
+  }
+
+  servercopyCode = () => {
+    const code = document.getElementById(this.state.inputID)
+    code.select()
+    document.execCommand('Copy', false)
+    this.setState({
+      copyStatus: true,
+    })
+  }
+
+  filterAs = value => {
+    const { copyStatus, icoTip } = this.state
+    return (
+      <div>
+        <span>{value}</span>
+        <Popover
+          placement="right"
+          trigger="click"
+          content={
+            <div>
+              <div>
+                <span style={{ color: '#2db7f5' }}> ak:{value}</span>
+                <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+                  <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
+                </Tooltip>
+              </div>
+              <div>
+                <span style={{ color: '#2db7f5' }}> sk:{value}</span>
+                <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+                  <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
+                </Tooltip>
+              </div>
+            </div>
+          }
+          arrowPointAtCenter={true}
+          trigger="click">
+          {
+            icoTip ? <Icon type="minus-square-o" onClick={() => this.handleIco('minus')} /> :
+              <Icon type="plus-square-o" onClick={() => this.handleIco('plus')} />
+          }
+        </Popover>
+      </div>
+    )
+  }
+
   render() {
-    const { addVisible, isAdd, title, delVisible, isUse } = this.state
+    const { addVisible, isAdd, title, delVisible, isUse, upVisible } = this.state
     const columns = [{
       id: 'id',
       title: '凭证名称',
@@ -85,6 +155,7 @@ export default class ConsumerVouchers extends React.Component {
     }, {
       title: 'AccessKey / SecretKey',
       dataIndex: 'as',
+      render: text => this.filterAs(text),
     }, {
       title: '订阅服务（个）',
       dataIndex: 'service',
@@ -99,7 +170,7 @@ export default class ConsumerVouchers extends React.Component {
       dataIndex: 'operation',
       render: () => <div>
         <Dropdown.Button onClick={this.handleButtonClick} overlay={
-          <Menu onClick={this.handleMenu} style={{ width: 78 }}>
+          <Menu onClick={this.handleMenu} style={{ width: 85 }}>
             <Menu.Item key="更新">更新</Menu.Item>
             <Menu.Item key="删除">删除</Menu.Item>
           </Menu>
@@ -114,14 +185,7 @@ export default class ConsumerVouchers extends React.Component {
     const data = [{
       key: '1',
       name: 'John Brown',
-      as: 32,
-      service: 'New York',
-      stime: '2017-01-01',
-      utime: '2017-02-02',
-    }, {
-      key: '2',
-      name: 'John Brown',
-      as: 32,
+      as: 'asdasdasdhabab',
       service: 'New York',
       stime: '2017-01-01',
       utime: '2017-02-02',
@@ -131,7 +195,7 @@ export default class ConsumerVouchers extends React.Component {
       defaultCurrent: 1,
     }
     return (
-      <QueueAnim className="msa-comsumer-vouchers">
+      <QueueAnim className="csb-comsumer-vouchers">
         <div className="top" key="top">
           <div className="topLeft">
             <Button className="vou" type="primary" onClick={this.handleAdd}><Icon type="plus" />创建凭证</Button>
@@ -148,8 +212,9 @@ export default class ConsumerVouchers extends React.Component {
             <Pagination simple {...pagination} />
           </div>
         </div>
-        <Card noHovering className="body" key="body">
+        <Card className="body" key="body">
           <Table
+            hoverable={false}
             columns={columns}
             pagination={false}
             dataSource={data}
@@ -161,9 +226,9 @@ export default class ConsumerVouchers extends React.Component {
             <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
             <Button key="submit" type="primary" onClick={this.handleOK}>{isAdd ? '确 定' : '保 存'}</Button>,
           ]}>
-          <div style={{ marginLeft: 30 }}>
-            <span style={{ marginRight: 20 }}>凭证名称</span>
-            <Input style={{ width: '70%' }} placeholder="请输入凭证名称" onChange={this.handleModal} />
+          <div className="modal-add-vouchers">
+            <span className="vouchers-name">凭证名称</span>
+            <Input placeholder="请输入凭证名称" onChange={this.handleModal} />
           </div>
         </Modal>
         <Modal title="删除消费凭证"
@@ -179,24 +244,72 @@ export default class ConsumerVouchers extends React.Component {
             ]}>
           {
             isUse ?
-              <div>
-                <div style={{ position: 'absolute', top: 70, left: 23 }}>
-                  <Icon type="exclamation-circle" style={{ fontSize: 25, color: '#2db7f5' }} />
+              <div className="modal-del-vouchers-tip">
+                <div className="img">
+                  <Icon className="ico" type="exclamation-circle" />
                 </div>
-                <div style={{ width: '90%', marginLeft: 40 }}>
+                <div className="desc">
                   <h3>删除消费凭证</h3>
                   <span>消费凭证 XX, XX 正被用于订阅服务，不可删除</span>
                 </div>
               </div> :
-              <div className="prompt" style={{ height: 50, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10, borderRadius: 4 }}>
-                <div style={{ position: 'absolute', top: 75, left: 30 }}>
-                  <Icon type="exclamation-circle" style={{ fontSize: 25, color: '#ffbf00' }} />
+              <div className="modal-del-vouchers">
+                <div className="img">
+                  <Icon type="exclamation-circle" />
                 </div>
-                <div style={{ width: '90%', marginLeft: 40, marginTop: 3 }}>
+                <div className="desc">
                   <span>确定删除消费凭证 ？</span>
                 </div>
               </div>
           }
+        </Modal>
+        <Modal title="更新消费凭证"
+          visible={upVisible}
+          onCancel={this.handleUpCancel}
+          footer={[
+            <Button key="back" type="ghost" onClick={this.handleUpCancel}>取 消</Button>,
+            <Button key="submit" type="primary" onClick={this.handleOK}>更 新</Button>,
+          ]}>
+          <div className="modal-up-vouchers">
+            <Row>
+              <Col span={4}>
+                <span>凭证名称：</span>
+              </Col>
+              <Col span={20}>
+                <span>abc</span>
+              </Col>
+            </Row>
+            <Row>
+              <div className="as-left">
+                <span>当前 AccessKey / SecretKey</span>
+                <div>
+                  <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
+                  {/* <Icon type="eye-o" /> */}
+                </div>
+              </div>
+              <div className="dec">
+                <span className="decs-title">更新</span>
+                <Icon type="arrow-right" style={{ fontSize: 25, color: '#5cb85c' }} />
+              </div>
+              <div className="as-rigth">
+                <span>新 AccessKey / SecretKey</span>
+                <div>
+                  <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
+                  <Icon type="eye-o" style={{ fontSize: 15 }} />
+                </div>
+              </div>
+            </Row>
+            <Row>
+              <span>生效设置：</span>
+              <RadioGroup>
+                <Radio value={1}>更新过度，新旧凭证同时失效</Radio>
+                <Radio value={2}>立即生效新凭证</Radio>
+              </RadioGroup>
+            </Row>
+            <Row>
+              <Input placeholder="输入过度时间，范围1~7200" />分
+            </Row>
+          </div>
         </Modal>
       </QueueAnim>
     )
