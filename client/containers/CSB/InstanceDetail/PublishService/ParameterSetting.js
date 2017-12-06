@@ -18,6 +18,10 @@ import './style/ParameterSetting.less'
 const FormItem = Form.Item
 
 export default class ParameterSetting extends React.Component {
+  state = {
+    fields: {},
+  }
+
   uuid = 0
 
   add = () => {
@@ -38,15 +42,44 @@ export default class ParameterSetting extends React.Component {
     })
   }
 
-  toogleEdit = key => {
-    this.uuid++
+  toogleEdit = (key, isCancel) => {
     const { form } = this.props
+    const { fields } = this.state
     const { setFieldsValue, getFieldValue } = form
     const isEditKey = `isEdit-${key}`
+    const errorCodeKey = `errorCode-${key}`
+    const errorCodeAdviceKey = `errorCodeAdvice-${key}`
+    const errorCodeDescKey = `errorCodeDesc-${key}`
     const isEdit = getFieldValue(isEditKey)
-    setFieldsValue({
+    let fieldsValue = {
       [isEditKey]: !isEdit,
-    })
+    }
+    if (!isEdit) {
+      // save fields
+      const errorCode = getFieldValue(errorCodeKey)
+      const errorCodeAdvice = getFieldValue(errorCodeAdviceKey)
+      const errorCodeDesc = getFieldValue(errorCodeDescKey)
+      this.setState({
+        fields: Object.assign(
+          {},
+          fields,
+          { [key]: { errorCode, errorCodeAdvice, errorCodeDesc } }
+        ),
+      })
+    } else if (isCancel === true) {
+      // cancel the change
+      const currentField = fields[key] || []
+      fieldsValue = Object.assign(
+        {},
+        fieldsValue,
+        {
+          [errorCodeKey]: currentField.errorCode,
+          [errorCodeAdviceKey]: currentField.errorCodeAdvice,
+          [errorCodeDescKey]: currentField.errorCodeDesc,
+        }
+      )
+    }
+    setFieldsValue(fieldsValue)
   }
 
   renderItem = key => {
@@ -113,7 +146,7 @@ export default class ParameterSetting extends React.Component {
         </Col>
         <Col span={6} className="btns">
           <Button type="dashed" icon="check" onClick={this.toogleEdit.bind(this, key)} />
-          <Button type="dashed" icon="close" />
+          <Button type="dashed" icon="close" onClick={this.toogleEdit.bind(this, key, true)} />
         </Col>
       </Row>,
     ]

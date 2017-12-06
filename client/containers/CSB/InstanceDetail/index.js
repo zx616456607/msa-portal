@@ -44,7 +44,7 @@ class CSBInstanceDetail extends React.Component {
         to: `/csb-instances-available/${instanceID}`,
         text: '概览',
         key: 'available',
-        icon: <Icon type="line-chart" />,
+        icon: <Icon type="dashboard" />,
       },
       {
         type: 'SubMenu',
