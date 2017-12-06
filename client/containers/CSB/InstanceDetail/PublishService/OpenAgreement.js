@@ -115,6 +115,7 @@ export default class OpenAgreement extends React.Component {
           className="service-protocols"
         >
           {getFieldDecorator('serviceProtocols', {
+            initialValue: [],
             rules: [{
               required: true, message: 'Please check protocols!',
             }],

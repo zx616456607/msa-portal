@@ -15,28 +15,11 @@ import ClassNames from 'classnames'
 import {
   Form, Input, Select, Switch, Icon, Tooltip, Row, Col,
 } from 'antd'
+import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
 import './style/ServiceControl.less'
 
 const FormItem = Form.Item
 const Option = Select.Option
-const API_GATEWAY_LIMIT_TYPES = [
-  {
-    key: 'second',
-    text: '秒',
-  },
-  {
-    key: 'minute',
-    text: '分钟',
-  },
-  {
-    key: 'hour',
-    text: '小时',
-  },
-  {
-    key: 'day',
-    text: '天',
-  },
-]
 
 export default class ServiceControl extends React.Component {
   render() {
@@ -70,7 +53,9 @@ export default class ServiceControl extends React.Component {
             </Col>
             <Col span={12}>
               最大调用
-              {getFieldDecorator('apiGatewayLimit')(
+              {getFieldDecorator('apiGatewayLimit', {
+                initialValue: 0,
+              })(
                 <Input placeholder="请填写整数" />
               )}
               次 <Tooltip title="设置为0或者为空时代表不限制访问频度">

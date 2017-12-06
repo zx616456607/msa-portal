@@ -193,7 +193,6 @@ export default class ParameterSetting extends React.Component {
       'parameter-setting': true,
       [className]: !!className,
     })
-    console.log('getFieldsValue', form.getFieldsValue())
     return (
       <div className={classNames}>
         <div className="second-title">编辑错误代码</div>

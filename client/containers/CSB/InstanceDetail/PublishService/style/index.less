@@ -25,9 +25,11 @@
   &-body {
     border-right: 1px @border-style-base @border-color-split;
     padding: @padding-medium;
+    height: calc(~"100% - 60px");
     & > .fields {
       padding-bottom: @padding-medium;
       border-bottom: 1px @border-style-base @border-color-split;
+      height: calc(~"100% - 60px");
       & > * {
         padding-top: @padding-medium;
         .second-title {
@@ -57,11 +59,35 @@
     }
   }
   &-detail {
-    padding: 0 @padding-medium;
+    padding: 0 @padding-medium @padding-medium;
     &-header {
       font-size: @font-size-medium;
       height: 60px;
       line-height: 60px;
+    }
+    &-body {
+      border: 1px @border-style-base @border-color-base;
+      border-radius: @border-radius-base;
+      margin-bottom: @padding-base;
+      .step-header {
+        text-align: center;
+        background-color: @primary-color;
+        color: #fff;
+      }
+      & > .ant-row {
+        height: 32px;
+        line-height: 32px;
+        padding: 0 @padding-base;
+        &:not(:last-child) {
+          border-bottom: 1px @border-style-base @border-color-split;
+        }
+        .field-label {
+          border-right: 1px @border-style-base @border-color-split;
+        }
+        .field-value {
+          padding-left: @padding-base;
+        }
+      }
     }
   }
 }

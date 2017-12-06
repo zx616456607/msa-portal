@@ -12,10 +12,11 @@
 
 import React from 'react'
 import {
-  Form, Input, Radio, Select, Button,
+  Form, Input, Radio, Select, Button, Modal,
 } from 'antd'
 import ClassNames from 'classnames'
-import './style/AccessAgreement.less'
+import SecurityHeaderModal from './SecurityHeaderModal'
+import './style/index.less'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
@@ -32,6 +33,12 @@ const ENDPOINT_RESPONSE_TYPE = [
 ]
 
 export default class AccessAgreement extends React.Component {
+  state = {
+    checkWSDLModalVisible: false,
+    pingLoading: false,
+    securityHeaderModalVisible: false,
+  }
+
   render() {
     const { formItemLayout, form, className } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -76,6 +83,8 @@ export default class AccessAgreement extends React.Component {
               )}
               <Button
                 className="right-btn"
+                loading={this.state.pingLoading}
+                onClick={() => this.setState({ pingLoading: true })}
               >
               测试连接
               </Button>
@@ -145,6 +154,7 @@ export default class AccessAgreement extends React.Component {
               )}
               <Button
                 className="right-btn"
+                onClick={() => this.setState({ checkWSDLModalVisible: true })}
               >
               本地 WSDL
               </Button>
@@ -219,10 +229,33 @@ export default class AccessAgreement extends React.Component {
               label="安全头定制"
               key="security-head-customization"
             >
-              <Button>点击定制</Button>
+              <Button
+                onClick={() => this.setState({ securityHeaderModalVisible: true })}
+              >
+              点击定制
+              </Button>
             </FormItem>,
           ]
         }
+        <Modal
+          title="检测 WSDL"
+          visible={this.state.checkWSDLModalVisible}
+          onCancel={() => this.setState({ checkWSDLModalVisible: false })}
+        >
+          <FormItem
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            label="内容"
+          >
+            <Input.TextArea />
+          </FormItem>
+        </Modal>
+        <SecurityHeaderModal
+          visible={this.state.securityHeaderModalVisible}
+          formItemLayout={formItemLayout}
+          form={form}
+          onCancel={() => this.setState({ securityHeaderModalVisible: false })}
+        />
       </div>
     )
   }
