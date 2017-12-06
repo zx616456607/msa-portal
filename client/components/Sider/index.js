@@ -13,7 +13,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Layout } from 'antd'
-import Classnames from 'classnames'
+import ClassNames from 'classnames'
 
 const LayoutSider = Layout.Sider
 
@@ -29,7 +29,7 @@ export default class Sider extends React.Component {
 
   render() {
     const { extra, children, ...otherProps } = this.props
-    const classNames = Classnames({
+    const classNames = ClassNames({
       'layout-sider': true,
       'layout-sider-extra': extra,
     })

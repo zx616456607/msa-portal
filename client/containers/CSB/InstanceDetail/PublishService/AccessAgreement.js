@@ -14,6 +14,7 @@ import React from 'react'
 import {
   Form, Input, Radio, Select, Button,
 } from 'antd'
+import ClassNames from 'classnames'
 import './style/AccessAgreement.less'
 
 const FormItem = Form.Item
@@ -32,10 +33,14 @@ const ENDPOINT_RESPONSE_TYPE = [
 
 export default class AccessAgreement extends React.Component {
   render() {
-    const { formItemLayout, form } = this.props
+    const { formItemLayout, form, className } = this.props
     const { getFieldDecorator, getFieldValue } = form
+    const classNames = ClassNames({
+      'access-agreement': true,
+      [className]: !!className,
+    })
     return (
-      <div className="access-agreement">
+      <div className={classNames}>
         <div className="second-title">服务接入协议配置</div>
         <FormItem
           {...formItemLayout}
@@ -47,7 +52,7 @@ export default class AccessAgreement extends React.Component {
               required: true, message: 'Please input protocol!',
             }],
           })(
-            <RadioGroup size="default">
+            <RadioGroup>
               <RadioButton value="Restful-API">Restful-API</RadioButton>
               <RadioButton value="WebService">WebService</RadioButton>
             </RadioGroup>
@@ -67,10 +72,9 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input endpoint!',
                 }],
               })(
-                <Input size="default" placeholder="请提供接入服务的基础 URL" />
+                <Input placeholder="请提供接入服务的基础 URL" />
               )}
               <Button
-                size="default"
                 className="right-btn"
               >
               测试连接
@@ -78,7 +82,7 @@ export default class AccessAgreement extends React.Component {
             </FormItem>,
             <FormItem
               {...formItemLayout}
-              label="方式"
+              label="方法"
               key="method"
             >
               {getFieldDecorator('method', {
@@ -86,7 +90,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input method!',
                 }],
               })(
-                <Select size="default" placeholder="请选择方式">
+                <Select placeholder="请选择方法">
                   {
                     ENDPOINT_METHODS.map(method => <Option key={method}>{method}</Option>)
                   }
@@ -99,7 +103,7 @@ export default class AccessAgreement extends React.Component {
               key="requestType"
             >
               {getFieldDecorator('requestType')(
-                <Select size="default" placeholder="请选择请求格式">
+                <Select placeholder="请选择请求格式">
                   {
                     ENDPOINT_REQUEST_TYPE.map(type => <Option key={type}>{type}</Option>)
                   }
@@ -112,7 +116,7 @@ export default class AccessAgreement extends React.Component {
               key="responseType"
             >
               {getFieldDecorator('responseType')(
-                <Select size="default" placeholder="请选择响应格式">
+                <Select placeholder="请选择响应格式">
                   {
                     ENDPOINT_RESPONSE_TYPE.map(({ key, text }) =>
                       <Option key={key}>{text}</Option>
@@ -137,10 +141,9 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input wsdlAddress!',
                 }],
               })(
-                <Input size="default" placeholder="请提供地址" />
+                <Input placeholder="请提供地址" />
               )}
               <Button
-                size="default"
                 className="right-btn"
               >
               本地 WSDL
@@ -156,7 +159,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input namespace!',
                 }],
               })(
-                <Input size="default" placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
+                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
               )}
             </FormItem>,
             <FormItem
@@ -169,7 +172,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input endPointAddress!',
                 }],
               })(
-                <Input size="default" placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
+                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
               )}
             </FormItem>,
             <FormItem
@@ -182,7 +185,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input bindingName!',
                 }],
               })(
-                <Input size="default" placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
+                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
               )}
             </FormItem>,
             <FormItem
@@ -195,7 +198,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input soapAction!',
                 }],
               })(
-                <Input size="default" placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
+                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
               )}
             </FormItem>,
             <FormItem
@@ -208,7 +211,7 @@ export default class AccessAgreement extends React.Component {
                   required: true, message: 'Please input methodName!',
                 }],
               })(
-                <Input size="default" placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
+                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
               )}
             </FormItem>,
             <FormItem
@@ -216,7 +219,7 @@ export default class AccessAgreement extends React.Component {
               label="安全头定制"
               key="security-head-customization"
             >
-              <Button size="default">点击定制</Button>
+              <Button>点击定制</Button>
             </FormItem>,
           ]
         }
