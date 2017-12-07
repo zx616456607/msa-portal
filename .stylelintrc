@@ -9,6 +9,7 @@
     "function-max-empty-lines": null,
     "function-whitespace-after": null,
     "indentation": null,
+    "no-descending-specificity": null,
     "number-leading-zero": null,
     "number-no-trailing-zeros": null,
     "rule-empty-line-before": null,

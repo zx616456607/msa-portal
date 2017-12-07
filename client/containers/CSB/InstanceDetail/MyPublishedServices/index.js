@@ -23,7 +23,6 @@ import CreateServiceGroup from './createServiceGroup'
 import BlackAndWhiteList from './blackAndWhiteList'
 import confirm from '../../../../components/Modal/confirm'
 
-
 const RadioGroup = Radio.Group
 const Option = Select.Option
 const Search = Input.Search
@@ -38,6 +37,12 @@ class MyPublishedServices extends React.Component {
     createModal: false,
     searchType: 'group-name',
     blackAndWhiteModal: false,
+  }
+
+  goPublishService = () => {
+    const { history, match } = this.props
+    const { instanceID } = match.params
+    history.push(`/csb-instances-available/${instanceID}/publish-service`)
   }
 
   allServicesTable = () => {
@@ -456,7 +461,9 @@ class MyPublishedServices extends React.Component {
           </Row>
         </div>
         <div className="layout-content-btns" key="layout-content-btns">
-          <Button type="primary">发布服务</Button>
+          <Button onClick={this.goPublishService} type="primary">
+          发布服务
+          </Button>
           {
             showType === 'group' && <Button icon="plus" onClick={this.openCreateModal.bind(this, 'create') }>创建服务组</Button>
           }
@@ -503,13 +510,10 @@ class MyPublishedServices extends React.Component {
             loading={confirmLoading}
           />
         }
-        {
-          visible &&
-          <ServiceDetailDock
-            visible={true}
-            onVisibleChange={visible => this.setState({ visible })}
-          />
-        }
+        <ServiceDetailDock
+          visible={visible}
+          onVisibleChange={visible => this.setState({ visible })}
+        />
       </QueueAnim>
     )
   }

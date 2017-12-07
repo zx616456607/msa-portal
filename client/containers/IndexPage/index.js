@@ -30,7 +30,10 @@ const Chart = CreateG2(chart => {
   chart.col('count', {
     alias: '次数',
   })
-  chart.line().position('dateTime*count').size(2)
+  chart.line()
+    .position('dateTime*count')
+    .size(2)
+    .shape('smooth')
   chart.render()
 })
 

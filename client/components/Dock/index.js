@@ -28,6 +28,7 @@ export default class Dock extends React.Component {
     dimStyle: {
       backgroundColor: 'rgba(55, 55, 55, .6)',
     },
+    zIndex: 1000,
   }
 
   state = {

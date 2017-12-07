@@ -32,7 +32,7 @@ const menus = [
   {
     to: '/csb-instances',
     key: 'csb-instances',
-    text: 'CSB',
+    text: '服务总线',
     title: 'Cloud Service Bus',
   },
   {

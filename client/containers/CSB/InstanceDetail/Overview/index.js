@@ -11,12 +11,17 @@
  */
 
 import React from 'react'
-import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import { Card, Button, Row, Col } from 'antd'
 import './style/index.less'
 
 export default class InstanceDetailOverview extends React.Component {
+  goPublishService = () => {
+    const { history, match } = this.props
+    const { instanceID } = match.params
+    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+  }
+
   render() {
     const images = [
       { src: require('../../../../assets/img/csb/csb.png') },
@@ -38,9 +43,9 @@ export default class InstanceDetailOverview extends React.Component {
             </div>
           </div>
           <div className="btn">
-            <Link to="/csb-instances-available/publish-service">
-              <Button type="primary">发布服务</Button>
-            </Link>
+            <Button onClick={this.goPublishService} type="primary">
+            发布服务
+            </Button>
             <Button className="subscribe">订阅服务</Button>
           </div>
         </div>
