@@ -19,8 +19,8 @@ import {
   Menu, Table, Modal, Form, Row, Col,
 } from 'antd'
 import '../style/myPublishedServices.less'
-import CreateServiceGroup from './createServiceGroup'
-import BlackAndWhiteList from './blackAndWhiteList'
+import CreateServiceGroupModal from './CreateServiceGroupModal'
+import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
 
 const RadioGroup = Radio.Group
@@ -34,9 +34,9 @@ class MyPublishedServices extends React.Component {
     currentRecord: {},
     confirmLoading: false,
     visible: false,
-    createModal: false,
+    createServiceGroupModalVisible: false,
     searchType: 'group-name',
-    blackAndWhiteModal: false,
+    blackAndWhiteListModalVisible: false,
   }
 
   goPublishService = () => {
@@ -161,7 +161,7 @@ class MyPublishedServices extends React.Component {
             <Menu.Item key="stop">停止</Menu.Item>
             <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
-          return <Dropdown.Button overlay={menu} onClick={this.openCreateModal.bind(this, 'edit', record)}>
+          return <Dropdown.Button overlay={menu} onClick={this.openCreateServiceGroupModal.bind(this, 'edit', record)}>
             编辑
           </Dropdown.Button>
         },
@@ -178,15 +178,15 @@ class MyPublishedServices extends React.Component {
     />
   }
 
-  closeCreateModal = () => {
+  closeCreateServiceGroupModal = () => {
     this.setState({
-      createModal: false,
+      createServiceGroupModalVisible: false,
     })
   }
 
   closeblackAndWhiteModal = () => {
     this.setState({
-      blackAndWhiteModal: false,
+      blackAndWhiteListModalVisible: false,
     })
   }
 
@@ -236,19 +236,19 @@ class MyPublishedServices extends React.Component {
     })
   }
 
-  openCreateModal = (currentHandle, currentRecord = {}) => {
+  openCreateServiceGroupModal = (currentHandle, currentRecord = {}) => {
     this.setState({
-      createModal: true,
+      createServiceGroupModalVisible: true,
       currentHandle,
       currentRecord,
       confirmLoading: false,
     })
   }
 
-  openBlackAndWhiteModal = record => {
+  openBlackAndWhiteListModal = record => {
     console.log('record=', record)
     this.setState({
-      blackAndWhiteModal: true,
+      blackAndWhiteListModalVisible: true,
       confirmLoading: false,
     })
   }
@@ -321,7 +321,7 @@ class MyPublishedServices extends React.Component {
       case 'stop':
         return this.stopService(record)
       case 'list':
-        return this.openBlackAndWhiteModal(record)
+        return this.openBlackAndWhiteListModal(record)
       case 'logout':
         return this.logoutService(record)
       default:
@@ -389,8 +389,8 @@ class MyPublishedServices extends React.Component {
 
   render() {
     const {
-      createModal, currentHandle, currentRecord,
-      confirmLoading, blackAndWhiteModal, visible,
+      createServiceGroupModalVisible, currentHandle, currentRecord,
+      confirmLoading, blackAndWhiteListModalVisible, visible,
     } = this.state
     const { form } = this.props
     const { getFieldValue, getFieldDecorator } = form
@@ -465,7 +465,7 @@ class MyPublishedServices extends React.Component {
           发布服务
           </Button>
           {
-            showType === 'group' && <Button icon="plus" onClick={this.openCreateModal.bind(this, 'create') }>创建服务组</Button>
+            showType === 'group' && <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create') }>创建服务组</Button>
           }
           <Button icon="sync">刷新</Button>
           {
@@ -495,8 +495,8 @@ class MyPublishedServices extends React.Component {
           </Card>
         </div>
         {
-          createModal && <CreateServiceGroup
-            closeCreateModal={this.closeCreateModal.bind(this)}
+          createServiceGroupModalVisible && <CreateServiceGroupModal
+            closeModalMethod={this.closeCreateServiceGroupModal.bind(this)}
             callback={this.handleCreateModalValues}
             handle={currentHandle}
             initailValue={currentRecord}
@@ -504,7 +504,7 @@ class MyPublishedServices extends React.Component {
           />
         }
         {
-          blackAndWhiteModal && <BlackAndWhiteList
+          blackAndWhiteListModalVisible && <BlackAndWhiteListModal
             closeblackAndWhiteModal={this.closeblackAndWhiteModal.bind(this)}
             callback={this.handleSaveBlackAndWhiteList}
             loading={confirmLoading}

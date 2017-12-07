@@ -23,7 +23,7 @@ const FormItem = Form.Item
 class CreateServiceGroup extends React.Component {
   static propTypes = {
     // 关闭 Modal 的函数
-    closeCreateModal: PropTypes.func.isRequired,
+    closeModalMethod: PropTypes.func.isRequired,
     // 点击确定按钮，获取 Modal 输入的值，供父组件调用
     callback: PropTypes.func.isRequired,
     // 当前进行的操作 create || edit
@@ -44,7 +44,7 @@ class CreateServiceGroup extends React.Component {
     }
   }
 
-  handleSubmit = () => {
+  handleOk = () => {
     const { form, callback } = this.props
     form.validateFields((errors, values) => {
       if (errors) {
@@ -54,9 +54,9 @@ class CreateServiceGroup extends React.Component {
     })
   }
 
-  cancelEdit = () => {
-    const { closeCreateModal } = this.props
-    closeCreateModal()
+  handleCancel = () => {
+    const { closeModalMethod } = this.props
+    closeModalMethod()
   }
 
   render() {
@@ -70,12 +70,12 @@ class CreateServiceGroup extends React.Component {
       title="创建服务组"
       visible={true}
       closable={true}
-      onCancel={this.cancelEdit}
+      onCancel={this.handleCancel}
       maskClosable={false}
       wrapClassName="reset-modal-incloud-form"
       footer={[
-        <Button key="cancel" size="large" onClick={this.cancelEdit}>取消</Button>,
-        <Button key="submit" size="large" type="primary" onClick={this.handleSubmit} loading={loading}>
+        <Button key="cancel" size="large" onClick={this.handleCancel}>取消</Button>,
+        <Button key="submit" size="large" type="primary" onClick={this.handleOk} loading={loading}>
           { handle === 'create' ? '创建' : '保存'}
         </Button>,
       ]}

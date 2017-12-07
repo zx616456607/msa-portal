@@ -1,0 +1,53 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Subscript Service Modal Less
+ *
+ * 2017-12-05
+ * @author zhangcz
+ */
+
+@import '../../../../assets/style/core/index.less';
+
+.subscript-service-modal {
+  .row-style {
+    margin-bottom: 24px;
+    line-height: 32px;
+    .require:before {
+      display: inline-block;
+      margin-right: 4px;
+      content: "*";
+      line-height: 1;
+      font-size: 12px;
+      color: #f5222d;
+    }
+    .ant-col-5 {
+      color: @font-color-1;
+      text-align: right;
+      padding-right: 10px;
+    }
+    .input-col-style {
+      .ant-form-item {
+        display: inline-block;
+        margin: 0 0 0 8px;
+      }
+    }
+  }
+  .service-info {
+    >tbody > tr > td {
+      height: 40px;
+      line-height: 40px;
+      border: 1px solid @border-color-base;
+      padding-left: 12px;
+    }
+    >tbody > tr > td:first-child {
+      width: 100px;
+    }
+    >tbody > tr > td:last-child {
+      width: 311px;
+    }
+  }
+}
