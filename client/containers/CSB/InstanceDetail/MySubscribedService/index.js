@@ -20,7 +20,7 @@ import {
 import '../style/mySubscribedService.less'
 import ServiceApIDoc from './ServiceApIDoc'
 import confirm from '../../../../components/Modal/confirm'
-import EditBindIp from './EditBindIp'
+import EditBindIpModal from './EditBindIpModal'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -30,7 +30,7 @@ const MenuItem = Menu.Item
 class MySubscribedService extends React.Component {
   state = {
     serviceApIDocModal: false,
-    editBindIpModal: false,
+    editBindIpModalVisible: false,
     confirmLoading: false,
   }
 
@@ -42,7 +42,7 @@ class MySubscribedService extends React.Component {
 
   closeEditBindIpModal = () => {
     this.setState({
-      editBindIpModal: false,
+      editBindIpModalVisible: false,
     })
   }
 
@@ -62,7 +62,7 @@ class MySubscribedService extends React.Component {
   openEditBindIpModal = record => {
     console.log('record=', record)
     this.setState({
-      editBindIpModal: true,
+      editBindIpModalVisible: true,
       confirmLoading: false,
     })
   }
@@ -248,7 +248,7 @@ class MySubscribedService extends React.Component {
   }
 
   render() {
-    const { serviceApIDocModal, editBindIpModal, confirmLoading } = this.state
+    const { serviceApIDocModal, editBindIpModalVisible, confirmLoading } = this.state
     const { form } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
@@ -305,7 +305,7 @@ class MySubscribedService extends React.Component {
           />
         }
         {
-          editBindIpModal && <EditBindIp
+          editBindIpModalVisible && <EditBindIpModal
             closeModalMethod={this.closeEditBindIpModal.bind(this)}
             callback={this.confirmEditBindIp}
             loading={confirmLoading}
