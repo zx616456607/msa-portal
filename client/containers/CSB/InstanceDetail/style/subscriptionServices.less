@@ -1,0 +1,56 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Subscription Services Less
+ *
+ * 2017-12-06
+ * @author zhangcz
+ */
+
+@import "../../../../assets/style/core/index.less";
+
+#subscription-services {
+  .search-style {
+    width: 180px;
+  }
+  .page-box {
+    float: right;
+    .total {
+      margin-right: 18px;
+      line-height: 24px;
+    }
+    .ant-pagination-simple {
+      float: right;
+    }
+  }
+  .status-icon {
+    height: 12px;
+    width: 12px;
+    margin: 2px 8px 0 0;
+    float: left;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+  .activated {
+    color: @success-color;
+    line-height: 18px;
+    .status-icon {
+      background: @success-color;
+    }
+  }
+  .cancelled {
+    color: @error-color;
+    .status-icon {
+      background: @error-color;
+    }
+  }
+  .deactivated {
+    color: #666;
+    .status-icon {
+      background: #666;
+    }
+  }
+}
