@@ -42,6 +42,7 @@ export default class AccessAgreement extends React.Component {
   render() {
     const { formItemLayout, form, className } = this.props
     const { getFieldDecorator, getFieldValue } = form
+    const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
       [className]: !!className,
@@ -66,7 +67,7 @@ export default class AccessAgreement extends React.Component {
           )}
         </FormItem>
         {
-          getFieldValue('protocol') === 'Restful-API' &&
+          protocol === 'Restful-API' &&
           [
             <FormItem
               {...formItemLayout}
@@ -137,7 +138,7 @@ export default class AccessAgreement extends React.Component {
           ]
         }
         {
-          getFieldValue('protocol') === 'WebService' &&
+          protocol === 'WebService' &&
           [
             <FormItem
               {...formItemLayout}
@@ -250,12 +251,15 @@ export default class AccessAgreement extends React.Component {
             <Input.TextArea />
           </FormItem>
         </Modal>
-        <SecurityHeaderModal
-          visible={this.state.securityHeaderModalVisible}
-          formItemLayout={formItemLayout}
-          form={form}
-          onCancel={() => this.setState({ securityHeaderModalVisible: false })}
-        />
+        {
+          protocol === 'WebService' &&
+          <SecurityHeaderModal
+            visible={this.state.securityHeaderModalVisible}
+            formItemLayout={formItemLayout}
+            form={form}
+            onCancel={() => this.setState({ securityHeaderModalVisible: false })}
+          />
+        }
       </div>
     )
   }

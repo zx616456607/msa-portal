@@ -243,7 +243,7 @@ class PublishService extends React.Component {
                   </Col>
                 </Row>
                 {
-                  protocol === 'Restful-API'
+                  (!protocol || protocol === 'Restful-API')
                     ? [
                       <Row key="endpoint">
                         <Col span={8}>
