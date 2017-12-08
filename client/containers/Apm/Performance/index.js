@@ -32,9 +32,9 @@ const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
 const Frame = G2.Frame
 const images = [
-  '/img/service/java.svg',
-  '/img/service/mysql.svg',
-  '/img/service/tomcat.svg',
+  '/img/service/java.png',
+  '/img/service/mysql.png',
+  '/img/service/tomcat.png',
 ]
 
 class Performance extends React.Component {

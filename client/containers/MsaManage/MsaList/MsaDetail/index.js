@@ -44,7 +44,7 @@ class MsaDetail extends React.Component {
       <QueueAnim className="msa-detail">
         <Row className="msa-detail-header" key="header">
           <Col span={3}>
-            <img className="msa-detail-header-icon" src="/img/service/java.svg"/>
+            <img className="msa-detail-header-icon" src="/img/service/java.png"/>
           </Col>
           <Col span={21} className="msa-detail-header-right">
             <div className="msa-detail-header-name">

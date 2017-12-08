@@ -30,10 +30,10 @@ import flatten from 'lodash/flatten'
 const Option = Select.Option
 
 const images = {
-  JAVA: '/img/service/java.svg',
-  MYSQL: '/img/service/mysql.svg',
-  TOMCAT: '/img/service/tomcat.svg',
-  USER: '/img/service/user.svg',
+  JAVA: '/img/service/java.png',
+  MYSQL: '/img/service/mysql.png',
+  TOMCAT: '/img/service/tomcat.png',
+  USER: '/img/service/user.png',
 }
 // 设置鼠标 hove 至气泡的样式
 G2.Global.activeShape.point = {
@@ -469,7 +469,9 @@ class Topology extends React.Component {
     let nodes = []
     const edges = []
     nodeDataArray.length && nodeDataArray.forEach(item => {
-      const shape = iconArr.includes(item.serviceType.toLowerCase()) ? `${origin}/img/service/${item.serviceType.toLowerCase()}.svg` : `${origin}/img/service/java.svg`
+      const shape = iconArr.includes(item.serviceType.toLowerCase())
+        ? `${origin}/img/service/${item.serviceType.toLowerCase()}.png`
+        : `${origin}/img/service/java.png`
       nodes.push({
         shape,
         label: item.applicationName,
@@ -677,7 +679,10 @@ class Topology extends React.Component {
               <Col span={10} className="topology-body-service-detail">
                 <Row className="service-info">
                   <Col span={6}>
-                    <img className="service-info-type" src={this.getServiceType(currentNode && currentNode.serviceType)}/>
+                    <img
+                      className="service-info-type"
+                      src={this.getServiceType(currentNode && currentNode.serviceType)}
+                    />
                   </Col>
                   <Col span={18}>
                     <div className="service-info-name">{currentNode && currentNode.applicationName}</div>
