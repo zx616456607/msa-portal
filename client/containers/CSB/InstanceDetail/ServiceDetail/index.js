@@ -217,7 +217,7 @@ export default class ServiceDetail extends React.Component {
                 <Chart
                   data={this.state.data}
                   height={this.state.height}
-                  width="auto"
+                  width={100}
                   forceFit={this.state.forceFit}
                 />
               </div>
