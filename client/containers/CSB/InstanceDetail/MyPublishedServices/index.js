@@ -18,7 +18,7 @@ import {
   Select, Input, Pagination,
   Menu, Table, Modal, Form, Row, Col,
 } from 'antd'
-import '../style/myPublishedServices.less'
+import './style/MyPublishedServices.less'
 import CreateServiceGroupModal from './CreateServiceGroupModal'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'

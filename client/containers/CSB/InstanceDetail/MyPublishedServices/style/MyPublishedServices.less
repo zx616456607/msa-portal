@@ -4,17 +4,30 @@
  */
 
 /**
- * Subscription Services Less
+ * My Published Services Less
  *
- * 2017-12-06
+ * 2017-12-05
  * @author zhangcz
  */
 
-@import "../../../../assets/style/core/index.less";
+@import "../../../../../assets/style/core/index.less";
 
-#subscription-services {
-  .search-style {
-    width: 180px;
+#my-published-services {
+  padding: 24px;
+  background: #fff;
+  .showType {
+    margin-bottom: 20px;
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+    .ant-form-item-label {
+      text-align: left;
+      width: 90px;
+    }
+  }
+  .ant-input-group-wrapper,
+  .search-input {
+    width: 280px;
   }
   .page-box {
     float: right;
@@ -24,6 +37,17 @@
     }
     .ant-pagination-simple {
       float: right;
+    }
+  }
+  .ant-card-bordered {
+    border: none;
+  }
+  .ant-card-body {
+    padding: 0;
+    .ant-table-expanded-row {
+      > td:last-of-type {
+        padding: 0;
+      }
     }
   }
   .status-icon {

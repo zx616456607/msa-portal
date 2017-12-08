@@ -16,7 +16,7 @@ import {
   Modal, Form, InputNumber, Row, Col,
   Select, Input, Button,
 } from 'antd'
-import '../style/subscriptServiceModal.less'
+import './style/SubscriptServiceModal.less'
 
 const FormItem = Form.Item
 const Option = Select.Option

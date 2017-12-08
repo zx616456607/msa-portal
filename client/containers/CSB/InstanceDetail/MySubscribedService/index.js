@@ -17,7 +17,7 @@ import {
   Input, Pagination, Table,
   Menu, Dropdown, Icon, Tooltip,
 } from 'antd'
-import '../style/mySubscribedService.less'
+import './style/MySubscribedService.less'
 import ServiceApIDoc from './ServiceApIDoc'
 import confirm from '../../../../components/Modal/confirm'
 import EditBindIpModal from './EditBindIpModal'
