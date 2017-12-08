@@ -276,9 +276,14 @@ class MyPublishedServices extends React.Component {
       <Menu.Item key="list">黑／白名单</Menu.Item>
       <Menu.Item key="logout">注销</Menu.Item>
     </Menu>
-    return <Dropdown.Button overlay={menu} onClick={this.viewServiceDetails.bind(this, record)}>
-      <a onClick={() => this.setState({ visible: true })}>显示详情</a>
-    </Dropdown.Button>
+    return (
+      <Dropdown.Button
+        overlay={menu}
+        onClick={this.viewServiceDetails.bind(this, record)}
+      >
+        显示详情
+      </Dropdown.Button>
+    )
   }
 
   renderServiceStatusUI = status => {
@@ -385,6 +390,7 @@ class MyPublishedServices extends React.Component {
 
   viewServiceDetails = record => {
     console.log('record=', record)
+    this.setState({ visible: true })
   }
 
   render() {
