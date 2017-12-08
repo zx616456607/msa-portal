@@ -18,7 +18,7 @@ import './style/Dock.less'
 
 export default class ServiceDetailDock extends React.Component {
   render() {
-    const { visible, onVisibleChange, children } = this.props
+    const { visible, onVisibleChange, children, ...otherProps } = this.props
     return ReactDOM.createPortal(
       <Dock
         position="right"
@@ -31,9 +31,9 @@ export default class ServiceDetailDock extends React.Component {
         dockStyle={{
           background: '#ecf0f4',
           cursor: 'initial',
-          overflowX: 'hidden',
         }}
         onVisibleChange={onVisibleChange}
+        {...otherProps}
       >
         <div className="detail-page-dock">
           <Icon type="cross" onClick={() => onVisibleChange(false)} />

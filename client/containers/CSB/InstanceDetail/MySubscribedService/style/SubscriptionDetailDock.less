@@ -1,0 +1,50 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of SubscriptionDetail
+ *
+ * 2017-12-07
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.sub-detail {
+  &-header {
+    height: 50px;
+    line-height: 50px;
+    font-size: @font-size-medium;
+    padding: 0 @padding-medium;
+    background-color: #f7f7f7;
+  }
+  &-body {
+    padding: @padding-medium;
+    & > *:not(:last-child) {
+      margin-bottom: @padding-medium;
+    }
+    &-line {
+      & > * {
+        height: 32px;
+        line-height: 32px;
+      }
+      & > .bind-ip {
+        height: auto;
+        line-height: initial;
+        & > span {
+          height: 60px;
+        }
+        & > .ant-input {
+          height: 60px;
+          width: 80%;
+        }
+      }
+      .sub-label {
+        width: 85px;
+        display: inline-block;
+      }
+    }
+  }
+}

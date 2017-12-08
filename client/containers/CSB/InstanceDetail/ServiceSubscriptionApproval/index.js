@@ -148,36 +148,39 @@ export default class ServiceSubscriptionApproval extends React.Component {
       defaultCurrent: 1,
     }
     return (
-      <QueueAnim className="csb-service-subscription-approval">
-        <Card hoverable className="layout-content-body" key="info">
-          <div>
-            <span>审批状态：</span>
-            <RadioGroup>
-              <Radio value={1}>待审批</Radio>
-              <Radio value={2}>已审批</Radio>
-            </RadioGroup>
-          </div>
-          <div className="nav">
-            <div className="left">
-              <Button className="refresh" type="primary"><Icon type="sync" /> 刷新</Button>
-              <Search
-                placeholder="请输入订阅名搜索"
-                style={{ width: 200 }}
-                onSearch={value => console.log(value)}
-              />
-              <div className="page">
-                <span>共计0条</span>
-                <Pagination {...pagination} />
+      <div className="csb-service-subscription-approval">
+        <Card hoverable className="layout-content-body">
+          <QueueAnim>
+            <div key="filter">
+              <span>审批状态：</span>
+              <RadioGroup>
+                <Radio value={1}>待审批</Radio>
+                <Radio value={2}>已审批</Radio>
+              </RadioGroup>
+            </div>
+            <div className="nav" key="nav">
+              <div className="left">
+                <Button className="refresh" type="primary"><Icon type="sync" /> 刷新</Button>
+                <Search
+                  placeholder="请输入订阅名搜索"
+                  style={{ width: 200 }}
+                  onSearch={value => console.log(value)}
+                />
+                <div className="page">
+                  <span>共计0条</span>
+                  <Pagination {...pagination} />
+                </div>
               </div>
             </div>
-          </div>
-          <Table
-            hoverable={false}
-            columns={columns}
-            pagination={false}
-            dataSource={data}
-            rowKey={row => row.id}
-          />
+            <Table
+              key="table"
+              hoverable={false}
+              columns={columns}
+              pagination={false}
+              dataSource={data}
+              rowKey={row => row.id}
+            />
+          </QueueAnim>
         </Card>
         <Modal title={modalTitle} visible={this.state.visible} onCancel={this.handleCancel}
           footer={[
@@ -205,7 +208,7 @@ export default class ServiceSubscriptionApproval extends React.Component {
             </Row>
           </div>
         </Modal>
-      </QueueAnim>
+      </div>
     )
   }
 }

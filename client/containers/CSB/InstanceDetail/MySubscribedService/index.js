@@ -21,6 +21,7 @@ import '../style/mySubscribedService.less'
 import ServiceApIDoc from './ServiceApIDoc'
 import confirm from '../../../../components/Modal/confirm'
 import EditBindIpModal from './EditBindIpModal'
+import SubscriptionDetailDock from './SubscriptionDetailDock'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -32,6 +33,7 @@ class MySubscribedService extends React.Component {
     serviceApIDocModal: false,
     editBindIpModalVisible: false,
     confirmLoading: false,
+    subDetailVisible: false,
   }
 
   closeServiceApiDocModal = () => {
@@ -213,7 +215,7 @@ class MySubscribedService extends React.Component {
     const { key } = item
     switch (key) {
       case 'details':
-        return console.log('details')
+        return this.setState({ subDetailVisible: true })
       case 'subscibe':
         return this.subscibeService(record)
       case 'editIP':
@@ -248,7 +250,12 @@ class MySubscribedService extends React.Component {
   }
 
   render() {
-    const { serviceApIDocModal, editBindIpModalVisible, confirmLoading } = this.state
+    const {
+      serviceApIDocModal,
+      editBindIpModalVisible,
+      confirmLoading,
+      subDetailVisible,
+    } = this.state
     const { form } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
@@ -311,6 +318,10 @@ class MySubscribedService extends React.Component {
             loading={confirmLoading}
           />
         }
+        <SubscriptionDetailDock
+          visible={subDetailVisible}
+          onVisibleChange={subDetailVisible => this.setState({ subDetailVisible })}
+        />
       </QueueAnim>
     )
   }

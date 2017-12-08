@@ -67,7 +67,7 @@ export default class AccessAgreement extends React.Component {
           )}
         </FormItem>
         {
-          protocol === 'Restful-API' &&
+          (!protocol || protocol === 'Restful-API') &&
           [
             <FormItem
               {...formItemLayout}
