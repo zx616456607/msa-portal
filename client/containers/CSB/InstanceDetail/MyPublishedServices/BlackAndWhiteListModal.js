@@ -17,13 +17,13 @@ import {
   Input, Icon, Button, Radio,
   Tooltip,
 } from 'antd'
-import '../style/blackAndWhiteList.less'
+import './style/blackAndWhiteListModal.less'
 import cloneDeep from 'lodash/cloneDeep'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 
-class BlackAndWhiteList extends React.Component {
+class BlackAndWhiteListModal extends React.Component {
   static propTypes = {
     // 关闭 Modal 的函数
     closeblackAndWhiteModal: PropTypes.func.isRequired,
@@ -247,4 +247,4 @@ class BlackAndWhiteList extends React.Component {
   }
 }
 
-export default Form.create()(BlackAndWhiteList)
+export default Form.create()(BlackAndWhiteListModal)

@@ -16,7 +16,7 @@ import {
   Modal, Button, Row, Col,
   Table, Input,
 } from 'antd'
-import '../style/serviceApiDoc.less'
+import './style/serviceApiDoc.less'
 
 const TextArea = Input.TextArea
 
