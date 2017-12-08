@@ -13,7 +13,7 @@
 import React from 'react'
 import { Button, Card, Pagination, Table, Input } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import './style/subscriptionServices.less'
+import './style/SubscriptionServices.less'
 import SubscriptServiceModal from './SubscriptServiceModal'
 
 const Search = Input.Search

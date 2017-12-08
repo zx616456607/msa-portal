@@ -17,7 +17,7 @@ import {
   Input, Icon, Button, Radio,
   Tooltip,
 } from 'antd'
-import './style/blackAndWhiteListModal.less'
+import './style/BlackAndWhiteListModal.less'
 import cloneDeep from 'lodash/cloneDeep'
 
 const FormItem = Form.Item
