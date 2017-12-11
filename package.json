@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@antv/g6": "1.1.1",
-    "antd": "^3.0.0",
+    "antd": "^3.0.1",
     "autoprefixer": "^7.1.6",
     "babel-core": "^6.23.1",
     "babel-eslint": "^8.0.2",
