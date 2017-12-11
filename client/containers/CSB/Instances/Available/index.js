@@ -179,7 +179,7 @@ class AvailableInstances extends React.Component {
       width: '20%',
       render: (text, record) => {
         const menu = (
-          <Menu onClick={menu => this.menuClick(menu, record)} style={{ width: 100 }}>
+          <Menu onClick={menu => this.menuClick(menu, record)} style={{ width: 108 }}>
             <Menu.Item key="edit">修改</Menu.Item>
             <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
