@@ -306,7 +306,6 @@ class CallLinkTracking extends React.Component {
               }}
               rowKey={row => row.spanId}
               loading={loading}
-              onRowClick={this.handleRowClick}
               onRow={record => ({
                 onClick: () => this.handleRowClick(record),
               })}
