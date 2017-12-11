@@ -18,7 +18,7 @@ import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstancesChildRoutes } from '../../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../../common/utils'
+import { getMenuSelectedKeys } from '../../../common/utils'
 import { renderMenu } from '../../../components/utils'
 import './style/index.less'
 
@@ -86,7 +86,7 @@ class CSBInstances extends React.Component {
             hoverable={false}
           >
             <Menu mode="inline"
-              defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+              selectedKeys={getMenuSelectedKeys(location, menus)}
               defaultOpenKeys={[ 'mine-csb-instances', 'public-csb-instances' ]}
             >
               {

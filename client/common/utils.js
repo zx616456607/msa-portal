@@ -110,7 +110,7 @@ export const getQueryKey = query => toQuerystring(query) || DEFAULT
  * @param {array} menus menu list
  * @return {array} defaultSelectedKeys
  */
-export const getDefaultSelectedKeys = (location, menus) => {
+export const getMenuSelectedKeys = (location, menus) => {
   const defaultSelectedKeys = []
   menus.every(menu => {
     if (menu.to === '/') {
@@ -120,6 +120,21 @@ export const getDefaultSelectedKeys = (location, menus) => {
       }
       return true
     }
+    if (menu.type === 'SubMenu') {
+      const childrenMenus = menu.children
+      let isFound = false
+      console.log('menu', menu)
+      childrenMenus.every(_menu => {
+        if (location.pathname === _menu.to) {
+          defaultSelectedKeys.push(_menu.to)
+          isFound = true
+          return false
+        }
+        return true
+      })
+      // if found jump out of the loop
+      return !isFound
+    }
     if (location.pathname === menu.to) {
       // if (location.pathname.indexOf(menu.to) === 0) {
       defaultSelectedKeys.push(menu.to)
@@ -128,7 +143,7 @@ export const getDefaultSelectedKeys = (location, menus) => {
     return true
   })
   if (defaultSelectedKeys.length === 0) {
-    defaultSelectedKeys.push(menus[0].to)
+    defaultSelectedKeys.push(menus[0].to || (menus.children && menus.children[0].to))
   }
   return defaultSelectedKeys
 }

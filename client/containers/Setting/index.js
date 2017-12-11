@@ -17,7 +17,7 @@ import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../common/utils'
+import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
@@ -83,7 +83,7 @@ class Setting extends React.Component {
             title="系统设置"
           >
             <Menu mode="inline"
-              defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
             >
               {
                 menus.map(renderMenu)

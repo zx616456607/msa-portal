@@ -17,7 +17,7 @@ import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../common/utils'
+import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu, renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import confirm from '../../components/Modal/confirm'
@@ -199,7 +199,7 @@ class MsaManage extends React.Component {
             hoverable={false}
           >
             <Menu mode="inline"
-              defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
             >
               {
                 menus.map(renderMenu)

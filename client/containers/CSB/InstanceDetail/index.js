@@ -19,7 +19,7 @@ import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstanceDetailChildRoutes } from '../../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../../common/utils'
+import { getMenuSelectedKeys } from '../../../common/utils'
 import { renderMenu } from '../../../components/utils'
 import './style/index.less'
 
@@ -43,7 +43,6 @@ class CSBInstanceDetail extends React.Component {
       {
         to: `/csb-instances-available/${instanceID}`,
         text: '概览',
-        key: 'available',
         icon: <Icon type="dashboard" />,
       },
       {
@@ -98,7 +97,7 @@ class CSBInstanceDetail extends React.Component {
               hoverable={false}
             >
               <Menu mode="inline"
-                defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+                selectedKeys={getMenuSelectedKeys(location, menus)}
                 defaultOpenKeys={[ 'service-publish', 'service-subscription' ]}
               >
                 {

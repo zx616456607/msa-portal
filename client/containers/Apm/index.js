@@ -18,7 +18,7 @@ import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../common/utils'
+import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu, renderLoading } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
@@ -146,7 +146,7 @@ class Apm extends React.Component {
             hoverable={false}
           >
             <Menu mode="inline"
-              defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
             >
               {
                 menus.map(renderMenu)

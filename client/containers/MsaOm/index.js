@@ -16,7 +16,7 @@ import { Route, Switch } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
-import { getDefaultSelectedKeys } from '../../common/utils'
+import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu } from '../../components/utils'
 import msaComponent from '../../assets/img/log/msa-component.svg'
 
@@ -66,7 +66,7 @@ export default class MsaOm extends React.Component {
             hoverable={false}
           >
             <Menu mode="inline"
-              defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
             >
               {
                 menus.map(renderMenu)

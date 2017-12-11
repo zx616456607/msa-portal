@@ -13,7 +13,7 @@
 import React from 'react'
 import { Layout, Menu, Dropdown, Icon } from 'antd'
 import { Link } from 'react-router-dom'
-import { getDefaultSelectedKeys } from '../../common/utils'
+import { getMenuSelectedKeys } from '../../common/utils'
 import logo from '../../assets/img/logo.svg'
 import './style/index.less'
 
@@ -60,7 +60,15 @@ export default class Header extends React.Component {
     } = this.props
     const { pathname } = location
     const pathArray = pathname.split('/')
-    const selectedKeys = [ pathArray[1] || '/' ]
+    let key = pathArray[1]
+    if (key) {
+      if (key === 'csb-instances-available') {
+        key = 'csb-instances'
+      }
+    } else {
+      key = '/'
+    }
+    const selectedKeys = [ key ]
     return (
       <LayoutHeader className="layout-header">
         <Link to="/">
@@ -93,7 +101,7 @@ export default class Header extends React.Component {
         <Menu
           theme="dark"
           mode="horizontal"
-          defaultSelectedKeys={getDefaultSelectedKeys(location, menus)}
+          defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
           className="layout-header-menu"
           selectedKeys={selectedKeys}
         >
