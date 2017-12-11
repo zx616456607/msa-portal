@@ -1,0 +1,46 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Public Instances Less
+ *
+ * 2017-12-11
+ * @author zhangcz
+ */
+@import '~assets/style/core/index.less';
+
+#PublicInstances {
+  .status-icon {
+    height: 12px;
+    width: 12px;
+    margin: 2px 8px 0 0;
+    float: left;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+  .available {
+    color: @success-color;
+    line-height: 18px;
+    .status-icon {
+      background: @success-color;
+    }
+  }
+  .may-apply {
+    color: @warning-color;
+    .status-icon {
+      background: @warning-color;
+    }
+  }
+  .applying {
+    color: @primary-color;
+    .status-icon {
+      background: @primary-color;
+    }
+  }
+  .nohandler-style {
+    height: 32px;
+    line-height: 32px;
+  }
+}
