@@ -14,8 +14,68 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Card, Button, Row, Col } from 'antd'
 import './style/index.less'
+import G2 from 'g2'
+import CreateG2Group from '../../../../components/CreateG2/Group'
 
+const Chart = chart => {
+  const Stat = G2.Stat
+  chart.legend(false)
+  chart.coord('theta', {
+    radius: 1,
+    inner: 0.75,
+  })
+  chart.intervalStack().position(Stat.summary.percent('profit'))
+    .color('area', [ '#d9d9d9', '#5cb85c', '#f85a5a' ])
+    .style({
+      lineWidth: 1,
+    })
+  chart.render()
+}
+const Chart1 = chart => {
+  const Stat = G2.Stat
+  chart.legend(false)
+  chart.coord('theta', {
+    radius: 1,
+    inner: 0.75,
+  })
+  chart.intervalStack().position(Stat.summary.percent('profit'))
+    .color('area', [ '#5cb85c', '#f85a5a' ])
+    .style({
+      lineWidth: 1,
+    })
+  chart.render()
+}
+const ChartTrial = chart => {
+  const Stat = G2.Stat
+  chart.legend(false)
+  chart.coord('theta', {
+    radius: 1,
+    inner: 0.75,
+  })
+  chart.intervalStack().position(Stat.summary.percent('profit'))
+    .color('area', [ '#d9d9d9', '#5cb85c', '#f85a5a', '#ffbf00' ])
+    .style({
+      lineWidth: 1,
+    })
+  chart.render()
+}
+const chartAry = [ Chart, Chart1, ChartTrial ]
+const ChartGroup = CreateG2Group(chartAry, true)
+const [ Charts, Charts1, Charts2 ] = ChartGroup
 export default class InstanceDetailOverview extends React.Component {
+  state = {
+    data: [
+      { year: 2007, area: '亚太地区', profit: 7860 * 0.189 },
+      { year: 2007, area: '非洲及中东', profit: 7860 * 0.042 },
+      { year: 2007, area: '拉丁美洲', profit: 7860 * 0.025 },
+    ],
+    datas: [
+      { year: 2007, area: '亚太地区', profit: 7860 * 0.189 },
+      { year: 2007, area: '非洲及中东', profit: 7860 * 0.042 },
+    ],
+    width: 260,
+    height: 210,
+  }
   goPublishService = () => {
     const { history, match } = this.props
     const { instanceID } = match.params
@@ -44,7 +104,7 @@ export default class InstanceDetailOverview extends React.Component {
           </div>
           <div className="btn">
             <Button onClick={this.goPublishService} type="primary">
-            发布服务
+              发布服务
             </Button>
             <Button className="subscribe">订阅服务</Button>
           </div>
@@ -62,12 +122,57 @@ export default class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我发布的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
-                <span>Card content</span>
+                <Charts
+                  data={this.state.data}
+                  width={this.state.width}
+                  height={this.state.height} />
+                <div className="desc">
+                  <div>
+                    <div className="dec-run"></div>
+                    <p>已激活</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-error"></div>
+                    <p>已停用</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-on"></div>
+                    <p>已注销</p>
+                    <span>0个</span>
+                  </div>
+                </div>
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="服务订阅审批" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
-                <span>Card content</span>
+              <Card title="服务订阅审批" extra={<a href="#">去审批>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <Charts2
+                  data={this.state.data}
+                  width={this.state.width}
+                  height={this.state.height} />
+                <div className="desc-trial">
+                  <div>
+                    <div className="dec-run"></div>
+                    <p>已通过</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-error"></div>
+                    <p>已拒绝</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-on"></div>
+                    <p>已退订</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-trial"></div>
+                    <p>待审批</p>
+                    <span>0个</span>
+                  </div>
+                </div>
               </Card>
             </Col>
           </Row>
@@ -85,12 +190,42 @@ export default class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我订阅的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
-                <span>Card content</span>
+                <Charts1
+                  data={this.state.datas}
+                  width={this.state.width}
+                  height={this.state.height} />
+                <div className="des">
+                  <div>
+                    <div className="dec-runs"></div>
+                    <p>已激活</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-errors"></div>
+                    <p>已停用</p>
+                    <span>0个</span>
+                  </div>
+                </div>
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="可订阅的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
-                <span>Card content</span>
+              <Card title="可订阅的服务" extra={<a href="#">去订阅>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+                <Charts1
+                  data={this.state.datas}
+                  width={this.state.width}
+                  height={this.state.height} />
+                <div className="des">
+                  <div>
+                    <div className="dec-runs"></div>
+                    <p>已激活</p>
+                    <span>0个</span>
+                  </div>
+                  <div>
+                    <div className="dec-errors"></div>
+                    <p>已停用</p>
+                    <span>0个</span>
+                  </div>
+                </div>
               </Card>
             </Col>
           </Row>

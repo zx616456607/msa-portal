@@ -4,11 +4,62 @@
  */
 
 /**
- * My application style
+ * Appliction-Style
  *
- * 2017-12-07
- * @author zhangxuan
+ * 2017-12-11
+ * @author zhaoyb
  */
-
-@import '~assets/style/core/index.less';
-
+ @import '~assets/style/core/index.less';
+ .csb-app {
+  .top {
+    width: 100%;
+    margin-bottom: 20px;
+    display: inline-block;
+    .text {
+      margin-left: 10px;
+    }
+    .page {
+     float: right;
+     display: inline-block;
+     span {
+       margin-right: 20px;
+     }
+     .ant-pagination {
+       display: inline;
+     }
+   }
+  }
+  .adopt {
+    color: @success-color;
+    div {
+      width: 12px;
+      height: 12px;
+      margin-right: 10px;
+      border-radius: 50px;
+      display: inline-block;
+      background-color: @success-color;
+    }
+  }
+  .refuse {
+    color: @error-color;
+    div {
+      width: 12px;
+      height: 12px;
+      margin-right: 10px;
+      border-radius: 50px;
+      display: inline-block;
+      background-color: @error-color;
+    }
+  }
+  .apply {
+    color: @primary-color;
+    div {
+      width: 12px;
+      height: 12px;
+      margin-right: 10px;
+      border-radius: 50px;
+      display: inline-block;
+      background-color: @primary-color;
+    }
+  }
+ }
