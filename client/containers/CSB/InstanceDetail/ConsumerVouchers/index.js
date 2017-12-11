@@ -284,18 +284,18 @@ export default class ConsumerVouchers extends React.Component {
                 <span>当前 AccessKey / SecretKey</span>
                 <div>
                   <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
-                  {/* <Icon type="eye-o" /> */}
+                  <Icon type="eye-o" className="text-ico" />
                 </div>
               </div>
               <div className="dec">
                 <span className="decs-title">更新</span>
-                <Icon type="arrow-right" style={{ fontSize: 25, color: '#5cb85c' }} />
+                <Icon type="arrow-right" className="dec-ico"/>
               </div>
               <div className="as-rigth">
                 <span>新 AccessKey / SecretKey</span>
                 <div>
                   <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
-                  <Icon type="eye-o" style={{ fontSize: 15 }} />
+                  <Icon type="eye-o" className="text-ico" />
                 </div>
               </div>
             </Row>
@@ -307,7 +307,7 @@ export default class ConsumerVouchers extends React.Component {
               </RadioGroup>
             </Row>
             <Row>
-              <Input placeholder="输入过度时间，范围1~7200" />分
+              <Input placeholder="输入过度时间，范围1~7200" style={{ width: '73%' }}/>&nbsp;&nbsp; 分
             </Row>
           </div>
         </Modal>
