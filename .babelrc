@@ -11,7 +11,7 @@
             "IE 11"
           ]
         },
-        "debug": true,
+        "debug": false,
         "useBuiltIns": "entry",
         "modules": false
       }
@@ -28,6 +28,16 @@
     "production": {
       "plugins": [
         "transform-react-remove-prop-types"
+      ]
+    },
+    "commonjs": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ]
       ]
     }
   },

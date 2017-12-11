@@ -61,6 +61,10 @@ const gatewayRoutesSchema = new schema.Entity('gatewayRoutes', {}, {
   idAttribute: 'id',
 })
 
+const csbInstancesSchema = new schema.Entity('csbInstances', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -107,5 +111,8 @@ export const Schemas = {
     data: {
       content: [ gatewayRoutesSchema ],
     },
+  },
+  CSB_INSNTANCES_LIST_DATA: {
+    data: [ csbInstancesSchema ],
   },
 }

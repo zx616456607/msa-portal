@@ -2,6 +2,7 @@
   "env": {
     "browser": true,
     "es6": true,
+    "jest": true,
     "node": true
   },
   "extends": "eslint-config-egg",
@@ -60,6 +61,9 @@
   },
   "globals": {
     "__root__dirname": true,
-    "Cookies": true
+    "Cookies": true,
+    "fetchMock": true,
+    "mockStore": true,
+    "store": true
   }
 }
