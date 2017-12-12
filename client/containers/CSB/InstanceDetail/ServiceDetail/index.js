@@ -120,7 +120,7 @@ export default class ServiceDetail extends React.Component {
     }]
     return (
       <div className="service-detail">
-        <div className="service-detail-header">
+        <div className="service-detail-header ant-row">
           <div className="service-detail-header-icon">
             <img width="80" height="80" src={serviceIcon} alt="service" />
           </div>
