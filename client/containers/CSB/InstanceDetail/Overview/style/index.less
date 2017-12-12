@@ -9,6 +9,7 @@
  * 2017-12-05
  * @author zhaoyb
  */
+ @import '~assets/style/core/index.less';
 
 .csb-overview {
   .top {
@@ -49,43 +50,32 @@
   .release {
     margin-top: 20px;
     .content {
+      .dec-pie {
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+        margin-right: 10px;
+        border-radius: 5px;
+      }
+      p {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 40%;
+      }
       .desc {
         width: 200px;
         display: inline-block;
         position: absolute;
         left: 50%;
-        top: 43%;
+        top: 41%;
         .dec-run {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #5cb85c;
-          border-radius: 5px;
+          background-color: @success-color;
         }
         .dec-error {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #f85a5a;
-          border-radius: 5px;
+          background-color: @error-color;
         }
         .dec-on {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #d9d9d9;
-          border-radius: 5px;
-        }
-        p {
-          display: inline-block;
-          vertical-align: top;
-          margin-right: 40%;
-        }
-        span {
-          font-size: 12px;
+          background-color: @border-color-base;
         }
       }
       .desc-trial {
@@ -95,44 +85,16 @@
         left: 50%;
         top: 38%;
         .dec-run {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #5cb85c;
-          border-radius: 5px;
+          background-color: @success-color;
         }
         .dec-error {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #f85a5a;
-          border-radius: 5px;
+          background-color: @error-color;
         }
         .dec-on {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #d9d9d9;
-          border-radius: 5px;
+          background-color: @border-color-base;
         }
         .dec-trial {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #ffbf00;
-          border-radius: 5px;
-        }
-        p {
-          display: inline-block;
-          vertical-align: top;
-          margin-right: 40%;
-        }
-        span {
-          font-size: 12px;
+          background-color: @warning-color;
         }
       }
       .des {
@@ -140,47 +102,19 @@
         display: inline-block;
         position: absolute;
         left: 50%;
-        top: 49%;
+        top: 47%;
         .dec-runs {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #5cb85c;
-          border-radius: 5px;
+          background-color: @success-color;
         }
         .dec-errors {
-          width: 15px;
-          height: 15px;
-          display: inline-block;
-          margin-right: 10px;
-          background-color: #f85a5a;
-          border-radius: 5px;
-        }
-        p {
-          display: inline-block;
-          vertical-align: top;
-          margin-right: 40%;
-        }
-        span {
-          font-size: 12px;
+          background-color: @error-color;
         }
       }
-      #g-chart1 {
+      #g-chart1, #g-chart2, #g-chart3, #g-chart4 {
+        height: 150px;
         position: relative;
         left: -40px;
-      }
-      #g-chart2 {
-        position: relative;
-        left: -40px;
-      }
-      #g-chart3 {
-        position: relative;
-        left: -40px;
-      }
-      #g-chart4 {
-        position: relative;
-        left: -40px;
+        top: 14px;
       }
     }
   }
