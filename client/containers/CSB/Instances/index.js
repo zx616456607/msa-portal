@@ -34,24 +34,20 @@ const menus = [
         text: '可用实例',
       },
       {
-        to: '/csb-instances/my-approval',
-        text: '我的审批',
+        to: '/csb-instances/my-application',
+        text: '我的申请',
       },
     ],
   },
   {
     type: 'SubMenu',
-    text: '公开实例',
+    text: '所有实例',
     icon: <Icon type="unlock" />,
     key: 'public-csb-instances',
     children: [
       {
         to: '/csb-instances/public',
-        text: '公开实例',
-      },
-      {
-        to: '/csb-instances/my-application',
-        text: '我的申请',
+        text: '所有实例',
       },
     ],
   },

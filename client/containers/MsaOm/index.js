@@ -31,6 +31,11 @@ const menus = [
     ),
   },
   {
+    to: '/msa-om/csb-approval',
+    text: '我的审批',
+    icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
+  },
+  {
     to: '/msa-om/log',
     text: '日志查询',
     icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
