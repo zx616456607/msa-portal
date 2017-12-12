@@ -72,7 +72,7 @@ class AvailableInstances extends React.Component {
         value: 'starting',
       }, {
         text: '已停止',
-        value: 'stop'
+        value: 'stop',
       }],
     }, {
       title: '部署集群',
