@@ -35,6 +35,7 @@ import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import MsaOm from './containers/MsaOm'
 import MsaOmLogs from './containers/MsaOm/Log'
 import MsaComponents from './containers/MsaOm/Components'
+import MsaOmCSBApproval from './containers/MsaOm/CSBApproval'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
@@ -42,7 +43,6 @@ import MsaConfig from './containers/Setting/MsaConfig'
 import CSBInstances from './containers/CSB/Instances'
 import AvailableInstances from './containers/CSB/Instances/Available'
 import PublicInstances from './containers/CSB/Instances/Public'
-import MyApproval from './containers/CSB/Instances/MyApproval'
 import MyApplication from './containers/CSB/Instances/MyApplication'
 import CSBInstanceDetail from './containers/CSB/InstanceDetail'
 import InstanceDetailOverview from './containers/CSB/InstanceDetail/Overview/'
@@ -231,6 +231,12 @@ export const msaOmChildRoutes = [
     exact: true,
     key: 'msa-om-components',
   },
+  {
+    path: '/msa-om/csb-approval',
+    component: MsaOmCSBApproval,
+    exact: true,
+    key: 'msa-om-csb-approval',
+  },
 ]
 
 export const settingChildRoutes = [
@@ -272,12 +278,6 @@ export const csbInstancesChildRoutes = [
     component: AvailableInstances,
     exact: true,
     key: 'available',
-  },
-  {
-    path: '/csb-instances/my-approval',
-    component: MyApproval,
-    exact: true,
-    key: 'my-approval',
   },
   {
     path: '/csb-instances/public',
