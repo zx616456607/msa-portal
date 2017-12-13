@@ -64,26 +64,12 @@ export default class MyApplication extends React.Component {
       title: '实例名称',
       dataIndex: 'name',
     }, {
+      title: '部署集群',
+      dataIndex: 'cluster',
+    }, {
       title: '申请时间',
       dataIndex: 'applyTirm',
       sorter: (a, b) => a.time - b.time,
-    }, {
-      title: '审批状态',
-      dataIndex: 'state',
-      filters: [{
-        text: '已拒绝',
-        value: '已拒绝',
-      }, {
-        text: '已通过',
-        value: '已通过',
-      }, {
-        text: '申请中',
-        value: '申请中',
-      }],
-      render: text => this.filterState(text),
-    }, {
-      title: '审批人',
-      dataIndex: 'trialName',
     }, {
       title: '可发布服务',
       dataIndex: 'canRelease',
@@ -105,6 +91,23 @@ export default class MyApplication extends React.Component {
         value: '否',
       }],
     }, {
+      title: '审批状态',
+      dataIndex: 'state',
+      filters: [{
+        text: '已拒绝',
+        value: '已拒绝',
+      }, {
+        text: '已通过',
+        value: '已通过',
+      }, {
+        text: '申请中',
+        value: '申请中',
+      }],
+      render: text => this.filterState(text),
+    }, {
+      title: '审批原因',
+      dataIndex: 'trial',
+    }, {
       title: '审批时间',
       dataIndex: 'trialTime',
       sorter: (a, b) => a.time - b.time,
@@ -120,27 +123,30 @@ export default class MyApplication extends React.Component {
     const data = [{
       id: '1',
       name: '张三',
+      cluster: '北京',
       applyTirm: '2017-12-11 11:12:00',
       state: '已拒绝',
-      trialName: 'admin',
+      trial: '不可发布',
       canRelease: '是',
       canBook: '是',
       trialTime: '2017-12-11 11:12:10',
     }, {
       id: '2',
       name: '李四',
+      cluster: '北京',
       applyTirm: '2017-12-11 11:12:00',
       state: '已通过',
-      trialName: 'admin',
+      trial: '通过',
       canRelease: '否',
       canBook: '是',
       trialTime: '2017-12-11 11:12:10',
     }, {
       id: '3',
       name: '赵薇',
+      cluster: '北京',
       applyTirm: '2017-12-11 11:12:00',
       state: '申请中',
-      trialName: 'admin',
+      trial: '不可发布',
       canRelease: '否',
       canBook: '是',
       trialTime: '2017-12-11 11:12:10',

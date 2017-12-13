@@ -114,7 +114,7 @@ class AvailableInstances extends React.Component {
       render: () => {
         return (
           <div>
-            <Button type="primary">查看实例</Button>
+            <Button type="primary" className="detailBtn">查看实例</Button>
             <Button>放弃使用</Button>
           </div>
         )
