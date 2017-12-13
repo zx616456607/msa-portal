@@ -91,12 +91,13 @@ export default class PublicInstances extends React.Component {
   render() {
     const { applyforCSBInstanceModalVisible, confirmLoading, currentRecord } = this.state
     const columns = [
-      { title: '实例名称', dataIndex: 'name', key: 'name', width: '16%' },
+      { title: '实例名称', dataIndex: 'name', key: 'name', width: '15%' },
+      { title: '部署集群', dataIndex: 'cluster', key: 'cluster', width: '15%' },
       {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        width: '16%',
+        width: '15%',
         render: status => this.renderServiceStatusUI(status),
         filters: [{
           text: '可用',
@@ -108,14 +109,14 @@ export default class PublicInstances extends React.Component {
         filterMultiple: false,
         onFilter: (value, record) => record.status.toString() === value,
       },
-      { title: '创建人', dataIndex: 'create', key: 'create', width: '16%' },
-      { title: '描述', dataIndex: 'desc', key: 'desc', width: '16%' },
-      { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: '16%' },
+      { title: '创建人', dataIndex: 'create', key: 'create', width: '15%' },
+      { title: '描述', dataIndex: 'desc', key: 'desc', width: '15%' },
+      { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: '15%' },
       {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '20%',
+        width: '10%',
         render: (text, record) => {
           if (record.status === 3) {
             return <Button type="ghost" onClick={this.cancelApplyforCSBInstance.bind(this, record)}>撤销申请</Button>
@@ -138,6 +139,7 @@ export default class PublicInstances extends React.Component {
       const item = {
         key: i,
         name: 'qeweqweq',
+        cluster: '北京',
         status: i,
         create: 'eqweqweq',
         desc: 'hello tenxcloud',

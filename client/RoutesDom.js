@@ -35,6 +35,7 @@ import CallLinkTracking from './containers/Apm/CallLinkTracking'
 import MsaOm from './containers/MsaOm'
 import MsaOmLogs from './containers/MsaOm/Log'
 import MsaComponents from './containers/MsaOm/Components'
+import CSBInstanceOm from './containers/MsaOm/CSBInstanceOm'
 import MsaOmCSBApproval from './containers/MsaOm/CSBApproval'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
@@ -232,10 +233,16 @@ export const msaOmChildRoutes = [
     key: 'msa-om-components',
   },
   {
-    path: '/msa-om/csb-approval',
+    path: '/msa-om/csb-instance-om',
+    component: CSBInstanceOm,
+    exact: true,
+    key: 'csb-instance-om',
+  },
+  {
+    path: '/msa-om/csb-instance-approval',
     component: MsaOmCSBApproval,
     exact: true,
-    key: 'msa-om-csb-approval',
+    key: 'csb-instance-approval',
   },
 ]
 

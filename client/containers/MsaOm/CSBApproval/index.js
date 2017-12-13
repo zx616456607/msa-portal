@@ -4,7 +4,7 @@
  */
 
 /**
- * My application
+ * CSB instance application
  *
  * 2017-12-11
  * @author zhangxuan
@@ -19,7 +19,7 @@ const RadioGroup = Radio.Group
 const SearchInput = Input.Search
 const CheckboxGroup = Checkbox.Group
 
-export default class MyApplication extends React.Component {
+export default class CSBApplication extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
