@@ -82,6 +82,8 @@ class SubscriptionServices extends React.Component {
         filterMultiple: false,
         onFilter: (value, record) => record.name.indexOf(value) === 0,
       },
+      { title: '服务版本', dataIndex: 'version', key: 'version' },
+      { title: '所属服务组', dataIndex: 'group', key: 'group' },
       { title: '服务开放类型', dataIndex: 'type', key: 'type' },
       { title: '服务描述', dataIndex: 'desc', key: 'desc' },
       {
@@ -106,6 +108,8 @@ class SubscriptionServices extends React.Component {
         type: 123123123,
         desc: 'hellooooooo',
         time: '2017-1-1-1-1',
+        version: '1.1',
+        group: 'hello',
       }
       dataSource.push(item)
     }

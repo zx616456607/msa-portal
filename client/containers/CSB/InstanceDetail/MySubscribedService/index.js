@@ -130,16 +130,18 @@ class MySubscribedService extends React.Component {
         num: '2',
         des: '我的描述',
         time: '222222222',
+        version: '1.1',
+        belongs: 'hello',
       },
     ]
 
     const columns = [
-      { title: '订阅服务名称', dataIndex: 'groupName', key: 'groupName', width: '16%' },
+      { title: '订阅服务名称', dataIndex: 'groupName', key: 'groupName', width: '14%' },
       {
         title: '服务状态',
         dataIndex: 'status',
         key: 'status',
-        width: '14%',
+        width: '10%',
         filters: [
           { text: '已激活', value: 'Joe' },
           { text: '已停用', value: 'Jim' },
@@ -147,6 +149,8 @@ class MySubscribedService extends React.Component {
         onFilter: (value, record) => record.charge.includes(value),
         render: status => this.renderServiceStatusUI(status),
       },
+      { title: '服务版本', dataIndex: 'version', key: 'version', width: '8%' },
+      { title: '所属服务', dataIndex: 'belongs', key: 'belongs', width: '8%' },
       {
         title: <span>
             订阅状态
@@ -156,34 +160,34 @@ class MySubscribedService extends React.Component {
         </span>,
         dataIndex: 'tel',
         key: 'tel',
-        width: '14%',
+        width: '12%',
       },
       {
         title: '累计调用量',
         dataIndex: 'charge',
         key: 'charge',
-        width: '14%',
+        width: '12%',
         sorter: (a, b) => a.status - b.status,
       },
       {
         title: '累计错误量',
         dataIndex: 'num',
         key: 'num',
-        width: '14%',
+        width: '12%',
         sorter: (a, b) => a.num - b.num,
       },
       {
         title: '平均RT（ms）',
         dataIndex: 'des',
         key: 'des',
-        width: '14%',
+        width: '12%',
         sorter: (a, b) => a.desc - b.desc,
       },
       {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '14%',
+        width: '12%',
         render: (text, record) => <Button type="primary" onClick={this.manageSubscibe.bind(this, record)}>订阅管理</Button>,
       },
     ]
