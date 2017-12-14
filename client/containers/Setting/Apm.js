@@ -235,7 +235,7 @@ class ApmSetting extends React.Component {
           id: item.id,
           cluster: clusterID,
         }
-        const projectName = project === 'default' ? defaultName : project
+        const projectName = project.namespace === 'default' ? defaultName : project.namespace
         removeApmRow(body, projectName).then(res => {
           if (res.error) return
           this.apmService()
