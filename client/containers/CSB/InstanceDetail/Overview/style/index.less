@@ -12,6 +12,7 @@
  @import '~assets/style/core/index.less';
 
 .csb-overview {
+  height: 800px;
   .top {
     height: 170px;
     background: #fff;
@@ -110,11 +111,14 @@
           background-color: @error-color;
         }
       }
-      #g-chart1, #g-chart2, #g-chart3, #g-chart4 {
-        height: 150px;
-        position: relative;
-        left: -40px;
-        top: 14px;
+      .ant-card-body {
+        & > div {
+          & > div:first-child {
+            & > div:last-child {
+              left: -30px;
+            }
+          }
+        }
       }
     }
   }

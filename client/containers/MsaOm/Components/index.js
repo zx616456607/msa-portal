@@ -252,11 +252,11 @@ class MsaComponents extends React.Component {
   }
 
   handleCommit = () => {
-    const { componentName, tooltipTitle, ApmID } = this.state
+    const { componentName, tooltipTitle, apmID } = this.state
     const { clusterId, getStart, getStop, getRedeploy } = this.props
     if (tooltipTitle === '重启组件') {
       const query = {
-        apmID: ApmID[0].id,
+        apmID: apmID[0].id,
         componentName,
       }
       getStart(clusterId, query).then(res => {
@@ -280,7 +280,7 @@ class MsaComponents extends React.Component {
       })
     } if (tooltipTitle === '停止组件') {
       const query = {
-        apmID: ApmID[0].id,
+        apmID: apmID[0].id,
         componentName,
       }
       getStop(clusterId, query).then(res => {
@@ -302,7 +302,7 @@ class MsaComponents extends React.Component {
       })
     } if (tooltipTitle === '重新部署') {
       const query = {
-        apmID: ApmID[0].id,
+        apmID: apmID[0].id,
         componentName,
       }
       getRedeploy(clusterId, query).then(res => {
