@@ -72,7 +72,7 @@ export default class InstanceDetailOverview extends React.Component {
       { year: 2007, area: '非洲及中东', profit: 7860 * 0.042 },
     ],
     width: 260,
-    height: 170,
+    height: 210,
   }
   goPublishService = () => {
     const { history, match } = this.props
@@ -191,7 +191,7 @@ export default class InstanceDetailOverview extends React.Component {
                 <ChartTrial
                   data={this.state.datas}
                   width={this.state.width}
-                  height={165} />
+                  height={this.state.height} />
                 <div className="des">
                   <div>
                     <div className="dec-runs dec-pie"></div>
@@ -211,7 +211,7 @@ export default class InstanceDetailOverview extends React.Component {
                 <ChartTrial
                   data={this.state.datas}
                   width={this.state.width}
-                  height={165} />
+                  height={this.state.height} />
                 <div className="des">
                   <div>
                     <div className="dec-runs dec-pie"></div>
