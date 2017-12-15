@@ -5,7 +5,7 @@ import api from '../middleware/api'
 
 const middlewares = [ thunk, api ]
 const mockStore = configureMockStore(middlewares)
-const store = mockStore({
+const initStore = () => mockStore({
   entities: {
     auth: {
       jwt: {
@@ -20,4 +20,4 @@ const store = mockStore({
 
 global.fetchMock = fetchMock
 global.mockStore = mockStore
-global.store = store
+global.initStore = initStore

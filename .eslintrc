@@ -64,6 +64,6 @@
     "Cookies": true,
     "fetchMock": true,
     "mockStore": true,
-    "store": true
+    "initStore": true
   }
 }

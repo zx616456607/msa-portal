@@ -21,6 +21,7 @@ import msa from './msa'
 import gateway from './gateway'
 import * as configCenter from './configcenter'
 import * as sringcloudComponent from './springcloud'
+import CSB from './CSB'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -69,6 +70,7 @@ const rootReducer = combineReducers({
   msa,
   gateway,
   ...configCenter,
+  CSB,
 })
 
 export default rootReducer

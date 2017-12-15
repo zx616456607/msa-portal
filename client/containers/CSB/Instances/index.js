@@ -20,6 +20,7 @@ import { Route, Switch } from 'react-router-dom'
 import { csbInstancesChildRoutes } from '../../../RoutesDom'
 import { getMenuSelectedKeys } from '../../../common/utils'
 import { renderMenu } from '../../../components/utils'
+import { getInstances } from '../../../actions/CSB/instance'
 import './style/index.less'
 
 const menus = [
@@ -66,6 +67,10 @@ class CSBInstances extends React.Component {
     ]
   }
 
+  componentDidMount() {
+    this.props.getInstances()
+  }
+
   render() {
     const { location } = this.props
     const title = (
@@ -102,5 +107,5 @@ class CSBInstances extends React.Component {
 const mapStateToProps = () => ({})
 
 export default connect(mapStateToProps, {
-  //
+  getInstances,
 })(CSBInstances)

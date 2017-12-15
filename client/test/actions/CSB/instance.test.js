@@ -11,9 +11,16 @@
  */
 
 import expect from 'expect'
-import * as ActionsAndTypes from '../../../actions/instance'
+import * as ActionsAndTypes from '../../../actions/CSB/instance'
 import { toQuerystring } from '../../../common/utils'
-import { API_CONFIG } from '../../../constants'
+import {
+  API_CONFIG,
+  CSB_PUBLIC_INSTANCES_FLAG,
+  CSB_AVAILABLE_INSTANCES_FLAG,
+  CSB_OM_INSTANCES_FLAG,
+} from '../../../constants'
+
+const { CSB_API_URL } = API_CONFIG
 
 describe('CSB instances actions', () => {
   afterEach(() => {
@@ -22,9 +29,10 @@ describe('CSB instances actions', () => {
   })
 
   it('should get public instances', () => {
+    const store = initStore()
     const clusterID = 'test'
     const query = {
-      flag: '1',
+      flag: CSB_PUBLIC_INSTANCES_FLAG,
       userId: 'test',
     }
     const csbInstancesData = {
@@ -38,7 +46,7 @@ describe('CSB instances actions', () => {
     }
 
     fetchMock.getOnce(
-      `${API_CONFIG.PAAS_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
       {
         body: csbInstancesData,
         headers: { 'content-type': 'application/json' },
@@ -49,21 +57,15 @@ describe('CSB instances actions', () => {
       {
         clusterID,
         query,
-        type: ActionsAndTypes.CSB_INSTANCES_REQUEST,
+        type: ActionsAndTypes.CSB_PUBLIC_INSTANCES_REQUEST,
       },
       {
         clusterID,
         query,
-        type: ActionsAndTypes.CSB_INSTANCES_SUCCESS,
+        type: ActionsAndTypes.CSB_PUBLIC_INSTANCES_SUCCESS,
         response: {
-          entities: {
-            csbInstances: {
-              [csbInstancesData.data[0].id]: csbInstancesData.data[0],
-            },
-          },
-          result: {
-            data: [ csbInstancesData.data[0].id ],
-          },
+          entities: {},
+          result: csbInstancesData,
         },
       },
     ]
@@ -72,7 +74,127 @@ describe('CSB instances actions', () => {
       .dispatch(ActionsAndTypes.fetchInstances(clusterID, query))
       .then(() => {
         // return of async actions
-        console.log(JSON.stringify(store.getActions(), null, 2))
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+  })
+
+  it('should get available instances', () => {
+    const store = initStore()
+    const clusterID = 'test'
+    const query = {
+      flag: CSB_AVAILABLE_INSTANCES_FLAG,
+      userId: 'test',
+    }
+    const csbInstancesData = {
+      data: {
+        content: [
+          {
+            instance: {
+              id: 33,
+              name: 'instance7',
+              description: '33333',
+            },
+            user: {
+              name: 'wanglei',
+              email: 'wanglei@tenxcloud.com',
+            },
+            role: 1,
+            id: 43,
+            new: false,
+          },
+        ],
+      },
+    }
+
+    fetchMock.getOnce(
+      `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      {
+        body: csbInstancesData,
+        headers: { 'content-type': 'application/json' },
+      }
+    )
+
+    const expectedActions = [
+      {
+        clusterID,
+        query,
+        type: ActionsAndTypes.CSB_AVAILABLE_INSTANCES_REQUEST,
+      },
+      {
+        clusterID,
+        query,
+        type: ActionsAndTypes.CSB_AVAILABLE_INSTANCES_SUCCESS,
+        response: {
+          entities: {},
+          result: csbInstancesData,
+        },
+      },
+    ]
+
+    return store
+      .dispatch(ActionsAndTypes.fetchInstances(clusterID, query))
+      .then(() => {
+        // return of async actions
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+  })
+
+  it('should get OM instances', () => {
+    const store = initStore()
+    const clusterID = 'test'
+    const query = {
+      flag: CSB_OM_INSTANCES_FLAG,
+      userId: 'test',
+    }
+    const csbInstancesData = {
+      data: {
+        content: [
+          {
+            name: 'test8',
+            clusterId: 'CID-90eb6ec7b55a',
+            description: 'test3-description',
+            systemCallKey: 'wdfaflasdf',
+            creationTime: '2017-12-14 14:10:53',
+            creator: {
+              name: '王3',
+              email: 'wmy@qq.com',
+            },
+            id: 9,
+            new: false,
+          },
+        ],
+      },
+    }
+
+    fetchMock.getOnce(
+      `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      {
+        body: csbInstancesData,
+        headers: { 'content-type': 'application/json' },
+      }
+    )
+
+    const expectedActions = [
+      {
+        clusterID,
+        query,
+        type: ActionsAndTypes.CSB_OM_INSTANCES_REQUEST,
+      },
+      {
+        clusterID,
+        query,
+        type: ActionsAndTypes.CSB_OM_INSTANCES_SUCCESS,
+        response: {
+          entities: {},
+          result: csbInstancesData,
+        },
+      },
+    ]
+
+    return store
+      .dispatch(ActionsAndTypes.fetchInstances(clusterID, query))
+      .then(() => {
+        // return of async actions
         expect(store.getActions()).toEqual(expectedActions)
       })
   })
