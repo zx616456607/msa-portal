@@ -90,20 +90,45 @@ export const CREATE_INSTANCE_FAILURE = 'CREATE_INSTANCE_FAILURE'
 
 // Create an instance
 // Relies on the custom API middleware defined in ../middleware/api.js.
-
 const fetchCreateInstance = (clusterID, query, body) => {
   return {
     [CALL_API]: {
       types: [ CREATE_INSTANCE_REQUEST, CREATE_INSTANCE_SUCCESS, CREATE_INSTANCE_FAILURE ],
       endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
-      schema: {},
       options: {
         method: 'POST',
         body,
       },
+      schema: {},
     },
   }
 }
 
 export const createInstance = (clusterID, query, body) =>
   dispatch => dispatch(fetchCreateInstance(clusterID, query, body))
+
+// 申请实例
+export const APPLY_FOR_INSTANCES_REQUEST = 'APPLY_FOR_INSTANCES_REQUEST'
+export const APPLY_FOR_INSTANCES_SUCCESS = 'APPLY_FOR_INSTANCES_SUCCESS'
+export const APPLY_FOR_INSTANCES_FAILURE = 'APPLY_FOR_INSTANCES_FAILURE'
+
+const fetchApplyforInstance = (clusterID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        APPLY_FOR_INSTANCES_REQUEST,
+        APPLY_FOR_INSTANCES_SUCCESS,
+        APPLY_FOR_INSTANCES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const applyforInstance = (clusterID, body) =>
+  dispatch => dispatch(fetchApplyforInstance(clusterID, body))
