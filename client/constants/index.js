@@ -94,3 +94,4 @@ export const API_GATEWAY_LIMIT_TYPES = [
 export const CSB_PUBLIC_INSTANCES_FLAG = 0
 export const CSB_AVAILABLE_INSTANCES_FLAG = 1
 export const CSB_OM_INSTANCES_FLAG = 2
+export const UNUSED_CLUSTER_ID = 'unused-cluster-id'
