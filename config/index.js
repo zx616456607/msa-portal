@@ -25,6 +25,9 @@ const PAAS_SPI_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_SPI_PREFIX}`
 const MSA_API = env.MSA_API || 'http://192.168.1.58:8080'
 const MSA_API_PREFIX = env.MSA_API_PREFIX || '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
+const CSB_API = env.CSB_API || 'http://192.168.1.58:9090'
+const CSB_API_PREFIX = env.CSB_API_PREFIX || '/api/v1'
+const CSB_API_URL = CSB_API + CSB_API_PREFIX
 const initialConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -35,9 +38,13 @@ const initialConfig = {
   MSA_API,
   MSA_API_PREFIX,
   MSA_API_URL,
+  CSB_API,
+  CSB_API_PREFIX,
+  CSB_API_URL,
 }
 
 const config = {
+  appKeys: [ 'tenxcloud.com', '5f4a73e9-0493-4c66-86a6-ffaf7a8b73c8' ],
   port: 8989,
   hostname: '0.0.0.0',
   site: 'tenxcloud.com',

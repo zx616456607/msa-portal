@@ -23,6 +23,9 @@ const PAAS_SPI_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_SPI_PREFIX}`
 const MSA_API = 'http://192.168.1.58:8080'
 const MSA_API_PREFIX = '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
+const CSB_API = 'http://192.168.1.58:9090'
+const CSB_API_PREFIX = '/api/v1'
+const CSB_API_URL = CSB_API + CSB_API_PREFIX
 let apiConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -33,6 +36,9 @@ let apiConfig = {
   MSA_API,
   MSA_API_PREFIX,
   MSA_API_URL,
+  CSB_API,
+  CSB_API_PREFIX,
+  CSB_API_URL,
 }
 // prod api config
 if (isProd) {
@@ -85,3 +91,6 @@ export const API_GATEWAY_LIMIT_TYPES = [
     text: '天',
   },
 ]
+export const CSB_PUBLIC_INSTANCES_FLAG = 0
+export const CSB_AVAILABLE_INSTANCES_FLAG = 1
+export const CSB_OM_INSTANCES_FLAG = 2

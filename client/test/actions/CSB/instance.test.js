@@ -21,11 +21,11 @@ describe('CSB instances actions', () => {
     fetchMock.restore()
   })
 
-  it('should get instances', () => {
+  it('should get public instances', () => {
     const clusterID = 'test'
-    const userID = 'test'
     const query = {
       flag: '1',
+      userId: 'test',
     }
     const csbInstancesData = {
       data: [
@@ -38,7 +38,7 @@ describe('CSB instances actions', () => {
     }
 
     fetchMock.getOnce(
-      `${API_CONFIG.PAAS_API_URL}/clusters/${clusterID}/instance/${userID}?${toQuerystring(query)}`,
+      `${API_CONFIG.PAAS_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
       {
         body: csbInstancesData,
         headers: { 'content-type': 'application/json' },
@@ -69,7 +69,7 @@ describe('CSB instances actions', () => {
     ]
 
     return store
-      .dispatch(ActionsAndTypes.fetchInstances(clusterID, userID, query))
+      .dispatch(ActionsAndTypes.fetchInstances(clusterID, query))
       .then(() => {
         // return of async actions
         console.log(JSON.stringify(store.getActions(), null, 2))
