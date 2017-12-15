@@ -156,3 +156,54 @@ const fetchAbandonInstance = (clusterID, instanceID, query) => {
 }
 export const abandonInstance = (clusterID, instanceID, query) =>
   dispatch => dispatch(fetchAbandonInstance(clusterID, instanceID, query))
+
+// 删除实例
+export const DELETE_CSB_INSTANCES_REQUEST = 'DELETE_CSB_INSTANCES_REQUEST'
+export const DELETE_CSB_INSTANCES_SUCCESS = 'DELETE_CSB_INSTANCES_SUCCESS'
+export const DELETE_CSB_INSTANCES_FAILURE = 'DELETE_CSB_INSTANCES_FAILURE'
+
+const fetchDeleteInstance = (clusterID, instanceID) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_CSB_INSTANCES_REQUEST,
+        DELETE_CSB_INSTANCES_SUCCESS,
+        DELETE_CSB_INSTANCES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/${instanceID}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const deleteInstance = (clusterID, instanceID) =>
+  dispatch => dispatch(fetchDeleteInstance(clusterID, instanceID))
+
+// 修改实例
+export const EDIT_CSB_INSTANCE_REQUEST = 'EDIT_CSB_INSTANCE_REQUEST'
+export const EDIT_CSB_INSTANCE_SUCCESS = 'EDIT_CSB_INSTANCE_SUCCESS'
+export const EDIT_CSB_INSTANCE_FAILURE = 'EDIT_CSB_INSTANCE_FAILURE'
+
+const fetchEditInstance = (clusterID, instanceID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        EDIT_CSB_INSTANCE_REQUEST,
+        EDIT_CSB_INSTANCE_SUCCESS,
+        EDIT_CSB_INSTANCE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/${instanceID}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const editInstance = (clusterID, instanceID, body) =>
+  dispatch => dispatch(fetchEditInstance(clusterID, instanceID, body))
