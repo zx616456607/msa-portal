@@ -10,6 +10,7 @@
  * @author zhangpc
  */
 
+import cloneDeep from 'lodash/cloneDeep'
 import { CALL_API } from '../../middleware/api'
 // import { Schemas } from '../../middleware/schemas'
 import { toQuerystring } from '../../common/utils'
@@ -37,11 +38,12 @@ export const CSB_PUBLIC_INSTANCES_FAILURE = 'CSB_PUBLIC_INSTANCES_FAILURE'
 // Fetches a page of pinpoint apps.
 // Relies on the custom API middleware defined in ../middleware/api.js.
 export const fetchInstances = (clusterID, query = {}) => {
-  let types
-  const { flag, page } = query
+  const _query = cloneDeep(query)
+  const { flag, page } = _query
   if (page !== undefined) {
-    query.page = page - 1 // for api page start from 0
+    _query.page = page - 1 // for api page start from 0
   }
+  let types
   switch (flag) {
     case CSB_AVAILABLE_INSTANCES_FLAG:
       types = [
@@ -71,7 +73,7 @@ export const fetchInstances = (clusterID, query = {}) => {
     query,
     [CALL_API]: {
       types,
-      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(_query)}`,
       schema: {},
     },
   }

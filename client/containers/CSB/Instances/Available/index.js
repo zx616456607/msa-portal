@@ -11,16 +11,47 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
+import { parse as parseQuerystring } from 'query-string'
 import { Button, Input, Icon, Card, Table } from 'antd'
+import { getInstances } from '../../../../actions/CSB/instance'
+import {
+  UNUSED_CLUSTER_ID,
+  CSB_AVAILABLE_INSTANCES_FLAG,
+} from '../../../../constants'
+import {
+  getQueryKey,
+} from '../../../../common/utils'
 import './style/index.less'
 
 const Search = Input.Search
+const defaultQuery = {
+  flag: CSB_AVAILABLE_INSTANCES_FLAG,
+  page: 1,
+  size: 10,
+}
+const mergeQuery = (userId, query) => Object.assign(
+  {},
+  defaultQuery,
+  query,
+  { userId }
+)
 
 class AvailableInstances extends React.Component {
+  componentDidMount() {
+    this.loadData()
+  }
+
+  loadData = () => {
+    const { getInstances, currentUser, location } = this.props
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(currentUser.userID, location.query))
+  }
 
   render() {
+    const { availableInstances } = this.props
+    console.log('availableInstances', availableInstances)
     const pagination = {
       simple: true,
       total: 10,
@@ -144,4 +175,19 @@ class AvailableInstances extends React.Component {
   }
 }
 
-export default AvailableInstances
+const mapStateToProps = (state, ownProps) => {
+  const { current, CSB } = state
+  const currentUser = current.user.info
+  const { location } = ownProps
+  location.query = parseQuerystring(location.search)
+  const availableInstancesKey = getQueryKey(mergeQuery(currentUser.userID, location.query))
+  return {
+    currentUser,
+    location,
+    availableInstances: CSB.availableInstances[availableInstancesKey] || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstances,
+})(AvailableInstances)
