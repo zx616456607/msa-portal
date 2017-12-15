@@ -41,13 +41,13 @@ const menus = [
   },
   {
     type: 'SubMenu',
-    text: '所有实例',
+    text: '可申请实例',
     icon: <Icon type="unlock" />,
     key: 'public-csb-instances',
     children: [
       {
         to: '/csb-instances/public',
-        text: '所有实例',
+        text: '可申请实例',
       },
     ],
   },
