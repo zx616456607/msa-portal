@@ -45,12 +45,24 @@ class ApplyforCSBInstanceModal extends React.Component {
       if (errors) {
         return
       }
-      callback(values)
+      const { reason, appplyformpermission } = values
+      let role
+      if (appplyformpermission.length === 1) {
+        role = appplyformpermission[0]
+      }
+      if (appplyformpermission.length === 2) {
+        role = 4
+      }
+      const requsetBody = {
+        role,
+        reason,
+      }
+      callback(requsetBody)
     })
   }
 
   render() {
-    const { loading, form } = this.props
+    const { loading, form, currentRecord } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -70,11 +82,11 @@ class ApplyforCSBInstanceModal extends React.Component {
     >
       <Row className="row-style">
         <Col span={5}>实例名称</Col>
-        <Col span={19}>qweqweqe</Col>
+        <Col span={19}>{ currentRecord.name }</Col>
       </Row>
       <Row className="row-style">
         <Col span={5}>实例描述</Col>
-        <Col span={19}>我是描述</Col>
+        <Col span={19}>{ currentRecord.description }</Col>
       </Row>
       <FormItem
         label="申请权限"
@@ -89,8 +101,8 @@ class ApplyforCSBInstanceModal extends React.Component {
             }],
           })(
             <CheckboxGroup>
-              <Checkbox value="p">可发布服务</Checkbox>
-              <Checkbox value="s">可订阅服务</Checkbox>
+              <Checkbox value={2}>可发布服务</Checkbox>
+              <Checkbox value={1}>可订阅服务</Checkbox>
             </CheckboxGroup>
           )
         }
@@ -101,7 +113,7 @@ class ApplyforCSBInstanceModal extends React.Component {
         {...formItemLayout}
       >
         {
-          getFieldDecorator('reson', {
+          getFieldDecorator('reason', {
             rules: [{
               required: true,
               message: '请填写申请原因',

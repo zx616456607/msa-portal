@@ -15,48 +15,66 @@ import './style/PublicInstances.less'
 import QueueAnim from 'rc-queue-anim'
 import {
   Button, Input, Pagination, Table,
-  Card,
+  Card, notification,
 } from 'antd'
+import { parse as parseQuerystring } from 'query-string'
 import ApplyforCSBInstanceModal from './ApplyforCSBInstanceModal'
-import confirm from '../../../../components/Modal/confirm'
+import { getInstances, applyforInstance } from '../../../../actions/CSB/instance'
+import { connect } from 'react-redux'
+import { formatDate } from '../../../../common/utils'
+import { CSB_PUBLIC_INSTANCES_FLAG, UNUSED_CLUSTER_ID } from '../../../../constants/index'
+import {
+  getQueryKey,
+  toQuerystring,
+} from '../../../../common/utils'
+import isEqual from 'lodash/isEqual'
 
 const Search = Input.Search
+const defaultQuery = {
+  flag: CSB_PUBLIC_INSTANCES_FLAG,
+  page: 1,
+  size: 10,
+}
+const mergeQuery = (userId, query) => Object.assign(
+  {},
+  defaultQuery,
+  query,
+  { userId }
+)
 
-export default class PublicInstances extends React.Component {
+class PublicInstances extends React.Component {
   state = {
     applyforCSBInstanceModalVisible: false,
     confirmLoading: false,
     currentRecord: {},
+    name: '',
   }
 
   componentWillMount() {
     this.loadData()
   }
 
-  loadData = () => {
-
+  loadData = query => {
+    const { getInstances, userId, history, location } = this.props
+    const { name } = this.state
+    query = Object.assign({}, location.query, { name }, query)
+    if (query.name === '') {
+      delete query.name
+    }
+    if (query.page === 1) {
+      delete query.page
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(userId, query))
   }
 
   openApplyforCSBInstanceModal = record => {
-    console.log('record=', record)
     this.setState({
       applyforCSBInstanceModalVisible: true,
       confirmLoading: false,
       currentRecord: record,
-    })
-  }
-
-  cancelApplyforCSBInstance = record => {
-    console.log('record=', record)
-    const self = this
-    confirm({
-      modalTitle: '撤销申请实例',
-      title: '是否确定撤销申请使用实例？',
-      content: '',
-      okText: '撤销',
-      onOk() {
-        self.loadData()
-      },
     })
   }
 
@@ -67,65 +85,76 @@ export default class PublicInstances extends React.Component {
   }
 
   confirmApplyforCSBInstance = values => {
-    console.log('values=', values)
-  }
-
-  searchData = e => {
-    const searchValue = e.target.value
-    console.log('searchValue=', searchValue)
+    const { applyforInstance, userId } = this.props
+    const { currentRecord } = this.state
+    const body = {
+      instance: {
+        id: currentRecord.id,
+      },
+      requestor: {
+        id: userId,
+      },
+      ...values,
+    }
+    this.setState({
+      confirmLoading: true,
+    })
+    applyforInstance(UNUSED_CLUSTER_ID, body).then(res => {
+      if (res.error || !res.response.result.data) {
+        return notification.error('申请失败，请重试')
+      }
+      notification.success('申请成功')
+      this.setState({
+        applyforCSBInstanceModalVisible: false,
+        confirmLoading: false,
+      })
+      this.loadData()
+    })
   }
 
   renderServiceStatusUI = status => {
-    switch (status) {
-      case 1:
-        return <span className="available"><div className="status-icon"></div>可用</span>
-      case 2:
-        return <span className="may-apply"><div className="status-icon"></div>可申请</span>
-      case 3:
-        return <span className="applying"><div className="status-icon"></div>申请中</span>
-      default:
-        return <span>未知</span>
+    if (status) {
+      return <span className="may-apply"><div className="status-icon"></div>可申请</span>
     }
+    return <span>-</span>
   }
 
   render() {
-    const { applyforCSBInstanceModalVisible, confirmLoading, currentRecord } = this.state
+    const { publicInstances } = this.props
+    const { isFetching, data } = publicInstances
+    const {
+      applyforCSBInstanceModalVisible, confirmLoading, currentRecord,
+      name,
+    } = this.state
     const columns = [
       { title: '实例名称', dataIndex: 'name', key: 'name', width: '15%' },
-      { title: '部署集群', dataIndex: 'cluster', key: 'cluster', width: '15%' },
+      { title: '部署集群', dataIndex: 'clusterId', key: 'clusterId', width: '15%' },
       {
         title: '状态',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'creator.status',
+        key: 'creator.status',
         width: '15%',
         render: status => this.renderServiceStatusUI(status),
-        filters: [{
-          text: '可用',
-          value: 1,
-        }, {
-          text: '可申请',
-          value: 2,
-        }],
-        filterMultiple: false,
-        onFilter: (value, record) => record.status.toString() === value,
       },
-      { title: '创建人', dataIndex: 'create', key: 'create', width: '15%' },
-      { title: '描述', dataIndex: 'desc', key: 'desc', width: '15%' },
-      { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: '15%' },
+      { title: '创建人', dataIndex: 'creator.name', key: 'creator', width: '15%' },
+      { title: '描述', dataIndex: 'description', key: 'description', width: '15%' },
+      {
+        title: '创建时间',
+        dataIndex: 'creationTime',
+        key: 'creationTime',
+        width: '15%',
+        render: creationTime => formatDate(creationTime),
+      },
       {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
         width: '10%',
         render: (text, record) => {
-          if (record.status === 3) {
-            return <Button type="ghost" onClick={this.cancelApplyforCSBInstance.bind(this, record)}>撤销申请</Button>
-          }
-          if (record.status === 2) {
+          if (record.creator && record.creator.status) {
             return <Button
               type="primary"
               onClick={this.openApplyforCSBInstanceModal.bind(this, record)}
-              style={{ width: 80 }}
             >
               申请
             </Button>
@@ -134,31 +163,20 @@ export default class PublicInstances extends React.Component {
         },
       },
     ]
-    const tableDataSource = []
-    for (let i = 0; i < 5; i++) {
-      const item = {
-        key: i,
-        name: 'qeweqweq',
-        cluster: '北京',
-        status: i,
-        create: 'eqweqweq',
-        desc: 'hello tenxcloud',
-        createTime: '2020-1-1',
-      }
-      tableDataSource.push(item)
-    }
-    const total = 10
+    const total = 100
     const paginationProps = {
       simple: true,
       total,
+      onChange: current => this.loadData({ page: current }),
     }
     return <QueueAnim id="PublicInstances">
       <div className="layout-content-btns" key="layout-content-btns">
-        <Button type="primary" icon="reload" onClick={this.loadData}>刷新</Button>
+        <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
         <Search
           placeholder="按微服务名称搜索"
           className="search-style"
-          onPressEnter={this.searchData}
+          onChange={e => this.setState({ name: e.target.value })}
+          onPressEnter={() => this.loadData({ name, page: 1 })}
         />
         {
           total > 0 && <div className="page-box">
@@ -171,11 +189,11 @@ export default class PublicInstances extends React.Component {
         <Card hoverable={false}>
           <Table
             columns={columns}
-            dataSource={tableDataSource}
+            dataSource={data}
             // rowSelection={rowSelection}
             pagination={false}
-            // loading={isFetching}
-            rowKey={record => record.key}
+            loading={isFetching}
+            rowKey={record => record.id}
           />
         </Card>
       </div>
@@ -190,3 +208,21 @@ export default class PublicInstances extends React.Component {
     </QueueAnim>
   }
 }
+
+const mapStateToProps = (state, props) => {
+  const { location } = props
+  const { current, CSB } = state
+  const { user } = current
+  const userID = user.info.userID
+  location.query = parseQuerystring(location.search)
+  const publicInstancesKey = getQueryKey(mergeQuery(userID, location.query))
+  return {
+    userId: userID,
+    publicInstances: CSB.publicInstances[publicInstancesKey] || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstances,
+  applyforInstance,
+})(PublicInstances)
