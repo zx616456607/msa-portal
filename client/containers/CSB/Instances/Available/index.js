@@ -13,6 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import isEqual from 'lodash/isEqual'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
 import { Button, Input, Icon, Card, Table, Pagination } from 'antd'
@@ -26,7 +27,6 @@ import {
   formatDate,
   getInstanceRole,
   toQuerystring,
-  isEmptyObj,
 } from '../../../../common/utils'
 import './style/index.less'
 
@@ -62,7 +62,7 @@ class AvailableInstances extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
-    if (!isEmptyObj(query) || !isEmptyObj(location.query)) {
+    if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(currentUser.userID, query))
@@ -180,6 +180,7 @@ class AvailableInstances extends React.Component {
             placeholder="按实例名搜索"
             onChange={e => this.setState({ name: e.target.value })}
             onSearch={name => this.loadData({ name, page: 1 })}
+            value={this.state.name}
           />
           {
             totalElements > 0 && <div className="page-box">
