@@ -12,26 +12,40 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select } from 'antd'
+import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select, Pagination } from 'antd'
 import QueueAnim from 'rc-queue-anim'
+import isEqual from 'lodash/isEqual'
+import { parse as parseQuerystring } from 'query-string'
 import './style/index.less'
 import CreateModal from './CreateModal'
 import confirm from '../../../components/Modal/confirm'
-import { getInstances } from '../../../actions/CSB/instance'
+import { getInstances, deleteInstance } from '../../../actions/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
-import { formatDate, getQueryKey } from '../../../common/utils'
+import { formatDate, getQueryKey, toQuerystring } from '../../../common/utils'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
 const Option = Select.Option
+
+const defaultQuery = {
+  flag: CSB_OM_INSTANCES_FLAG,
+  page: 1,
+  size: 10,
+}
+const mergeQuery = (userId, query) => Object.assign(
+  {},
+  defaultQuery,
+  query,
+  { userId }
+)
 
 class CSBInstanceOm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       createModal: false,
-      page: 1,
-      size: 5,
+      currentSearchType: 'creator',
+      searchValue: '',
     }
   }
 
@@ -39,30 +53,27 @@ class CSBInstanceOm extends React.Component {
     this.getInstanceList()
   }
 
-  getInstanceList = () => {
-    const { getInstances, userID, location } = this.props
-    const { filterName, filterCreator, page, size } = this.state
-    const query = {
-      userId: userID,
-      flag: CSB_OM_INSTANCES_FLAG,
-      page,
-      size,
+  getInstanceList = query => {
+    const { getInstances, location, userID, history } = this.props
+    const { currentSearchType, searchValue } = this.state
+    query = Object.assign({}, location.query, { [currentSearchType]: searchValue }, query)
+    if (currentSearchType === 'name') {
+      delete query.creator
     }
-    if (filterName) {
-      Object.assign(query, { name: filterName })
+    if (currentSearchType === 'creator') {
+      delete query.name
     }
-    if (filterCreator) {
-      Object.assign(query, { creator: filterCreator })
+    if (searchValue === '') {
+      delete query[currentSearchType]
+    }
+    if (query.page === 1) {
+      delete query.page
     }
     location.query = getQueryKey(query)
-    this.setState({
-      tableLoading: true,
-    })
-    getInstances(UNUSED_CLUSTER_ID, query).then(() => {
-      this.setState({
-        tableLoading: false,
-      })
-    })
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
   }
 
   tableChange = pagination => {
@@ -77,8 +88,9 @@ class CSBInstanceOm extends React.Component {
     })
   }
 
-  handleButtonClick = () => {
-
+  handleButtonClick = row => {
+    const { history } = this.props
+    history.push(`/csb-instances-available/${row.id}`)
   }
 
   stopConfirm = () => {
@@ -94,13 +106,23 @@ class CSBInstanceOm extends React.Component {
   }
 
   deleteConfirm = () => {
+    const { deleteInstance } = this.props
+    const { currentInstance } = this.state
     confirm({
       modalTitle: '放弃使用 CSB 实例',
       title: '放弃使用后将不能在此实例中发布、订阅服务；已发布的服务将被\n' +
       '注销，已订购的服务将被退订。',
-      content: '确定是否放弃使用 xxx 实例？',
+      content: `确定是否放弃使用 ${currentInstance.name} 实例？`,
       onOk: () => {
-
+        return new Promise((resolve, reject) => {
+          deleteInstance(currentInstance.clusterId, currentInstance.id).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            this.getInstanceList()
+          })
+        })
       },
     })
   }
@@ -117,7 +139,9 @@ class CSBInstanceOm extends React.Component {
         })
         break
       case 'delete':
-        this.deleteConfirm()
+        this.setState({
+          currentInstance: row,
+        }, this.deleteConfirm)
         break
       default:
         break
@@ -139,15 +163,18 @@ class CSBInstanceOm extends React.Component {
 
   render() {
     const {
-      radioValue, createModal, currentInstance, page,
-      tableLoading,
+      radioValue, createModal, currentInstance, searchValue,
+      currentSearchType,
     } = this.state
-    const { omInstances, userID, namespace } = this.props
+    const { omInstances, userID, namespace, location } = this.props
+    const { totalElements, isFetching, content, size } = omInstances
+    const { query } = location
     const pagination = {
       simple: true,
-      total: omInstances && omInstances.totalElements,
-      current: page,
-      pageSize: 5,
+      total: totalElements,
+      pageSize: size,
+      current: parseInt(query.page) || 1,
+      onChange: page => this.getInstanceList({ page }),
     }
     const columns = [
       { title: 'CSB实例', dataIndex: 'name' },
@@ -164,22 +191,29 @@ class CSBInstanceOm extends React.Component {
           text: '已停止',
           value: 'stop',
         }],
+        render: text => (text ? text : '-'),
       },
-      { title: '累计调用量', dataIndex: 'transferNum' },
-      { title: 'CPU使用率', dataIndex: 'cpuRate' },
-      { title: '内存使用率', dataIndex: 'memoryRate' },
+      { title: '累计调用量', dataIndex: 'transferNum',
+        render: text => (text ? text : '-'),
+      },
+      { title: 'CPU使用率', dataIndex: 'cpuRate',
+        render: text => (text ? text : '-'),
+      },
+      { title: '内存使用率', dataIndex: 'memoryRate',
+        render: text => (text ? text : '-'),
+      },
       { title: '创建时间', dataIndex: 'creationTime', render: text => formatDate(text) },
       { title: '操作',
         render: (text, row) => {
           const menu = (
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
-              <Menu.Item key="stop">停止</Menu.Item>
+              {/* <Menu.Item key="stop">停止</Menu.Item>*/}
               <Menu.Item key="edit">修改实例</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
             </Menu>
           )
           return (
-            <Dropdown.Button onClick={this.handleButtonClick} overlay={menu}>
+            <Dropdown.Button onClick={() => this.handleButtonClick(row)} overlay={menu}>
               实例详情
             </Dropdown.Button>
           )
@@ -187,9 +221,9 @@ class CSBInstanceOm extends React.Component {
       },
     ]
     const selectBefore = (
-      <Select defaultValue="creator" style={{ width: 90 }}>
+      <Select defaultValue="creator" style={{ width: 90 }} onSelect={currentSearchType => this.setState({ currentSearchType })}>
         <Option value="creator">创建人</Option>
-        <Option value="instance">实例名称</Option>
+        <Option value="name">实例名称</Option>
       </Select>
     )
     return (
@@ -214,25 +248,33 @@ class CSBInstanceOm extends React.Component {
         </div>
         <div className="layout-content-btns" key="btns">
           <Button type="primary" onClick={this.openCreateModal}><Icon type="plus"/>创建实例</Button>
-          <Button type="primary"><Icon type="sync" /> 刷新</Button>
+          <Button type="primary" onClick={() => this.getInstanceList()}><Icon type="sync" /> 刷新</Button>
           <SearchInput
             addonBefore={selectBefore}
             placeholder="请输入关键字搜索"
             style={{ width: 280 }}
+            value={searchValue}
+            onChange={e => this.setState({ searchValue: e.target.value })}
+            onSearch={value => this.getInstanceList({ [currentSearchType]: value, page: 1 })}
           />
           {
-            omInstances && omInstances.totalElements &&
-            <span className="csb-om-total float-right">共计 {omInstances && omInstances.totalElements} 条</span>
+            totalElements ?
+              <div className="page-box">
+                <span className="total">共计 {totalElements} 条</span>
+                <Pagination {...pagination}/>
+              </div>
+              : null
           }
         </div>
         <div className="layout-content-body" key="body">
           <Table
             className="csb-om-table"
             columns={columns}
-            dataSource={omInstances.content}
-            pagination={pagination}
+            dataSource={content}
+            pagination={false}
             onChange={this.tableChange}
-            loading={tableLoading}
+            loading={isFetching}
+            rowKey={row => row.id}
           />
         </div>
       </QueueAnim>
@@ -247,7 +289,8 @@ const mapStateToProps = (state, props) => {
   const { userID, namespace } = info
   const { omInstances } = CSB
   const { location } = props
-  const omInstancesKey = location.query
+  location.query = parseQuerystring(location.search)
+  const omInstancesKey = getQueryKey(mergeQuery(userID, location.query))
   return {
     location,
     namespace,
@@ -258,4 +301,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(mapStateToProps, {
   getInstances,
+  deleteInstance,
 })(CSBInstanceOm)
