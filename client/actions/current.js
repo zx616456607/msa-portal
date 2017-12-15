@@ -131,3 +131,26 @@ const fetchDefaultClusters = query => {
 export const getDefaultClusters = query => dispatch => {
   return dispatch(fetchDefaultClusters(query))
 }
+
+export const FETCH_ALL_CLUSTERS_REQUEST = 'FETCH_ALL_CLUSTERS_REQUEST'
+export const FETCH_ALL_CLUSTERS_SUCCESS = 'FETCH_ALL_CLUSTERS_SUCCESS'
+export const FETCH_ALL_CLUSTERS_FAILURE = 'FETCH_ALL_CLUSTERS_FAILURE'
+
+// Get all clusters
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchAllClusters = query => {
+  return {
+    [CALL_API]: {
+      types: [ FETCH_ALL_CLUSTERS_REQUEST, FETCH_ALL_CLUSTERS_SUCCESS, FETCH_ALL_CLUSTERS_FAILURE ],
+      endpoint: `/clusters?${toQuerystring(query)}`,
+      schema: Schemas.ALL_CLUSTERS_ARRAY_DATA,
+    },
+  }
+}
+
+// Fetches all clusters
+// Relies on Redux Thunk middleware.
+
+export const getAllClusters = query => dispatch => {
+  return dispatch(fetchAllClusters(query))
+}

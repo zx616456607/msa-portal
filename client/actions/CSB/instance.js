@@ -83,3 +83,27 @@ export const fetchInstances = (clusterID, query = {}) => {
 // Relies on Redux Thunk middleware.
 export const getInstances = (clusterID, query) =>
   dispatch => dispatch(fetchInstances(clusterID, query))
+
+export const CREATE_INSTANCE_REQUEST = 'CREATE_INSTANCE_REQUEST'
+export const CREATE_INSTANCE_SUCCESS = 'CREATE_INSTANCE_SUCCESS'
+export const CREATE_INSTANCE_FAILURE = 'CREATE_INSTANCE_FAILURE'
+
+// Create an instance
+// Relies on the custom API middleware defined in ../middleware/api.js.
+
+const fetchCreateInstance = (clusterID, query, body) => {
+  return {
+    [CALL_API]: {
+      types: [ CREATE_INSTANCE_REQUEST, CREATE_INSTANCE_SUCCESS, CREATE_INSTANCE_FAILURE ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const createInstance = (clusterID, query, body) =>
+  dispatch => dispatch(fetchCreateInstance(clusterID, query, body))

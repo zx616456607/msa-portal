@@ -11,22 +11,64 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
 import CreateModal from './CreateModal'
 import confirm from '../../../components/Modal/confirm'
+import { getInstances } from '../../../actions/CSB/instance'
+import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
+import { formatDate, getQueryKey } from '../../../common/utils'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
 const Option = Select.Option
 
-export default class CSBInstanceOm extends React.Component {
+class CSBInstanceOm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       createModal: false,
+      page: 1,
+      size: 5,
     }
+  }
+
+  componentWillMount() {
+    this.getInstanceList()
+  }
+
+  getInstanceList = () => {
+    const { getInstances, userID, location } = this.props
+    const { filterName, filterCreator, page, size } = this.state
+    const query = {
+      userId: userID,
+      flag: CSB_OM_INSTANCES_FLAG,
+      page,
+      size,
+    }
+    if (filterName) {
+      Object.assign(query, { name: filterName })
+    }
+    if (filterCreator) {
+      Object.assign(query, { creator: filterCreator })
+    }
+    location.query = getQueryKey(query)
+    this.setState({
+      tableLoading: true,
+    })
+    getInstances(UNUSED_CLUSTER_ID, query).then(() => {
+      this.setState({
+        tableLoading: false,
+      })
+    })
+  }
+
+  tableChange = pagination => {
+    this.setState({
+      page: pagination.current,
+    }, this.getInstanceList)
   }
 
   radioChange = e => {
@@ -96,17 +138,21 @@ export default class CSBInstanceOm extends React.Component {
   }
 
   render() {
-    const { radioValue, createModal, currentInstance } = this.state
+    const {
+      radioValue, createModal, currentInstance, page,
+      tableLoading,
+    } = this.state
+    const { omInstances, userID } = this.props
     const pagination = {
       simple: true,
-      total: 10,
-      current: 1,
-      pageSize: 10,
+      total: omInstances && omInstances.totalElements,
+      current: page,
+      pageSize: 5,
     }
     const columns = [
-      { title: 'CSB实例', dataIndex: 'instance' },
-      { title: '创建人', dataIndex: 'creator' },
-      { title: '部署集群', dataIndex: 'cluster' },
+      { title: 'CSB实例', dataIndex: 'name' },
+      { title: '创建人', dataIndex: 'creator.name' },
+      { title: '部署集群', dataIndex: 'clusterId' },
       { title: '状态', dataIndex: 'status',
         filters: [{
           text: '运行中',
@@ -122,7 +168,7 @@ export default class CSBInstanceOm extends React.Component {
       { title: '累计调用量', dataIndex: 'transferNum' },
       { title: 'CPU使用率', dataIndex: 'cpuRate' },
       { title: '内存使用率', dataIndex: 'memoryRate' },
-      { title: '创建时间', dataIndex: 'creationTime' },
+      { title: '创建时间', dataIndex: 'creationTime', render: text => formatDate(text) },
       { title: '操作',
         render: (text, row) => {
           const menu = (
@@ -140,20 +186,6 @@ export default class CSBInstanceOm extends React.Component {
         },
       },
     ]
-    const data = []
-    for (let i = 0; i < 3; i++) {
-      data.push({
-        key: i,
-        instance: `instance${i + 1}`,
-        creator: 'admin',
-        cluster: 'beijing',
-        status: '运行中',
-        transferNum: 100,
-        cpuRate: '80%',
-        memoryRate: '70%',
-        creationTime: '2017-12-13 12:00:00',
-      })
-    }
     const selectBefore = (
       <Select defaultValue="creator" style={{ width: 90 }}>
         <Option value="creator">创建人</Option>
@@ -163,6 +195,7 @@ export default class CSBInstanceOm extends React.Component {
     return (
       <QueueAnim className="csb-om">
         <CreateModal
+          userId={userID}
           visible={createModal}
           currentInstance={currentInstance}
           closeCreateModal={this.closeCreateModal}
@@ -182,17 +215,41 @@ export default class CSBInstanceOm extends React.Component {
             placeholder="请输入关键字搜索"
             style={{ width: 280 }}
           />
-          <span className="csb-om-total float-right">共计 10 条</span>
+          {
+            omInstances && omInstances.totalElements &&
+            <span className="csb-om-total float-right">共计 {omInstances && omInstances.totalElements} 条</span>
+          }
         </div>
         <div className="layout-content-body" key="body">
           <Table
             className="csb-om-table"
             columns={columns}
-            dataSource={data}
+            dataSource={omInstances.content}
             pagination={pagination}
+            onChange={this.tableChange}
+            loading={tableLoading}
           />
         </div>
       </QueueAnim>
     )
   }
 }
+
+const mapStateToProps = (state, props) => {
+  const { current, CSB } = state
+  const { user } = current
+  const { info } = user
+  const { userID } = info
+  const { omInstances } = CSB
+  const { location } = props
+  const omInstancesKey = location.query
+  return {
+    location,
+    userID,
+    omInstances: omInstances[omInstancesKey] || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstances,
+})(CSBInstanceOm)

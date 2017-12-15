@@ -111,6 +111,29 @@ function clusters(state = {}, action) {
   }
 }
 
+function allClusters(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.FETCH_ALL_CLUSTERS_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.FETCH_ALL_CLUSTERS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ids: action.response.result.clusters,
+      }
+    case ActionTypes.FETCH_ALL_CLUSTERS_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const current = (state = {
   config: { project: {}, cluster: {} },
   user: {},
@@ -122,6 +145,7 @@ const current = (state = {
     user: user(state.user, action),
     projects: projects(state.projects, action),
     clusters: clusters(state.clusters, action),
+    allClusters: allClusters(state.allClusters, action),
   }
 }
 

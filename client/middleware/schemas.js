@@ -41,6 +41,10 @@ const clusterSchema = new schema.Entity('clusters', {}, {
   idAttribute: 'clusterID',
 })
 
+const allClusterSchema = new schema.Entity('allClusters', {}, {
+  idAttribute: 'clusterID',
+})
+
 // PinPoint
 const ppAppsSchema = new schema.Entity('ppApps', {}, {
   idAttribute: 'applicationName',
@@ -92,6 +96,9 @@ export const Schemas = {
   },
   CLUSTERS_ARRAY_DATA: {
     clusters: [ clusterSchema ],
+  },
+  ALL_CLUSTERS_ARRAY_DATA: {
+    clusters: [ allClusterSchema ],
   },
   AUTH: authSchema,
   AUTH_DATA: {
