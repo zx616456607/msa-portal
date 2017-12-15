@@ -21,28 +21,14 @@ const FormItem = Form.Item
 const Option = Select.Option
 
 class InstanceModal extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      visible: false,
-    }
-  }
 
-  componentWillReceiveProps(nextProps) {
-    const { visible: oldVisible } = this.props
-    const { visible: newVisible, getAllClusters } = nextProps
-    if (oldVisible !== newVisible) {
-      this.setState({
-        visible: newVisible,
-      })
-    }
-    if (!oldVisible && newVisible) {
-      getAllClusters({ size: 100 })
-    }
+  componentDidMount() {
+    const { getAllClusters } = this.props
+    getAllClusters({ size: 100 })
   }
 
   confirmModal = () => {
-    const { closeCreateModal, createInstance, form, userId } = this.props
+    const { closeCreateModal, createInstance, form, userId, namespace, callback } = this.props
     form.validateFields((errors, values) => {
       if (errors) {
         return
@@ -50,6 +36,7 @@ class InstanceModal extends React.Component {
       const { name, description, cluster } = values
       const body = {
         name,
+        namespace,
         description,
         systemCallKey: 'wdfaflasdf',
       }
@@ -60,10 +47,8 @@ class InstanceModal extends React.Component {
         if (res.error) {
           return
         }
+        callback()
         closeCreateModal()
-        this.setState({
-          visible: false,
-        })
       })
     })
   }
@@ -71,13 +56,9 @@ class InstanceModal extends React.Component {
   cancelModal = () => {
     const { closeCreateModal } = this.props
     closeCreateModal()
-    this.setState({
-      visible: false,
-    })
   }
   render() {
-    const { form, currentInstance, clusterList } = this.props
-    const { visible } = this.state
+    const { form, currentInstance, clusterList, visible } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: {
