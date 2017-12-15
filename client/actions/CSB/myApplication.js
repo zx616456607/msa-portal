@@ -63,3 +63,27 @@ export const removeApply = (clusterID, id) => dispatch => {
   return dispatch(delApply(clusterID, id))
 }
 
+
+export const UPDATE_APPLY_REQUEST = 'UPDATE_APPLY_REQUEST'
+export const UPDATE_APPLY_SUCCESS = 'UPDATE_APPLY_SUCCESS'
+export const UPDATE_APPLY_FAILURE = 'UPDATE_APPLY_FAILURE'
+
+const fetchUpdateApply = (clusterID, id, body) => {
+  return {
+    id,
+    clusterID,
+    [CALL_API]: {
+      types: [ UPDATE_APPLY_REQUEST, UPDATE_APPLY_SUCCESS, UPDATE_APPLY_FAILURE ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request/${id}`,
+      schema: {},
+      options: {
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateApply = (clusterID, id, body) => dispatch => {
+  return dispatch(fetchUpdateApply(clusterID, id, body))
+}

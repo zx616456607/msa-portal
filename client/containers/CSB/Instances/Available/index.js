@@ -92,7 +92,7 @@ class AvailableInstances extends React.Component {
             notification.success({
               message: '放弃使用实例成功',
             })
-            self.loadData()
+            self.loadData({ name: '', page: 1 })
           })
         })
       },
