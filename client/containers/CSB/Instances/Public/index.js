@@ -101,9 +101,9 @@ class PublicInstances extends React.Component {
     })
     applyforInstance(UNUSED_CLUSTER_ID, body).then(res => {
       if (res.error || !res.response.result.data) {
-        return notification.error('申请失败，请重试')
+        return notification.error({ message: '申请失败，请重试' })
       }
-      notification.success('申请成功')
+      notification.success({ message: '申请成功' })
       this.setState({
         applyforCSBInstanceModalVisible: false,
         confirmLoading: false,
