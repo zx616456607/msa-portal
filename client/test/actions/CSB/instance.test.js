@@ -11,9 +11,9 @@
  */
 
 import expect from 'expect'
-import * as ActionsAndTypes from '../../actions/instance'
-import { toQuerystring } from '../../common/utils'
-import { API_CONFIG } from '../../constants'
+import * as ActionsAndTypes from '../../../actions/instance'
+import { toQuerystring } from '../../../common/utils'
+import { API_CONFIG } from '../../../constants'
 
 describe('CSB instances actions', () => {
   afterEach(() => {
@@ -72,6 +72,7 @@ describe('CSB instances actions', () => {
       .dispatch(ActionsAndTypes.fetchInstances(clusterID, userID, query))
       .then(() => {
         // return of async actions
+        console.log(JSON.stringify(store.getActions(), null, 2))
         expect(store.getActions()).toEqual(expectedActions)
       })
   })
