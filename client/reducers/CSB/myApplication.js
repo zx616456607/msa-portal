@@ -29,7 +29,7 @@ export const myApplication = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          meta: action.response.result.data,
+          ...action.response.result.data,
         },
       }
     case ActionTypes.FETCH_APPLY_LIST_FAILURE:
