@@ -10,6 +10,7 @@
  * @author zhangpc
  */
 import { publicInstances, availableInstances, omInstances } from './instance'
+
 const CSB = (state = {
   publicInstances: {},
   availableInstances: {},

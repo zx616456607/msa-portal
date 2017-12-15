@@ -38,7 +38,11 @@ export const CSB_PUBLIC_INSTANCES_FAILURE = 'CSB_PUBLIC_INSTANCES_FAILURE'
 // Relies on the custom API middleware defined in ../middleware/api.js.
 export const fetchInstances = (clusterID, query = {}) => {
   let types
-  switch (query.flag) {
+  const { flag, page } = query
+  if (page !== undefined) {
+    query.page = page - 1 // for api page start from 0
+  }
+  switch (flag) {
     case CSB_AVAILABLE_INSTANCES_FLAG:
       types = [
         CSB_AVAILABLE_INSTANCES_REQUEST,

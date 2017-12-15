@@ -11,11 +11,11 @@
  */
 
 import * as ActionTypes from '../../actions/CSB/instance'
-import { toQuerystring } from '../../common/utils'
+import { getQueryKey } from '../../common/utils'
 
 export const publicInstances = (state = {}, action) => {
   const { query, type } = action
-  const key = toQuerystring(query)
+  const key = getQueryKey(query)
   switch (type) {
     case ActionTypes.CSB_PUBLIC_INSTANCES_REQUEST:
       return {
@@ -46,7 +46,7 @@ export const publicInstances = (state = {}, action) => {
 
 export const availableInstances = (state = {}, action) => {
   const { query, type } = action
-  const key = toQuerystring(query)
+  const key = getQueryKey(query)
   switch (type) {
     case ActionTypes.CSB_AVAILABLE_INSTANCES_REQUEST:
       return {
@@ -77,7 +77,7 @@ export const availableInstances = (state = {}, action) => {
 
 export const omInstances = (state = {}, action) => {
   const { query, type } = action
-  const key = toQuerystring(query)
+  const key = getQueryKey(query)
   switch (type) {
     case ActionTypes.CSB_OM_INSTANCES_REQUEST:
       return {
