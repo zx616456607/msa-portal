@@ -13,6 +13,7 @@
 import { CALL_API } from '../../middleware/api'
 import { toQuerystring } from '../../common/utils'
 import { API_CONFIG } from '../../constants'
+import cloneDeep from 'lodash/cloneDeep'
 
 const { CSB_API_URL } = API_CONFIG
 
@@ -21,11 +22,17 @@ export const FETCH_APPLY_LIST_SUCCESS = 'FETCH_APPLY_LIST_SUCCESS'
 export const FETCH_APPLY_LIST_FAILURE = 'FETCH_APPLY_LIST_FAILURE'
 
 const fetchApplyList = (clusterID, query = {}) => {
+  const _query = cloneDeep(query)
+  const { page } = _query
+  if (page !== undefined) {
+    _query.page = page - 1 // for api page start from 0
+  }
   return {
     clusterID,
+    query,
     [CALL_API]: {
       types: [ FETCH_APPLY_LIST_REQUEST, FETCH_APPLY_LIST_SUCCESS, FETCH_APPLY_LIST_FAILURE ],
-      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request?${toQuerystring(query)}`,
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request?${toQuerystring(_query)}`,
       schema: {},
     },
   }
