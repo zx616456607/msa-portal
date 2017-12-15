@@ -132,3 +132,27 @@ const fetchApplyforInstance = (clusterID, body) => {
 
 export const applyforInstance = (clusterID, body) =>
   dispatch => dispatch(fetchApplyforInstance(clusterID, body))
+
+// 放弃使用实例
+export const ABANDON_CSB_INSTANCES_REQUEST = 'ABANDON_CSB_INSTANCES_REQUEST'
+export const ABANDON_CSB_INSTANCES_SUCCESS = 'ABANDON_CSB_INSTANCES_SUCCESS'
+export const ABANDON_CSB_INSTANCES_FAILURE = 'ABANDON_CSB_INSTANCES_FAILURE'
+
+const fetchAbandonInstance = (clusterID, instanceID, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        ABANDON_CSB_INSTANCES_REQUEST,
+        ABANDON_CSB_INSTANCES_SUCCESS,
+        ABANDON_CSB_INSTANCES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/role/${instanceID}?${toQuerystring(query)}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+export const abandonInstance = (clusterID, instanceID, query) =>
+  dispatch => dispatch(fetchAbandonInstance(clusterID, instanceID, query))

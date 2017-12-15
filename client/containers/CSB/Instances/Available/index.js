@@ -16,8 +16,12 @@ import { Link } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
-import { Button, Input, Icon, Card, Table, Pagination } from 'antd'
-import { getInstances } from '../../../../actions/CSB/instance'
+import { Button, Input, Icon, Card, Table, Pagination, notification } from 'antd'
+import confirm from '../../../../components/Modal/confirm'
+import {
+  getInstances,
+  abandonInstance,
+} from '../../../../actions/CSB/instance'
 import {
   UNUSED_CLUSTER_ID,
   CSB_AVAILABLE_INSTANCES_FLAG,
@@ -66,6 +70,33 @@ class AvailableInstances extends React.Component {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(currentUser.userID, query))
+  }
+
+  abandonInstance = id => {
+    const { abandonInstance, currentUser } = this.props
+    const self = this
+    confirm({
+      modalTitle: '放弃使用实例',
+      title: '是否确定放弃使用实例？',
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          const query = {
+            userId: currentUser.userID,
+          }
+          abandonInstance(UNUSED_CLUSTER_ID, id, query).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '放弃使用实例成功',
+            })
+            self.loadData()
+          })
+        })
+      },
+    })
   }
 
   render() {
@@ -154,7 +185,9 @@ class AvailableInstances extends React.Component {
               >
               查看实例
               </Button>
-              <Button>放弃使用</Button>
+              <Button onClick={this.abandonInstance.bind(this, row.instance.id)}>
+                放弃使用
+              </Button>
             </div>
           )
         },
@@ -220,4 +253,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(mapStateToProps, {
   getInstances,
+  abandonInstance,
 })(AvailableInstances)
