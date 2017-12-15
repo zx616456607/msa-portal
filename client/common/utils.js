@@ -200,3 +200,44 @@ export function getType(param) {
   type = type.replace(/\]/, '')
   return type.toLowerCase()
 }
+
+/**
+ * Check object if empty
+ *
+ * @param {object} obj the object
+ * @return {bool} true or false
+ */
+export function isEmptyObj(obj) {
+  for (const name in obj) {
+    return false
+  }
+  return true
+}
+
+/**
+ * Get role object by roleId
+ *
+ * @param {number} roleId id of role
+ * @return {object} role object
+ */
+export const getInstanceRole = roleId => {
+  const data = {
+    subscribe: false,
+    publish: false,
+  }
+  switch (roleId) {
+    case 1:
+      data.subscribe = true
+      break
+    case 2:
+      data.publish = true
+      break
+    case 4:
+      data.subscribe = true
+      data.publish = true
+      break
+    default:
+      break
+  }
+  return data
+}

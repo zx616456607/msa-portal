@@ -20,9 +20,9 @@ export const publicInstances = (state = {}, action) => {
     case ActionTypes.CSB_PUBLIC_INSTANCES_REQUEST:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: true,
-        },
+        }),
       }
     case ActionTypes.CSB_PUBLIC_INSTANCES_SUCCESS:
       return {
@@ -35,9 +35,9 @@ export const publicInstances = (state = {}, action) => {
     case ActionTypes.CSB_PUBLIC_INSTANCES_FAILURE:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: false,
-        },
+        }),
       }
     default:
       return state
@@ -51,9 +51,9 @@ export const availableInstances = (state = {}, action) => {
     case ActionTypes.CSB_AVAILABLE_INSTANCES_REQUEST:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: true,
-        },
+        }),
       }
     case ActionTypes.CSB_AVAILABLE_INSTANCES_SUCCESS:
       return {
@@ -66,9 +66,9 @@ export const availableInstances = (state = {}, action) => {
     case ActionTypes.CSB_AVAILABLE_INSTANCES_FAILURE:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: false,
-        },
+        }),
       }
     default:
       return state
@@ -82,9 +82,9 @@ export const omInstances = (state = {}, action) => {
     case ActionTypes.CSB_OM_INSTANCES_REQUEST:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: true,
-        },
+        }),
       }
     case ActionTypes.CSB_OM_INSTANCES_SUCCESS:
       return {
@@ -97,9 +97,9 @@ export const omInstances = (state = {}, action) => {
     case ActionTypes.CSB_OM_INSTANCES_FAILURE:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: false,
-        },
+        }),
       }
     default:
       return state
