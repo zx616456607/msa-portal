@@ -142,7 +142,7 @@ class CSBInstanceOm extends React.Component {
       radioValue, createModal, currentInstance, page,
       tableLoading,
     } = this.state
-    const { omInstances, userID } = this.props
+    const { omInstances, userID, namespace } = this.props
     const pagination = {
       simple: true,
       total: omInstances && omInstances.totalElements,
@@ -194,12 +194,17 @@ class CSBInstanceOm extends React.Component {
     )
     return (
       <QueueAnim className="csb-om">
-        <CreateModal
-          userId={userID}
-          visible={createModal}
-          currentInstance={currentInstance}
-          closeCreateModal={this.closeCreateModal}
-        />
+        {
+          createModal &&
+          <CreateModal
+            callback={this.getInstanceList}
+            userId={userID}
+            namespace={namespace}
+            visible={createModal}
+            currentInstance={currentInstance}
+            closeCreateModal={this.closeCreateModal}
+          />
+        }
         <div className="csb-om-radio" key="radios">
           实例状态：
           <RadioGroup onChange={this.radioChange} value={radioValue}>
@@ -239,12 +244,13 @@ const mapStateToProps = (state, props) => {
   const { current, CSB } = state
   const { user } = current
   const { info } = user
-  const { userID } = info
+  const { userID, namespace } = info
   const { omInstances } = CSB
   const { location } = props
   const omInstancesKey = location.query
   return {
     location,
+    namespace,
     userID,
     omInstances: omInstances[omInstancesKey] || {},
   }
