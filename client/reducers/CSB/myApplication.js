@@ -11,21 +11,23 @@
  */
 
 import * as ActionTypes from '../../actions/CSB/myApplication'
+import { getQueryKey } from '../../common/utils'
 
 export const myApplication = (state = {}, action) => {
-  const { type, clusterID } = action
+  const { type, query } = action
+  const key = getQueryKey(query)
   switch (type) {
     case ActionTypes.FETCH_APPLY_LIST_REQUEST:
       return {
         ...state,
-        [clusterID]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: true,
-        },
+        }),
       }
     case ActionTypes.FETCH_APPLY_LIST_SUCCESS:
       return {
         ...state,
-        [clusterID]: {
+        [key]: {
           isFetching: false,
           meta: action.response.result.data,
         },
@@ -33,9 +35,9 @@ export const myApplication = (state = {}, action) => {
     case ActionTypes.FETCH_APPLY_LIST_FAILURE:
       return {
         ...state,
-        [clusterID]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: false,
-        },
+        }),
       }
     default:
       return state
