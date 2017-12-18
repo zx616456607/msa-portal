@@ -76,6 +76,11 @@ const csbOmInstancesSchema = new schema.Entity('csbOmInstances', {}, {
   idAttribute: 'id',
 })
 
+// CSB myApplication
+const csbApplySchema = new schema.Entity('csbApply', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -139,6 +144,11 @@ export const Schemas = {
   CSB_OM_INSNTANCES_LIST_DATA: {
     data: {
       content: [ csbOmInstancesSchema ],
+    },
+  },
+  CSB_APPLY_LIST_DATA: {
+    data: {
+      content: [ csbApplySchema ],
     },
   },
 }

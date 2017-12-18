@@ -1,0 +1,55 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * SCBApply-Style
+ *
+ * 2017-12-18
+ * @author zhaoyb
+ */
+ @import '~assets/style/core/index.less';
+
+ .body {
+  display: inline-block;
+  .circular {
+    span {
+      vertical-align: text-bottom;
+    }
+    div {
+      width: 12px;
+      height: 12px;
+      margin-right: 10px;
+      border-radius: 50px;
+      display: inline-block;
+    }
+  }
+  .adopt {
+    display: inline-block;
+    span {
+      color: @success-color;
+    }
+    div {
+      background-color: @success-color;
+    }
+  }
+  .refuse {
+    display: inline-block;
+    span {
+      color: @error-color;
+    }
+    div {
+      background-color: @error-color;
+    }
+  }
+  .apply {
+    display: inline-block;
+    span {
+      color: @primary-color;
+    }
+    div {
+      background-color: @primary-color;
+    }
+  }
+ }

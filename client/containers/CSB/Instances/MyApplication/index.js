@@ -13,24 +13,18 @@ import React from 'react'
 import isEqual from 'lodash/isEqual'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Table, Pagination, Card, Modal, notification } from 'antd'
+import { Button, Icon, Input, Table, Pagination, Card, Modal, notification, Tooltip } from 'antd'
 import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
-import { UNUSED_CLUSTER_ID, CSB_PUBLIC_INSTANCES_FLAG } from '../../../../constants'
-import { getInstanceRole, getQueryKey, toQuerystring } from '../../../../common/utils'
+import CSBApplyStatus from '../../../../components/CSBApplyStatus'
+import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
+import { getInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
+import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/apply'
+
+const applysSlt = csbApplySltMaker(CSB_APPLY_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_APPLY_FLAG)
 const Search = Input.Search
-const defaultQuery = {
-  flag: CSB_PUBLIC_INSTANCES_FLAG,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
 class MyApplication extends React.Component {
   state = {
     id: '',
@@ -77,13 +71,9 @@ class MyApplication extends React.Component {
     }
   }
 
-  fliterTimer = value => {
-    return value.replace('T', ' ').replace('Z', '')
-  }
-
   handleRevokeApply = (id, name) => {
     this.setState({
-      id: '',
+      id,
       textName: name,
       delVisible: true,
     })
@@ -116,23 +106,11 @@ class MyApplication extends React.Component {
     })
   }
 
-  filterState = key => {
-    switch (key) {
-      case 2:
-        return <span className="adopt"><div></div>已通过</span>
-      case 1:
-        return <span className="apply"><div></div>申请中</span>
-      case 3:
-        return <span className="refuse"><div></div>已拒绝</span>
-      default:
-        return
-    }
-  }
-
   filterBtn = (value, id, name) => {
+    const { history } = this.props
     switch (value) {
       case 2:
-        return <Button type="primary" onClick={() => { }}>实例详情</Button>
+        return <Button type="primary" onClick={() => history.push(`/csb-instances-available/${id}`)}>实例详情</Button>
       case 1:
         return <Button onClick={() => this.handleRevokeApply(id, name)}>撤销申请</Button>
       case 3:
@@ -162,16 +140,20 @@ class MyApplication extends React.Component {
         title: '部署集群',
         dataIndex: 'cluster',
         width: '10%',
-        render: (text, row) => this.fliterCluster(row.instance.clusterId),
+        render: (text, row) =>
+          <Tooltip title={this.fliterCluster(row.instance.clusterId)}>
+            <div className="colmuns-ellipsis">{this.fliterCluster(row.instance.clusterId)}</div>
+          </Tooltip>,
       }, {
         title: '申请时间',
         dataIndex: 'requestTime',
         width: '15%',
         sorter: (a, b) => a.time - b.time,
+        render: (text, row) => formatDate(row.requestTime),
       }, {
         title: '可发布服务',
         dataIndex: 'canRelease',
-        width: '14%',
+        width: '15%',
         render: (text, row) => (getInstanceRole(row.role).publish ? '是' : '否'),
         filters: [{
           text: '是',
@@ -180,10 +162,12 @@ class MyApplication extends React.Component {
           text: '否',
           value: '否',
         }],
+        filterMultiple: false,
+        onFilter: (value, row) => (getInstanceRole(row.role).publish ? '是' : '否').indexOf(value) === 0,
       }, {
         title: '可订阅服务',
         dataIndex: 'canBook',
-        width: '14%',
+        width: '15%',
         render: (text, row) => (getInstanceRole(row.role).subscribe ? '是' : '否'),
         filters: [{
           text: '是',
@@ -192,11 +176,13 @@ class MyApplication extends React.Component {
           text: '否',
           value: '否',
         }],
+        filterMultiple: false,
+        onFilter: (value, row) => (getInstanceRole(row.role).subscribe ? '是' : '否').indexOf(value) === 0,
       }, {
         title: '审批状态',
         dataIndex: 'status',
         width: '13%',
-        render: (text, row) => this.filterState(row.status),
+        render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
         filters: [{
           text: '已拒绝',
           value: '已拒绝',
@@ -215,8 +201,8 @@ class MyApplication extends React.Component {
       }, {
         title: '审批时间',
         dataIndex: 'approvalTime',
-        width: '17%',
-        render: (text, row) => this.fliterTimer(row.approvalTime),
+        width: '15%',
+        render: (text, row) => formatDate(row.approvalTime),
         sorter: (a, b) => a.time - b.time,
       }, {
         title: '操作',
@@ -248,7 +234,7 @@ class MyApplication extends React.Component {
             value={this.state.name}
           />
           <div className="page">
-            <span>共计{size}条</span>
+            <span>共计{totalElements}条</span>
             <Pagination {...pagination} />
           </div>
         </div>
@@ -284,17 +270,16 @@ class MyApplication extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current, CSB, entities } = state
+  const { current, entities } = state
   const { clusters } = entities
   const userID = current.user.info.userID
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
-  const myApplicationKey = getQueryKey(mergeQuery(userID, location.query))
   return {
     userID,
     clusters,
     location,
-    myApplication: CSB.myApplication[myApplicationKey] || {},
+    myApplication: applysSlt(state, ownProps),
   }
 }
 

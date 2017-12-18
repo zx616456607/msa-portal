@@ -10,6 +10,7 @@
  * @author zhaoyb
  */
 
+import union from 'lodash/union'
 import * as ActionTypes from '../../actions/CSB/myApplication'
 import { getQueryKey } from '../../common/utils'
 
@@ -29,7 +30,9 @@ export const myApplication = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ...action.response.result.data,
+          ids: union(state.ids, action.response.result.data.content),
+          totalElements: action.response.result.data.totalElements,
+          size: action.response.result.data.size,
         },
       }
     case ActionTypes.FETCH_APPLY_LIST_FAILURE:
