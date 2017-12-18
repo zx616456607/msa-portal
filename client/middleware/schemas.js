@@ -65,7 +65,14 @@ const gatewayRoutesSchema = new schema.Entity('gatewayRoutes', {}, {
   idAttribute: 'id',
 })
 
-const csbInstancesSchema = new schema.Entity('csbInstances', {}, {
+// CSB instances
+const csbPubInstancesSchema = new schema.Entity('csbPubInstances', {}, {
+  idAttribute: 'id',
+})
+const csbAvaInstancesSchema = new schema.Entity('csbAvaInstances', {}, {
+  idAttribute: 'id',
+})
+const csbOmInstancesSchema = new schema.Entity('csbOmInstances', {}, {
   idAttribute: 'id',
 })
 
@@ -119,7 +126,19 @@ export const Schemas = {
       content: [ gatewayRoutesSchema ],
     },
   },
-  CSB_INSNTANCES_LIST_DATA: {
-    data: [ csbInstancesSchema ],
+  CSB_PUB_INSNTANCES_LIST_DATA: {
+    data: {
+      content: [ csbPubInstancesSchema ],
+    },
+  },
+  CSB_AVA_INSNTANCES_LIST_DATA: {
+    data: {
+      content: [ csbAvaInstancesSchema ],
+    },
+  },
+  CSB_OM_INSNTANCES_LIST_DATA: {
+    data: {
+      content: [ csbOmInstancesSchema ],
+    },
   },
 }

@@ -20,6 +20,10 @@ import './style/index.less'
 import CreateModal from './CreateModal'
 import confirm from '../../../components/Modal/confirm'
 import { getInstances, deleteInstance } from '../../../actions/CSB/instance'
+import {
+  instancesSltMaker,
+  getQueryAndFuncs,
+} from '../../../selectors/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
 import { formatDate, getQueryKey, toQuerystring } from '../../../common/utils'
 
@@ -27,17 +31,8 @@ const RadioGroup = Radio.Group
 const SearchInput = Input.Search
 const Option = Select.Option
 
-const defaultQuery = {
-  flag: CSB_OM_INSTANCES_FLAG,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
+const omInstancesSlt = instancesSltMaker(CSB_OM_INSTANCES_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_OM_INSTANCES_FLAG)
 
 class CSBInstanceOm extends React.Component {
   constructor(props) {
@@ -283,19 +278,17 @@ class CSBInstanceOm extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { current, CSB } = state
+  const { current } = state
   const { user } = current
   const { info } = user
   const { userID, namespace } = info
-  const { omInstances } = CSB
   const { location } = props
   location.query = parseQuerystring(location.search)
-  const omInstancesKey = getQueryKey(mergeQuery(userID, location.query))
   return {
     location,
     namespace,
     userID,
-    omInstances: omInstances[omInstancesKey] || {},
+    omInstances: omInstancesSlt(state, props),
   }
 }
 
