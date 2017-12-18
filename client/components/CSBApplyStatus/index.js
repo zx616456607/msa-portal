@@ -12,7 +12,7 @@
 import React from 'react'
 import './style/index.less'
 
-export default class CSBApply extends React.Component {
+export default class CSBApplyStatus extends React.Component {
   filterState = key => {
     switch (key) {
       case 2:

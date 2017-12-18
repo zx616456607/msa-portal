@@ -14,6 +14,7 @@ import { CALL_API } from '../../middleware/api'
 import { toQuerystring } from '../../common/utils'
 import { API_CONFIG } from '../../constants'
 import cloneDeep from 'lodash/cloneDeep'
+import { Schemas } from '../../middleware/schemas'
 
 const { CSB_API_URL } = API_CONFIG
 
@@ -33,7 +34,7 @@ const fetchApplyList = (clusterID, query = {}) => {
     [CALL_API]: {
       types: [ FETCH_APPLY_LIST_REQUEST, FETCH_APPLY_LIST_SUCCESS, FETCH_APPLY_LIST_FAILURE ],
       endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request?${toQuerystring(_query)}`,
-      schema: {},
+      schema: Schemas.CSB_APPLY_LIST_DATA,
     },
   }
 }

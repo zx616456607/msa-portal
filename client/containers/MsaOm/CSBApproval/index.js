@@ -26,22 +26,25 @@ import {
 } from '../../../actions/CSB/myApplication'
 import {
   UNUSED_CLUSTER_ID,
+  CSB_APPLY_EAA_FLAG,
 } from '../../../constants'
 import {
-  getQueryKey,
   formatDate,
   getInstanceRole,
   toQuerystring,
 } from '../../../common/utils'
 import './style/index.less'
-import CSBApply from '../../../components/CSBApply'
+import CSBApplyStatus from '../../../components/CSBApplyStatus'
+import { csbApplySltMaker } from '../../../selectors/CSB/apply'
 
+const applysSlt = csbApplySltMaker(CSB_APPLY_EAA_FLAG)
 const RadioGroup = Radio.Group
 const Search = Input.Search
 const TextArea = Input.TextArea
 const CheckboxGroup = Checkbox.Group
+
 const defaultQuery = {
-  flag: 1,
+  flag: CSB_APPLY_EAA_FLAG,
   page: 1,
   size: 10,
 }
@@ -186,7 +189,7 @@ class CSBApplication extends React.Component {
         title: '状态',
         dataIndex: 'status',
         width: '10%',
-        render: (text, row) => <CSBApply stateKey={row.status}></CSBApply>,
+        render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
       },
       {
         title: '申请时间',
@@ -381,15 +384,14 @@ class CSBApplication extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current, CSB } = state
+  const { current } = state
   const currentUser = current.user.info
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
-  const myApplicationKey = getQueryKey(mergeQuery(currentUser.userID, location.query))
   return {
     currentUser,
     location,
-    myApplication: CSB.myApplication[myApplicationKey] || {},
+    myApplication: applysSlt(state, ownProps),
   }
 }
 
