@@ -34,6 +34,7 @@ import {
   toQuerystring,
 } from '../../../common/utils'
 import './style/index.less'
+import CSBApply from '../../../components/CSBApply'
 
 const RadioGroup = Radio.Group
 const Search = Input.Search
@@ -185,6 +186,7 @@ class CSBApplication extends React.Component {
         title: '状态',
         dataIndex: 'status',
         width: '10%',
+        render: (text, row) => <CSBApply stateKey={row.status}></CSBApply>,
       },
       {
         title: '申请时间',

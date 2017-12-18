@@ -12,10 +12,12 @@
 import React from 'react'
 import isEqual from 'lodash/isEqual'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Icon, Input, Table, Pagination, Card, Modal, notification } from 'antd'
 import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
+import CSBApply from '../../../../components/CSBApply'
 import { UNUSED_CLUSTER_ID, CSB_PUBLIC_INSTANCES_FLAG } from '../../../../constants'
 import { getInstanceRole, getQueryKey, toQuerystring } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
@@ -78,7 +80,7 @@ class MyApplication extends React.Component {
   }
 
   fliterTimer = value => {
-    return value.replace('T', ' ').replace('Z', '')
+    return value.substring(19, 0).replace('T', ' ')
   }
 
   handleRevokeApply = (id, name) => {
@@ -116,23 +118,10 @@ class MyApplication extends React.Component {
     })
   }
 
-  filterState = key => {
-    switch (key) {
-      case 2:
-        return <span className="adopt"><div></div>已通过</span>
-      case 1:
-        return <span className="apply"><div></div>申请中</span>
-      case 3:
-        return <span className="refuse"><div></div>已拒绝</span>
-      default:
-        return
-    }
-  }
-
   filterBtn = (value, id, name) => {
     switch (value) {
       case 2:
-        return <Button type="primary" onClick={() => { }}>实例详情</Button>
+        return <Link to={`/csb-instances-available/${id}`}><Button type="primary">实例详情</Button></Link>
       case 1:
         return <Button onClick={() => this.handleRevokeApply(id, name)}>撤销申请</Button>
       case 3:
@@ -168,6 +157,7 @@ class MyApplication extends React.Component {
         dataIndex: 'requestTime',
         width: '15%',
         sorter: (a, b) => a.time - b.time,
+        render: (text, row) => this.fliterTimer(row.requestTime),
       }, {
         title: '可发布服务',
         dataIndex: 'canRelease',
@@ -180,6 +170,8 @@ class MyApplication extends React.Component {
           text: '否',
           value: '否',
         }],
+        filterMultiple: false,
+        onFilter: (value, row) => (getInstanceRole(row.role).publish ? '是' : '否').indexOf(value) === 0,
       }, {
         title: '可订阅服务',
         dataIndex: 'canBook',
@@ -192,11 +184,13 @@ class MyApplication extends React.Component {
           text: '否',
           value: '否',
         }],
+        filterMultiple: false,
+        onFilter: (value, row) => (getInstanceRole(row.role).subscribe ? '是' : '否').indexOf(value) === 0,
       }, {
         title: '审批状态',
         dataIndex: 'status',
         width: '13%',
-        render: (text, row) => this.filterState(row.status),
+        render: (text, row) => <CSBApply stateKey={row.status}></CSBApply>,
         filters: [{
           text: '已拒绝',
           value: '已拒绝',
@@ -248,7 +242,7 @@ class MyApplication extends React.Component {
             value={this.state.name}
           />
           <div className="page">
-            <span>共计{size}条</span>
+            <span>共计{totalElements}条</span>
             <Pagination {...pagination} />
           </div>
         </div>
