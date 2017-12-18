@@ -22,6 +22,7 @@ import confirm from '../../../components/Modal/confirm'
 import { getInstances, deleteInstance } from '../../../actions/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
 import { formatDate, getQueryKey, toQuerystring } from '../../../common/utils'
+import TableSort from '../../../components/TableSort'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -46,6 +47,10 @@ class CSBInstanceOm extends React.Component {
       createModal: false,
       currentSearchType: 'creator',
       searchValue: '',
+      creationTimeSort: true,
+      transferNumSort: true,
+      cpuRateSort: true,
+      memoryRateSort: true,
     }
   }
 
@@ -53,9 +58,50 @@ class CSBInstanceOm extends React.Component {
     this.getInstanceList()
   }
 
+  componentWillReceiveProps(nextPorps) {
+    const { location: oldLocation } = this.props
+    const { location: newLocation } = nextPorps
+    const { query: oldQuery } = oldLocation
+    const { query: newQuery } = newLocation
+    const {
+      transferNum: oldTransferNum, cpuRate: oldCpuRate,
+      memoryRate: oldMemoryRate, creationTime: oldCreationTime,
+    } = oldQuery
+    const {
+      transferNum: newTransferNum, cpuRate: newCpuRate,
+      memoryRate: newMemoryRate, creationTime: newCreationTime,
+    } = newQuery
+    if (oldTransferNum !== newTransferNum) {
+      this.setState({
+        transferNumSort: this.transferQuerySort(newTransferNum),
+      })
+    }
+    if (oldCpuRate !== newCpuRate) {
+      this.setState({
+        cpuRateSort: this.transferQuerySort(newCpuRate),
+      })
+    }
+    if (oldMemoryRate !== newMemoryRate) {
+      this.setState({
+        memoryRateSort: this.transferQuerySort(newMemoryRate),
+      })
+    }
+    if (oldCreationTime !== newCreationTime) {
+      this.setState({
+        creationTimeSort: this.transferQuerySort(newCreationTime),
+      })
+    }
+  }
+
+  transferQuerySort = str => {
+    return str === 'desc'
+  }
+
   getInstanceList = query => {
     const { getInstances, location, userID, history } = this.props
-    const { currentSearchType, searchValue } = this.state
+    const {
+      currentSearchType, searchValue,
+    } = this.state
     query = Object.assign({}, location.query, { [currentSearchType]: searchValue }, query)
     if (currentSearchType === 'name') {
       delete query.creator
@@ -161,10 +207,29 @@ class CSBInstanceOm extends React.Component {
     })
   }
 
+  handleSort = type => {
+    const preTypeState = this.state[type]
+    const sortString = this.getSortString(!preTypeState)
+    this.setState(preState => {
+      return { [type]: !preState[type] }
+    })
+    const sortType = type.substring(0, type.length - 4)
+    this.getInstanceList({ [sortType]: sortString })
+  }
+
+  getSortString = flag => {
+    let str = 'asc'
+    if (flag) {
+      str = 'desc'
+    }
+    return str
+  }
+
   render() {
     const {
       radioValue, createModal, currentInstance, searchValue,
-      currentSearchType,
+      currentSearchType, transferNumSort, cpuRateSort, memoryRateSort,
+      creationTimeSort,
     } = this.state
     const { omInstances, userID, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
@@ -193,16 +258,36 @@ class CSBInstanceOm extends React.Component {
         }],
         render: text => (text ? text : '-'),
       },
-      { title: '累计调用量', dataIndex: 'transferNum',
-        render: text => (text ? text : '-'),
+      { title: <TableSort
+        title="累计调用量"
+        status={transferNumSort}
+        onChange={() => this.handleSort('transferNumSort')}
+      />,
+      dataIndex: 'transferNum',
+      render: text => (text ? text : '-'),
       },
-      { title: 'CPU使用率', dataIndex: 'cpuRate',
-        render: text => (text ? text : '-'),
+      { title: <TableSort
+        title="CPU利用率"
+        status={cpuRateSort}
+        onChange={() => this.handleSort('cpuRateSort')}
+      />,
+      dataIndex: 'cpuRate',
+      render: text => (text ? text : '-'),
       },
-      { title: '内存使用率', dataIndex: 'memoryRate',
-        render: text => (text ? text : '-'),
+      { title: <TableSort
+        title="CPU利用率"
+        status={memoryRateSort}
+        onChange={() => this.handleSort('memoryRateSort')}
+      />,
+      dataIndex: 'memoryRate',
+      render: text => (text ? text : '-'),
       },
-      { title: '创建时间', dataIndex: 'creationTime', render: text => formatDate(text) },
+      { title: <TableSort
+        title="创建时间"
+        status={creationTimeSort}
+        onChange={() => this.handleSort('creationTimeSort')}
+      />,
+      dataIndex: 'creationTime', render: text => formatDate(text) },
       { title: '操作',
         render: (text, row) => {
           const menu = (
