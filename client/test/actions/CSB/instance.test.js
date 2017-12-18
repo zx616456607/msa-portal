@@ -36,13 +36,15 @@ describe('CSB instances actions', () => {
       userId: 'test',
     }
     const csbInstancesData = {
-      data: [
-        {
-          id: 33,
-          name: 'instance7',
-          description: '33333',
-        },
-      ],
+      data: {
+        content: [
+          {
+            id: 33,
+            name: 'instance7',
+            description: '33333',
+          },
+        ],
+      },
     }
 
     fetchMock.getOnce(
@@ -64,8 +66,16 @@ describe('CSB instances actions', () => {
         query,
         type: ActionsAndTypes.CSB_PUBLIC_INSTANCES_SUCCESS,
         response: {
-          entities: {},
-          result: csbInstancesData,
+          entities: {
+            csbPubInstances: {
+              [csbInstancesData.data.content[0].id]: csbInstancesData.data.content[0],
+            },
+          },
+          result: {
+            data: {
+              content: [ csbInstancesData.data.content[0].id ],
+            },
+          },
         },
       },
     ]
@@ -99,7 +109,7 @@ describe('CSB instances actions', () => {
               email: 'wanglei@tenxcloud.com',
             },
             role: 1,
-            id: 43,
+            id: 33,
             new: false,
           },
         ],
@@ -125,8 +135,16 @@ describe('CSB instances actions', () => {
         query,
         type: ActionsAndTypes.CSB_AVAILABLE_INSTANCES_SUCCESS,
         response: {
-          entities: {},
-          result: csbInstancesData,
+          entities: {
+            csbAvaInstances: {
+              [csbInstancesData.data.content[0].id]: csbInstancesData.data.content[0],
+            },
+          },
+          result: {
+            data: {
+              content: [ csbInstancesData.data.content[0].id ],
+            },
+          },
         },
       },
     ]
@@ -185,8 +203,16 @@ describe('CSB instances actions', () => {
         query,
         type: ActionsAndTypes.CSB_OM_INSTANCES_SUCCESS,
         response: {
-          entities: {},
-          result: csbInstancesData,
+          entities: {
+            csbOmInstances: {
+              [csbInstancesData.data.content[0].id]: csbInstancesData.data.content[0],
+            },
+          },
+          result: {
+            data: {
+              content: [ csbInstancesData.data.content[0].id ],
+            },
+          },
         },
       },
     ]
