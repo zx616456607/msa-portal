@@ -54,6 +54,9 @@ const delApply = (clusterID, id) => {
     [CALL_API]: {
       types: [ DELTE_APPLY_REQUEST, DELTE_APPLY_SUCCESS, DELTE_APPLY_FAILURE ],
       endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/request/${id}`,
+      options: {
+        method: 'DELETE',
+      },
       schema: {},
     },
   }
