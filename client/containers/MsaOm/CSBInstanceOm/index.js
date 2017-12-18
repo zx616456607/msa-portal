@@ -26,7 +26,6 @@ import {
 } from '../../../selectors/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
 import { formatDate, getQueryKey, toQuerystring } from '../../../common/utils'
-import TableSort from '../../../components/TableSort'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -117,7 +116,8 @@ class CSBInstanceOm extends React.Component {
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
   }
 
-  tableChange = pagination => {
+  tableChange = (pagination, filters, sorter) => {
+    console.log(filters, sorter)
     this.setState({
       page: pagination.current,
     }, this.getInstanceList)
@@ -202,29 +202,10 @@ class CSBInstanceOm extends React.Component {
     })
   }
 
-  handleSort = type => {
-    const preTypeState = this.state[type]
-    const sortString = this.getSortString(!preTypeState)
-    this.setState(preState => {
-      return { [type]: !preState[type] }
-    })
-    const sortType = type.substring(0, type.length - 4)
-    this.getInstanceList({ [sortType]: sortString })
-  }
-
-  getSortString = flag => {
-    let str = 'asc'
-    if (flag) {
-      str = 'desc'
-    }
-    return str
-  }
-
   render() {
     const {
       radioValue, createModal, currentInstance, searchValue,
-      currentSearchType, transferNumSort, cpuRateSort, memoryRateSort,
-      creationTimeSort,
+      currentSearchType,
     } = this.state
     const { omInstances, userID, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
@@ -253,36 +234,30 @@ class CSBInstanceOm extends React.Component {
         }],
         render: text => (text ? text : '-'),
       },
-      { title: <TableSort
-        title="累计调用量"
-        status={transferNumSort}
-        onChange={() => this.handleSort('transferNumSort')}
-      />,
-      dataIndex: 'transferNum',
-      render: text => (text ? text : '-'),
+      {
+        title: '累计调用量',
+        dataIndex: 'transferNum',
+        sorter: (a, b) => a.transferNum - b.transferNum,
+        render: text => (text ? text : '-'),
       },
-      { title: <TableSort
-        title="CPU利用率"
-        status={cpuRateSort}
-        onChange={() => this.handleSort('cpuRateSort')}
-      />,
-      dataIndex: 'cpuRate',
-      render: text => (text ? text : '-'),
+      {
+        title: 'CPU利用率',
+        dataIndex: 'cpuRate',
+        sorter: (a, b) => a.cpuRate - b.cpuRate,
+        render: text => (text ? text : '-'),
       },
-      { title: <TableSort
-        title="CPU利用率"
-        status={memoryRateSort}
-        onChange={() => this.handleSort('memoryRateSort')}
-      />,
-      dataIndex: 'memoryRate',
-      render: text => (text ? text : '-'),
+      {
+        title: 'CPU利用率',
+        dataIndex: 'memoryRate',
+        sorter: (a, b) => a.memoryRate - b.memoryRate,
+        render: text => (text ? text : '-'),
       },
-      { title: <TableSort
-        title="创建时间"
-        status={creationTimeSort}
-        onChange={() => this.handleSort('creationTimeSort')}
-      />,
-      dataIndex: 'creationTime', render: text => formatDate(text) },
+      {
+        title: '创建时间',
+        dataIndex: 'creationTime',
+        sorter: (a, b) => a.creationTime - b.creationTime,
+        render: text => formatDate(text),
+      },
       { title: '操作',
         render: (text, row) => {
           const menu = (
