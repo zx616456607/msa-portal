@@ -12,14 +12,13 @@
 import React from 'react'
 import isEqual from 'lodash/isEqual'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Icon, Input, Table, Pagination, Card, Modal, notification, Tooltip } from 'antd'
 import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
 import CSBApplyStatus from '../../../../components/CSBApplyStatus'
 import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
-import { getInstanceRole, toQuerystring } from '../../../../common/utils'
+import { getInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
 import { csbApplySltMaker } from '../../../../selectors/CSB/apply'
 
@@ -82,10 +81,6 @@ class MyApplication extends React.Component {
     }
   }
 
-  fliterTimer = value => {
-    return value.substring(19, 0).replace('T', ' ')
-  }
-
   handleRevokeApply = (id, name) => {
     this.setState({
       id,
@@ -122,9 +117,10 @@ class MyApplication extends React.Component {
   }
 
   filterBtn = (value, id, name) => {
+    const { history } = this.props
     switch (value) {
       case 2:
-        return <Link to={`/csb-instances-available/${id}`}><Button type="primary">实例详情</Button></Link>
+        return <Button type="primary" onClick={() => history.push(`/csb-instances-available/${id}`)}>实例详情</Button>
       case 1:
         return <Button onClick={() => this.handleRevokeApply(id, name)}>撤销申请</Button>
       case 3:
@@ -163,7 +159,7 @@ class MyApplication extends React.Component {
         dataIndex: 'requestTime',
         width: '15%',
         sorter: (a, b) => a.time - b.time,
-        render: (text, row) => this.fliterTimer(row.requestTime),
+        render: (text, row) => formatDate(row.requestTime),
       }, {
         title: '可发布服务',
         dataIndex: 'canRelease',
@@ -216,7 +212,7 @@ class MyApplication extends React.Component {
         title: '审批时间',
         dataIndex: 'approvalTime',
         width: '15%',
-        render: (text, row) => this.fliterTimer(row.approvalTime),
+        render: (text, row) => formatDate(row.approvalTime),
         sorter: (a, b) => a.time - b.time,
       }, {
         title: '操作',

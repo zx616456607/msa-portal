@@ -26,7 +26,7 @@ import {
 } from '../../../actions/CSB/myApplication'
 import {
   UNUSED_CLUSTER_ID,
-  CSB_APPLY_EAA_FLAG,
+  CSB_APPROVAL_FLAG,
 } from '../../../constants'
 import {
   formatDate,
@@ -37,14 +37,14 @@ import './style/index.less'
 import CSBApplyStatus from '../../../components/CSBApplyStatus'
 import { csbApplySltMaker } from '../../../selectors/CSB/apply'
 
-const applysSlt = csbApplySltMaker(CSB_APPLY_EAA_FLAG)
+const approvalSlt = csbApplySltMaker(CSB_APPROVAL_FLAG)
 const RadioGroup = Radio.Group
 const Search = Input.Search
 const TextArea = Input.TextArea
 const CheckboxGroup = Checkbox.Group
 
 const defaultQuery = {
-  flag: CSB_APPLY_EAA_FLAG,
+  flag: CSB_APPROVAL_FLAG,
   page: 1,
   size: 10,
 }
@@ -391,7 +391,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     currentUser,
     location,
-    myApplication: applysSlt(state, ownProps),
+    myApplication: approvalSlt(state, ownProps),
   }
 }
 

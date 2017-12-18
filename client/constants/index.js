@@ -95,5 +95,5 @@ export const CSB_PUBLIC_INSTANCES_FLAG = 0
 export const CSB_AVAILABLE_INSTANCES_FLAG = 1
 export const CSB_OM_INSTANCES_FLAG = 2
 export const CSB_APPLY_FLAG = 0
-export const CSB_APPLY_EAA_FLAG = 1
+export const CSB_APPROVAL_FLAG = 1
 export const UNUSED_CLUSTER_ID = 'unused-cluster-id'
