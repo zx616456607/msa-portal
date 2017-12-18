@@ -18,7 +18,9 @@ import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
 import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu } from '../../components/utils'
-import msaComponent from '../../assets/img/log/msa-component.svg'
+import msaComponent from '../../assets/img/msa-om/msa-component.svg'
+import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
+import csbInstancesApproval from '../../assets/img/msa-om/csb-instances-approval.svg'
 
 const menus = [
   {
@@ -33,12 +35,20 @@ const menus = [
   {
     to: '/msa-om/csb-instance-om',
     text: 'CSB 实例运维',
-    icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${csbInstancesOm.id}`} />
+      </svg>
+    ),
   },
   {
     to: '/msa-om/csb-instance-approval',
     text: 'CSB 实例审批',
-    icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${csbInstancesApproval.id}`} />
+      </svg>
+    ),
   },
   {
     to: '/msa-om/log',

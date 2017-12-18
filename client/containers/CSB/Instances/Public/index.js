@@ -20,27 +20,21 @@ import {
 import { parse as parseQuerystring } from 'query-string'
 import ApplyforCSBInstanceModal from './ApplyforCSBInstanceModal'
 import { getInstances, applyforInstance } from '../../../../actions/CSB/instance'
+import {
+  instancesSltMaker,
+  getQueryAndFuncs,
+} from '../../../../selectors/CSB/instance'
 import { connect } from 'react-redux'
 import { formatDate } from '../../../../common/utils'
 import { CSB_PUBLIC_INSTANCES_FLAG, UNUSED_CLUSTER_ID } from '../../../../constants/index'
 import {
-  getQueryKey,
   toQuerystring,
 } from '../../../../common/utils'
 import isEqual from 'lodash/isEqual'
 
 const Search = Input.Search
-const defaultQuery = {
-  flag: CSB_PUBLIC_INSTANCES_FLAG,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
+const pubInstancesSlt = instancesSltMaker(CSB_PUBLIC_INSTANCES_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_PUBLIC_INSTANCES_FLAG)
 
 class PublicInstances extends React.Component {
   state = {
@@ -213,14 +207,13 @@ class PublicInstances extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const { location } = props
-  const { current, CSB } = state
+  const { current } = state
   const { user } = current
   const userID = user.info.userID
   location.query = parseQuerystring(location.search)
-  const publicInstancesKey = getQueryKey(mergeQuery(userID, location.query))
   return {
     userId: userID,
-    publicInstances: CSB.publicInstances[publicInstancesKey] || {},
+    publicInstances: pubInstancesSlt(state, props),
   }
 }
 

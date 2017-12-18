@@ -12,7 +12,7 @@
 
 import cloneDeep from 'lodash/cloneDeep'
 import { CALL_API } from '../../middleware/api'
-// import { Schemas } from '../../middleware/schemas'
+import { Schemas } from '../../middleware/schemas'
 import { toQuerystring } from '../../common/utils'
 import {
   API_CONFIG,
@@ -44,6 +44,7 @@ export const fetchInstances = (clusterID, query = {}) => {
     _query.page = page - 1 // for api page start from 0
   }
   let types
+  let schema
   switch (flag) {
     case CSB_AVAILABLE_INSTANCES_FLAG:
       types = [
@@ -51,6 +52,7 @@ export const fetchInstances = (clusterID, query = {}) => {
         CSB_AVAILABLE_INSTANCES_SUCCESS,
         CSB_AVAILABLE_INSTANCES_FAILURE,
       ]
+      schema = Schemas.CSB_AVA_INSNTANCES_LIST_DATA
       break
     case CSB_OM_INSTANCES_FLAG:
       types = [
@@ -58,6 +60,7 @@ export const fetchInstances = (clusterID, query = {}) => {
         CSB_OM_INSTANCES_SUCCESS,
         CSB_OM_INSTANCES_FAILURE,
       ]
+      schema = Schemas.CSB_OM_INSNTANCES_LIST_DATA
       break
     case CSB_PUBLIC_INSTANCES_FLAG:
     default:
@@ -66,6 +69,7 @@ export const fetchInstances = (clusterID, query = {}) => {
         CSB_PUBLIC_INSTANCES_SUCCESS,
         CSB_PUBLIC_INSTANCES_FAILURE,
       ]
+      schema = Schemas.CSB_PUB_INSNTANCES_LIST_DATA
       break
   }
   return {
@@ -74,7 +78,7 @@ export const fetchInstances = (clusterID, query = {}) => {
     [CALL_API]: {
       types,
       endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(_query)}`,
-      schema: {},
+      schema,
     },
   }
 }
