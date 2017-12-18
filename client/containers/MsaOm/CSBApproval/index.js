@@ -35,25 +35,14 @@ import {
 } from '../../../common/utils'
 import './style/index.less'
 import CSBApplyStatus from '../../../components/CSBApplyStatus'
-import { csbApplySltMaker } from '../../../selectors/CSB/apply'
+import { csbApplySltMaker, getQueryAndFuncs } from '../../../selectors/CSB/apply'
 
 const approvalSlt = csbApplySltMaker(CSB_APPROVAL_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_APPROVAL_FLAG)
 const RadioGroup = Radio.Group
 const Search = Input.Search
 const TextArea = Input.TextArea
 const CheckboxGroup = Checkbox.Group
-
-const defaultQuery = {
-  flag: CSB_APPROVAL_FLAG,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
 
 class CSBApplication extends React.Component {
   state = {

@@ -20,21 +20,11 @@ import CSBApplyStatus from '../../../../components/CSBApplyStatus'
 import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
 import { getInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
-import { csbApplySltMaker } from '../../../../selectors/CSB/apply'
+import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/apply'
 
 const applysSlt = csbApplySltMaker(CSB_APPLY_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_APPLY_FLAG)
 const Search = Input.Search
-const defaultQuery = {
-  flag: CSB_APPLY_FLAG,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
 class MyApplication extends React.Component {
   state = {
     id: '',
