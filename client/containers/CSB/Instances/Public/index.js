@@ -120,8 +120,9 @@ class PublicInstances extends React.Component {
   }
 
   render() {
-    const { publicInstances } = this.props
-    const { isFetching, data } = publicInstances
+    const { publicInstances, location } = this.props
+    const { query } = location
+    const { isFetching, content, totalElements, size } = publicInstances
     const {
       applyforCSBInstanceModalVisible, confirmLoading, currentRecord,
       name,
@@ -163,10 +164,11 @@ class PublicInstances extends React.Component {
         },
       },
     ]
-    const total = 100
     const paginationProps = {
       simple: true,
-      total,
+      total: totalElements,
+      pageSize: size,
+      current: parseInt(query.page) || 1,
       onChange: current => this.loadData({ page: current }),
     }
     return <QueueAnim id="PublicInstances">
@@ -179,8 +181,8 @@ class PublicInstances extends React.Component {
           onPressEnter={() => this.loadData({ name, page: 1 })}
         />
         {
-          total > 0 && <div className="page-box">
-            <span className="total">共 {total} 条</span>
+          totalElements > 0 && <div className="page-box">
+            <span className="total">共 {totalElements} 条</span>
             <Pagination {...paginationProps}/>
           </div>
         }
@@ -189,7 +191,7 @@ class PublicInstances extends React.Component {
         <Card hoverable={false}>
           <Table
             columns={columns}
-            dataSource={data}
+            dataSource={content}
             // rowSelection={rowSelection}
             pagination={false}
             loading={isFetching}

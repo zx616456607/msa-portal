@@ -29,7 +29,7 @@ export const publicInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          data: action.response.result.data,
+          ...action.response.result.data,
         },
       }
     case ActionTypes.CSB_PUBLIC_INSTANCES_FAILURE:
