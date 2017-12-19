@@ -289,7 +289,7 @@ class CSBApplication extends React.Component {
             <Button
               type="dashed"
               onClick={this.cancelApproval.bind(this, row)}
-              icon="clock-circle-o"
+              icon={disabled ? 'close-circle-o' : 'clock-circle-o'}
               disabled={disabled}
             >
             撤销审批
