@@ -20,8 +20,25 @@
 
 import { DEFAULT, DEFAULT_TIME_FORMAT } from '../constants'
 import moment from 'moment'
+import 'moment/locale/zh-cn'
 
-moment.locale('zh-cn')
+moment.locale('zh-cn', {
+  relativeTime: {
+    future: '%s内',
+    past: '%s前',
+    s: '%d 秒',
+    m: '1 分钟',
+    mm: '%d 分钟',
+    h: '1 小时',
+    hh: '%d 小时',
+    d: '1 天',
+    dd: '%d 天',
+    M: '1 个月',
+    MM: '%d 个月',
+    y: '1 年',
+    yy: '%d 年',
+  },
+})
 
 export function getCookie(cName) {
   if (document.cookie.length === 0) {
@@ -123,7 +140,6 @@ export const getMenuSelectedKeys = (location, menus) => {
     if (menu.type === 'SubMenu') {
       const childrenMenus = menu.children
       let isFound = false
-      console.log('menu', menu)
       childrenMenus.every(_menu => {
         if (location.pathname === _menu.to) {
           defaultSelectedKeys.push(_menu.to)

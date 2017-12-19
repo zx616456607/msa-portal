@@ -12,14 +12,16 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import moment from 'moment'
 import {
   Radio, Button, Icon, Input, Modal, Table, Row, Col, Checkbox, Pagination,
-  notification,
+  notification, Tooltip,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
 import isEqual from 'lodash/isEqual'
 import confirm from '../../../components/Modal/confirm'
+import Countdown from '../../../components/Countdown'
 import {
   loadApply,
   updateApply,
@@ -27,6 +29,7 @@ import {
 import {
   UNUSED_CLUSTER_ID,
   CSB_APPROVAL_FLAG,
+  CANCEL_APPROVAL_TIMEOUT,
 } from '../../../constants'
 import {
   formatDate,
@@ -51,6 +54,7 @@ class CSBApplication extends React.Component {
     currentRow: null,
     confirmLoading: false,
     ownerResponse: '',
+    timeoutComplete: 0,
   }
 
   componentDidMount() {
@@ -122,10 +126,19 @@ class CSBApplication extends React.Component {
 
   cancelApproval = row => {
     const self = this
+    const timeout = <font className="primary-color">
+      {moment(this.getApprovalDeadline(row)).toNow(true)}
+    </font>
     confirm({
       modalTitle: '撤销审批',
-      title: '撤销审批后，该申请将回到申请中状态，可重新审批。',
-      content: '已通过的审批申请人在实例中发布的服务将被注销，已订阅的服务将被退订，1小时5分钟后将不能执行撤销操作，是否确定撤销审批?',
+      width: 520,
+      title: <span>
+        撤销审批后，该申请将回到申请中状态，可重新审批。已通过的
+        审批申请人在实例中发布的服务将被注销，已订阅的服务将被退订
+      </span>,
+      content: <div>
+        {timeout}后将不能执行撤销操作，是否确定撤销审批？
+      </div>,
       onOk() {
         return new Promise((resolve, reject) => {
           const { updateApply, currentUser } = self.props
@@ -153,6 +166,21 @@ class CSBApplication extends React.Component {
   cancelModal = () => {
     this.setState({
       approveModal: false,
+    })
+  }
+
+  getApprovalDeadline = row => {
+    const { approvalTime } = row
+    const deadline = +new Date(approvalTime) + CANCEL_APPROVAL_TIMEOUT
+    return deadline
+  }
+
+  // when countdown complete change state to rerender
+  onCancelApprovalTimeoutComplete = () => {
+    let { timeoutComplete } = this.state
+    timeoutComplete++
+    this.setState({
+      timeoutComplete,
     })
   }
 
@@ -232,7 +260,7 @@ class CSBApplication extends React.Component {
                 <Button
                   className="passBtn"
                   key="pass"
-                  type="primary"
+                  // type="primary"
                   onClick={() => this.handleApprove('pass', row)}
                 >
                 通过
@@ -246,12 +274,27 @@ class CSBApplication extends React.Component {
               ]
             )
           }
-          return <Button
-            type="primary"
-            onClick={this.cancelApproval.bind(this, row)}
-          >
-          撤销审批
-          </Button>
+          const deadline = this.getApprovalDeadline(row)
+          const timeLeftSec = (deadline - +new Date()) / 1000
+          const disabled = timeLeftSec <= 0
+          const title = disabled
+            ? '审批已超过 6 小时，无法撤销'
+            : <div>
+              <Countdown
+                seconds={timeLeftSec}
+                onComplete={this.onCancelApprovalTimeoutComplete.bind(this, row)}
+              />可撤销
+            </div>
+          return <Tooltip title={title}>
+            <Button
+              type="dashed"
+              onClick={this.cancelApproval.bind(this, row)}
+              icon="clock-circle-o"
+              disabled={disabled}
+            >
+            撤销审批
+            </Button>
+          </Tooltip>
         },
       },
     ]
