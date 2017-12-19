@@ -51,31 +51,29 @@ body {
     padding-right: 0;
     padding-left: 0;
     .ant-menu {
-    .ant-menu-inline, .ant-menu-vertical {
       border-right: 0;
-    }
-    .ant-menu-item > a, div.ant-menu-submenu-title {
-      &:hover {
-        .menu-icon {
-          fill: @primary-color;
+      .ant-menu-item > a, div.ant-menu-submenu-title {
+        &:hover {
+          .menu-icon {
+            fill: @primary-color;
+          }
         }
       }
-    }
-    .ant-menu-item-selected.ant-menu-item > a {
-      & > .menu-icon, &:hover > .menu-icon {
-        fill: #fff;
+      .ant-menu-item-selected.ant-menu-item > a {
+        & > .menu-icon, &:hover > .menu-icon {
+          fill: #fff;
+        }
+      }
+      .ant-menu-item-selected.ant-menu-item {
+        background-color: @primary-color;
+        a {
+          color: #fff;
+        }
+      }
+      .ant-menu-item::after {
+        border: 0;
       }
     }
-    .ant-menu-item-selected.ant-menu-item {
-      background-color: @primary-color;
-      a {
-        color: #fff;
-      }
-    }
-    .ant-menu-item::after {
-      border: 0;
-    }
-  }
   }
 }
 .ant-layout {
