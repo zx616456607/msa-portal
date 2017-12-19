@@ -26,30 +26,23 @@ import {
 } from '../../../actions/CSB/myApplication'
 import {
   UNUSED_CLUSTER_ID,
+  CSB_APPROVAL_FLAG,
 } from '../../../constants'
 import {
-  getQueryKey,
   formatDate,
   getInstanceRole,
   toQuerystring,
 } from '../../../common/utils'
 import './style/index.less'
+import CSBApplyStatus from '../../../components/CSBApplyStatus'
+import { csbApplySltMaker, getQueryAndFuncs } from '../../../selectors/CSB/apply'
 
+const approvalSlt = csbApplySltMaker(CSB_APPROVAL_FLAG)
+const { mergeQuery } = getQueryAndFuncs(CSB_APPROVAL_FLAG)
 const RadioGroup = Radio.Group
 const Search = Input.Search
 const TextArea = Input.TextArea
 const CheckboxGroup = Checkbox.Group
-const defaultQuery = {
-  flag: 1,
-  page: 1,
-  size: 10,
-}
-const mergeQuery = (userId, query) => Object.assign(
-  {},
-  defaultQuery,
-  query,
-  { userId }
-)
 
 class CSBApplication extends React.Component {
   state = {
@@ -185,6 +178,7 @@ class CSBApplication extends React.Component {
         title: '状态',
         dataIndex: 'status',
         width: '10%',
+        render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
       },
       {
         title: '申请时间',
@@ -379,15 +373,14 @@ class CSBApplication extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current, CSB } = state
+  const { current } = state
   const currentUser = current.user.info
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
-  const myApplicationKey = getQueryKey(mergeQuery(currentUser.userID, location.query))
   return {
     currentUser,
     location,
-    myApplication: CSB.myApplication[myApplicationKey] || {},
+    myApplication: approvalSlt(state, ownProps),
   }
 }
 
