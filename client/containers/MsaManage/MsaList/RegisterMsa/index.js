@@ -323,7 +323,6 @@ class RegisterMsa extends React.Component {
             ? '添加实例'
             : '注册微服务'
         }
-        hoverable={false}
       >
         <Form onSubmit={this.handleSubmit}>
           <FormItem {...formItemLayout} label="微服务名称">

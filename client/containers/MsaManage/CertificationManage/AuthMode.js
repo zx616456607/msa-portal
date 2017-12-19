@@ -58,7 +58,7 @@ export default class AuthMode extends React.Component {
     ]
     return (
       <QueueAnim>
-        <Card className="auth-mode" key="bdoy" hoverable={false}>
+        <Card className="auth-mode" key="bdoy">
           <Table
             columns={columns}
             dataSource={data}

@@ -143,7 +143,6 @@ class Apm extends React.Component {
           <Card
             className="left-menu-card"
             title={title}
-            hoverable={false}
           >
             <Menu mode="inline"
               defaultSelectedKeys={getMenuSelectedKeys(location, menus)}

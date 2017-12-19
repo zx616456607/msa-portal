@@ -135,7 +135,7 @@ class SubscriptionServices extends React.Component {
           }
         </div>
         <div key="data-box" className="layout-content-body">
-          <Card hoverable={false}>
+          <Card>
             <Table
               columns={columns}
               dataSource={dataSource}

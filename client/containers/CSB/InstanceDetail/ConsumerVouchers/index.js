@@ -214,7 +214,6 @@ export default class ConsumerVouchers extends React.Component {
         </div>
         <Card className="body" key="body">
           <Table
-            hoverable={false}
             columns={columns}
             pagination={false}
             dataSource={data}

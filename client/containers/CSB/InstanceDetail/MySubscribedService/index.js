@@ -305,7 +305,7 @@ class MySubscribedService extends React.Component {
           }
         </div>
         <div className="layout-content-body" key="layout-content-body">
-          <Card hoverable={false}>
+          <Card>
             {this.renderServiceListTable()}
           </Card>
         </div>

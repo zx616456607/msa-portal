@@ -238,7 +238,7 @@ class MyApplication extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card hoverable={false} >
+        <Card>
           <Table
             pagination={false}
             columns={colmuns}

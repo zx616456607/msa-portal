@@ -301,7 +301,6 @@ class ApmSetting extends React.Component {
           <Card
             title="APM配置"
             className="apm_config_style"
-            hoverable={false}
           >
             <Row className="contents">
               <Col className="left">
