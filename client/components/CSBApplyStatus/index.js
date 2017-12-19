@@ -29,7 +29,7 @@ export default class CSBApplyStatus extends React.Component {
   render() {
     const { stateKey } = this.props
     return (
-      <div className="body">
+      <div className="CSBApply-status">
         {this.filterState(stateKey)}
       </div>
     )
