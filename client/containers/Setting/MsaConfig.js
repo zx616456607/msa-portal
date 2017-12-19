@@ -111,7 +111,7 @@ class MsaConfig extends React.Component {
       })
       DataAry.push(projectID)
       this.setState({
-        notCurAry: DataAry,
+        notCurAry: DataAry[0],
       })
     }
   }
@@ -260,7 +260,7 @@ class MsaConfig extends React.Component {
                         <Row className="install">
                           <Icon className="ico" type="check-circle-o" />&nbsp;
                           <span className="existence" >已安装</span>
-                          <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
+                          <span className="unload" onClick={this.handleUnload}>卸载</span>
                         </Row> :
                         <Button type="primary" onClick={this.handleInstall}>安装</Button>
                     }
@@ -289,7 +289,7 @@ class MsaConfig extends React.Component {
                     <div className="notInstalled">
                       {
                         Object.keys(notCurAry).length > 0 ?
-                          notCurAry[0].map((item, index) => (
+                          notCurAry.map((item, index) => (
                             <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                               <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
                             </div>
