@@ -42,22 +42,43 @@ class PublicInstances extends React.Component {
     confirmLoading: false,
     currentRecord: {},
     name: '',
+    sortOrder: false,
+  }
+
+  componentDidMount() {
+    const { location } = this.props
+    const { query } = location
+    const { name, sort } = query
+    const sortOrder = this.formatSortOrder(sort)
+    this.setState({
+      name,
+      sortOrder,
+    }, this.loadData)
   }
 
   componentWillMount() {
     this.loadData()
   }
 
+  formatSortOrder = sort => {
+    if (!sort) {
+      return false
+    }
+    const order = sort.substring(0, 1)
+    switch (order) {
+      case 'a':
+        return 'ascend'
+      case 'd':
+        return 'descend'
+      default:
+        return false
+    }
+  }
+
   loadData = query => {
     const { getInstances, userId, history, location } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
-    if (query.sort === null) {
-      delete query.sort
-    }
-    if (query.name === '') {
-      delete query.name
-    }
     if (query.page === 1) {
       delete query.page
     }
@@ -118,6 +139,15 @@ class PublicInstances extends React.Component {
 
   tableOnchange = (pagination, filters, sorter) => {
     const { columnKey, order } = sorter
+    if (order) {
+      this.setState({
+        sortOrder: order,
+      })
+    } else {
+      this.setState({
+        sortOrder: false,
+      })
+    }
     const query = {
       page: 1,
       sort: order ? `${order.substring(0, 1)},${columnKey}` : null,
@@ -131,7 +161,7 @@ class PublicInstances extends React.Component {
     const { isFetching, content, totalElements, size } = publicInstances
     const {
       applyforCSBInstanceModalVisible, confirmLoading, currentRecord,
-      name,
+      name, sortOrder,
     } = this.state
     const columns = [
       { title: '实例名称', dataIndex: 'name', key: 'name', width: '15%' },
@@ -152,6 +182,7 @@ class PublicInstances extends React.Component {
         width: '15%',
         render: creationTime => formatDate(creationTime),
         sorter: true,
+        sortOrder,
       },
       {
         title: '操作',
@@ -186,6 +217,7 @@ class PublicInstances extends React.Component {
           className="search-style"
           onChange={e => this.setState({ name: e.target.value })}
           onPressEnter={() => this.loadData({ name, page: 1 })}
+          value={name}
         />
         {
           totalElements > 0 && <div className="page-box">

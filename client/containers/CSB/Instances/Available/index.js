@@ -32,8 +32,10 @@ import {
 } from '../../../../constants'
 import {
   formatDate,
-  getInstanceRole,
+  renderInstanceRole,
   toQuerystring,
+  formatFilterConditions,
+  formatRole,
 } from '../../../../common/utils'
 import './style/index.less'
 
@@ -44,22 +46,27 @@ const { mergeQuery } = getQueryAndFuncs(CSB_AVAILABLE_INSTANCES_FLAG)
 class AvailableInstances extends React.Component {
   state = {
     name: '',
+    sortOrder: false,
+    filteredValue: [],
   }
 
   componentDidMount() {
     const { location } = this.props
     const { query } = location
-    const { name } = query
-    this.setState({ name }, this.loadData)
+    const { name, sort, filter } = query
+    const sortOrder = this.formatSortOrder(sort)
+    const filteredValue = formatRole(filter)
+    this.setState({
+      name,
+      sortOrder,
+      filteredValue,
+    }, this.loadData)
   }
 
   loadData = query => {
     const { getInstances, currentUser, location, history } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
-    if (query.name === '') {
-      delete query.name
-    }
     if (query.page === 1) {
       delete query.page
     }
@@ -67,6 +74,45 @@ class AvailableInstances extends React.Component {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(currentUser.userID, query))
+  }
+
+  formatSortOrder = sort => {
+    if (!sort) {
+      return false
+    }
+    const order = sort.substring(0, 1)
+    switch (order) {
+      case 'a':
+        return 'ascend'
+      case 'd':
+        return 'descend'
+      default:
+        return false
+    }
+  }
+
+  tableOnchange = (pagination, filters, sorter) => {
+    const { columnKey, order } = sorter
+    const { role } = filters
+    const filter = formatFilterConditions(filters)
+    this.setState({
+      filteredValue: role,
+    })
+    if (order) {
+      this.setState({
+        sortOrder: order,
+      })
+    } else {
+      this.setState({
+        sortOrder: false,
+      })
+    }
+    const query = {
+      page: 1,
+      filter,
+      sort: order ? `${order.substring(0, 1)},${columnKey}` : null,
+    }
+    this.loadData(query)
   }
 
   abandonInstance = id => {
@@ -100,6 +146,7 @@ class AvailableInstances extends React.Component {
     const { availableInstances, history, location } = this.props
     const { isFetching, content, totalElements, size } = availableInstances
     const { query } = location
+    const { sortOrder, name, filteredValue } = this.state
     const columns = [
       {
         title: '实例名称',
@@ -132,30 +179,21 @@ class AvailableInstances extends React.Component {
         render: (text, row) => row.instance.clusterId,
       },
       {
-        title: '可发布服务',
-        dataIndex: 'publish',
+        title: '实例授权',
+        dataIndex: 'role',
         width: '10%',
         filters: [{
-          text: '是',
-          value: true,
+          text: '仅发布服务',
+          value: 2,
         }, {
-          text: '否',
-          value: false,
-        }],
-        render: (text, row) => (getInstanceRole(row.role).publish ? '是' : '否'),
-      },
-      {
-        title: '可订阅服务',
-        dataIndex: 'subscribe',
-        width: '10%',
-        filters: [{
-          text: '是',
-          value: true,
+          text: '仅订阅服务',
+          value: 1,
         }, {
-          text: '否',
-          value: false,
+          text: '发布服务 & 订阅服务',
+          value: 4,
         }],
-        render: (text, row) => (getInstanceRole(row.role).subscribe ? '是' : '否'),
+        filteredValue,
+        render: role => renderInstanceRole(role),
       },
       {
         title: '描述',
@@ -167,6 +205,8 @@ class AvailableInstances extends React.Component {
         title: '申请时间',
         dataIndex: 'creationTime',
         width: '10%',
+        sorter: true,
+        sortOrder,
         render: (text, row) => formatDate(row.instance.creationTime),
       },
       {
@@ -210,7 +250,7 @@ class AvailableInstances extends React.Component {
             placeholder="按实例名搜索"
             onChange={e => this.setState({ name: e.target.value })}
             onSearch={name => this.loadData({ name, page: 1 })}
-            value={this.state.name}
+            value={name}
           />
           {
             totalElements > 0 && <div className="page-box">
@@ -227,6 +267,7 @@ class AvailableInstances extends React.Component {
               pagination={false}
               loading={isFetching}
               rowKey={row => row.instance.id}
+              onChange={this.tableOnchange}
             />
           </Card>
         </div>

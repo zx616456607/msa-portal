@@ -33,6 +33,8 @@ import {
 } from '../../../constants'
 import {
   formatDate,
+  renderInstanceRole,
+  formatFilterConditions,
   getInstanceRole,
   toQuerystring,
 } from '../../../common/utils'
@@ -49,25 +51,61 @@ const CheckboxGroup = Checkbox.Group
 
 class CSBApplication extends React.Component {
   state = {
-    radioValue: 'all',
+    radioValue: 'status,eq,1',
     name: '',
     currentRow: null,
     confirmLoading: false,
     ownerResponse: '',
     timeoutComplete: 0,
+    filteredRoleValue: [],
+    filteredStatueValue: [],
+    requestTimeSortOrder: false,
+    approvalTimeSortOrder: false,
   }
 
   componentDidMount() {
-    this.loadData()
+    const { location } = this.props
+    const { query } = location
+    const { name, filter, sort } = query
+    const filteredValue = []
+    console.log(this.formatSortOrder(sort))
+    this.setState({
+      name,
+      filteredValue,
+      radioValue: !filter || filter.indexOf('status,eq,1') > -1 ? 'status,eq,1' : 'status,ne,1',
+      requestTimeSortOrder: this.formatSortOrder(sort),
+      approvalTimeSortOrder: this.formatSortOrder(sort),
+    }, this.loadData)
+  }
+
+  formatSortOrder = sort => {
+    if (!sort) {
+      return false
+    }
+    const columeKey = sort.substring(2, sort.length)
+    const orderValue = sort.substring(0, 1)
+    if (columeKey === 'approvalTime' && orderValue === 'a') {
+      return 'ascend'
+    }
+    if (columeKey === 'approvalTime' && orderValue === 'd') {
+      return 'descend'
+    }
+    if (columeKey === 'requestTime' && orderValue === 'a') {
+      return 'ascend'
+    }
+    if (columeKey === 'requestTime' && orderValue === 'd') {
+      return 'descend'
+    }
+    return false
   }
 
   loadData = query => {
     const { loadApply, currentUser, location, history } = this.props
-    const { name } = this.state
-    query = Object.assign({}, location.query, { name }, query)
-    if (query.name === '') {
-      delete query.name
-    }
+    const { name, radioValue } = this.state
+    query = Object.assign({}, location.query, {
+      name,
+      filter: [ radioValue ],
+    }, query)
     if (query.page === 1) {
       delete query.page
     }
@@ -78,9 +116,61 @@ class CSBApplication extends React.Component {
   }
 
   radioChange = e => {
+    const radioValue = e.target.value
     this.setState({
-      radioValue: e.target.value,
+      radioValue,
     })
+    this.loadData({ filter: [ e.target.value ] })
+  }
+
+  formatFilterConditions = filters => {
+    const { status } = filters
+    let statusFilter = 'status,ne,1'
+    if (status.length === 1) {
+      statusFilter = `status,eq,${status[0]}`
+    }
+    const roleConditions = formatFilterConditions(filters)
+    roleConditions.push(statusFilter)
+    return roleConditions
+  }
+
+  tableOnchange = (pagination, filters, sorter) => {
+    const { columnKey, order } = sorter
+    const { role, status } = filters
+    const filter = this.formatFilterConditions(filters)
+    this.setState({
+      filteredRoleValue: role,
+      filteredStatueValue: status,
+    })
+    if (order) {
+      switch (columnKey) {
+        case 'approvalTime':
+          this.setState({
+            requestTimeSortOrder: false,
+            approvalTimeSortOrder: order,
+          })
+          break
+        case 'requestTime':
+          this.setState({
+            requestTimeSortOrder: order,
+            approvalTimeSortOrder: false,
+          })
+          break
+        default:
+          break
+      }
+    } else {
+      this.setState({
+        requestTimeSortOrder: false,
+        approvalTimeSortOrder: false,
+      })
+    }
+    const query = {
+      page: 1,
+      filter,
+      sort: order ? `${order.substring(0, 1)},${columnKey}` : null,
+    }
+    this.loadData(query)
   }
 
   handleApprove = (result, row) => {
@@ -184,75 +274,79 @@ class CSBApplication extends React.Component {
     })
   }
 
-  render() {
-    const { myApplication, location } = this.props
-    const { query } = location
-    const { isFetching, content, totalElements, size } = myApplication
-    const { radioValue, isPass, approveModal, currentRow, confirmLoading } = this.state
+  renderTableColume = () => {
+    const {
+      radioValue, filteredStatueValue, filteredRoleValue,
+      requestTimeSortOrder, approvalTimeSortOrder,
+    } = this.state
+    const approvalTimeCol = {
+      title: '审批时间',
+      dataIndex: 'approvalTime',
+      width: '13%',
+      sorter: true,
+      sortOrder: approvalTimeSortOrder,
+      render: (text, row) => (
+        (text && text !== row.requestTime)
+          ? formatDate(text)
+          : '-'
+      ),
+    }
+    const reviewerCol = { title: '审批人', dataIndex: 'reviewer.name', width: '13%' }
     const columns = [
       {
         title: '申请人',
         dataIndex: 'applicant',
-        width: '10%',
+        width: radioValue === 'status,eq,1' ? '15%' : '10%',
         render: (text, row) => row.requestor.name,
       },
       {
         title: '申请实例',
         dataIndex: 'instance',
-        width: '10%',
+        width: radioValue === 'status,eq,1' ? '15%' : '15%',
         render: (text, row) => row.instance.name,
       },
       {
-        title: '状态',
-        dataIndex: 'status',
-        width: '10%',
-        render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
+        title: '实例授权',
+        dataIndex: 'role',
+        width: radioValue === 'status,eq,1' ? '20%' : '15%',
+        filters: radioValue === 'status,eq,1' ? null : [{
+          text: '仅发布服务',
+          value: 2,
+        }, {
+          text: '仅订阅服务',
+          value: 1,
+        }, {
+          text: '发布服务 & 订阅服务',
+          value: 4,
+        }],
+        filteredValue: radioValue === 'status,eq,1' ? null : filteredRoleValue,
+        render: role => renderInstanceRole(role),
       },
       {
         title: '申请时间',
         dataIndex: 'requestTime',
-        width: '10%',
+        width: radioValue === 'status,eq,1' ? '15%' : '13%',
         render: text => formatDate(text),
+        sorter: true,
+        sortOrder: requestTimeSortOrder,
       },
       {
-        title: '可发布服务',
-        dataIndex: 'publish',
-        width: '10%',
-        filters: [{
-          text: '是',
-          value: true,
+        title: '审批状态',
+        dataIndex: 'status',
+        width: '15%',
+        filters: radioValue === 'status,eq,1' ? null : [{
+          text: '已通过',
+          value: 2,
         }, {
-          text: '否',
-          value: false,
+          text: '已拒绝',
+          value: 3,
         }],
-        render: (text, row) => (getInstanceRole(row.role).publish ? '是' : '否'),
-      },
-      {
-        title: '可订阅服务',
-        dataIndex: 'subscribe',
-        width: '10%',
-        filters: [{
-          text: '是',
-          value: true,
-        }, {
-          text: '否',
-          value: false,
-        }],
-        render: (text, row) => (getInstanceRole(row.role).subscribe ? '是' : '否'),
-      },
-      {
-        title: '审批时间',
-        dataIndex: 'approvalTime',
-        width: '10%',
-        render: (text, row) => (
-          (text && text !== row.requestTime)
-            ? formatDate(text)
-            : '-'
-        ),
+        filteredValue: radioValue === 'status,eq,1' ? null : filteredStatueValue,
+        render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
       },
       {
         title: '操作',
-        width: '20%',
+        width: radioValue === 'status,eq,1' ? '20%' : '14%',
         render: (text, row) => {
           if (row.status === 1) {
             return (
@@ -263,13 +357,13 @@ class CSBApplication extends React.Component {
                   // type="primary"
                   onClick={() => this.handleApprove('pass', row)}
                 >
-                通过
+                  通过
                 </Button>,
                 <Button
                   key="refuse"
                   onClick={() => this.handleApprove('refuse', row)}
                 >
-                拒绝
+                  拒绝
                 </Button>,
               ]
             )
@@ -292,12 +386,27 @@ class CSBApplication extends React.Component {
               icon={disabled ? 'close-circle-o' : 'clock-circle-o'}
               disabled={disabled}
             >
-            撤销审批
+              撤销审批
             </Button>
           </Tooltip>
         },
       },
     ]
+    if (radioValue !== 'status,eq,1') {
+      columns.splice(4, 0, approvalTimeCol, reviewerCol)
+    }
+    return columns
+  }
+
+  render() {
+    const { myApplication, location } = this.props
+    const { query } = location
+    const { isFetching, content, totalElements, size } = myApplication
+    const {
+      radioValue, isPass, approveModal, currentRow,
+      confirmLoading,
+    } = this.state
+    const columns = this.renderTableColume()
     const rolePlainOptions = [
       { label: '可发布服务', value: 2 },
       { label: '可订阅服务', value: 1 },
@@ -322,9 +431,8 @@ class CSBApplication extends React.Component {
         <div className="approval-instance-radio" key="radios">
           审批状态：
           <RadioGroup onChange={this.radioChange} value={radioValue}>
-            <Radio value="all">all</Radio>
-            <Radio value={false}>待审批</Radio>
-            <Radio value={true}>已审批</Radio>
+            <Radio value="status,eq,1">待审批</Radio>
+            <Radio value="status,ne,1">已审批</Radio>
           </RadioGroup>
         </div>
         <div className="layout-content-btns" key="btns">
@@ -355,6 +463,7 @@ class CSBApplication extends React.Component {
             pagination={false}
             loading={isFetching}
             rowKey={row => row.id}
+            onChange={this.tableOnchange}
           />
         </div>
         <Modal

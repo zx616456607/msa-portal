@@ -291,25 +291,25 @@ export const renderInstanceRole = role => {
 export const formatFilterConditions = filters => {
   const { role } = filters
   if (!role || !role.length || role.length === 3) {
-    return ''
+    return []
   }
   if (role.length === 1) {
-    return `role,eq,${role[0]}`
+    return [ `role,eq,${role[0]}` ]
   }
   role.sort()
   if (role.length === 2) {
     const firstValue = role[0]
     const secondValue = role[1]
     if (firstValue === '1' && secondValue === '2') {
-      return 'role,ne,4'
+      return [ 'role,ne,4' ]
     }
     if (firstValue === '1' && secondValue === '4') {
-      return 'role,ne,2'
+      return [ 'role,ne,2' ]
     }
     if (firstValue === '2' && secondValue === '4') {
-      return 'role,ne,1'
+      return [ 'role,ne,1' ]
     }
-    return ''
+    return []
   }
 }
 
