@@ -47,7 +47,10 @@ class AvailableInstances extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData()
+    const { location } = this.props
+    const { query } = location
+    const { name } = query
+    this.setState({ name }, this.loadData)
   }
 
   loadData = query => {

@@ -59,8 +59,10 @@ class App extends React.Component {
       location,
       history,
     } = this.props
-    const query = parse(location.search)
-    const { username, token, jwt, authUrl } = query
+    const { pathname, search, hash } = location
+    const query = parse(search)
+    const { username, token, jwt, authUrl, ...otherQuery } = query
+    console.log(pathname, search, hash)
     getAuth({ username, token, jwt }).then(res => {
       if (res.type === AUTH_FAILURE) {
         Modal.error({
@@ -79,7 +81,7 @@ class App extends React.Component {
       }
       const { userID } = jwt
       // replace history
-      history.replace(location.pathname)
+      history.replace(`${pathname}?${toQuerystring(otherQuery)}${hash}`)
       // Get user detail info
       return getCurrentUser(userID)
     })
