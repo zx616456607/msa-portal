@@ -182,7 +182,7 @@ class PublicInstances extends React.Component {
         }
       </div>
       <div className="layout-content-body" key="layout-content-body">
-        <Card hoverable={false}>
+        <Card>
           <Table
             columns={columns}
             dataSource={content}

@@ -224,7 +224,7 @@ class RoutingManage extends React.Component {
           }
         </div>
         <div className="layout-content-body" key="body">
-          <Card hoverable={false}>
+          <Card>
             <Table
               className="router-manage-table"
               pagination={false}

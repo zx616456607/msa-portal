@@ -79,7 +79,6 @@ class CSBInstances extends React.Component {
           <Card
             className="left-menu-card"
             title={title}
-            hoverable={false}
           >
             <Menu mode="inline"
               selectedKeys={getMenuSelectedKeys(location, menus)}

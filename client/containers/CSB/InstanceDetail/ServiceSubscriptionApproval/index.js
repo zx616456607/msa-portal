@@ -174,7 +174,6 @@ export default class ServiceSubscriptionApproval extends React.Component {
             </div>
             <Table
               key="table"
-              hoverable={false}
               columns={columns}
               pagination={false}
               dataSource={data}

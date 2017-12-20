@@ -296,7 +296,7 @@ class CallLinkTracking extends React.Component {
           </Select>
         </div>
         <div className="layout-content-body" key="body">
-          <Card className="call-link-tracking-table" hoverable={false}>
+          <Card className="call-link-tracking-table">
             <Table
               columns={columns}
               dataSource={data}

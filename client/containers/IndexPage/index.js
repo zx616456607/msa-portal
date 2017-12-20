@@ -117,7 +117,7 @@ class IndexPage extends React.Component {
       <QueueAnim className="index-page">
         <Row gutter={16} key="row1">
           <Col span={8} className="index-page-overview">
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -154,7 +154,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
           <Col span={8}>
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -188,7 +188,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
           <Col span={8}>
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -227,7 +227,7 @@ class IndexPage extends React.Component {
         </Row>
         <Row gutter={16} key="row2">
           <Col span={8}>
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -264,7 +264,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
           <Col span={8}>
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -301,7 +301,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
           <Col span={8}>
-            <Card>
+            <Card hoverable={true}>
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
@@ -340,7 +340,7 @@ class IndexPage extends React.Component {
         </Row>
         <Row gutter={16} key="row3">
           <Col span={12}>
-            <Card title="TOP 20 调用情况" style={{ height: 560 }}>
+            <Card hoverable={true} title="TOP 20 调用情况" style={{ height: 560 }}>
               <Row gutter={16}>
                 <Col span={12} className="index-page-top-call">
                   <div className="index-page-top-call-failed">失败最多服务</div>
@@ -366,7 +366,7 @@ class IndexPage extends React.Component {
             </Card>
           </Col>
           <Col span={12}>
-            <Card title="所有微服务调用次数" style={{ height: 560 }}>
+            <Card hoverable={true} title="所有微服务调用次数" style={{ height: 560 }}>
               <Chart
                 data={this.state.data}
                 width={this.state.width}

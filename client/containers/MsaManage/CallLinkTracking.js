@@ -38,7 +38,7 @@ class CallLinkTracking extends React.Component {
     return (
       <QueueAnim className="msa-call-link-tracking">
         <div className="layout-content-body" key="body">
-          <Card hoverable={false} extra={extra}>
+          <Card extra={extra}>
             <iframe src={iframeSrc} />
           </Card>
         </div>

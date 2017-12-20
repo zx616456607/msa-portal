@@ -496,7 +496,7 @@ class MyPublishedServices extends React.Component {
           }
         </div>
         <div key="data-box" className="layout-content-body">
-          <Card hoverable={false}>
+          <Card>
             { this.renderDifferentTable() }
           </Card>
         </div>

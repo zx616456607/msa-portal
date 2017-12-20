@@ -267,7 +267,7 @@ class MsaList extends React.Component {
           <span className="float-right msa-btn-box-total">共计 {msaData.length} 条</span>
         </div>
         <div className="layout-content-body" key="body">
-          <Card hoverable={false}>
+          <Card>
             <Table
               className="msa-table"
               pagination={pagination}

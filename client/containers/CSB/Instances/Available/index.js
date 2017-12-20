@@ -217,7 +217,7 @@ class AvailableInstances extends React.Component {
           }
         </div>
         <div className="layout-content-body" key="body">
-          <Card className="available-instance-table" hoverable={false}>
+          <Card className="available-instance-table">
             <Table
               columns={columns}
               dataSource={content}
