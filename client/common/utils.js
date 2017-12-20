@@ -100,6 +100,11 @@ export function toQuerystring(obj, sep, eq) {
         return ''
     }
   }
+  for (const k in obj) {
+    if (obj[k] === null || obj[k] === '' || obj[k] === undefined) {
+      delete obj[k]
+    }
+  }
   const queryString = Object.keys(obj)
     .sort()
     .map(k => {
@@ -256,4 +261,79 @@ export const getInstanceRole = roleId => {
       break
   }
   return data
+}
+
+/**
+ * render instance authorization status
+ *
+ * @param {number} role of instance
+ * @return {string} role object
+ */
+export const renderInstanceRole = role => {
+  switch (role) {
+    case 1:
+      return '仅订阅服务'
+    case 2:
+      return '仅发布服务'
+    case 4:
+      return '发布服务 & 订阅服务'
+    default:
+      return '-'
+  }
+}
+
+/**
+ * format instance filter by role
+ *
+ * @param {object} filters object
+ * @return {string} filters conditions
+ */
+export const formatFilterConditions = filters => {
+  const { role } = filters
+  if (!role || !role.length || role.length === 3) {
+    return ''
+  }
+  if (role.length === 1) {
+    return `role,eq,${role[0]}`
+  }
+  role.sort()
+  if (role.length === 2) {
+    const firstValue = role[0]
+    const secondValue = role[1]
+    if (firstValue === '1' && secondValue === '2') {
+      return 'role,ne,4'
+    }
+    if (firstValue === '1' && secondValue === '4') {
+      return 'role,ne,2'
+    }
+    if (firstValue === '2' && secondValue === '4') {
+      return 'role,ne,1'
+    }
+    return ''
+  }
+}
+
+/**
+ * format instance role by filter
+ *
+ * @param {string} filterString string
+ * @return {array} filters conditions
+ */
+export const formatRole = filterString => {
+  switch (filterString) {
+    case 'role,eq,1':
+      return [ '1' ]
+    case 'role,eq,2':
+      return [ '2' ]
+    case 'role,eq,4':
+      return [ '4' ]
+    case 'role,ne,4':
+      return [ '1', '2' ]
+    case 'role,ne,2':
+      return [ '1', '4' ]
+    case 'role,ne,1':
+      return [ '2', '4' ]
+    default:
+      return []
+  }
 }
