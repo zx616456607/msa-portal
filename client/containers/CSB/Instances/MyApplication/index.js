@@ -11,6 +11,8 @@
  */
 import React from 'react'
 import isEqual from 'lodash/isEqual'
+import isEmpty from 'lodash/isEmpty'
+import difference from 'lodash/difference'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Icon, Input, Table, Pagination, Card, Modal, notification, Tooltip } from 'antd'
@@ -18,7 +20,7 @@ import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
 import CSBApplyStatus from '../../../../components/CSBApplyStatus'
 import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
-import { getInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
+import { renderInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
 import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/apply'
 
@@ -34,6 +36,9 @@ class MyApplication extends React.Component {
     dataList: [],
     pages: 0,
     total: 0,
+    sort: '',
+    filter: '',
+    requestTime: true,
     delVisible: false,
     isRevoke: false,
   }
@@ -44,13 +49,19 @@ class MyApplication extends React.Component {
 
   loadData = query => {
     const { loadApply, userID, history } = this.props
-    const { name } = this.state
-    query = Object.assign({}, location.query, { name }, query)
+    const { name, sort, filter } = this.state
+    query = Object.assign({}, location.query, { name, sort, filter }, query)
     if (query.name === '') {
       delete query.name
     }
     if (query.page === 1) {
       delete query.page
+    }
+    if (query.sort === '') {
+      delete query.sort
+    }
+    if (query.filter === '') {
+      delete query.filter
     }
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
@@ -122,7 +133,78 @@ class MyApplication extends React.Component {
 
   fliterCluster = value => {
     const { clusters } = this.props
-    return clusters[value].clusterName
+    return clusters[value] === undefined ? value : clusters[value].clusterName
+  }
+
+  getSort = (order, column) => {
+    let orderStr = 'a,'
+    if (order === 'descend') {
+      orderStr = 'd,'
+    }
+    return orderStr + column
+  }
+
+  getfilter = (Ary, column) => {
+    if (Ary.length > 0 && Ary) {
+      let filter
+      if (Ary.length === 1) {
+        if (column === 'empower') {
+          filter = `role,eq,${Ary[0]}`
+        } else {
+          filter = `${column},eq,${Ary[0]}`
+        }
+      } else if (Ary.length.length < 3) {
+        if (column === 'status') {
+          const statusAry = [ '1', '2', '3' ]
+          const diffStatuAry = difference(statusAry, Ary)
+          filter = `${column},ne,${diffStatuAry}`
+        } else {
+          const roleKey = [ '1', '2', '4' ]
+          const diffRoleAry = difference(roleKey, Ary)
+          filter = `role,ne,${diffRoleAry}`
+        }
+      }
+      return filter
+    }
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    let filterStr = ''
+    let sortSrt = ''
+    if (!isEmpty(filters)) {
+      const { empower, status } = filters
+      if (empower !== undefined && status !== undefined) {
+        if (empower.length < 3 && empower.length > 0 && status.length < 3 && status.length > 0) {
+          const query = {
+            filter: [
+              `${this.getfilter(empower, 'empower')}`,
+              `${this.getfilter(status, 'status')}`,
+            ],
+          }
+          filterStr = toQuerystring(query)
+          filterStr = filterStr.substring(7, filterStr.length)
+        }
+      } else {
+        if (empower !== undefined) {
+          if (empower.length > 0 && empower.length < 3) {
+            filterStr = this.getfilter(empower, 'empower')
+          }
+        } if (status !== undefined) {
+          if (status.length > 0 && status.length < 3) {
+            filterStr = this.getfilter(status, 'status')
+          }
+        }
+      }
+    }
+    if (!isEmpty(sorter)) {
+      const { columnKey, order } = sorter
+      sortSrt = this.getSort(order, columnKey)
+    }
+    this.setState({
+      filter: filterStr,
+      sorter: sortSrt,
+    })
+    this.loadData({ sort: sortSrt, filter: filterStr })
   }
 
   render() {
@@ -151,47 +233,34 @@ class MyApplication extends React.Component {
         sorter: (a, b) => a.time - b.time,
         render: (text, row) => formatDate(row.requestTime),
       }, {
-        title: '可发布服务',
-        dataIndex: 'canRelease',
-        width: '15%',
-        render: (text, row) => (getInstanceRole(row.role).publish ? '是' : '否'),
+        title: '实例授权',
+        dataIndex: 'empower',
+        width: '13%',
+        render: (text, row) => renderInstanceRole(row.role),
         filters: [{
-          text: '是',
-          value: '是',
+          text: '仅发布服务',
+          value: '2',
         }, {
-          text: '否',
-          value: '否',
-        }],
-        filterMultiple: false,
-        onFilter: (value, row) => (getInstanceRole(row.role).publish ? '是' : '否').indexOf(value) === 0,
-      }, {
-        title: '可订阅服务',
-        dataIndex: 'canBook',
-        width: '15%',
-        render: (text, row) => (getInstanceRole(row.role).subscribe ? '是' : '否'),
-        filters: [{
-          text: '是',
-          value: '是',
+          text: '仅订阅服务',
+          value: '1',
         }, {
-          text: '否',
-          value: '否',
+          text: '发布服务&订阅服务',
+          value: '4',
         }],
-        filterMultiple: false,
-        onFilter: (value, row) => (getInstanceRole(row.role).subscribe ? '是' : '否').indexOf(value) === 0,
       }, {
         title: '审批状态',
         dataIndex: 'status',
-        width: '13%',
+        width: '12%',
         render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
         filters: [{
           text: '已拒绝',
-          value: '已拒绝',
+          value: '3',
         }, {
           text: '已通过',
-          value: '已通过',
+          value: '2',
         }, {
           text: '申请中',
-          value: '申请中',
+          value: '1',
         }],
       }, {
         title: '审批原因',
@@ -217,13 +286,13 @@ class MyApplication extends React.Component {
     const pagination = {
       simple: true,
       pageSize: size,
-      total: totalElements,
+      total: totalElements || 0,
       current: parseInt(query.page) || 1,
       onChange: page => this.loadData({ page }),
     }
     return (
       <QueueAnim className="csb-app">
-        <div className="top">
+        <div className="top" key="top">
           <Button type="primary" onClick={() => this.loadData()}><Icon type="sync" />刷 新</Button>
           <Search
             className="text"
@@ -238,12 +307,13 @@ class MyApplication extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card>
+        <Card key="table">
           <Table
             pagination={false}
             columns={colmuns}
             dataSource={content}
             loading={isFetching}
+            onChange={this.handleTableChange}
             rowKey={row => row.id} />
         </Card>
         <Modal title="撤销申请实例"
