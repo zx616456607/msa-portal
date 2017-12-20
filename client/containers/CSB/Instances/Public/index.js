@@ -52,6 +52,9 @@ class PublicInstances extends React.Component {
     const { getInstances, userId, history, location } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
+    if (query.sort === null) {
+      delete query.sort
+    }
     if (query.name === '') {
       delete query.name
     }
@@ -113,6 +116,15 @@ class PublicInstances extends React.Component {
     return <span>-</span>
   }
 
+  tableOnchange = (pagination, filters, sorter) => {
+    const { columnKey, order } = sorter
+    const query = {
+      page: 1,
+      sort: order ? `${order.substring(0, 1)},${columnKey}` : null,
+    }
+    this.loadData(query)
+  }
+
   render() {
     const { publicInstances, location } = this.props
     const { query } = location
@@ -139,6 +151,7 @@ class PublicInstances extends React.Component {
         key: 'creationTime',
         width: '15%',
         render: creationTime => formatDate(creationTime),
+        sorter: true,
       },
       {
         title: '操作',
@@ -190,6 +203,7 @@ class PublicInstances extends React.Component {
             pagination={false}
             loading={isFetching}
             rowKey={record => record.id}
+            onChange={this.tableOnchange}
           />
         </Card>
       </div>
