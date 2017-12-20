@@ -15,6 +15,8 @@ import { connect } from 'react-redux'
 import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select, Pagination } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEqual from 'lodash/isEqual'
+import isEmpty from 'lodash/isEmpty'
+import difference from 'lodash/difference'
 import { parse as parseQuerystring } from 'query-string'
 import './style/index.less'
 import CreateModal from './CreateModal'
@@ -41,54 +43,11 @@ class CSBInstanceOm extends React.Component {
       createModal: false,
       currentSearchType: 'creator',
       searchValue: '',
-      creationTimeSort: true,
-      transferNumSort: true,
-      cpuRateSort: true,
-      memoryRateSort: true,
     }
   }
 
   componentWillMount() {
     this.getInstanceList()
-  }
-
-  componentWillReceiveProps(nextPorps) {
-    const { location: oldLocation } = this.props
-    const { location: newLocation } = nextPorps
-    const { query: oldQuery } = oldLocation
-    const { query: newQuery } = newLocation
-    const {
-      transferNum: oldTransferNum, cpuRate: oldCpuRate,
-      memoryRate: oldMemoryRate, creationTime: oldCreationTime,
-    } = oldQuery
-    const {
-      transferNum: newTransferNum, cpuRate: newCpuRate,
-      memoryRate: newMemoryRate, creationTime: newCreationTime,
-    } = newQuery
-    if (oldTransferNum !== newTransferNum) {
-      this.setState({
-        transferNumSort: this.transferQuerySort(newTransferNum),
-      })
-    }
-    if (oldCpuRate !== newCpuRate) {
-      this.setState({
-        cpuRateSort: this.transferQuerySort(newCpuRate),
-      })
-    }
-    if (oldMemoryRate !== newMemoryRate) {
-      this.setState({
-        memoryRateSort: this.transferQuerySort(newMemoryRate),
-      })
-    }
-    if (oldCreationTime !== newCreationTime) {
-      this.setState({
-        creationTimeSort: this.transferQuerySort(newCreationTime),
-      })
-    }
-  }
-
-  transferQuerySort = str => {
-    return str === 'desc'
   }
 
   getInstanceList = query => {
@@ -109,6 +68,12 @@ class CSBInstanceOm extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
+    if (query.sort === '') {
+      delete query.sort
+    }
+    if (query.filter === '') {
+      delete query.filter
+    }
     location.query = getQueryKey(query)
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
@@ -117,10 +82,36 @@ class CSBInstanceOm extends React.Component {
   }
 
   tableChange = (pagination, filters, sorter) => {
-    console.log(filters, sorter)
     this.setState({
       page: pagination.current,
-    }, this.getInstanceList)
+      filterInfo: filters,
+      sorterInfo: sorter,
+    })
+    let sortStr = ''
+    let filterStr = ''
+    if (!isEmpty(sorter)) {
+      const { columnKey, order } = sorter
+      sortStr = this.getSortString(columnKey, order)
+    }
+    if (!isEmpty(filters.status)) {
+      const { status } = filters
+      if (status.length === 1) {
+        filterStr = `status,eq,${status[0]}`
+      } else {
+        const statusArr = [ 'running', 'starting', 'stop' ]
+        const diffArr = difference(statusArr, status)
+        filterStr = `status,nq,${diffArr[0]}`
+      }
+    }
+    this.getInstanceList({ sort: sortStr, filter: filterStr })
+  }
+
+  getSortString = (columnKey, order) => {
+    let str = 'a,'
+    if (order === 'descend') {
+      str = 'd,'
+    }
+    return `${str}${columnKey}`
   }
 
   radioChange = e => {
@@ -203,13 +194,15 @@ class CSBInstanceOm extends React.Component {
   }
 
   render() {
-    const {
+    let {
       radioValue, createModal, currentInstance, searchValue,
-      currentSearchType,
+      currentSearchType, sorterInfo, filterInfo,
     } = this.state
     const { omInstances, userID, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
     const { query } = location
+    filterInfo = filterInfo || {}
+    sorterInfo = sorterInfo || {}
     const pagination = {
       simple: true,
       total: totalElements,
@@ -232,30 +225,35 @@ class CSBInstanceOm extends React.Component {
           text: '已停止',
           value: 'stop',
         }],
+        filteredValue: filterInfo.status || null,
         render: text => (text ? text : '-'),
       },
       {
         title: '累计调用量',
         dataIndex: 'transferNum',
         sorter: (a, b) => a.transferNum - b.transferNum,
+        sortOrder: sorterInfo.columnKey === 'transferNum' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
       {
         title: 'CPU利用率',
         dataIndex: 'cpuRate',
         sorter: (a, b) => a.cpuRate - b.cpuRate,
+        sortOrder: sorterInfo.columnKey === 'cpuRate' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
       {
         title: 'CPU利用率',
         dataIndex: 'memoryRate',
         sorter: (a, b) => a.memoryRate - b.memoryRate,
+        sortOrder: sorterInfo.columnKey === 'memoryRate' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
       {
         title: '创建时间',
         dataIndex: 'creationTime',
         sorter: (a, b) => a.creationTime - b.creationTime,
+        sortOrder: sorterInfo.columnKey === 'creationTime' && sorterInfo.order,
         render: text => formatDate(text),
       },
       { title: '操作',
