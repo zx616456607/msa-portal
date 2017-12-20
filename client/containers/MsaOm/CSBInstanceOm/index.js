@@ -15,6 +15,8 @@ import { connect } from 'react-redux'
 import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select, Pagination } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEqual from 'lodash/isEqual'
+import isEmpty from 'lodash/isEmpty'
+import difference from 'lodash/difference'
 import { parse as parseQuerystring } from 'query-string'
 import './style/index.less'
 import CreateModal from './CreateModal'
@@ -50,7 +52,9 @@ class CSBInstanceOm extends React.Component {
 
   getInstanceList = query => {
     const { getInstances, location, userID, history } = this.props
-    const { currentSearchType, searchValue } = this.state
+    const {
+      currentSearchType, searchValue,
+    } = this.state
     query = Object.assign({}, location.query, { [currentSearchType]: searchValue }, query)
     if (currentSearchType === 'name') {
       delete query.creator
@@ -64,6 +68,12 @@ class CSBInstanceOm extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
+    if (query.sort === '') {
+      delete query.sort
+    }
+    if (query.filter === '') {
+      delete query.filter
+    }
     location.query = getQueryKey(query)
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
@@ -71,10 +81,37 @@ class CSBInstanceOm extends React.Component {
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
   }
 
-  tableChange = pagination => {
+  tableChange = (pagination, filters, sorter) => {
     this.setState({
       page: pagination.current,
-    }, this.getInstanceList)
+      filterInfo: filters,
+      sorterInfo: sorter,
+    })
+    let sortStr = ''
+    let filterStr = ''
+    if (!isEmpty(sorter)) {
+      const { columnKey, order } = sorter
+      sortStr = this.getSortString(columnKey, order)
+    }
+    if (!isEmpty(filters.status)) {
+      const { status } = filters
+      if (status.length === 1) {
+        filterStr = `status,eq,${status[0]}`
+      } else {
+        const statusArr = [ 'running', 'starting', 'stop' ]
+        const diffArr = difference(statusArr, status)
+        filterStr = `status,nq,${diffArr[0]}`
+      }
+    }
+    this.getInstanceList({ sort: sortStr, filter: filterStr })
+  }
+
+  getSortString = (columnKey, order) => {
+    let str = 'a,'
+    if (order === 'descend') {
+      str = 'd,'
+    }
+    return `${str}${columnKey}`
   }
 
   radioChange = e => {
@@ -157,13 +194,15 @@ class CSBInstanceOm extends React.Component {
   }
 
   render() {
-    const {
+    let {
       radioValue, createModal, currentInstance, searchValue,
-      currentSearchType,
+      currentSearchType, sorterInfo, filterInfo,
     } = this.state
     const { omInstances, userID, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
     const { query } = location
+    filterInfo = filterInfo || {}
+    sorterInfo = sorterInfo || {}
     const pagination = {
       simple: true,
       total: totalElements,
@@ -186,18 +225,37 @@ class CSBInstanceOm extends React.Component {
           text: '已停止',
           value: 'stop',
         }],
+        filteredValue: filterInfo.status || null,
         render: text => (text ? text : '-'),
       },
-      { title: '累计调用量', dataIndex: 'transferNum',
+      {
+        title: '累计调用量',
+        dataIndex: 'transferNum',
+        sorter: (a, b) => a.transferNum - b.transferNum,
+        sortOrder: sorterInfo.columnKey === 'transferNum' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
-      { title: 'CPU使用率', dataIndex: 'cpuRate',
+      {
+        title: 'CPU利用率',
+        dataIndex: 'cpuRate',
+        sorter: (a, b) => a.cpuRate - b.cpuRate,
+        sortOrder: sorterInfo.columnKey === 'cpuRate' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
-      { title: '内存使用率', dataIndex: 'memoryRate',
+      {
+        title: 'CPU利用率',
+        dataIndex: 'memoryRate',
+        sorter: (a, b) => a.memoryRate - b.memoryRate,
+        sortOrder: sorterInfo.columnKey === 'memoryRate' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
-      { title: '创建时间', dataIndex: 'creationTime', render: text => formatDate(text) },
+      {
+        title: '创建时间',
+        dataIndex: 'creationTime',
+        sorter: (a, b) => a.creationTime - b.creationTime,
+        sortOrder: sorterInfo.columnKey === 'creationTime' && sorterInfo.order,
+        render: text => formatDate(text),
+      },
       { title: '操作',
         render: (text, row) => {
           const menu = (
