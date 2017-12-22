@@ -96,5 +96,7 @@ export const CSB_AVAILABLE_INSTANCES_FLAG = 1
 export const CSB_OM_INSTANCES_FLAG = 2
 export const CSB_APPLY_FLAG = 0
 export const CSB_APPROVAL_FLAG = 1
+export const CSB_RELEASE_INSTANCES_SERVICE_FLAG = 1
+export const CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG = 0
 export const UNUSED_CLUSTER_ID = 'unused-cluster-id'
 export const CANCEL_APPROVAL_TIMEOUT = 6 * 60 * 60 * 1000

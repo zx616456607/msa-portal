@@ -11,6 +11,7 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import ServiceDetailDock from '../ServiceDetail/Dock'
 import QueueAnim from 'rc-queue-anim'
 import {
@@ -18,18 +19,29 @@ import {
   Select, Input, Pagination,
   Menu, Table, Modal, Form, Row, Col,
 } from 'antd'
+import isEqual from 'lodash/isEqual'
 import './style/MyPublishedServices.less'
+import { parse as parseQuerystring } from 'query-string'
 import CreateServiceGroupModal from './CreateServiceGroupModal'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
+import { toQuerystring } from '../../../../common/utils'
+import { getInstanceService } from '../../../../actions/CSB/instanceServices'
+import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
+import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 
 const RadioGroup = Radio.Group
 const Option = Select.Option
 const Search = Input.Search
 const FormItem = Form.Item
+const { mergeQuery } = getQueryAndFuncs(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
+const publishedSlt = csbInstanceServiceSltMaker(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
 
 class MyPublishedServices extends React.Component {
   state = {
+    allName: '',
+    groupName: '',
+    showType: '',
     currentHandle: undefined,
     currentRecord: {},
     confirmLoading: false,
@@ -39,12 +51,36 @@ class MyPublishedServices extends React.Component {
     blackAndWhiteListModalVisible: false,
   }
 
+  componentWillMount() {
+    this.loadData()
+  }
+
+  // 加载数据
+  loadData = query => {
+    const { getInstanceService, history, match } = this.props
+    const { instanceID } = match.params
+    const { name } = this.state
+    query = Object.assign({}, location.query, { name }, query)
+    if (query.name === '') {
+      delete query.name
+    }
+    if (query.page === 1) {
+      delete query.page
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
+    getInstanceService(instanceID, mergeQuery(query))
+  }
+
+  // 发布服务
   goPublishService = () => {
     const { history, match } = this.props
     const { instanceID } = match.params
     history.push(`/csb-instances-available/${instanceID}/publish-service`)
   }
 
+  // 显示全部服务
   allServicesTable = () => {
     const columns = [
       { title: '服务名', dataIndex: 'serviceName', key: 'serviceName', width: '13%' },
@@ -87,13 +123,13 @@ class MyPublishedServices extends React.Component {
     return <Table
       columns={columns}
       dataSource={tableDataSource}
-      // rowSelection={rowSelection}
       pagination={false}
-      // loading={isFetching}
-      // key={ record => record.key}
+    // loading={isFetching}
+    // key={ record => record.key}
     />
   }
 
+  // 显示服务组
   allServiceGroupsTable = () => {
     const expandedRowRender = () => {
       const columns = [
@@ -196,7 +232,7 @@ class MyPublishedServices extends React.Component {
       return Modal.info({
         title: '删除服务组',
         content: <span>服务组中仍有服务，不能执行删除操作，清空服务组中的服务后，方可执行删除操作</span>,
-        onOk() {},
+        onOk7() { },
       })
     }
     confirm({
@@ -204,7 +240,7 @@ class MyPublishedServices extends React.Component {
       title: `服务组一旦删除，将不可恢复，请确认是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
       content: '',
       onOk() {
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -217,9 +253,7 @@ class MyPublishedServices extends React.Component {
     console.log('values=', values)
   }
 
-  lodaData = () => {
-  }
-
+  // 是否显示已注销服务
   logoutServiceChange = value => {
     console.log('value=', value)
   }
@@ -231,7 +265,7 @@ class MyPublishedServices extends React.Component {
       title: '注销服务后，不可以对该服务进行变更，启动，停止和订购操作。',
       content: `Tips：对于没有被订阅过的服务，注销后不可见。定注销服务 ${record.name} 吗？确定注销服务 xxx 吗？`,
       onOk() {
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -259,7 +293,7 @@ class MyPublishedServices extends React.Component {
     const showType = getFieldValue('showType')
     switch (showType) {
       case 'all':
-        return this.allServicesTable()
+        return this.allServicesTable
       case 'group':
         return this.allServiceGroupsTable()
       default:
@@ -309,12 +343,6 @@ class MyPublishedServices extends React.Component {
     console.log('value=', value)
   }
 
-  searchWithServiceGroup = value => {
-    const { searchType } = this.state
-    console.log('searchType=', searchType)
-    console.log('value=', value)
-  }
-
   serviceMenuClick = (record, item) => {
     const { key } = item
     console.log('record=', record)
@@ -347,7 +375,9 @@ class MyPublishedServices extends React.Component {
   }
 
   showTypeChange = value => {
-    console.log('value=', value)
+    this.setState({
+      showType: value,
+    })
   }
 
   startService = record => {
@@ -358,7 +388,7 @@ class MyPublishedServices extends React.Component {
       content: '',
       onOk() {
         console.log('start.record=', record)
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -371,7 +401,7 @@ class MyPublishedServices extends React.Component {
       content: '',
       onOk() {
         console.log('stop.service.record=', record)
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -383,7 +413,7 @@ class MyPublishedServices extends React.Component {
       title: `停止服务组操作将使服务组中的所有服务全部停止。确定停止服务组 ${record.groupName} 吗？`,
       content: '',
       onOk() {
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -468,10 +498,10 @@ class MyPublishedServices extends React.Component {
         </div>
         <div className="layout-content-btns" key="layout-content-btns">
           <Button onClick={this.goPublishService} type="primary">
-          发布服务
+            发布服务
           </Button>
           {
-            showType === 'group' && <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create') }>创建服务组</Button>
+            showType === 'group' && <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create')}>创建服务组</Button>
           }
           <Button icon="sync">刷新</Button>
           {
@@ -480,7 +510,9 @@ class MyPublishedServices extends React.Component {
                 addonBefore={selectBefore}
                 placeholder="请输入关键词搜索"
                 className="search-input"
-                onSearch={this.searchWithServiceGroup}
+                onChange={e => this.setState({ name: e.target.value })}
+                onSearch={name => this.loadData({ name, page: 1 })}
+                value={this.state.name}
               />
               : <Search
                 placeholder="按服务名称搜索"
@@ -490,14 +522,14 @@ class MyPublishedServices extends React.Component {
           }
           {
             total > 0 && <div className="page-box">
-              <span className="total">共 { total } 条</span>
-              <Pagination {...paginationProps}/>
+              <span className="total">共 {total} 条</span>
+              <Pagination {...paginationProps} />
             </div>
           }
         </div>
         <div key="data-box" className="layout-content-body">
           <Card>
-            { this.renderDifferentTable() }
+            {this.renderDifferentTable()}
           </Card>
         </div>
         {
@@ -524,5 +556,18 @@ class MyPublishedServices extends React.Component {
     )
   }
 }
+const mapStateToProps = (state, ownProps) => {
+  const { entities } = state
+  const { clusters } = entities
+  const { location } = ownProps
+  location.query = parseQuerystring(location.search)
+  return {
+    clusters,
+    location,
+    myPublished: publishedSlt(state, ownProps),
+  }
+}
 
-export default Form.create()(MyPublishedServices)
+export default connect(mapStateToProps, {
+  getInstanceService,
+})(Form.create()(MyPublishedServices))
