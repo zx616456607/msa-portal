@@ -16,9 +16,19 @@ import {
   Card, Button, Select, Input, Pagination, Table, Menu, Dropdown,
   Modal,
 } from 'antd'
-import ServicesTable from './Services/Table'
-import confirm from '../../../../components/Modal/confirm'
+import ServicesTable from '../Services/Table'
+import confirm from '../../../../../components/Modal/confirm'
 import CreateServiceGroupModal from './CreateServiceGroupModal'
+import {
+  formatDate,
+} from '../../../../../common/utils'
+import {
+  createGroup,
+  getGroups,
+} from '../../../../../actions/CSB/instanceService/group'
+import {
+  serviceGroupsSlt,
+} from '../../../../../selectors/CSB/instanceService/group'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -30,6 +40,15 @@ class MyPublishedServiceGroups extends React.Component {
     confirmLoading: false,
     createServiceGroupModalVisible: false,
     searchType: 'group-name',
+  }
+
+  componentDidMount() {
+    this.loadData()
+  }
+
+  loadData = () => {
+    const { getGroups, instanceID } = this.props
+    getGroups(instanceID)
   }
 
   openCreateServiceGroupModal = (currentHandle, currentRecord = {}) => {
@@ -80,8 +99,7 @@ class MyPublishedServiceGroups extends React.Component {
 
   // 发布服务
   goPublishService = () => {
-    const { history, match } = this.props
-    const { instanceID } = match.params
+    const { history, instanceID } = this.props
     history.push(`/csb-instances-available/${instanceID}/publish-service`)
   }
 
@@ -91,35 +109,43 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  handleCreateModalValues = values => {
-    console.log('values=', values)
+  handleCreateGroup = body => {
+    const { createGroup, instanceID } = this.props
+    this.setState({
+      confirmLoading: true,
+    })
+    createGroup(instanceID, body).then(res => {
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) {
+        return
+      }
+      this.closeCreateServiceGroupModal()
+    })
   }
 
-  // 显示服务组
-  allServiceGroupsTable = () => {
-    const expandedRowRender = () => <ServicesTable loadData={() => {}} />
-
-    const tableDataSource = [
-      {
-        key: 1,
-        groupName: '我的组',
-        charge: '我',
-        tel: '12312341234',
-        status: '1',
-        num: '2',
-        des: '我的描述',
-        time: '222222222',
-      },
-    ]
-
+  render() {
+    const { serviceGroups } = this.props
+    const { isFetching, content, totalElements, size } = serviceGroups
+    const {
+      createServiceGroupModalVisible, currentHandle, currentRecord,
+      confirmLoading,
+    } = this.state
     const columns = [
-      { title: '服务组名', dataIndex: 'groupName', key: 'groupName' },
-      { title: '负责人', dataIndex: 'charge', key: 'charge' },
-      { title: '负责人电话', dataIndex: 'tel', key: 'tel' },
+      { title: '服务组名', dataIndex: 'name', key: 'name' },
+      { title: '负责人', dataIndex: 'ownerName', key: 'ownerName' },
+      { title: '负责人电话', dataIndex: 'ownerPhone', key: 'ownerPhone' },
       { title: '状态', dataIndex: 'status', key: 'status' },
       { title: '服务数量', dataIndex: 'num', key: 'num' },
-      { title: '描述', dataIndex: 'des', key: 'des' },
-      { title: '创建时间', dataIndex: 'time', key: 'time' }, {
+      { title: '描述', dataIndex: 'description', key: 'description' },
+      {
+        title: '创建时间',
+        dataIndex: 'creationTime',
+        key: 'creationTime',
+        render: text => formatDate(text),
+      },
+      {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
@@ -136,22 +162,6 @@ class MyPublishedServiceGroups extends React.Component {
         },
       },
     ]
-
-    return <Table
-      columns={columns}
-      expandedRowRender={expandedRowRender}
-      dataSource={tableDataSource}
-      pagination={false}
-      rowKey={record => record.key}
-      indentSize={0}
-    />
-  }
-
-  render() {
-    const {
-      createServiceGroupModalVisible, currentHandle, currentRecord,
-      confirmLoading,
-    } = this.state
     const selectBefore = (
       <Select
         defaultValue="group-name"
@@ -162,10 +172,10 @@ class MyPublishedServiceGroups extends React.Component {
         <Option value="service-name">服务名称</Option>
       </Select>
     )
-    const total = 10
     const paginationProps = {
       simple: true,
-      total,
+      total: totalElements,
+      pageSize: size,
     }
     return [
       <div className="layout-content-btns">
@@ -175,7 +185,7 @@ class MyPublishedServiceGroups extends React.Component {
         <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create')}>
         创建服务组
         </Button>
-        <Button icon="sync">刷新</Button>
+        <Button icon="sync" onClick={this.loadData}>刷新</Button>
         <Search
           addonBefore={selectBefore}
           placeholder="请输入关键词搜索"
@@ -185,25 +195,33 @@ class MyPublishedServiceGroups extends React.Component {
           value={this.state.name}
         />
         {
-          total > 0 && <div className="page-box">
-            <span className="total">共 {total} 条</span>
+          totalElements > 0 && <div className="page-box">
+            <span className="total">共 {totalElements} 条</span>
             <Pagination {...paginationProps} />
           </div>
         }
       </div>,
       <div key="data-box" className="layout-content-body">
         <Card>
-          {this.allServiceGroupsTable()}
+          <Table
+            columns={columns}
+            expandedRowRender={() => <ServicesTable loadData={() => {}} />}
+            dataSource={content}
+            loadData={isFetching}
+            pagination={false}
+            rowKey={record => record.id}
+            indentSize={0}
+          />
         </Card>
       </div>,
       <div key="modals">
         {
           createServiceGroupModalVisible && <CreateServiceGroupModal
             closeModalMethod={this.closeCreateServiceGroupModal}
-            callback={this.handleCreateModalValues}
             handle={currentHandle}
             initailValue={currentRecord}
             loading={confirmLoading}
+            callback={this.handleCreateGroup}
           />
         }
       </div>,
@@ -211,10 +229,16 @@ class MyPublishedServiceGroups extends React.Component {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
+  return {
+    instanceID,
+    serviceGroups: serviceGroupsSlt(state),
+  }
 }
 
 export default connect(mapStateToProps, {
-  //
+  createGroup,
+  getGroups,
 })(MyPublishedServiceGroups)
