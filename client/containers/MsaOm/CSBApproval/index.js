@@ -236,11 +236,8 @@ class CSBApplication extends React.Component {
       </div>,
       onOk() {
         return new Promise((resolve, reject) => {
-          const { updateApply, currentUser } = self.props
+          const { updateApply } = self.props
           const body = {
-            reviewer: {
-              id: currentUser.userID,
-            },
             status: 1,
           }
           updateApply(UNUSED_CLUSTER_ID, row.id, body).then(res => {
