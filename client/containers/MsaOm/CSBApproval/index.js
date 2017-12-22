@@ -68,7 +68,6 @@ class CSBApplication extends React.Component {
     const { query } = location
     const { name, filter, sort } = query
     const filteredValue = []
-    console.log(this.formatSortOrder(sort))
     this.setState({
       name,
       filteredValue,
@@ -117,16 +116,25 @@ class CSBApplication extends React.Component {
 
   radioChange = e => {
     const radioValue = e.target.value
+    // 切换审批状态，重置 table 组件的排序和筛选
     this.setState({
       radioValue,
+      requestTimeSortOrder: false,
+      approvalTimeSortOrder: false,
+      filteredRoleValue: [],
+      filteredStatueValue: [],
     })
-    this.loadData({ filter: [ e.target.value ] })
+    this.loadData({
+      filter: [ e.target.value ],
+      page: 1,
+      sort: null,
+    })
   }
 
   formatFilterConditions = filters => {
     const { status } = filters
     let statusFilter = 'status,ne,1'
-    if (status.length === 1) {
+    if (status && status.length === 1) {
       statusFilter = `status,eq,${status[0]}`
     }
     const roleConditions = formatFilterConditions(filters)
