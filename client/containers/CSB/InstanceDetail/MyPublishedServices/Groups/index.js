@@ -140,8 +140,15 @@ class MyPublishedServiceGroups extends React.Component {
       { title: '服务组名', dataIndex: 'name', key: 'name' },
       { title: '负责人', dataIndex: 'ownerName', key: 'ownerName' },
       { title: '负责人电话', dataIndex: 'ownerPhone', key: 'ownerPhone' },
-      { title: '状态', dataIndex: 'status', key: 'status' },
-      { title: '服务数量', dataIndex: 'num', key: 'num' },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        render: (text, row) => <span>
+          {row.stoppedCount} 停止，{row.activeCount} 运行
+        </span>,
+      },
+      { title: '服务数量', dataIndex: 'servicesCount', key: 'servicesCount' },
       { title: '描述', dataIndex: 'description', key: 'description' },
       {
         title: '创建时间',
