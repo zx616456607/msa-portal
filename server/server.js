@@ -35,7 +35,7 @@ import { format as formatError } from './service/errors'
 const { env } = process
 const { NODE_ENV } = env
 const app = new Koa()
-const bunyan = koaBunyanLogger.bunyan
+// const bunyan = koaBunyanLogger.bunyan
 const isDebug = NODE_ENV !== 'production'
 global.isDebug = isDebug
 global.config = config
@@ -50,7 +50,7 @@ const bunyanLoggerOpts = {
   name,
   level: config.log.level,
 }
-if (!isDebug) {
+/* if (!isDebug) {
   class MyRawStream {
     write(rec) {
       console.log('rec', rec)
@@ -76,7 +76,7 @@ if (!isDebug) {
     period: '1d', // daily rotation
     count: 7, // keep 7 back copies at recent week
   }]
-}
+} */
 app.use(koaBunyanLogger(bunyanLoggerOpts))
 app.use(koaBunyanLogger.requestIdContext())
 app.use(async (ctx, next) => {
