@@ -55,6 +55,7 @@ export default class ServiceDetail extends React.Component {
             <Row>
               <Col span={6}>
                 <div className="txt-of-ellipsis">
+                  运行状态：
                   {renderServiceStatusUI(detail.active, detail.accessible)}
                 </div>
               </Col>
