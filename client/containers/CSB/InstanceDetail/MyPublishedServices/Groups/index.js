@@ -182,7 +182,7 @@ class MyPublishedServiceGroups extends React.Component {
       pageSize: size,
     }
     return [
-      <div className="layout-content-btns">
+      <div className="layout-content-btns" key="btns">
         <Button onClick={this.goPublishService} type="primary" key="layout-content-btns">
         发布服务
         </Button>
