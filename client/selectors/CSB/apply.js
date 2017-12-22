@@ -20,11 +20,10 @@ export const getQueryAndFuncs = flag => {
     size: 10,
   }
 
-  const mergeQuery = (userId, query) => Object.assign(
+  const mergeQuery = query => Object.assign(
     {},
     defaultQuery,
-    query,
-    { userId }
+    query
   )
 
   return {
@@ -35,10 +34,9 @@ export const getQueryAndFuncs = flag => {
 
 const getApply = (flag, state, props) => {
   const { location } = props
-  const { current, CSB } = state
-  const userID = current.user.info.userID
+  const { CSB } = state
   const { mergeQuery } = getQueryAndFuncs(flag)
-  const applysKey = getQueryKey(mergeQuery(userID, location.query))
+  const applysKey = getQueryKey(mergeQuery(location.query))
   return CSB.myApplication[applysKey] || {}
 }
 

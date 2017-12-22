@@ -51,7 +51,7 @@ class CSBInstanceOm extends React.Component {
   }
 
   getInstanceList = query => {
-    const { getInstances, location, userID, history } = this.props
+    const { getInstances, location, history } = this.props
     const {
       currentSearchType, searchValue,
     } = this.state
@@ -78,7 +78,7 @@ class CSBInstanceOm extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    getInstances(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
   tableChange = (pagination, filters, sorter) => {
@@ -96,11 +96,11 @@ class CSBInstanceOm extends React.Component {
     if (!isEmpty(filters.status)) {
       const { status } = filters
       if (status.length === 1) {
-        filterStr = `status,eq,${status[0]}`
+        filterStr = `status-eq-${status[0]}`
       } else {
         const statusArr = [ 'running', 'starting', 'stop' ]
         const diffArr = difference(statusArr, status)
-        filterStr = `status,nq,${diffArr[0]}`
+        filterStr = `status-nq-${diffArr[0]}`
       }
     }
     this.getInstanceList({ sort: sortStr, filter: filterStr })
@@ -211,10 +211,10 @@ class CSBInstanceOm extends React.Component {
       onChange: page => this.getInstanceList({ page }),
     }
     const columns = [
-      { title: 'CSB实例', dataIndex: 'name' },
-      { title: '创建人', dataIndex: 'creator.name' },
-      { title: '部署集群', dataIndex: 'clusterId' },
-      { title: '状态', dataIndex: 'status',
+      { title: 'CSB实例', dataIndex: 'name', width: '15%' },
+      { title: '创建人', dataIndex: 'creator.name', width: '10%' },
+      { title: '部署集群', dataIndex: 'clusterId', width: '15%' },
+      { title: '状态', dataIndex: 'status', width: '10%',
         filters: [{
           text: '运行中',
           value: 'running',
@@ -231,32 +231,34 @@ class CSBInstanceOm extends React.Component {
       {
         title: '累计调用量',
         dataIndex: 'transferNum',
+        width: '10%',
         sorter: (a, b) => a.transferNum - b.transferNum,
         sortOrder: sorterInfo.columnKey === 'transferNum' && sorterInfo.order,
         render: text => (text ? text : '-'),
       },
-      {
-        title: 'CPU利用率',
-        dataIndex: 'cpuRate',
-        sorter: (a, b) => a.cpuRate - b.cpuRate,
-        sortOrder: sorterInfo.columnKey === 'cpuRate' && sorterInfo.order,
-        render: text => (text ? text : '-'),
-      },
-      {
-        title: 'CPU利用率',
-        dataIndex: 'memoryRate',
-        sorter: (a, b) => a.memoryRate - b.memoryRate,
-        sortOrder: sorterInfo.columnKey === 'memoryRate' && sorterInfo.order,
-        render: text => (text ? text : '-'),
-      },
+      // {
+      //   title: 'CPU利用率',
+      //   dataIndex: 'cpuRate',
+      //   sorter: (a, b) => a.cpuRate - b.cpuRate,
+      //   sortOrder: sorterInfo.columnKey === 'cpuRate' && sorterInfo.order,
+      //   render: text => (text ? text : '-'),
+      // },
+      // {
+      //   title: 'CPU利用率',
+      //   dataIndex: 'memoryRate',
+      //   sorter: (a, b) => a.memoryRate - b.memoryRate,
+      //   sortOrder: sorterInfo.columnKey === 'memoryRate' && sorterInfo.order,
+      //   render: text => (text ? text : '-'),
+      // },
       {
         title: '创建时间',
         dataIndex: 'creationTime',
+        width: '20%',
         sorter: (a, b) => a.creationTime - b.creationTime,
         sortOrder: sorterInfo.columnKey === 'creationTime' && sorterInfo.order,
         render: text => formatDate(text),
       },
-      { title: '操作',
+      { title: '操作', width: '20%',
         render: (text, row) => {
           const menu = (
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
