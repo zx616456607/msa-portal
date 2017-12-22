@@ -77,6 +77,15 @@ const csbApplySchema = new schema.Entity('csbApply', {}, {
   idAttribute: 'id',
 })
 
+// CSB InstanceService
+const csbPublishedSchema = new schema.Entity('cbsPublished', {}, {
+  idAttribute: 'id',
+})
+const csbSubscribeSchema = new schema.Entity('csbSubscribe', {}, {
+  idAttribute: 'id',
+})
+
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -145,6 +154,16 @@ export const Schemas = {
   CSB_APPLY_LIST_DATA: {
     data: {
       content: [ csbApplySchema ],
+    },
+  },
+  CSB_PUBLISHED_LIST_DATA: {
+    data: {
+      content: [ csbPublishedSchema ],
+    },
+  },
+  CSB_SUBSCRIBE_LIST_DATA: {
+    data: {
+      content: [ csbSubscribeSchema ],
     },
   },
 }
