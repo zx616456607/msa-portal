@@ -28,7 +28,9 @@ const { mergeQuery } = getQueryAndFuncs(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
 const publishedSlt = csbInstanceServiceSltMaker(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
 
 class MyPublishedServices extends React.Component {
-  state = {}
+  state = {
+    name: '',
+  }
 
   componentWillMount() {
     this.loadData()
@@ -64,37 +66,38 @@ class MyPublishedServices extends React.Component {
     console.log('value=', value)
   }
 
-  searchWithServiceName = value => {
-    console.log('value=', value)
-  }
-
   render() {
-    const total = 10
+    const { myPublished } = this.props
+    const { content, size, isFetching, totalElements } = myPublished
     const paginationProps = {
       simple: true,
-      total,
+      pageSize: size || 10,
+      total: totalElements,
+      current: 1,
     }
     return [
       <div className="layout-content-btns" key="layout-content-btns">
         <Button onClick={this.goPublishService} type="primary">
           发布服务
         </Button>
-        <Button icon="sync">刷新</Button>
+        <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
         <Search
           placeholder="按服务名称搜索"
           className="search-input"
-          onSearch={this.searchWithServiceName}
+          onChange={e => this.setState({ name: e.target.value })}
+          onSearch={name => this.loadData({ name, page: 1 })}
+          value={this.state.name}
         />
         {
-          total > 0 && <div className="page-box">
-            <span className="total">共 {total} 条</span>
+          totalElements > 0 && <div className="page-box">
+            <span className="total">共 {totalElements} 条</span>
             <Pagination {...paginationProps} />
           </div>
         }
       </div>,
       <div key="data-box" className="layout-content-body">
         <Card>
-          <ServicesTable loadData={this.loadData} />
+          <ServicesTable loadData={this.loadData} loading={isFetching} dataSource={content} />
         </Card>
       </div>,
     ]

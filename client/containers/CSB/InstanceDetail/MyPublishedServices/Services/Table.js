@@ -17,6 +17,7 @@ import ServiceDetailDock from '../../ServiceDetail/Dock'
 import {
   Dropdown, Menu, Table, Modal,
 } from 'antd'
+import { formatDate } from '../../../../../common/utils'
 import '../style/MyPublishedServices.less'
 import BlackAndWhiteListModal from '../BlackAndWhiteListModal'
 import confirm from '../../../../../components/Modal/confirm'
@@ -35,10 +36,6 @@ class ServicesTable extends React.Component {
     confirmLoading: false,
     visible: false,
     blackAndWhiteListModalVisible: false,
-  }
-
-  componentWillMount() {
-    // this.loadData()
   }
 
   closeblackAndWhiteModal = () => {
@@ -117,17 +114,27 @@ class ServicesTable extends React.Component {
     )
   }
 
-  renderServiceStatusUI = status => {
-    switch (status) {
-      case 1:
-        return <span className="activated"><div className="status-icon"></div>已激活</span>
-      case 2:
-        return <span className="cancelled"><div className="status-icon"></div>已注销</span>
-      case 3:
-        return <span className="deactivated"><div className="status-icon"></div>已停用</span>
-      default:
-        return <span>未知</span>
+  renderServiceStatusUI = (active, accessible) => {
+    let result
+    if (active) {
+      result = <span className="activated"><div className="status-icon"></div>已激活</span>
+    } else {
+      result = <span className="deactivated"><div className="status-icon"></div>已停用</span>
     }
+    if (accessible) {
+      return <span className="cancelled"><div className="status-icon"></div>已注销</span>
+    }
+    return result
+    // switch (status) {
+    //   case 1:
+    //     return <span className="activated"><div className="status-icon"></div>已激活</span>
+    //   case 2:
+    //     return <span className="cancelled"><div className="status-icon"></div>已注销</span>
+    //   case 3:
+    //     return <span className="deactivated"><div className="status-icon"></div>已停用</span>
+    //   default:
+    //     return <span>未知</span>
+    // }
   }
 
   searchWithServiceName = value => {
@@ -185,25 +192,59 @@ class ServicesTable extends React.Component {
   }
 
   render() {
-    // const { dataSource } = this.props
+    const { dataSource, loading } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
     } = this.state
     const columns = [
-      { title: '服务名', dataIndex: 'serviceName', key: 'serviceName', width: '13%' },
-      { title: '服务版本', dataIndex: 'version', key: 'version', width: '10%' },
-      { title: '所属服务组', dataIndex: 'group', key: 'group', width: '10%' },
       {
+        id: 'id',
+        title: '服务名',
+        dataIndex: 'serviceName',
+        key: 'serviceName',
+        width: '13%',
+        render: (text, row) => row.name,
+      }, {
+        title: '服务版本',
+        dataIndex: 'version',
+        key: 'version',
+        width: '10%',
+        render: (text, row) => row.version,
+      }, {
+        title: '所属服务组',
+        dataIndex: 'group',
+        key: 'group',
+        width: '10%',
+        render: (text, row) => row.groupId,
+      }, {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
         width: '10%',
-        render: status => this.renderServiceStatusUI(status),
+        render: (text, row) => this.renderServiceStatusUI(row.active, row.accessible),
+      }, {
+        title: '待审批订阅',
+        dataIndex: 'wait',
+        key: 'wait',
+        width: '10%',
+        // render: (text, row) => row.
+      }, {
+        title: '累计调用量',
+        dataIndex: 'num',
+        key: 'num',
+        width: '10%',
+      }, {
+        title: '平均RT（ms）',
+        dataIndex: 'ave',
+        key: 'ave',
+        width: '10%',
+      }, {
+        title: '发布时间',
+        dataIndex: 'time',
+        key: 'time',
+        width: '10%',
+        render: (text, row) => formatDate(row.publishTime),
       },
-      { title: '待审批订阅', dataIndex: 'wait', key: 'wait', width: '10%' },
-      { title: '累计调用量', dataIndex: 'num', key: 'num', width: '10%' },
-      { title: '平均RT（ms）', dataIndex: 'ave', key: 'ave', width: '10%' },
-      { title: '发布时间', dataIndex: 'time', key: 'time', width: '10%' },
       {
         title: '操作',
         dataIndex: 'handle',
@@ -212,29 +253,13 @@ class ServicesTable extends React.Component {
         render: (text, record) => this.renderHandleServiceDropdown(record),
       },
     ]
-    const tableDataSource = []
-    for (let i = 1; i < 4; i++) {
-      const item = {
-        key: i,
-        serviceName: 'hello',
-        version: '1.1',
-        group: 'hellogroup',
-        status: i,
-        wait: i,
-        num: i,
-        ave: i,
-        time: i,
-      }
-      tableDataSource.push(item)
-    }
     return [
       <Table
         columns={columns}
-        dataSource={tableDataSource}
-        // dataSource={dataSource}
+        dataSource={dataSource}
         pagination={false}
-        // loading={isFetching}
-        // key={ record => record.key}
+        loading={loading}
+        key={row => row.id}
       />,
       <div key="modals">
         {

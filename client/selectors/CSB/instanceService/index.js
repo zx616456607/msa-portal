@@ -22,12 +22,12 @@ const getInstancesServiceTypesByFlag = flag => {
   let instancesServiceEntitiesType
   switch (flag) {
     case CSB_RELEASE_INSTANCES_SERVICE_FLAG:
-      instancesServiceType = 'availableInstances'
-      instancesServiceEntitiesType = 'csbAvaInstances'
+      instancesServiceType = 'publishedService'
+      instancesServiceEntitiesType = 'cbsPublished'
       break
     case CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG:
-      instancesServiceType = 'omInstances'
-      instancesServiceEntitiesType = 'csbOmInstances'
+      instancesServiceType = 'subscribeService'
+      instancesServiceEntitiesType = 'csbSubscribe'
       break
     default:
       break
@@ -44,11 +44,10 @@ export const getQueryAndFuncs = flag => {
     size: 10,
   }
 
-  const mergeQuery = (userId, query) => Object.assign(
+  const mergeQuery = query => Object.assign(
     {},
     defaultQuery,
-    query,
-    { userId }
+    query
   )
 
   return {

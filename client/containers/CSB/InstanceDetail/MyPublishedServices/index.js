@@ -129,3 +129,4 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   getInstanceService,
 })(Form.create()(MyPublishedServices))
+
