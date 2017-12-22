@@ -11,14 +11,16 @@
  */
 import { myApplication } from './myApplication'
 import { publicInstances, availableInstances, omInstances } from './instance'
-
+import { publishedService } from './instanceService'
 const CSB = (state = {
   myApplication: {},
   publicInstances: {},
   availableInstances: {},
   omInstances: {},
+  publishedService: {},
 }, action) => {
   return {
+    publishedService: publishedService(state.publishedService, action),
     myApplication: myApplication(state.myApplication, action),
     publicInstances: publicInstances(state.publicInstances, action),
     availableInstances: availableInstances(state.availableInstances, action),
