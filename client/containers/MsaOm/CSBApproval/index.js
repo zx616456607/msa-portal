@@ -192,13 +192,10 @@ class CSBApplication extends React.Component {
   }
 
   confirmModal = () => {
-    const { updateApply, currentUser } = this.props
+    const { updateApply } = this.props
     const { isPass, ownerResponse, currentRow } = this.state
     const status = isPass ? 2 : 3
     const body = {
-      reviewer: {
-        id: currentUser.userID,
-      },
       status,
       ownerResponse,
     }
@@ -239,11 +236,8 @@ class CSBApplication extends React.Component {
       </div>,
       onOk() {
         return new Promise((resolve, reject) => {
-          const { updateApply, currentUser } = self.props
+          const { updateApply } = self.props
           const body = {
-            reviewer: {
-              id: currentUser.userID,
-            },
             status: 1,
           }
           updateApply(UNUSED_CLUSTER_ID, row.id, body).then(res => {

@@ -31,7 +31,7 @@ class InstanceModal extends React.Component {
   confirmModal = () => {
     const {
       closeCreateModal, createInstance, form,
-      userId, namespace, callback, currentInstance,
+      namespace, callback, currentInstance,
       editInstance,
     } = this.props
     form.validateFields((errors, values) => {
@@ -45,9 +45,6 @@ class InstanceModal extends React.Component {
         description,
         systemCallKey: 'wdfaflasdf',
       }
-      const query = {
-        userId,
-      }
       if (currentInstance) {
         editInstance(cluster, currentInstance.id, body).then(res => {
           if (res.error) {
@@ -58,7 +55,7 @@ class InstanceModal extends React.Component {
         })
         return
       }
-      createInstance(cluster, query, body).then(res => {
+      createInstance(cluster, null, body).then(res => {
         if (res.error) {
           return
         }

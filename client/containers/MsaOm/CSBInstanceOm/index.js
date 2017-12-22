@@ -198,7 +198,7 @@ class CSBInstanceOm extends React.Component {
       radioValue, createModal, currentInstance, searchValue,
       currentSearchType, sorterInfo, filterInfo,
     } = this.state
-    const { omInstances, userID, namespace, location } = this.props
+    const { omInstances, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
     const { query } = location
     filterInfo = filterInfo || {}
@@ -287,7 +287,6 @@ class CSBInstanceOm extends React.Component {
           createModal &&
           <CreateModal
             callback={this.getInstanceList}
-            userId={userID}
             namespace={namespace}
             visible={createModal}
             currentInstance={currentInstance}
