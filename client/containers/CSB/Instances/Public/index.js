@@ -117,7 +117,6 @@ class PublicInstances extends React.Component {
     this.setState({
       confirmLoading: true,
     })
-    debugger
     applyforInstance(UNUSED_CLUSTER_ID, body).then(res => {
       if (res.error || !res.response.result.data) {
         return notification.error({ message: '申请失败，请重试' })
@@ -160,7 +159,7 @@ class PublicInstances extends React.Component {
   }
 
   render() {
-    const { publicInstances, location } = this.props
+    const { publicInstances, location, history } = this.props
     const { query } = location
     const { isFetching, content, totalElements, size } = publicInstances
     const {
@@ -251,6 +250,7 @@ class PublicInstances extends React.Component {
       </div>
       {
         applyforCSBInstanceModalVisible && <ApplyforCSBInstanceModal
+          history={history}
           closeModalMethod={this.closeApplyforCSBInstanceModal.bind(this)}
           loading={confirmLoading}
           callback={this.confirmApplyforCSBInstance}

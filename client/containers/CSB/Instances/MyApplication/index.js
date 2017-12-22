@@ -288,8 +288,12 @@ class MyApplication extends React.Component {
     this.loadData({ sort: sortSrt, filter: filterStr })
   }
 
+  hadnleState = row => {
+    return row.status !== 1 ? formatDate(row.approvalTime) : <div>--</div>
+  }
+
   render() {
-    const { myApplication, location } = this.props
+    const { myApplication, location, history } = this.props
     const { totalElements, isFetching, size, content } = myApplication
     const { query } = location
     const colmuns = [
@@ -349,7 +353,7 @@ class MyApplication extends React.Component {
       }, {
         title: '审批时间',
         dataIndex: 'approvalTime',
-        render: (text, row) => formatDate(row.approvalTime),
+        render: (text, row) => this.hadnleState(row),
         sorter: (a, b) => a.time - b.time,
       }, {
         title: '操作',
@@ -371,7 +375,7 @@ class MyApplication extends React.Component {
     }
     return (
       <QueueAnim className="csb-app">
-        <div className="top" key="top">
+        <div className="layout-content-btns" key="top">
           <Button type="primary" onClick={() => this.loadData()}><Icon type="sync" />刷 新</Button>
           <Search
             className="text"
@@ -386,15 +390,17 @@ class MyApplication extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card className="table" key="table">
-          <Table
-            pagination={false}
-            columns={colmuns}
-            dataSource={content}
-            loading={isFetching}
-            onChange={this.handleTableChange}
-            rowKey={row => row.id} />
-        </Card>
+        <div className="layout-content-body" key="body">
+          <Card className="table" key="table">
+            <Table
+              pagination={false}
+              columns={colmuns}
+              dataSource={content}
+              loading={isFetching}
+              onChange={this.handleTableChange}
+              rowKey={row => row.id} />
+          </Card>
+        </div>
         <Modal title="撤销申请实例"
           visible={this.state.delVisible}
           onCancel={this.handleDelClose}
@@ -415,6 +421,7 @@ class MyApplication extends React.Component {
         </Modal>
         {
           this.state.againApply && <ApplyforCSBInstanceModal
+            history={history}
             closeModalMethod={this.handleAgainColse}
             loading={this.state.confirmLoading}
             callback={this.handleAgainOK}
