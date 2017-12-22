@@ -11,24 +11,27 @@
  */
 
 import { CALL_API } from '../../../middleware/api'
-import { toQuerystring } from '../../../common/utils'
 import {
   API_CONFIG,
 } from '../../../constants'
 
 const { CSB_API_URL } = API_CONFIG
 
-export const CREATE_INSTANCE_REQUEST = 'CREATE_INSTANCE_REQUEST'
-export const CREATE_INSTANCE_SUCCESS = 'CREATE_INSTANCE_SUCCESS'
-export const CREATE_INSTANCE_FAILURE = 'CREATE_INSTANCE_FAILURE'
+export const CREATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST = 'CREATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST'
+export const CREATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS = 'CREATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS'
+export const CREATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE = 'CREATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE'
 
 // Create an instance
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchCreateInstance = (clusterID, query, body) => {
+const fetchCreateGroup = (instanceID, body) => {
   return {
     [CALL_API]: {
-      types: [ CREATE_INSTANCE_REQUEST, CREATE_INSTANCE_SUCCESS, CREATE_INSTANCE_FAILURE ],
-      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance?${toQuerystring(query)}`,
+      types: [
+        CREATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST,
+        CREATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS,
+        CREATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/groups`,
       options: {
         method: 'POST',
         body,
@@ -38,5 +41,5 @@ const fetchCreateInstance = (clusterID, query, body) => {
   }
 }
 
-export const createInstance = (clusterID, query, body) =>
-  dispatch => dispatch(fetchCreateInstance(clusterID, query, body))
+export const createGroup = (instanceID, body) =>
+  dispatch => dispatch(fetchCreateGroup(instanceID, body))

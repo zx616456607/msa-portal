@@ -89,6 +89,7 @@ class CreateServiceGroup extends React.Component {
           {
             getFieldDecorator('name', {
               rules: [{
+                required: true,
                 validator: (rule, value, callback) => {
                   if (!value) {
                     return callback('服务组名称不能为空')
@@ -106,11 +107,11 @@ class CreateServiceGroup extends React.Component {
         </FormItem>
         <FormItem
           label="服务组负责人"
-          key="charge"
+          key="ownerName"
           {...formItemLayout}
         >
           {
-            getFieldDecorator('charge', {
+            getFieldDecorator('ownerName', {
               rules: [{
                 required: true,
                 message: '服务组负责人姓名不能为空',
@@ -122,11 +123,11 @@ class CreateServiceGroup extends React.Component {
         </FormItem>
         <FormItem
           label="负责人邮件"
-          key="email"
+          key="ownerEmail"
           {...formItemLayout}
         >
           {
-            getFieldDecorator('email', {
+            getFieldDecorator('ownerEmail', {
               rules: [{
                 required: true,
                 message: '服务负责人邮件不能为空',
@@ -138,11 +139,11 @@ class CreateServiceGroup extends React.Component {
         </FormItem>
         <FormItem
           label="负责人电话"
-          key="tel"
+          key="ownerPhone"
           {...formItemLayout}
         >
           {
-            getFieldDecorator('tel', {
+            getFieldDecorator('ownerPhone', {
               rules: [{
                 required: true,
                 message: '服务负责人电话不能为空',
@@ -154,11 +155,11 @@ class CreateServiceGroup extends React.Component {
         </FormItem>
         <FormItem
           label="服务组描述（可选）"
-          key="desc"
+          key="description"
           {...formItemLayout}
         >
           {
-            getFieldDecorator('desc')(
+            getFieldDecorator('description')(
               <TextArea placeholder="请输入服务组描述"/>
             )
           }

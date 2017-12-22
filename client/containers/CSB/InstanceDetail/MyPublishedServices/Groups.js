@@ -4,7 +4,7 @@
  */
 
 /**
- * My Published Services
+ * My Published Service Groups
  *
  * 2017-12-05
  * @author zhangcz
@@ -18,6 +18,7 @@ import {
 } from 'antd'
 import ServicesTable from './Services/Table'
 import confirm from '../../../../components/Modal/confirm'
+import CreateServiceGroupModal from './CreateServiceGroupModal'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -75,6 +76,23 @@ class MyPublishedServiceGroups extends React.Component {
       default:
         return
     }
+  }
+
+  // 发布服务
+  goPublishService = () => {
+    const { history, match } = this.props
+    const { instanceID } = match.params
+    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+  }
+
+  closeCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: false,
+    })
+  }
+
+  handleCreateModalValues = values => {
+    console.log('values=', values)
   }
 
   // 显示服务组
@@ -181,7 +199,7 @@ class MyPublishedServiceGroups extends React.Component {
       <div key="modals">
         {
           createServiceGroupModalVisible && <CreateServiceGroupModal
-            closeModalMethod={this.closeCreateServiceGroupModal.bind(this)}
+            closeModalMethod={this.closeCreateServiceGroupModal}
             callback={this.handleCreateModalValues}
             handle={currentHandle}
             initailValue={currentRecord}
