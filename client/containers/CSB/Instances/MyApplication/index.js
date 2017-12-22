@@ -48,7 +48,7 @@ class MyApplication extends React.Component {
   }
 
   loadData = query => {
-    const { loadApply, userID, history } = this.props
+    const { loadApply, history } = this.props
     const { name, sort, filter } = this.state
     query = Object.assign({}, location.query, { name, sort, filter }, query)
     if (query.name === '') {
@@ -66,7 +66,7 @@ class MyApplication extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    loadApply(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
+    loadApply(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
   fliterStatus = value => {
@@ -149,19 +149,19 @@ class MyApplication extends React.Component {
       let filter
       if (Ary.length === 1) {
         if (column === 'empower') {
-          filter = `role,eq,${Ary[0]}`
+          filter = `role-eq-${Ary[0]}`
         } else {
-          filter = `${column},eq,${Ary[0]}`
+          filter = `${column}-eq-${Ary[0]}`
         }
       } else if (Ary.length.length < 3) {
         if (column === 'status') {
           const statusAry = [ '1', '2', '3' ]
           const diffStatuAry = difference(statusAry, Ary)
-          filter = `${column},ne,${diffStatuAry}`
+          filter = `${column}-ne-${diffStatuAry}`
         } else {
           const roleKey = [ '1', '2', '4' ]
           const diffRoleAry = difference(roleKey, Ary)
-          filter = `role,ne,${diffRoleAry}`
+          filter = `role-ne-${diffRoleAry}`
         }
       }
       return filter
@@ -285,8 +285,8 @@ class MyApplication extends React.Component {
 
     const pagination = {
       simple: true,
-      pageSize: size,
-      total: totalElements || 0,
+      pageSize: size || 10,
+      total: totalElements,
       current: parseInt(query.page) || 1,
       onChange: page => this.loadData({ page }),
     }
