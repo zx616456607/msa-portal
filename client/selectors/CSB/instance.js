@@ -81,9 +81,18 @@ export const instancesSltMaker = flag => createSelector(
   ],
   (csbInstances, entities) => {
     const { ids, ...other } = csbInstances
+    const { clusters } = entities
     const { instancesEntitiesType } = getInstancesTypesByFlag(flag)
     const instancesEntities = entities[instancesEntitiesType]
-    const content = (ids || []).map(id => instancesEntities[id])
+    const content = (ids || []).map(id => {
+      const instance = instancesEntities[id]
+      if (instance.clusterId) {
+        instance.cluster = clusters[instance.clusterId] || {}
+      } else if (instance.instance && instance.instance.clusterId) {
+        instance.instance.cluster = clusters[instance.instance.clusterId] || {}
+      }
+      return instance
+    })
     return {
       content,
       ...other,

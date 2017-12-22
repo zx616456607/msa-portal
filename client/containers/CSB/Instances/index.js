@@ -20,6 +20,7 @@ import { Route, Switch } from 'react-router-dom'
 import { csbInstancesChildRoutes } from '../../../RoutesDom'
 import { getMenuSelectedKeys } from '../../../common/utils'
 import { renderMenu } from '../../../components/utils'
+import { getAllClusters } from '../../../actions/current'
 import './style/index.less'
 
 const menus = [
@@ -54,6 +55,11 @@ const menus = [
 ]
 
 class CSBInstances extends React.Component {
+  componentDidMount() {
+    const { getAllClusters } = this.props
+    getAllClusters({ size: 100 })
+  }
+
   renderChildren = () => {
     const { children } = this.props
     return [
@@ -101,5 +107,5 @@ class CSBInstances extends React.Component {
 const mapStateToProps = () => ({})
 
 export default connect(mapStateToProps, {
-  //
+  getAllClusters,
 })(CSBInstances)

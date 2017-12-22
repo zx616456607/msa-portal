@@ -165,7 +165,13 @@ class PublicInstances extends React.Component {
     } = this.state
     const columns = [
       { title: '实例名称', dataIndex: 'name', key: 'name', width: '15%' },
-      { title: '部署集群', dataIndex: 'clusterId', key: 'clusterId', width: '15%' },
+      {
+        title: '部署集群',
+        dataIndex: 'clusterId',
+        key: 'clusterId',
+        width: '15%',
+        render: (text, row) => row.cluster && row.cluster.clusterName,
+      },
       {
         title: '状态',
         dataIndex: 'creator.status',

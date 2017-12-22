@@ -43,7 +43,6 @@ class InstanceModal extends React.Component {
         name,
         namespace,
         description,
-        systemCallKey: 'wdfaflasdf',
       }
       if (currentInstance) {
         editInstance(cluster, currentInstance.id, body).then(res => {
@@ -105,10 +104,11 @@ class InstanceModal extends React.Component {
         span: 20,
       },
     }
-    const child = clusterList &&
-      clusterList.length &&
-      clusterList.map(item =>
-        <Option key={item.clusterID} value={item.clusterID}>{item.clusterName}</Option>)
+    const optionChildren = clusterList.map(item =>
+      <Option key={item.clusterID} value={item.clusterID}>
+        {item.clusterName}
+      </Option>
+    ) || []
     return (
       <Modal
         title={currentInstance ? '修改 CSB 实例' : '创建 CSB 实例'}
@@ -145,13 +145,13 @@ class InstanceModal extends React.Component {
                   validator: this.checkCluster,
                 },
               ],
-              initialValue: currentInstance ? currentInstance.clusterId : '',
+              initialValue: currentInstance ? currentInstance.clusterId : undefined,
             })(
               <Select
                 placeholder="请选择部署集群"
                 disabled={!!currentInstance}
               >
-                {child}
+                {optionChildren}
               </Select>
             )}
           </FormItem>
@@ -189,10 +189,10 @@ class InstanceModal extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { allClusters } = entities
+  const { clusters } = entities
   const { allClusters: allClusterIDs } = current
   const { ids } = allClusterIDs
-  const clusterList = ids && ids && ids.length && ids.map(item => allClusters[item]) || []
+  const clusterList = ids && ids && ids.length && ids.map(item => clusters[item]) || []
   return {
     clusterList,
   }

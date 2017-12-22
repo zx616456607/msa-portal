@@ -176,7 +176,7 @@ class AvailableInstances extends React.Component {
         title: '部署集群',
         dataIndex: 'cluster',
         width: '10%',
-        render: (text, row) => row.instance.clusterId,
+        render: (text, row) => row.instance.cluster && row.instance.cluster.clusterName,
       },
       {
         title: '实例授权',

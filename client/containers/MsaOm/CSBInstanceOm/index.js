@@ -21,6 +21,7 @@ import { parse as parseQuerystring } from 'query-string'
 import './style/index.less'
 import CreateModal from './CreateModal'
 import confirm from '../../../components/Modal/confirm'
+import { getAllClusters } from '../../../actions/current'
 import { getInstances, deleteInstance } from '../../../actions/CSB/instance'
 import {
   instancesSltMaker,
@@ -46,7 +47,9 @@ class CSBInstanceOm extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    const { getAllClusters } = this.props
+    getAllClusters({ size: 100 })
     this.getInstanceList()
   }
 
@@ -213,7 +216,12 @@ class CSBInstanceOm extends React.Component {
     const columns = [
       { title: 'CSB实例', dataIndex: 'name', width: '15%' },
       { title: '创建人', dataIndex: 'creator.name', width: '10%' },
-      { title: '部署集群', dataIndex: 'clusterId', width: '15%' },
+      {
+        title: '部署集群',
+        dataIndex: 'clusterId',
+        width: '15%',
+        render: (text, row) => row.cluster && row.cluster.clusterName,
+      },
       { title: '状态', dataIndex: 'status', width: '10%',
         filters: [{
           text: '运行中',
@@ -312,12 +320,11 @@ class CSBInstanceOm extends React.Component {
             onSearch={value => this.getInstanceList({ [currentSearchType]: value, page: 1 })}
           />
           {
-            totalElements ?
-              <div className="page-box">
-                <span className="total">共计 {totalElements} 条</span>
-                <Pagination {...pagination}/>
-              </div>
-              : null
+            totalElements &&
+            <div className="page-box">
+              <span className="total">共计 {totalElements} 条</span>
+              <Pagination {...pagination}/>
+            </div>
           }
         </div>
         <div className="layout-content-body" key="body">
@@ -352,6 +359,7 @@ const mapStateToProps = (state, props) => {
 }
 
 export default connect(mapStateToProps, {
+  getAllClusters,
   getInstances,
   deleteInstance,
 })(CSBInstanceOm)
