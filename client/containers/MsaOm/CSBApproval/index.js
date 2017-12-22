@@ -51,7 +51,7 @@ const CheckboxGroup = Checkbox.Group
 
 class CSBApplication extends React.Component {
   state = {
-    radioValue: 'status,eq,1',
+    radioValue: 'status-eq-1',
     name: '',
     currentRow: null,
     confirmLoading: false,
@@ -71,7 +71,7 @@ class CSBApplication extends React.Component {
     this.setState({
       name,
       filteredValue,
-      radioValue: !filter || filter.indexOf('status,eq,1') > -1 ? 'status,eq,1' : 'status,ne,1',
+      radioValue: !filter || filter.indexOf('status-eq-1') > -1 ? 'status-eq-1' : 'status-ne-1',
       requestTimeSortOrder: this.formatSortOrder(sort),
       approvalTimeSortOrder: this.formatSortOrder(sort),
     }, this.loadData)
@@ -99,7 +99,7 @@ class CSBApplication extends React.Component {
   }
 
   loadData = query => {
-    const { loadApply, currentUser, location, history } = this.props
+    const { loadApply, location, history } = this.props
     const { name, radioValue } = this.state
     query = Object.assign({}, location.query, {
       name,
@@ -111,7 +111,7 @@ class CSBApplication extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    loadApply(UNUSED_CLUSTER_ID, mergeQuery(currentUser.userID, query))
+    loadApply(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
   radioChange = e => {
@@ -133,9 +133,9 @@ class CSBApplication extends React.Component {
 
   formatFilterConditions = filters => {
     const { status } = filters
-    let statusFilter = 'status,ne,1'
+    let statusFilter = 'status-ne-1'
     if (status && status.length === 1) {
-      statusFilter = `status,eq,${status[0]}`
+      statusFilter = `status-eq-${status[0]}`
     }
     const roleConditions = formatFilterConditions(filters)
     roleConditions.push(statusFilter)
@@ -304,20 +304,20 @@ class CSBApplication extends React.Component {
       {
         title: '申请人',
         dataIndex: 'applicant',
-        width: radioValue === 'status,eq,1' ? '15%' : '10%',
+        width: radioValue === 'status-eq-1' ? '15%' : '10%',
         render: (text, row) => row.requestor.name,
       },
       {
         title: '申请实例',
         dataIndex: 'instance',
-        width: radioValue === 'status,eq,1' ? '15%' : '15%',
+        width: radioValue === 'status-eq-1' ? '15%' : '15%',
         render: (text, row) => row.instance.name,
       },
       {
         title: '实例授权',
         dataIndex: 'role',
-        width: radioValue === 'status,eq,1' ? '20%' : '15%',
-        filters: radioValue === 'status,eq,1' ? null : [{
+        width: radioValue === 'status-eq-1' ? '20%' : '15%',
+        filters: radioValue === 'status-eq-1' ? null : [{
           text: '仅发布服务',
           value: 2,
         }, {
@@ -327,13 +327,13 @@ class CSBApplication extends React.Component {
           text: '发布服务 & 订阅服务',
           value: 4,
         }],
-        filteredValue: radioValue === 'status,eq,1' ? null : filteredRoleValue,
+        filteredValue: radioValue === 'status-eq-1' ? null : filteredRoleValue,
         render: role => renderInstanceRole(role),
       },
       {
         title: '申请时间',
         dataIndex: 'requestTime',
-        width: radioValue === 'status,eq,1' ? '15%' : '13%',
+        width: radioValue === 'status-eq-1' ? '15%' : '13%',
         render: text => formatDate(text),
         sorter: true,
         sortOrder: requestTimeSortOrder,
@@ -342,19 +342,19 @@ class CSBApplication extends React.Component {
         title: '审批状态',
         dataIndex: 'status',
         width: '15%',
-        filters: radioValue === 'status,eq,1' ? null : [{
+        filters: radioValue === 'status-eq-1' ? null : [{
           text: '已通过',
           value: 2,
         }, {
           text: '已拒绝',
           value: 3,
         }],
-        filteredValue: radioValue === 'status,eq,1' ? null : filteredStatueValue,
+        filteredValue: radioValue === 'status-eq-1' ? null : filteredStatueValue,
         render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
       },
       {
         title: '操作',
-        width: radioValue === 'status,eq,1' ? '20%' : '14%',
+        width: radioValue === 'status-eq-1' ? '20%' : '14%',
         render: (text, row) => {
           if (row.status === 1) {
             return (
@@ -400,7 +400,7 @@ class CSBApplication extends React.Component {
         },
       },
     ]
-    if (radioValue !== 'status,eq,1') {
+    if (radioValue !== 'status-eq-1') {
       columns.splice(4, 0, approvalTimeCol, reviewerCol)
     }
     return columns
@@ -439,8 +439,8 @@ class CSBApplication extends React.Component {
         <div className="approval-instance-radio" key="radios">
           审批状态：
           <RadioGroup onChange={this.radioChange} value={radioValue}>
-            <Radio value="status,eq,1">待审批</Radio>
-            <Radio value="status,ne,1">已审批</Radio>
+            <Radio value="status-eq-1">待审批</Radio>
+            <Radio value="status-ne-1">已审批</Radio>
           </RadioGroup>
         </div>
         <div className="layout-content-btns" key="btns">

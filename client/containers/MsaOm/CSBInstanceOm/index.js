@@ -51,7 +51,7 @@ class CSBInstanceOm extends React.Component {
   }
 
   getInstanceList = query => {
-    const { getInstances, location, userID, history } = this.props
+    const { getInstances, location, history } = this.props
     const {
       currentSearchType, searchValue,
     } = this.state
@@ -78,7 +78,7 @@ class CSBInstanceOm extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    getInstances(UNUSED_CLUSTER_ID, mergeQuery(userID, query))
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
   tableChange = (pagination, filters, sorter) => {
@@ -96,11 +96,11 @@ class CSBInstanceOm extends React.Component {
     if (!isEmpty(filters.status)) {
       const { status } = filters
       if (status.length === 1) {
-        filterStr = `status,eq,${status[0]}`
+        filterStr = `status-eq-${status[0]}`
       } else {
         const statusArr = [ 'running', 'starting', 'stop' ]
         const diffArr = difference(statusArr, status)
-        filterStr = `status,nq,${diffArr[0]}`
+        filterStr = `status-nq-${diffArr[0]}`
       }
     }
     this.getInstanceList({ sort: sortStr, filter: filterStr })

@@ -76,7 +76,7 @@ class PublicInstances extends React.Component {
   }
 
   loadData = query => {
-    const { getInstances, userId, history, location } = this.props
+    const { getInstances, history, location } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
     if (query.page === 1) {
@@ -85,7 +85,7 @@ class PublicInstances extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    getInstances(UNUSED_CLUSTER_ID, mergeQuery(userId, query))
+    getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
   openApplyforCSBInstanceModal = record => {
