@@ -35,6 +35,7 @@ import { format as formatError } from './service/errors'
 const { env } = process
 const { NODE_ENV } = env
 const app = new Koa()
+const bunyan = koaBunyanLogger.bunyan
 const isDebug = NODE_ENV !== 'production'
 global.isDebug = isDebug
 global.config = config
@@ -45,10 +46,38 @@ app.name = name
 app.version = version
 
 // use logging middleware
-app.use(koaBunyanLogger({
+const bunyanLoggerOpts = {
   name,
   level: config.log.level,
-}))
+}
+if (!isDebug) {
+  class MyRawStream {
+    write(rec) {
+      console.log('rec', rec)
+      console.log('[%s] %s: %s',
+        rec.time.toISOString(),
+        bunyan.nameFromLevel[rec.level],
+        rec.msg
+      )
+    }
+  }
+  bunyanLoggerOpts.streams = [{
+    stream: new MyRawStream(),
+    type: 'raw',
+  }, {
+    type: 'rotating-file',
+    path: `/var/log/${name}/${name}-web.log`,
+    period: '1d', // daily rotation
+    count: 7, // keep 7 back copies at recent week
+  }, {
+    type: 'rotating-file',
+    level: 'error',
+    path: `/var/log/${name}/${name}-error.log`,
+    period: '1d', // daily rotation
+    count: 7, // keep 7 back copies at recent week
+  }]
+}
+app.use(koaBunyanLogger(bunyanLoggerOpts))
 app.use(koaBunyanLogger.requestIdContext())
 app.use(async (ctx, next) => {
   // ignore static file url
@@ -59,7 +88,7 @@ app.use(async (ctx, next) => {
   return koaBunyanLogger.requestLogger().apply(this, [ ctx, next ])
 })
 // set signed cookie keys
-app.keys = [ 'tenxcloud.com', '5f4a73e9-0493-4c66-86a6-ffaf7a8b73c8' ]
+app.keys = config.appKeys
 
 // uses async arrow functions
 app.use(async (ctx, next) => {

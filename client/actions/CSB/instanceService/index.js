@@ -10,15 +10,15 @@
  * @author zhaoyb
  */
 
-import { CALL_API } from '../../middleware/api'
-import { toQuerystring } from '../../common/utils'
-import { API_CONFIG } from '../../constants'
+import { CALL_API } from '../../../middleware/api'
+import { toQuerystring } from '../../../common/utils'
+import { API_CONFIG } from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
-import { Schemas } from '../../middleware/schemas'
+import { Schemas } from '../../../middleware/schemas'
 import {
   CSB_RELEASE_INSTANCES_SERVICE_FLAG,
   CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG,
-} from '../../constants'
+} from '../../../constants'
 
 const { CSB_API_URL } = API_CONFIG
 

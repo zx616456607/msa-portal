@@ -11,8 +11,11 @@
  */
 
 import { createSelector } from 'reselect'
-import { getQueryKey } from '../../common/utils'
-import { CSB_RELEASE_INSTANCES_SERVICE_FLAG, CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../constants'
+import { getQueryKey } from '../../../common/utils'
+import {
+  CSB_RELEASE_INSTANCES_SERVICE_FLAG,
+  CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG,
+} from '../../../constants'
 
 const getInstancesServiceTypesByFlag = flag => {
   let instancesServiceType

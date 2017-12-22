@@ -26,7 +26,7 @@ import CreateServiceGroupModal from './CreateServiceGroupModal'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
 import { toQuerystring } from '../../../../common/utils'
-import { getInstanceService } from '../../../../actions/CSB/instanceServices'
+import { getInstanceService } from '../../../../actions/CSB/instanceService'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 
@@ -293,7 +293,7 @@ class MyPublishedServices extends React.Component {
     const showType = getFieldValue('showType')
     switch (showType) {
       case 'all':
-        return this.allServicesTable
+        return this.allServicesTable()
       case 'group':
         return this.allServiceGroupsTable()
       default:

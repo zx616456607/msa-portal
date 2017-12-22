@@ -84,7 +84,9 @@ const csbPublishedSchema = new schema.Entity('cbsPublished', {}, {
 const csbSubscribeSchema = new schema.Entity('csbSubscribe', {}, {
   idAttribute: 'id',
 })
-
+const csbInstanceServiceGroupsSchema = new schema.Entity('csbInstanceServiceGroups', {}, {
+  idAttribute: 'id',
+})
 
 // Schemas for tce API responses.
 export const Schemas = {
@@ -164,6 +166,11 @@ export const Schemas = {
   CSB_SUBSCRIBE_LIST_DATA: {
     data: {
       content: [ csbSubscribeSchema ],
+    },
+  },
+  CSB_INSTANCE_SERVICE_GROUP_LIST_DATA: {
+    data: {
+      content: [ csbInstanceServiceGroupsSchema ],
     },
   },
 }
