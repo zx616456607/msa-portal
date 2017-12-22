@@ -68,7 +68,7 @@ export default class ServiceControl extends React.Component {
           {...formItemLayout}
           label="公开访问"
         >
-          {getFieldDecorator('isPublicVisit', {
+          {getFieldDecorator('accessible', {
             valuePropName: 'checked',
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />

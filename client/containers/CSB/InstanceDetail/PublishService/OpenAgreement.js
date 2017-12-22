@@ -23,19 +23,19 @@ const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
   render() {
-    const { formItemLayout, form, className } = this.props
+    const { formItemLayout, form, className, serviceGroups } = this.props
     const { getFieldDecorator, getFieldValue } = form
-    const serviceName = getFieldValue('serviceName')
-    const serviceVersion = getFieldValue('serviceVersion')
+    const name = getFieldValue('name')
+    const version = getFieldValue('version')
     const ssl = getFieldValue('ssl')
     let openUrlBefore = `${ssl ? 'https' : 'http'}://csbname:9081/`
-    if (serviceName) {
-      openUrlBefore += `${serviceName}/`
+    if (name) {
+      openUrlBefore += `${name}/`
     } else {
       openUrlBefore += '<服务名称>/'
     }
-    if (serviceVersion) {
-      openUrlBefore += `${serviceVersion}/`
+    if (version) {
+      openUrlBefore += `${version}/`
     } else {
       openUrlBefore += '<服务版本>/'
     }
@@ -51,9 +51,9 @@ export default class OpenAgreement extends React.Component {
           {...formItemLayout}
           label="服务名称"
         >
-          {getFieldDecorator('serviceName', {
+          {getFieldDecorator('name', {
             rules: [{
-              required: true, message: 'Please input serviceName!',
+              required: true, message: 'Please input name!',
             }],
           })(
             <Input placeholder="可由1-63个中文字符、英文字母、数字或中划线“-”组成" />
@@ -63,9 +63,9 @@ export default class OpenAgreement extends React.Component {
           {...formItemLayout}
           label="服务版本"
         >
-          {getFieldDecorator('serviceVersion', {
+          {getFieldDecorator('version', {
             rules: [{
-              required: true, message: 'Please input serviceVersion!',
+              required: true, message: 'Please input version!',
             }],
           })(
             <Input placeholder="自定义版本" />
@@ -91,13 +91,15 @@ export default class OpenAgreement extends React.Component {
           label="所属服务组"
           key="serviceGroup"
         >
-          {getFieldDecorator('serviceGroup', {
+          {getFieldDecorator('groupId', {
             rules: [{
               required: true, message: 'Please select serviceGroup!',
             }],
           })(
             <Select placeholder="请选择">
-              <Option key="test">test</Option>
+              {
+                serviceGroups.map(group => <Option key={group.id}>{group.name}</Option>)
+              }
             </Select>
           )}
         </FormItem>
@@ -105,7 +107,7 @@ export default class OpenAgreement extends React.Component {
           {...formItemLayout}
           label="服务描述"
         >
-          {getFieldDecorator('seviceDesc')(
+          {getFieldDecorator('description')(
             <Input.TextArea placeholder="请输入描述，支持1-128个汉字或字符" />
           )}
         </FormItem>
@@ -120,7 +122,12 @@ export default class OpenAgreement extends React.Component {
               required: true, message: 'Please check protocols!',
             }],
           })(
-            <CheckboxGroup options={[ 'Restful-API', 'WebService' ]}/>
+            <CheckboxGroup
+              options={[
+                { label: 'Restful-API', value: 'Restful-API' },
+                { label: 'WebService', value: 'WebService', disabled: true },
+              ]}
+            />
           )}
         </FormItem>
         <FormItem

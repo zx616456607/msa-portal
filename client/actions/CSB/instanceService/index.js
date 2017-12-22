@@ -73,3 +73,29 @@ export const getInstanceService = (instanceId, query) => dispatch => {
   return dispatch(fetchInstanceServiceList(instanceId, query))
 }
 
+export const CREATE_CSB_INSTANCE_SERVICE_REQUEST = 'CREATE_CSB_INSTANCE_SERVICE_REQUEST'
+export const CREATE_CSB_INSTANCE_SERVICE_SUCCESS = 'CREATE_CSB_INSTANCE_SERVICE_SUCCESS'
+export const CREATE_CSB_INSTANCE_SERVICE_FAILURE = 'CREATE_CSB_INSTANCE_SERVICE_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchCreateService = (instanceID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_CSB_INSTANCE_SERVICE_REQUEST,
+        CREATE_CSB_INSTANCE_SERVICE_SUCCESS,
+        CREATE_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/services`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const createService = (instanceID, body) =>
+  dispatch => dispatch(fetchCreateService(instanceID, body))

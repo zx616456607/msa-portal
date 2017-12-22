@@ -11,9 +11,10 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Form, Steps, Row, Col, Button, Tag,
+  Form, Steps, Row, Col, Button, Tag, notification,
 } from 'antd'
 import ClassNames from 'classnames'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
@@ -21,6 +22,15 @@ import AccessAgreement from './AccessAgreement/'
 import OpenAgreement from './OpenAgreement'
 import ParameterSetting from './ParameterSetting'
 import ServiceControl from './ServiceControl'
+import {
+  getGroups,
+} from '../../../../actions/CSB/instanceService/group'
+import {
+  createService,
+} from '../../../../actions/CSB/instanceService'
+import {
+  serviceGroupsSlt,
+} from '../../../../selectors/CSB/instanceService/group'
 import './style/index.less'
 
 const Step = Steps.Step
@@ -28,6 +38,15 @@ const Step = Steps.Step
 class PublishService extends React.Component {
   state = {
     currentStep: 0,
+  }
+
+  componentDidMount() {
+    this.loadServiceGroups()
+  }
+
+  loadServiceGroups = () => {
+    const { getGroups, instanceID } = this.props
+    getGroups(instanceID)
   }
 
   validateFieldsAndGoNext = currentStep => {
@@ -93,18 +112,49 @@ class PublishService extends React.Component {
   }
 
   submitService = () => {
-    const { form } = this.props
+    const { form, createService, instanceID, history } = this.props
     const { validateFieldsAndScroll } = form
     validateFieldsAndScroll((errors, values) => {
       if (errors) {
         return
       }
-      console.log(values)
+      const body = [
+        {
+          name: values.name,
+          version: values.version,
+          description: values.description,
+          type: 'rest',
+          inboundId: 'default_rest',
+          accessible: values.accessible,
+          targetType: 'url',
+          targetDetail: values.targetDetail,
+          transformationType: 'direct',
+          transformationDetail: '{}',
+          authenticationType: 'bypass',
+          authenticationDetail: '{}',
+          limitationType: 'no_limitation',
+          limitationDetail: '{}',
+          groupId: parseInt(values.groupId),
+        },
+      ]
+      createService(instanceID, body).then(res => {
+        this.setState({
+          confirmLoading: false,
+        })
+        if (res.error) {
+          return
+        }
+        notification.success({
+          message: '创建服务成功',
+        })
+        history.push(`/csb-instances-available/${instanceID}/my-published-services`)
+      })
     })
   }
 
   render() {
-    const { form } = this.props
+    const { serviceGroups, form } = this.props
+    const { content } = serviceGroups
     const { currentStep } = this.state
     const formItemLayout = {
       labelCol: {
@@ -159,6 +209,7 @@ class PublishService extends React.Component {
                   className={stepOneClassNames}
                   form={form}
                   formItemLayout={formItemLayout}
+                  serviceGroups={content || []}
                 />
                 <ParameterSetting
                   className={stepTwoClassNames}
@@ -190,7 +241,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.serviceName}
+                      {fields.name}
                     </div>
                   </Col>
                 </Row>
@@ -202,7 +253,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.serviceVersion}
+                      {fields.version}
                     </div>
                   </Col>
                 </Row>
@@ -214,7 +265,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.serviceGroup}
+                      {fields.groupId}
                     </div>
                   </Col>
                 </Row>
@@ -226,7 +277,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.seviceDesc}
+                      {fields.description}
                     </div>
                   </Col>
                 </Row>
@@ -253,7 +304,7 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.endpoint}
+                            {fields.targetDetail}
                           </div>
                         </Col>
                       </Row>,
@@ -422,7 +473,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.isPublicVisit ? '允许' : '不允许'}
+                      {fields.accessible ? '允许' : '不允许'}
                     </div>
                   </Col>
                 </Row>
@@ -447,4 +498,16 @@ class PublishService extends React.Component {
   }
 }
 
-export default Form.create()(PublishService)
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
+  return {
+    instanceID,
+    serviceGroups: serviceGroupsSlt(state),
+  }
+}
+
+export default connect(mapStateToProps, {
+  getGroups,
+  createService,
+})(Form.create()(PublishService))

@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import {
   Card, Button, Select, Input, Pagination, Table, Menu, Dropdown,
-  Modal,
+  Modal, notification,
 } from 'antd'
 import ServicesTable from '../Services/Table'
 import confirm from '../../../../../components/Modal/confirm'
@@ -121,7 +121,11 @@ class MyPublishedServiceGroups extends React.Component {
       if (res.error) {
         return
       }
+      notification.success({
+        message: '创建服务组成功',
+      })
       this.closeCreateServiceGroupModal()
+      this.loadData()
     })
   }
 
