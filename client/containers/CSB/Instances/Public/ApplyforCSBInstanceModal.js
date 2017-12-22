@@ -34,7 +34,15 @@ class ApplyforCSBInstanceModal extends React.Component {
     currentRecord: propTypes.object.isRequired,
   }
   state = {
+    text: '',
     isApplyfor: false,
+  }
+
+  componentWillMount() {
+    const { desc } = this.props
+    this.setState({
+      text: desc,
+    })
   }
 
   handleCancel = () => {
@@ -62,6 +70,12 @@ class ApplyforCSBInstanceModal extends React.Component {
         reason,
       }
       callback(requsetBody, self)
+    })
+  }
+
+  handleChange = e => {
+    this.setState({
+      text: e.target.value,
     })
   }
 
@@ -125,12 +139,13 @@ class ApplyforCSBInstanceModal extends React.Component {
             >
               {
                 getFieldDecorator('reason', {
+                  initialValue: this.state.text ? this.state.text : undefined,
                   rules: [{
                     required: true,
                     message: '请填写申请原因',
                   }],
                 })(
-                  <TextArea placeholder="必填" />
+                  <TextArea placeholder="必填" onChange={this.handleChange} />
                 )
               }
             </FormItem>

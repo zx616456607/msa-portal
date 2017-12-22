@@ -41,6 +41,7 @@ class MyApplication extends React.Component {
     total: 0,
     sort: '',
     filter: '',
+    desc: '',
     currentRecord: {},
     againApply: false,
     requestTime: true,
@@ -124,6 +125,7 @@ class MyApplication extends React.Component {
 
   handleAbandonInstance = id => {
     const { abandonInstance, userID } = this.props
+    const self = this
     confirm({
       modalTitle: '放弃使用实例',
       title: '是否确定放弃使用实例？',
@@ -141,7 +143,7 @@ class MyApplication extends React.Component {
             notification.success({
               message: '放弃使用实例成功',
             })
-            this.loadData({ name: '', page: 1 })
+            self.loadData()
           })
         })
       },
@@ -185,28 +187,29 @@ class MyApplication extends React.Component {
     })
   }
 
-  handleAgainApply = (name, id) => {
+  handleAgainApply = (name, row) => {
     const content = { name }
     this.setState({
-      id,
       againApply: true,
-      currentRecord: content,
+      id: row.instance.id,
       confirmLoading: false,
+      currentRecord: content,
+      desc: row.ownerResponse,
     })
   }
 
-  filterBtn = (value, id, name) => {
+  filterBtn = row => {
     const { history } = this.props
-    switch (value) {
+    switch (row.status) {
       case 2:
         return <div>
-          <Button type="primary" onClick={() => history.push(`/csb-instances-available/${id}`)}>实例详情</Button>
-          <Button className="btn-abandon" onClick={() => this.handleAbandonInstance(id)}>放弃使用</Button>
+          <Button type="primary" onClick={() => history.push(`/csb-instances-available/${row.instance.id}`)}>实例详情</Button>
+          <Button className="btn-abandon" onClick={() => this.handleAbandonInstance(row.instance.id)}>放弃使用</Button>
         </div>
       case 1:
-        return <Button onClick={() => this.handleRevokeApply(id, name)}>撤销申请</Button>
+        return <Button onClick={() => this.handleRevokeApply(row.id, row.status)}>撤销申请</Button>
       case 3:
-        return <Button type="primary" onClick={() => this.handleAgainApply(name, id)}>重新申请</Button>
+        return <Button type="primary" onClick={() => this.handleAgainApply(name, row)}>重新申请</Button>
       default:
         return
     }
@@ -361,7 +364,7 @@ class MyApplication extends React.Component {
         width: '22%',
         render: (text, row) => <div>
           {
-            this.filterBtn(row.status, row.id, row.instance.name)
+            this.filterBtn(row)
           }
         </div>,
       }]
@@ -421,6 +424,7 @@ class MyApplication extends React.Component {
         </Modal>
         {
           this.state.againApply && <ApplyforCSBInstanceModal
+            desc={this.state.desc}
             history={history}
             closeModalMethod={this.handleAgainColse}
             loading={this.state.confirmLoading}
