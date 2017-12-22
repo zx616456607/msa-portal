@@ -15,7 +15,7 @@ import propTypes from 'prop-types'
 import './style/ApplyforCSBInstanceModal.less'
 import {
   Modal, Form, Row, Col,
-  Input, Checkbox,
+  Input, Checkbox, Icon, Button,
 } from 'antd'
 
 const FormItem = Form.Item
@@ -33,6 +33,9 @@ class ApplyforCSBInstanceModal extends React.Component {
     // 当前申请的实例
     currentRecord: propTypes.object.isRequired,
   }
+  state = {
+    isApplyfor: false,
+  }
 
   handleCancel = () => {
     const { closeModalMethod } = this.props
@@ -41,6 +44,7 @@ class ApplyforCSBInstanceModal extends React.Component {
 
   handleOk = () => {
     const { callback, form } = this.props
+    const self = this
     form.validateFields((errors, values) => {
       if (errors) {
         return
@@ -57,12 +61,12 @@ class ApplyforCSBInstanceModal extends React.Component {
         role,
         reason,
       }
-      callback(requsetBody)
+      callback(requsetBody, self)
     })
   }
 
   render() {
-    const { loading, form, currentRecord } = this.props
+    const { loading, form, currentRecord, history } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -72,57 +76,71 @@ class ApplyforCSBInstanceModal extends React.Component {
       title="申请使用 CSB 实例"
       visible={true}
       closable={true}
-      onOk={this.handleOk}
       onCancel={this.handleCancel}
       width="570px"
       maskClosable={false}
       confirmLoading={loading}
       wrapClassName="ApplyforCSBInstanceModal"
-      okText="申请"
+      footer={[
+        <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
+        !this.state.isApplyfor ?
+          <Button key="submit" type="primary" onClick={this.handleOk}>申 请</Button> :
+          <Button key="submit" type="primary" onClick={() => history.push('/csb-instances/my-application')}>去查看</Button>,
+      ]}
     >
-      <Row className="row-style">
-        <Col span={5}>实例名称</Col>
-        <Col span={19}>{ currentRecord.name }</Col>
-      </Row>
-      <Row className="row-style">
-        <Col span={5}>实例描述</Col>
-        <Col span={19}>{ currentRecord.description }</Col>
-      </Row>
-      <FormItem
-        label="申请权限"
-        key="appplyformpermission"
-        {...formItemLayout}
-      >
-        {
-          getFieldDecorator('appplyformpermission', {
-            rules: [{
-              required: true,
-              message: '请选择申请权限',
-            }],
-          })(
-            <CheckboxGroup>
-              <Checkbox value={2}>可发布服务</Checkbox>
-              <Checkbox value={1}>可订阅服务</Checkbox>
-            </CheckboxGroup>
-          )
-        }
-      </FormItem>
-      <FormItem
-        label="申请原因"
-        key="reason"
-        {...formItemLayout}
-      >
-        {
-          getFieldDecorator('reason', {
-            rules: [{
-              required: true,
-              message: '请填写申请原因',
-            }],
-          })(
-            <TextArea placeholder="必填"/>
-          )
-        }
-      </FormItem>
+      {
+        !this.state.isApplyfor ?
+          <Row>
+            <Row className="row-style">
+              <Col span={5}>实例名称</Col>
+              <Col span={19}>{currentRecord.name}</Col>
+            </Row>
+            <Row className="row-style">
+              <Col span={5}>实例描述</Col>
+              <Col span={19}>{currentRecord.description === undefined ? '--' : currentRecord.description}</Col>
+            </Row>
+            <FormItem
+              label="申请权限"
+              key="appplyformpermission"
+              {...formItemLayout}
+            >
+              {
+                getFieldDecorator('appplyformpermission', {
+                  rules: [{
+                    required: true,
+                    message: '请选择申请权限',
+                  }],
+                })(
+                  <CheckboxGroup>
+                    <Checkbox value={2}>可发布服务</Checkbox>
+                    <Checkbox value={1}>可订阅服务</Checkbox>
+                  </CheckboxGroup>
+                )
+              }
+            </FormItem>
+            <FormItem
+              label="申请原因"
+              key="reason"
+              {...formItemLayout}
+            >
+              {
+                getFieldDecorator('reason', {
+                  rules: [{
+                    required: true,
+                    message: '请填写申请原因',
+                  }],
+                })(
+                  <TextArea placeholder="必填" />
+                )
+              }
+            </FormItem>
+          </Row> :
+          <div className="check">
+            <Icon type="check-circle-o" />
+            <div className="desc">申请操作成功，待审批</div>
+            <div>实例名称  {currentRecord.name}</div>
+          </div>
+      }
     </Modal>
   }
 }

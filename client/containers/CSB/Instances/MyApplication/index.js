@@ -15,7 +15,7 @@ import isEmpty from 'lodash/isEmpty'
 import difference from 'lodash/difference'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Table, Pagination, Card, Modal, notification, Tooltip } from 'antd'
+import { Button, Icon, Input, Table, Pagination, Card, Modal, notification } from 'antd'
 import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
 import CSBApplyStatus from '../../../../components/CSBApplyStatus'
@@ -23,6 +23,9 @@ import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
 import { renderInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
 import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/apply'
+import confirm from '../../../../components/Modal/confirm'
+import ApplyforCSBInstanceModal from '../Public/ApplyforCSBInstanceModal'
+import { applyforInstance, abandonInstance } from '../../../../actions/CSB/instance'
 
 const applysSlt = csbApplySltMaker(CSB_APPLY_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_APPLY_FLAG)
@@ -38,9 +41,12 @@ class MyApplication extends React.Component {
     total: 0,
     sort: '',
     filter: '',
+    currentRecord: {},
+    againApply: false,
     requestTime: true,
     delVisible: false,
     isRevoke: false,
+    confirmLoading: false,
   }
 
   componentWillMount() {
@@ -98,8 +104,7 @@ class MyApplication extends React.Component {
         notification.error({
           message: `撤销申请实例${textName}失败`,
         })
-      }
-      if (res.response.result.code === 200) {
+      } else if (res.response.result.code === 200) {
         notification.success({
           message: `撤销申请实例${textName}成功`,
         })
@@ -117,15 +122,91 @@ class MyApplication extends React.Component {
     })
   }
 
+  handleAbandonInstance = id => {
+    const { abandonInstance, userID } = this.props
+    confirm({
+      modalTitle: '放弃使用实例',
+      title: '是否确定放弃使用实例？',
+      content: '',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          const query = {
+            userId: userID,
+          }
+          abandonInstance(UNUSED_CLUSTER_ID, id, query).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '放弃使用实例成功',
+            })
+            this.loadData({ name: '', page: 1 })
+          })
+        })
+      },
+    })
+  }
+
+  handleAgainColse = () => {
+    this.setState({
+      againApply: false,
+    })
+  }
+
+  handleAgainOK = (values, self) => {
+    const { id } = this.state
+    const { applyforInstance, userID } = this.props
+    const body = {
+      instance: {
+        id,
+      },
+      requestor: {
+        id: userID,
+      },
+      ...values,
+    }
+    this.setState({
+      confirmLoading: true,
+    })
+    applyforInstance(UNUSED_CLUSTER_ID, body).then(res => {
+      if (res.error || !res.response.result.data) {
+        return notification.error({ message: '申请失败，请重试' })
+      }
+      notification.success({ message: '申请成功' })
+      self.setState({
+        isApplyfor: true,
+      })
+      this.setState({
+        againApply: false,
+        confirmLoading: false,
+      })
+      this.loadData()
+    })
+  }
+
+  handleAgainApply = (name, id) => {
+    const content = { name }
+    this.setState({
+      id,
+      againApply: true,
+      currentRecord: content,
+      confirmLoading: false,
+    })
+  }
+
   filterBtn = (value, id, name) => {
     const { history } = this.props
     switch (value) {
       case 2:
-        return <Button type="primary" onClick={() => history.push(`/csb-instances-available/${id}`)}>实例详情</Button>
+        return <div>
+          <Button type="primary" onClick={() => history.push(`/csb-instances-available/${id}`)}>实例详情</Button>
+          <Button className="btn-abandon" onClick={() => this.handleAbandonInstance(id)}>放弃使用</Button>
+        </div>
       case 1:
         return <Button onClick={() => this.handleRevokeApply(id, name)}>撤销申请</Button>
       case 3:
-        return <div>--</div>
+        return <Button type="primary" onClick={() => this.handleAgainApply(name, id)}>重新申请</Button>
       default:
         return
     }
@@ -223,19 +304,17 @@ class MyApplication extends React.Component {
         dataIndex: 'cluster',
         width: '10%',
         render: (text, row) =>
-          <Tooltip title={this.fliterCluster(row.instance.clusterId)}>
-            <div className="colmuns-ellipsis">{this.fliterCluster(row.instance.clusterId)}</div>
-          </Tooltip>,
+          <div>{this.fliterCluster(row.instance.clusterId)}</div>,
       }, {
         title: '申请时间',
         dataIndex: 'requestTime',
-        width: '15%',
+        width: '11%',
         sorter: (a, b) => a.time - b.time,
         render: (text, row) => formatDate(row.requestTime),
       }, {
         title: '实例授权',
         dataIndex: 'empower',
-        width: '13%',
+        width: '11%',
         render: (text, row) => renderInstanceRole(row.role),
         filters: [{
           text: '仅发布服务',
@@ -250,7 +329,7 @@ class MyApplication extends React.Component {
       }, {
         title: '审批状态',
         dataIndex: 'status',
-        width: '12%',
+        width: '11%',
         render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
         filters: [{
           text: '已拒绝',
@@ -264,18 +343,18 @@ class MyApplication extends React.Component {
         }],
       }, {
         title: '审批原因',
-        dataIndex: 'description',
+        dataIndex: 'ownerresponse',
         width: '10%',
-        render: (text, row) => row.instance.description,
+        render: (text, row) => row.ownerResponse,
       }, {
         title: '审批时间',
         dataIndex: 'approvalTime',
-        width: '15%',
         render: (text, row) => formatDate(row.approvalTime),
         sorter: (a, b) => a.time - b.time,
       }, {
         title: '操作',
         dataIndex: 'operation',
+        width: '22%',
         render: (text, row) => <div>
           {
             this.filterBtn(row.status, row.id, row.instance.name)
@@ -307,7 +386,7 @@ class MyApplication extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card key="table">
+        <Card className="table" key="table">
           <Table
             pagination={false}
             columns={colmuns}
@@ -321,7 +400,7 @@ class MyApplication extends React.Component {
           onCancel={this.handleDelClose}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleDelClose}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDelcancel}>撤 销</Button>,
+            <Button key="submit" type="primary" onClick={this.handleDelcancel}>确 定</Button>,
           ]}>
           {
             <div className="modal-del-vouchers">
@@ -334,6 +413,14 @@ class MyApplication extends React.Component {
             </div>
           }
         </Modal>
+        {
+          this.state.againApply && <ApplyforCSBInstanceModal
+            closeModalMethod={this.handleAgainColse}
+            loading={this.state.confirmLoading}
+            callback={this.handleAgainOK}
+            currentRecord={this.state.currentRecord}
+          ></ApplyforCSBInstanceModal>
+        }
       </QueueAnim>
     )
   }
@@ -356,4 +443,6 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   loadApply,
   removeApply,
+  abandonInstance,
+  applyforInstance,
 })(MyApplication)

@@ -14,8 +14,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import {
   Card, Button, Select, Input, Pagination, Table, Menu, Dropdown,
+  Modal,
 } from 'antd'
 import ServicesTable from './Services/Table'
+import confirm from '../../../../components/Modal/confirm'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -41,6 +43,25 @@ class MyPublishedServiceGroups extends React.Component {
   searchTypeSelect = searchType => {
     this.setState({
       searchType,
+    })
+  }
+
+  deleteServiceGroup = record => {
+    const self = this
+    if (record.num > 1) {
+      return Modal.info({
+        title: '删除服务组',
+        content: <span>服务组中仍有服务，不能执行删除操作，清空服务组中的服务后，方可执行删除操作</span>,
+        onOk7() { },
+      })
+    }
+    confirm({
+      modalTitle: '删除服务组',
+      title: `服务组一旦删除，将不可恢复，请确认是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
+      content: '',
+      onOk() {
+        self.loadData()
+      },
     })
   }
 

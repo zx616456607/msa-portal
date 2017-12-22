@@ -102,7 +102,7 @@ class PublicInstances extends React.Component {
     })
   }
 
-  confirmApplyforCSBInstance = values => {
+  confirmApplyforCSBInstance = (values, self) => {
     const { applyforInstance, userId } = this.props
     const { currentRecord } = this.state
     const body = {
@@ -117,13 +117,17 @@ class PublicInstances extends React.Component {
     this.setState({
       confirmLoading: true,
     })
+    debugger
     applyforInstance(UNUSED_CLUSTER_ID, body).then(res => {
       if (res.error || !res.response.result.data) {
         return notification.error({ message: '申请失败，请重试' })
       }
       notification.success({ message: '申请成功' })
+      self.setState({
+        isApplyfor: true,
+      })
       this.setState({
-        applyforCSBInstanceModalVisible: false,
+        // applyforCSBInstanceModalVisible: false,
         confirmLoading: false,
       })
       this.loadData()

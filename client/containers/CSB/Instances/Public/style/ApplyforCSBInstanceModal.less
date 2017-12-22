@@ -9,6 +9,7 @@
  * 2017-12-05
  * @author zhangcz
  */
+ @import '~assets/style/core/index.less';
 
 .ApplyforCSBInstanceModal {
   .row-style {
@@ -17,6 +18,24 @@
       text-align: right;
       padding-right: 10px;
       color: #666;
+    }
+  }
+  .check {
+    i {
+      font-size: 80px;
+      margin-left: 40%;
+      color: @success-color;
+    }
+    .desc {
+      font-size: 14px;
+      margin-left: 35%;
+      margin-top: 10px;
+      color: @success-color;
+    }
+    & > div:last-child {
+      font-size: 14px;
+      margin-left: 40%;
+      margin-top: 10px;
     }
   }
   .ant-checkbox-group {

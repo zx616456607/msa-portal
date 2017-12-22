@@ -10,6 +10,7 @@
  * @author zhangpc
  */
 import { myApplication } from './myApplication'
+import { publishedService, subscribeService } from './instanceService'
 import { publicInstances, availableInstances, omInstances } from './instance'
 
 const CSB = (state = {
