@@ -36,6 +36,7 @@ class ServicesTable extends React.Component {
     confirmLoading: false,
     visible: false,
     blackAndWhiteListModalVisible: false,
+    currentRow: {},
   }
 
   closeblackAndWhiteModal = () => {
@@ -188,13 +189,17 @@ class ServicesTable extends React.Component {
 
   viewServiceDetails = record => {
     console.log('record=', record)
-    this.setState({ visible: true })
+    this.setState({
+      visible: true,
+      currentRow: record,
+    })
   }
 
   render() {
     const { dataSource, loading } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
+      currentRow,
     } = this.state
     const columns = [
       {
@@ -272,6 +277,8 @@ class ServicesTable extends React.Component {
         <ServiceDetailDock
           visible={visible}
           onVisibleChange={visible => this.setState({ visible })}
+          detail={currentRow}
+          renderServiceStatusUI={this.renderServiceStatusUI}
         />
       </div>,
     ]
