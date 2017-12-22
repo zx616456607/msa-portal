@@ -70,6 +70,7 @@ export default class ServiceControl extends React.Component {
         >
           {getFieldDecorator('accessible', {
             valuePropName: 'checked',
+            initialValue: false,
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}

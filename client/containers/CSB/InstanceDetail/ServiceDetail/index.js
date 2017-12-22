@@ -75,7 +75,7 @@ export default class ServiceDetail extends React.Component {
               </Col>
               <Col span={14}>
                 <div className="txt-of-ellipsis">
-                服务描述：{detail.description}
+                服务描述：{detail.description || '-'}
                 </div>
               </Col>
             </Row>
