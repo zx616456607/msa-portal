@@ -102,7 +102,7 @@ class PublicInstances extends React.Component {
     })
   }
 
-  confirmApplyforCSBInstance = values => {
+  confirmApplyforCSBInstance = (values, self) => {
     const { applyforInstance, userId } = this.props
     const { currentRecord } = this.state
     const body = {
@@ -122,8 +122,11 @@ class PublicInstances extends React.Component {
         return notification.error({ message: '申请失败，请重试' })
       }
       notification.success({ message: '申请成功' })
+      self.setState({
+        isApplyfor: true,
+      })
       this.setState({
-        applyforCSBInstanceModalVisible: false,
+        // applyforCSBInstanceModalVisible: false,
         confirmLoading: false,
       })
       this.loadData()
@@ -156,7 +159,7 @@ class PublicInstances extends React.Component {
   }
 
   render() {
-    const { publicInstances, location } = this.props
+    const { publicInstances, location, history } = this.props
     const { query } = location
     const { isFetching, content, totalElements, size } = publicInstances
     const {
@@ -247,6 +250,7 @@ class PublicInstances extends React.Component {
       </div>
       {
         applyforCSBInstanceModalVisible && <ApplyforCSBInstanceModal
+          history={history}
           closeModalMethod={this.closeApplyforCSBInstanceModal.bind(this)}
           loading={confirmLoading}
           callback={this.confirmApplyforCSBInstance}
