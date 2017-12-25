@@ -59,7 +59,15 @@ const callApi = (endpoint, options, schema) => {
   }
   return fetch(fullUrl, options)
     .then(response =>
-      response.json().then(json => {
+      response.text().then(text => {
+        let json
+        try {
+          json = JSON.parse(text)
+        } catch (error) {
+          json = {
+            body: text,
+          }
+        }
         if (!response.ok) {
           return Promise.reject(json)
         }
