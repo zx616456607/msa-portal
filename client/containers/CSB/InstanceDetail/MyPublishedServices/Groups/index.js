@@ -216,7 +216,7 @@ class MyPublishedServiceGroups extends React.Component {
         <Card>
           <Table
             columns={columns}
-            expandedRowRender={() => <ServicesTable loadData={() => {}} />}
+            expandedRowRender={() => <ServicesTable from="group" loadData={() => {}} />}
             dataSource={content}
             loadData={isFetching}
             pagination={false}

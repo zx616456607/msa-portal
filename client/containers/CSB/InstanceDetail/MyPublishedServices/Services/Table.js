@@ -30,6 +30,12 @@ class ServicesTable extends React.Component {
     loadData: PropTypes.func.isRequired,
     // 列表数据
     dataSource: PropTypes.array,
+    // 来源：服务列表或服务组
+    from: PropTypes.oneOf([ 'services', 'group' ]),
+  }
+
+  static defaultProps = {
+    from: 'services',
   }
 
   state = {
@@ -196,68 +202,69 @@ class ServicesTable extends React.Component {
   }
 
   render() {
-    const { dataSource, loading } = this.props
+    const { dataSource, loading, from } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
     } = this.state
-    const columns = [
+    let columns = [
       {
-        id: 'id',
         title: '服务名',
         dataIndex: 'serviceName',
         key: 'serviceName',
-        width: '13%',
         render: (text, row) => row.name,
-      }, {
+      },
+      {
         title: '服务版本',
         dataIndex: 'version',
         key: 'version',
-        width: '10%',
         render: (text, row) => row.version,
-      }, {
+      },
+      {
         title: '所属服务组',
         dataIndex: 'group',
         key: 'group',
-        width: '10%',
         render: (text, row) => row.groupId,
-      }, {
+      },
+      {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        width: '10%',
         render: (text, row) => this.renderServiceStatusUI(row.active, row.accessible),
-      }, {
+      },
+      {
         title: '待审批订阅',
         dataIndex: 'wait',
         key: 'wait',
-        width: '10%',
         // render: (text, row) => row.
-      }, {
+      },
+      {
         title: '累计调用量',
         dataIndex: 'num',
         key: 'num',
-        width: '10%',
-      }, {
+      },
+      {
         title: '平均RT（ms）',
         dataIndex: 'ave',
         key: 'ave',
-        width: '10%',
-      }, {
+      },
+      {
         title: '发布时间',
         dataIndex: 'time',
         key: 'time',
-        width: '10%',
         render: (text, row) => formatDate(row.publishTime),
       },
       {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '10%',
         render: (text, record) => this.renderHandleServiceDropdown(record),
       },
     ]
+    if (from === 'group') {
+      const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
+      columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
+    }
     return [
       <Table
         columns={columns}
