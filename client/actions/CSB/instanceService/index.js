@@ -15,56 +15,32 @@ import { toQuerystring } from '../../../common/utils'
 import { API_CONFIG } from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
 import { Schemas } from '../../../middleware/schemas'
-import {
-  CSB_RELEASE_INSTANCES_SERVICE_FLAG,
-  CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG,
-} from '../../../constants'
 
 const { CSB_API_URL } = API_CONFIG
 
-export const CSB_RELEASE_INSTANCE_REQUEST = 'CSB_RELEASE_INSTANCE_REQUEST'
-export const CSB_RELEASE_INSTANCE_SUCCESS = 'CSB_RELEASE_INSTANCE_SUCCESS'
-export const CSB_RELEASE_INSTANCE_FAILURE = 'CSB_RELEASE_INSTANCE_FAILURE'
+export const FETCH_CSB_INSTANCE_REQUEST = 'FETCH_CSB_INSTANCE_REQUEST'
+export const FETCH_CSB_INSTANCE_SUCCESS = 'FETCH_CSB_INSTANCE_SUCCESS'
+export const FETCH_CSB_INSTANCE_FAILURE = 'FETCH_CSB_INSTANCE_FAILURE'
 
-export const CSB_SUBSCRIBE_INSTANCE_REQUEST = 'CSB_SUBSCRIBE_INSTANCE_REQUEST'
-export const CSB_SUBSCRIBE_INSTANCE_SUCCESS = 'CSB_SUBSCRIBE_INSTANCE_SUCCESS'
-export const CSB_SUBSCRIBE_INSTANCE_FAILURE = 'CSB_SUBSCRIBE_INSTANCE_FAILURE'
-
+// Create an instance service list
+// Relies on the custom API middleware defined in ../middleware/api.js.
 const fetchInstanceServiceList = (instanceId, query = {}) => {
   const _query = cloneDeep(query)
-  const { page, flag } = _query
+  const { page } = _query
   if (page !== undefined) {
     _query.page = page - 1
-  }
-  let types
-  let schema
-  switch (flag) {
-    case CSB_RELEASE_INSTANCES_SERVICE_FLAG:
-      types = [
-        CSB_RELEASE_INSTANCE_REQUEST,
-        CSB_RELEASE_INSTANCE_SUCCESS,
-        CSB_RELEASE_INSTANCE_FAILURE,
-      ]
-      schema = Schemas.CSB_PUBLISHED_LIST_DATA
-      break
-    case CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG:
-      types = [
-        CSB_SUBSCRIBE_INSTANCE_REQUEST,
-        CSB_SUBSCRIBE_INSTANCE_SUCCESS,
-        CSB_SUBSCRIBE_INSTANCE_FAILURE,
-      ]
-      schema = Schemas.CSB_SUBSCRIBE_LIST_DATA
-      break
-    default:
-      break
   }
   return {
     instanceId,
     query,
     [CALL_API]: {
-      types,
+      types: [
+        FETCH_CSB_INSTANCE_REQUEST,
+        FETCH_CSB_INSTANCE_SUCCESS,
+        FETCH_CSB_INSTANCE_FAILURE,
+      ],
       endpoint: `${CSB_API_URL}/instances/${instanceId}/services?${toQuerystring(_query)}`,
-      schema,
+      schema: Schemas.CSB_PUBLISHED_LIST_DATA,
     },
   }
 }
@@ -77,7 +53,7 @@ export const CREATE_CSB_INSTANCE_SERVICE_REQUEST = 'CREATE_CSB_INSTANCE_SERVICE_
 export const CREATE_CSB_INSTANCE_SERVICE_SUCCESS = 'CREATE_CSB_INSTANCE_SERVICE_SUCCESS'
 export const CREATE_CSB_INSTANCE_SERVICE_FAILURE = 'CREATE_CSB_INSTANCE_SERVICE_FAILURE'
 
-// Create an instance service group
+// fetch an instance service group
 // Relies on the custom API middleware defined in ../middleware/api.js.
 const fetchCreateService = (instanceID, body) => {
   return {
@@ -99,3 +75,126 @@ const fetchCreateService = (instanceID, body) => {
 
 export const createService = (instanceID, body) =>
   dispatch => dispatch(fetchCreateService(instanceID, body))
+
+export const PUT_CSB_INSTANCE_SERVICE_REQUEST = 'PUT_CSB_INSTANCE_SERVICE_REQUEST'
+export const PUT_CSB_INSTANCE_SERVICE_SUCCESS = 'PUT_CSB_INSTANCE_SERVICE_SUCCESS'
+export const PUT_CSB_INSTANCE_SERVICE_FAILURE = 'PUT_CSB_INSTANCE_SERVICE_FAILURE'
+
+// edit an instance service
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const editInstanceService = (instanceId, serviceId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PUT_CSB_INSTANCE_SERVICE_REQUEST,
+        PUT_CSB_INSTANCE_SERVICE_SUCCESS,
+        PUT_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/status`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const PutInstanceService = (instanceId, serviceId, body) => dispatch => {
+  return dispatch(editInstanceService(instanceId, serviceId, body))
+}
+
+export const DEL_CSB_INSTANCE_SERVICE_REQUEST = 'DEL_CSB_INSTANCE_SERVICE_REQUEST'
+export const DEL_CSB_INSTANCE_SERVICE_SUCCESS = 'DEL_CSB_INSTANCE_SERVICE_SUCCESS'
+export const DEL_CSB_INSTANCE_SERVICE_FAILURE = 'DEL_CSB_INSTANCE_SERVICE_FAILURE'
+
+// delete an instance service
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const rmInstanceService = (instanceId, id) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DEL_CSB_INSTANCE_SERVICE_REQUEST,
+        DEL_CSB_INSTANCE_SERVICE_SUCCESS,
+        DEL_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${id}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const delInstanceService = (instanceId, id) => dispatch => {
+  return dispatch(rmInstanceService(instanceId, id))
+}
+
+export const FETCH_CSB_INSTANCE_SERVICE_ACL_REQUEST = 'FETCH_CSB_INSTANCE_SERVICE_ACL_REQUEST'
+export const FETCH_CSB_INSTANCE_SERVICE_ACL_SUCCESS = 'FETCH_CSB_INSTANCE_SERVICE_ACL_SUCCESS'
+export const FETCH_CSB_INSTANCE_SERVICE_ACL_FAILURE = 'FETCH_CSB_INSTANCE_SERVICE_ACL_FAILURE'
+
+// fetch an instance service ACL
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchInstanceServiceACL = (instanceId, serviceId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        FETCH_CSB_INSTANCE_SERVICE_ACL_REQUEST,
+        FETCH_CSB_INSTANCE_SERVICE_ACL_SUCCESS,
+        FETCH_CSB_INSTANCE_SERVICE_ACL_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/access-control`,
+      schema: Schemas.CSB_INSTANCE_SERVICE_ACL_LIST_DATA,
+    },
+  }
+}
+
+export const getInstanceServiceACL = (instanceId, serviceId) => dispatch => {
+  return dispatch(fetchInstanceServiceACL(instanceId, serviceId))
+}
+
+export const DEL_CSB_INSTANCE_SERVICE_ACL_REQUEST = 'DEL_CSB_INSTANCE_SERVICE_ACL_REQUEST'
+export const DEL_CSB_INSTANCE_SERVICE_ACL_SUCCESS = 'DEL_CSB_INSTANCE_SERVICE_ACL_SUCCESS'
+export const DEL_CSB_INSTANCE_SERVICE_ACL_FAILURE = 'DEL_CSB_INSTANCE_SERVICE_ACL_FAILURE'
+
+const rmInstanceServiceACL = (instanceId, serviceId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DEL_CSB_INSTANCE_SERVICE_ACL_REQUEST,
+        DEL_CSB_INSTANCE_SERVICE_ACL_SUCCESS,
+        DEL_CSB_INSTANCE_SERVICE_ACL_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/access-control`,
+      schema: Schemas.CSB_INSTANCE_SERVICE_ACL_LIST_DATA,
+    },
+  }
+}
+
+export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
+  return dispatch(rmInstanceServiceACL(instanceId, serviceId))
+}
+
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_REQUEST = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_REQUEST'
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_SUCCESS = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_SUCCESS'
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_FAILURE = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_FAILURE'
+
+// const fetchInstanceServiceDetail = (instanceId, serviceId) => {
+//   return {
+//     [CALL_API]: {
+//       types: [
+//         DEL_CSB_INSTANCE_SERVICE_ACL_REQUEST,
+//         DEL_CSB_INSTANCE_SERVICE_ACL_SUCCESS,
+//         DEL_CSB_INSTANCE_SERVICE_ACL_FAILURE,
+//       ],
+//       endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/access-control`,
+//       schema: Schemas.CSB_INSTANCE_SERVICE_ACL_LIST_DATA,
+//     },
+//   }
+// }
+
+// // export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
+// //   return dispatch(fetchInstanceServiceDetail(instanceId, serviceId))
+// // }

@@ -21,18 +21,18 @@ import { parse as parseQuerystring } from 'query-string'
 import ServiceGroups from './Groups'
 import Services from './Services'
 import { getInstanceService } from '../../../../actions/CSB/instanceService'
-
 const RadioGroup = Radio.Group
 const FormItem = Form.Item
 
 class MyPublishedServices extends React.Component {
   state = {
+    isOff: false,
     showType: '',
   }
 
   // 是否显示已注销服务
   logoutServiceChange = value => {
-    console.log('value=', value)
+    return value
   }
 
   renderDifferentTable = () => {
@@ -41,7 +41,11 @@ class MyPublishedServices extends React.Component {
     const showType = getFieldValue('showType')
     switch (showType) {
       case 'all':
-        return <Services history={history} match={match} location={location} />
+        return <Services
+          history={history}
+          match={match}
+          location={location}
+          isOff={this.state.isOff} />
       case 'group':
         return <ServiceGroups history={history} match={match} location={location} />
       default:
