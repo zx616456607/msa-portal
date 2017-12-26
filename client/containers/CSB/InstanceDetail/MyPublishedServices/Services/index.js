@@ -36,6 +36,14 @@ class MyPublishedServices extends React.Component {
     this.loadData()
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { isOff } = this.props
+    const nextOff = nextProps.isOff
+    if (nextOff !== isOff) {
+      this.loadData({ includeDeleted: nextProps.isOff })
+    }
+  }
+
   // 加载数据
   loadData = query => {
     const { getInstanceService, history, match, isOff } = this.props
@@ -66,9 +74,7 @@ class MyPublishedServices extends React.Component {
   }
 
   render() {
-    const { myPublished, match, history, isoff } = this.props
-    console.log(isoff)
-    const { instanceID } = match.params
+    const { myPublished, match, history } = this.props
     const { content, size, isFetching, totalElements } = myPublished
     const paginationProps = {
       simple: true,
@@ -103,7 +109,7 @@ class MyPublishedServices extends React.Component {
             loading={isFetching}
             dataSource={content}
             history={history}
-            instanceId={instanceID} />
+            match={match} />
         </Card>
       </div>,
     ]
