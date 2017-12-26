@@ -12,25 +12,62 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Icon, Input, Pagination, Dropdown, Table, Card, Menu, Modal, Row, Col, Radio, Tooltip, Popover } from 'antd'
+import {
+  Button, Icon, Input, Pagination,
+  Dropdown, Table, Card, Menu, Modal,
+  Row, Col, Radio, Tooltip, Popover,
+  Form, notification,
+} from 'antd'
 import './style/index.less'
+import {
+  createConsumerVoucher,
+  getConsumerVouchersList,
+} from '../../../../actions/CSB/instanceService/consumerVouchers'
+import { connect } from 'react-redux'
+import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
+import { formatDate } from '../../../../common/utils'
+import confirm from '../../../../components/Modal/confirm'
+
 const Search = Input.Search
 const { TextArea } = Input
 const RadioGroup = Radio.Group
+const FormItem = Form.Item
 
-export default class ConsumerVouchers extends React.Component {
+class ConsumerVouchers extends React.Component {
 
   state = {
+    name: '',
     title: '',
     isUse: true,
     isAdd: false,
     delValue: '',
     icoTip: false,
-    voucherName: '',
     copyStatus: false,
     upVisible: false,
-    delVisible: false,
     addVisible: false,
+    confirmLoading: false,
+    currentConsumerVoucher: {},
+  }
+
+  componentWillMount() {
+    this.loadData()
+  }
+
+  confirmDeleteConsumerVoucher = () => {
+    const { currentConsumerVoucher } = this.state
+    return confirm({
+      modalTitle: '使用实例',
+      title: `确定删除消费凭证 ${currentConsumerVoucher.name}？`,
+      content: '',
+      onOk() {
+        return 123
+      },
+    })
+  }
+
+  loadData = () => {
+    const { getConsumerVouchersList, instanceID } = this.props
+    getConsumerVouchersList(instanceID)
   }
 
   handleAdd = () => {
@@ -49,7 +86,40 @@ export default class ConsumerVouchers extends React.Component {
     })
   }
 
-  handleOK = () => { }
+  createConsumerVoucher = (instanceID, values) => {
+    const { createConsumerVoucher } = this.props
+    createConsumerVoucher(instanceID, values).then(res => {
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '创建消费凭证成功',
+      })
+      this.setState({
+        addVisible: false,
+      })
+      this.loadData()
+    })
+  }
+
+  handleOK = () => {
+    const { isAdd } = this.state
+    const { form, instanceID } = this.props
+    const validateArray = [ 'name' ]
+    form.validateFields(validateArray, (errors, values) => {
+      if (errors) return
+      this.setState({
+        confirmLoading: true,
+      })
+      if (isAdd) {
+        this.createConsumerVoucher(instanceID, values)
+        return
+      }
+    })
+  }
 
   handleCancel = () => {
     this.setState({
@@ -57,36 +127,26 @@ export default class ConsumerVouchers extends React.Component {
     })
   }
 
-  handleMenu = value => {
-    if (value.key === '更新') {
-      this.setState({
-        upVisible: true,
-      })
-    } if (value.key === '删除') {
-      this.setState({
-        delValue: '',
-        delVisible: true,
-      })
-    }
-  }
-
-  handleDelOk = () => { }
-
-  handleDelcancel = () => {
+  handleMenu = (record, item) => {
+    const { key } = item
     this.setState({
-      delVisible: false,
+      currentConsumerVoucher: record,
     })
+    switch (key) {
+      case 'update':
+        return this.setState({
+          upVisible: true,
+        })
+      case 'delete':
+        return this.confirmDeleteConsumerVoucher()
+      default:
+        return
+    }
   }
 
   handleUpCancel = () => {
     this.setState({
       upVisible: false,
-    })
-  }
-
-  handleModal = e => {
-    this.setState({
-      voucherName: e.target.value,
     })
   }
 
@@ -111,24 +171,24 @@ export default class ConsumerVouchers extends React.Component {
     })
   }
 
-  filterAs = value => {
+  filterAs = record => {
     const { copyStatus, icoTip } = this.state
     return (
       <div>
-        <span>{value}</span>
+        <span>{record.clientId} / {record.secret}</span>
         <Popover
           placement="right"
           trigger="click"
           content={
             <div>
               <div>
-                <span style={{ color: '#2db7f5' }}> ak:{value}</span>
+                <span style={{ color: '#2db7f5' }}> ak:{record.clientId}</span>
                 <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
                   <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
                 </Tooltip>
               </div>
               <div>
-                <span style={{ color: '#2db7f5' }}> sk:{value}</span>
+                <span style={{ color: '#2db7f5' }}> sk:{record.secret}</span>
                 <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
                   <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
                 </Tooltip>
@@ -136,7 +196,7 @@ export default class ConsumerVouchers extends React.Component {
             </div>
           }
           arrowPointAtCenter={true}
-          trigger="click">
+        >
           {
             icoTip ? <Icon type="minus-square-o" onClick={() => this.handleIco('minus')} /> :
               <Icon type="plus-square-o" onClick={() => this.handleIco('plus')} />
@@ -147,64 +207,77 @@ export default class ConsumerVouchers extends React.Component {
   }
 
   render() {
-    const { addVisible, isAdd, title, delVisible, isUse, upVisible } = this.state
+    const {
+      addVisible, isAdd, title,
+      upVisible, name,
+    } = this.state
+    const { form, consumeVoucherList } = this.props
+    const { content, size, isFetching, totalElements } = consumeVoucherList
+    const { getFieldDecorator } = form
+    const formItemLayout = {
+      labelCol: { span: 5 },
+      wrapperCol: { span: 15 },
+    }
     const columns = [{
       id: 'id',
       title: '凭证名称',
+      width: '16%',
       dataIndex: 'name',
     }, {
       title: 'AccessKey / SecretKey',
-      dataIndex: 'as',
-      render: text => this.filterAs(text),
+      key: 'clientId',
+      dataIndex: 'clientId',
+      width: '20%',
+      render: (text, record) => this.filterAs(record),
     }, {
       title: '订阅服务（个）',
+      width: '16%',
       dataIndex: 'service',
     }, {
       title: '创建时间',
-      dataIndex: 'stime',
+      key: 'creationTime',
+      dataIndex: 'creationTime',
+      width: '16%',
+      render: creationTime => formatDate(creationTime),
     }, {
       title: '更新时间',
       dataIndex: 'utime',
+      width: '16%',
     }, {
       title: '操作',
       dataIndex: 'operation',
-      render: () => <div>
+      width: '16%',
+      render: (text, record) => <div>
         <Dropdown.Button onClick={this.handleButtonClick} overlay={
-          <Menu onClick={this.handleMenu} style={{ width: 85 }}>
-            <Menu.Item key="更新">更新</Menu.Item>
-            <Menu.Item key="删除">删除</Menu.Item>
+          <Menu onClick={this.handleMenu.bind(this, record)} style={{ width: 85 }}>
+            <Menu.Item key="update">更新</Menu.Item>
+            <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
         }>编辑</Dropdown.Button>
       </div>,
     }]
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-      },
-    }
-    const data = [{
-      key: '1',
-      name: 'John Brown',
-      as: 'asdasdasdhabab',
-      service: 'New York',
-      stime: '2017-01-01',
-      utime: '2017-02-02',
-    }]
+    // const rowSelection = {
+    //  onChange: (selectedRowKeys, selectedRows) => {
+    //    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+    //  },
+    // }
     const pagination = {
-      total: 1,
+      total: totalElements,
       defaultCurrent: 1,
+      size,
     }
     return (
       <QueueAnim className="csb-comsumer-vouchers">
         <div className="top" key="top">
           <div className="topLeft">
-            <Button className="vou" type="primary" onClick={this.handleAdd}><Icon type="plus" />创建凭证</Button>
-            <Button className="res"><Icon type="sync" />刷新</Button>
-            <Button className="del"><Icon type="delete" />删除</Button>
+            <Button className="vou" type="primary" onClick={this.handleAdd}><Icon type="plus"/>创建凭证</Button>
+            <Button className="res" onClick={() => this.loadData()}><Icon type="sync"/>刷新</Button>
+            {/* <Button className="del"><Icon type="delete" />删除</Button> */}
             <Search
               placeholder="按凭证名称搜索"
               style={{ width: 200 }}
-              onSearch={value => console.log(value)}
+              onChange={e => this.setState({ name: e.target.value })}
+              value={name}
             />
           </div>
           <div className="topRigth" type="card">
@@ -216,52 +289,40 @@ export default class ConsumerVouchers extends React.Component {
           <Table
             columns={columns}
             pagination={false}
-            dataSource={data}
-            rowSelection={rowSelection}
+            dataSource={content}
+            // rowSelection={rowSelection}
+            loading={isFetching}
+            rowKey={record => record.id}
           />
         </Card>
-        <Modal title={title} visible={addVisible} onCancel={this.handleCancel}
+        {addVisible && <Modal
+          title={title}
+          visible={true}
+          onCancel={this.handleCancel}
+          maskClosable={false}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleOK}>{isAdd ? '确 定' : '保 存'}</Button>,
+            <Button key="submit" type="primary" onClick={this.handleOK}>
+              {isAdd ? '确 定' : '保 存'}
+            </Button>,
           ]}>
-          <div className="modal-add-vouchers">
-            <span className="vouchers-name">凭证名称</span>
-            <Input placeholder="请输入凭证名称" onChange={this.handleModal} />
-          </div>
-        </Modal>
-        <Modal title="删除消费凭证"
-          visible={delVisible}
-          onCancel={this.handleDelcancel}
-          footer={isUse ?
-            [
-              <Button key="back" type="primary" onClick={this.handleDelcancel}>知道了</Button>,
-            ] :
-            [
-              <Button key="back" type="ghost" onClick={this.handleDelcancel}>取 消</Button>,
-              <Button key="submit" type="primary" onClick={this.handleDelOk}>{isAdd ? '确 定' : '保 存'}</Button>,
-            ]}>
-          {
-            isUse ?
-              <div className="modal-del-vouchers-tip">
-                <div className="img">
-                  <Icon className="ico" type="exclamation-circle" />
-                </div>
-                <div className="desc">
-                  <h3>删除消费凭证</h3>
-                  <span>消费凭证 XX, XX 正被用于订阅服务，不可删除</span>
-                </div>
-              </div> :
-              <div className="modal-del-vouchers">
-                <div className="img">
-                  <Icon type="exclamation-circle" />
-                </div>
-                <div className="desc">
-                  <span>确定删除消费凭证 ？</span>
-                </div>
-              </div>
-          }
-        </Modal>
+          <FormItem
+            label="凭证名称"
+            key="name"
+            {...formItemLayout}
+          >
+            {
+              getFieldDecorator('name', {
+                rules: [{
+                  required: true,
+                  message: '消费凭证名称不能为空',
+                }],
+              })(
+                <Input placeholder="请输入消费凭证名称"/>
+              )
+            }
+          </FormItem>
+        </Modal> }
         <Modal title="更新消费凭证"
           visible={upVisible}
           onCancel={this.handleUpCancel}
@@ -314,3 +375,18 @@ export default class ConsumerVouchers extends React.Component {
     )
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
+  const consumeVoucherList = consumeVoucherSlt(state, ownProps)
+  return {
+    consumeVoucherList,
+    instanceID,
+  }
+}
+
+export default connect(mapStateToProps, {
+  createConsumerVoucher,
+  getConsumerVouchersList,
+})(Form.create()(ConsumerVouchers))
