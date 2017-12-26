@@ -84,3 +84,25 @@ export const csbInstanceServiceSltMaker = flag => createSelector(
     }
   }
 )
+
+const getInstanceServiceDetail = state => {
+  const { CSB } = state
+  return CSB.serviceDetail || {}
+}
+
+export const csbInstanceServiceDetailSlt = () => createSelector(
+  [
+    getInstanceServiceDetail.bind(this),
+    getEntities,
+  ],
+  (csbServiceDetail, entities) => {
+    const { ids, ...other } = csbServiceDetail
+    const serviceDetail = entities.csbInstanceServiceDetail
+    const content = (ids || []).map(id => serviceDetail[id])
+    return {
+      content,
+      ...other,
+    }
+  }
+)
+

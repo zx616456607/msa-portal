@@ -77,3 +77,34 @@ export const serviceCAL = (state = {}, action) => {
   }
 }
 
+export const serviceDetail = (state = {}, action) => {
+  const { type, query } = action
+  const key = getQueryKey(query)
+  switch (type) {
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_REQUEST:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_SUCCESS:
+      return {
+        ...state,
+        [key]: {
+          isFetching: false,
+          ids: union(state.ids, action.response.result),
+        },
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_FAILURE:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}
+

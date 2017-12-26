@@ -65,7 +65,6 @@ class ServicesTable extends React.Component {
 
   state = {
     serviceId: '',
-    instanceId: '',
     confirmLoading: false,
     visible: false,
     blackAndWhiteListModalVisible: false,
@@ -112,9 +111,7 @@ class ServicesTable extends React.Component {
   }
 
   openBlackAndWhiteListModal = record => {
-    const { instanceId } = this.props
     this.setState({
-      instanceId,
       serviceId: record.id,
       blackAndWhiteListModalVisible: true,
       confirmLoading: false,
@@ -241,7 +238,8 @@ class ServicesTable extends React.Component {
   }
 
   serviceOperation = (record, type) => {
-    const { loadData, instanceId, PutInstanceService, delInstanceService } = this.props
+    const { loadData, match, PutInstanceService, delInstanceService } = this.props
+    const { instanceID } = match.params
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
     const self = this
     confirm({
@@ -250,7 +248,7 @@ class ServicesTable extends React.Component {
       modalTitle,
       onOk() {
         if (type === 'logout') {
-          delInstanceService(instanceId, record.id).then(res => {
+          delInstanceService(instanceID, record.id).then(res => {
             if (res.error) {
               Notification.error({
                 message: self.serviceMessages(type, true),
@@ -266,7 +264,7 @@ class ServicesTable extends React.Component {
           })
           return
         }
-        PutInstanceService(instanceId, record.id, body).then(res => {
+        PutInstanceService(instanceID, record.id, body).then(res => {
           if (res.error) {
             Notification.error({
               message: self.serviceMessages(type, true),
@@ -292,7 +290,7 @@ class ServicesTable extends React.Component {
   }
 
   render() {
-    const { dataSource, loading, from } = this.props
+    const { dataSource, loading, from, match } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -352,10 +350,12 @@ class ServicesTable extends React.Component {
         render: (text, record) => this.renderHandleServiceDropdown(record),
       },
     ]
+    const { instanceID } = match.params
     if (from === 'group') {
       const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
     }
+    console.log(instanceID)
     return [
       <Table
         columns={columns}
@@ -367,7 +367,7 @@ class ServicesTable extends React.Component {
       <div key="modals">
         {
           blackAndWhiteListModalVisible && <BlackAndWhiteListModal
-            instanceId={this.state.instanceId}
+            instanceId={instanceID}
             serviceId={this.state.serviceId}
             closeblackAndWhiteModal={this.closeblackAndWhiteModal.bind(this)}
             callback={this.handleSaveBlackAndWhiteList}
@@ -377,6 +377,7 @@ class ServicesTable extends React.Component {
         <ServiceDetailDock
           visible={visible}
           onVisibleChange={visible => this.setState({ visible })}
+          instanceId={instanceID}
           detail={currentRow}
           renderServiceStatusUI={this.renderServiceStatusUI}
         />

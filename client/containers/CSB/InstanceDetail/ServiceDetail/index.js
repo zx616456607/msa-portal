@@ -39,7 +39,7 @@ export default class ServiceDetail extends React.Component {
   }
 
   render() {
-    const { detail, renderServiceStatusUI } = this.props
+    const { detail, instanceId, renderServiceStatusUI } = this.props
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -49,7 +49,7 @@ export default class ServiceDetail extends React.Component {
           <div className="service-detail-header-right">
             <div>
               <h2 className="txt-of-ellipsis">
-              服务名称：{detail.name}
+                服务名称：{detail.name}
               </h2>
             </div>
             <Row>
@@ -61,7 +61,7 @@ export default class ServiceDetail extends React.Component {
               </Col>
               <Col span={14}>
                 <div className="txt-of-ellipsis">
-                所属服务组：{detail.groupId}
+                  所属服务组：{detail.groupId}
                 </div>
               </Col>
               <Col span={4} className="service-detail-header-btns">
@@ -71,12 +71,12 @@ export default class ServiceDetail extends React.Component {
             <Row>
               <Col span={6}>
                 <div className="txt-of-ellipsis">
-                服务版本：{detail.version}
+                  服务版本：{detail.version}
                 </div>
               </Col>
               <Col span={14}>
                 <div className="txt-of-ellipsis">
-                服务描述：{detail.description || '-'}
+                  服务描述：{detail.description || '-'}
                 </div>
               </Col>
             </Row>
@@ -88,7 +88,7 @@ export default class ServiceDetail extends React.Component {
             type="card"
           >
             <TabPane tab="统计信息" key="statistics">
-              <ServiceStatistics />
+              <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />
             </TabPane>
             <TabPane tab="协议信息" key="protocols">
               <ServiceProtocols />

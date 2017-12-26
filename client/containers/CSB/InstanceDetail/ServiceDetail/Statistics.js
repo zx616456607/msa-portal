@@ -11,10 +11,13 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import {
   Row, Col, DatePicker,
 } from 'antd'
 import CreateG2 from '../../../../components/CreateG2'
+import { getInstanceServiceDetail } from '../../../../actions/CSB/instanceService'
+import { csbInstanceServiceDetailSlt } from '../../../../selectors/CSB/instanceService'
 
 const RangePicker = DatePicker.RangePicker
 const Chart = CreateG2(chart => {
@@ -42,8 +45,9 @@ const Chart = CreateG2(chart => {
   })
   chart.render()
 })
+const detailStr = csbInstanceServiceDetailSlt()
 
-export default class Statistics extends React.Component {
+class Statistics extends React.Component {
   state = {
     data: [
       { dateTime: '09:59:00', count: 12, monitorType: 'qps' },
@@ -75,7 +79,16 @@ export default class Statistics extends React.Component {
     height: 300,
   }
 
+  componentWillMount() {
+    // this.loadData()
+  }
+  loadData = () => {
+    const { serviceId, instanceId, getInstanceServiceDetail } = this.props
+    getInstanceServiceDetail(instanceId, serviceId)
+  }
+
   render() {
+    // const { detailData } = this.props
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -141,3 +154,13 @@ export default class Statistics extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    detailData: detailStr(state),
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstanceServiceDetail,
+})(Statistics)
