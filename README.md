@@ -128,6 +128,22 @@ npm run build
 ```
 npm run pro
 ```
+* 构建镜像
+
+```
+docker build -t msa-portal .
+```
+* 运行镜像
+
+```
+docker run --name msa-portal \
+           --restart=always \
+           -e PAAS_API=http://192.168.1.103:48000 \
+           -e MSA_API=http://192.168.1.58:8000 \
+           -e CSB_API=http://192.168.1.58:9090 \
+           -p 8989:8989 \
+           -d msa-portal
+```
 
 ### 调试工具
 * [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)

@@ -34,11 +34,14 @@ export const groupServicesSlt = createSelector(
   [ getGroupServices, getEntities ],
   (groupServices, entities) => {
     const { cbsPublished } = entities
+    const data = {}
     Object.keys(groupServices).forEach(groupID => {
-      groupServices[groupID].content = (groupServices[groupID].ids || [])
-        .map(id => cbsPublished[id])
-      delete groupServices[groupID].ids
+      const { ids, ...otherProps } = groupServices[groupID]
+      data[groupID] = {
+        content: (ids || []).map(id => cbsPublished[id]),
+        ...otherProps,
+      }
     })
-    return groupServices
+    return data
   }
 )

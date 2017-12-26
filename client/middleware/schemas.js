@@ -87,6 +87,16 @@ const csbSubscribeSchema = new schema.Entity('csbSubscribe', {}, {
 const csbInstanceServiceGroupsSchema = new schema.Entity('csbInstanceServiceGroups', {}, {
   idAttribute: 'id',
 })
+const csbInstanceConsumerVouchersSchema = new schema.Entity('csbInstanceConsumerVouchers', {}, {
+  idAttribute: 'id',
+})
+const csbInstanceMySubscribedServicesSchema = new schema.Entity('csbInstanceMySubscribedServices', {}, {
+  idAttribute: 'id',
+})
+
+const csbInstanceServiceSubscribeApproveSchema = new schema.Entity('csbInstanceServiceSubscribeApprove', {}, {
+  idAttribute: 'id',
+})
 
 // CSB InstanceService ACL
 const csbInstanceServiceACLSchema = new schema.Entity('csbInstanceServiceACL', {}, {
@@ -191,6 +201,21 @@ export const Schemas = {
   CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA: {
     data: {
       content: [ csbInstanceServiceDetailSchema ],
+    },
+  },
+  CSB_INSTANCE_CONSUMER_VOUCHER_LIST_DATA: {
+    data: {
+      content: [ csbInstanceConsumerVouchersSchema ],
+    },
+  },
+  CSB_INSTANCE_MY_SUBSCRIBED_SERVICES_LIST_DATA: {
+    data: {
+      content: [ csbInstanceMySubscribedServicesSchema ],
+    },
+  },
+  CSB_INSTANCE_SERVICE_SUBSCRIBE_APPROVE_LIST_DATA: {
+    data: {
+      content: [ csbInstanceServiceSubscribeApproveSchema ],
     },
   },
 }

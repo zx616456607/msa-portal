@@ -33,6 +33,7 @@ import {
   serviceGroupsSlt,
   groupServicesSlt,
 } from '../../../../../selectors/CSB/instanceService/group'
+import './style/index.less'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -178,6 +179,7 @@ class MyPublishedServiceGroups extends React.Component {
       loadData={this.loadGroupServices.bind(this, record.id)}
       dataSource={currentGroupServices.content}
       loading={currentGroupServices.isFetching}
+      size="small"
     />
   }
 
@@ -265,7 +267,7 @@ class MyPublishedServiceGroups extends React.Component {
           </div>
         }
       </div>,
-      <div key="data-box" className="layout-content-body">
+      <div key="data-box" className="layout-content-body service-groups-body">
         <Card>
           <Table
             columns={columns}
