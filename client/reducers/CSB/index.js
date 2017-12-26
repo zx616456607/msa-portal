@@ -20,6 +20,7 @@ const CSB = (state = {
   availableInstances: {},
   omInstances: {},
   publishedService: {},
+  groupServices: {},
 }, action) => {
   return {
     myApplication: myApplication(state.myApplication, action),

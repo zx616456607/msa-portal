@@ -30,7 +30,7 @@ export const publicInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
+          ids: union(state[key].ids, action.response.result.data.content),
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -63,7 +63,7 @@ export const availableInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
+          ids: union(state[key].ids, action.response.result.data.content),
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -96,7 +96,7 @@ export const omInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
+          ids: union(state[key].ids, action.response.result.data.content),
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
