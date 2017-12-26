@@ -16,7 +16,7 @@ import {
   Row, Col, DatePicker,
 } from 'antd'
 import CreateG2 from '../../../../components/CreateG2'
-import { getInstanceServiceDetail, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
+import { getInstanceServiceOverview, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
 
 const RangePicker = DatePicker.RangePicker
 const Chart = CreateG2(chart => {
@@ -73,6 +73,8 @@ class Statistics extends React.Component {
       { dateTime: '10:09:00', count: 3, monitorType: 'errNum' },
       { dateTime: '10:10:00', count: 2, monitorType: 'errNum' },
     ],
+    callCount: 0,
+    errorCallCount: 0,
     forceFit: true,
     height: 300,
   }
@@ -81,15 +83,31 @@ class Statistics extends React.Component {
     this.loadData()
   }
   loadData = () => {
-    const { serviceId, instanceId, getInstanceServiceDetail } = this.props
-    getInstanceServiceDetail(instanceId, serviceId)
+    const {
+      serviceId,
+      instanceId,
+      getInstanceServiceOverview,
+      getInstanceServiceDetailMap } = this.props
+    getInstanceServiceOverview(instanceId, serviceId)
     getInstanceServiceDetailMap(instanceId, serviceId)
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { isFetching } = nextProps.detailData
+    if (isFetching !== undefined) {
+      if (!isFetching && nextProps.detailData.data) {
+        if (!nextProps.detailData.data[`${nextProps.serviceId}`]) return
+        const { totalCallCount, totalErrorCallCount } = nextProps.detailData.data[`${nextProps.serviceId}`]
+        this.setState({
+          callCount: totalCallCount,
+          errorCallCount: totalErrorCallCount,
+        })
+      }
+    }
+  }
+
   render() {
-    const { detailData, serviceId } = this.props
-    console.log(detailData)
-    const { totalCallCount, totalErrorCallCount } = detailData.data[`${serviceId}`]
+    const { callCount, errorCallCount } = this.state
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -97,14 +115,14 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>累计调用量</div>
               <div>
-                <span>{totalCallCount}</span>
+                <span>{callCount}</span>
                 <span>个</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>累计错误量</div>
               <div className="error-status">
-                <span>{totalErrorCallCount}</span>
+                <span>{errorCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
@@ -158,15 +176,15 @@ class Statistics extends React.Component {
 
 const mapStateToProps = state => {
   const { CSB } = state
-  const data = CSB.serviceDetail.default
-  const dataMap = CSB.serviceDetailMap.default || []
+  const overviewList = CSB.serviceDetail.default
+  // const dataMap = CSB.serviceDetailMap.default.data || []
   return {
-    dataMap,
-    detailData: data || [],
+    // dataMap,
+    detailData: overviewList || [],
   }
 }
 
 export default connect(mapStateToProps, {
-  getInstanceServiceDetail,
+  getInstanceServiceOverview,
   getInstanceServiceDetailMap,
 })(Statistics)

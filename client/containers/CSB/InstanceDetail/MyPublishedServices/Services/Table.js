@@ -140,18 +140,26 @@ class ServicesTable extends React.Component {
     )
   }
 
-  renderServiceStatusUI = (active, accessible, concealed) => {
-    let result
-    if (!concealed) {
-      if (active) {
-        result = <span className="activated"><div className="status-icon"></div>已激活</span>
-      } else {
-        result = <span className="deactivated"><div className="status-icon"></div>已停用</span>
-      }
-    } else {
-      return <span className="cancelled"><div className="status-icon"></div>已注销</span>
+  renderServiceStatusUI = status => {
+    let className = ''
+    let desc = ''
+    switch (status) {
+      case '1':
+        desc = '已激活'
+        className = 'activated'
+        break
+      case '2':
+        desc = '已停用'
+        className = 'deactivated'
+        break
+      case '4':
+        desc = '已注销'
+        className = 'cancelled'
+        break
+      default:
+        break
     }
-    return result
+    return <span className={className}><div className="status-icon"></div>{desc}</span>
   }
 
   searchWithServiceName = value => {
@@ -328,7 +336,7 @@ class ServicesTable extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (text, row) => this.renderServiceStatusUI(row.active, row.concealed),
+        render: (text, row) => this.renderServiceStatusUI(row.status),
       },
       {
         title: '待审批订阅',
@@ -361,7 +369,7 @@ class ServicesTable extends React.Component {
     ]
     const { instanceID } = match.params
     if (from === 'group') {
-      const columnsKeys = [ 'name', 'version', 'status', 'wait', 'time', 'handle' ]
+      const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
       columns.forEach(column => (column.width = `${100 / columns.length}%`))
     }
