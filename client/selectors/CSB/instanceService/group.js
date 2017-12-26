@@ -27,3 +27,18 @@ export const serviceGroupsSlt = createSelector(
     }
   }
 )
+
+const getGroupServices = state => state.CSB && state.CSB.groupServices || {}
+
+export const groupServicesSlt = createSelector(
+  [ getGroupServices, getEntities ],
+  (groupServices, entities) => {
+    const { cbsPublished } = entities
+    Object.keys(groupServices).forEach(groupID => {
+      groupServices[groupID].content = (groupServices[groupID].ids || [])
+        .map(id => cbsPublished[id])
+      delete groupServices[groupID].ids
+    })
+    return groupServices
+  }
+)

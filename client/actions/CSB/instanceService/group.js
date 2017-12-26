@@ -101,3 +101,58 @@ const fetchGetGroups = (instanceID, query = {}) => {
 
 export const getGroups = (instanceID, query) =>
   dispatch => dispatch(fetchGetGroups(instanceID, query))
+
+export const DELETE_CSB_INSTANCE_SERVICE_GROUP_REQUEST = 'DELETE_CSB_INSTANCE_SERVICE_GROUP_REQUEST'
+export const DELETE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS = 'DELETE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS'
+export const DELETE_CSB_INSTANCE_SERVICE_GROUP_FAILURE = 'DELETE_CSB_INSTANCE_SERVICE_GROUP_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchDeleteGroup = (instanceID, groupID) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_CSB_INSTANCE_SERVICE_GROUP_REQUEST,
+        DELETE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS,
+        DELETE_CSB_INSTANCE_SERVICE_GROUP_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/groups/${groupID}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const deleteGroup = (instanceID, groupID) =>
+  dispatch => dispatch(fetchDeleteGroup(instanceID, groupID))
+
+export const GET_CSB_INSTANCE_GROUP_SERVICES_REQUEST = 'GET_CSB_INSTANCE_GROUP_SERVICES_REQUEST'
+export const GET_CSB_INSTANCE_GROUP_SERVICES_SUCCESS = 'GET_CSB_INSTANCE_GROUP_SERVICES_SUCCESS'
+export const GET_CSB_INSTANCE_GROUP_SERVICES_FAILURE = 'GET_CSB_INSTANCE_GROUP_SERVICES_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchGetGroupServices = (instanceID, groupID, query = {}) => {
+  const _query = cloneDeep(query)
+  const { page } = _query
+  if (page !== undefined) {
+    _query.page = page - 1
+  }
+  return {
+    groupID,
+    [CALL_API]: {
+      types: [
+        GET_CSB_INSTANCE_GROUP_SERVICES_REQUEST,
+        GET_CSB_INSTANCE_GROUP_SERVICES_SUCCESS,
+        GET_CSB_INSTANCE_GROUP_SERVICES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/groups/${groupID}/services?${toQuerystring(_query)}`,
+      schema: Schemas.CSB_PUBLISHED_LIST_DATA,
+    },
+  }
+}
+
+export const getGroupServices = (instanceID, groupID, query) =>
+  dispatch => dispatch(fetchGetGroupServices(instanceID, groupID, query))

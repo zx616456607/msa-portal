@@ -26,9 +26,12 @@ import {
   createGroup,
   getGroups,
   updateGroup,
+  getGroupServices,
+  deleteGroup,
 } from '../../../../../actions/CSB/instanceService/group'
 import {
   serviceGroupsSlt,
+  groupServicesSlt,
 } from '../../../../../selectors/CSB/instanceService/group'
 
 const Option = Select.Option
@@ -67,13 +70,24 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
+  toogleServiceGroupStatus = (action, record) => {
+    const self = this
+    confirm({
+      modalTitle: '停止服务组',
+      title: `停止服务组操作将使服务组中的所有服务全部停止。确定停止服务组 ${record.groupName} 吗？`,
+      content: '',
+      onOk() {
+        self.loadData()
+      },
+    })
+  }
+
   deleteServiceGroup = record => {
     const self = this
-    if (record.num > 1) {
+    if (record.servicesCount > 0) {
       return Modal.info({
         title: '删除服务组',
         content: <span>服务组中仍有服务，不能执行删除操作，清空服务组中的服务后，方可执行删除操作</span>,
-        onOk7() { },
       })
     }
     confirm({
@@ -81,7 +95,19 @@ class MyPublishedServiceGroups extends React.Component {
       title: `服务组一旦删除，将不可恢复，请确认是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
       content: '',
       onOk() {
-        self.loadData()
+        return new Promise((resolve, reject) => {
+          const { instanceID, deleteGroup } = self.props
+          deleteGroup(instanceID, record.id).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: '删除服务组成功',
+            })
+            self.loadData()
+          })
+        })
       },
     })
   }
@@ -90,7 +116,8 @@ class MyPublishedServiceGroups extends React.Component {
     const { key } = item
     switch (key) {
       case 'stop':
-        return this.stopServiceGroup(record)
+      case 'start':
+        return this.toogleServiceGroupStatus(key, record)
       case 'delete':
         return this.deleteServiceGroup(record)
       default:
@@ -138,6 +165,22 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
+  loadGroupServices = groupID => {
+    const { instanceID, getGroupServices } = this.props
+    getGroupServices(instanceID, groupID)
+  }
+
+  handleExpandedRowRender = record => {
+    const { groupsServices } = this.props
+    const currentGroupServices = groupsServices[record.id] || {}
+    return <ServicesTable
+      from="group"
+      loadData={this.loadGroupServices.bind(this, record.id)}
+      dataSource={currentGroupServices.content}
+      loading={currentGroupServices.isFetching}
+    />
+  }
+
   render() {
     const { serviceGroups } = this.props
     const { isFetching, content, totalElements, size } = serviceGroups
@@ -170,9 +213,10 @@ class MyPublishedServiceGroups extends React.Component {
         dataIndex: 'handle',
         key: 'handle',
         render: (text, record) => {
-          const menu = <Menu style={{ width: 80 }}
+          const menu = <Menu style={{ width: 88 }}
             onClick={this.serviceGroupMenuClick.bind(this, record)}
           >
+            <Menu.Item key="start">启动</Menu.Item>
             <Menu.Item key="stop">停止</Menu.Item>
             <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
@@ -225,7 +269,7 @@ class MyPublishedServiceGroups extends React.Component {
         <Card>
           <Table
             columns={columns}
-            expandedRowRender={() => <ServicesTable from="group" loadData={() => {}} />}
+            expandedRowRender={this.handleExpandedRowRender}
             dataSource={content}
             loading={isFetching}
             pagination={false}
@@ -255,6 +299,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     instanceID,
     serviceGroups: serviceGroupsSlt(state),
+    groupsServices: groupServicesSlt(state),
   }
 }
 
@@ -262,4 +307,6 @@ export default connect(mapStateToProps, {
   createGroup,
   getGroups,
   updateGroup,
+  getGroupServices,
+  deleteGroup,
 })(MyPublishedServiceGroups)

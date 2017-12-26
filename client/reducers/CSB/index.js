@@ -12,7 +12,7 @@
 import { myApplication } from './myApplication'
 import { publicInstances, availableInstances, omInstances } from './instance'
 import { publishedService, serviceCAL } from './instanceService'
-import { serviceGroups } from './instanceService/group'
+import { serviceGroups, groupServices } from './instanceService/group'
 
 const CSB = (state = {
   myApplication: {},
@@ -29,6 +29,7 @@ const CSB = (state = {
     publishedService: publishedService(state.publishedService, action),
     serviceGroups: serviceGroups(state.serviceGroups, action),
     serviceCAL: serviceCAL(state.serviceCAL, action),
+    groupServices: groupServices(state.groupServices, action),
   }
 }
 

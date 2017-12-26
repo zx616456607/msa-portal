@@ -46,3 +46,35 @@ export const serviceGroups = (state = {}, action) => {
       return state
   }
 }
+
+export const groupServices = (state = {}, action) => {
+  const { groupID, type } = action
+  switch (type) {
+    case ActionTypes.GET_CSB_INSTANCE_GROUP_SERVICES_REQUEST:
+      return {
+        ...state,
+        [groupID]: Object.assign({}, state[groupID], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.GET_CSB_INSTANCE_GROUP_SERVICES_SUCCESS:
+      return {
+        ...state,
+        [groupID]: {
+          isFetching: false,
+          ids: union(state.ids, action.response.result.data.content),
+          totalElements: action.response.result.data.totalElements,
+          size: action.response.result.data.size,
+        },
+      }
+    case ActionTypes.GET_CSB_INSTANCE_GROUP_SERVICES_FAILURE:
+      return {
+        ...state,
+        [groupID]: Object.assign({}, state[groupID], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}

@@ -96,7 +96,7 @@ class CreateServiceGroup extends React.Component {
                 },
               }],
             })(
-              <Input placeholder="自定义服务组名称"/>
+              <Input placeholder="自定义服务组名称" disabled={handle === 'edit'} />
             )
           }
         </FormItem>

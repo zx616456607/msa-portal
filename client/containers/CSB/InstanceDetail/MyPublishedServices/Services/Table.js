@@ -72,6 +72,13 @@ class ServicesTable extends React.Component {
     currentRow: {},
   }
 
+  componentDidMount() {
+    const { from, loadData } = this.props
+    if (from === 'group') {
+      loadData()
+    }
+  }
+
   closeblackAndWhiteModal = () => {
     this.setState({
       blackAndWhiteListModalVisible: false,
