@@ -68,6 +68,7 @@ const callApi = (endpoint, options, schema) => {
             body: text,
           }
         }
+
         if (!response.ok) {
           return Promise.reject(json)
         }

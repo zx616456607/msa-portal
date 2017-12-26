@@ -14,6 +14,8 @@ PAAS_API_PREFIX | `'/api/v2'` | pass api 前缀 |
 PAAS_SPI_PREFIX | `'/spi/v2'` | pass spi 前缀 |
 MSA_API | `'http://192.168.1.58:8000'` | spring cloud api 地址 |
 MSA_API_PREFIX | `'/api/v1'` | pass api 前缀 |
+CSB_API | `'http://192.168.1.58:9090'` | csb api 地址 |
+CSB_API_PREFIX | `'/api/v1'` | pass api 前缀 |
 
 ### 项目结构
 ```
