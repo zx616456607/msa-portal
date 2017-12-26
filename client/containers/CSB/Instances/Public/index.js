@@ -199,7 +199,7 @@ class PublicInstances extends React.Component {
         key: 'handle',
         width: '10%',
         render: (text, record) => {
-          if (record.creator && record.creator.status) {
+          if (record.creator) {
             return <Button
               type="primary"
               onClick={this.openApplyforCSBInstanceModal.bind(this, record)}

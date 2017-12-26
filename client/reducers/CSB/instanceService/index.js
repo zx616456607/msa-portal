@@ -17,14 +17,14 @@ export const publishedService = (state = {}, action) => {
   const { type, query } = action
   const key = getQueryKey(query)
   switch (type) {
-    case ActionTypes.CSB_RELEASE_INSTANCE_REQUEST:
+    case ActionTypes.FETCH_CSB_INSTANCE_REQUEST:
       return {
         ...state,
         [key]: Object.assign({}, state[key], {
           isFetching: true,
         }),
       }
-    case ActionTypes.CSB_RELEASE_INSTANCE_SUCCESS:
+    case ActionTypes.FETCH_CSB_INSTANCE_SUCCESS:
       return {
         ...state,
         [key]: {
@@ -34,7 +34,7 @@ export const publishedService = (state = {}, action) => {
           size: action.response.result.data.size,
         },
       }
-    case ActionTypes.CSB_RELEASE_INSTANCE_FAILURE:
+    case ActionTypes.FETCH_CSB_INSTANCE_FAILURE:
       return {
         ...state,
         [key]: Object.assign({}, state[key], {
@@ -45,28 +45,27 @@ export const publishedService = (state = {}, action) => {
       return state
   }
 }
-export const subscribeService = (state = {}, action) => {
+
+export const serviceCAL = (state = {}, action) => {
   const { type, query } = action
   const key = getQueryKey(query)
   switch (type) {
-    case ActionTypes.CSB_SUBSCRIBE_INSTANCE_REQUEST:
+    case ActionTypes.FETCH_CSB_INSTANCE_SERVICE_ACL_REQUEST:
       return {
         ...state,
         [key]: Object.assign({}, state[key], {
           isFetching: true,
         }),
       }
-    case ActionTypes.CSB_SUBSCRIBE_INSTANCE_SUCCESS:
+    case ActionTypes.FETCH_CSB_INSTANCE_SERVICE_ACL_SUCCESS:
       return {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
-          totalElements: action.response.result.data.totalElements,
-          size: action.response.result.data.size,
+          data: action.response.result,
         },
       }
-    case ActionTypes.CSB_SUBSCRIBE_INSTANCE_FAILURE:
+    case ActionTypes.FETCH_CSB_INSTANCE_SERVICE_ACL_FAILURE:
       return {
         ...state,
         [key]: Object.assign({}, state[key], {

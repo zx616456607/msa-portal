@@ -38,15 +38,19 @@ class MyPublishedServices extends React.Component {
 
   // 加载数据
   loadData = query => {
-    const { getInstanceService, history, match } = this.props
+    const { getInstanceService, history, match, isOff } = this.props
     const { instanceID } = match.params
     const { name } = this.state
-    query = Object.assign({}, location.query, { name }, query)
+    const includeDeleted = isOff
+    query = Object.assign({}, location.query, { name, includeDeleted }, query)
     if (query.name === '') {
       delete query.name
     }
     if (query.page === 1) {
       delete query.page
+    }
+    if (query.includeDeleted === false) {
+      delete query.includeDeleted
     }
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
@@ -61,13 +65,10 @@ class MyPublishedServices extends React.Component {
     history.push(`/csb-instances-available/${instanceID}/publish-service`)
   }
 
-  // 是否显示已注销服务
-  logoutServiceChange = value => {
-    console.log('value=', value)
-  }
-
   render() {
-    const { myPublished } = this.props
+    const { myPublished, match, history, isoff } = this.props
+    console.log(isoff)
+    const { instanceID } = match.params
     const { content, size, isFetching, totalElements } = myPublished
     const paginationProps = {
       simple: true,
@@ -97,7 +98,12 @@ class MyPublishedServices extends React.Component {
       </div>,
       <div key="data-box" className="layout-content-body">
         <Card>
-          <ServicesTable loadData={this.loadData} loading={isFetching} dataSource={content} />
+          <ServicesTable
+            loadData={this.loadData}
+            loading={isFetching}
+            dataSource={content}
+            history={history}
+            instanceId={instanceID} />
         </Card>
       </div>,
     ]

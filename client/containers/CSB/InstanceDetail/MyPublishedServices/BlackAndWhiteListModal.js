@@ -11,6 +11,7 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
   Form, Modal, Row, Col,
@@ -19,6 +20,7 @@ import {
 } from 'antd'
 import './style/BlackAndWhiteListModal.less'
 import cloneDeep from 'lodash/cloneDeep'
+import { getInstanceServiceACL, delInstanceServiceACL } from '../../../../actions/CSB/instanceService'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -41,26 +43,17 @@ class BlackAndWhiteListModal extends React.Component {
   }
 
   componentWillMount() {
-    const { blacklistArray, whitelistArray } = this.state
-    const blacklist = []
-    const whitelist = []
-    blacklistArray.forEach((value, index) => {
-      const item = { index }
-      blacklist.push(item)
-    })
-    whitelistArray.forEach((value, index) => {
-      const item = { index }
-      whitelist.push(item)
-    })
-    this.setState({
-      blacklist,
-      whitelist,
-    })
+    this.loadData()
+  }
+
+  loadData = () => {
+    const { getInstanceServiceACL, instanceId, serviceId } = this.props
+    getInstanceServiceACL(instanceId, serviceId)
   }
 
   addlist = (list, type) => {
     const preList = cloneDeep(list)
-    const preIndex = preList[ preList.length - 1].index
+    const preIndex = preList[preList.length - 1].index
     const item = {
       index: preIndex + 1,
     }
@@ -132,10 +125,10 @@ class BlackAndWhiteListModal extends React.Component {
               message: 'IP地址或者IP网段不能为空',
             }],
           })(
-            <Input placeholder="IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24"/>
+            <Input placeholder="IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24" />
           )
         }
-        <Icon type="delete" onClick={this.deletelist.bind(this, item, list, formProps)}/>
+        <Icon type="delete" onClick={this.deletelist.bind(this, item, list, formProps)} />
       </FormItem>
     })
   }
@@ -162,9 +155,9 @@ class BlackAndWhiteListModal extends React.Component {
           黑名单
           <Tooltip
             title={`IP黑名单支持ip网段添加，例如127.0.0.1/24\n
-例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
-即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
-主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
+            例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
+            即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
+            主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
             placement="top"
           >
             <Icon type="question-circle-o" />
@@ -193,9 +186,9 @@ class BlackAndWhiteListModal extends React.Component {
           白名单
           <Tooltip
             title={`IP白名单支持ip网段添加，例如127.0.0.1/24
-例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
-即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
-主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
+            例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
+            即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
+            主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
             placement="top"
           >
             <Icon type="question-circle-o" />
@@ -247,4 +240,13 @@ class BlackAndWhiteListModal extends React.Component {
   }
 }
 
-export default Form.create()(BlackAndWhiteListModal)
+const mapStateToProps = () => {
+  return {
+    //
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstanceServiceACL,
+  delInstanceServiceACL,
+})(Form.create()(BlackAndWhiteListModal))

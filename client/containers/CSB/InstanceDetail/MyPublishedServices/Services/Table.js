@@ -15,15 +15,40 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import ServiceDetailDock from '../../ServiceDetail/Dock'
 import {
-  Dropdown, Menu, Table, Modal,
+  Dropdown, Menu, Table, Modal, Notification,
 } from 'antd'
 import { formatDate } from '../../../../../common/utils'
 import '../style/MyPublishedServices.less'
 import BlackAndWhiteListModal from '../BlackAndWhiteListModal'
 import confirm from '../../../../../components/Modal/confirm'
-import { getInstanceService } from '../../../../../actions/CSB/instanceService'
+import { PutInstanceService, delInstanceService } from '../../../../../actions/CSB/instanceService'
 
-
+const modalTooptip = [
+  {
+    modalTitle: '注销',
+    title: '注销服务后，不可以对该服务进行变更，启动，停止和订购操作。',
+  }, {
+    modalTitle: '启动服务',
+    title: '您确定要启动这个服务吗？',
+  }, {
+    modalTitle: '停止服务',
+    title: '您确定要停止这个服务吗？',
+  }]
+const resyltMessages = [
+  {
+    message: '启动服务失败',
+  }, {
+    message: '启动服务成功',
+  }, {
+    message: '停止服务失败',
+  }, {
+    message: '停止服务成功',
+  }, {
+    message: '注销服务成功',
+  }, {
+    message: '注销服务成功',
+  },
+]
 class ServicesTable extends React.Component {
   static propTypes = {
     // 获取列表数据的函数
@@ -39,6 +64,8 @@ class ServicesTable extends React.Component {
   }
 
   state = {
+    serviceId: '',
+    instanceId: '',
     confirmLoading: false,
     visible: false,
     blackAndWhiteListModalVisible: false,
@@ -56,7 +83,7 @@ class ServicesTable extends React.Component {
       return Modal.info({
         title: '删除服务组',
         content: <span>服务组中仍有服务，不能执行删除操作，清空服务组中的服务后，方可执行删除操作</span>,
-        onOk7() { },
+        onOk() { },
       })
     }
     confirm({
@@ -77,26 +104,11 @@ class ServicesTable extends React.Component {
     console.log('values=', values)
   }
 
-  // 是否显示已注销服务
-  logoutServiceChange = value => {
-    console.log('value=', value)
-  }
-
-  logoutService = record => {
-    // const self = this
-    confirm({
-      modalTitle: '注销',
-      title: '注销服务后，不可以对该服务进行变更，启动，停止和订购操作。',
-      content: `Tips：对于没有被订阅过的服务，注销后不可见。定注销服务 ${record.name} 吗？确定注销服务 xxx 吗？`,
-      onOk() {
-        // self.loadData()
-      },
-    })
-  }
-
   openBlackAndWhiteListModal = record => {
-    console.log('record=', record)
+    const { instanceId } = this.props
     this.setState({
+      instanceId,
+      serviceId: record.id,
       blackAndWhiteListModalVisible: true,
       confirmLoading: false,
     })
@@ -107,7 +119,10 @@ class ServicesTable extends React.Component {
       onClick={this.serviceMenuClick.bind(this, record)}
     >
       <Menu.Item key="edit">编辑</Menu.Item>
-      <Menu.Item key="start">启动</Menu.Item>
+      {
+        !record.active ? <Menu.Item key="start">启动</Menu.Item> :
+          <Menu.Item key="stop">停止</Menu.Item>
+      }
       <Menu.Item key="list">黑／白名单</Menu.Item>
       <Menu.Item key="logout">注销</Menu.Item>
     </Menu>
@@ -132,16 +147,6 @@ class ServicesTable extends React.Component {
       return <span className="cancelled"><div className="status-icon"></div>已注销</span>
     }
     return result
-    // switch (status) {
-    //   case 1:
-    //     return <span className="activated"><div className="status-icon"></div>已激活</span>
-    //   case 2:
-    //     return <span className="cancelled"><div className="status-icon"></div>已注销</span>
-    //   case 3:
-    //     return <span className="deactivated"><div className="status-icon"></div>已停用</span>
-    //   default:
-    //     return <span>未知</span>
-    // }
   }
 
   searchWithServiceName = value => {
@@ -150,51 +155,129 @@ class ServicesTable extends React.Component {
 
   serviceMenuClick = (record, item) => {
     const { key } = item
-    console.log('record=', record)
-    switch (key) {
-      case 'edit':
-        return console.log('edit')
+    const { history } = this.props
+    if (key === 'list') {
+      return this.openBlackAndWhiteListModal(record)
+    }
+    if (key === 'edit') {
+      return history.push(`/csb-instances-available/63/publish-service?id=${record.id}&model=edit`)
+    }
+    this.serviceOperation(record, key)
+  }
+
+  serviceModals = (record, type) => {
+    let resultMessage
+    switch (type) {
       case 'start':
-        return this.startService(record)
+        resultMessage = {
+          body: {
+            active: 'true',
+          },
+          title: modalTooptip[1].title,
+          content: '',
+          modalTitle: modalTooptip[1].modalTitle,
+        }
+        break
       case 'stop':
-        return this.stopService(record)
-      case 'list':
-        return this.openBlackAndWhiteListModal(record)
+        resultMessage = {
+          body: {
+            active: 'false',
+          },
+          title: modalTooptip[2].title,
+          content: '',
+          modalTitle: modalTooptip[2].modalTitle,
+        }
+        break
       case 'logout':
-        return this.logoutService(record)
+        resultMessage = {
+          body: {
+            concealed: 'true',
+          },
+          title: modalTooptip[0].title,
+          modalTitle: modalTooptip[0].modalTitle,
+          content: `Tips：对于没有被订阅过的服务，注销后不可见。定注销服务 ${record.name} 吗？`,
+        }
+        break
       default:
-        return
+        break
+    }
+    return resultMessage
+  }
+
+  serviceMessages = (type, isError) => {
+    let message
+    switch (type) {
+      case 'start':
+        if (isError) {
+          message = resyltMessages[0].message
+        } else {
+          message = resyltMessages[1].message
+        }
+        return message
+      case 'stop':
+        if (isError) {
+          message = resyltMessages[2].message
+        } else {
+          message = resyltMessages[3].message
+        }
+        return message
+      case 'logout':
+        if (isError) {
+          message = resyltMessages[4].message
+        } else {
+          message = resyltMessages[5].message
+        }
+        return message
+      default:
+        return message
     }
   }
 
-  startService = record => {
-    // const self = this
+  serviceOperation = (record, type) => {
+    const { loadData, instanceId, PutInstanceService, delInstanceService } = this.props
+    const { body, title, content, modalTitle } = this.serviceModals(record, type)
+    const self = this
     confirm({
-      modalTitle: '启动服务',
-      title: '您确定要启动这个服务吗？',
-      content: '',
+      title,
+      content,
+      modalTitle,
       onOk() {
-        console.log('start.record=', record)
-        // self.loadData()
-      },
-    })
-  }
-
-  stopService = record => {
-    // const self = this
-    confirm({
-      modalTitle: '停止服务',
-      title: '您确定要停止发布这个服务吗？',
-      content: '',
-      onOk() {
-        console.log('stop.service.record=', record)
-        // self.loadData()
+        if (type === 'logout') {
+          delInstanceService(instanceId, record.id).then(res => {
+            if (res.error) {
+              Notification.error({
+                message: self.serviceMessages(type, true),
+              })
+              return
+            }
+            if (res.response.result.code === 200) {
+              Notification.success({
+                message: self.serviceMessages(type, false),
+              })
+              loadData()
+            }
+          })
+          return
+        }
+        PutInstanceService(instanceId, record.id, body).then(res => {
+          if (res.error) {
+            Notification.error({
+              message: self.serviceMessages(type, true),
+            })
+            return
+          }
+          if (res.response.result.code === 200) {
+            Notification.success({
+              message: self.serviceMessages(type, false),
+            })
+            loadData()
+          }
+        })
       },
     })
   }
 
   viewServiceDetails = record => {
-    console.log('record=', record)
     this.setState({
       visible: true,
       currentRow: record,
@@ -209,6 +292,7 @@ class ServicesTable extends React.Component {
     } = this.state
     let columns = [
       {
+        id: 'id',
         title: '服务名',
         dataIndex: 'serviceName',
         key: 'serviceName',
@@ -271,11 +355,13 @@ class ServicesTable extends React.Component {
         dataSource={dataSource}
         pagination={false}
         loading={loading}
-        key={row => row.id}
+        rowkey={row => row.id}
       />,
       <div key="modals">
         {
           blackAndWhiteListModalVisible && <BlackAndWhiteListModal
+            instanceId={this.state.instanceId}
+            serviceId={this.state.serviceId}
             closeblackAndWhiteModal={this.closeblackAndWhiteModal.bind(this)}
             callback={this.handleSaveBlackAndWhiteList}
             loading={confirmLoading}
@@ -299,5 +385,6 @@ const mapStateToProps = () => {
 }
 
 export default connect(mapStateToProps, {
-  getInstanceService,
+  delInstanceService,
+  PutInstanceService,
 })(ServicesTable)
