@@ -13,7 +13,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Modal, Form, Input, Button,
+  Modal, Form, Input,
 } from 'antd'
 
 const { TextArea } = Input
@@ -36,10 +36,9 @@ class CreateServiceGroup extends React.Component {
     const { handle } = this.props
     if (handle === 'edit') {
       const { form, initailValue } = this.props
+      const { name, ownerName, ownerEmail, ownerPhone, description } = initailValue
       setTimeout(() => {
-        form.setFieldsValue({
-          tel: initailValue.tel,
-        })
+        form.setFieldsValue({ name, ownerName, ownerEmail, ownerPhone, description })
       }, 200)
     }
   }
@@ -67,18 +66,14 @@ class CreateServiceGroup extends React.Component {
       wrapperCol: { span: 15 },
     }
     return <Modal
-      title="创建服务组"
+      title={`${handle === 'create' ? '创建' : '编辑'}服务组`}
+      wrapClassName="reset-modal-incloud-form"
       visible={true}
       closable={true}
       onCancel={this.handleCancel}
+      onOk={this.handleOk}
       maskClosable={false}
-      wrapClassName="reset-modal-incloud-form"
-      footer={[
-        <Button key="cancel" size="large" onClick={this.handleCancel}>取消</Button>,
-        <Button key="submit" size="large" type="primary" onClick={this.handleOk} loading={loading}>
-          { handle === 'create' ? '创建' : '保存'}
-        </Button>,
-      ]}
+      confirmLoading={loading}
     >
       <Form>
         <FormItem

@@ -25,6 +25,7 @@ import {
 import {
   createGroup,
   getGroups,
+  updateGroup,
 } from '../../../../../actions/CSB/instanceService/group'
 import {
   serviceGroupsSlt,
@@ -109,12 +110,20 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  handleCreateGroup = body => {
-    const { createGroup, instanceID } = this.props
+  handleUpsertGroup = body => {
+    const { createGroup, updateGroup, instanceID } = this.props
+    const { currentHandle, currentRecord } = this.state
+    const isEdit = currentHandle === 'edit'
+    let currentAction
+    if (isEdit) {
+      currentAction = updateGroup(instanceID, currentRecord.id, body)
+    } else {
+      currentAction = createGroup(instanceID, body)
+    }
     this.setState({
       confirmLoading: true,
     })
-    createGroup(instanceID, body).then(res => {
+    currentAction.then(res => {
       this.setState({
         confirmLoading: false,
       })
@@ -122,7 +131,7 @@ class MyPublishedServiceGroups extends React.Component {
         return
       }
       notification.success({
-        message: '创建服务组成功',
+        message: `${isEdit ? '编辑' : '创建'}服务组成功`,
       })
       this.closeCreateServiceGroupModal()
       this.loadData()
@@ -218,7 +227,7 @@ class MyPublishedServiceGroups extends React.Component {
             columns={columns}
             expandedRowRender={() => <ServicesTable from="group" loadData={() => {}} />}
             dataSource={content}
-            loadData={isFetching}
+            loading={isFetching}
             pagination={false}
             rowKey={record => record.id}
             indentSize={0}
@@ -232,7 +241,7 @@ class MyPublishedServiceGroups extends React.Component {
             handle={currentHandle}
             initailValue={currentRecord}
             loading={confirmLoading}
-            callback={this.handleCreateGroup}
+            callback={this.handleUpsertGroup}
           />
         }
       </div>,
@@ -252,4 +261,5 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   createGroup,
   getGroups,
+  updateGroup,
 })(MyPublishedServiceGroups)

@@ -47,6 +47,33 @@ const fetchCreateGroup = (instanceID, body) => {
 export const createGroup = (instanceID, body) =>
   dispatch => dispatch(fetchCreateGroup(instanceID, body))
 
+export const UPDATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST = 'UPDATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST'
+export const UPDATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS = 'UPDATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS'
+export const UPDATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE = 'UPDATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchUpdateGroup = (instanceID, groupID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST,
+        UPDATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS,
+        UPDATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/groups/${groupID}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const updateGroup = (instanceID, groupID, body) =>
+  dispatch => dispatch(fetchUpdateGroup(instanceID, groupID, body))
+
 export const GET_CSB_INSTANCE_SERVICE_GROUPS_REQUEST = 'GET_CSB_INSTANCE_SERVICE_GROUPS_REQUEST'
 export const GET_CSB_INSTANCE_SERVICE_GROUPS_SUCCESS = 'GET_CSB_INSTANCE_SERVICE_GROUPS_SUCCESS'
 export const GET_CSB_INSTANCE_SERVICE_GROUPS_FAILURE = 'GET_CSB_INSTANCE_SERVICE_GROUPS_FAILURE'
