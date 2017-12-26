@@ -35,7 +35,7 @@ export const mySubscribedServices = (state = {}, action) => {
     case ActionTypes.GET_MY_SUBSCRIBED_SERVICE_LIST_FALIURE:
       return {
         ...state,
-        [instanceID]: Object.assgin({}, state[instanceID], {
+        [instanceID]: Object.assign({}, state[instanceID], {
           isFetching: false,
         }),
       }

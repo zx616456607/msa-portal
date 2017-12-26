@@ -35,7 +35,7 @@ export const serviceSubscribeApprove = (state = {}, action) => {
     case ActionTypes.GET_SERVICE_SUBSCRIBE_APPROVE_LIST_FALIURE:
       return {
         ...state,
-        [instanceID]: Object.assgin({}, state[instanceID], {
+        [instanceID]: Object.assign({}, state[instanceID], {
           isFetching: false,
         }),
       }
