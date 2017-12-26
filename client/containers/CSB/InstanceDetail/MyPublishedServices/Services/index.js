@@ -22,6 +22,7 @@ import { toQuerystring } from '../../../../../common/utils'
 import { getInstanceService } from '../../../../../actions/CSB/instanceService'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../../selectors/CSB/instanceService'
+import CreateServiceGroupModal from '../Groups/CreateServiceGroupModal'
 
 const Search = Input.Search
 const { mergeQuery } = getQueryAndFuncs(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
@@ -30,6 +31,7 @@ const publishedSlt = csbInstanceServiceSltMaker(CSB_RELEASE_INSTANCES_SERVICE_FL
 class MyPublishedServices extends React.Component {
   state = {
     name: '',
+    createServiceGroupModalVisible: false,
   }
 
   componentWillMount() {
@@ -42,6 +44,18 @@ class MyPublishedServices extends React.Component {
     if (nextOff !== isOff) {
       this.loadData({ includeDeleted: nextProps.isOff })
     }
+  }
+
+  openCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: true,
+    })
+  }
+
+  closeCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: false,
+    })
   }
 
   // 加载数据
@@ -74,7 +88,7 @@ class MyPublishedServices extends React.Component {
   }
 
   render() {
-    const { myPublished, match, history } = this.props
+    const { myPublished, match, history, instanceID } = this.props
     const { content, size, isFetching, totalElements } = myPublished
     const paginationProps = {
       simple: true,
@@ -82,10 +96,14 @@ class MyPublishedServices extends React.Component {
       total: totalElements,
       current: 1,
     }
+    const { createServiceGroupModalVisible } = this.state
     return [
       <div className="layout-content-btns" key="layout-content-btns">
         <Button onClick={this.goPublishService} type="primary">
           发布服务
+        </Button>
+        <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
+        创建服务组
         </Button>
         <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
         <Search
@@ -111,6 +129,15 @@ class MyPublishedServices extends React.Component {
             history={history}
             match={match} />
         </Card>
+      </div>,
+      <div key="modals">
+        {
+          createServiceGroupModalVisible && <CreateServiceGroupModal
+            closeModalMethod={this.closeCreateServiceGroupModal}
+            handle="create"
+            instanceID={instanceID}
+          />
+        }
       </div>,
     ]
   }

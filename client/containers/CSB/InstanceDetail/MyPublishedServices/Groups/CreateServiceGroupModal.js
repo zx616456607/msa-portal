@@ -12,24 +12,36 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import {
-  Modal, Form, Input,
+  Modal, Form, Input, notification,
 } from 'antd'
+import {
+  createGroup,
+  updateGroup,
+} from '../../../../../actions/CSB/instanceService/group'
 
 const { TextArea } = Input
 
 const FormItem = Form.Item
 
 class CreateServiceGroup extends React.Component {
+  state = {
+    // 确定按钮的 loading 态
+    confirmLoading: false,
+  }
+
   static propTypes = {
     // 关闭 Modal 的函数
     closeModalMethod: PropTypes.func.isRequired,
-    // 点击确定按钮，获取 Modal 输入的值，供父组件调用
-    callback: PropTypes.func.isRequired,
     // 当前进行的操作 create || edit
-    handle: PropTypes.string.isRequired,
-    // 确定按钮的 loading 态
-    loading: PropTypes.bool.isRequired,
+    handle: PropTypes.string,
+    // 编辑时初始值
+    initailValue: PropTypes.object,
+    // 实例 ID
+    instanceID: PropTypes.string.isRequired,
+    // 加载数据
+    loadData: PropTypes.func,
   }
 
   componentDidMount() {
@@ -44,12 +56,38 @@ class CreateServiceGroup extends React.Component {
   }
 
   handleOk = () => {
-    const { form, callback } = this.props
+    const {
+      form, createGroup, updateGroup, instanceID,
+      initailValue, handle, closeModalMethod,
+      loadData,
+    } = this.props
     form.validateFields((errors, values) => {
       if (errors) {
         return
       }
-      callback(values)
+      const isEdit = handle === 'edit'
+      let currentAction
+      if (isEdit) {
+        currentAction = updateGroup(instanceID, initailValue.id, values)
+      } else {
+        currentAction = createGroup(instanceID, values)
+      }
+      this.setState({
+        confirmLoading: true,
+      })
+      currentAction.then(res => {
+        this.setState({
+          confirmLoading: false,
+        })
+        if (res.error) {
+          return
+        }
+        notification.success({
+          message: `${isEdit ? '编辑' : '创建'}服务组成功`,
+        })
+        closeModalMethod()
+        loadData && loadData()
+      })
     })
   }
 
@@ -59,7 +97,8 @@ class CreateServiceGroup extends React.Component {
   }
 
   render() {
-    const { form, loading, handle } = this.props
+    const { form, handle } = this.props
+    const { confirmLoading } = this.state
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -73,7 +112,7 @@ class CreateServiceGroup extends React.Component {
       onCancel={this.handleCancel}
       onOk={this.handleOk}
       maskClosable={false}
-      confirmLoading={loading}
+      confirmLoading={confirmLoading}
     >
       <Form>
         <FormItem
@@ -164,4 +203,13 @@ class CreateServiceGroup extends React.Component {
   }
 }
 
-export default Form.create()(CreateServiceGroup)
+const mapStateToProps = () => {
+  return {
+    //
+  }
+}
+
+export default connect(mapStateToProps, {
+  createGroup,
+  updateGroup,
+})(Form.create()(CreateServiceGroup))

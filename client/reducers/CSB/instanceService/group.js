@@ -10,7 +10,6 @@
  * @author zhangpc
  */
 
-import union from 'lodash/union'
 import * as ActionTypes from '../../../actions/CSB/instanceService/group'
 import { getQueryKey } from '../../../common/utils'
 
@@ -30,7 +29,7 @@ export const serviceGroups = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state[key].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -62,7 +61,7 @@ export const groupServices = (state = {}, action) => {
         ...state,
         [groupID]: {
           isFetching: false,
-          ids: union(state[groupID].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },

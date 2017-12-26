@@ -153,7 +153,7 @@ class PublishService extends React.Component {
   }
 
   render() {
-    const { serviceGroups, form } = this.props
+    const { serviceGroups, form, instanceID } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
     const formItemLayout = {
@@ -168,7 +168,7 @@ class PublishService extends React.Component {
     }
     const fields = form.getFieldsValue()
     const protocol = fields.protocol
-    const serviceProtocols = fields.serviceProtocols || []
+    const serviceProtocol = fields.serviceProtocol || []
     const apiGatewayLimitType = fields.apiGatewayLimitType || API_GATEWAY_LIMIT_TYPES[0].key
     let apiGatewayLimitTypeText
     API_GATEWAY_LIMIT_TYPES.every(type => {
@@ -204,21 +204,25 @@ class PublishService extends React.Component {
                   className={stepOneClassNames}
                   form={form}
                   formItemLayout={formItemLayout}
+                  instanceID={instanceID}
                 />
                 <OpenAgreement
                   className={stepOneClassNames}
                   form={form}
                   formItemLayout={formItemLayout}
                   serviceGroups={content || []}
+                  instanceID={instanceID}
                 />
                 <ParameterSetting
                   className={stepTwoClassNames}
                   form={form}
+                  instanceID={instanceID}
                 />
                 <ServiceControl
                   className={stepThreeClassNames}
                   form={form}
                   formItemLayout={formItemLayout}
+                  instanceID={instanceID}
                 />
               </div>
               <div className="btns">
@@ -405,11 +409,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {
-                        serviceProtocols.map(_protocol =>
-                          <Tag key={_protocol} color="blue">{_protocol}</Tag>
-                        )
-                      }
+                      <Tag key={serviceProtocol} color="blue">{serviceProtocol}</Tag>
                     </div>
                   </Col>
                 </Row>
@@ -426,7 +426,7 @@ class PublishService extends React.Component {
                   </Col>
                 </Row>
                 {
-                  serviceProtocols.indexOf('Restful-API') > -1 &&
+                  serviceProtocol.indexOf('Restful-API') > -1 &&
                   <Row>
                     <Col span={8}>
                       <div className="field-label txt-of-ellipsis">

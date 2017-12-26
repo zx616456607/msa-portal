@@ -306,9 +306,11 @@ class ServicesTable extends React.Component {
       {
         id: 'id',
         title: '服务名',
-        dataIndex: 'serviceName',
-        key: 'serviceName',
-        render: (text, row) => row.name,
+        dataIndex: 'name',
+        key: 'name',
+        render: (text, row) => <a onClick={this.viewServiceDetails.bind(this, row)}>
+          {text}
+        </a>,
       },
       {
         title: '服务版本',
@@ -361,6 +363,7 @@ class ServicesTable extends React.Component {
     if (from === 'group') {
       const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
+      columns.forEach(column => (column.width = `${100 / columns.length}%`))
     }
     const self = this
     return [

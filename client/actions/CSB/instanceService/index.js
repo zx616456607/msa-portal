@@ -224,3 +224,29 @@ const fetchServiceDetailMap = (instanceId, serviceId, query) => {
 export const getInstanceServiceDetailMap = (instanceId, serviceId, query) => dispatch => {
   return dispatch(fetchServiceDetailMap(instanceId, serviceId, query))
 }
+
+export const PING_CSB_INSTANCE_SERVICE_REQUEST = 'PING_CSB_INSTANCE_SERVICE_REQUEST'
+export const PING_CSB_INSTANCE_SERVICE_SUCCESS = 'PING_CSB_INSTANCE_SERVICE_SUCCESS'
+export const PING_CSB_INSTANCE_SERVICE_FAILURE = 'PING_CSB_INSTANCE_SERVICE_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchPingService = (instanceID, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PING_CSB_INSTANCE_SERVICE_REQUEST,
+        PING_CSB_INSTANCE_SERVICE_SUCCESS,
+        PING_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/ping?${toQuerystring(query)}`,
+      options: {
+        method: 'OPTIONS',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const pingService = (instanceID, query) =>
+  dispatch => dispatch(fetchPingService(instanceID, query))

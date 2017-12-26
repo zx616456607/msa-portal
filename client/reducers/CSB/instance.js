@@ -10,7 +10,6 @@
  * @author zhangpc
  */
 
-import union from 'lodash/union'
 import * as ActionTypes from '../../actions/CSB/instance'
 import { getQueryKey } from '../../common/utils'
 
@@ -30,7 +29,7 @@ export const publicInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state[key].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -63,7 +62,7 @@ export const availableInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state[key].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -96,7 +95,7 @@ export const omInstances = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state[key].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },

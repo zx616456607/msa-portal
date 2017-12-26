@@ -11,11 +11,18 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import {
   Form, Input, Radio, Select, Button, Modal,
 } from 'antd'
 import ClassNames from 'classnames'
 import SecurityHeaderModal from './SecurityHeaderModal'
+import {
+  URL_REG,
+} from '../../../../../constants'
+import {
+  pingService,
+} from '../../../../../actions/CSB/instanceService'
 import './style/index.less'
 
 const FormItem = Form.Item
@@ -32,11 +39,28 @@ const ENDPOINT_RESPONSE_TYPE = [
   },
 ]
 
-export default class AccessAgreement extends React.Component {
+class AccessAgreement extends React.Component {
   state = {
     checkWSDLModalVisible: false,
     pingLoading: false,
     securityHeaderModalVisible: false,
+  }
+
+  ping = () => {
+    const { instanceID, pingService, form } = this.props
+    form.validateFields([ 'targetDetail' ], (err, values) => {
+      if (err) {
+        return
+      }
+      this.setState({ pingLoading: true })
+      pingService(instanceID, { url: values.targetDetail }).then(res => {
+        this.setState({ pingLoading: false })
+        console.log(res)
+        if (res.error) {
+          return
+        }
+      })
+    })
   }
 
   render() {
@@ -77,7 +101,10 @@ export default class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('targetDetail', {
                 rules: [{
-                  required: true, message: 'Please input endpoint!',
+                  required: true,
+                  whitespace: true,
+                  pattern: URL_REG,
+                  message: '请填写正确的服务地址',
                 }],
               })(
                 <Input placeholder="请提供接入服务的基础 URL" />
@@ -85,7 +112,7 @@ export default class AccessAgreement extends React.Component {
               <Button
                 className="right-btn"
                 loading={this.state.pingLoading}
-                onClick={() => this.setState({ pingLoading: true })}
+                onClick={this.ping}
               >
               测试连接
               </Button>
@@ -264,3 +291,13 @@ export default class AccessAgreement extends React.Component {
     )
   }
 }
+
+const mapStateToProps = () => {
+  return {
+    //
+  }
+}
+
+export default connect(mapStateToProps, {
+  pingService,
+})(Form.create()(AccessAgreement))

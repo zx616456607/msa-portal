@@ -61,6 +61,7 @@ const callApi = (endpoint, options, schema) => {
     .then(response =>
       response.text().then(text => {
         let json
+        console.log('response', response)
         try {
           json = JSON.parse(text)
         } catch (error) {
