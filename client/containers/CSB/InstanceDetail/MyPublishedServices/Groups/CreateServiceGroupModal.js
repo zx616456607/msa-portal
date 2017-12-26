@@ -25,7 +25,7 @@ const { TextArea } = Input
 
 const FormItem = Form.Item
 
-class CreateServiceGroup extends React.Component {
+class CreateServiceGroupModal extends React.Component {
   state = {
     // 确定按钮的 loading 态
     confirmLoading: false,
@@ -212,4 +212,4 @@ const mapStateToProps = () => {
 export default connect(mapStateToProps, {
   createGroup,
   updateGroup,
-})(Form.create()(CreateServiceGroup))
+})(Form.create()(CreateServiceGroupModal))

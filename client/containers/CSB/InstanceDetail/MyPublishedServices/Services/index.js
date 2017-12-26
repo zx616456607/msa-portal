@@ -146,8 +146,11 @@ class MyPublishedServices extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const { entities } = state
   const { clusters } = entities
+  const { match } = ownProps
+  const { instanceID } = match.params
   return {
     clusters,
+    instanceID,
     myPublished: publishedSlt(state, ownProps),
   }
 }
