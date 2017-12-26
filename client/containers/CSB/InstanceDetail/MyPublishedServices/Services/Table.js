@@ -292,7 +292,7 @@ class ServicesTable extends React.Component {
   }
 
   render() {
-    const { dataSource, loading, from } = this.props
+    const { dataSource, loading, from, size } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -357,13 +357,16 @@ class ServicesTable extends React.Component {
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
     }
     return [
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-        loading={loading}
-        rowkey={row => row.id}
-      />,
+      <div key="table">
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          loading={loading}
+          rowKey={row => row.id}
+          size={size}
+        />
+      </div>,
       <div key="modals">
         {
           blackAndWhiteListModalVisible && <BlackAndWhiteListModal
