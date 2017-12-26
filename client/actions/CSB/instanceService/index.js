@@ -181,7 +181,7 @@ export const FETCH_CSB_SERVICE_DETAIL_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_REQUES
 export const FETCH_CSB_SERVICE_DETAIL_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_SUCCESS'
 export const FETCH_CSB_SERVICE_DETAIL_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_FAILURE'
 
-const fetchServiceDetail = (instanceId, serviceId) => {
+const fetchServiceOverview = (instanceId, serviceId) => {
   return {
     serviceId,
     instanceId,
@@ -197,8 +197,8 @@ const fetchServiceDetail = (instanceId, serviceId) => {
   }
 }
 
-export const getInstanceServiceDetail = (instanceId, serviceId) => dispatch => {
-  return dispatch(fetchServiceDetail(instanceId, serviceId))
+export const getInstanceServiceOverview = (instanceId, serviceId) => dispatch => {
+  return dispatch(fetchServiceOverview(instanceId, serviceId))
 }
 
 export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_REQUEST'
