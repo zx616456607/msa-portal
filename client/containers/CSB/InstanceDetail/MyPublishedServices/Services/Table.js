@@ -261,6 +261,9 @@ class ServicesTable extends React.Component {
                 message: self.serviceMessages(type, false),
               })
               loadData()
+              self.setState({
+                currentRow: dataSource,
+              })
             }
           })
           return

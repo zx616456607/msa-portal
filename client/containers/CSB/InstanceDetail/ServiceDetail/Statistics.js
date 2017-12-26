@@ -86,12 +86,10 @@ class Statistics extends React.Component {
     getInstanceServiceDetailMap(instanceId, serviceId)
   }
 
-  componentDidMount() {
-    const { detailData, serviceId } = this.props
-    console.log(detailData[serviceId])
-  }
-
   render() {
+    const { detailData, serviceId } = this.props
+    console.log(detailData)
+    const { totalCallCount, totalErrorCallCount } = detailData.data[`${serviceId}`]
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -99,14 +97,14 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>累计调用量</div>
               <div>
-                <span>210</span>
+                <span>{totalCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>累计错误量</div>
               <div className="error-status">
-                <span>210</span>
+                <span>{totalErrorCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
@@ -161,7 +159,9 @@ class Statistics extends React.Component {
 const mapStateToProps = state => {
   const { CSB } = state
   const data = CSB.serviceDetail.default
+  const dataMap = CSB.serviceDetailMap.default || []
   return {
+    dataMap,
     detailData: data || [],
   }
 }
