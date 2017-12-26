@@ -143,6 +143,7 @@ docker run --name msa-portal \
            -e CSB_API=http://192.168.1.58:9090 \
            -p 8989:8989 \
            -d msa-portal
+```
 
 ### 调试工具
 * [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
