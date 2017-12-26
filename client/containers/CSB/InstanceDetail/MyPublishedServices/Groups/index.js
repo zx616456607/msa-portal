@@ -140,7 +140,7 @@ class MyPublishedServiceGroups extends React.Component {
   }
 
   handleExpandedRowRender = record => {
-    const { groupsServices } = this.props
+    const { groupsServices, history, match } = this.props
     const currentGroupServices = groupsServices[record.id] || {}
     return <ServicesTable
       from="group"
@@ -148,6 +148,8 @@ class MyPublishedServiceGroups extends React.Component {
       dataSource={currentGroupServices.content}
       loading={currentGroupServices.isFetching}
       size="small"
+      history={history}
+      match={match}
     />
   }
 

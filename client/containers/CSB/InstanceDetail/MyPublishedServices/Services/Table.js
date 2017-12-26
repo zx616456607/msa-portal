@@ -361,7 +361,7 @@ class ServicesTable extends React.Component {
     ]
     const { instanceID } = match.params
     if (from === 'group') {
-      const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
+      const columnsKeys = [ 'name', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
       columns.forEach(column => (column.width = `${100 / columns.length}%`))
     }
