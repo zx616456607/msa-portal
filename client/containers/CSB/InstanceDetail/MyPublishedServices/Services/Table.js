@@ -140,14 +140,15 @@ class ServicesTable extends React.Component {
     )
   }
 
-  renderServiceStatusUI = (active, accessible) => {
+  renderServiceStatusUI = (active, accessible, concealed) => {
     let result
-    if (active) {
-      result = <span className="activated"><div className="status-icon"></div>已激活</span>
+    if (!concealed) {
+      if (active) {
+        result = <span className="activated"><div className="status-icon"></div>已激活</span>
+      } else {
+        result = <span className="deactivated"><div className="status-icon"></div>已停用</span>
+      }
     } else {
-      result = <span className="deactivated"><div className="status-icon"></div>已停用</span>
-    }
-    if (accessible) {
       return <span className="cancelled"><div className="status-icon"></div>已注销</span>
     }
     return result
@@ -238,7 +239,7 @@ class ServicesTable extends React.Component {
   }
 
   serviceOperation = (record, type) => {
-    const { loadData, match, PutInstanceService, delInstanceService } = this.props
+    const { loadData, match, PutInstanceService, delInstanceService, dataSource } = this.props
     const { instanceID } = match.params
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
     const self = this
@@ -276,6 +277,9 @@ class ServicesTable extends React.Component {
               message: self.serviceMessages(type, false),
             })
             loadData()
+            self.setState({
+              currentRow: dataSource,
+            })
           }
         })
       },
@@ -319,7 +323,7 @@ class ServicesTable extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (text, row) => this.renderServiceStatusUI(row.active, row.accessible),
+        render: (text, row) => this.renderServiceStatusUI(row.active, row.concealed),
       },
       {
         title: '待审批订阅',
@@ -355,7 +359,7 @@ class ServicesTable extends React.Component {
       const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
     }
-    console.log(instanceID)
+    const self = this
     return [
       <div key="table">
         <Table
@@ -378,6 +382,7 @@ class ServicesTable extends React.Component {
           />
         }
         <ServiceDetailDock
+          self={self}
           visible={visible}
           onVisibleChange={visible => this.setState({ visible })}
           instanceId={instanceID}

@@ -16,8 +16,7 @@ import {
   Row, Col, DatePicker,
 } from 'antd'
 import CreateG2 from '../../../../components/CreateG2'
-import { getInstanceServiceDetail } from '../../../../actions/CSB/instanceService'
-import { csbInstanceServiceDetailSlt } from '../../../../selectors/CSB/instanceService'
+import { getInstanceServiceDetail, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
 
 const RangePicker = DatePicker.RangePicker
 const Chart = CreateG2(chart => {
@@ -45,7 +44,6 @@ const Chart = CreateG2(chart => {
   })
   chart.render()
 })
-const detailStr = csbInstanceServiceDetailSlt()
 
 class Statistics extends React.Component {
   state = {
@@ -80,15 +78,20 @@ class Statistics extends React.Component {
   }
 
   componentWillMount() {
-    // this.loadData()
+    this.loadData()
   }
   loadData = () => {
     const { serviceId, instanceId, getInstanceServiceDetail } = this.props
     getInstanceServiceDetail(instanceId, serviceId)
+    getInstanceServiceDetailMap(instanceId, serviceId)
+  }
+
+  componentDidMount() {
+    const { detailData, serviceId } = this.props
+    console.log(detailData[serviceId])
   }
 
   render() {
-    // const { detailData } = this.props
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -156,11 +159,14 @@ class Statistics extends React.Component {
 }
 
 const mapStateToProps = state => {
+  const { CSB } = state
+  const data = CSB.serviceDetail.default
   return {
-    detailData: detailStr(state),
+    detailData: data || [],
   }
 }
 
 export default connect(mapStateToProps, {
   getInstanceServiceDetail,
+  getInstanceServiceDetailMap,
 })(Statistics)

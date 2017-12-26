@@ -26,16 +26,29 @@ const TabPane = Tabs.TabPane
 export default class ServiceDetail extends React.Component {
   renderDropdown = () => {
     const menu = (
-      <Menu style={{ width: 109 }}>
+      <Menu onClick={this.handleMenu} style={{ width: 109 }}>
         <Menu.Item key="list">黑／白名单</Menu.Item>
         <Menu.Item key="logout">注销</Menu.Item>
       </Menu>
     )
     return (
-      <Dropdown.Button overlay={menu}>
+      <Dropdown.Button overlay={menu} onClick={this.handleDown}>
         停止服务
       </Dropdown.Button>
     )
+  }
+
+  handleDown = () => {
+    const item = {
+      key: 'stop',
+    }
+    this.handleMenu(item)
+  }
+
+  handleMenu = item => {
+    const { key } = item
+    const { self, detail } = this.props
+    self.serviceOperation(detail, key)
   }
 
   render() {
@@ -91,7 +104,7 @@ export default class ServiceDetail extends React.Component {
               <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />
             </TabPane>
             <TabPane tab="协议信息" key="protocols">
-              <ServiceProtocols />
+              <ServiceProtocols detail={detail}/>
             </TabPane>
             <TabPane tab="参数信息" key="parameters">
               <ServiceParameters />
@@ -105,3 +118,4 @@ export default class ServiceDetail extends React.Component {
     )
   }
 }
+

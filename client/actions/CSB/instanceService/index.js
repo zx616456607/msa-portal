@@ -183,6 +183,8 @@ export const FETCH_CSB_SERVICE_DETAIL_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_FAILUR
 
 const fetchServiceDetail = (instanceId, serviceId) => {
   return {
+    serviceId,
+    instanceId,
     [CALL_API]: {
       types: [
         FETCH_CSB_SERVICE_DETAIL_REQUEST,
@@ -197,4 +199,28 @@ const fetchServiceDetail = (instanceId, serviceId) => {
 
 export const getInstanceServiceDetail = (instanceId, serviceId) => dispatch => {
   return dispatch(fetchServiceDetail(instanceId, serviceId))
+}
+
+export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_REQUEST'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_SUCCESS'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_FAILURE'
+
+const fetchServiceDetailMap = (instanceId, serviceId, query) => {
+  return {
+    serviceId,
+    instanceId,
+    [CALL_API]: {
+      types: [
+        FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST,
+        FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS,
+        FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/datediagram?${toQuerystring(query)}`,
+      schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
+    },
+  }
+}
+
+export const getInstanceServiceDetailMap = (instanceId, serviceId, query) => dispatch => {
+  return dispatch(fetchServiceDetailMap(instanceId, serviceId, query))
 }
