@@ -60,22 +60,9 @@ class Statistics extends React.Component {
   }
 
   componentWillMount() {
+    const { serviceId, instanceId, getInstanceServiceOverview } = this.props
+    getInstanceServiceOverview(instanceId, serviceId)
     this.loadData()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { isFetching } = nextProps.detailData
-    if (!nextProps.dataMap.isFetching) {
-      if (nextProps.dataMap.data) {
-        this.fetchMapList(nextProps.dataMap.data)
-      }
-    }
-    if (isFetching !== undefined) {
-      if (!isFetching && nextProps.detailData.data) {
-        if (!nextProps.detailData.data[`${nextProps.serviceId}`]) return
-        this.fetchDetailList(nextProps.detailData.data, nextProps.serviceId)
-      }
-    }
   }
 
   loadData = () => {
@@ -83,7 +70,6 @@ class Statistics extends React.Component {
     const {
       serviceId,
       instanceId,
-      getInstanceServiceOverview,
       getInstanceServiceDetailMap } = this.props
     const timer = this.filterTimer(rangeDateTime)
     let query = {
@@ -99,7 +85,6 @@ class Statistics extends React.Component {
     if (query.endTime === '') {
       delete query.endTime
     }
-    getInstanceServiceOverview(instanceId, serviceId)
     getInstanceServiceDetailMap(instanceId, serviceId, query)
   }
 
@@ -116,34 +101,25 @@ class Statistics extends React.Component {
     return timer
   }
 
-  fetchDetailList = (data, serviceId) => {
-    const { totalCallCount, totalErrorCallCount } = data[`${serviceId}`]
-    this.setState({
-      callCount: totalCallCount,
-      errorCallCount: totalErrorCallCount,
-    })
-  }
-
   fetchMapList = data => {
+    if (data.length === 0) return
     const curAry = []
-    data.diagramData.forEach(item => {
+    data.forEach(item => {
       const dataAry = {
         count: item.callCount,
         dateTime: formatDate(item.timeStamp),
       }
       curAry.push(dataAry)
     })
-    this.setState({
-      maxTime: data.maxCallTime,
-      minTime: data.minCallTime,
-      averageTime: data.averageCallTime,
-      data: curAry,
-    })
+    return curAry
   }
 
   render() {
-    const { data, averageTime, minTime, maxTime } = this.state
-    const { callCount, errorCallCount, rangeDateTime } = this.state
+    const { rangeDateTime } = this.state
+    const { dataMap, detailData, serviceId } = this.props
+    const { maxCallTime, minCallTime, averageCallTime, diagramData } = dataMap && dataMap.data || {}
+    const { totalCallCount, totalErrorCallCount } = detailData.data && detailData.data[`${serviceId}`] || {}
+    const dataList = this.fetchMapList(diagramData || [])
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -151,14 +127,14 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>累计调用量</div>
               <div>
-                <span>{callCount}</span>
+                <span>{totalCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>累计错误量</div>
               <div className="error-status">
-                <span>{errorCallCount}</span>
+                <span>{totalErrorCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
@@ -177,28 +153,28 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>平均响应时间</div>
               <div>
-                <span>{averageTime}</span>
+                <span>{averageCallTime}</span>
                 <span>ms</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>最小响应时间</div>
               <div>
-                <span>{minTime}</span>
+                <span>{minCallTime}</span>
                 <span>ms</span>
               </div>
             </Col>
             <Col span={5} className="service-statistics-item">
               <div>最大响应时间</div>
               <div>
-                <span>{maxTime}</span>
+                <span>{maxCallTime}</span>
                 <span>ms</span>
               </div>
             </Col>
           </Row>
           <div className="service-detail-body-monitor">
             <Chart
-              data={data}
+              data={dataList}
               height={this.state.height}
               width={100}
               forceFit={this.state.forceFit}
@@ -216,7 +192,7 @@ const mapStateToProps = state => {
   const dataMap = CSB.serviceDetailMap.default
   return {
     dataMap,
-    detailData: overviewList || [],
+    detailData: overviewList || {},
   }
 }
 

@@ -142,7 +142,7 @@ const mapStateToProps = state => {
   const { entities } = state
   const dataList = entities.cbsPublished
   return {
-    detailData: dataList || [],
+    detailData: dataList || {},
   }
 }
 
