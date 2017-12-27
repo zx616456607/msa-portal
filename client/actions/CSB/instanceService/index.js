@@ -228,3 +228,77 @@ const fetchSubscribableServices = (instanceID, query) => {
 
 export const subscribableServices = (instanceID, query) =>
   dispatch => dispatch(fetchSubscribableServices(instanceID, query))
+
+export const FETCH_CSB_SERVICE_OVERVIEW_REQUEST = 'FETCH_CSB_SERVICE_OVERVIEW_REQUEST'
+export const FETCH_CSB_SERVICE_OVERVIEW_SUCCESS = 'FETCH_CSB_SERVICE_OVERVIEW_SUCCESS'
+export const FETCH_CSB_SERVICE_OVERVIEW_FAILURE = 'FETCH_CSB_SERVICE_OVERVIEW_FAILURE'
+
+const fetchServiceOverview = (instanceId, serviceId) => {
+  return {
+    serviceId,
+    instanceId,
+    [CALL_API]: {
+      types: [
+        FETCH_CSB_SERVICE_OVERVIEW_REQUEST,
+        FETCH_CSB_SERVICE_OVERVIEW_SUCCESS,
+        FETCH_CSB_SERVICE_OVERVIEW_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/overview`,
+      schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
+    },
+  }
+}
+
+export const getInstanceServiceOverview = (instanceId, serviceId) => dispatch => {
+  return dispatch(fetchServiceOverview(instanceId, serviceId))
+}
+
+export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE'
+
+const fetchServiceDetailMap = (instanceId, serviceId, query) => {
+  return {
+    serviceId,
+    instanceId,
+    [CALL_API]: {
+      types: [
+        FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST,
+        FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS,
+        FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/datediagram?${toQuerystring(query)}`,
+      schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
+    },
+  }
+}
+
+export const getInstanceServiceDetailMap = (instanceId, serviceId, query) => dispatch => {
+  return dispatch(fetchServiceDetailMap(instanceId, serviceId, query))
+}
+
+export const PING_CSB_INSTANCE_SERVICE_REQUEST = 'PING_CSB_INSTANCE_SERVICE_REQUEST'
+export const PING_CSB_INSTANCE_SERVICE_SUCCESS = 'PING_CSB_INSTANCE_SERVICE_SUCCESS'
+export const PING_CSB_INSTANCE_SERVICE_FAILURE = 'PING_CSB_INSTANCE_SERVICE_FAILURE'
+
+// Create an instance service group
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchPingService = (instanceID, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PING_CSB_INSTANCE_SERVICE_REQUEST,
+        PING_CSB_INSTANCE_SERVICE_SUCCESS,
+        PING_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/ping?${toQuerystring(query)}`,
+      options: {
+        method: 'OPTIONS',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const pingService = (instanceID, query) =>
+  dispatch => dispatch(fetchPingService(instanceID, query))

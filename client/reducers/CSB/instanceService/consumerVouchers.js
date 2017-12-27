@@ -35,7 +35,7 @@ export const consumerVouchers = (state = {}, action) => {
     case ActionTypes.GET_CONSUMER_VOUCHERS_LIST_FAILUER:
       return {
         ...state,
-        [instanceID]: Object.assgin({}, state[instanceID], {
+        [instanceID]: Object.assign({}, state[instanceID], {
           isFetching: false,
         }),
       }

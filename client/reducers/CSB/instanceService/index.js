@@ -9,7 +9,6 @@
  * 2017-12-22
  * @author zhaoyb
  */
-import union from 'lodash/union'
 import * as ActionTypes from '../../../actions/CSB/instanceService'
 import { getQueryKey } from '../../../common/utils'
 
@@ -29,7 +28,7 @@ export const publishedService = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
@@ -91,14 +90,14 @@ export const subscribableServices = (state = {}, action) => {
     case ActionTypes.SUBSCRIBEABLE_SERVICES_SUCCESS:
       return {
         ...state,
-        [key]: {
+        [key]: Object.assign({}, state[key], {
           isFetching: false,
-          ids: union(state[key].ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
-        },
+        }),
       }
-    case ActionTypes.SUBSCRIBEABLE_SERVICES_FAILURE:
+    case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_FAILURE:
       return {
         ...state,
         [key]: Object.assign({}, state[key], {
@@ -109,3 +108,67 @@ export const subscribableServices = (state = {}, action) => {
       return state
   }
 }
+
+
+export const serviceOverview = (state = {}, action) => {
+  const { type, query } = action
+  const key = getQueryKey(query)
+  switch (type) {
+    case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_REQUEST:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_SUCCESS:
+      return {
+        ...state,
+        [key]: {
+          isFetching: false,
+          data: action.response.result.data,
+        },
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_FAILURE:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}
+
+export const serviceDetailMap = (state = {}, action) => {
+  const { type, query } = action
+  const key = getQueryKey(query)
+  switch (type) {
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS:
+      return {
+        ...state,
+        [key]: {
+          isFetching: false,
+          data: action.response.result.data,
+        },
+      }
+    case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}
+

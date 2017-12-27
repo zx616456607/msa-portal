@@ -12,13 +12,13 @@
 
 import React from 'react'
 import {
-  Form, Input, Select, Checkbox, Switch,
+  Form, Input, Select, Radio, Switch,
 } from 'antd'
 import ClassNames from 'classnames'
 import './style/OpenAgreement.less'
 
 const FormItem = Form.Item
-const CheckboxGroup = Checkbox.Group
+const RadioGroup = Radio.Group
 const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
@@ -39,7 +39,7 @@ export default class OpenAgreement extends React.Component {
     } else {
       openUrlBefore += '<服务版本>/'
     }
-    const serviceProtocols = getFieldValue('serviceProtocols') || []
+    const serviceProtocol = getFieldValue('serviceProtocol') || []
     const classNames = ClassNames({
       'open-agreement': true,
       [className]: !!className,
@@ -116,18 +116,17 @@ export default class OpenAgreement extends React.Component {
           label="选择服务开放接口"
           className="service-protocols"
         >
-          {getFieldDecorator('serviceProtocols', {
-            initialValue: [],
+          {getFieldDecorator('serviceProtocol', {
+            initialValue: 'Restful-API',
             rules: [{
-              required: true, message: 'Please check protocols!',
+              required: true,
+              message: 'Please select protocols!',
             }],
           })(
-            <CheckboxGroup
-              options={[
-                { label: 'Restful-API', value: 'Restful-API' },
-                { label: 'WebService', value: 'WebService', disabled: true },
-              ]}
-            />
+            <RadioGroup>
+              <Radio value="Restful-API">Restful-API</Radio>
+              <Radio value="WebService" disabled>WebService</Radio>
+            </RadioGroup>
           )}
         </FormItem>
         <FormItem
@@ -143,7 +142,7 @@ export default class OpenAgreement extends React.Component {
           <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
         {
-          serviceProtocols.indexOf('Restful-API') > -1 &&
+          serviceProtocol === 'Restful-API' &&
           <FormItem
             {...formItemLayout}
             label="Restful Path"

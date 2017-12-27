@@ -23,9 +23,7 @@ import {
   formatDate,
 } from '../../../../../common/utils'
 import {
-  createGroup,
   getGroups,
-  updateGroup,
   getGroupServices,
   deleteGroup,
 } from '../../../../../actions/CSB/instanceService/group'
@@ -42,7 +40,6 @@ class MyPublishedServiceGroups extends React.Component {
   state = {
     currentHandle: undefined,
     currentRecord: {},
-    confirmLoading: false,
     createServiceGroupModalVisible: false,
     searchType: 'group-name',
   }
@@ -61,7 +58,6 @@ class MyPublishedServiceGroups extends React.Component {
       createServiceGroupModalVisible: true,
       currentHandle,
       currentRecord,
-      confirmLoading: false,
     })
   }
 
@@ -138,41 +134,13 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  handleUpsertGroup = body => {
-    const { createGroup, updateGroup, instanceID } = this.props
-    const { currentHandle, currentRecord } = this.state
-    const isEdit = currentHandle === 'edit'
-    let currentAction
-    if (isEdit) {
-      currentAction = updateGroup(instanceID, currentRecord.id, body)
-    } else {
-      currentAction = createGroup(instanceID, body)
-    }
-    this.setState({
-      confirmLoading: true,
-    })
-    currentAction.then(res => {
-      this.setState({
-        confirmLoading: false,
-      })
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: `${isEdit ? '编辑' : '创建'}服务组成功`,
-      })
-      this.closeCreateServiceGroupModal()
-      this.loadData()
-    })
-  }
-
   loadGroupServices = groupID => {
     const { instanceID, getGroupServices } = this.props
     getGroupServices(instanceID, groupID)
   }
 
   handleExpandedRowRender = record => {
-    const { groupsServices } = this.props
+    const { groupsServices, history, match } = this.props
     const currentGroupServices = groupsServices[record.id] || {}
     return <ServicesTable
       from="group"
@@ -180,15 +148,16 @@ class MyPublishedServiceGroups extends React.Component {
       dataSource={currentGroupServices.content}
       loading={currentGroupServices.isFetching}
       size="small"
+      history={history}
+      match={match}
     />
   }
 
   render() {
-    const { serviceGroups } = this.props
+    const { serviceGroups, instanceID } = this.props
     const { isFetching, content, totalElements, size } = serviceGroups
     const {
       createServiceGroupModalVisible, currentHandle, currentRecord,
-      confirmLoading,
     } = this.state
     const columns = [
       { title: '服务组名', dataIndex: 'name', key: 'name' },
@@ -286,8 +255,8 @@ class MyPublishedServiceGroups extends React.Component {
             closeModalMethod={this.closeCreateServiceGroupModal}
             handle={currentHandle}
             initailValue={currentRecord}
-            loading={confirmLoading}
-            callback={this.handleUpsertGroup}
+            loadData={this.loadData}
+            instanceID={instanceID}
           />
         }
       </div>,
@@ -306,9 +275,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export default connect(mapStateToProps, {
-  createGroup,
   getGroups,
-  updateGroup,
   getGroupServices,
   deleteGroup,
 })(MyPublishedServiceGroups)

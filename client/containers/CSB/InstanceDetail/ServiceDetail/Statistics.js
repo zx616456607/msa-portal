@@ -11,12 +11,14 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import {
-  Row, Col, DatePicker,
+  Row, Col,
 } from 'antd'
 import CreateG2 from '../../../../components/CreateG2'
+import ApmTimePicker from '../../../../components/ApmTimePicker'
+import { getInstanceServiceOverview, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
 
-const RangePicker = DatePicker.RangePicker
 const Chart = CreateG2(chart => {
   chart.col('dateTime', {
     alias: '时间',
@@ -43,7 +45,7 @@ const Chart = CreateG2(chart => {
   chart.render()
 })
 
-export default class Statistics extends React.Component {
+class Statistics extends React.Component {
   state = {
     data: [
       { dateTime: '09:59:00', count: 12, monitorType: 'qps' },
@@ -71,11 +73,59 @@ export default class Statistics extends React.Component {
       { dateTime: '10:09:00', count: 3, monitorType: 'errNum' },
       { dateTime: '10:10:00', count: 2, monitorType: 'errNum' },
     ],
+    callCount: 0,
+    errorCallCount: 0,
     forceFit: true,
     height: 300,
+    rangeDateTime: [],
+  }
+
+  componentWillMount() {
+    this.loadData()
+  }
+
+  loadData = () => {
+    const { rangeDateTime } = this.state
+    const {
+      serviceId,
+      instanceId,
+      getInstanceServiceOverview,
+      getInstanceServiceDetailMap } = this.props
+    let query = {
+      period: '16',
+      startTime: rangeDateTime.length > 0 ?
+        rangeDateTime[0].toISOString() : new Date().toISOString(),
+      endTime: rangeDateTime.length > 0 ?
+        rangeDateTime[1].toISOString() : new Date(new Date() - 300 * 1000).toISOString(),
+    }
+    query = Object.assign({}, query)
+    if (query.startTime === '') {
+      delete query.startTime
+      delete query.period
+    }
+    if (query.endTime === '') {
+      delete query.endTime
+    }
+    getInstanceServiceOverview(instanceId, serviceId)
+    getInstanceServiceDetailMap(instanceId, serviceId, query)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { isFetching } = nextProps.detailData
+    if (isFetching !== undefined) {
+      if (!isFetching && nextProps.detailData.data) {
+        if (!nextProps.detailData.data[`${nextProps.serviceId}`]) return
+        const { totalCallCount, totalErrorCallCount } = nextProps.detailData.data[`${nextProps.serviceId}`]
+        this.setState({
+          callCount: totalCallCount,
+          errorCallCount: totalErrorCallCount,
+        })
+      }
+    }
   }
 
   render() {
+    const { callCount, errorCallCount, rangeDateTime } = this.state
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -83,25 +133,25 @@ export default class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>累计调用量</div>
               <div>
-                <span>210</span>
+                <span>{callCount}</span>
                 <span>个</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>累计错误量</div>
               <div className="error-status">
-                <span>210</span>
+                <span>{errorCallCount}</span>
                 <span>个</span>
               </div>
             </Col>
           </Row>
           <Row className="service-statistics-and-monitor">
-            <Col span={12}>服务响应 & 调用监控趋势</Col>
-            <Col span={12}>
-              <RangePicker
-                showTime
-                size="small"
-                format="YYYY-MM-DD HH:mm:ss"
+            <Col span={11}>服务响应 & 调用监控趋势</Col>
+            <Col span={13}>
+              <ApmTimePicker
+                value={rangeDateTime}
+                onChange={rangeDateTime => this.setState({ rangeDateTime })}
+                onOk={this.loadData}
               />
             </Col>
           </Row>
@@ -141,3 +191,17 @@ export default class Statistics extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { CSB } = state
+  const overviewList = CSB.serviceOverview.default
+  return {
+    // dataMap,
+    detailData: overviewList || [],
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstanceServiceOverview,
+  getInstanceServiceDetailMap,
+})(Statistics)

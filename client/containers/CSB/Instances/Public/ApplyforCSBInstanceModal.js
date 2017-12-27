@@ -153,7 +153,7 @@ class ApplyforCSBInstanceModal extends React.Component {
           <div className="check">
             <Icon type="check-circle-o" />
             <div className="desc">申请操作成功，待审批</div>
-            <div>实例名称  {currentRecord.name}</div>
+            <div>实例名称：{currentRecord.name}</div>
           </div>
       }
     </Modal>

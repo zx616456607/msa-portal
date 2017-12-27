@@ -32,7 +32,15 @@ class MyPublishedServices extends React.Component {
 
   // 是否显示已注销服务
   logoutServiceChange = value => {
-    return value
+    if (value.target.value === 'group') {
+      this.setState({
+        isOff: true,
+      })
+    } else {
+      this.setState({
+        isOff: false,
+      })
+    }
   }
 
   renderDifferentTable = () => {

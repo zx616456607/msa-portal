@@ -103,6 +103,11 @@ const csbInstanceServiceACLSchema = new schema.Entity('csbInstanceServiceACL', {
   idAttribute: 'id',
 })
 
+// CSB InstanceService Detail
+const csbInstanceServiceDetailSchema = new schema.Entity('csbInstanceServiceDetail', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -191,6 +196,11 @@ export const Schemas = {
   CSB_INSTANCE_SERVICE_ACL_LIST_DATA: {
     data: {
       content: [ csbInstanceServiceACLSchema ],
+    },
+  },
+  CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA: {
+    data: {
+      content: [ csbInstanceServiceDetailSchema ],
     },
   },
   CSB_INSTANCE_CONSUMER_VOUCHER_LIST_DATA: {

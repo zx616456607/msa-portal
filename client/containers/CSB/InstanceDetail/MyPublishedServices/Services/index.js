@@ -22,6 +22,7 @@ import { toQuerystring } from '../../../../../common/utils'
 import { getInstanceService } from '../../../../../actions/CSB/instanceService'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../../selectors/CSB/instanceService'
+import CreateServiceGroupModal from '../Groups/CreateServiceGroupModal'
 
 const Search = Input.Search
 const { mergeQuery } = getQueryAndFuncs(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
@@ -30,10 +31,31 @@ const publishedSlt = csbInstanceServiceSltMaker(CSB_RELEASE_INSTANCES_SERVICE_FL
 class MyPublishedServices extends React.Component {
   state = {
     name: '',
+    createServiceGroupModalVisible: false,
   }
 
   componentWillMount() {
     this.loadData()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { isOff } = this.props
+    const nextOff = nextProps.isOff
+    if (nextOff !== isOff) {
+      this.loadData({ includeDeleted: nextProps.isOff })
+    }
+  }
+
+  openCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: true,
+    })
+  }
+
+  closeCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: false,
+    })
   }
 
   // 加载数据
@@ -66,9 +88,7 @@ class MyPublishedServices extends React.Component {
   }
 
   render() {
-    const { myPublished, match, history, isoff } = this.props
-    console.log(isoff)
-    const { instanceID } = match.params
+    const { myPublished, match, history, instanceID } = this.props
     const { content, size, isFetching, totalElements } = myPublished
     const paginationProps = {
       simple: true,
@@ -76,10 +96,14 @@ class MyPublishedServices extends React.Component {
       total: totalElements,
       current: 1,
     }
+    const { createServiceGroupModalVisible } = this.state
     return [
       <div className="layout-content-btns" key="layout-content-btns">
         <Button onClick={this.goPublishService} type="primary">
           发布服务
+        </Button>
+        <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
+        创建服务组
         </Button>
         <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
         <Search
@@ -103,8 +127,17 @@ class MyPublishedServices extends React.Component {
             loading={isFetching}
             dataSource={content}
             history={history}
-            instanceId={instanceID} />
+            match={match} />
         </Card>
+      </div>,
+      <div key="modals">
+        {
+          createServiceGroupModalVisible && <CreateServiceGroupModal
+            closeModalMethod={this.closeCreateServiceGroupModal}
+            handle="create"
+            instanceID={instanceID}
+          />
+        }
       </div>,
     ]
   }
@@ -113,8 +146,11 @@ class MyPublishedServices extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const { entities } = state
   const { clusters } = entities
+  const { match } = ownProps
+  const { instanceID } = match.params
   return {
     clusters,
+    instanceID,
     myPublished: publishedSlt(state, ownProps),
   }
 }
