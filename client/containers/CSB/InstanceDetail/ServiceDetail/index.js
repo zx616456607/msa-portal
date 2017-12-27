@@ -11,6 +11,7 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import {
   Menu, Dropdown, Row, Col, Tabs,
 } from 'antd'
@@ -23,7 +24,21 @@ import './style/index.less'
 
 const TabPane = Tabs.TabPane
 
-export default class ServiceDetail extends React.Component {
+class ServiceDetail extends React.Component {
+
+  state = {
+    serviceId: '',
+    statusState: 0,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { serviceId } = this.state
+    const serviceList = nextProps.detailData[`${serviceId}`]
+    this.setState({
+      statusState: serviceList.status,
+    })
+  }
+
   renderDropdown = () => {
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
@@ -47,11 +62,15 @@ export default class ServiceDetail extends React.Component {
 
   handleMenu = item => {
     const { key } = item
-    const { self, detail } = this.props
-    self.serviceOperation(detail, key)
+    const { callback, detail } = this.props
+    this.setState({
+      serviceId: detail.id,
+    })
+    callback(detail, key)
   }
 
   render() {
+    const { statusState } = this.state
     const { detail, instanceId, renderServiceStatusUI } = this.props
     return (
       <div className="service-detail">
@@ -69,7 +88,7 @@ export default class ServiceDetail extends React.Component {
               <Col span={6}>
                 <div className="txt-of-ellipsis">
                   运行状态：
-                  {renderServiceStatusUI(detail.active, detail.accessible)}
+                  {renderServiceStatusUI(statusState > 0 ? statusState : detail.status)}
                 </div>
               </Col>
               <Col span={14}>
@@ -104,7 +123,7 @@ export default class ServiceDetail extends React.Component {
               <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />
             </TabPane>
             <TabPane tab="协议信息" key="protocols">
-              <ServiceProtocols detail={detail}/>
+              <ServiceProtocols detail={detail} />
             </TabPane>
             <TabPane tab="参数信息" key="parameters">
               <ServiceParameters />
@@ -118,4 +137,15 @@ export default class ServiceDetail extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  const { entities } = state
+  const dataList = entities.cbsPublished
+  return {
+    detailData: dataList || [],
+  }
+}
+
+export default connect(mapStateToProps, {
+})(ServiceDetail)
 

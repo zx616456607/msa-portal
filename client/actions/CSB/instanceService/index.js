@@ -177,9 +177,9 @@ export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
   return dispatch(rmInstanceServiceACL(instanceId, serviceId))
 }
 
-export const FETCH_CSB_SERVICE_DETAIL_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_REQUEST'
-export const FETCH_CSB_SERVICE_DETAIL_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_SUCCESS'
-export const FETCH_CSB_SERVICE_DETAIL_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_FAILURE'
+export const FETCH_CSB_SERVICE_OVERVIEW_REQUEST = 'FETCH_CSB_SERVICE_OVERVIEW_REQUEST'
+export const FETCH_CSB_SERVICE_OVERVIEW_SUCCESS = 'FETCH_CSB_SERVICE_OVERVIEW_SUCCESS'
+export const FETCH_CSB_SERVICE_OVERVIEW_FAILURE = 'FETCH_CSB_SERVICE_OVERVIEW_FAILURE'
 
 const fetchServiceOverview = (instanceId, serviceId) => {
   return {
@@ -187,9 +187,9 @@ const fetchServiceOverview = (instanceId, serviceId) => {
     instanceId,
     [CALL_API]: {
       types: [
-        FETCH_CSB_SERVICE_DETAIL_REQUEST,
-        FETCH_CSB_SERVICE_DETAIL_SUCCESS,
-        FETCH_CSB_SERVICE_DETAIL_FAILURE,
+        FETCH_CSB_SERVICE_OVERVIEW_REQUEST,
+        FETCH_CSB_SERVICE_OVERVIEW_SUCCESS,
+        FETCH_CSB_SERVICE_OVERVIEW_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/overview`,
       schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
@@ -201,9 +201,9 @@ export const getInstanceServiceOverview = (instanceId, serviceId) => dispatch =>
   return dispatch(fetchServiceOverview(instanceId, serviceId))
 }
 
-export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_REQUEST'
-export const FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_SUCCESS'
-export const FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_FAILURE'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS = 'FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS'
+export const FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE = 'FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE'
 
 const fetchServiceDetailMap = (instanceId, serviceId, query) => {
   return {
