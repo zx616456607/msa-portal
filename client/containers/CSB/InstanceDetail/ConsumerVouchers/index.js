@@ -15,22 +15,24 @@ import QueueAnim from 'rc-queue-anim'
 import {
   Button, Icon, Input, Pagination,
   Dropdown, Table, Card, Menu, Modal,
-  Row, Col, Radio, Tooltip, Popover,
+  Row, Col, Tooltip, Popover,
   Form, notification,
 } from 'antd'
 import './style/index.less'
 import {
   createConsumerVoucher,
   getConsumerVouchersList,
+  triggerUpdateConsumerVoucher,
+  confirmUpdateConsumerVoucher,
 } from '../../../../actions/CSB/instanceService/consumerVouchers'
 import { connect } from 'react-redux'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
 import { formatDate } from '../../../../common/utils'
 import confirm from '../../../../components/Modal/confirm'
+import UpdateConsumerVoucher from './UpdateConsumerVoncher'
 
 const Search = Input.Search
-const { TextArea } = Input
-const RadioGroup = Radio.Group
 const FormItem = Form.Item
 
 class ConsumerVouchers extends React.Component {
@@ -43,10 +45,10 @@ class ConsumerVouchers extends React.Component {
     delValue: '',
     icoTip: false,
     copyStatus: false,
-    upVisible: false,
     addVisible: false,
     confirmLoading: false,
     currentConsumerVoucher: {},
+    updateVisible: false,
   }
 
   componentWillMount() {
@@ -65,9 +67,11 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
-  loadData = () => {
+  loadData = (query = {}) => {
     const { getConsumerVouchersList, instanceID } = this.props
-    getConsumerVouchersList(instanceID)
+    const { name } = this.state
+    query = Object.assign({}, { name }, query)
+    getConsumerVouchersList(instanceID, query)
   }
 
   handleAdd = () => {
@@ -105,6 +109,46 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
+  closeUpdateModal = () => {
+    this.setState({
+      updateVisible: false,
+    })
+  }
+
+  confirmUpdateConsumeVoucher = record => {
+    console.log('record= ', record)
+    const { confirmUpdateConsumerVoucher, instanceID } = this.props
+    const { currentConsumerVoucher } = this.state
+    const { id } = currentConsumerVoucher
+    confirmUpdateConsumerVoucher(instanceID, id).then(res => {
+      console.log('res=', res)
+      if (res.error) return
+    })
+  }
+
+  triggerUpdateConsumeVoucher = values => {
+    const { triggerUpdateConsumerVoucher, instanceID } = this.props
+    const { currentConsumerVoucher } = this.state
+    const { id } = currentConsumerVoucher
+    const { updateSetting, delayTime } = values
+    let body = {}
+    if (updateSetting === 'delay') {
+      const nowTime = new Date()
+      const sec = nowTime.getTime() + delayTime * 60 * 1000
+      const expireAt = new Date(sec).toISOString()
+      body = Object.assign({}, body, { expireAt })
+    }
+    triggerUpdateConsumerVoucher(instanceID, id, body).then(res => {
+      console.log('res= ', res)
+      if (res.error) return
+
+    })
+  }
+
+  updateConsumeVocuher = values => {
+    console.log('values=', values)
+  }
+
   handleOK = () => {
     const { isAdd } = this.state
     const { form, instanceID } = this.props
@@ -135,7 +179,7 @@ class ConsumerVouchers extends React.Component {
     switch (key) {
       case 'update':
         return this.setState({
-          upVisible: true,
+          updateVisible: true,
         })
       case 'delete':
         return this.confirmDeleteConsumerVoucher()
@@ -144,72 +188,70 @@ class ConsumerVouchers extends React.Component {
     }
   }
 
-  handleUpCancel = () => {
+  handleIco = (value, currentConsumerVoucher) => {
     this.setState({
-      upVisible: false,
+      currentConsumerVoucher,
+      icoTip: value === 'plus',
     })
   }
 
-  handleIco = value => {
-    if (value === 'minus') {
-      this.setState({
-        icoTip: false,
-      })
-    } if (value === 'plus') {
-      this.setState({
-        icoTip: true,
-      })
-    }
-  }
-
-  servercopyCode = () => {
-    const code = document.getElementById(this.state.inputID)
-    code.select()
-    document.execCommand('Copy', false)
-    this.setState({
-      copyStatus: true,
-    })
+  copyKey = () => {
+    this.setState({ copyStatus: true })
+    setTimeout(() => {
+      this.setState({ copyStatus: false })
+    }, 1000)
   }
 
   filterAs = record => {
-    const { copyStatus, icoTip } = this.state
+    const { copyStatus, icoTip, currentConsumerVoucher } = this.state
     return (
-      <div>
-        <span>{record.clientId} / {record.secret}</span>
-        <Popover
-          placement="right"
-          trigger="click"
-          content={
-            <div>
+      <Row>
+        <Col span={10} className="text">{record.clientId}</Col>
+        <Col span={2}>/</Col>
+        <Col span={10} className="text">{record.secret}</Col>
+        <Col span={2} className="spread-icon">
+          <Popover
+            placement="right"
+            trigger="click"
+            arrowPointAtCenter={true}
+            overlayClassName="keys-popover"
+            content={
               <div>
-                <span style={{ color: '#2db7f5' }}> ak:{record.clientId}</span>
-                <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-                  <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
-                </Tooltip>
+                <div>
+                  <span className="key-value">ak:{record.clientId}</span>
+                  <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+                    <CopyToClipboard text={record.clientId} onCopy={() => this.copyKey()} >
+                      <Icon type="copy"/>
+                    </CopyToClipboard>
+                  </Tooltip>
+                </div>
+                <div>
+                  <span className="key-value">sk:{record.secret}</span>
+                  <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+                    <CopyToClipboard text={record.secret} onCopy={() => this.copyKey()} >
+                      <Icon type="copy"/>
+                    </CopyToClipboard>
+                  </Tooltip>
+                </div>
               </div>
-              <div>
-                <span style={{ color: '#2db7f5' }}> sk:{record.secret}</span>
-                <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-                  <Icon type="copy" onClick={this.servercopyCode} style={{ color: '#2db7f5' }} />
-                </Tooltip>
-              </div>
-            </div>
-          }
-          arrowPointAtCenter={true}
-        >
-          {
-            icoTip ? <Icon type="minus-square-o" onClick={() => this.handleIco('minus')} /> :
-              <Icon type="plus-square-o" onClick={() => this.handleIco('plus')} />
-          }
-        </Popover>
-      </div>
+            }
+          >
+            {
+              icoTip && currentConsumerVoucher.id === record.id
+                ? <Icon type="minus-square-o" onClick={() => this.handleIco('minus', record)}/>
+                : <Icon type="plus-square-o" onClick={() => this.handleIco('plus', record)}/>
+            }
+          </Popover>
+        </Col>
+      </Row>
     )
   }
 
   render() {
     const {
       addVisible, isAdd, title,
-      upVisible, name,
+      name, updateVisible, currentConsumerVoucher,
+      confirmLoading,
     } = this.state
     const { form, consumeVoucherList } = this.props
     const { content, size, isFetching, totalElements } = consumeVoucherList
@@ -219,30 +261,34 @@ class ConsumerVouchers extends React.Component {
       wrapperCol: { span: 15 },
     }
     const columns = [{
-      id: 'id',
       title: '凭证名称',
-      width: '16%',
+      width: '12%',
       dataIndex: 'name',
     }, {
       title: 'AccessKey / SecretKey',
-      key: 'clientId',
       dataIndex: 'clientId',
-      width: '20%',
+      width: '12%',
+      className: 'keys',
+      render: (text, record) => this.filterAs(record),
+    }, {
+      title: '新 AccessKey / SecretKey',
+      dataIndex: 'secret',
+      width: '12%',
+      className: 'keys',
       render: (text, record) => this.filterAs(record),
     }, {
       title: '订阅服务（个）',
-      width: '16%',
-      dataIndex: 'service',
+      width: '10%',
+      dataIndex: 'subscribedCount',
     }, {
       title: '创建时间',
-      key: 'creationTime',
       dataIndex: 'creationTime',
-      width: '16%',
+      width: '19%',
       render: creationTime => formatDate(creationTime),
     }, {
       title: '更新时间',
       dataIndex: 'utime',
-      width: '16%',
+      width: '19%',
     }, {
       title: '操作',
       dataIndex: 'operation',
@@ -278,12 +324,13 @@ class ConsumerVouchers extends React.Component {
               style={{ width: 200 }}
               onChange={e => this.setState({ name: e.target.value })}
               value={name}
+              // onSearch={() => this.loadData()}
             />
           </div>
-          <div className="topRigth" type="card">
-            <span>共计0条</span>
+          {totalElements > 0 && <div className="topRigth" type="card">
+            <span>共计 {totalElements} 条</span>
             <Pagination simple {...pagination} />
-          </div>
+          </div>}
         </div>
         <Card className="body" key="body">
           <Table
@@ -322,55 +369,15 @@ class ConsumerVouchers extends React.Component {
               )
             }
           </FormItem>
-        </Modal> }
-        <Modal title="更新消费凭证"
-          visible={upVisible}
-          onCancel={this.handleUpCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleUpCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleOK}>更 新</Button>,
-          ]}>
-          <div className="modal-up-vouchers">
-            <Row>
-              <Col span={4}>
-                <span>凭证名称：</span>
-              </Col>
-              <Col span={20}>
-                <span>abc</span>
-              </Col>
-            </Row>
-            <Row>
-              <div className="as-left">
-                <span>当前 AccessKey / SecretKey</span>
-                <div>
-                  <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
-                  <Icon type="eye-o" className="text-ico" />
-                </div>
-              </div>
-              <div className="dec">
-                <span className="decs-title">更新</span>
-                <Icon type="arrow-right" className="dec-ico"/>
-              </div>
-              <div className="as-rigth">
-                <span>新 AccessKey / SecretKey</span>
-                <div>
-                  <TextArea autosize={{ minRows: 2, maxRows: 6 }} />
-                  <Icon type="eye-o" className="text-ico" />
-                </div>
-              </div>
-            </Row>
-            <Row>
-              <span>生效设置：</span>
-              <RadioGroup>
-                <Radio value={1}>更新过度，新旧凭证同时失效</Radio>
-                <Radio value={2}>立即生效新凭证</Radio>
-              </RadioGroup>
-            </Row>
-            <Row>
-              <Input placeholder="输入过度时间，范围1~7200" style={{ width: '73%' }}/>&nbsp;&nbsp; 分
-            </Row>
-          </div>
-        </Modal>
+        </Modal>}
+        {
+          updateVisible && <UpdateConsumerVoucher
+            loading={confirmLoading}
+            callback={this.updateConsumeVocuher}
+            closeModalMethod={this.closeUpdateModal}
+            record={currentConsumerVoucher}
+          />
+        }
       </QueueAnim>
     )
   }
@@ -389,4 +396,6 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   createConsumerVoucher,
   getConsumerVouchersList,
+  triggerUpdateConsumerVoucher,
+  confirmUpdateConsumerVoucher,
 })(Form.create()(ConsumerVouchers))

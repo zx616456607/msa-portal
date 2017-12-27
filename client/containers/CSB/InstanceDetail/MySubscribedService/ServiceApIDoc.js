@@ -14,9 +14,10 @@ import React from 'react'
 import propTypes from 'prop-types'
 import {
   Modal, Button, Row, Col,
-  Table, Input,
+  Table, Input, Spin,
 } from 'antd'
 import './style/ServiceApiDoc.less'
+import isEmpty from 'lodash/isEmpty'
 
 const TextArea = Input.TextArea
 
@@ -24,6 +25,9 @@ class ServiceApIDoc extends React.Component {
   static propTypes = {
     // 关闭 Modal 的方法
     closeModalMethod: propTypes.func.isRequired,
+    currentService: propTypes.object.isRequired,
+    serviceList: propTypes.object.isRequired,
+    loading: propTypes.bool.isRequired,
   }
 
   closeModal = () => {
@@ -31,7 +35,16 @@ class ServiceApIDoc extends React.Component {
     closeModalMethod()
   }
 
-  render() {
+  renderModalBody = () => {
+    const { loading, currentService, serviceList } = this.props
+    if (loading) {
+      return <div className="loading-status"><Spin /></div>
+    }
+    const { serviceId } = currentService
+    const serviceDetial = serviceList[serviceId]
+    if ((!loading && !serviceDetial) || (!loading && isEmpty(serviceDetial))) {
+      return <div>文档为空，请点击其他文档查看</div>
+    }
     const basicColumns = [
       { title: '开放协议类型', dataIndex: 'type', key: 'type' },
       { title: '开放地址', dataIndex: 'address', key: 'address' },
@@ -49,22 +62,12 @@ class ServiceApIDoc extends React.Component {
       { errorCode: 'arg0', suggestion: 'arg0', desc: 'int' },
       { errorCode: 'arg1', suggestion: 'arg1', desc: 'int' },
     ]
-    return <Modal
-      title="服务 API 文档"
-      visible={true}
-      closable={true}
-      onCancel={this.closeModal}
-      maskClosable={false}
-      wrapClassName="service-api-doc"
-      footer={[
-        <Button type="primary" size="large" key="ok" onClick={this.closeModal}>知道了</Button>,
-      ]}
-    >
+    return <div>
       <div className="basicInfo">
         <div className="second-title header">服务基本信息及开放协议</div>
         <Row>
           <Col span={5}>服务名：</Col>
-          <Col span={19}>qeqweqw</Col>
+          <Col span={19}>{serviceDetial.name}</Col>
         </Row>
         <Row>
           <Col span={5}>订阅状态：</Col>
@@ -102,9 +105,26 @@ class ServiceApIDoc extends React.Component {
           <Col span={24}>模拟返回结果</Col>
         </Row>
         <Row>
-          <Col span={24}><TextArea /></Col>
+          <Col span={24}><TextArea disabled/></Col>
         </Row>
       </div>
+    </div>
+  }
+
+  render() {
+    return <Modal
+      title="服务 API 文档"
+      visible={true}
+      closable={true}
+      onCancel={this.closeModal}
+      maskClosable={false}
+      wrapClassName="service-api-doc"
+      width="570px"
+      footer={[
+        <Button type="primary" size="large" key="ok" onClick={this.closeModal}>知道了</Button>,
+      ]}
+    >
+      {this.renderModalBody()}
     </Modal>
   }
 }

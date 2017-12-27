@@ -24,11 +24,12 @@ const vendors = [
   'react-dock',
   'react-dom',
   'react-redux',
-  'react-router',
+  'react-router-dom',
   'react-router-redux',
   'redux',
   'redux-thunk',
   'redux-devtools-extension',
+  'react-copy-to-clipboard',
   // ...其它库
 ]
 
