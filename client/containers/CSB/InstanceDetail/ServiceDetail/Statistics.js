@@ -13,12 +13,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {
-  Row, Col, DatePicker,
+  Row, Col,
 } from 'antd'
 import CreateG2 from '../../../../components/CreateG2'
+import ApmTimePicker from '../../../../components/ApmTimePicker'
 import { getInstanceServiceOverview, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
 
-const RangePicker = DatePicker.RangePicker
 const Chart = CreateG2(chart => {
   chart.col('dateTime', {
     alias: '时间',
@@ -77,19 +77,37 @@ class Statistics extends React.Component {
     errorCallCount: 0,
     forceFit: true,
     height: 300,
+    rangeDateTime: [],
   }
 
   componentWillMount() {
     this.loadData()
   }
+
   loadData = () => {
+    const { rangeDateTime } = this.state
     const {
       serviceId,
       instanceId,
       getInstanceServiceOverview,
       getInstanceServiceDetailMap } = this.props
+    let query = {
+      period: '16',
+      startTime: rangeDateTime.length > 0 ?
+        rangeDateTime[0].toISOString() : new Date().toISOString(),
+      endTime: rangeDateTime.length > 0 ?
+        rangeDateTime[1].toISOString() : new Date(new Date() - 300 * 1000).toISOString(),
+    }
+    query = Object.assign({}, query)
+    if (query.startTime === '') {
+      delete query.startTime
+      delete query.period
+    }
+    if (query.endTime === '') {
+      delete query.endTime
+    }
     getInstanceServiceOverview(instanceId, serviceId)
-    getInstanceServiceDetailMap(instanceId, serviceId)
+    getInstanceServiceDetailMap(instanceId, serviceId, query)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -107,7 +125,7 @@ class Statistics extends React.Component {
   }
 
   render() {
-    const { callCount, errorCallCount } = this.state
+    const { callCount, errorCallCount, rangeDateTime } = this.state
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -128,12 +146,12 @@ class Statistics extends React.Component {
             </Col>
           </Row>
           <Row className="service-statistics-and-monitor">
-            <Col span={12}>服务响应 & 调用监控趋势</Col>
-            <Col span={12}>
-              <RangePicker
-                showTime
-                size="small"
-                format="YYYY-MM-DD HH:mm:ss"
+            <Col span={11}>服务响应 & 调用监控趋势</Col>
+            <Col span={13}>
+              <ApmTimePicker
+                value={rangeDateTime}
+                onChange={rangeDateTime => this.setState({ rangeDateTime })}
+                onOk={this.loadData}
               />
             </Col>
           </Row>
@@ -176,8 +194,7 @@ class Statistics extends React.Component {
 
 const mapStateToProps = state => {
   const { CSB } = state
-  const overviewList = CSB.serviceDetail.default
-  // const dataMap = CSB.serviceDetailMap.default.data || []
+  const overviewList = CSB.serviceOverview.default
   return {
     // dataMap,
     detailData: overviewList || [],

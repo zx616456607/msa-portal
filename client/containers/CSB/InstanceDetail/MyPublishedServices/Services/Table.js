@@ -124,7 +124,7 @@ class ServicesTable extends React.Component {
     >
       <Menu.Item key="edit">编辑</Menu.Item>
       {
-        !record.active ? <Menu.Item key="start">启动</Menu.Item> :
+        record.status === 2 ? <Menu.Item key="start">启动</Menu.Item> :
           <Menu.Item key="stop">停止</Menu.Item>
       }
       <Menu.Item key="list">黑／白名单</Menu.Item>
@@ -144,15 +144,15 @@ class ServicesTable extends React.Component {
     let className = ''
     let desc = ''
     switch (status) {
-      case '1':
+      case 1:
         desc = '已激活'
         className = 'activated'
         break
-      case '2':
+      case 2:
         desc = '已停用'
         className = 'deactivated'
         break
-      case '4':
+      case 4:
         desc = '已注销'
         className = 'cancelled'
         break
@@ -184,7 +184,7 @@ class ServicesTable extends React.Component {
       case 'start':
         resultMessage = {
           body: {
-            active: 'true',
+            status: '1',
           },
           title: modalTooptip[1].title,
           content: '',
@@ -194,7 +194,7 @@ class ServicesTable extends React.Component {
       case 'stop':
         resultMessage = {
           body: {
-            active: 'false',
+            status: '2',
           },
           title: modalTooptip[2].title,
           content: '',
@@ -204,7 +204,7 @@ class ServicesTable extends React.Component {
       case 'logout':
         resultMessage = {
           body: {
-            concealed: 'true',
+            status: '4',
           },
           title: modalTooptip[0].title,
           modalTitle: modalTooptip[0].modalTitle,
@@ -247,7 +247,7 @@ class ServicesTable extends React.Component {
   }
 
   serviceOperation = (record, type) => {
-    const { loadData, match, PutInstanceService, delInstanceService, dataSource } = this.props
+    const { loadData, match, PutInstanceService, delInstanceService } = this.props
     const { instanceID } = match.params
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
     const self = this
@@ -269,9 +269,6 @@ class ServicesTable extends React.Component {
                 message: self.serviceMessages(type, false),
               })
               loadData()
-              self.setState({
-                currentRow: dataSource,
-              })
             }
           })
           return
@@ -288,9 +285,6 @@ class ServicesTable extends React.Component {
               message: self.serviceMessages(type, false),
             })
             loadData()
-            self.setState({
-              currentRow: dataSource,
-            })
           }
         })
       },
@@ -396,7 +390,7 @@ class ServicesTable extends React.Component {
           />
         }
         <ServiceDetailDock
-          self={self}
+          callback={self.serviceOperation}
           visible={visible}
           onVisibleChange={visible => this.setState({ visible })}
           instanceId={instanceID}

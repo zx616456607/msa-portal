@@ -16,11 +16,11 @@ import ServiceDetail from './'
 
 export default class ServiceDetailDock extends React.Component {
   render() {
-    const { detail, self, renderServiceStatusUI, instanceId, ...otherProps } = this.props
+    const { detail, callback, renderServiceStatusUI, instanceId, ...otherProps } = this.props
     return (
       <DetailPageDock {...otherProps}>
         <ServiceDetail
-          self={self}
+          callback={callback}
           detail={detail}
           instanceId={instanceId}
           renderServiceStatusUI={renderServiceStatusUI} />
