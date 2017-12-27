@@ -112,7 +112,6 @@ class SubscriptServiceModal extends React.Component {
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
     }
-    console.log(dateSource)
     return <Modal
       title="订阅服务"
       visible={visible}
