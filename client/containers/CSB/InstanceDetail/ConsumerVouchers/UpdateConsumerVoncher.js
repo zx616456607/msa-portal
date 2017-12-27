@@ -19,22 +19,22 @@ import {
 import './style/UpdateConsumerVoucher.less'
 
 const RadioGroup = Radio.Group
-
 const { TextArea } = Input
 
 class UpdateConsumerVoucher extends React.Component {
-  state = {
-    updateSetting: 'delay',
-    delayTime: 1,
-    hideOld: false,
-    hideNew: false,
-  }
   static propTypes = {
     callback: propTypes.func.isRequired,
     loading: propTypes.bool.isRequired,
     closeModalMethod: propTypes.func.isRequired,
     // 当前更新的消费凭证
     record: propTypes.object.isRequired,
+  }
+
+  state = {
+    updateSetting: 'delay',
+    delayTime: 1,
+    hideOld: false,
+    hideNew: false,
   }
 
   handleOk = () => {
