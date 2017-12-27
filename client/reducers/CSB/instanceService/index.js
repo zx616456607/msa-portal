@@ -111,20 +111,19 @@ export const subscribableServices = (state = {}, action) => {
 
 
 export const serviceOverview = (state = {}, action) => {
-  const { type, query } = action
-  const key = getQueryKey(query)
+  const { type, serviceId } = action
   switch (type) {
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_REQUEST:
       return {
         ...state,
-        [key]: Object.assign({}, state[key], {
+        [serviceId]: Object.assign({}, state[serviceId], {
           isFetching: true,
         }),
       }
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_SUCCESS:
       return {
         ...state,
-        [key]: {
+        [serviceId]: {
           isFetching: false,
           data: action.response.result.data,
         },
@@ -132,7 +131,7 @@ export const serviceOverview = (state = {}, action) => {
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_FAILURE:
       return {
         ...state,
-        [key]: Object.assign({}, state[key], {
+        [serviceId]: Object.assign({}, state[serviceId], {
           isFetching: false,
         }),
       }
@@ -142,20 +141,19 @@ export const serviceOverview = (state = {}, action) => {
 }
 
 export const serviceDetailMap = (state = {}, action) => {
-  const { type, query } = action
-  const key = getQueryKey(query)
+  const { type, serviceId } = action
   switch (type) {
     case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST:
       return {
         ...state,
-        [key]: Object.assign({}, state[key], {
+        [serviceId]: Object.assign({}, state[serviceId], {
           isFetching: true,
         }),
       }
     case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_SUCCESS:
       return {
         ...state,
-        [key]: {
+        [serviceId]: {
           isFetching: false,
           data: action.response.result.data,
         },
@@ -163,7 +161,7 @@ export const serviceDetailMap = (state = {}, action) => {
     case ActionTypes.FETCH_CSB_SERVICE_DETAIL_MAP_FAILURE:
       return {
         ...state,
-        [key]: Object.assign({}, state[key], {
+        [serviceId]: Object.assign({}, state[serviceId], {
           isFetching: false,
         }),
       }
