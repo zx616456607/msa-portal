@@ -74,3 +74,56 @@ const fetchGetConsumerVouchersList = (instanceID, query) => {
 export const getConsumerVouchersList = (instanceID, query) => {
   return dispatch => dispatch(fetchGetConsumerVouchersList(instanceID, query))
 }
+
+// 触发更新消费凭证
+export const POST_UPDATE_CONSUMER_VOUCJER_REQUEST = 'POST_UPDATE_CONSUMER_VOUCJER_REQUEST'
+export const POST_UPDATE_CONSUMER_VOUCJER_SUCCESS = 'POST_UPDATE_CONSUMER_VOUCJER_SUCCESS'
+export const POST_UPDATE_CONSUMER_VOUCJER_FAILUER = 'POST_UPDATE_CONSUMER_VOUCJER_FAILUER'
+
+const fetchTriggerUpdateConsumerVoucher = (instanceID, evidenceId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        POST_UPDATE_CONSUMER_VOUCJER_REQUEST,
+        POST_UPDATE_CONSUMER_VOUCJER_SUCCESS,
+        POST_UPDATE_CONSUMER_VOUCJER_FAILUER,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/evidences/${evidenceId}/replacement`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const triggerUpdateConsumerVoucher = (instanceID, evidenceId, body) => {
+  return dispatch => dispatch(fetchTriggerUpdateConsumerVoucher(instanceID, evidenceId, body))
+}
+
+// 确认更新消费凭证
+export const PUT_UPDATE_CONSUMER_VOUCHER_REQUEST = 'PUT_UPDATE_CONSUMER_VOUCHER_REQUEST'
+export const PUT_UPDATE_CONSUMER_VOUCHER_SUCCESS = 'PUT_UPDATE_CONSUMER_VOUCHER_SUCCESS'
+export const PUT_UPDATE_CONSUMER_VOUCHER_FAILUER = 'PUT_UPDATE_CONSUMER_VOUCHER_FAILUER'
+
+const fetchConfirmUpdateConsumerVoucher = (instanceID, evidenceId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PUT_UPDATE_CONSUMER_VOUCHER_REQUEST,
+        PUT_UPDATE_CONSUMER_VOUCHER_SUCCESS,
+        PUT_UPDATE_CONSUMER_VOUCHER_FAILUER,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/evidences/${evidenceId}/replacement`,
+      options: {
+        method: 'PUT',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const confirmUpdateConsumerVoucher = (instanceID, evidenceId) => {
+  return dispatch => dispatch(fetchConfirmUpdateConsumerVoucher(instanceID, evidenceId))
+}

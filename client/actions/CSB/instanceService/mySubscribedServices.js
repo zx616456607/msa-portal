@@ -47,3 +47,31 @@ const fetchGetMySubscribedServiceList = (instanceID, query) => {
 export const getMySubscribedServiceList = (instanceID, query) => {
   return dispatch => dispatch(fetchGetMySubscribedServiceList(instanceID, query))
 }
+
+// 查看服务文档
+export const GET_SERVICE_API_DOC_REQUEST = 'GET_SERVICE_API_DOC_REQUEST'
+export const GET_SERVICE_API_DOC_SUCCESS = 'GET_SERVICE_API_DOC_SUCCESS'
+export const GET_SERVICE_API_DOC_FALIURE = 'GET_SERVICE_API_DOC_FALIURE'
+
+const fetchGetServiceApiDoc = (instanceID, serviceId) => {
+  return {
+    serviceId,
+    [CALL_API]: {
+      types: [
+        GET_SERVICE_API_DOC_REQUEST,
+        GET_SERVICE_API_DOC_SUCCESS,
+        GET_SERVICE_API_DOC_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/${serviceId}`,
+      options: {
+        method: 'GET',
+      },
+      schema: Schemas.CSB_INSTANCE_SERVICE_API_DOC,
+    },
+  }
+}
+
+export const getServiceApiDoc = (instanceID, serviceId) => {
+  return dispatch => dispatch(fetchGetServiceApiDoc(instanceID, serviceId))
+}
+
