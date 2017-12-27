@@ -48,7 +48,7 @@ class SubscriptServiceModal extends React.Component {
   }
 
   render() {
-    const { loading, form } = this.props
+    const { loading, form, visible } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -56,12 +56,10 @@ class SubscriptServiceModal extends React.Component {
     }
     return <Modal
       title="订阅服务"
-      visible={true}
-      closable={true}
+      visible={visible}
       onOk={this.handleOk}
       onCancel={this.handleCancel}
       width="570px"
-      maskClosable={false}
       confirmLoading={loading}
       wrapClassName="subscript-service-modal"
     >
@@ -115,8 +113,7 @@ class SubscriptServiceModal extends React.Component {
         >
           {
             getFieldDecorator('bindIp')(
-              <TextArea placeholder={`用于限制访问该服务的 IP 地址，空表示不需要限制 IP 访问；
-用"，"号隔开；`}/>
+              <TextArea placeholder={'用于限制访问该服务的 IP 地址，空表示不需要限制 IP 访问；\n用"，"号隔开；'}/>
             )
           }
         </FormItem>

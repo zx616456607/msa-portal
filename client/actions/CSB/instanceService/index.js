@@ -198,3 +198,33 @@ export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
 // // export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
 // //   return dispatch(fetchInstanceServiceDetail(instanceId, serviceId))
 // // }
+
+export const SUBSCRIBEABLE_SERVICES_REQUEST = 'SUBSCRIBEABLE_SERVICES_REQUEST'
+export const SUBSCRIBEABLE_SERVICES_SUCCESS = 'SUBSCRIBEABLE_SERVICES_SUCCESS'
+export const SUBSCRIBEABLE_SERVICES_FAILURE = 'SUBSCRIBEABLE_SERVICES_FAILURE'
+
+// Create an subscribable service list
+// Relies on the custom API middleware defined in ../middleware/api.js.
+
+const fetchSubscribableServices = (instanceID, query) => {
+  const _query = cloneDeep(query)
+  const { page } = _query
+  if (page !== undefined) {
+    _query.page = page - 1
+  }
+  return {
+    query,
+    [CALL_API]: {
+      types: [
+        SUBSCRIBEABLE_SERVICES_REQUEST,
+        SUBSCRIBEABLE_SERVICES_SUCCESS,
+        SUBSCRIBEABLE_SERVICES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/subscribable?${toQuerystring(_query)}`,
+      schema: Schemas.CSB_SUBSCRIBE_LIST_DATA,
+    },
+  }
+}
+
+export const subscribableServices = (instanceID, query) =>
+  dispatch => dispatch(fetchSubscribableServices(instanceID, query))

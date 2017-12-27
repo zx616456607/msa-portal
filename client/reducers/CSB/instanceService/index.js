@@ -77,3 +77,35 @@ export const serviceCAL = (state = {}, action) => {
   }
 }
 
+export const subscribableServices = (state = {}, action) => {
+  const { type, query } = action
+  const key = getQueryKey(query)
+  switch (type) {
+    case ActionTypes.SUBSCRIBEABLE_SERVICES_REQUEST:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.SUBSCRIBEABLE_SERVICES_SUCCESS:
+      return {
+        ...state,
+        [key]: {
+          isFetching: false,
+          ids: union(state[key].ids, action.response.result.data.content),
+          totalElements: action.response.result.data.totalElements,
+          size: action.response.result.data.size,
+        },
+      }
+    case ActionTypes.SUBSCRIBEABLE_SERVICES_FAILURE:
+      return {
+        ...state,
+        [key]: Object.assign({}, state[key], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}
