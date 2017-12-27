@@ -98,7 +98,7 @@ export default class ServiceDetail extends React.Component {
         <div className="service-detail-body">
           <Tabs
             tabPosition="left"
-            type="card"
+            // type="card"
           >
             <TabPane tab="统计信息" key="statistics">
               <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />
