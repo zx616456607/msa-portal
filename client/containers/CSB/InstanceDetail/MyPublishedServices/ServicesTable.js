@@ -43,7 +43,7 @@ const resyltMessages = [
   }, {
     message: '停止服务成功',
   }, {
-    message: '注销服务成功',
+    message: '注销服务失败',
   }, {
     message: '注销服务成功',
   },
@@ -208,7 +208,7 @@ class ServicesTable extends React.Component {
           },
           title: modalTooptip[0].title,
           modalTitle: modalTooptip[0].modalTitle,
-          content: `Tips：对于没有被订阅过的服务，注销后不可见。定注销服务 ${record.name} 吗？`,
+          content: `Tips：对于没有被订阅过的服务，注销后不可见。确定注销服务 ${record.name} 吗？`,
         }
         break
       default:
