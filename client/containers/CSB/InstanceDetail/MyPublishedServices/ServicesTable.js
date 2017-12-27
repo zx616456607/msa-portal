@@ -13,15 +13,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import ServiceDetailDock from '../../ServiceDetail/Dock'
+import ServiceDetailDock from '../ServiceDetail/Dock'
 import {
   Dropdown, Menu, Table, Modal, Notification,
 } from 'antd'
-import { formatDate } from '../../../../../common/utils'
-import '../style/MyPublishedServices.less'
-import BlackAndWhiteListModal from '../BlackAndWhiteListModal'
-import confirm from '../../../../../components/Modal/confirm'
-import { PutInstanceService, delInstanceService } from '../../../../../actions/CSB/instanceService'
+import { formatDate } from '../../../../common/utils'
+import BlackAndWhiteListModal from './BlackAndWhiteListModal'
+import confirm from '../../../../components/Modal/confirm'
+import { PutInstanceService, delInstanceService } from '../../../../actions/CSB/instanceService'
 
 const modalTooptip = [
   {
@@ -49,6 +48,7 @@ const resyltMessages = [
     message: '注销服务成功',
   },
 ]
+
 class ServicesTable extends React.Component {
   static propTypes = {
     // 获取列表数据的函数
@@ -322,9 +322,8 @@ class ServicesTable extends React.Component {
       },
       {
         title: '所属服务组',
-        dataIndex: 'group',
-        key: 'group',
-        render: (text, row) => row.groupId,
+        dataIndex: 'groupName',
+        key: 'groupName',
       },
       {
         title: '状态',

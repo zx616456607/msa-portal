@@ -48,6 +48,7 @@ import MyApplication from './containers/CSB/Instances/MyApplication'
 import CSBInstanceDetail from './containers/CSB/InstanceDetail'
 import InstanceDetailOverview from './containers/CSB/InstanceDetail/Overview/'
 import MyPublishedServices from './containers/CSB/InstanceDetail/MyPublishedServices'
+import MyPublishedServicesGroups from './containers/CSB/InstanceDetail/MyPublishedServices/Groups'
 import ServiceSubscriptionApproval from './containers/CSB/InstanceDetail/ServiceSubscriptionApproval'
 import MySubscribedService from './containers/CSB/InstanceDetail/MySubscribedService'
 import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionServices'
@@ -318,6 +319,12 @@ export const csbInstanceDetailChildRoutes = [
     component: MyPublishedServices,
     exact: true,
     key: 'my-published-services',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/my-published-services-groups',
+    component: MyPublishedServicesGroups,
+    exact: true,
+    key: 'my-published-services-groups',
   },
   {
     path: '/csb-instances-available/:instanceID/service-subscription-approval',

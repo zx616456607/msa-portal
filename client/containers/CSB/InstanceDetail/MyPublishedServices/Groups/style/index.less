@@ -12,14 +12,30 @@
 
  @import '~assets/style/core/index.less';
 
-.service-groups-body {
-  .ant-table-small {
-    border: none;
-    & > .ant-table-content > .ant-table-body > table {
-      padding: 0;
-      margin: 0 8px;
-      & > .ant-table-thead > tr > th {
-        color: @font-color-2;
+ .service-groups {
+  padding: @padding-medium;
+  background: #fff;
+  .ant-input-group-wrapper,
+  .search-input {
+    width: 280px;
+  }
+  .show-type {
+    margin-bottom: @padding-medium;
+  }
+  &-body {
+    .ant-table-expanded-row {
+      > td:last-of-type {
+        padding: 0;
+        .ant-table-small {
+          border: none;
+          & > .ant-table-content > .ant-table-body > table {
+            padding: 0;
+            margin: 0 8px;
+            & > .ant-table-thead > tr > th {
+              color: @font-color-2;
+            }
+          }
+        }
       }
     }
   }

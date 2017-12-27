@@ -12,20 +12,27 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import QueueAnim from 'rc-queue-anim'
 import {
-  Card, Button, Select, Input, Pagination, Table, Menu, Dropdown,
+  Button, Select, Input, Pagination, Table, Menu, Dropdown,
   Modal, notification,
 } from 'antd'
-import ServicesTable from '../Services/Table'
+import ServicesTable from '../ServicesTable'
 import confirm from '../../../../../components/Modal/confirm'
 import CreateServiceGroupModal from './CreateServiceGroupModal'
+import ServiceOrGroupSwitch from '../ServiceOrGroupSwitch'
 import {
   formatDate,
 } from '../../../../../common/utils'
 import {
+  CSB_INSTANCE_SERVICE_STATUS_RUNNING,
+  CSB_INSTANCE_SERVICE_STATUS_STOPPED,
+} from '../../../../../constants'
+import {
   getGroups,
   getGroupServices,
   deleteGroup,
+  updateGroupStatus,
 } from '../../../../../actions/CSB/instanceService/group'
 import {
   serviceGroupsSlt,
@@ -69,12 +76,38 @@ class MyPublishedServiceGroups extends React.Component {
 
   toogleServiceGroupStatus = (action, record) => {
     const self = this
+    let status
+    let text
+    switch (action) {
+      case 'start':
+        status = CSB_INSTANCE_SERVICE_STATUS_RUNNING
+        text = '启动'
+        break
+      case 'stop':
+        status = CSB_INSTANCE_SERVICE_STATUS_STOPPED
+        text = '停止'
+        break
+      default:
+        break
+    }
     confirm({
-      modalTitle: '停止服务组',
-      title: `停止服务组操作将使服务组中的所有服务全部停止。确定停止服务组 ${record.groupName} 吗？`,
+      modalTitle: `${text}服务组`,
+      title: `${text}服务组操作将使服务组中的所有服务全部${text}。确定${text}服务组 ${record.name} 吗？`,
       content: '',
       onOk() {
-        self.loadData()
+        return new Promise((resolve, reject) => {
+          const { instanceID, updateGroupStatus } = self.props
+          updateGroupStatus(instanceID, record.id, { status }).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: `${text}服务组成功`,
+            })
+            self.loadData()
+          })
+        })
       },
     })
   }
@@ -154,7 +187,7 @@ class MyPublishedServiceGroups extends React.Component {
   }
 
   render() {
-    const { serviceGroups, instanceID } = this.props
+    const { serviceGroups, instanceID, history } = this.props
     const { isFetching, content, totalElements, size } = serviceGroups
     const {
       createServiceGroupModalVisible, currentHandle, currentRecord,
@@ -187,8 +220,12 @@ class MyPublishedServiceGroups extends React.Component {
           const menu = <Menu style={{ width: 88 }}
             onClick={this.serviceGroupMenuClick.bind(this, record)}
           >
-            <Menu.Item key="start">启动</Menu.Item>
-            <Menu.Item key="stop">停止</Menu.Item>
+            <Menu.Item key="start" disabled={record.stoppedCount < 1}>
+            启动
+            </Menu.Item>
+            <Menu.Item key="stop" disabled={record.activeCount < 1}>
+            停止
+            </Menu.Item>
             <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
           return <Dropdown.Button overlay={menu} onClick={this.openCreateServiceGroupModal.bind(this, 'edit', record)}>
@@ -212,8 +249,15 @@ class MyPublishedServiceGroups extends React.Component {
       total: totalElements,
       pageSize: size,
     }
-    return [
-      <div className="layout-content-btns" key="btns">
+    return <QueueAnim className="service-groups">
+      <div key="type" className="show-type">
+        <ServiceOrGroupSwitch
+          defaultValue="group"
+          instanceID={instanceID}
+          history={history}
+        />
+      </div>
+      <div key="btns" className="layout-content-btns">
         <Button onClick={this.goPublishService} type="primary" key="layout-content-btns">
         发布服务
         </Button>
@@ -235,20 +279,18 @@ class MyPublishedServiceGroups extends React.Component {
             <Pagination {...paginationProps} />
           </div>
         }
-      </div>,
+      </div>
       <div key="data-box" className="layout-content-body service-groups-body">
-        <Card>
-          <Table
-            columns={columns}
-            expandedRowRender={this.handleExpandedRowRender}
-            dataSource={content}
-            loading={isFetching}
-            pagination={false}
-            rowKey={record => record.id}
-            indentSize={0}
-          />
-        </Card>
-      </div>,
+        <Table
+          columns={columns}
+          expandedRowRender={this.handleExpandedRowRender}
+          dataSource={content}
+          loading={isFetching}
+          pagination={false}
+          rowKey={record => record.id}
+          indentSize={0}
+        />
+      </div>
       <div key="modals">
         {
           createServiceGroupModalVisible && <CreateServiceGroupModal
@@ -259,8 +301,8 @@ class MyPublishedServiceGroups extends React.Component {
             instanceID={instanceID}
           />
         }
-      </div>,
-    ]
+      </div>
+    </QueueAnim>
   }
 }
 
@@ -278,4 +320,5 @@ export default connect(mapStateToProps, {
   getGroups,
   getGroupServices,
   deleteGroup,
+  updateGroupStatus,
 })(MyPublishedServiceGroups)

@@ -93,7 +93,7 @@ class ServiceDetail extends React.Component {
               </Col>
               <Col span={14}>
                 <div className="txt-of-ellipsis">
-                  所属服务组：{detail.groupId}
+                  所属服务组：{detail.groupName}
                 </div>
               </Col>
               <Col span={4} className="service-detail-header-btns">
