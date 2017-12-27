@@ -33,6 +33,12 @@ import {
 } from '../../../../selectors/CSB/instanceService/group'
 import './style/index.less'
 
+const SECONDS_CONVERSION = {
+  second: 1,
+  minute: 60,
+  hour: 60 * 60,
+  day: 60 * 60 * 24,
+}
 const Step = Steps.Step
 
 class PublishService extends React.Component {
@@ -118,6 +124,16 @@ class PublishService extends React.Component {
       if (errors) {
         return
       }
+      const { apiGatewayLimit, apiGatewayLimitType } = values
+      let limitationType = 'no_limitation'
+      let limitationDetail = {}
+      if (apiGatewayLimit > 0) {
+        limitationType = 'rate_limitation'
+        limitationDetail = {
+          limit: apiGatewayLimit,
+          duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
+        }
+      }
       const body = [
         {
           name: values.name,
@@ -132,8 +148,8 @@ class PublishService extends React.Component {
           transformationDetail: '{}',
           authenticationType: 'bypass',
           authenticationDetail: '{}',
-          limitationType: 'no_limitation',
-          limitationDetail: '{}',
+          limitationType,
+          limitationDetail: JSON.stringify(limitationDetail),
           groupId: parseInt(values.groupId),
         },
       ]

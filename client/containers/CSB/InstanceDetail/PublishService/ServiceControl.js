@@ -13,7 +13,7 @@
 import React from 'react'
 import ClassNames from 'classnames'
 import {
-  Form, Input, Select, Switch, Icon, Tooltip, Row, Col,
+  Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col,
 } from 'antd'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
 import './style/ServiceControl.less'
@@ -56,7 +56,7 @@ export default class ServiceControl extends React.Component {
               {getFieldDecorator('apiGatewayLimit', {
                 initialValue: 0,
               })(
-                <Input placeholder="请填写整数" />
+                <InputNumber step={1} precision={0} placeholder="请填写整数" />
               )}
               次 <Tooltip title="设置为0或者为空时代表不限制访问频度">
                 <Icon type="question-circle-o" />

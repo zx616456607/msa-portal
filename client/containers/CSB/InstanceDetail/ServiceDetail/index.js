@@ -129,7 +129,7 @@ class ServiceDetail extends React.Component {
               <ServiceParameters />
             </TabPane>
             <TabPane tab="控制信息" key="control">
-              <ServiceControl />
+              <ServiceControl detail={detail} />
             </TabPane>
           </Tabs>
         </div>
