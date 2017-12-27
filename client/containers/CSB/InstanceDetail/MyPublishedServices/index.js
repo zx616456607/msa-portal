@@ -14,114 +14,154 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Radio, Form, Row, Col,
+  Radio, Row, Col, Card, Button, Input, Pagination,
 } from 'antd'
-import './style/MyPublishedServices.less'
 import { parse as parseQuerystring } from 'query-string'
-import ServiceGroups from './Groups'
-import Services from './Services'
+import isEqual from 'lodash/isEqual'
+import ServicesTable from './ServicesTable'
+import { toQuerystring } from '../../../../common/utils'
+import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
+import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
+import CreateServiceGroupModal from './Groups/CreateServiceGroupModal'
 import { getInstanceService } from '../../../../actions/CSB/instanceService'
+import ServiceOrGroupSwitch from './ServiceOrGroupSwitch'
+import './style/MyPublishedServices.less'
+
 const RadioGroup = Radio.Group
-const FormItem = Form.Item
+const Search = Input.Search
+const { mergeQuery } = getQueryAndFuncs(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
+const publishedSlt = csbInstanceServiceSltMaker(CSB_RELEASE_INSTANCES_SERVICE_FLAG)
 
 class MyPublishedServices extends React.Component {
   state = {
-    isOff: false,
-    showType: '',
+    includeDeleted: false,
+    name: '',
+    createServiceGroupModalVisible: false,
   }
 
   // 是否显示已注销服务
   logoutServiceChange = value => {
-    if (value.target.value === 'group') {
-      this.setState({
-        isOff: true,
-      })
-    } else {
-      this.setState({
-        isOff: false,
-      })
-    }
-  }
-
-  renderDifferentTable = () => {
-    const { form, location, match, history } = this.props
-    const { getFieldValue } = form
-    const showType = getFieldValue('showType')
-    switch (showType) {
-      case 'all':
-        return <Services
-          history={history}
-          match={match}
-          location={location}
-          isOff={this.state.isOff} />
-      case 'group':
-        return <ServiceGroups history={history} match={match} location={location} />
-      default:
-        return
-    }
-  }
-
-  showTypeChange = value => {
     this.setState({
-      showType: value,
+      includeDeleted: value,
     })
   }
 
+  componentDidMount() {
+    this.loadData()
+  }
+
+  openCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: true,
+    })
+  }
+
+  closeCreateServiceGroupModal = () => {
+    this.setState({
+      createServiceGroupModalVisible: false,
+    })
+  }
+
+  // 加载数据
+  loadData = query => {
+    const { getInstanceService, history, match, isOff } = this.props
+    const { instanceID } = match.params
+    const { name } = this.state
+    const includeDeleted = isOff
+    query = Object.assign({}, location.query, { name, includeDeleted }, query)
+    if (query.name === '') {
+      delete query.name
+    }
+    if (query.page === 1) {
+      delete query.page
+    }
+    if (query.includeDeleted === false) {
+      delete query.includeDeleted
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
+    getInstanceService(instanceID, mergeQuery(query))
+  }
+
+  // 发布服务
+  goPublishService = () => {
+    const { history, match } = this.props
+    const { instanceID } = match.params
+    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+  }
+
   render() {
-    const { form } = this.props
-    const { getFieldValue, getFieldDecorator } = form
-    const showType = getFieldValue('showType')
+    const { myPublished, match, history, instanceID } = this.props
+    const { content, size, isFetching, totalElements } = myPublished
+    const paginationProps = {
+      simple: true,
+      pageSize: size || 10,
+      total: totalElements,
+      current: 1,
+    }
+    const { createServiceGroupModalVisible } = this.state
     return (
       <QueueAnim id="my-published-services">
-        <div className="showType">
+        <div key="type" className="showType">
           <Row>
             <Col span="10">
-              <FormItem
-                label={<span>显示方式：</span>}
-                key="showType"
-                labelCol={{ span: 3 }}
-                wrapperCol={{ span: 15 }}
-                className="showType"
-              >
-                {
-                  getFieldDecorator('showType', {
-                    initialValue: 'all',
-                    onChange: this.showTypeChange,
-                  })(
-                    <RadioGroup>
-                      <Radio value="all">显示全部服务</Radio>
-                      <Radio value="group">显示服务组</Radio>
-                    </RadioGroup>
-                  )
-                }
-              </FormItem>
+              <ServiceOrGroupSwitch
+                defaultValue="all"
+                instanceID={instanceID}
+                history={history}
+              />
             </Col>
-            {
-              showType === 'all' && <Col span="12">
-                <FormItem
-                  label={<span>已注销服务：</span>}
-                  key="logoutService"
-                  labelCol={{ span: 3 }}
-                  wrapperCol={{ span: 15 }}
-                  className="showType"
-                >
-                  {
-                    getFieldDecorator('logoutService', {
-                      initialValue: 'all',
-                      onChange: this.logoutServiceChange,
-                    })(
-                      <RadioGroup>
-                        <Radio value="all">不显示</Radio>
-                        <Radio value="group">显示</Radio>
-                      </RadioGroup>
-                    )
-                  }
-                </FormItem>
-              </Col>
-            }
+            <Col span="12">
+              <label>已注销服务：</label>
+              <RadioGroup onChange={this.logoutServiceChange}>
+                <Radio value={false}>不显示</Radio>
+                <Radio value={true}>显示</Radio>
+              </RadioGroup>
+            </Col>
           </Row>
         </div>
-        {this.renderDifferentTable()}
+        <div key="layout-content-btns" className="layout-content-btns">
+          <Button onClick={this.goPublishService} type="primary">
+            发布服务
+          </Button>
+          <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
+          创建服务组
+          </Button>
+          <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
+          <Search
+            placeholder="按服务名称搜索"
+            className="search-input"
+            onChange={e => this.setState({ name: e.target.value })}
+            onSearch={name => this.loadData({ name, page: 1 })}
+            value={this.state.name}
+          />
+          {
+            totalElements > 0 && <div className="page-box">
+              <span className="total">共 {totalElements} 条</span>
+              <Pagination {...paginationProps} />
+            </div>
+          }
+        </div>
+        <div key="data-box" className="layout-content-body">
+          <Card>
+            <ServicesTable
+              loadData={this.loadData}
+              loading={isFetching}
+              dataSource={content}
+              history={history}
+              match={match} />
+          </Card>
+        </div>
+        <div key="modals">
+          {
+            createServiceGroupModalVisible && <CreateServiceGroupModal
+              closeModalMethod={this.closeCreateServiceGroupModal}
+              handle="create"
+              instanceID={instanceID}
+            />
+          }
+        </div>
       </QueueAnim>
     )
   }
@@ -130,15 +170,17 @@ class MyPublishedServices extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const { entities } = state
   const { clusters } = entities
-  const { location } = ownProps
+  const { location, match } = ownProps
+  const { instanceID } = match.params
   location.query = parseQuerystring(location.search)
   return {
     clusters,
-    location,
+    instanceID,
+    myPublished: publishedSlt(state, ownProps),
   }
 }
 
 export default connect(mapStateToProps, {
   getInstanceService,
-})(Form.create()(MyPublishedServices))
+})(MyPublishedServices)
 

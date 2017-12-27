@@ -13,16 +13,14 @@
 @import "../../../../../assets/style/core/index.less";
 
 #my-published-services {
-  padding: 24px;
+  padding: @padding-medium;
   background: #fff;
   .showType {
-    margin-bottom: 20px;
-    .ant-form-item {
-      margin-bottom: 0;
-    }
-    .ant-form-item-label {
-      text-align: left;
-      width: 90px;
+    margin-bottom: @padding-medium;
+    label {
+      display: inline-block;
+      width: 100px;
+      color: rgba(0, 0, 0, 0.85);
     }
   }
   .ant-input-group-wrapper,
@@ -44,11 +42,6 @@
   }
   .ant-card-body {
     padding: 0;
-    .ant-table-expanded-row {
-      > td:last-of-type {
-        padding: 0;
-      }
-    }
   }
   .status-icon {
     height: 12px;
