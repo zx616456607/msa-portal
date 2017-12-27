@@ -40,10 +40,12 @@ class MyPublishedServices extends React.Component {
   }
 
   // 是否显示已注销服务
-  logoutServiceChange = value => {
+  logoutServiceChange = e => {
+    const includeDeleted = e.target.value
     this.setState({
-      includeDeleted: value,
+      includeDeleted,
     })
+    this.loadData({ includeDeleted })
   }
 
   componentDidMount() {
@@ -64,10 +66,9 @@ class MyPublishedServices extends React.Component {
 
   // 加载数据
   loadData = query => {
-    const { getInstanceService, history, match, isOff } = this.props
+    const { getInstanceService, history, match } = this.props
     const { instanceID } = match.params
-    const { name } = this.state
-    const includeDeleted = isOff
+    const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
     if (query.name === '') {
       delete query.name
@@ -114,7 +115,7 @@ class MyPublishedServices extends React.Component {
             </Col>
             <Col span="12">
               <label>已注销服务：</label>
-              <RadioGroup onChange={this.logoutServiceChange}>
+              <RadioGroup onChange={this.logoutServiceChange} defaultValue={false}>
                 <Radio value={false}>不显示</Radio>
                 <Radio value={true}>显示</Radio>
               </RadioGroup>
