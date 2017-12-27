@@ -218,4 +218,7 @@ export const Schemas = {
       content: [ csbInstanceServiceSubscribeApproveSchema ],
     },
   },
+  CSB_INSTANCE_SERVICE_API_DOC: {
+    data: csbPublishedSchema,
+  },
 }

@@ -129,7 +129,7 @@ class ServiceDetail extends React.Component {
               <ServiceParameters />
             </TabPane>
             <TabPane tab="控制信息" key="control">
-              <ServiceControl />
+              <ServiceControl detail={detail} />
             </TabPane>
           </Tabs>
         </div>
@@ -142,7 +142,7 @@ const mapStateToProps = state => {
   const { entities } = state
   const dataList = entities.cbsPublished
   return {
-    detailData: dataList || [],
+    detailData: dataList || {},
   }
 }
 

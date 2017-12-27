@@ -40,6 +40,25 @@
     }
   }
   .body {
+    .keys {
+      white-space: normal;
+      .ant-row {
+        width: 200px;
+        max-width: 250px;
+        .ant-col-2 {
+          width: 10px;
+          text-align: center;
+        }
+        .spread-icon {
+          padding-left: 3px;
+        }
+        .text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
     .tip-value {
       color: @primary-color;
     }
@@ -138,5 +157,16 @@
   .as-new {
     width: 50%;
     margin-left: 33px;
+  }
+}
+
+.keys-popover {
+  .key-value {
+    color: #2db7f5;
+    margin-right: 8px;
+  }
+  .anticon-copy {
+    color: #2db7f5;
+    cursor: pointer;
   }
 }

@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import ServiceDetailDock from '../ServiceDetail/Dock'
 import {
-  Dropdown, Menu, Table, Modal, Notification,
+  Dropdown, Menu, Table, Notification,
 } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
@@ -81,24 +81,6 @@ class ServicesTable extends React.Component {
   closeblackAndWhiteModal = () => {
     this.setState({
       blackAndWhiteListModalVisible: false,
-    })
-  }
-
-  deleteServiceGroup = record => {
-    if (record.num > 1) {
-      return Modal.info({
-        title: '删除服务组',
-        content: <span>服务组中仍有服务，不能执行删除操作，清空服务组中的服务后，方可执行删除操作</span>,
-        onOk() { },
-      })
-    }
-    confirm({
-      modalTitle: '删除服务组',
-      title: `服务组一旦删除，将不可恢复，请确认是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
-      content: '',
-      onOk() {
-        //
-      },
     })
   }
 
@@ -362,7 +344,7 @@ class ServicesTable extends React.Component {
     ]
     const { instanceID } = match.params
     if (from === 'group') {
-      const columnsKeys = [ 'serviceName', 'version', 'status', 'wait', 'time', 'handle' ]
+      const columnsKeys = [ 'name', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
       columns.forEach(column => (column.width = `${100 / columns.length}%`))
     }
