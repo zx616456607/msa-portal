@@ -26,7 +26,7 @@ const getInstancesServiceTypesByFlag = flag => {
       instancesServiceEntitiesType = 'cbsPublished'
       break
     case CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG:
-      instancesServiceType = 'subscribeService'
+      instancesServiceType = 'subscribableServices'
       instancesServiceEntitiesType = 'csbSubscribe'
       break
     default:
@@ -59,10 +59,9 @@ export const getQueryAndFuncs = flag => {
 const getInstanceService = (flag, state, props) => {
   const { instancesServiceType } = getInstancesServiceTypesByFlag(flag)
   const { location } = props
-  const { current, CSB } = state
-  const userID = current.user.info.userID
+  const { CSB } = state
   const { mergeQuery } = getQueryAndFuncs(flag)
-  const applysKey = getQueryKey(mergeQuery(userID, location.query))
+  const applysKey = getQueryKey(mergeQuery(location.query))
   return CSB[instancesServiceType][applysKey] || {}
 }
 

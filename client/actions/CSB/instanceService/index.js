@@ -177,6 +177,58 @@ export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
   return dispatch(rmInstanceServiceACL(instanceId, serviceId))
 }
 
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_REQUEST = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_REQUEST'
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_SUCCESS = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_SUCCESS'
+// export const FETCH_CSB_INSTANCE_SERVICE_DETAIL_FAILURE = 'FETCH_CSB_INSTANCE_SERVICE_DETAIL_FAILURE'
+
+// const fetchInstanceServiceDetail = (instanceId, serviceId) => {
+//   return {
+//     [CALL_API]: {
+//       types: [
+//         DEL_CSB_INSTANCE_SERVICE_ACL_REQUEST,
+//         DEL_CSB_INSTANCE_SERVICE_ACL_SUCCESS,
+//         DEL_CSB_INSTANCE_SERVICE_ACL_FAILURE,
+//       ],
+//       endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/access-control`,
+//       schema: Schemas.CSB_INSTANCE_SERVICE_ACL_LIST_DATA,
+//     },
+//   }
+// }
+
+// // export const delInstanceServiceACL = (instanceId, serviceId) => dispatch => {
+// //   return dispatch(fetchInstanceServiceDetail(instanceId, serviceId))
+// // }
+
+export const SUBSCRIBEABLE_SERVICES_REQUEST = 'SUBSCRIBEABLE_SERVICES_REQUEST'
+export const SUBSCRIBEABLE_SERVICES_SUCCESS = 'SUBSCRIBEABLE_SERVICES_SUCCESS'
+export const SUBSCRIBEABLE_SERVICES_FAILURE = 'SUBSCRIBEABLE_SERVICES_FAILURE'
+
+// Create an subscribable service list
+// Relies on the custom API middleware defined in ../middleware/api.js.
+
+const fetchSubscribableServices = (instanceID, query) => {
+  const _query = cloneDeep(query)
+  const { page } = _query
+  if (page !== undefined) {
+    _query.page = page - 1
+  }
+  return {
+    query,
+    [CALL_API]: {
+      types: [
+        SUBSCRIBEABLE_SERVICES_REQUEST,
+        SUBSCRIBEABLE_SERVICES_SUCCESS,
+        SUBSCRIBEABLE_SERVICES_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/subscribable?${toQuerystring(_query)}`,
+      schema: Schemas.CSB_SUBSCRIBE_LIST_DATA,
+    },
+  }
+}
+
+export const subscribableServices = (instanceID, query) =>
+  dispatch => dispatch(fetchSubscribableServices(instanceID, query))
+
 export const FETCH_CSB_SERVICE_OVERVIEW_REQUEST = 'FETCH_CSB_SERVICE_OVERVIEW_REQUEST'
 export const FETCH_CSB_SERVICE_OVERVIEW_SUCCESS = 'FETCH_CSB_SERVICE_OVERVIEW_SUCCESS'
 export const FETCH_CSB_SERVICE_OVERVIEW_FAILURE = 'FETCH_CSB_SERVICE_OVERVIEW_FAILURE'

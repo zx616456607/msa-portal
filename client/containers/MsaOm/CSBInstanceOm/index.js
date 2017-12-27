@@ -28,7 +28,7 @@ import {
   getQueryAndFuncs,
 } from '../../../selectors/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
-import { formatDate, getQueryKey, toQuerystring } from '../../../common/utils'
+import { formatDate, toQuerystring } from '../../../common/utils'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -77,7 +77,6 @@ class CSBInstanceOm extends React.Component {
     if (query.filter === '') {
       delete query.filter
     }
-    location.query = getQueryKey(query)
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
@@ -86,7 +85,6 @@ class CSBInstanceOm extends React.Component {
 
   tableChange = (pagination, filters, sorter) => {
     this.setState({
-      page: pagination.current,
       filterInfo: filters,
       sorterInfo: sorter,
     })
