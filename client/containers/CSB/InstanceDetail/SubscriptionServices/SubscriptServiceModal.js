@@ -11,12 +11,16 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import propTypes from 'prop-types'
 import {
   Modal, Form, InputNumber, Row, Col,
-  Select, Input, Button,
+  Select, Input, notification, Radio,
 } from 'antd'
 import './style/SubscriptServiceModal.less'
+import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
+import { getConsumerVouchersList } from '../../../../actions/CSB/instanceService/consumerVouchers'
+import { subscribeService } from '../../../../actions/CSB/instanceService'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -24,21 +28,69 @@ const TextArea = Input.TextArea
 
 class SubscriptServiceModal extends React.Component {
   static propTypes = {
+    // 控制Modal的显示隐藏
+    visible: propTypes.bool.isRequired,
     // 关闭 modal 的方法
     closeModalMethod: propTypes.func.isRequired,
-    // 获取当前 modal 的值供父组件调用
-    callback: propTypes.func.isRequired,
-    // modal 确定按钮的 loading 太
-    loading: propTypes.bool.isRequired,
+  }
+  state = {
+    mode: 'top',
+    confirmLoading: false,
+  }
+
+  componentDidMount() {
+    const { getConsumerVouchersList, match } = this.props
+    const { instanceID } = match.params
+    getConsumerVouchersList(instanceID)
   }
 
   handleOk = () => {
-    const { form, callback } = this.props
+    const { form, subscribeService, match, dateSource, callback, closeModalMethod } = this.props
+    const { instanceID } = match.params
     form.validateFields((errors, values) => {
       if (errors) {
         return
       }
-      callback(values)
+      const { consumer } = values
+      const body = {
+        serviceId: dateSource.id,
+        evidenceId: parseInt(consumer),
+        reason: '',
+        accessConfig: '',
+      }
+      this.setState({
+        confirmLoading: true,
+      })
+      subscribeService(instanceID, body).then(res => {
+        if (res.error) {
+          if (res.status === 403) {
+            notification.warn({
+              message: '订阅失败',
+              description: '没有订阅服务权限',
+            })
+            this.setState({
+              confirmLoading: false,
+            })
+            return
+          }
+          notification.error({
+            message: '订阅失败',
+            description: res.error,
+          })
+          this.setState({
+            confirmLoading: false,
+          })
+          return
+        }
+        notification.success({
+          message: '订阅成功',
+        })
+        this.setState({
+          confirmLoading: false,
+        })
+        callback()
+        closeModalMethod()
+      })
     })
   }
 
@@ -47,25 +99,32 @@ class SubscriptServiceModal extends React.Component {
     closeModalMethod()
   }
 
+  handleModeChange = e => {
+    const mode = e.target.value
+    this.setState({ mode })
+  }
   render() {
-    const { loading, form, visible } = this.props
+    const { form, visible, dateSource, vouchers } = this.props
+    const { mode, confirmLoading } = this.state
     const { getFieldDecorator } = form
+    const { content } = vouchers
     const formItemLayout = {
-      labelCol: { span: 5 },
-      wrapperCol: { span: 19 },
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
     }
+    console.log(dateSource)
     return <Modal
       title="订阅服务"
       visible={visible}
       onOk={this.handleOk}
       onCancel={this.handleCancel}
       width="570px"
-      confirmLoading={loading}
+      confirmLoading={confirmLoading}
       wrapClassName="subscript-service-modal"
     >
       <Form>
         <Row className="row-style">
-          <Col span={5} className="require">QPS</Col>
+          <Col span={4} className="require">QPS</Col>
           <Col span={15} className="input-col-style">
             希望每秒最大访问<FormItem>
               {
@@ -99,9 +158,11 @@ class SubscriptServiceModal extends React.Component {
               }],
             })(
               <Select placeholder="选择一个消费凭证">
-                <Option value="1" key="1">消费凭证1</Option>
-                <Option value="2" key="2">消费凭证2</Option>
-                <Option value="3" key="3">消费凭证3</Option>
+                {
+                  content ? content.map(item => {
+                    return <Option key={item.id}>{item.name}</Option>
+                  }) : []
+                }
               </Select>
             )
           }
@@ -110,6 +171,7 @@ class SubscriptServiceModal extends React.Component {
           label="绑定 IP"
           key="bindIp"
           {...formItemLayout}
+          style={{ marginBottom: 24 }}
         >
           {
             getFieldDecorator('bindIp')(
@@ -118,29 +180,34 @@ class SubscriptServiceModal extends React.Component {
           }
         </FormItem>
         <Row className="row-style">
-          <Col span={5}>服务详细信息</Col>
-          <Col span={19}><Button>基本详情</Button></Col>
+          <Col span={4}>服务详细信息</Col>
+          <Col span={18}>
+            <Radio.Group className="subscript-radio-group" onChange={this.handleModeChange} value={mode}>
+              <Radio.Button value="top">基本详情</Radio.Button>
+              <Radio.Button value="left" disabled>入参</Radio.Button>
+              <Radio.Button value="right" disabled>出参</Radio.Button>
+            </Radio.Group>
+          </Col>
         </Row>
         <Row>
-          <Col span={5}></Col>
-          <Col span={19}>
+          <Col span={18} offset={4}>
             <table className="service-info">
               <tbody>
                 <tr>
                   <td>服务名称</td>
-                  <td></td>
+                  <td>{dateSource.name}</td>
                 </tr>
                 <tr>
                   <td>服务描述</td>
-                  <td></td>
+                  <td>{dateSource.description || '-'}</td>
                 </tr>
                 <tr>
                   <td>服务状态</td>
-                  <td></td>
+                  <td>{dateSource.status === 1 ? '已激活' : '已停用'}</td>
                 </tr>
                 <tr>
                   <td>开放接口</td>
-                  <td></td>
+                  <td>-</td>
                 </tr>
               </tbody>
             </table>
@@ -151,4 +218,13 @@ class SubscriptServiceModal extends React.Component {
   }
 }
 
-export default Form.create()(SubscriptServiceModal)
+const mapStateToProps = (state, props) => {
+  return {
+    vouchers: consumeVoucherSlt(state, props),
+  }
+}
+
+export default connect(mapStateToProps, {
+  getConsumerVouchersList,
+  subscribeService,
+})(Form.create()(SubscriptServiceModal))

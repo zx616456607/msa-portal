@@ -32,7 +32,6 @@ const { mergeQuery } = getQueryAndFuncs(CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG)
 class SubscriptionServices extends React.Component {
   state = {
     subscriptServiceVisible: false,
-    confirmLoading: false,
   }
 
   componentWillMount() {
@@ -89,10 +88,9 @@ class SubscriptionServices extends React.Component {
   }
 
   openSubscriptServiceModal = record => {
-    console.log('record=', record)
     this.setState({
+      currentService: record,
       subscriptServiceVisible: true,
-      confirmLoading: false,
     })
   }
 
@@ -107,13 +105,9 @@ class SubscriptionServices extends React.Component {
     }
   }
 
-  subscriptService = values => {
-    console.log('values=', values)
-  }
-
   render() {
-    const { services, location } = this.props
-    let { subscriptServiceVisible, confirmLoading, name, sorterInfo, filterInfo } = this.state
+    const { services, location, match } = this.props
+    let { subscriptServiceVisible, name, sorterInfo, filterInfo, currentService } = this.state
     const { isFetching, content, totalElements, size } = services
     const { query } = location
     filterInfo = filterInfo || {}
@@ -203,9 +197,9 @@ class SubscriptionServices extends React.Component {
         {
           subscriptServiceVisible && <SubscriptServiceModal
             visible={subscriptServiceVisible}
-            loading={confirmLoading}
+            dateSource={currentService}
+            match={match}
             closeModalMethod={this.closeSubscriptServiceModal.bind(this)}
-            callback={this.subscriptService}
           />
         }
       </QueueAnim>

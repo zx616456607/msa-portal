@@ -302,3 +302,28 @@ const fetchPingService = (instanceID, query) => {
 
 export const pingService = (instanceID, query) =>
   dispatch => dispatch(fetchPingService(instanceID, query))
+
+export const SUBSCRIBE_SERVICE_REQUEST = 'SUBSCRIBE_SERVICE_REQUEST'
+export const SUBSCRIBE_SERVICE_SUCCESS = 'SUBSCRIBE_SERVICE_SUCCESS'
+export const SUBSCRIBE_SERVICE_FAILURE = 'SUBSCRIBE_SERVICE_FAILURE'
+
+const fetchSubscribeService = (instanceID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        SUBSCRIBE_SERVICE_REQUEST,
+        SUBSCRIBE_SERVICE_SUCCESS,
+        SUBSCRIBE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-request`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const subscribeService = (instanceID, body) =>
+  dispatch => dispatch(fetchSubscribeService(instanceID, body))
