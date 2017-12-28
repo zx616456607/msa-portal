@@ -77,7 +77,14 @@ class MyPublishedServices extends React.Component {
       delete query.page
     }
     if (query.includeDeleted === true) {
-      query.status = [ 1, 2, 4 ]
+      query.status ? query.status :
+        query.status = [ '1', '2', '4' ]
+    }
+    if (query.sort === '') {
+      delete query.sort
+    }
+    if (query.filter === '') {
+      delete query.filter
     }
     delete query.includeDeleted
     if (!isEqual(query, location.query)) {
@@ -103,13 +110,16 @@ class MyPublishedServices extends React.Component {
   }
 
   render() {
-    const { myPublished, match, history, instanceID } = this.props
+    const { myPublished, match, history, instanceID, location } = this.props
     const { content, size, isFetching, totalElements } = myPublished
+    const { query } = location
+    const { includeDeleted } = this.state
     const paginationProps = {
       simple: true,
       pageSize: size || 10,
       total: totalElements,
-      current: 1,
+      current: parseInt(query.page) || 1,
+      onChange: page => this.loadData({ page }),
     }
     const { createServiceGroupModalVisible } = this.state
     return (
@@ -137,7 +147,7 @@ class MyPublishedServices extends React.Component {
             发布服务
           </Button>
           <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
-          创建服务组
+            创建服务组
           </Button>
           <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
           <Search
@@ -157,6 +167,7 @@ class MyPublishedServices extends React.Component {
         <div key="data-box" className="layout-content-body">
           <Card>
             <ServicesTable
+              check={includeDeleted}
               loadData={this.loadData}
               loading={isFetching}
               dataSource={content}

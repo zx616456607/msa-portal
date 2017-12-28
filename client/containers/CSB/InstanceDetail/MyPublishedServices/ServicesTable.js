@@ -13,10 +13,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
-import {
-  Dropdown, Menu, Table, Notification,
-} from 'antd'
+import { Dropdown, Menu, Table, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
@@ -241,13 +240,13 @@ class ServicesTable extends React.Component {
         if (type === 'logout') {
           delInstanceService(instanceID, record.id).then(res => {
             if (res.error) {
-              Notification.error({
+              notification.error({
                 message: self.serviceMessages(type, true),
               })
               return
             }
             if (res.response.result.code === 200) {
-              Notification.success({
+              notification.success({
                 message: self.serviceMessages(type, false),
               })
               loadData()
@@ -257,13 +256,13 @@ class ServicesTable extends React.Component {
         }
         PutInstanceService(instanceID, record.id, body).then(res => {
           if (res.error) {
-            Notification.error({
+            notification.error({
               message: self.serviceMessages(type, true),
             })
             return
           }
           if (res.response.result.code === 200) {
-            Notification.success({
+            notification.success({
               message: self.serviceMessages(type, false),
             })
             loadData()
@@ -280,8 +279,42 @@ class ServicesTable extends React.Component {
     })
   }
 
+  getSort = value => {
+    let orderStr = 'publishTime,asc'
+    if (value.order === 'descend') {
+      orderStr = 'publishTime,desc'
+    }
+    return orderStr
+  }
+
+  handleChange = (pagination, filters, sorter) => {
+    const { check, loadData } = this.props
+    let filtersStr = ''
+    let sorterStr = ''
+    if (!isEmpty(filters)) {
+      const { status } = filters
+      if (check) {
+        if (status.length < 3 && status.length > 0) {
+          filtersStr = status
+          if (status > 1) {
+            status.forEach(item => {
+              filtersStr = {
+                status: item,
+              }
+            })
+          }
+        }
+      }
+      filtersStr = status
+    }
+    if (!isEmpty(sorter)) {
+      sorterStr = this.getSort(sorter)
+    }
+    loadData({ status: filtersStr, sort: sorterStr })
+  }
+
   render() {
-    const { dataSource, loading, from, size, match } = this.props
+    const { dataSource, loading, from, match, check } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -311,6 +344,22 @@ class ServicesTable extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
+        filters: check ? [{
+          text: '已停用',
+          value: '2',
+        }, {
+          text: '已激活',
+          value: '1',
+        }, {
+          text: '已注销',
+          value: '4',
+        }] : [{
+          text: '已停用',
+          value: '2',
+        }, {
+          text: '已激活',
+          value: '1',
+        }],
         render: (text, row) => this.renderServiceStatusUI(row.status),
       },
       {
@@ -335,6 +384,7 @@ class ServicesTable extends React.Component {
         title: '发布时间',
         dataIndex: 'time',
         key: 'time',
+        sorter: (a, b) => a.time - b.time,
         render: (text, row) => formatDate(row.publishTime),
       },
       {
@@ -359,7 +409,7 @@ class ServicesTable extends React.Component {
           pagination={false}
           loading={loading}
           rowKey={row => row.id}
-          size={size}
+          onChange={this.handleChange}
         />
       </div>,
       <div key="modals">
