@@ -14,6 +14,7 @@ import { CALL_API } from '../../../middleware/api'
 import { Schemas } from '../../../middleware/schemas'
 import { toQuerystring } from '../../../common/utils'
 import { API_CONFIG } from '../../../constants'
+import cloneDeep from 'lodash/cloneDeep'
 
 const { CSB_API_URL } = API_CONFIG
 
@@ -25,7 +26,11 @@ export const GET_SERVICE_SUBSCRIBE_APPROVE_LIST_FALIURE = 'GET_SERVICE_SUBSCRIBE
 const fetchGetServiceSubscribeApproveList = (instanceID, query) => {
   let endpoint = `${CSB_API_URL}/instances/${instanceID}/service-request`
   if (query) {
-    endpoint += `?${toQuerystring(query)}`
+    const _query = cloneDeep(query)
+    if (query.page) {
+      _query.page = query.page - 1
+    }
+    endpoint += `?${toQuerystring(_query)}`
   }
   return {
     instanceID,

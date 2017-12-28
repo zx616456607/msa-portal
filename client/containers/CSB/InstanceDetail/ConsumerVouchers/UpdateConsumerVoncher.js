@@ -34,7 +34,6 @@ class UpdateConsumerVoucher extends React.Component {
     updateSetting: 'delay',
     delayTime: 1,
     hideOld: false,
-    hideNew: false,
   }
 
   handleOk = () => {
@@ -47,19 +46,10 @@ class UpdateConsumerVoucher extends React.Component {
     callback(values)
   }
 
-  hideKeys = type => {
-    switch (type) {
-      case 'old':
-        return this.setState(preState => {
-          return { hideOld: !preState.hideOld }
-        })
-      case 'new':
-        return this.setState(preState => {
-          return { hideNew: !preState.hideNew }
-        })
-      default:
-        return
-    }
+  hideKeys = () => {
+    this.setState(preState => {
+      return { hideOld: !preState.hideOld }
+    })
   }
 
   inputNumberOnchange = delayTime => {
@@ -82,17 +72,28 @@ class UpdateConsumerVoucher extends React.Component {
     return star
   }
 
+  renderTimeout = () => {
+    const { record } = this.props
+    const { expireAt } = record
+    if (!expireAt) {
+      return false
+    }
+    const nowTime = new Date().getTime()
+    const updateTime = new Date(record.expireAt).getTime()
+    if (updateTime - nowTime < 0) {
+      return true
+    }
+    return false
+  }
+
   render() {
     const { loading, closeModalMethod, record } = this.props
-    const { updateSetting, delayTime, hideOld, hideNew } = this.state
+    const { updateSetting, delayTime, hideOld } = this.state
     const starStr = this.renderStarStr()
+    const timeout = this.renderTimeout()
     let oldKeys = `ak: ${record.clientId}\nsk: ${record.secret}`
     if (hideOld) {
       oldKeys = `ak: ${starStr}\nsk: ${starStr}`
-    }
-    let newKeys = `ak: ${record.clientId}\nsk: ${record.secret}`
-    if (hideNew) {
-      newKeys = `ak: ${starStr}\nsk: ${starStr}`
     }
     return (
       <Modal
@@ -105,7 +106,7 @@ class UpdateConsumerVoucher extends React.Component {
         maskClosable={false}
         confirmLoading={loading}
         wrapClassName="update-consumer-voucher"
-        okText="更新"
+        okText={ record.expireAt ? '完成更新' : '确定' }
       >
         <Row>
           <Col span={4}>
@@ -124,7 +125,7 @@ class UpdateConsumerVoucher extends React.Component {
                 value={oldKeys}
                 autosize={{ minRows: 2, maxRows: 8 }}
               />
-              <Icon type="eye-o" className="text-ico" onClick={() => this.hideKeys('old')}/>
+              <Icon type="eye-o" className="text-ico" onClick={() => this.hideKeys()}/>
             </div>
           </Col>
         </Row>
@@ -132,15 +133,8 @@ class UpdateConsumerVoucher extends React.Component {
           <Col span={4}>
             新 AK / SK
           </Col>
-          <Col span={19}>
-            <div className="key-container">
-              <TextArea
-                disabled
-                value={newKeys}
-                autosize={{ minRows: 2, maxRows: 8 }}
-              />
-              <Icon type="eye-o" className="text-ico" onClick={() => this.hideKeys('new')}/>
-            </div>
+          <Col span={19} className="newkeys-style">
+            更新后，新 AccessKey / SecretKey 将会被生成
           </Col>
         </Row>
         <Row>
@@ -150,8 +144,8 @@ class UpdateConsumerVoucher extends React.Component {
               defaultValue={updateSetting}
               onChange={e => this.setState({ updateSetting: e.target.value })}
             >
-              <Radio value="delay">更新过度，新旧凭证同时失效</Radio>
-              <Radio value="immediately">立即生效新凭证</Radio>
+              <Radio value="delay">更新过渡，新旧凭证同时生效</Radio>
+              <Radio value="immediately">立即生效，仅用新凭证</Radio>
             </RadioGroup>
           </Col>
         </Row>
@@ -170,6 +164,14 @@ class UpdateConsumerVoucher extends React.Component {
               </Col>
             </Row>
           )
+        }
+        {
+          timeout && <Row>
+            <Col span={4}></Col>
+            <Col span={20} className="timeout-style">
+              已超时，旧 ak / sk 不生效，完成更新后方可进行下次更新。
+            </Col>
+          </Row>
         }
       </Modal>
     )
