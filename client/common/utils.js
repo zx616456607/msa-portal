@@ -134,9 +134,10 @@ export const getQueryKey = query => toQuerystring(query) || DEFAULT
  */
 export const getMenuSelectedKeys = (location, menus) => {
   const defaultSelectedKeys = []
+  const { pathname } = location
   menus.every(menu => {
     if (menu.to === '/') {
-      if (location.pathname === menu.to) {
+      if (pathname === menu.to) {
         defaultSelectedKeys.push(menu.to)
         return false
       }
@@ -146,7 +147,12 @@ export const getMenuSelectedKeys = (location, menus) => {
       const childrenMenus = menu.children
       let isFound = false
       childrenMenus.every(_menu => {
-        if (location.pathname === _menu.to) {
+        if (_menu.includePaths && _menu.includePaths.indexOf(pathname) > -1) {
+          defaultSelectedKeys.push(_menu.to)
+          isFound = true
+          return false
+        }
+        if (pathname === _menu.to) {
           defaultSelectedKeys.push(_menu.to)
           isFound = true
           return false
@@ -156,8 +162,8 @@ export const getMenuSelectedKeys = (location, menus) => {
       // if found jump out of the loop
       return !isFound
     }
-    if (location.pathname === menu.to) {
-      // if (location.pathname.indexOf(menu.to) === 0) {
+    if (pathname === menu.to) {
+      // if (pathname.indexOf(menu.to) === 0) {
       defaultSelectedKeys.push(menu.to)
       return false
     }

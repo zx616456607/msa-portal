@@ -53,12 +53,16 @@ class CSBInstanceDetail extends React.Component {
         children: [
           {
             to: `/csb-instances-available/${instanceID}/my-published-services`,
+            includePaths: [
+              `/csb-instances-available/${instanceID}/my-published-services-groups`,
+              `/csb-instances-available/${instanceID}/publish-service`,
+            ],
             text: '我发布的服务',
           },
-          {
+          /* {
             to: `/csb-instances-available/${instanceID}/my-published-services-groups`,
             text: '我的服务组',
-          },
+          }, */
           {
             to: `/csb-instances-available/${instanceID}/service-subscription-approval`,
             text: '服务订阅审批',
