@@ -290,9 +290,9 @@ const fetchPingService = (instanceID, query) => {
         PING_CSB_INSTANCE_SERVICE_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/instances/${instanceID}/ping?${toQuerystring(query)}`,
-      options: {
+      /* options: {
         method: 'OPTIONS',
-      },
+      }, */
       schema: {},
     },
   }

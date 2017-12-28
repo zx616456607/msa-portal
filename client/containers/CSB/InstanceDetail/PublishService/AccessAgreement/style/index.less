@@ -13,5 +13,14 @@
 @import '~assets/style/core/index.less';
 
 .access-agreement {
-  display: block;
+  .right-btn {
+    &.success {
+      color: @success-color;
+      border-color: @success-color;
+    }
+    &.failed {
+      color: @error-color;
+      border-color: @error-color;
+    }
+  }
 }

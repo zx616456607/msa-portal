@@ -101,7 +101,7 @@ class InstanceDetailOverview extends React.Component {
               <img src={images[0].src} />
             </div>
             <div className="desc">
-              <h2>实例名称：</h2>
+              <h2>实例名称：dddd</h2>
               <div className="descs">
                 <div>创建人：小白</div>
                 <div>创建时间：2017-12-12</div>

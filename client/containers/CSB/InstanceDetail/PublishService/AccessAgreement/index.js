@@ -44,6 +44,7 @@ class AccessAgreement extends React.Component {
     checkWSDLModalVisible: false,
     pingLoading: false,
     securityHeaderModalVisible: false,
+    pingSuccess: null,
   }
 
   ping = () => {
@@ -52,24 +53,47 @@ class AccessAgreement extends React.Component {
       if (err) {
         return
       }
-      this.setState({ pingLoading: true })
+      this.setState({
+        pingLoading: true,
+        pingSuccess: null,
+      })
       pingService(instanceID, { url: values.targetDetail }).then(res => {
         this.setState({ pingLoading: false })
         console.log(res)
         if (res.error) {
+          this.setState({ pingSuccess: false })
           return
         }
+        this.setState({ pingSuccess: true })
       })
     })
   }
 
+  getPingBtnIcon = () => {
+    const { pingSuccess } = this.state
+    switch (pingSuccess) {
+      case true:
+        return 'check-circle-o'
+      case false:
+        return 'exclamation-circle-o'
+      default:
+        return 'rocket'
+    }
+  }
+
   render() {
     const { formItemLayout, form, className } = this.props
+    const { pingSuccess } = this.state
     const { getFieldDecorator, getFieldValue } = form
     const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
       [className]: !!className,
+    })
+    const pingBtnClassNames = ClassNames({
+      'right-btn': true,
+      success: pingSuccess === true,
+      failed: pingSuccess === false,
     })
     return (
       <div className={classNames}>
@@ -110,7 +134,8 @@ class AccessAgreement extends React.Component {
                 <Input placeholder="请提供接入服务的基础 URL" />
               )}
               <Button
-                className="right-btn"
+                className={pingBtnClassNames}
+                icon={this.getPingBtnIcon()}
                 loading={this.state.pingLoading}
                 onClick={this.ping}
               >
