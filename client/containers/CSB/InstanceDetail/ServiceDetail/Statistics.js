@@ -48,15 +48,9 @@ const Chart = CreateG2(chart => {
 
 class Statistics extends React.Component {
   state = {
-    data: [],
-    callCount: 0,
-    errorCallCount: 0,
     forceFit: true,
     height: 300,
     rangeDateTime: [],
-    averageTime: 0,
-    minTime: 0,
-    maxTime: 0,
   }
 
   componentWillMount() {
@@ -119,7 +113,7 @@ class Statistics extends React.Component {
     const { dataMap, detailData, serviceId } = this.props
     const { maxCallTime, minCallTime, averageCallTime, diagramData } = dataMap && dataMap.data || {}
     const { totalCallCount, totalErrorCallCount } = detailData.data && detailData.data[`${serviceId}`] || {}
-    const dataList = this.fetchMapList(diagramData || [])
+    const dataList = this.fetchMapList(diagramData || []) || []
     return (
       <div className="service-statistics">
         <div className="service-statistics-body">
@@ -127,14 +121,14 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>累计调用量</div>
               <div>
-                <span>{totalCallCount}</span>
+                <span>{totalCallCount || 0}</span>
                 <span>个</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>累计错误量</div>
               <div className="error-status">
-                <span>{totalErrorCallCount}</span>
+                <span>{totalErrorCallCount || 0}</span>
                 <span>个</span>
               </div>
             </Col>
@@ -186,10 +180,11 @@ class Statistics extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const { CSB } = state
-  const overviewList = CSB.serviceOverview.default
-  const dataMap = CSB.serviceDetailMap.default
+  const { serviceId } = ownProps
+  const overviewList = CSB.serviceOverview[serviceId]
+  const dataMap = CSB.serviceDetailMap[serviceId]
   return {
     dataMap,
     detailData: overviewList || {},

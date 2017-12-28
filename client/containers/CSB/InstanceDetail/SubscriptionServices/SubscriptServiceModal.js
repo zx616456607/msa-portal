@@ -45,7 +45,7 @@ class SubscriptServiceModal extends React.Component {
   }
 
   handleOk = () => {
-    const { form, subscribeService, match, dateSource, callback, closeModalMethod } = this.props
+    const { form, subscribeService, match, dateSource, closeModalMethod } = this.props
     const { instanceID } = match.params
     form.validateFields((errors, values) => {
       if (errors) {
@@ -88,7 +88,6 @@ class SubscriptServiceModal extends React.Component {
         this.setState({
           confirmLoading: false,
         })
-        callback()
         closeModalMethod()
       })
     })
