@@ -233,7 +233,7 @@ export const FETCH_CSB_SERVICE_OVERVIEW_REQUEST = 'FETCH_CSB_SERVICE_OVERVIEW_RE
 export const FETCH_CSB_SERVICE_OVERVIEW_SUCCESS = 'FETCH_CSB_SERVICE_OVERVIEW_SUCCESS'
 export const FETCH_CSB_SERVICE_OVERVIEW_FAILURE = 'FETCH_CSB_SERVICE_OVERVIEW_FAILURE'
 
-const fetchServiceOverview = (instanceId, serviceId) => {
+const fetchServiceOverview = (instanceId, serviceIds) => {
   return {
     [CALL_API]: {
       types: [
@@ -241,14 +241,14 @@ const fetchServiceOverview = (instanceId, serviceId) => {
         FETCH_CSB_SERVICE_OVERVIEW_SUCCESS,
         FETCH_CSB_SERVICE_OVERVIEW_FAILURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/overview`,
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceIds}/overview`,
       schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
     },
   }
 }
 
-export const getInstanceServiceOverview = (instanceId, serviceId) => dispatch => {
-  return dispatch(fetchServiceOverview(instanceId, serviceId))
+export const getInstanceServiceOverview = (instanceId, serviceIds) => dispatch => {
+  return dispatch(fetchServiceOverview(instanceId, serviceIds))
 }
 
 export const FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST = 'FETCH_CSB_SERVICE_DETAIL_MAP_REQUEST'

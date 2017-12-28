@@ -23,7 +23,7 @@ import { toQuerystring } from '../../../../common/utils'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import CreateServiceGroupModal from './Groups/CreateServiceGroupModal'
-import { getInstanceService } from '../../../../actions/CSB/instanceService'
+import { getInstanceService, getInstanceServiceOverview } from '../../../../actions/CSB/instanceService'
 import ServiceOrGroupSwitch from './ServiceOrGroupSwitch'
 import './style/MyPublishedServices.less'
 
@@ -66,7 +66,7 @@ class MyPublishedServices extends React.Component {
 
   // 加载数据
   loadData = query => {
-    const { getInstanceService, history, match } = this.props
+    const { getInstanceService, getInstanceServiceOverview, history, match } = this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
@@ -83,7 +83,12 @@ class MyPublishedServices extends React.Component {
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
-    getInstanceService(instanceID, mergeQuery(query))
+    getInstanceService(instanceID, mergeQuery(query)).then(res => {
+      if (res.error) {
+        return
+      }
+      getInstanceServiceOverview(instanceID, res.response.result.data.content)
+    })
   }
 
   // 发布服务
@@ -184,5 +189,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(mapStateToProps, {
   getInstanceService,
+  getInstanceServiceOverview,
 })(MyPublishedServices)
-

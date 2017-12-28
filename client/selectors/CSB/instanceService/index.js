@@ -65,18 +65,25 @@ const getInstanceService = (flag, state, props) => {
   return CSB[instancesServiceType][applysKey] || {}
 }
 
+const getInstanceServiceOverview = state => state.CSB.serviceOverview
+
 const getEntities = state => state.entities
 
 export const csbInstanceServiceSltMaker = flag => createSelector(
   [
     getInstanceService.bind(this, flag),
+    getInstanceServiceOverview,
     getEntities,
   ],
-  (csbApplys, entities) => {
+  (csbApplys, serviceOverview, entities) => {
     const { ids, ...other } = csbApplys
     const { instancesServiceEntitiesType } = getInstancesServiceTypesByFlag(flag)
     const applyEntities = entities[instancesServiceEntitiesType]
-    const content = (ids || []).map(id => applyEntities[id])
+    const content = (ids || []).map(id => Object.assign(
+      {},
+      applyEntities[id],
+      serviceOverview[id]
+    ))
     return {
       content,
       ...other,
