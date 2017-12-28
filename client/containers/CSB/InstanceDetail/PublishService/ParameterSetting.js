@@ -16,6 +16,7 @@ import { Row, Col, Input, Button, Icon, Form } from 'antd'
 import './style/ParameterSetting.less'
 
 const FormItem = Form.Item
+const TextArea = Input.TextArea
 
 export default class ParameterSetting extends React.Component {
   state = {
@@ -185,7 +186,7 @@ export default class ParameterSetting extends React.Component {
   }
 
   render() {
-    const { className, form } = this.props
+    const { className, form, formItemLayout } = this.props
     const { getFieldDecorator, getFieldValue } = form
     getFieldDecorator('parameterKeys', { initialValue: [] })
     const keys = getFieldValue('parameterKeys')
@@ -195,6 +196,30 @@ export default class ParameterSetting extends React.Component {
     })
     return (
       <div className={classNames}>
+        {
+          getFieldValue('protocol') !== getFieldValue('serviceProtocol') &&
+          [
+            <div key="title" className="second-title">参数映射</div>,
+            <div key="dody" className="parameter-mapping-body">
+              <FormItem
+                {...formItemLayout}
+                label="请求转换模版"
+              >
+                {getFieldDecorator('requestXslt')(
+                  <TextArea placeholder="请提供请求转换模版" />
+                )}
+              </FormItem>
+              <FormItem
+                {...formItemLayout}
+                label="响应转换模版"
+              >
+                {getFieldDecorator('responseXslt')(
+                  <TextArea placeholder="请提供响应转换模版" />
+                )}
+              </FormItem>
+            </div>,
+          ]
+        }
         <div className="second-title">编辑错误代码</div>
         <div className="parameter-setting-body">
           <div className="parameter-setting-box">

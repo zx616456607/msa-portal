@@ -232,6 +232,7 @@ class PublishService extends React.Component {
                 <ParameterSetting
                   className={stepTwoClassNames}
                   form={form}
+                  formItemLayout={formItemLayout}
                   instanceID={instanceID}
                 />
                 <ServiceControl

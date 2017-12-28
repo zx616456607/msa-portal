@@ -125,7 +125,7 @@ export default class OpenAgreement extends React.Component {
           })(
             <RadioGroup>
               <Radio value="Restful-API">Restful-API</Radio>
-              <Radio value="WebService" disabled>WebService</Radio>
+              <Radio value="WebService">WebService</Radio>
             </RadioGroup>
           )}
         </FormItem>

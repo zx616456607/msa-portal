@@ -378,7 +378,11 @@ class ServicesTable extends React.Component {
         title: '平均RT（ms）',
         dataIndex: 'averageCallTime',
         key: 'averageCallTime',
-        render: text => (text !== undefined ? text : '-'),
+        render: text => (
+          text !== undefined
+            ? Math.ceil(text * 100) / 100
+            : '-'
+        ),
       },
       {
         title: '发布时间',
