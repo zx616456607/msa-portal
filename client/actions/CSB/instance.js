@@ -211,3 +211,26 @@ const fetchEditInstance = (clusterID, instanceID, body) => {
 
 export const editInstance = (clusterID, instanceID, body) =>
   dispatch => dispatch(fetchEditInstance(clusterID, instanceID, body))
+
+// 获取实例概览
+export const GET_CSB_INSTANCE_OVERVIEW_REQUEST = 'GET_CSB_INSTANCE_OVERVIEW_REQUEST'
+export const GET_CSB_INSTANCE_OVERVIEW_SUCCESS = 'GET_CSB_INSTANCE_OVERVIEW_SUCCESS'
+export const GET_CSB_INSTANCE_OVERVIEW_FAILURE = 'GET_CSB_INSTANCE_OVERVIEW_FAILURE'
+
+const fetchGetInstanceOverview = (clusterID, instanceID) => {
+  return {
+    instanceID,
+    [CALL_API]: {
+      types: [
+        GET_CSB_INSTANCE_OVERVIEW_REQUEST,
+        GET_CSB_INSTANCE_OVERVIEW_SUCCESS,
+        GET_CSB_INSTANCE_OVERVIEW_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/${instanceID}/overview`,
+      schema: {},
+    },
+  }
+}
+
+export const getInstanceOverview = (clusterID, instanceID) =>
+  dispatch => dispatch(fetchGetInstanceOverview(clusterID, instanceID))
