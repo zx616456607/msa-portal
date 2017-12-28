@@ -132,12 +132,12 @@ class ServiceSubscriptionApproval extends React.Component {
     const columns = [{
       id: 'id',
       title: '订阅人',
-      dataIndex: 'name',
+      dataIndex: 'subscriberName',
       width: '12%',
     }, {
       title: '订阅服务名称',
-      key: 'serviceId',
-      dataIndex: 'serviceId',
+      key: 'serviceName',
+      dataIndex: 'serviceName',
       width: '12%',
     }, {
       title: '状态',
@@ -161,10 +161,10 @@ class ServiceSubscriptionApproval extends React.Component {
       dataIndex: 'QPS',
       width: '10%',
     }, {
-      title: <Tooltip title="希望最大每秒访问次数">
-        <span>QPS</span>
+      title: <Tooltip>
+        <span>绑定 IP</span>
       </Tooltip>,
-      dataIndex: 'QPH',
+      dataIndex: 'bindingIP',
       width: '10%',
       filterIcon: <Icon type="smile-o" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }} />,
     }, {
@@ -242,11 +242,11 @@ class ServiceSubscriptionApproval extends React.Component {
           <div className="modal-approval">
             <Row className="modal-div">
               <Col span={4}>订阅服务</Col>
-              <Col span={20}>{currentRecord.serviceId}</Col>
+              <Col span={20}>{currentRecord.serviceName}</Col>
             </Row>
             <Row className="modal-div">
               <Col span={4}>订阅人</Col>
-              <Col span={20}>{currentRecord.people ? currentRecord.people : '-' }</Col>
+              <Col span={20}>{currentRecord.subscriberName ? currentRecord.subscriberName : '-' }</Col>
             </Row>
             <Row className="modal-div">
               <Col span={4}>消费凭证</Col>
