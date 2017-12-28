@@ -13,6 +13,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
+import { parse as parseQuerystring } from 'query-string'
+import isEqual from 'lodash/isEqual'
 import {
   Button, Select, Input, Pagination, Table, Menu, Dropdown,
   Modal, notification,
@@ -23,6 +25,7 @@ import CreateServiceGroupModal from './CreateServiceGroupModal'
 import ServiceOrGroupSwitch from '../ServiceOrGroupSwitch'
 import {
   formatDate,
+  toQuerystring,
 } from '../../../../../common/utils'
 import {
   CSB_INSTANCE_SERVICE_STATUS_RUNNING,
@@ -43,6 +46,16 @@ import './style/index.less'
 const Option = Select.Option
 const Search = Input.Search
 
+const defaultQuery = {
+  page: 1,
+  size: 10,
+}
+const mergeQuery = query => Object.assign(
+  {},
+  defaultQuery,
+  query
+)
+
 class MyPublishedServiceGroups extends React.Component {
   state = {
     currentHandle: undefined,
@@ -55,9 +68,16 @@ class MyPublishedServiceGroups extends React.Component {
     this.loadData()
   }
 
-  loadData = () => {
-    const { getGroups, instanceID } = this.props
-    getGroups(instanceID)
+  loadData = query => {
+    const { getGroups, instanceID, location, history } = this.props
+    query = Object.assign({}, location.query, { name }, query)
+    if (query.page === 1) {
+      delete query.page
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
+    getGroups(instanceID, mergeQuery(query))
   }
 
   openCreateServiceGroupModal = (currentHandle, currentRecord = {}) => {
@@ -187,7 +207,7 @@ class MyPublishedServiceGroups extends React.Component {
   }
 
   render() {
-    const { serviceGroups, instanceID, history } = this.props
+    const { serviceGroups, instanceID, history, location } = this.props
     const { isFetching, content, totalElements, size } = serviceGroups
     const {
       createServiceGroupModalVisible, currentHandle, currentRecord,
@@ -244,10 +264,13 @@ class MyPublishedServiceGroups extends React.Component {
         <Option value="service-name">服务名称</Option>
       </Select>
     )
+    const { query } = location
     const paginationProps = {
       simple: true,
       total: totalElements,
       pageSize: size,
+      current: parseInt(query.page) || 1,
+      onChange: page => this.loadData({ page }),
     }
     return <QueueAnim className="service-groups">
       <div key="type" className="show-type">
@@ -307,8 +330,9 @@ class MyPublishedServiceGroups extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { match } = ownProps
+  const { match, location } = ownProps
   const { instanceID } = match.params
+  location.query = parseQuerystring(location.search)
   return {
     instanceID,
     serviceGroups: serviceGroupsSlt(state),

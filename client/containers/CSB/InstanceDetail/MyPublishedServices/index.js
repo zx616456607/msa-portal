@@ -181,6 +181,8 @@ class MyPublishedServices extends React.Component {
               closeModalMethod={this.closeCreateServiceGroupModal}
               handle="create"
               instanceID={instanceID}
+              history={history}
+              from="services"
             />
           }
         </div>

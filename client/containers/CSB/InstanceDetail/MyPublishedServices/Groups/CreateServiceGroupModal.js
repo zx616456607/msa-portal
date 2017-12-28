@@ -20,17 +20,13 @@ import {
   createGroup,
   updateGroup,
 } from '../../../../../actions/CSB/instanceService/group'
+import confirm from '../../../../../components/Modal/confirm'
 
 const { TextArea } = Input
 
 const FormItem = Form.Item
 
 class CreateServiceGroupModal extends React.Component {
-  state = {
-    // 确定按钮的 loading 态
-    confirmLoading: false,
-  }
-
   static propTypes = {
     // 关闭 Modal 的函数
     closeModalMethod: PropTypes.func.isRequired,
@@ -42,6 +38,13 @@ class CreateServiceGroupModal extends React.Component {
     instanceID: PropTypes.string.isRequired,
     // 加载数据
     loadData: PropTypes.func,
+    // 来源：服务列表或服务组
+    from: PropTypes.oneOf([ 'services', 'group' ]),
+  }
+
+  state = {
+    // 确定按钮的 loading 态
+    confirmLoading: false,
   }
 
   componentDidMount() {
@@ -59,7 +62,7 @@ class CreateServiceGroupModal extends React.Component {
     const {
       form, createGroup, updateGroup, instanceID,
       initailValue, handle, closeModalMethod,
-      loadData,
+      loadData, from, history,
     } = this.props
     form.validateFields((errors, values) => {
       if (errors) {
@@ -82,11 +85,24 @@ class CreateServiceGroupModal extends React.Component {
         if (res.error) {
           return
         }
+        closeModalMethod()
+        loadData && loadData()
+        if (from === 'services') {
+          confirm({
+            modalTitle: '创建服务组成功',
+            title: `创建服务组成功，服务组：${values.name}`,
+            iconType: 'check-circle-o',
+            okText: '去查看',
+            width: 520,
+            onOk() {
+              history.push(`/csb-instances-available/${instanceID}/my-published-services-groups`)
+            },
+          })
+          return
+        }
         notification.success({
           message: `${isEdit ? '编辑' : '创建'}服务组成功`,
         })
-        closeModalMethod()
-        loadData && loadData()
       })
     })
   }
