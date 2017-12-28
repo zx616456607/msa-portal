@@ -112,7 +112,7 @@ class Statistics extends React.Component {
     const { rangeDateTime } = this.state
     const { dataMap, detailData, serviceId } = this.props
     const { maxCallTime, minCallTime, averageCallTime, diagramData } = dataMap && dataMap.data || {}
-    const { totalCallCount, totalErrorCallCount } = detailData.data && detailData.data[`${serviceId}`] || {}
+    const { totalCallCount, totalErrorCallCount } = detailData && detailData[`${serviceId}`] || {}
     const dataList = this.fetchMapList(diagramData || []) || []
     return (
       <div className="service-statistics">
@@ -183,7 +183,7 @@ class Statistics extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const { CSB } = state
   const { serviceId } = ownProps
-  const overviewList = CSB.serviceOverview[serviceId]
+  const overviewList = CSB.serviceOverview
   const dataMap = CSB.serviceDetailMap[serviceId]
   return {
     dataMap,

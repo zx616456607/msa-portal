@@ -315,19 +315,21 @@ class ServicesTable extends React.Component {
       },
       {
         title: '待审批订阅',
-        dataIndex: 'wait',
-        key: 'wait',
-        // render: (text, row) => row.
+        dataIndex: 'waitApprovingCount',
+        key: 'waitApprovingCount',
+        render: text => text || '-',
       },
       {
         title: '累计调用量',
         dataIndex: 'num',
         key: 'num',
+        render: text => text || '-',
       },
       {
         title: '平均RT（ms）',
         dataIndex: 'ave',
         key: 'ave',
+        render: text => text || '-',
       },
       {
         title: '发布时间',

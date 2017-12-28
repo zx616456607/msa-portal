@@ -235,8 +235,6 @@ export const FETCH_CSB_SERVICE_OVERVIEW_FAILURE = 'FETCH_CSB_SERVICE_OVERVIEW_FA
 
 const fetchServiceOverview = (instanceId, serviceId) => {
   return {
-    serviceId,
-    instanceId,
     [CALL_API]: {
       types: [
         FETCH_CSB_SERVICE_OVERVIEW_REQUEST,

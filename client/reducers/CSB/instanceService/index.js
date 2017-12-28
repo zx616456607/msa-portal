@@ -111,29 +111,23 @@ export const subscribableServices = (state = {}, action) => {
 
 
 export const serviceOverview = (state = {}, action) => {
-  const { type, serviceId } = action
+  const { type } = action
   switch (type) {
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_REQUEST:
       return {
         ...state,
-        [serviceId]: Object.assign({}, state[serviceId], {
-          isFetching: true,
-        }),
+        isFetching: true,
       }
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_SUCCESS:
       return {
         ...state,
-        [serviceId]: {
-          isFetching: false,
-          data: action.response.result.data,
-        },
+        isFetching: false,
+        ...action.response.result.data,
       }
     case ActionTypes.FETCH_CSB_SERVICE_OVERVIEW_FAILURE:
       return {
         ...state,
-        [serviceId]: Object.assign({}, state[serviceId], {
-          isFetching: false,
-        }),
+        isFetching: false,
       }
     default:
       return state
