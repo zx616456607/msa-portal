@@ -11,6 +11,7 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Card } from 'antd'
 import { Route, Switch } from 'react-router-dom'
 import Sider from '../../components/Sider'
@@ -18,6 +19,7 @@ import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
 import { getMenuSelectedKeys } from '../../common/utils'
 import { renderMenu } from '../../components/utils'
+import { ROLE_SYS_ADMIN } from '../../constants'
 import msaComponent from '../../assets/img/msa-om/msa-component.svg'
 import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
 import csbInstancesApproval from '../../assets/img/msa-om/csb-instances-approval.svg'
@@ -57,7 +59,14 @@ const menus = [
   },
 ]
 
-export default class MsaOm extends React.Component {
+class MsaOm extends React.Component {
+  componentWillMount() {
+    const { current, history } = this.props
+    if (current.user.info && current.user.info.role !== ROLE_SYS_ADMIN) {
+      history.replace('/')
+    }
+  }
+
   renderChildren = () => {
     const { children } = this.props
     return [
@@ -100,3 +109,14 @@ export default class MsaOm extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  const current = state.current || {}
+  return {
+    current,
+  }
+}
+
+export default connect(mapStateToProps, {
+  //
+})(MsaOm)

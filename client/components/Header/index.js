@@ -13,12 +13,14 @@
 import React from 'react'
 import { Layout, Menu, Dropdown, Icon } from 'antd'
 import { Link } from 'react-router-dom'
+import cloneDeep from 'lodash/cloneDeep'
 import { getMenuSelectedKeys } from '../../common/utils'
+import { ROLE_SYS_ADMIN } from '../../constants'
 import logo from '../../assets/img/logo.svg'
 import './style/index.less'
 
 const LayoutHeader = Layout.Header
-const menus = [
+const MENUS = [
   {
     to: '/',
     key: '/',
@@ -69,6 +71,10 @@ export default class Header extends React.Component {
       key = '/'
     }
     const selectedKeys = [ key ]
+    let menus = cloneDeep(MENUS)
+    if (currentUser.role !== ROLE_SYS_ADMIN) {
+      menus = menus.filter(menu => menu.key !== 'msa-om')
+    }
     return (
       <LayoutHeader className="layout-header">
         <Link to="/">
