@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
-import { Dropdown, Menu, Table, Notification } from 'antd'
+import { Dropdown, Menu, Table, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
@@ -240,13 +240,13 @@ class ServicesTable extends React.Component {
         if (type === 'logout') {
           delInstanceService(instanceID, record.id).then(res => {
             if (res.error) {
-              Notification.error({
+              notification.error({
                 message: self.serviceMessages(type, true),
               })
               return
             }
             if (res.response.result.code === 200) {
-              Notification.success({
+              notification.success({
                 message: self.serviceMessages(type, false),
               })
               loadData()
@@ -256,13 +256,13 @@ class ServicesTable extends React.Component {
         }
         PutInstanceService(instanceID, record.id, body).then(res => {
           if (res.error) {
-            Notification.error({
+            notification.error({
               message: self.serviceMessages(type, true),
             })
             return
           }
           if (res.response.result.code === 200) {
-            Notification.success({
+            notification.success({
               message: self.serviceMessages(type, false),
             })
             loadData()

@@ -76,8 +76,9 @@ class MyPublishedServices extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
-    if (query.includeDeleted === false) {
-      delete query.includeDeleted
+    if (query.includeDeleted === true) {
+      query.status ? query.status :
+        query.status = [ '1', '2', '4' ]
     }
     if (query.sort === '') {
       delete query.sort
@@ -85,6 +86,7 @@ class MyPublishedServices extends React.Component {
     if (query.filter === '') {
       delete query.filter
     }
+    delete query.includeDeleted
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
