@@ -76,10 +76,15 @@ class MyPublishedServices extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
-    if (query.includeDeleted === true) {
-      query.status = [ 1, 2, 4 ]
+    if (query.includeDeleted === false) {
+      delete query.includeDeleted
     }
-    delete query.includeDeleted
+    if (query.sort === '') {
+      delete query.sort
+    }
+    if (query.filter === '') {
+      delete query.filter
+    }
     if (!isEqual(query, location.query)) {
       history.push(`${location.pathname}?${toQuerystring(query)}`)
     }
@@ -99,13 +104,16 @@ class MyPublishedServices extends React.Component {
   }
 
   render() {
-    const { myPublished, match, history, instanceID } = this.props
+    const { myPublished, match, history, instanceID, location } = this.props
     const { content, size, isFetching, totalElements } = myPublished
+    const { query } = location
+    const { includeDeleted } = this.state
     const paginationProps = {
       simple: true,
       pageSize: size || 10,
       total: totalElements,
-      current: 1,
+      current: parseInt(query.page) || 1,
+      onChange: page => this.loadData({ page }),
     }
     const { createServiceGroupModalVisible } = this.state
     return (
@@ -133,7 +141,7 @@ class MyPublishedServices extends React.Component {
             发布服务
           </Button>
           <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
-          创建服务组
+            创建服务组
           </Button>
           <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
           <Search
@@ -153,6 +161,7 @@ class MyPublishedServices extends React.Component {
         <div key="data-box" className="layout-content-body">
           <Card>
             <ServicesTable
+              check={includeDeleted}
               loadData={this.loadData}
               loading={isFetching}
               dataSource={content}

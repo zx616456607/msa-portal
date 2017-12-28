@@ -147,21 +147,21 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>平均响应时间</div>
               <div>
-                <span>{averageCallTime}</span>
+                <span>{averageCallTime || 0}</span>
                 <span>ms</span>
               </div>
             </Col>
             <Col span={10} className="service-statistics-item">
               <div>最小响应时间</div>
               <div>
-                <span>{minCallTime}</span>
+                <span>{minCallTime || 0}</span>
                 <span>ms</span>
               </div>
             </Col>
             <Col span={5} className="service-statistics-item">
               <div>最大响应时间</div>
               <div>
-                <span>{maxCallTime}</span>
+                <span>{maxCallTime || 0}</span>
                 <span>ms</span>
               </div>
             </Col>
