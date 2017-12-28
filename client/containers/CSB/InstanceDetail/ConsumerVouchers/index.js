@@ -15,7 +15,7 @@ import QueueAnim from 'rc-queue-anim'
 import {
   Button, Icon, Input, Pagination,
   Dropdown, Table, Card, Menu, Modal,
-  Row, Col, Tooltip, Popover,
+  Row, Col,
   Form, notification,
 } from 'antd'
 import './style/index.less'
@@ -24,53 +24,76 @@ import {
   getConsumerVouchersList,
   triggerUpdateConsumerVoucher,
   confirmUpdateConsumerVoucher,
+  editConsumerVoucher,
+  deleteConsumerVoucher,
 } from '../../../../actions/CSB/instanceService/consumerVouchers'
 import { connect } from 'react-redux'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
-import { formatDate } from '../../../../common/utils'
+import { formatDate, toQuerystring } from '../../../../common/utils'
 import confirm from '../../../../components/Modal/confirm'
 import UpdateConsumerVoucher from './UpdateConsumerVoncher'
+import isEqual from 'lodash/isEqual'
+import { parse as parseQuerystring } from 'query-string'
+import IndentTip from './TipSvcDomain/index'
 
 const Search = Input.Search
 const FormItem = Form.Item
 
 class ConsumerVouchers extends React.Component {
-
   state = {
     name: '',
     title: '',
     isUse: true,
     isAdd: false,
     delValue: '',
-    icoTip: false,
-    copyStatus: false,
     addVisible: false,
     confirmLoading: false,
     currentConsumerVoucher: {},
     updateVisible: false,
   }
 
-  componentWillMount() {
-    this.loadData()
+  componentDidMount() {
+    const { location } = this.props
+    const { query } = location
+    const { name } = query
+    this.setState({
+      name,
+    }, this.loadData)
   }
 
-  confirmDeleteConsumerVoucher = () => {
-    const { currentConsumerVoucher } = this.state
+  confirmDeleteConsumerVoucher = record => {
+    const { instanceID, deleteConsumerVoucher } = this.props
+    const { name, id } = record
+    const self = this
     return confirm({
       modalTitle: '使用实例',
-      title: `确定删除消费凭证 ${currentConsumerVoucher.name}？`,
+      title: `确定删除消费凭证 ${name} 吗？`,
       content: '',
       onOk() {
-        return 123
+        return new Promise((resolve, reject) => {
+          deleteConsumerVoucher(instanceID, id).then(res => {
+            if (res.error) return reject()
+            resolve()
+            notification.success({
+              message: '删除消费凭证成功',
+            })
+            self.loadData()
+          })
+        })
       },
     })
   }
 
   loadData = (query = {}) => {
-    const { getConsumerVouchersList, instanceID } = this.props
+    const { getConsumerVouchersList, instanceID, location, history } = this.props
     const { name } = this.state
-    query = Object.assign({}, { name }, query)
+    query = Object.assign({}, location.query, { name }, query)
+    if (query.page && query.page === 1) {
+      delete query.page
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
     getConsumerVouchersList(instanceID, query)
   }
 
@@ -82,11 +105,12 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
-  handleButtonClick = () => {
+  handleButtonClick = currentConsumerVoucher => {
     this.setState({
       isAdd: false,
       title: '编辑消费凭证',
       addVisible: true,
+      currentConsumerVoucher,
     })
   }
 
@@ -109,44 +133,80 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
+  editConsumerVoucher = (instanceID, values) => {
+    const { editConsumerVoucher } = this.props
+    const { currentConsumerVoucher } = this.state
+    const { id } = currentConsumerVoucher
+    editConsumerVoucher(instanceID, id, values).then(res => {
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) return
+      notification.success({
+        message: '编辑消费凭证成功',
+      })
+      this.setState({
+        addVisible: false,
+      })
+    })
+  }
+
   closeUpdateModal = () => {
     this.setState({
       updateVisible: false,
     })
   }
 
-  confirmUpdateConsumeVoucher = record => {
-    console.log('record= ', record)
+  confirmUpdateConsumeVoucher = () => {
     const { confirmUpdateConsumerVoucher, instanceID } = this.props
     const { currentConsumerVoucher } = this.state
     const { id } = currentConsumerVoucher
     confirmUpdateConsumerVoucher(instanceID, id).then(res => {
-      console.log('res=', res)
       if (res.error) return
+      notification.success({
+        message: '确认更新成功',
+      })
+      this.setState({
+        updateVisible: false,
+        confirmLoading: false,
+      })
     })
   }
 
   triggerUpdateConsumeVoucher = values => {
     const { triggerUpdateConsumerVoucher, instanceID } = this.props
     const { currentConsumerVoucher } = this.state
-    const { id } = currentConsumerVoucher
+    const { id, replacingSecret } = currentConsumerVoucher
+    if (replacingSecret) {
+      return this.confirmUpdateConsumeVoucher()
+    }
     const { updateSetting, delayTime } = values
-    let body = {}
+    const nowTime = new Date()
+    let sec = nowTime.getTime()
+    let expireAt = new Date(sec).toISOString()
+    let body = { expireAt }
     if (updateSetting === 'delay') {
-      const nowTime = new Date()
-      const sec = nowTime.getTime() + delayTime * 60 * 1000
-      const expireAt = new Date(sec).toISOString()
+      sec = nowTime.getTime() + delayTime * 60 * 1000
+      expireAt = new Date(sec).toISOString()
       body = Object.assign({}, body, { expireAt })
     }
-    triggerUpdateConsumerVoucher(instanceID, id, body).then(res => {
-      console.log('res= ', res)
-      if (res.error) return
-
+    this.setState({
+      confirmLoading: true,
     })
-  }
-
-  updateConsumeVocuher = values => {
-    console.log('values=', values)
+    triggerUpdateConsumerVoucher(instanceID, id, body).then(res => {
+      if (res.error) return
+      if (updateSetting === 'immediately') {
+        this.confirmUpdateConsumeVoucher()
+        return
+      }
+      notification.success({
+        message: '触发更新成功',
+      })
+      this.setState({
+        updateVisible: false,
+        confirmLoading: false,
+      })
+    })
   }
 
   handleOK = () => {
@@ -162,6 +222,7 @@ class ConsumerVouchers extends React.Component {
         this.createConsumerVoucher(instanceID, values)
         return
       }
+      this.editConsumerVoucher(instanceID, values)
     })
   }
 
@@ -182,66 +243,20 @@ class ConsumerVouchers extends React.Component {
           updateVisible: true,
         })
       case 'delete':
-        return this.confirmDeleteConsumerVoucher()
+        return this.confirmDeleteConsumerVoucher(record)
       default:
         return
     }
   }
 
-  handleIco = (value, currentConsumerVoucher) => {
-    this.setState({
-      currentConsumerVoucher,
-      icoTip: value === 'plus',
-    })
-  }
-
-  copyKey = () => {
-    this.setState({ copyStatus: true })
-    setTimeout(() => {
-      this.setState({ copyStatus: false })
-    }, 1000)
-  }
-
   filterAs = record => {
-    const { copyStatus, icoTip, currentConsumerVoucher } = this.state
     return (
       <Row>
         <Col span={10} className="text">{record.clientId}</Col>
         <Col span={2}>/</Col>
         <Col span={10} className="text">{record.secret}</Col>
         <Col span={2} className="spread-icon">
-          <Popover
-            placement="right"
-            trigger="click"
-            arrowPointAtCenter={true}
-            overlayClassName="keys-popover"
-            content={
-              <div>
-                <div>
-                  <span className="key-value">ak:{record.clientId}</span>
-                  <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-                    <CopyToClipboard text={record.clientId} onCopy={() => this.copyKey()} >
-                      <Icon type="copy"/>
-                    </CopyToClipboard>
-                  </Tooltip>
-                </div>
-                <div>
-                  <span className="key-value">sk:{record.secret}</span>
-                  <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-                    <CopyToClipboard text={record.secret} onCopy={() => this.copyKey()} >
-                      <Icon type="copy"/>
-                    </CopyToClipboard>
-                  </Tooltip>
-                </div>
-              </div>
-            }
-          >
-            {
-              icoTip && currentConsumerVoucher.id === record.id
-                ? <Icon type="minus-square-o" onClick={() => this.handleIco('minus', record)}/>
-                : <Icon type="plus-square-o" onClick={() => this.handleIco('plus', record)}/>
-            }
-          </Popover>
+          <IndentTip record={record}/>
         </Col>
       </Row>
     )
@@ -253,55 +268,57 @@ class ConsumerVouchers extends React.Component {
       name, updateVisible, currentConsumerVoucher,
       confirmLoading,
     } = this.state
-    const { form, consumeVoucherList } = this.props
+    const { form, consumeVoucherList, location } = this.props
+    const { query } = location
     const { content, size, isFetching, totalElements } = consumeVoucherList
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
       wrapperCol: { span: 15 },
     }
-    const columns = [{
-      title: '凭证名称',
-      width: '12%',
-      dataIndex: 'name',
-    }, {
-      title: 'AccessKey / SecretKey',
-      dataIndex: 'clientId',
-      width: '12%',
-      className: 'keys',
-      render: (text, record) => this.filterAs(record),
-    }, {
-      title: '新 AccessKey / SecretKey',
-      dataIndex: 'secret',
-      width: '12%',
-      className: 'keys',
-      render: (text, record) => this.filterAs(record),
-    }, {
-      title: '订阅服务（个）',
-      width: '10%',
-      dataIndex: 'subscribedCount',
-    }, {
-      title: '创建时间',
-      dataIndex: 'creationTime',
-      width: '19%',
-      render: creationTime => formatDate(creationTime),
-    }, {
-      title: '更新时间',
-      dataIndex: 'utime',
-      width: '19%',
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      width: '16%',
-      render: (text, record) => <div>
-        <Dropdown.Button onClick={this.handleButtonClick} overlay={
-          <Menu onClick={this.handleMenu.bind(this, record)} style={{ width: 85 }}>
-            <Menu.Item key="update">更新</Menu.Item>
-            <Menu.Item key="delete">删除</Menu.Item>
-          </Menu>
-        }>编辑</Dropdown.Button>
-      </div>,
-    }]
+    const columns = [
+      { title: '凭证名称', width: '12%', dataIndex: 'name' },
+      {
+        title: 'AccessKey / SecretKey',
+        dataIndex: 'clientId',
+        width: '12%',
+        className: 'keys',
+        render: (text, record) => this.filterAs(record),
+      }, {
+        title: '新 AccessKey / SecretKey',
+        dataIndex: 'replacingSecret',
+        width: '12%',
+        className: 'keys',
+        render: (text, record) => <span>{text ? this.filterAs(record) : '-'}</span>,
+      }, {
+        title: '订阅服务（个）',
+        width: '10%',
+        dataIndex: 'subscribedCount',
+        render: text => <span>{text ? text : 0}</span>,
+      }, {
+        title: '创建时间',
+        dataIndex: 'creationTime',
+        width: '19%',
+        render: creationTime => formatDate(creationTime),
+      }, {
+        title: '更新时间',
+        dataIndex: 'updatedAt',
+        width: '19%',
+        render: (text, record) => <span>{text ? '-' : formatDate(record)}</span>,
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        width: '16%',
+        render: (text, record) => <div>
+          <Dropdown.Button onClick={this.handleButtonClick.bind(this, record)} overlay={
+            <Menu onClick={this.handleMenu.bind(this, record)} style={{ width: 85 }}>
+              <Menu.Item key="update">{record.replacingSecret ? '确认更新' : '更新'}</Menu.Item>
+              <Menu.Item key="delete">删除</Menu.Item>
+            </Menu>
+          }>编辑</Dropdown.Button>
+        </div>,
+      },
+    ]
     // const rowSelection = {
     //  onChange: (selectedRowKeys, selectedRows) => {
     //    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
@@ -311,6 +328,8 @@ class ConsumerVouchers extends React.Component {
       total: totalElements,
       defaultCurrent: 1,
       size,
+      current: parseInt(query.page) || 1,
+      onChange: current => this.loadData({ page: current }),
     }
     return (
       <QueueAnim className="csb-comsumer-vouchers">
@@ -324,7 +343,7 @@ class ConsumerVouchers extends React.Component {
               style={{ width: 200 }}
               onChange={e => this.setState({ name: e.target.value })}
               value={name}
-              // onSearch={() => this.loadData()}
+              onSearch={() => this.loadData({ page: 1 })}
             />
           </div>
           {totalElements > 0 && <div className="topRigth" type="card">
@@ -360,6 +379,7 @@ class ConsumerVouchers extends React.Component {
           >
             {
               getFieldDecorator('name', {
+                initialValue: isAdd ? undefined : currentConsumerVoucher.name,
                 rules: [{
                   required: true,
                   message: '消费凭证名称不能为空',
@@ -373,7 +393,7 @@ class ConsumerVouchers extends React.Component {
         {
           updateVisible && <UpdateConsumerVoucher
             loading={confirmLoading}
-            callback={this.updateConsumeVocuher}
+            callback={this.triggerUpdateConsumeVoucher}
             closeModalMethod={this.closeUpdateModal}
             record={currentConsumerVoucher}
           />
@@ -384,9 +404,10 @@ class ConsumerVouchers extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { match } = ownProps
+  const { match, location } = ownProps
   const { instanceID } = match.params
   const consumeVoucherList = consumeVoucherSlt(state, ownProps)
+  location.query = parseQuerystring(location.search)
   return {
     consumeVoucherList,
     instanceID,
@@ -398,4 +419,6 @@ export default connect(mapStateToProps, {
   getConsumerVouchersList,
   triggerUpdateConsumerVoucher,
   confirmUpdateConsumerVoucher,
+  editConsumerVoucher,
+  deleteConsumerVoucher,
 })(Form.create()(ConsumerVouchers))

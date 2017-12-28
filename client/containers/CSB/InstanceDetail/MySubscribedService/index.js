@@ -16,7 +16,7 @@ import {
   Card, Button, Radio,
   Input, Pagination, Table,
   Menu, Dropdown, Icon, Tooltip,
-  Row, Col,
+  Row, Col, Select,
 } from 'antd'
 import './style/MySubscribedService.less'
 import ServiceApIDoc from './ServiceApIDoc'
@@ -27,12 +27,19 @@ import { connect } from 'react-redux'
 import {
   getMySubscribedServiceList,
   getServiceApiDoc,
+  editServiceBindIp,
+  unsubscriveService,
 } from '../../../../actions/CSB/instanceService/mySubscribedServices'
 import { mySbuscrivedServicesSlt } from '../../../../selectors/CSB/instanceService/mySubscribedService'
+import { formatDate, toQuerystring } from '../../../../common/utils'
+import isEqual from 'lodash/isEqual'
+import { parse as parseQuerystring } from 'query-string'
 
 const RadioGroup = Radio.Group
 const Search = Input.Search
 const MenuItem = Menu.Item
+const InputGroup = Input.Group
+const Option = Select.Option
 
 class MySubscribedService extends React.Component {
   state = {
@@ -40,12 +47,17 @@ class MySubscribedService extends React.Component {
     editBindIpModalVisible: false,
     confirmLoading: false,
     subDetailVisible: false,
-    includeDeleted: false,
     currentService: {},
+    searchType: 'serviceId',
   }
 
-  componentWillMount() {
-    this.lodaData()
+  componentDidMount() {
+    const { location } = this.props
+    const { query } = location
+    const { name } = query
+    this.setState({
+      name,
+    }, this.loadData)
   }
 
   closeServiceApiDocModal = () => {
@@ -67,8 +79,18 @@ class MySubscribedService extends React.Component {
     })
   }
 
-  lodaData = (query = {}) => {
-    const { getMySubscribedServiceList, instanceID } = this.props
+  loadData = (query = {}) => {
+    const {
+      getMySubscribedServiceList, instanceID, location, history,
+    } = this.props
+    const { name } = this.state
+    query = Object.assign({}, location.query, { name }, query)
+    if (query.page && query.page === 1) {
+      delete query.page
+    }
+    if (!isEqual(query, location.query)) {
+      history.push(`${location.pathname}?${toQuerystring(query)}`)
+    }
     getMySubscribedServiceList(instanceID, query)
   }
 
@@ -123,7 +145,7 @@ class MySubscribedService extends React.Component {
       title: '你确定要退订这个服务吗？',
       content: '',
       onOk() {
-        self.lodaData()
+        self.loadData()
       },
     })
   }
@@ -132,7 +154,7 @@ class MySubscribedService extends React.Component {
     const includeDeleted = e.target.value
     this.setState({
       includeDeleted,
-    }, () => this.lodaData({ includeDeleted }))
+    }, () => this.loadData({ includeDeleted }))
   }
 
   openServiceApiDocModal = currentService => {
@@ -152,12 +174,8 @@ class MySubscribedService extends React.Component {
 
   render() {
     const {
-      serviceApIDocModal,
-      editBindIpModalVisible,
-      confirmLoading,
-      subDetailVisible,
-      includeDeleted,
-      currentService,
+      serviceApIDocModal, editBindIpModalVisible, confirmLoading,
+      subDetailVisible, currentService, searchType,
     } = this.state
     const { mySubscribedServicelist, serviceList } = this.props
     const { isFetching, size, totalElements, content } = mySubscribedServicelist
@@ -179,8 +197,7 @@ class MySubscribedService extends React.Component {
         ],
         onFilter: (value, record) => record.charge.includes(value),
         render: status => this.renderServiceStatusUI(status),
-      },
-      { title: '服务版本', dataIndex: 'version', key: 'version', width: '8%' },
+      }, { title: '服务版本', dataIndex: 'version', key: 'version', width: '8%' },
       { title: '所属服务组', dataIndex: 'belongs', key: 'belongs', width: '8%' },
       { title: '我的消费凭证', dataIndex: 'evidenceName', key: 'evidenceName', width: '8%' },
       {
@@ -193,31 +210,29 @@ class MySubscribedService extends React.Component {
         dataIndex: 'tel',
         key: 'tel',
         width: '8%',
-      },
-      { title: '订阅时间', dataIndex: 'dtime', key: 'dtime', width: '8%' },
-      { title: '审批时间', dataIndex: 'stime', key: 'stime', width: '8%' },
-      {
+      }, { title: '订阅时间', dataIndex: 'dtime', key: 'dtime', width: '8%',
+        render: text => formatDate(text),
+      }, { title: '审批时间', dataIndex: 'stime', key: 'stime', width: '8%',
+        render: text => formatDate(text),
+      }, {
         title: '累计调用量',
         dataIndex: 'charge',
         key: 'charge',
         width: '10%',
         sorter: (a, b) => a.status - b.status,
-      },
-      {
+      }, {
         title: '累计错误量',
         dataIndex: 'num',
         key: 'num',
         width: '10%',
         sorter: (a, b) => a.num - b.num,
-      },
-      {
+      }, {
         title: '平均RT（ms）',
         dataIndex: 'des',
         key: 'des',
         width: '10%',
         sorter: (a, b) => a.desc - b.desc,
-      },
-      {
+      }, {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
@@ -243,25 +258,33 @@ class MySubscribedService extends React.Component {
         <Row key="showType" className="showType">
           <Col span={5}>服务订阅的状态：</Col>
           <Col span={15}>
-            <RadioGroup value={includeDeleted} onChange={this.subStatusChange}>
+            <RadioGroup onChange={this.subStatusChange}>
               <Radio value={true}>不含退订服务</Radio>
               <Radio value={false}>全部订阅的服务</Radio>
             </RadioGroup>
           </Col>
         </Row>
-        <div className="layout-content-btns" key="layout-content-btns">
-          <Button icon="reload" type="primary" onClick={() => this.lodaData()}>刷新</Button>
-          <Search
-            placeholder="按订阅服务名称搜索"
-            className="serch-style"
-            onSearch={this.searchWithServiceName}
-          />
-          {
-            totalElements > 0 && <div className="page-box">
-              <span className="total">共 {totalElements} 条</span>
-              <Pagination {...paginationProps}/>
-            </div>
-          }
+        <div className="layout-content-btns handler-row" key="layout-content-btns">
+          <Button icon="reload" type="primary" onClick={() => this.loadData()}>刷新</Button>
+          <InputGroup compact>
+            <Select
+              value={searchType}
+              onChange={searchType => this.setState({ searchType })}
+            >
+              <Option value="serviceId">服务名称</Option>
+              <Option value="evidenceId">消费凭证</Option>
+              <Option value="none">所属服务组</Option>
+            </Select>
+            <Search
+              placeholder="按订阅服务名称搜索"
+              className="serch-style"
+              onSearch={this.searchWithServiceName}
+            />
+          </InputGroup>
+          {totalElements > 0 && <div className="page-box">
+            <span className="total">共 {totalElements} 条</span>
+            <Pagination {...paginationProps}/>
+          </div>}
         </div>
         <div className="layout-content-body" key="layout-content-body">
           <Card>
@@ -275,7 +298,6 @@ class MySubscribedService extends React.Component {
             />
           </Card>
         </div>
-
         {
           serviceApIDocModal && <ServiceApIDoc
             closeModalMethod={this.closeServiceApiDocModal.bind(this)}
@@ -302,10 +324,11 @@ class MySubscribedService extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { entities } = state
-  const { match } = ownProps
+  const { match, location } = ownProps
   const { instanceID } = match.params
   const mySubscribedServicelist = mySbuscrivedServicesSlt(state, ownProps)
   const serviceList = entities.cbsPublished || {}
+  location.query = parseQuerystring(location.search)
   return {
     instanceID,
     mySubscribedServicelist,
@@ -316,4 +339,6 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   getMySubscribedServiceList,
   getServiceApiDoc,
+  editServiceBindIp,
+  unsubscriveService,
 })(MySubscribedService)

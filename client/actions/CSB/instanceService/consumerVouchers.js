@@ -14,6 +14,7 @@ import { CALL_API } from '../../../middleware/api'
 import { Schemas } from '../../../middleware/schemas'
 import { toQuerystring } from '../../../common/utils'
 import { API_CONFIG } from '../../../constants'
+import cloneDeep from 'lodash/cloneDeep'
 
 const { CSB_API_URL } = API_CONFIG
 
@@ -52,7 +53,11 @@ export const GET_CONSUMER_VOUCHERS_LIST_FAILUER = 'GET_CONSUMER_VOUCHERS_LIST_FA
 const fetchGetConsumerVouchersList = (instanceID, query) => {
   let endpoint = `${CSB_API_URL}/instances/${instanceID}/evidences`
   if (query) {
-    endpoint += `?${toQuerystring(query)}`
+    const _query = cloneDeep(query)
+    if (query.page) {
+      _query.page = query.page - 1
+    }
+    endpoint += `?${toQuerystring(_query)}`
   }
   return {
     instanceID,
@@ -93,7 +98,7 @@ const fetchTriggerUpdateConsumerVoucher = (instanceID, evidenceId, body) => {
         method: 'POST',
         body,
       },
-      schema: {},
+      schema: Schemas.CSB__INSTANCE_CONSUMER_VOUCHER_UPDATE_DATA,
     },
   }
 }
@@ -119,11 +124,64 @@ const fetchConfirmUpdateConsumerVoucher = (instanceID, evidenceId) => {
       options: {
         method: 'PUT',
       },
-      schema: {},
+      schema: Schemas.CSB__INSTANCE_CONSUMER_VOUCHER_UPDATE_DATA,
     },
   }
 }
 
 export const confirmUpdateConsumerVoucher = (instanceID, evidenceId) => {
   return dispatch => dispatch(fetchConfirmUpdateConsumerVoucher(instanceID, evidenceId))
+}
+
+// 编辑消费凭证
+export const PUT_EDIT_CONSUMER_VOUCHER_REQUEST = 'PUT_EDIT_CONSUMER_VOUCHER_REQUEST'
+export const PUT_EDIT_CONSUMER_VOUCHER_SUCCESS = 'PUT_EDIT_CONSUMER_VOUCHER_SUCCESS'
+export const PUT_EDIT_CONSUMER_VOUCHER_FAILUER = 'PUT_EDIT_CONSUMER_VOUCHER_FAILUER'
+
+const fetchEditConsumerVoucher = (instanceID, evidenceId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PUT_EDIT_CONSUMER_VOUCHER_REQUEST,
+        PUT_EDIT_CONSUMER_VOUCHER_SUCCESS,
+        PUT_EDIT_CONSUMER_VOUCHER_FAILUER,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/evidences/${evidenceId}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: Schemas.CSB__INSTANCE_CONSUMER_VOUCHER_UPDATE_DATA,
+    },
+  }
+}
+
+export const editConsumerVoucher = (instanceID, evidenceId, body) => {
+  return dispatch => dispatch(fetchEditConsumerVoucher(instanceID, evidenceId, body))
+}
+
+// 删除消费凭证
+export const DELETE_CONSUMER_VOUCHER_REQUEST = 'DELETE_CONSUMER_VOUCHER_REQUEST'
+export const DELETE_CONSUMER_VOUCHER_SUCCESS = 'DELETE_CONSUMER_VOUCHER_SUCCESS'
+export const DELETE_CONSUMER_VOUCHER_FAILUER = 'DELETE_CONSUMER_VOUCHER_FAILUER'
+
+const fetchDeleteConsumerVoucher = (instanceID, evidenceId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_CONSUMER_VOUCHER_REQUEST,
+        DELETE_CONSUMER_VOUCHER_SUCCESS,
+        DELETE_CONSUMER_VOUCHER_FAILUER,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/evidences/${evidenceId}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const deleteConsumerVoucher = (instanceID, evidenceId) => {
+  return dispatch => dispatch(fetchDeleteConsumerVoucher(instanceID, evidenceId))
 }

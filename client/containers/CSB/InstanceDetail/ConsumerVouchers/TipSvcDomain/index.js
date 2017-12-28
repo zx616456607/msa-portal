@@ -11,62 +11,73 @@
  */
 
 import React from 'react'
-import { Popover } from 'antd'
+import propTypes from 'prop-types'
+import { Popover, Icon, Tooltip } from 'antd'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-class SvcTip extends React.Component {
+export default class IndentTip extends React.Component {
+  static propTypes = {
+    // 当前消费凭证
+    record: propTypes.object.isRequired,
+  }
+
   state = {
+    icoTip: false,
     copyStatus: false,
     inputID: '',
   }
-  servercopyCode() {
-    const code = document.getElementById(this.state.inputID)
-    code.select()
-    document.execCommand('Copy', false)
-    this.setState({
-      copyStatus: true,
-    })
-  }
-  returnDefaultTooltip() {
+
+  copyKey = () => {
+    this.setState({ copyStatus: true })
     setTimeout(() => {
-      this.setState({
-        copyStatus: false,
-      })
-    }, 500)
+      this.setState({ copyStatus: false })
+    }, 1000)
   }
-  render() {
+
+  renderPopoverContent = () => {
+    const { record } = this.props
     const { copyStatus } = this.state
-    const { svcDomain } = this.props
-    const item = svcDomain.map(element => {
-      return (
-        <li>
-          <span> ak:</span>
-          <span> sk:</span>
-          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-            <Icon type="copy" onClick={this.servercopyCode} onMouseLeave={this.returnDefaultTooltip} onMouseEnter={() => this.startCopyCode(element.domain)} />
-          </Tooltip>
-        </li>
-      )
-    })
     return (
       <div>
-        <ul>
-          {item}
-        </ul>
+        <div>
+          <span className="key-value">ak:{record.clientId}</span>
+          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+            <CopyToClipboard text={record.clientId} onCopy={() => this.copyKey()}>
+              <Icon type="copy"/>
+            </CopyToClipboard>
+          </Tooltip>
+        </div>
+        <div>
+          <span className="key-value">
+            sk:{record.replacingSecret ? record.secret : record.replacingSecret}
+          </span>
+          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
+            <CopyToClipboard text={record.secret} onCopy={() => this.copyKey()}>
+              <Icon type="copy"/>
+            </CopyToClipboard>
+          </Tooltip>
+        </div>
       </div>
     )
   }
-}
 
-export default class IndentTip extends React.Component {
   render() {
+    const { icoTip } = this.state
     return (
-      <div>
-        <Popover
-          placement="right"
-          content={<SvcTip />}
-          trigger="click">
-        </Popover>
-      </div>
+      <Popover
+        placement="right"
+        trigger="click"
+        arrowPointAtCenter={true}
+        overlayClassName="keys-popover"
+        onVisibleChange={visible => this.setState({ icoTip: visible })}
+        content={this.renderPopoverContent()}
+      >
+        {
+          icoTip
+            ? <Icon type="minus-square-o" onClick={() => this.setState({ icoTip: true })}/>
+            : <Icon type="plus-square-o" onClick={() => this.setState({ icoTip: false })}/>
+        }
+      </Popover>
     )
   }
 }

@@ -208,6 +208,9 @@ export const Schemas = {
       content: [ csbInstanceConsumerVouchersSchema ],
     },
   },
+  CSB__INSTANCE_CONSUMER_VOUCHER_UPDATE_DATA: {
+    data: csbInstanceConsumerVouchersSchema,
+  },
   CSB_INSTANCE_MY_SUBSCRIBED_SERVICES_LIST_DATA: {
     data: {
       content: [ csbInstanceMySubscribedServicesSchema ],
