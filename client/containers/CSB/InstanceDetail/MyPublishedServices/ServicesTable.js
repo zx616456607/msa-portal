@@ -366,20 +366,19 @@ class ServicesTable extends React.Component {
         title: '待审批订阅',
         dataIndex: 'waitApprovingCount',
         key: 'waitApprovingCount',
-        // sorter: (a, b) => a.waitApprovingCount - b.waitApprovingCount,
-        render: text => text && text.toString() || '-',
+        render: text => (text !== undefined ? text : '-'),
       },
       {
         title: '累计调用量',
         dataIndex: 'totalCallCount',
         key: 'totalCallCount',
-        render: text => text && text.toString() || '-',
+        render: text => (text !== undefined ? text : '-'),
       },
       {
         title: '平均RT（ms）',
         dataIndex: 'averageCallTime',
         key: 'averageCallTime',
-        render: text => text && text.toString() || '-',
+        render: text => (text !== undefined ? text : '-'),
       },
       {
         title: '发布时间',

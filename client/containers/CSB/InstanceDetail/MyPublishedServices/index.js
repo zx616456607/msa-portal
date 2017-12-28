@@ -92,7 +92,11 @@ class MyPublishedServices extends React.Component {
       if (res.error) {
         return
       }
-      getInstanceServiceOverview(instanceID, res.response.result.data.content)
+      const servicesIds = res.response.result.data.content
+      if (servicesIds.length === 0) {
+        return
+      }
+      getInstanceServiceOverview(instanceID, servicesIds)
     })
   }
 

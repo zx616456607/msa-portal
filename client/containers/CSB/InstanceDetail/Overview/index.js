@@ -12,6 +12,8 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { Card, Button, Row, Col } from 'antd'
 import './style/index.less'
 import G2 from 'g2'
@@ -60,7 +62,7 @@ const ChartTrial = createG2(chart => {
   chart.render()
 })
 
-export default class InstanceDetailOverview extends React.Component {
+class InstanceDetailOverview extends React.Component {
   state = {
     data: [
       { year: 2007, area: '亚太地区', profit: 7860 * 0.189 },
@@ -74,13 +76,20 @@ export default class InstanceDetailOverview extends React.Component {
     width: 260,
     height: 210,
   }
+
   goPublishService = () => {
-    const { history, match } = this.props
-    const { instanceID } = match.params
+    const { history, instanceID } = this.props
     history.push(`/csb-instances-available/${instanceID}/publish-service`)
   }
 
+  goSubscriptService = () => {
+    const { history, instanceID } = this.props
+    history.push(`/csb-instances-available/${instanceID}/subscription-services`)
+  }
+
+
   render() {
+    const { instanceID } = this.props
     const images = [
       { src: require('../../../../assets/img/csb/csb.png') },
     ]
@@ -104,14 +113,20 @@ export default class InstanceDetailOverview extends React.Component {
             <Button onClick={this.goPublishService} type="primary">
               发布服务
             </Button>
-            <Button className="subscribe">订阅服务</Button>
+            <Button className="subscribe" onClick={this.goSubscriptService}>
+            订阅服务
+            </Button>
           </div>
         </div>
         <div className="release" key="release">
           <span className="first-title">服务发布</span>
           <Row className="content" gutter={8} style={{ marginTop: 16 }}>
             <Col span={6}>
-              <Card title="我的服务调用" bodyStyle={{ height: 180 }}>
+              <Card
+                title="我的服务调用"
+                bordered={false}
+                bodyStyle={{ height: 180 }}
+              >
                 <span>累计调用量</span>
                 <h1>10000个</h1>
                 <span>累计错误量</span>
@@ -119,7 +134,14 @@ export default class InstanceDetailOverview extends React.Component {
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="我发布的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+              <Card title="我发布的服务"
+                extra={<Link to={`/csb-instances-available/${instanceID}/my-published-services`}>
+                  更多>>
+                </Link>
+                }
+                bordered={false}
+                bodyStyle={{ height: 180, padding: '0px' }}
+              >
                 <Chart
                   data={this.state.data}
                   width={this.state.width}
@@ -144,7 +166,15 @@ export default class InstanceDetailOverview extends React.Component {
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="服务订阅审批" extra={<a href="#">去审批>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+              <Card
+                title="服务订阅审批"
+                extra={<Link to={`/csb-instances-available/${instanceID}/service-subscription-approval`}>
+                  去审批>>
+                </Link>
+                }
+                bordered={false}
+                bodyStyle={{ height: 180, padding: '0px' }}
+              >
                 <Chart1
                   data={this.state.data}
                   width={this.state.width}
@@ -179,7 +209,15 @@ export default class InstanceDetailOverview extends React.Component {
           <span className="first-title">服务订阅</span>
           <Row className="content" gutter={8} style={{ marginTop: 16 }}>
             <Col span={6}>
-              <Card title="消费凭证" bodyStyle={{ height: 180 }}>
+              <Card
+                title="消费凭证"
+                extra={<Link to={`/csb-instances-available/${instanceID}/consumer-vouchers`}>
+                  更多>>
+                </Link>
+                }
+                bordered={false}
+                bodyStyle={{ height: 180 }}
+              >
                 <span>我创建</span>
                 <h1>10000个</h1>
                 <span>最近更新时间</span>
@@ -187,7 +225,15 @@ export default class InstanceDetailOverview extends React.Component {
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="我订阅的服务" extra={<a href="#">更多>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+              <Card
+                title="我订阅的服务"
+                extra={<Link to={`/csb-instances-available/${instanceID}/my-subscribed-service`}>
+                  更多>>
+                </Link>
+                }
+                bordered={false}
+                bodyStyle={{ height: 180, padding: '0px' }}
+              >
                 <ChartTrial
                   data={this.state.datas}
                   width={this.state.width}
@@ -207,7 +253,15 @@ export default class InstanceDetailOverview extends React.Component {
               </Card>
             </Col>
             <Col span={9}>
-              <Card title="可订阅的服务" extra={<a href="#">去订阅>></a>} bordered={false} bodyStyle={{ height: 180, padding: '0px' }}>
+              <Card
+                title="可订阅的服务"
+                extra={<Link to={`/csb-instances-available/${instanceID}/subscription-services`}>
+                  去订阅>>
+                </Link>
+                }
+                bordered={false}
+                bodyStyle={{ height: 180, padding: '0px' }}
+              >
                 <ChartTrial
                   data={this.state.datas}
                   width={this.state.width}
@@ -232,3 +286,15 @@ export default class InstanceDetailOverview extends React.Component {
     )
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
+  return {
+    instanceID,
+  }
+}
+
+export default connect(mapStateToProps, {
+  //
+})(InstanceDetailOverview)
