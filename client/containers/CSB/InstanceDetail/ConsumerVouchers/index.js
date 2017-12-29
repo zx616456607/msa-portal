@@ -45,9 +45,7 @@ class ConsumerVouchers extends React.Component {
   state = {
     name: '',
     title: '',
-    isUse: true,
     isAdd: false,
-    delValue: '',
     addVisible: false,
     confirmLoading: false,
     currentConsumerVoucher: {},
@@ -119,18 +117,12 @@ class ConsumerVouchers extends React.Component {
   createConsumerVoucher = (instanceID, values) => {
     const { createConsumerVoucher } = this.props
     createConsumerVoucher(instanceID, values).then(res => {
-      this.setState({
-        confirmLoading: false,
-      })
-      if (res.error) {
-        return
-      }
+      this.setState({ confirmLoading: false })
+      if (res.error) return
       notification.success({
         message: '创建消费凭证成功',
       })
-      this.setState({
-        addVisible: false,
-      })
+      this.setState({ addVisible: false })
       this.loadData()
     })
   }
@@ -140,22 +132,11 @@ class ConsumerVouchers extends React.Component {
     const { currentConsumerVoucher } = this.state
     const { id } = currentConsumerVoucher
     editConsumerVoucher(instanceID, id, values).then(res => {
-      this.setState({
-        confirmLoading: false,
-      })
+      this.setState({ confirmLoading: false })
       if (res.error) return
-      notification.success({
-        message: '编辑消费凭证成功',
-      })
-      this.setState({
-        addVisible: false,
-      })
-    })
-  }
-
-  closeUpdateModal = () => {
-    this.setState({
-      updateVisible: false,
+      notification.success({ message: '编辑消费凭证成功' })
+      this.setState({ addVisible: false })
+      this.loadData()
     })
   }
 
@@ -164,14 +145,10 @@ class ConsumerVouchers extends React.Component {
     const { currentConsumerVoucher } = this.state
     const { id } = currentConsumerVoucher
     confirmUpdateConsumerVoucher(instanceID, id).then(res => {
+      this.setState({ confirmLoading: false })
       if (res.error) return
-      notification.success({
-        message: '确认更新成功',
-      })
-      this.setState({
-        updateVisible: false,
-        confirmLoading: false,
-      })
+      notification.success({ message: '确认更新成功' })
+      this.setState({ updateVisible: false })
     })
   }
 
@@ -196,18 +173,14 @@ class ConsumerVouchers extends React.Component {
       confirmLoading: true,
     })
     triggerUpdateConsumerVoucher(instanceID, id, body).then(res => {
+      this.setState({ updateVisible: false })
       if (res.error) return
       if (updateSetting === 'immediately') {
         this.confirmUpdateConsumeVoucher()
         return
       }
-      notification.success({
-        message: '触发更新成功',
-      })
-      this.setState({
-        updateVisible: false,
-        confirmLoading: false,
-      })
+      notification.success({ message: '触发更新成功' })
+      this.setState({ confirmLoading: false })
     })
   }
 
@@ -217,20 +190,12 @@ class ConsumerVouchers extends React.Component {
     const validateArray = [ 'name' ]
     form.validateFields(validateArray, (errors, values) => {
       if (errors) return
-      this.setState({
-        confirmLoading: true,
-      })
+      this.setState({ confirmLoading: true })
       if (isAdd) {
         this.createConsumerVoucher(instanceID, values)
         return
       }
       this.editConsumerVoucher(instanceID, values)
-    })
-  }
-
-  handleCancel = () => {
-    this.setState({
-      addVisible: false,
     })
   }
 
@@ -241,9 +206,7 @@ class ConsumerVouchers extends React.Component {
     })
     switch (key) {
       case 'update':
-        return this.setState({
-          updateVisible: true,
-        })
+        return this.setState({ updateVisible: true })
       case 'delete':
         return this.confirmDeleteConsumerVoucher(record)
       default:
@@ -332,7 +295,6 @@ class ConsumerVouchers extends React.Component {
     // }
     const pagination = {
       total: totalElements,
-      defaultCurrent: 1,
       size,
       current: parseInt(query.page) || 1,
       onChange: current => this.loadData({ page: current }),
@@ -370,10 +332,10 @@ class ConsumerVouchers extends React.Component {
         {addVisible && <Modal
           title={title}
           visible={true}
-          onCancel={this.handleCancel}
+          onCancel={() => this.setState({ addVisible: false })}
           maskClosable={false}
           footer={[
-            <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
+            <Button key="back" type="ghost" onClick={() => this.setState({ addVisible: false })}>取 消</Button>,
             <Button key="submit" type="primary" onClick={this.handleOK}>
               {isAdd ? '确 定' : '保 存'}
             </Button>,
@@ -400,7 +362,7 @@ class ConsumerVouchers extends React.Component {
           updateVisible && <UpdateConsumerVoucher
             loading={confirmLoading}
             callback={this.triggerUpdateConsumeVoucher}
-            closeModalMethod={this.closeUpdateModal}
+            closeModalMethod={() => this.setState({ updateVisible: false })}
             record={currentConsumerVoucher}
           />
         }

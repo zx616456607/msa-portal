@@ -16,7 +16,23 @@ import DetailPageDock from '../../../../components/Dock/DetailPageDock'
 import './style/SubscriptionDetailDock.less'
 
 export default class SubscriptionDetailDock extends React.Component {
+
+  renderSubstatus = status => {
+    switch (status) {
+      case 2:
+        return <span className="adopt">已通过</span>
+      case 3:
+        return <span className="refuse">已拒绝</span>
+      case 4:
+        return <span className="ub">已退订</span>
+      default:
+        return
+    }
+  }
+
   render() {
+    const { currentService } = this.props
+    console.log('currentService=', currentService)
     return (
       <DetailPageDock
         dockStyle={{
@@ -37,11 +53,11 @@ export default class SubscriptionDetailDock extends React.Component {
               <div className="sub-detail-body-line">
                 <div>
                   <span className="sub-label">订阅状态：</span>
-                  <span className="success-status">已通过</span>
+                  <span className="success-status">{this.renderSubstatus(currentService.requestStatus)}</span>
                 </div>
                 <div>
                   <span className="sub-label">消费凭证：</span>
-                  <span className="desc-text">凭证</span>
+                  <span className="desc-text">{currentService.evidenceName}</span>
                 </div>
                 <div>
                   <span className="sub-label">订阅时间：</span>
@@ -49,7 +65,7 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div>
                   <span className="sub-label">QPS：</span>
-                  20000
+                  -
                 </div>
                 <div className="bind-ip">
                   <span className="sub-label">绑定 IP：</span>
@@ -64,15 +80,15 @@ export default class SubscriptionDetailDock extends React.Component {
               <div className="sub-detail-body-line">
                 <div>
                   <span className="sub-label">服务名称：</span>
-                  hello
+                  {currentService.serviceName}
                 </div>
                 <div>
                   <span className="sub-label">所属服务组：</span>
-                  hello-group
+                  -
                 </div>
                 <div>
                   <span className="sub-label">服务描述：</span>
-                  hahaha~
+                  -
                 </div>
               </div>
             </div>

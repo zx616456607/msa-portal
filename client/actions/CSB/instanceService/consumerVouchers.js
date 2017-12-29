@@ -151,7 +151,7 @@ const fetchEditConsumerVoucher = (instanceID, evidenceId, body) => {
         method: 'PUT',
         body,
       },
-      schema: Schemas.CSB__INSTANCE_CONSUMER_VOUCHER_UPDATE_DATA,
+      schema: {},
     },
   }
 }

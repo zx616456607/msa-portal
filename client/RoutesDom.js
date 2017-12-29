@@ -54,6 +54,7 @@ import MySubscribedService from './containers/CSB/InstanceDetail/MySubscribedSer
 import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionServices'
 import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
 import PublishService from './containers/CSB/InstanceDetail/PublishService'
+import PlubicServices from './containers/CSB/InstanceDetail/PlubicService'
 
 export const appChildRoutes = [
   {
@@ -343,6 +344,12 @@ export const csbInstanceDetailChildRoutes = [
     component: SubscriptionServices,
     exact: true,
     key: 'subscription-services',
+  },
+  {
+    path: '/csb-instances-available/:instanceID/plubic-services',
+    component: PlubicServices,
+    exact: true,
+    key: 'plubic-services',
   },
   {
     path: '/csb-instances-available/:instanceID/consumer-vouchers',
