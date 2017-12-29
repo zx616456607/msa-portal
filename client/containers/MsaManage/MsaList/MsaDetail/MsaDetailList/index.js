@@ -36,7 +36,6 @@ class MsaDetailList extends React.Component {
 
   removeRegister = record => {
     const { delManualrules, clusterID, loadMsaDetail } = this.props
-    console.log(record.id)
     confirm({
       title: `确认将实例 ${record.instanceId} 移除注册吗？`,
       content: '',

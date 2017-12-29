@@ -157,8 +157,7 @@ class ServiceSubscriptionApproval extends React.Component {
     }
   }
 
-  tableChange = (pagination, filters, sorter) => {
-    console.log('sorter=', sorter)
+  tableChange = (pagination, filters) => {
     const { status } = filters
     this.setState({
       status,

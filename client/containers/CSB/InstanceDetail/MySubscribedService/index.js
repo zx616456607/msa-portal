@@ -98,8 +98,7 @@ class MySubscribedService extends React.Component {
     return [ '1', '2', '3' ]
   }
 
-  confirmEditBindIp = values => {
-    console.log('values=', values)
+  confirmEditBindIp = () => {
     this.setState({
       confirmLoading: true,
     })
@@ -139,8 +138,7 @@ class MySubscribedService extends React.Component {
     })
   }
 
-  openEditBindIpModal = record => {
-    console.log('record=', record)
+  openEditBindIpModal = () => {
     this.setState({
       editBindIpModalVisible: true,
       confirmLoading: false,
@@ -160,8 +158,7 @@ class MySubscribedService extends React.Component {
     }
   }
 
-  tableChange = (pagination, filters, sorter) => {
-    console.log('sorter=', sorter)
+  tableChange = (pagination, filters) => {
     const { requestStatus } = filters
     let status = requestStatus
     if (!requestStatus.length) {
@@ -244,9 +241,7 @@ class MySubscribedService extends React.Component {
     }, callback)
   }
 
-  passApproveService = values => {
-    console.log('values=', values)
-  }
+  passApproveService = () => { }
 
   renderSubstatus = status => {
     switch (status) {

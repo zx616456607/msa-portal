@@ -33,7 +33,6 @@ class PlubicServices extends React.Component {
   }
 
   loadData = (query = {}) => {
-    console.log(query)
     const { location, history } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, {

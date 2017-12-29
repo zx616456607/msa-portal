@@ -32,7 +32,6 @@ export default class SubscriptionDetailDock extends React.Component {
 
   render() {
     const { currentService } = this.props
-    console.log('currentService=', currentService)
     return (
       <DetailPageDock
         dockStyle={{
