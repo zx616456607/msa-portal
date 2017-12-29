@@ -180,6 +180,9 @@ const addCenter = (clusterId, yaml, query) => {
       endpoint,
       schema: {},
       options: {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
         body,
         method: 'POST',
       },
