@@ -23,8 +23,8 @@ import { getInstanceServiceOverview, getInstanceServiceDetailMap } from '../../.
 const Chart = CreateG2(chart => {
   chart.col('dateTime', {
     alias: '时间',
-    // type: 'time',
-    // mask: 'MM:ss',
+    type: 'time',
+    mask: 'yyyy-mm-dd hh:MM:ss',
     tickCount: 10,
     // nice: false,
   })
@@ -84,10 +84,10 @@ class Statistics extends React.Component {
 
   filterTimer = time => {
     const startT = time.length > 0 ?
-      time[0].toISOString().split('.')[0] + 'Z' : new Date().toISOString().split('.')[0] + 'Z'
-    const endT = time.length > 0 ?
-      time[1].toISOString().split('.')[0] + 'Z' :
+      time[0].toISOString().split('.')[0] + 'Z' :
       new Date(new Date() - 300 * 1000).toISOString().split('.')[0] + 'Z'
+    const endT = time.length > 0 ?
+      time[1].toISOString().split('.')[0] + 'Z' : new Date().toISOString().split('.')[0] + 'Z'
     const timer = {
       start: startT,
       end: endT,
