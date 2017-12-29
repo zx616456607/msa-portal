@@ -24,9 +24,7 @@ class MsaDetailConfig extends React.Component {
     refreshConfigLoading: false,
   }
 
-  handleChange = value => {
-    console.log(value)
-  }
+  handleChange = () => {}
 
   loadMsaConfig = () => {
     const { getMsaConfig, clusterID, name, instances } = this.props

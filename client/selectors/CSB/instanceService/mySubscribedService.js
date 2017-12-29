@@ -18,15 +18,28 @@ const getInstanceID = (state, props) => {
   return instanceID
 }
 const getmySubscribedServices = state => state.CSB && state.CSB.mySubscribedServices || {}
+const getInstanceServiceOverview = state => state.CSB.serviceOverview
 const getEntities = state => state.entities
 
 export const mySbuscrivedServicesSlt = createSelector(
-  [ getmySubscribedServices, getEntities, getInstanceID ],
-  (getmySubscribedServices, getEntities, getInstanceID) => {
+  [
+    getmySubscribedServices,
+    getInstanceServiceOverview,
+    getEntities,
+    getInstanceID,
+  ],
+  (getmySubscribedServices, serviceOverview, getEntities, getInstanceID) => {
     const { csbInstanceMySubscribedServices } = getEntities
     const { ids, totalElements, size, isFetching } = getmySubscribedServices[getInstanceID] || {}
+    const content = (ids || []).map(id => {
+      const service = csbInstanceMySubscribedServices[ id ]
+      return Object.assign({},
+        service,
+        serviceOverview[ service.serviceId ]
+      )
+    })
     return {
-      content: ids ? ids.map(id => csbInstanceMySubscribedServices[id]) : [],
+      content,
       totalElements,
       size,
       isFetching,

@@ -242,7 +242,7 @@ const fetchServiceOverview = (instanceId, serviceIds) => {
         FETCH_CSB_SERVICE_OVERVIEW_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceIds}/overview`,
-      schema: Schemas.CSB_INSTANCE_SERVICE_DETAIL_LIST_DATA,
+      schema: {},
     },
   }
 }

@@ -44,6 +44,7 @@ const Step = Steps.Step
 class PublishService extends React.Component {
   state = {
     currentStep: 0,
+    confirmLoading: false,
   }
 
   componentDidMount() {
@@ -68,7 +69,7 @@ class PublishService extends React.Component {
 
   renderSteps = () => {
     const { history } = this.props
-    const { currentStep } = this.state
+    const { currentStep, confirmLoading } = this.state
     if (currentStep === 0) {
       return [
         <Button key="cancel" onClick={() => history.goBack(-1)}>取 消</Button>,
@@ -110,6 +111,7 @@ class PublishService extends React.Component {
           type="primary"
           key="submit"
           onClick={this.submitService}
+          confirmLoading={confirmLoading}
         >
         发 布
         </Button>,
@@ -124,6 +126,9 @@ class PublishService extends React.Component {
       if (errors) {
         return
       }
+      this.setState({
+        confirmLoading: true,
+      })
       const { apiGatewayLimit, apiGatewayLimitType } = values
       let limitationType = 'no_limitation'
       let limitationDetail = {}
