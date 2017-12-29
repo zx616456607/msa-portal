@@ -49,7 +49,7 @@ export default class IndentTip extends React.Component {
         </div>
         <div>
           <span className="key-value">
-            sk:{record.replacingSecret ? record.secret : record.replacingSecret}
+            sk:{record.secret}
           </span>
           <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
             <CopyToClipboard text={record.secret} onCopy={() => this.copyKey()}>

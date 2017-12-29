@@ -12,6 +12,8 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
+import cloneDeep from 'lodash/cloneDeep'
+
 import {
   Button, Icon, Input, Pagination,
   Dropdown, Table, Card, Menu, Modal,
@@ -249,14 +251,18 @@ class ConsumerVouchers extends React.Component {
     }
   }
 
-  filterAs = record => {
+  filterAs = (column, record) => {
+    const currentRecord = cloneDeep(record)
+    if (column === 2) {
+      currentRecord.secret = record.replacingSecret
+    }
     return (
       <Row>
-        <Col span={10} className="text">{record.clientId}</Col>
+        <Col span={10} className="text">{currentRecord.clientId}</Col>
         <Col span={2}>/</Col>
-        <Col span={10} className="text">{record.secret}</Col>
+        <Col span={10} className="text">{currentRecord.secret}</Col>
         <Col span={2} className="spread-icon">
-          <IndentTip record={record}/>
+          <IndentTip record={currentRecord}/>
         </Col>
       </Row>
     )
@@ -283,13 +289,13 @@ class ConsumerVouchers extends React.Component {
         dataIndex: 'clientId',
         width: '12%',
         className: 'keys',
-        render: (text, record) => this.filterAs(record),
+        render: (text, record) => this.filterAs(1, record),
       }, {
         title: '新 AccessKey / SecretKey',
         dataIndex: 'replacingSecret',
         width: '12%',
         className: 'keys',
-        render: (text, record) => <span>{text ? this.filterAs(record) : '-'}</span>,
+        render: (text, record) => <span>{text ? this.filterAs(2, record) : '-'}</span>,
       }, {
         title: '订阅服务（个）',
         width: '10%',
@@ -304,7 +310,7 @@ class ConsumerVouchers extends React.Component {
         title: '更新时间',
         dataIndex: 'updatedAt',
         width: '19%',
-        render: (text, record) => <span>{text ? '-' : formatDate(record)}</span>,
+        render: updatedAt => <span>{updatedAt ? formatDate(updatedAt) : '-'}</span>,
       }, {
         title: '操作',
         dataIndex: 'operation',
@@ -313,7 +319,7 @@ class ConsumerVouchers extends React.Component {
           <Dropdown.Button onClick={this.handleButtonClick.bind(this, record)} overlay={
             <Menu onClick={this.handleMenu.bind(this, record)} style={{ width: 85 }}>
               <Menu.Item key="update">{record.replacingSecret ? '确认更新' : '更新'}</Menu.Item>
-              <Menu.Item key="delete">删除</Menu.Item>
+              <Menu.Item key="delete" disabled={record.subscribedCount > 0}>删除</Menu.Item>
             </Menu>
           }>编辑</Dropdown.Button>
         </div>,
