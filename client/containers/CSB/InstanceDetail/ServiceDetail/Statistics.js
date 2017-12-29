@@ -25,9 +25,10 @@ const Chart = CreateG2(chart => {
     alias: '时间',
     type: 'time',
     mask: 'hh:MM:ss',
-    tickCount: 10,
+    tickCount: 30,
     // nice: false,
   })
+  chart.tooltip('x*y')
   chart.col('count', {
     alias: '次数',
   })
@@ -147,7 +148,7 @@ class Statistics extends React.Component {
             <Col span={9} className="service-statistics-item">
               <div>平均响应时间</div>
               <div>
-                <span>{averageCallTime || 0}</span>
+                <span>{averageCallTime ? Number(averageCallTime).toFixed(2) : 0}</span>
                 <span>ms</span>
               </div>
             </Col>
