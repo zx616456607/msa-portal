@@ -14,9 +14,8 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import {
   Card, Button, Icon, Input,
-  Radio, Table, Pagination, Modal,
-  Row, Col, Tooltip, Form,
-  notification,
+  Radio, Table, Pagination,
+  Tooltip, notification,
 } from 'antd'
 import './style/index.less'
 import { connect } from 'react-redux'
@@ -31,10 +30,8 @@ import { formatDate, toQuerystring } from '../../../../common/utils'
 import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 
-const { TextArea } = Input
 const Search = Input.Search
 const RadioGroup = Radio.Group
-const FormItem = Form.Item
 
 class ServiceSubscriptionApproval extends React.Component {
   state = {
@@ -51,10 +48,9 @@ class ServiceSubscriptionApproval extends React.Component {
     const { location } = this.props
     const { query } = location
     const { name, status } = query
-    const approveStatus = this.renderStatus(status)
     this.setState({
       name,
-      status: approveStatus,
+      status: this.renderStatus(status),
     }, this.loadData)
   }
 
@@ -65,9 +61,10 @@ class ServiceSubscriptionApproval extends React.Component {
     if (typeof status === 'string') {
       return [ status ]
     }
-    if (typeof status === 'object') {
+    if (Array.isArray(status)) {
       return status
     }
+    return [ 1 ]
   }
 
   approveStatusChange = e => {
@@ -88,10 +85,9 @@ class ServiceSubscriptionApproval extends React.Component {
     })
   }
 
-  handleOk = () => {
-    const { form, instanceID, putServiceApprove } = this.props
+  handleCallback = values => {
+    const { instanceID, putServiceApprove } = this.props
     const { currentRecord, isToo } = this.state
-    const response = form.getFieldValue('response')
     const requestID = currentRecord.id
     let status = 2
     if (!isToo) {
@@ -99,22 +95,16 @@ class ServiceSubscriptionApproval extends React.Component {
     }
     const body = {
       status,
-      response,
+      values,
     }
-    this.setState({
-      confirmLoading: true,
-    })
+    this.setState({ confirmLoading: true })
     putServiceApprove(instanceID, requestID, body).then(res => {
       this.setState({
         confirmLoading: false,
       })
       if (res.error) return
-      this.setState({
-        visible: false,
-      })
-      notification.success({
-        message: '操作成功',
-      })
+      this.setState({ visible: false })
+      notification.success({ message: '操作成功' })
       this.loadData()
     })
   }
@@ -167,8 +157,7 @@ class ServiceSubscriptionApproval extends React.Component {
     }
   }
 
-  tableChange = (pagination, filters, sorter) => {
-    console.log('sorter=', sorter)
+  tableChange = (pagination, filters) => {
     const { status } = filters
     this.setState({
       status,
@@ -191,10 +180,9 @@ class ServiceSubscriptionApproval extends React.Component {
       modalTitle, isToo, currentRecord, confirmLoading,
       name,
     } = this.state
-    const { serviceSubscribeAppraveList, form, location } = this.props
+    const { serviceSubscribeAppraveList, location } = this.props
     const { query } = location
     const { content, size, isFetching, totalElements } = serviceSubscribeAppraveList
-    const { getFieldDecorator } = form
     let radioGroupValue = 1
     if (query.status && parseInt(query.status) !== 1) {
       radioGroupValue = 5
@@ -205,7 +193,7 @@ class ServiceSubscriptionApproval extends React.Component {
       { text: '已退订', value: 4 },
     ]
     const columns = [
-      { title: '订阅人', dataIndex: 'name', width: '8%' },
+      { title: '订阅人', dataIndex: 'subscriberName', width: '8%' },
       { title: '订阅服务名称', dataIndex: 'serviceName', width: '10%' },
       { title: '服务版本', dataIndex: 'version', width: '8%' },
       {
@@ -224,9 +212,7 @@ class ServiceSubscriptionApproval extends React.Component {
         dataIndex: 'QPS',
         width: '8%',
       }, {
-        title: <Tooltip title="希望最大每秒访问次数">
-          <span>QPS</span>
-        </Tooltip>,
+        title: 'IP',
         dataIndex: 'QPH',
         width: '8%',
         filterIcon: <Icon type="smile-o" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }}/>,
@@ -242,6 +228,7 @@ class ServiceSubscriptionApproval extends React.Component {
       { title: '审批意见', dataIndex: 'response', width: '8%' }, {
         title: '操作',
         dataIndex: 'operation',
+        key: 'operation',
         width: '18%',
         render: (text, record) => {
           if (record.status !== 1) {
@@ -257,14 +244,9 @@ class ServiceSubscriptionApproval extends React.Component {
     const pagination = {
       simple: true,
       total: totalElements,
-      defaultCurrent: 1,
       size,
       current: parseInt(query.page) || 1,
       onChange: page => this.loadData({ page }),
-    }
-    const formItemLayout = {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 19 },
     }
     return (
       <div className="csb-service-subscription-approval">
@@ -307,43 +289,17 @@ class ServiceSubscriptionApproval extends React.Component {
             />
           </QueueAnim>
         </Card>
-        { this.state.visible && <Modal
-          title={modalTitle}
-          visible={this.state.visible}
-          onCancel={this.handleCancel}
-          confirmLoading={confirmLoading}
-          wrapClassName="approve-modal"
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleOk}>{isToo ? '通 过' : '拒 绝'}</Button>,
-          ]}
-        >
-          <div className="modal-approval">
-            <Row className="modal-div">
-              <Col span={4}>订阅服务</Col>
-              <Col span={20}>{currentRecord.serviceName}</Col>
-            </Row>
-            <Row className="modal-div">
-              <Col span={4}>订阅人</Col>
-              <Col span={20}>{currentRecord.subscriberName ? currentRecord.subscriberName : '-' }</Col>
-            </Row>
-            <Row className="modal-div">
-              <Col span={4}>消费凭证</Col>
-              <Col span={20}>{ currentRecord.evidenceId }</Col>
-            </Row>
-            <FormItem
-              label="审批意见"
-              key="response"
-              {...formItemLayout}
-            >
-              {
-                getFieldDecorator('response')(
-                  <TextArea placeholder="选填" className="textArea" autosize={{ minRows: 2, maxRows: 6 }}/>
-                )
-              }
-            </FormItem>
-          </div>
-        </Modal>}
+
+        {
+          this.state.visible && <ApproveService
+            closeModalMethod={() => this.setState({ visible: false })}
+            isToo={isToo}
+            modalTitle={modalTitle}
+            loading={confirmLoading}
+            currentRecord={currentRecord}
+            callback={this.handleCallback}
+          />
+        }
       </div>
     )
   }
@@ -363,4 +319,4 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   getServiceSubscribeApproveList,
   putServiceApprove,
-})(Form.create()(ServiceSubscriptionApproval))
+})(ServiceSubscriptionApproval)

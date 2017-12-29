@@ -84,7 +84,7 @@ export const GET_UNSUBSCRIBE_SERVICE_REQUEST = 'GET_UNSUBSCRIBE_SERVICEREQUEST'
 export const GET_UNSUBSCRIBE_SERVICE_SUCCESS = 'GET_UNSUBSCRIBE_SERVICE_SUCCESS'
 export const GET_UNSUBSCRIBE_SERVICE_FALIURE = 'GET_UNSUBSCRIBE_SERVICE_FALIURE'
 
-const fetchGetUnsubscribeService = (instanceID, serviceId) => {
+const fetchGetUnsubscribeService = (instanceID, requestId) => {
   return {
     [CALL_API]: {
       types: [
@@ -92,17 +92,17 @@ const fetchGetUnsubscribeService = (instanceID, serviceId) => {
         GET_UNSUBSCRIBE_SERVICE_SUCCESS,
         GET_UNSUBSCRIBE_SERVICE_FALIURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/${serviceId}`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-request/${requestId}`,
       options: {
-        method: 'GET',
+        method: 'DELETE',
       },
-      schema: Schemas.CSB_INSTANCE_SERVICE_API_DOC,
+      schema: {},
     },
   }
 }
 
-export const unsubscriveService = (instanceID, serviceId) => {
-  return dispatch => dispatch(fetchGetUnsubscribeService(instanceID, serviceId))
+export const unsubscriveService = (instanceID, requestId) => {
+  return dispatch => dispatch(fetchGetUnsubscribeService(instanceID, requestId))
 }
 
 // 修改绑定 IP

@@ -83,13 +83,9 @@ class ServicesTable extends React.Component {
     })
   }
 
-  handleCreateModalValues = values => {
-    console.log('values=', values)
-  }
+  handleCreateModalValues = () => {}
 
-  handleSaveBlackAndWhiteList = values => {
-    console.log('values=', values)
-  }
+  handleSaveBlackAndWhiteList = () => {}
 
   openBlackAndWhiteListModal = record => {
     this.setState({
@@ -141,10 +137,6 @@ class ServicesTable extends React.Component {
         break
     }
     return <span className={className}><div className="status-icon"></div>{desc}</span>
-  }
-
-  searchWithServiceName = value => {
-    console.log('value=', value)
   }
 
   serviceMenuClick = (record, item) => {
