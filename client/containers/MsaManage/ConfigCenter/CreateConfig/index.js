@@ -109,6 +109,9 @@ class CreateConfig extends React.Component {
         editLoading: true,
       })
       putCenterConfig(clusterID, yamls, query).then(res => {
+        this.setState({
+          editLoading: false,
+        })
         if (res.error) {
           notification.error({
             message: '保存失败',
@@ -120,7 +123,6 @@ class CreateConfig extends React.Component {
             message: '保存成功',
           })
           this.setState({
-            editLoading: false,
             btnVasible: false,
           })
         }
@@ -192,11 +194,11 @@ class CreateConfig extends React.Component {
       }
       addCenterConfig(clusterID, currentYaml, query).then(res => {
         if (res.error) {
-          notification.error({
-            message: '添加失败',
-          })
           this.setState({
             addLoading: false,
+          })
+          notification.error({
+            message: '添加失败',
           })
           return
         }
