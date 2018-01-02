@@ -88,6 +88,7 @@
     "g2": "^2.3.13",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.29.0",
+    "isomorphic-fetch": "^2.2.1",
     "jest": "^21.2.1",
     "koa-webpack": "^1.0.0",
     "less": "^2.7.3",
