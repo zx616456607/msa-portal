@@ -17,7 +17,7 @@ import { parse as parseQuerystring } from 'query-string'
 import isEqual from 'lodash/isEqual'
 import {
   Button, Select, Input, Pagination, Table, Menu, Dropdown,
-  Modal, notification,
+  Modal, notification, Badge,
 } from 'antd'
 import ServicesTable from '../ServicesTable'
 import confirm from '../../../../../components/Modal/confirm'
@@ -223,9 +223,26 @@ class MyPublishedServiceGroups extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (text, row) => <span>
-          {row.stoppedCount} 停止，{row.activeCount} 运行
-        </span>,
+        render: (text, row) => {
+          const { stoppedCount, activeCount } = row
+          return <span>
+            {
+              stoppedCount > 0 &&
+              <div>
+                <Badge status="error" text={`停止 +${stoppedCount}`} />
+              </div>
+            }
+            {
+              activeCount > 0 &&
+              <div>
+                <Badge status="success" text={`运行 +${activeCount}`} />
+              </div>
+            }
+            {
+              stoppedCount < 1 && activeCount < 1 && '-'
+            }
+          </span>
+        },
       },
       { title: '服务数量', dataIndex: 'servicesCount', key: 'servicesCount' },
       { title: '描述', dataIndex: 'description', key: 'description' },
