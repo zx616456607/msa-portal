@@ -236,13 +236,13 @@ class MyPublishedServiceGroups extends React.Component {
             {
               stoppedCount > 0 &&
               <div>
-                <Badge status="error" text={`停止 +${stoppedCount}`} />
+                <Badge status="error" />已停用 +{stoppedCount}
               </div>
             }
             {
               activeCount > 0 &&
               <div>
-                <Badge status="success" text={`运行 +${activeCount}`} />
+                <Badge status="success" />已激活 +{activeCount}
               </div>
             }
             {
