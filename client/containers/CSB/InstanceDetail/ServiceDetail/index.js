@@ -16,6 +16,7 @@ import {
   Menu, Dropdown, Row, Col, Tabs,
 } from 'antd'
 import serviceIcon from '../../../../assets/img/csb/service.png'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import ServiceStatistics from './Statistics'
 import ServiceProtocols from './Protocols'
 import ServiceParameters from './Parameters'
@@ -73,7 +74,7 @@ class ServiceDetail extends React.Component {
 
   render() {
     const { statusState } = this.state
-    const { detail, instanceId, renderServiceStatusUI } = this.props
+    const { detail, instanceId } = this.props
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -90,7 +91,7 @@ class ServiceDetail extends React.Component {
               <Col span={6}>
                 <div className="txt-of-ellipsis">
                   运行状态：
-                  {renderServiceStatusUI(statusState > 0 ? statusState : detail.status)}
+                  {renderCSBInstanceServiceStatus(statusState > 0 ? statusState : detail.status)}
                 </div>
               </Col>
               <Col span={14}>
