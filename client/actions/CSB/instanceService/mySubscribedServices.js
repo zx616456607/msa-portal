@@ -130,3 +130,30 @@ const fetchEditServiceBindIp = (instanceID, serviceId) => {
 export const editServiceBindIp = (instanceID, serviceId) => {
   return dispatch => dispatch(fetchEditServiceBindIp(instanceID, serviceId))
 }
+
+// 重新订阅服务
+export const POST_RESUBCRIBESERVICE_REQUEST = 'POST_RESUBCRIBESERVICE_REQUEST'
+export const POST_RESUBCRIBESERVICE_SUCCESS = 'POST_RESUBCRIBESERVICE_SUCCESS'
+export const POST_RESUBCRIBESERVICE_FALIURE = 'POST_RESUBCRIBESERVICE_FALIURE'
+
+const fetchResubcribeService = (instanceID, subscriptionId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        POST_RESUBCRIBESERVICE_REQUEST,
+        POST_RESUBCRIBESERVICE_SUCCESS,
+        POST_RESUBCRIBESERVICE_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription/${subscriptionId}`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const reSubscribeService = (instanceID, subscriptionId, body) => {
+  return dispatch => dispatch(fetchResubcribeService(instanceID, subscriptionId, body))
+}

@@ -19,6 +19,8 @@ export default class SubscriptionDetailDock extends React.Component {
 
   renderSubstatus = status => {
     switch (status) {
+      case 1:
+        return <span className="eap">待审批</span>
       case 2:
         return <span className="adopt">已通过</span>
       case 3:
@@ -26,7 +28,7 @@ export default class SubscriptionDetailDock extends React.Component {
       case 4:
         return <span className="ub">已退订</span>
       default:
-        return
+        return '未知'
     }
   }
 
@@ -52,7 +54,7 @@ export default class SubscriptionDetailDock extends React.Component {
               <div className="sub-detail-body-line">
                 <div>
                   <span className="sub-label">订阅状态：</span>
-                  <span className="success-status">{this.renderSubstatus(currentService.requestStatus)}</span>
+                  <span className="success-status">{this.renderSubstatus(currentService.status)}</span>
                 </div>
                 <div>
                   <span className="sub-label">消费凭证：</span>
@@ -83,7 +85,7 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div>
                   <span className="sub-label">所属服务组：</span>
-                  -
+                  {currentService.serviceGroupName ? currentService.serviceGroupName : '-'}
                 </div>
                 <div>
                   <span className="sub-label">服务描述：</span>
