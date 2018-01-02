@@ -207,9 +207,7 @@ class MySubscribedService extends React.Component {
           unsubscriveService(instanceID, id).then(res => {
             if (res.error) return reject()
             resolve()
-            notification.success({
-              message: '退订服务成功',
-            })
+            notification.success({ message: '退订服务成功' })
             self.loadData()
           })
         })
@@ -226,11 +224,11 @@ class MySubscribedService extends React.Component {
     this.setState({
       requestStatus,
       subFilteredValue: requestStatus,
-    })
-    this.loadData({
+      name: '',
+    }, () => this.loadData({
       requestStatus,
       page: 1,
-    })
+    }))
   }
 
   openServiceApiDocModal = currentService => {
@@ -248,8 +246,6 @@ class MySubscribedService extends React.Component {
     }, callback)
   }
 
-  passApproveService = () => { }
-
   renderSubstatus = status => {
     switch (status) {
       case 1:
@@ -265,13 +261,20 @@ class MySubscribedService extends React.Component {
     }
   }
 
+  reSubscribeService = record => {
+    this.setState({
+      currentService: record,
+      subVisible: true,
+    })
+  }
+
   render() {
     const {
       serviceApIDocModal, editBindIpModalVisible, confirmLoading,
       subDetailVisible, currentService, searchType, subFilteredValue,
       name, subVisible,
     } = this.state
-    const { mySubscribedServicelist, serviceList, location } = this.props
+    const { mySubscribedServicelist, serviceList, location, match, instanceID } = this.props
     const { query } = location
     const { isFetching, size, totalElements, content } = mySubscribedServicelist
     const paginationProps = {
@@ -291,11 +294,11 @@ class MySubscribedService extends React.Component {
       { text: '已拒绝', value: '3' },
     ]
     const columns = [
-      { title: '订阅服务名称', dataIndex: 'serviceName', width: '10%' },
+      { title: '订阅服务名称', dataIndex: 'serviceName', width: '8%' },
       {
         title: '服务状态',
         dataIndex: 'serviceStatus',
-        width: '10%',
+        width: '8%',
         filters: [
           { text: '已激活', value: 'Joe' },
           { text: '已停用', value: 'Jim' },
@@ -304,7 +307,7 @@ class MySubscribedService extends React.Component {
         render: status => this.renderServiceStatusUI(status),
       },
       { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
-      { title: '所属服务组', dataIndex: 'belongs', width: '8%' },
+      { title: '所属服务组', dataIndex: 'serviceGroupName', width: '8%' },
       { title: '我的消费凭证', dataIndex: 'evidenceName', width: '8%' },
       {
         title: '订阅状态',
@@ -315,29 +318,29 @@ class MySubscribedService extends React.Component {
         render: text => this.renderSubstatus(text),
       },
       {
-        title: '订阅时间', dataIndex: 'requestTime', width: '8%',
+        title: '订阅时间', dataIndex: 'requestTime', width: '10%',
         render: text => formatDate(text),
       },
       {
-        title: '审批时间', dataIndex: 'approvalTime', width: '8%',
+        title: '审批时间', dataIndex: 'approvalTime', width: '10%',
         render: text => formatDate(text),
       },
       {
         title: '累计调用量',
         dataIndex: 'totalCallCount',
-        width: '10%',
+        width: '8%',
         // sorter: (a, b) => a.status - b.status,
         render: text => (text !== undefined ? text : '-'),
       }, {
         title: '累计错误量',
         dataIndex: 'totalErrorCallCount',
-        width: '10%',
+        width: '8%',
         // sorter: (a, b) => a.num - b.num,
         render: text => (text !== undefined ? text : '-'),
       }, {
         title: '平均RT（ms）',
         dataIndex: 'averageCallTime',
-        width: '10%',
+        width: '8%',
         // sorter: (a, b) => a.desc - b.desc,
         render: text => (
           text !== undefined
@@ -348,11 +351,10 @@ class MySubscribedService extends React.Component {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '12%',
+        width: '8%',
         render: (text, record) => {
           if (record.status === 4) {
-            return '-'
-            // return <Button type="primary">订阅</Button>
+            return <Button type="primary" onClick={this.reSubscribeService.bind(this, record)}>重新订阅</Button>
           }
           const menu = <Menu style={{ width: 110 }}
             onClick={this.tableMenuClick.bind(this, record)}
@@ -445,6 +447,11 @@ class MySubscribedService extends React.Component {
           subVisible && <SubscriptServiceModal
             closeModalMethod={() => this.setState({ subVisible: false })}
             visible={subVisible}
+            match={match}
+            dateSource={currentService}
+            from="mySubcribeUI"
+            callback={this.loadData.bind(this)}
+            instanceID={instanceID}
           />
         }
       </QueueAnim>

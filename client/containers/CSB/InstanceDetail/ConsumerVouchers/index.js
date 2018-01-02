@@ -97,12 +97,18 @@ class ConsumerVouchers extends React.Component {
     getConsumerVouchersList(instanceID, query)
   }
 
+  focusNameInput = () => {
+    setTimeout(() => {
+      this.nameInput.focus()
+    }, 200)
+  }
+
   handleAdd = () => {
     this.setState({
       isAdd: true,
       title: '创建消费凭证',
       addVisible: true,
-    })
+    }, this.focusNameInput)
   }
 
   handleButtonClick = currentConsumerVoucher => {
@@ -111,7 +117,7 @@ class ConsumerVouchers extends React.Component {
       title: '编辑消费凭证',
       addVisible: true,
       currentConsumerVoucher,
-    })
+    }, this.focusNameInput)
   }
 
   createConsumerVoucher = (instanceID, values) => {
@@ -353,7 +359,7 @@ class ConsumerVouchers extends React.Component {
                   message: '消费凭证名称不能为空',
                 }],
               })(
-                <Input placeholder="请输入消费凭证名称"/>
+                <Input placeholder="请输入消费凭证名称" ref={input => { this.nameInput = input }} />
               )
             }
           </FormItem>

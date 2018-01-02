@@ -214,11 +214,13 @@ class ServiceSubscriptionApproval extends React.Component {
         </Tooltip>,
         dataIndex: 'QPS',
         width: '8%',
+        render: text => <span>{text ? text : '-'}</span>,
       }, {
         title: 'IP',
         dataIndex: 'QPH',
         width: '8%',
         filterIcon: <Icon type="smile-o" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }}/>,
+        render: text => <span>{text ? text : '-'}</span>,
       },
       {
         title: '申请订阅时间',
@@ -228,7 +230,11 @@ class ServiceSubscriptionApproval extends React.Component {
         // sorter: (a, b) => a.time - b.time,
         render: requestTime => formatDate(requestTime),
       },
-      { title: '审批意见', dataIndex: 'serviceDescription', width: '8%' }, {
+      {
+        title: '审批意见', dataIndex: 'serviceDescription', width: '8%',
+        render: text => <span>{text ? text : '-'}</span>,
+      },
+      {
         title: '操作',
         dataIndex: 'operation',
         key: 'operation',

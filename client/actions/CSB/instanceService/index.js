@@ -313,7 +313,7 @@ const fetchSubscribeService = (instanceID, body) => {
         SUBSCRIBE_SERVICE_SUCCESS,
         SUBSCRIBE_SERVICE_FAILURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-request`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription`,
       options: {
         method: 'POST',
         body,

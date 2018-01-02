@@ -96,15 +96,15 @@ class PublicServices extends React.Component {
     const columns = [
       { title: '公开服务名称', dataIndex: 'name', width: '12%' },
       {
-        title: '服务状态', dataIndex: 'status', width: '12%',
+        title: '服务状态', dataIndex: 'status', width: '11%',
         render: status => this.renderServiceStatusUI(status),
       },
-      { title: '服务版本', dataIndex: 'version', width: '12%' },
-      { title: '所属服务组', dataIndex: 'groupName', width: '12%' },
+      { title: '服务版本', dataIndex: 'version', width: '11%' },
+      { title: '所属服务组', dataIndex: 'groupName', width: '11%' },
       { title: '订阅状态', dataIndex: 'dingyue', width: '12%', render: () => '无需订阅' },
       { title: '服务描述', dataIndex: 'desc', width: '12%', render: () => '无需订阅' },
       {
-        title: '服务发布时间', dataIndex: 'publishTime', width: '12%',
+        title: '服务发布时间', dataIndex: 'publishTime', width: '15%',
         render: text => formatDate(text),
       },
       {
