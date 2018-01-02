@@ -62,7 +62,6 @@ class App extends React.Component {
     const { pathname, search, hash } = location
     const query = parse(search)
     const { username, token, jwt, authUrl, ...otherQuery } = query
-    console.log(pathname, search, hash)
     getAuth({ username, token, jwt }).then(res => {
       if (res.type === AUTH_FAILURE) {
         Modal.error({

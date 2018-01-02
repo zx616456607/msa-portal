@@ -18,7 +18,6 @@ import {
 export default class Protocols extends React.Component {
   render() {
     const { detail } = this.props
-    console.log(detail)
     return (
       <div className="service-protocols">
         <div className="service-protocols-body row-table">

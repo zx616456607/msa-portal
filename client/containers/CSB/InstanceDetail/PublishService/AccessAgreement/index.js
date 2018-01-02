@@ -59,7 +59,6 @@ class AccessAgreement extends React.Component {
       })
       pingService(instanceID, { url: values.targetDetail }).then(res => {
         this.setState({ pingLoading: false })
-        console.log(res)
         if (res.error) {
           this.setState({ pingSuccess: false })
           return
@@ -110,7 +109,7 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup>
               <RadioButton value="Restful-API">Restful-API</RadioButton>
-              <RadioButton value="WebService">WebService</RadioButton>
+              <RadioButton value="WebService" disabled>WebService</RadioButton>
             </RadioGroup>
           )}
         </FormItem>
