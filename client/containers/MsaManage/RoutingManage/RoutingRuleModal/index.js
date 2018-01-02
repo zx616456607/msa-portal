@@ -51,12 +51,15 @@ class RoutingRuleModal extends React.Component {
       const values = {
         routeId,
         path,
-        serviceId,
-        url,
         description,
         stripPrefix,
         retryable,
         status,
+      }
+      if (msaUrlType === 'url') {
+        values.url = url
+      } else {
+        values.serviceId = serviceId
       }
       setTimeout(() => {
         setFieldsValue(values)
