@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
-import { Dropdown, Menu, Table, notification } from 'antd'
+import { Dropdown, Menu, Table, notification, Badge } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
@@ -83,9 +83,9 @@ class ServicesTable extends React.Component {
     })
   }
 
-  handleCreateModalValues = () => {}
+  handleCreateModalValues = () => { }
 
-  handleSaveBlackAndWhiteList = () => {}
+  handleSaveBlackAndWhiteList = () => { }
 
   openBlackAndWhiteListModal = record => {
     this.setState({
@@ -118,25 +118,25 @@ class ServicesTable extends React.Component {
   }
 
   renderServiceStatusUI = status => {
-    let className = ''
     let desc = ''
+    let text = ''
     switch (status) {
       case 1:
-        desc = '已激活'
-        className = 'activated'
+        text = '已激活'
+        desc = 'success'
         break
       case 2:
-        desc = '已停用'
-        className = 'deactivated'
+        text = '已停用'
+        desc = 'error'
         break
       case 4:
-        desc = '已注销'
-        className = 'cancelled'
+        text = '已注销'
+        desc = 'default'
         break
       default:
         break
     }
-    return <span className={className}><div className="status-icon"></div>{desc}</span>
+    return < Badge status={desc} text={text} />
   }
 
   serviceMenuClick = (record, item) => {
