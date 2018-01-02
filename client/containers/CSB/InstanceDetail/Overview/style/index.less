@@ -68,15 +68,6 @@
         position: absolute;
         left: 50%;
         top: 41%;
-        .dec-run {
-          background-color: @success-color;
-        }
-        .dec-error {
-          background-color: @error-color;
-        }
-        .dec-on {
-          background-color: @border-color-base;
-        }
       }
       .desc-trial {
         width: 200px;
@@ -84,34 +75,13 @@
         position: absolute;
         left: 50%;
         top: 38%;
-        .dec-run {
-          background-color: @success-color;
-        }
-        .dec-error {
-          background-color: @error-color;
-        }
-        .dec-on {
-          background-color: @border-color-base;
-        }
-        .dec-trial {
-          background-color: @warning-color;
-        }
       }
       .des {
         width: 200px;
         display: inline-block;
         position: absolute;
         left: 50%;
-        top: 47%;
-        .dec-runs {
-          background-color: @success-color;
-        }
-        .dec-errors {
-          background-color: @error-color;
-        }
-        .dec-on {
-          background-color: @border-color-base;
-        }
+        top: 45%;
       }
       .ant-card-body {
         & > div {
@@ -122,6 +92,16 @@
           }
         }
       }
+      .status-desc {
+        margin-left: 36%;
+      }
+      .ant-badge {
+        margin-bottom: 10px;
+      }
     }
+  }
+  .ant-badge-status-dot {
+    width: 14px;
+    height: 14px;
   }
 }
