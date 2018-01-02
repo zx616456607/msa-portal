@@ -302,11 +302,11 @@ class ServicesTable extends React.Component {
     if (!isEmpty(sorter)) {
       sorterStr = this.getSort(sorter)
     }
-    loadData({ status: filtersStr, sort: sorterStr })
+    loadData({ status: filtersStr, sort: sorterStr, page: pagination.current })
   }
 
   render() {
-    const { dataSource, loading, from, match, check } = this.props
+    const { dataSource, pageSize, total, loading, from, match, check } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -391,10 +391,17 @@ class ServicesTable extends React.Component {
       },
     ]
     const { instanceID } = match.params
+    let pagination = false
     if (from === 'group') {
       const columnsKeys = [ 'name', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
       columns.forEach(column => (column.width = `${100 / columns.length}%`))
+      pagination = {
+        simple: true,
+        hideOnSinglePage: true,
+        pageSize,
+        total,
+      }
     }
     const self = this
     return [
@@ -402,7 +409,7 @@ class ServicesTable extends React.Component {
         <Table
           columns={columns}
           dataSource={dataSource}
-          pagination={false}
+          pagination={pagination}
           loading={loading}
           rowKey={row => row.id}
           onChange={this.handleChange}
