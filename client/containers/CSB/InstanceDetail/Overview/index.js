@@ -43,7 +43,7 @@ const Chart1 = createG2(chart => {
     inner: 0.75,
   })
   chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#5cb85c', '#f85a5a', '#ffbf00', '#d9d9d9' ])
+    .color('area', [ '#ffbf00', '#5cb85c', '#f85a5a', '#d9d9d9' ])
     .style({
       lineWidth: 1,
     })
@@ -109,10 +109,23 @@ class InstanceDetailOverview extends React.Component {
         return '已激活'
       case 2:
         return '已停止'
-      case 3:
-        return '待审批'
       case 4:
         return '已注销'
+      default:
+        return ''
+    }
+  }
+
+  filterSubscriptionState = key => {
+    switch (key) {
+      case 1:
+        return '待审批'
+      case 2:
+        return '已通过'
+      case 3:
+        return '已拒绝'
+      case 4:
+        return '已撤销'
       default:
         return ''
     }
@@ -153,11 +166,46 @@ class InstanceDetailOverview extends React.Component {
     return countList
   }
 
+  filterServiceSubscription = data => {
+    let countList
+    if (data && data.length > 0) {
+      let runCount = 0
+      let errorCount = 0
+      let revokeCount = 0
+      let approvalCount = 0
+      data.forEach(item => {
+        switch (item.status) {
+          case 1:
+            approvalCount = item.count
+            break
+          case 2:
+            runCount = item.count
+            break
+          case 3:
+            errorCount = item.count
+            break
+          case 4:
+            revokeCount = item.count
+            break
+          default:
+            return ''
+        }
+      })
+      countList = {
+        runCount,
+        revokeCount,
+        errorCount,
+        approvalCount,
+      }
+    }
+    return countList
+  }
+
   filterData = data => {
     const { publishedServiceData, serviceubscribeData, subServiceData, cansubServiceData } =
       data && data || {}
     const publish = this.filterStatusCount(publishedServiceData)
-    const publishSub = this.filterStatusCount(serviceubscribeData)
+    const publishSub = this.filterServiceSubscription(serviceubscribeData)
     const subService = this.filterStatusCount(subServiceData)
     const canSubService = this.filterStatusCount(cansubServiceData)
     const ListStatusCount = {
@@ -190,7 +238,7 @@ class InstanceDetailOverview extends React.Component {
         const subscribeRequest = {
           status: item.status,
           count: item.count,
-          area: this.filterStatus(item.status),
+          area: this.filterSubscriptionState(item.status),
         }
         serviceubscribeData.push(subscribeRequest)
       })
@@ -270,9 +318,9 @@ class InstanceDetailOverview extends React.Component {
                 bodyStyle={{ height: 180 }}
               >
                 <span>累计调用量</span>
-                <h1>{totalCallCount} 个</h1>
+                <h1>{totalCallCount || 0} 个</h1>
                 <span>累计错误量</span>
-                <h1>{totalErrorCallCount} 个</h1>
+                <h1>{totalErrorCallCount || 0} 个</h1>
               </Card>
             </Col>
             <Col span={9}>
@@ -346,7 +394,7 @@ class InstanceDetailOverview extends React.Component {
                   <div>
                     <div className="dec-on dec-pie"></div>
                     <p>已退订</p>
-                    <span>{publishSub !== undefined ? publishSub.offCount : 0}个</span>
+                    <span>{publishSub !== undefined ? publishSub.revokeCount : 0}个</span>
                   </div>
                 </div>
               </Card>
@@ -367,9 +415,9 @@ class InstanceDetailOverview extends React.Component {
                 bodyStyle={{ height: 180 }}
               >
                 <span>我创建</span>
-                <h1>{myEvidenceCount} 个</h1>
+                <h1>{myEvidenceCount || 0} 个</h1>
                 <span>未完成更新</span>
-                <h1>{incompleteEvidenceCount} 个</h1>
+                <h1>{incompleteEvidenceCount || 0} 个</h1>
               </Card>
             </Col>
             <Col span={9}>
@@ -395,7 +443,7 @@ class InstanceDetailOverview extends React.Component {
                   <div>
                     <div className="dec-errors dec-pie"></div>
                     <p>已停用</p>
-                    <span>{subService !== undefined ? subService.errorCount : 0}个</span>
+                    <span>{subService !== undefined ? subService.offCount : 0}个</span>
                   </div>
                 </div>
               </Card>

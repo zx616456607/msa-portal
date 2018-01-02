@@ -34,9 +34,11 @@ class ServiceDetail extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { serviceId } = this.state
     const serviceList = nextProps.detailData[`${serviceId}`]
-    this.setState({
-      statusState: serviceList.status,
-    })
+    if (serviceList !== undefined) {
+      this.setState({
+        statusState: serviceList.status,
+      })
+    }
   }
 
   renderDropdown = () => {
@@ -117,7 +119,7 @@ class ServiceDetail extends React.Component {
         <div className="service-detail-body">
           <Tabs
             tabPosition="left"
-            // type="card"
+          // type="card"
           >
             <TabPane tab="统计信息" key="statistics">
               <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />
