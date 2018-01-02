@@ -153,7 +153,7 @@ class CreateConfig extends React.Component {
         })
         return
       }
-      if (res.response.status === 200) {
+      if (res.type === 'CENTER_RELEASE_SUCCESS') {
         notification.success({
           message: '发布成功',
         })
