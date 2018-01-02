@@ -318,9 +318,9 @@ class InstanceDetailOverview extends React.Component {
                 bodyStyle={{ height: 180 }}
               >
                 <span>累计调用量</span>
-                <h1>{totalCallCount} 个</h1>
+                <h1>{totalCallCount || 0} 个</h1>
                 <span>累计错误量</span>
-                <h1>{totalErrorCallCount} 个</h1>
+                <h1>{totalErrorCallCount || 0} 个</h1>
               </Card>
             </Col>
             <Col span={9}>
@@ -415,9 +415,9 @@ class InstanceDetailOverview extends React.Component {
                 bodyStyle={{ height: 180 }}
               >
                 <span>我创建</span>
-                <h1>{myEvidenceCount} 个</h1>
+                <h1>{myEvidenceCount || 0} 个</h1>
                 <span>未完成更新</span>
-                <h1>{incompleteEvidenceCount} 个</h1>
+                <h1>{incompleteEvidenceCount || 0} 个</h1>
               </Card>
             </Col>
             <Col span={9}>
