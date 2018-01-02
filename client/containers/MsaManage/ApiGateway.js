@@ -20,7 +20,7 @@ import {
   Input, Menu, Select,
   Switch, InputNumber,
   Form, Spin, Card,
-  notification,
+  notification, Badge,
 } from 'antd'
 import {
   gatewayPagePoliciesList,
@@ -389,14 +389,8 @@ class ApiGateway extends React.Component {
       render: status => <div>
         {
           status
-            ? <span className="success-status">
-              <p className="icon_style able_background"/>
-              &nbsp;启用
-            </span>
-            : <span className="error-status">
-              <p className="icon_style disable_background"/>
-            &nbsp;停用
-            </span>
+            ? <Badge status="success" text="启用"/>
+            : <Badge status="error" text="停用"/>
         }
       </div>,
     }, {
