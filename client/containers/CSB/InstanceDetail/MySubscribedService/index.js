@@ -100,7 +100,8 @@ class MySubscribedService extends React.Component {
 
   confirmEditBindIp = () => {
     this.setState({
-      confirmLoading: true,
+      confirmLoading: false,
+      editBindIpModalVisible: false,
     })
   }
 
@@ -114,7 +115,7 @@ class MySubscribedService extends React.Component {
       delete location.query.evidenceName
       delete location.query.groupName
     }
-    query = Object.assign({}, location.query, {
+    query = Object.assign({}, { view: 'subscriber' }, location.query, {
       requestStatus: subFilteredValue,
       [searchType]: name,
     }, query)
@@ -150,24 +151,27 @@ class MySubscribedService extends React.Component {
       case 1:
         return <span className="activated"><div className="status-icon"></div>已激活</span>
       case 2:
-        return <span className="cancelled"><div className="status-icon"></div>已注销</span>
-      case 3:
-        return <span className="deactivated"><div className="status-icon"></div>已停用</span>
+        return <span className="cancelled"><div className="status-icon"></div>已停用</span>
+      case 4:
+        return <span className="deactivated"><div className="status-icon"></div>已注销</span>
       default:
         return <span>未知</span>
     }
   }
 
   tableChange = (pagination, filters) => {
-    const { requestStatus } = filters
-    let status = requestStatus
-    if (!requestStatus.length) {
-      status = [ '1', '2', '3' ]
+    const { status } = filters
+    let requestStatus = status
+    if (!status.length) {
+      requestStatus = [ '1', '2', '3' ]
     }
     this.setState({
       subFilteredValue: status,
     })
-    this.loadData({ requestStatus: status })
+    this.loadData({
+      requestStatus,
+      page: 1,
+    })
   }
 
   tableMenuClick = (record, item) => {
@@ -192,7 +196,7 @@ class MySubscribedService extends React.Component {
 
   unsubscibeService = record => {
     const { unsubscriveService, instanceID } = this.props
-    const { requestId, serviceName } = record
+    const { id, serviceName } = record
     const self = this
     confirm({
       modalTitle: '退订',
@@ -200,7 +204,7 @@ class MySubscribedService extends React.Component {
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
-          unsubscriveService(instanceID, requestId).then(res => {
+          unsubscriveService(instanceID, id).then(res => {
             if (res.error) return reject()
             resolve()
             notification.success({
@@ -223,7 +227,10 @@ class MySubscribedService extends React.Component {
       requestStatus,
       subFilteredValue: requestStatus,
     })
-    this.loadData({ requestStatus })
+    this.loadData({
+      requestStatus,
+      page: 1,
+    })
   }
 
   openServiceApiDocModal = currentService => {
@@ -287,7 +294,7 @@ class MySubscribedService extends React.Component {
       { title: '订阅服务名称', dataIndex: 'serviceName', width: '10%' },
       {
         title: '服务状态',
-        dataIndex: 'status',
+        dataIndex: 'serviceStatus',
         width: '10%',
         filters: [
           { text: '已激活', value: 'Joe' },
@@ -296,23 +303,23 @@ class MySubscribedService extends React.Component {
         // onFilter: (value, record) => record.charge.includes(value),
         render: status => this.renderServiceStatusUI(status),
       },
-      { title: '服务版本', dataIndex: 'version', width: '8%' },
+      { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
       { title: '所属服务组', dataIndex: 'belongs', width: '8%' },
       { title: '我的消费凭证', dataIndex: 'evidenceName', width: '8%' },
       {
         title: '订阅状态',
-        dataIndex: 'requestStatus',
+        dataIndex: 'status',
         width: '8%',
         filters: radioGroupValue === 1 ? subFilters : null,
         filteredValue: radioGroupValue === 1 ? subFilteredValue : null,
         render: text => this.renderSubstatus(text),
       },
       {
-        title: '订阅时间', dataIndex: 'dtime', width: '8%',
+        title: '订阅时间', dataIndex: 'requestTime', width: '8%',
         render: text => formatDate(text),
       },
       {
-        title: '审批时间', dataIndex: 'stime', width: '8%',
+        title: '审批时间', dataIndex: 'approvalTime', width: '8%',
         render: text => formatDate(text),
       },
       {
@@ -343,14 +350,19 @@ class MySubscribedService extends React.Component {
         key: 'handle',
         width: '12%',
         render: (text, record) => {
-          if (record.requestStatus === 4) {
-            return <Button type="primary">订阅</Button>
+          if (record.status === 4) {
+            return '-'
+            // return <Button type="primary">订阅</Button>
           }
           const menu = <Menu style={{ width: 110 }}
             onClick={this.tableMenuClick.bind(this, record)}
           >
             <MenuItem key="details">订阅详情</MenuItem>
-            {record.requestStatus === 2 && <MenuItem key="unsubscibe">退订</MenuItem>}
+            {
+              (record.status === 2 || record.status === 1) && <MenuItem key="unsubscibe">
+                退订
+              </MenuItem>
+            }
             <MenuItem key="editIP">修改绑定 IP</MenuItem>
           </Menu>
           return <Dropdown.Button overlay={menu}
@@ -377,7 +389,7 @@ class MySubscribedService extends React.Component {
           <InputGroup compact>
             <Select
               value={searchType}
-              onChange={searchType => this.setState({ searchType })}
+              onChange={searchType => this.setState({ searchType, name: '' })}
             >
               <Option value="serviceName">服务名称</Option>
               <Option value="evidenceName">消费凭证</Option>

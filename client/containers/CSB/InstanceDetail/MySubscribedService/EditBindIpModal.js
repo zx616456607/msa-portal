@@ -30,9 +30,7 @@ class EditBindIp extends React.Component {
   handleOk = () => {
     const { form, callback } = this.props
     form.validateFields((errors, values) => {
-      if (errors) {
-        return
-      }
+      if (errors) return
       callback(values)
     })
   }
