@@ -407,10 +407,6 @@ class InstanceDetailOverview extends React.Component {
             <Col span={6}>
               <Card
                 title="消费凭证"
-                extra={<Link to={`/csb-instances-available/${instanceID}/consumer-vouchers`}>
-                  更多>>
-                </Link>
-                }
                 bordered={false}
                 bodyStyle={{ height: 180 }}
               >

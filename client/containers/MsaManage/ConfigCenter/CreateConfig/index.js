@@ -33,6 +33,9 @@ class CreateConfig extends React.Component {
     branchData: [],
     configGitUrl: '',
     currentYaml: '',
+    editLoading: false,
+    addLoading: false,
+    releaseLoading: false,
   }
   componentWillMount() {
     const { detal } = parse(location.search)
@@ -90,7 +93,8 @@ class CreateConfig extends React.Component {
   }
 
   handleSaveUpdate = () => {
-    const { configGitUrl, branchName, inputValue, textAreaValue, currentYaml, yaml } = this.state
+    const { configGitUrl, branchName, inputValue, textAreaValue, currentYaml,
+      yaml } = this.state
     const { putCenterConfig, clusterID } = this.props
     const query = {
       branch_name: branchName,
@@ -101,7 +105,13 @@ class CreateConfig extends React.Component {
     const yamls = currentYaml === '' ? yaml : currentYaml
     this.props.form.validateFields(err => {
       if (err) return
+      this.setState({
+        editLoading: true,
+      })
       putCenterConfig(clusterID, yamls, query).then(res => {
+        this.setState({
+          editLoading: false,
+        })
         if (res.error) {
           notification.error({
             message: '保存失败',
@@ -145,28 +155,37 @@ class CreateConfig extends React.Component {
   }
 
   handleRelease = () => {
-    const { releaseConfigService, clusterID } = this.props
+    const { releaseConfigService, clusterID, history } = this.props
+    this.setState({
+      releaseLoading: true,
+    })
     releaseConfigService(clusterID).then(res => {
       if (res.error) {
         notification.error({
           message: '发布失败',
         })
+        this.setState({
+          releaseLoading: false,
+        })
         return
       }
-      if (res.response.status === 200) {
+      if (res.response.result.body === '') {
         notification.success({
           message: '发布成功',
         })
-        this.props.history.push('/msa-manage/config-center')
+        history.push('/msa-manage/config-center')
       }
     })
   }
 
   handleAdd = () => {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
-    const { addCenterConfig, clusterID } = this.props
+    const { addCenterConfig, clusterID, history } = this.props
     this.props.form.validateFields(err => {
       if (err) return
+      this.setState({
+        addLoading: true,
+      })
       const query = {
         branch_name: branchName,
         file_path: inputValue,
@@ -175,6 +194,9 @@ class CreateConfig extends React.Component {
       }
       addCenterConfig(clusterID, currentYaml, query).then(res => {
         if (res.error) {
+          this.setState({
+            addLoading: false,
+          })
           notification.error({
             message: '添加失败',
           })
@@ -184,14 +206,15 @@ class CreateConfig extends React.Component {
           notification.success({
             message: '添加成功',
           })
-          this.props.history.push('/msa-manage/config-center')
+          history.push('/msa-manage/config-center')
         }
       })
     })
   }
 
   render() {
-    const { detal, yaml, branchData, btnVasible, currentYaml, branchName } = this.state
+    const { detal, yaml, branchData, btnVasible, currentYaml,
+      branchName, addLoading, editLoading, releaseLoading } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
     const { getFieldDecorator } = this.props.form
@@ -234,7 +257,7 @@ class CreateConfig extends React.Component {
             <FormItem {...fromLayout} label="配置内容">
               {getFieldDecorator('info', {
                 initialValue: currentYaml === '' ? yaml : currentYaml,
-                rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
+                // rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
               })(
                 <YamlEditor style={{ width: '60%' }} onChange={this.handleYamlEditor} />
               )}
@@ -245,7 +268,7 @@ class CreateConfig extends React.Component {
               {getFieldDecorator('configArea', {
                 rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
               })(
-                <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 2, maxRows: 6 }} onChange={this.handleTextArea} />
+                <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 1.5, maxRows: 6 }} onChange={this.handleTextArea} />
               )}
             </FormItem>
           </Row>
@@ -255,14 +278,14 @@ class CreateConfig extends React.Component {
                 <div>
                   {
                     btnVasible ?
-                      <Button className="close" type="primary" onClick={this.handleSaveUpdate}>保存更新</Button> :
-                      <Button className="close" onClick={this.handleSaveUpdate}>保存更新</Button>
+                      <Button className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> :
+                      <Button className="close" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button>
                   }
-                  <Button className="ok" type="primary" disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
+                  <Button className="ok" type="primary" loading={releaseLoading} disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
                 </div> :
                 <div>
                   <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
-                  <Button className="ok" type="primary" onClick={this.handleAdd}>确认</Button>
+                  <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确认</Button>
                 </div>
             }
           </div>
