@@ -25,7 +25,7 @@ const Chart = CreateG2(chart => {
     alias: '时间',
     type: 'time',
     mask: 'hh:MM:ss',
-    tickCount: 30,
+    tickCount: 20,
     // nice: false,
   })
   chart.tooltip('x*y')
@@ -135,8 +135,8 @@ class Statistics extends React.Component {
             </Col>
           </Row>
           <Row className="service-statistics-and-monitor">
-            <Col span={8}>服务响应 & 调用监控趋势</Col>
-            <Col span={16} style={{ textAlign: 'right' }}>
+            <Col span={7}>服务响应 & 调用监控趋势</Col>
+            <Col span={17} style={{ textAlign: 'right' }}>
               <ApmTimePicker
                 value={rangeDateTime}
                 onChange={rangeDateTime => this.setState({ rangeDateTime })}
