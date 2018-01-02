@@ -15,10 +15,11 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
-import { Dropdown, Menu, Table, notification, Badge } from 'antd'
+import { Dropdown, Menu, Table, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import { PutInstanceService, delInstanceService } from '../../../../actions/CSB/instanceService'
 
 const modalTooptip = [
@@ -115,28 +116,6 @@ class ServicesTable extends React.Component {
         显示详情
       </Dropdown.Button>
     )
-  }
-
-  renderServiceStatusUI = status => {
-    let desc = ''
-    let text = ''
-    switch (status) {
-      case 1:
-        text = '已激活'
-        desc = 'success'
-        break
-      case 2:
-        text = '已停用'
-        desc = 'error'
-        break
-      case 4:
-        text = '已注销'
-        desc = 'default'
-        break
-      default:
-        break
-    }
-    return < Badge status={desc} text={text} />
   }
 
   serviceMenuClick = (record, item) => {
@@ -352,7 +331,7 @@ class ServicesTable extends React.Component {
           text: '已激活',
           value: '1',
         }],
-        render: (text, row) => this.renderServiceStatusUI(row.status),
+        render: (text, row) => renderCSBInstanceServiceStatus(row.status),
       },
       {
         title: '待审批订阅',
@@ -431,7 +410,6 @@ class ServicesTable extends React.Component {
           onVisibleChange={visible => this.setState({ visible })}
           instanceId={instanceID}
           detail={currentRow}
-          renderServiceStatusUI={this.renderServiceStatusUI}
         />
       </div>,
     ]

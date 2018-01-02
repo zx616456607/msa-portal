@@ -14,7 +14,7 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import {
   Input, Table, Card, Button,
-  Pagination,
+  Pagination, Badge,
 } from 'antd'
 import './style/PublicServices.less'
 import { connect } from 'react-redux'
@@ -63,9 +63,11 @@ class PublicServices extends React.Component {
   renderServiceStatusUI = status => {
     switch (status) {
       case 1:
-        return <span className="activated"><div className="status-icon"></div>已激活</span>
+        return <Badge status="success" text="已激活"/>
       case 2:
-        return <span className="cancelled"><div className="status-icon"></div>已停用</span>
+        return <Badge status="error" text="已停用"/>
+      case 4:
+        return <Badge status="default" text="已注销"/>
       default:
         return <span>未知</span>
     }

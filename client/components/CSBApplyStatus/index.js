@@ -10,28 +10,34 @@
  * @author zhaoyb
  */
 import React from 'react'
-import './style/index.less'
+import { Badge } from 'antd'
 
 export default class CSBApplyStatus extends React.Component {
   filterState = key => {
+    let status
+    let text
     switch (key) {
       case 2:
-        return <div className="adopt circular"><div></div><span>已通过</span></div>
+        status = 'success'
+        text = '已通过'
+        break
       case 1:
-        return <div className="apply circular"><div></div><span>申请中</span></div>
+        status = 'processing'
+        text = '申请中'
+        break
       case 3:
-        return <div className="refuse circular"><div></div><span>已拒绝</span></div>
+        status = 'error'
+        text = '已拒绝'
+        break
       default:
-        return
+        status = 'default'
+        text = '未知'
     }
+    return { status, text }
   }
 
   render() {
     const { stateKey } = this.props
-    return (
-      <div className="CSBApply-status">
-        {this.filterState(stateKey)}
-      </div>
-    )
+    return <Badge {...this.filterState(stateKey)} />
   }
 }

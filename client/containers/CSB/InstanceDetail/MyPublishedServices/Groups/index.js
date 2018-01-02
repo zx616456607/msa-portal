@@ -17,7 +17,7 @@ import { parse as parseQuerystring } from 'query-string'
 import isEqual from 'lodash/isEqual'
 import {
   Button, Select, Input, Pagination, Table, Menu, Dropdown,
-  Modal, notification,
+  Modal, notification, Badge,
 } from 'antd'
 import ServicesTable from '../ServicesTable'
 import confirm from '../../../../../components/Modal/confirm'
@@ -61,10 +61,22 @@ class MyPublishedServiceGroups extends React.Component {
     currentHandle: undefined,
     currentRecord: {},
     createServiceGroupModalVisible: false,
-    searchType: 'group-name',
+    searchType: 'name',
+    name: null,
   }
 
   componentDidMount() {
+    const { name, serviceName } = this.props.location.query
+    let { searchType } = this.state
+    if (name !== undefined) {
+      searchType = 'name'
+    } else if (serviceName !== undefined) {
+      searchType = 'serviceName'
+    }
+    this.setState({
+      searchType,
+      name: name || serviceName,
+    })
     this.loadData()
   }
 
@@ -85,12 +97,6 @@ class MyPublishedServiceGroups extends React.Component {
       createServiceGroupModalVisible: true,
       currentHandle,
       currentRecord,
-    })
-  }
-
-  searchTypeSelect = searchType => {
-    this.setState({
-      searchType,
     })
   }
 
@@ -214,6 +220,7 @@ class MyPublishedServiceGroups extends React.Component {
     const { isFetching, content, totalElements, size } = serviceGroups
     const {
       createServiceGroupModalVisible, currentHandle, currentRecord,
+      searchType,
     } = this.state
     const columns = [
       { title: '服务组名', dataIndex: 'name', key: 'name' },
@@ -223,9 +230,26 @@ class MyPublishedServiceGroups extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (text, row) => <span>
-          {row.stoppedCount} 停止，{row.activeCount} 运行
-        </span>,
+        render: (text, row) => {
+          const { stoppedCount, activeCount } = row
+          return <span>
+            {
+              stoppedCount > 0 &&
+              <div>
+                <Badge status="error" text={`停止 +${stoppedCount}`} />
+              </div>
+            }
+            {
+              activeCount > 0 &&
+              <div>
+                <Badge status="success" text={`运行 +${activeCount}`} />
+              </div>
+            }
+            {
+              stoppedCount < 1 && activeCount < 1 && '-'
+            }
+          </span>
+        },
       },
       { title: '服务数量', dataIndex: 'servicesCount', key: 'servicesCount' },
       { title: '描述', dataIndex: 'description', key: 'description' },
@@ -259,12 +283,12 @@ class MyPublishedServiceGroups extends React.Component {
     ]
     const selectBefore = (
       <Select
-        defaultValue="group-name"
+        value={searchType}
         style={{ width: 90 }}
-        onChange={value => this.searchTypeSelect(value)}
+        onChange={searchType => this.setState({ searchType })}
       >
-        <Option value="group-name">服务组名</Option>
-        <Option value="service-name">服务名称</Option>
+        <Option value="name">服务组名</Option>
+        <Option value="serviceName">服务名称</Option>
       </Select>
     )
     const { query } = location
@@ -296,7 +320,13 @@ class MyPublishedServiceGroups extends React.Component {
           placeholder="请输入关键词搜索"
           className="search-input"
           onChange={e => this.setState({ name: e.target.value })}
-          onSearch={name => this.loadData({ name, page: 1 })}
+          onSearch={
+            name => this.loadData({
+              name: searchType === 'name' && name || '',
+              serviceName: searchType === 'serviceName' && name || '',
+              page: 1,
+            })
+          }
           value={this.state.name}
         />
         {
