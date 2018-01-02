@@ -10,6 +10,7 @@
  * @author zhangpc
  */
 
+import fetch from 'isomorphic-fetch'
 import { normalize } from 'normalizr'
 import { JWT, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring } from '../common/utils'

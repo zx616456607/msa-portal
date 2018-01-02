@@ -19,6 +19,7 @@ import { Dropdown, Menu, Table, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import { PutInstanceService, delInstanceService } from '../../../../actions/CSB/instanceService'
 
 const modalTooptip = [
@@ -83,9 +84,9 @@ class ServicesTable extends React.Component {
     })
   }
 
-  handleCreateModalValues = () => {}
+  handleCreateModalValues = () => { }
 
-  handleSaveBlackAndWhiteList = () => {}
+  handleSaveBlackAndWhiteList = () => { }
 
   openBlackAndWhiteListModal = record => {
     this.setState({
@@ -115,28 +116,6 @@ class ServicesTable extends React.Component {
         显示详情
       </Dropdown.Button>
     )
-  }
-
-  renderServiceStatusUI = status => {
-    let className = ''
-    let desc = ''
-    switch (status) {
-      case 1:
-        desc = '已激活'
-        className = 'activated'
-        break
-      case 2:
-        desc = '已停用'
-        className = 'deactivated'
-        break
-      case 4:
-        desc = '已注销'
-        className = 'cancelled'
-        break
-      default:
-        break
-    }
-    return <span className={className}><div className="status-icon"></div>{desc}</span>
   }
 
   serviceMenuClick = (record, item) => {
@@ -302,11 +281,11 @@ class ServicesTable extends React.Component {
     if (!isEmpty(sorter)) {
       sorterStr = this.getSort(sorter)
     }
-    loadData({ status: filtersStr, sort: sorterStr })
+    loadData({ status: filtersStr, sort: sorterStr, page: pagination.current })
   }
 
   render() {
-    const { dataSource, loading, from, match, check } = this.props
+    const { dataSource, pageSize, total, loading, from, match, check } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -352,7 +331,7 @@ class ServicesTable extends React.Component {
           text: '已激活',
           value: '1',
         }],
-        render: (text, row) => this.renderServiceStatusUI(row.status),
+        render: (text, row) => renderCSBInstanceServiceStatus(row.status),
       },
       {
         title: '待审批订阅',
@@ -391,10 +370,17 @@ class ServicesTable extends React.Component {
       },
     ]
     const { instanceID } = match.params
+    let pagination = false
     if (from === 'group') {
       const columnsKeys = [ 'name', 'version', 'status', 'wait', 'time', 'handle' ]
       columns = columns.filter(column => columnsKeys.indexOf(column.key) > -1)
       columns.forEach(column => (column.width = `${100 / columns.length}%`))
+      pagination = {
+        simple: true,
+        hideOnSinglePage: true,
+        pageSize,
+        total,
+      }
     }
     const self = this
     return [
@@ -402,7 +388,7 @@ class ServicesTable extends React.Component {
         <Table
           columns={columns}
           dataSource={dataSource}
-          pagination={false}
+          pagination={pagination}
           loading={loading}
           rowKey={row => row.id}
           onChange={this.handleChange}
@@ -424,7 +410,6 @@ class ServicesTable extends React.Component {
           onVisibleChange={visible => this.setState({ visible })}
           instanceId={instanceID}
           detail={currentRow}
-          renderServiceStatusUI={this.renderServiceStatusUI}
         />
       </div>,
     ]

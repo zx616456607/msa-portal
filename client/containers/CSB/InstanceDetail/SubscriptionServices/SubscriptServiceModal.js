@@ -7,7 +7,7 @@
  * Subscript Service Modal
  *
  * 2017-12-05
- * @author zhangcz
+ * @author zhangxuan
  */
 
 import React from 'react'
@@ -21,6 +21,7 @@ import './style/SubscriptServiceModal.less'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
 import { getConsumerVouchersList } from '../../../../actions/CSB/instanceService/consumerVouchers'
 import { subscribeService } from '../../../../actions/CSB/instanceService'
+import { reSubscribeService } from '../../../../actions/CSB/instanceService/mySubscribedServices'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -41,11 +42,37 @@ class SubscriptServiceModal extends React.Component {
   componentDidMount() {
     const { getConsumerVouchersList, match } = this.props
     const { instanceID } = match.params
-    getConsumerVouchersList(instanceID)
+    getConsumerVouchersList(instanceID, { size: 2000 })
+  }
+
+  filterConsumerVoucher = (input, option) => {
+    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+
+  reSubscribeService = values => {
+    const {
+      reSubscribeService, instanceID, dateSource,
+      callback, closeModalMethod,
+    } = this.props
+    const { id } = dateSource
+    const { consumer: evidenceId } = values
+    const body = {
+      evidenceId,
+      ...values,
+    }
+    reSubscribeService(instanceID, id, body).then(res => {
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) return
+      notification.success({ message: '重新订阅成功' })
+      closeModalMethod()
+      callback()
+    })
   }
 
   handleOk = () => {
-    const { form, subscribeService, match, dateSource, closeModalMethod } = this.props
+    const { form, subscribeService, match, dateSource, closeModalMethod, from } = this.props
     const { instanceID } = match.params
     form.validateFields((errors, values) => {
       if (errors) {
@@ -61,6 +88,10 @@ class SubscriptServiceModal extends React.Component {
       this.setState({
         confirmLoading: true,
       })
+      if (from === 'mySubcribeUI') {
+        this.reSubscribeService(values)
+        return
+      }
       subscribeService(instanceID, body).then(res => {
         if (res.error) {
           if (res.status === 403) {
@@ -150,15 +181,20 @@ class SubscriptServiceModal extends React.Component {
         >
           {
             getFieldDecorator('consumer', {
+              initialValue: dateSource.evidenceId ? dateSource.evidenceId : undefined,
               rules: [{
                 required: true,
                 message: '选择一个消费凭证',
               }],
             })(
-              <Select placeholder="选择一个消费凭证">
+              <Select
+                showSearch
+                placeholder="选择一个消费凭证"
+                filterOption={this.filterConsumerVoucher}
+              >
                 {
                   content ? content.map(item => {
-                    return <Option key={item.id}>{item.name}</Option>
+                    return <Option key={item.id} value={item.id}>{item.name}</Option>
                   }) : []
                 }
               </Select>
@@ -225,4 +261,5 @@ const mapStateToProps = (state, props) => {
 export default connect(mapStateToProps, {
   getConsumerVouchersList,
   subscribeService,
+  reSubscribeService,
 })(Form.create()(SubscriptServiceModal))

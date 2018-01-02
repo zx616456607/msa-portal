@@ -16,6 +16,7 @@ import {
   Menu, Dropdown, Row, Col, Tabs,
 } from 'antd'
 import serviceIcon from '../../../../assets/img/csb/service.png'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import ServiceStatistics from './Statistics'
 import ServiceProtocols from './Protocols'
 import ServiceParameters from './Parameters'
@@ -34,9 +35,11 @@ class ServiceDetail extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { serviceId } = this.state
     const serviceList = nextProps.detailData[`${serviceId}`]
-    this.setState({
-      statusState: serviceList.status,
-    })
+    if (serviceList !== undefined) {
+      this.setState({
+        statusState: serviceList.status,
+      })
+    }
   }
 
   renderDropdown = () => {
@@ -71,7 +74,7 @@ class ServiceDetail extends React.Component {
 
   render() {
     const { statusState } = this.state
-    const { detail, instanceId, renderServiceStatusUI } = this.props
+    const { detail, instanceId } = this.props
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -88,7 +91,7 @@ class ServiceDetail extends React.Component {
               <Col span={6}>
                 <div className="txt-of-ellipsis">
                   运行状态：
-                  {renderServiceStatusUI(statusState > 0 ? statusState : detail.status)}
+                  {renderCSBInstanceServiceStatus(statusState > 0 ? statusState : detail.status)}
                 </div>
               </Col>
               <Col span={14}>
@@ -117,7 +120,7 @@ class ServiceDetail extends React.Component {
         <div className="service-detail-body">
           <Tabs
             tabPosition="left"
-            // type="card"
+          // type="card"
           >
             <TabPane tab="统计信息" key="statistics">
               <ServiceStatistics serviceId={detail.id} instanceId={instanceId} />

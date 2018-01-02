@@ -347,7 +347,7 @@ class ApmSetting extends React.Component {
                         <Row className="install">
                           <Icon className="ico" type="check-circle-o" />&nbsp;
                           <span className="existence" >已安装</span>
-                          <sapn className="unload" onClick={this.handleUnload}>卸载</sapn>
+                          <span className="unload" onClick={this.handleUnload}>卸载</span>
                         </Row> :
                         <Button type="primary" onClick={this.handleInstall}>安装</Button>
                     }

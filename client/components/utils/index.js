@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Menu, Spin } from 'antd'
+import { Menu, Spin, Badge } from 'antd'
 import { Link } from 'react-router-dom'
 
 const SubMenu = Menu.SubMenu
@@ -55,4 +55,35 @@ export function renderLoading(tip) {
   return <div className="loading">
     <Spin size="large" tip={tip} />
   </div>
+}
+
+/**
+ * render service status of CSB instance
+ *
+ * @export
+ * @param {number} serviceStatus status of service
+ * @return {element} badge element
+ */
+export function renderCSBInstanceServiceStatus(serviceStatus) {
+  let status
+  let text
+  switch (serviceStatus) {
+    case 1:
+      text = '已激活'
+      status = 'success'
+      break
+    case 2:
+      text = '已停用'
+      status = 'error'
+      break
+    case 4:
+      text = '已注销'
+      status = 'default'
+      break
+    default:
+      text = '未知'
+      status = 'default'
+      break
+  }
+  return <Badge status={status} text={text} />
 }

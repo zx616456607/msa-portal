@@ -59,3 +59,30 @@
     display: none;
   }
 }
+
+&.ant-badge-status {
+  &-dot {
+    width: 8px;
+    height: 8px;
+  }
+  &-success {
+    & + span {
+      color: @success-color;
+    }
+  }
+  &-error {
+    & + span {
+      color: @error-color;
+    }
+  }
+  &-warning {
+    & + span {
+      color: @warning-color;
+    }
+  }
+  &-processing {
+    & + span {
+      color: @primary-color;
+    }
+  }
+}

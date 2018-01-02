@@ -53,7 +53,7 @@ class PublishService extends React.Component {
 
   loadServiceGroups = () => {
     const { getGroups, instanceID } = this.props
-    getGroups(instanceID)
+    getGroups(instanceID, { size: 2000 })
   }
 
   validateFieldsAndGoNext = currentStep => {

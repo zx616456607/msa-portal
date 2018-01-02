@@ -15,9 +15,8 @@ import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import {
   Button, Icon, Input, Table, Card, notification, Tooltip,
-  Dropdown, Menu,
+  Dropdown, Menu, Badge,
 } from 'antd'
-import classNames from 'classnames'
 import {
   getMsaList,
   delManualrules,
@@ -181,15 +180,11 @@ class MsaList extends React.Component {
       dataIndex: 'discoverable',
       width: '20%',
       render: text =>
-        <span
-          className={
-            classNames(
-              'msa-table-status-box',
-              { 'msa-table-running': text, 'msa-table-error': !text }
-            )
-          }
-        >
-          <i className="msa-table-status" />{text ? '可被发现' : '不可被发现'}
+        <span>
+          <Badge
+            status={text ? 'success' : 'default'}
+            text={text ? '可被发现' : '不可被发现'}
+          />
         </span>,
     }, {
       title: '操作',

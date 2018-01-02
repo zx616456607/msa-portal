@@ -42,7 +42,8 @@ export default class Editor extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { value } = nextProps
-    if (value) {
+    const { value: stateValue } = this.state
+    if (value !== stateValue) {
       this.setState({
         value,
       })
@@ -78,8 +79,7 @@ export default class Editor extends React.Component {
           {...otherProps}
           value={value}
           onBeforeChange={(editor, data, value) => {
-            this.setState({ value })
-            onChange && onChange(value)
+            this.setState({ value }, () => onChange && onChange(value))
           }}
         />
       </div>

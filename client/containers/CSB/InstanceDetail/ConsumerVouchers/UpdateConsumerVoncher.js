@@ -36,12 +36,28 @@ class UpdateConsumerVoucher extends React.Component {
     hideOld: false,
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      if (this.delayTimeInput) {
+        this.delayTimeInput.focus()
+      }
+    }, 200)
+  }
+
   handleOk = () => {
     const { callback } = this.props
     const { updateSetting, delayTime } = this.state
     let values = { updateSetting }
+    let delayTimeIllegality = false
     if (updateSetting === 'delay') {
+      delayTimeIllegality = this.testDelayTime()
       values = Object.assign({}, values, { delayTime })
+    }
+    if (delayTimeIllegality) {
+      setTimeout(() => {
+        callback(values)
+      }, 200)
+      return
     }
     callback(values)
   }
@@ -52,16 +68,16 @@ class UpdateConsumerVoucher extends React.Component {
     })
   }
 
-  inputNumberOnchange = delayTime => {
-    if (typeof delayTime !== 'number') {
+  testDelayTime = () => {
+    const { delayTime } = this.state
+    const delayNumber = parseInt(delayTime)
+    if (isNaN(delayNumber)) {
       this.setState({
         delayTime: 1,
       })
-      return
+      return true
     }
-    this.setState({
-      delayTime,
-    })
+    return false
   }
 
   renderStarStr = () => {
@@ -159,7 +175,9 @@ class UpdateConsumerVoucher extends React.Component {
                   max={7000}
                   defaultValue={1}
                   value={delayTime}
-                  onChange={this.inputNumberOnchange}
+                  ref={input => { this.delayTimeInput = input }}
+                  onChange={delayTime => this.setState({ delayTime })}
+                  onBlur={this.testDelayTime}
                 /> 分
               </Col>
             </Row>
