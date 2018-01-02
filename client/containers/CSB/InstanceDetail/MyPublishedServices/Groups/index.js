@@ -287,7 +287,7 @@ class MyPublishedServiceGroups extends React.Component {
         <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create')}>
         创建服务组
         </Button>
-        <Button icon="sync" onClick={this.loadData}>刷新</Button>
+        <Button icon="sync" onClick={this.loadData.bind(this, null)}>刷新</Button>
         <Search
           addonBefore={selectBefore}
           placeholder="请输入关键词搜索"

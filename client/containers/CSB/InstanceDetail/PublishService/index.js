@@ -111,7 +111,7 @@ class PublishService extends React.Component {
           type="primary"
           key="submit"
           onClick={this.submitService}
-          confirmLoading={confirmLoading}
+          loading={confirmLoading}
         >
         发 布
         </Button>,
