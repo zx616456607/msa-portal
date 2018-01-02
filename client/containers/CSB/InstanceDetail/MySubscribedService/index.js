@@ -15,7 +15,7 @@ import QueueAnim from 'rc-queue-anim'
 import {
   Card, Button, Radio,
   Input, Pagination, Table,
-  Menu, Dropdown,
+  Menu, Dropdown, Badge,
   Row, Col, Select, notification,
 } from 'antd'
 import './style/MySubscribedService.less'
@@ -149,11 +149,11 @@ class MySubscribedService extends React.Component {
   renderServiceStatusUI = status => {
     switch (status) {
       case 1:
-        return <span className="activated"><div className="status-icon"></div>已激活</span>
+        return <Badge status="success" text="已激活"/>
       case 2:
-        return <span className="cancelled"><div className="status-icon"></div>已停用</span>
+        return <Badge status="error" text="已停用"/>
       case 4:
-        return <span className="deactivated"><div className="status-icon"></div>已注销</span>
+        return <Badge status="default" text="已注销"/>
       default:
         return <span>未知</span>
     }
@@ -249,15 +249,15 @@ class MySubscribedService extends React.Component {
   renderSubstatus = status => {
     switch (status) {
       case 1:
-        return <span className="eap"><div></div>待审批</span>
+        return <Badge status="warning" text="待审批"/>
       case 2:
-        return <span className="adopt"><div></div>已通过</span>
+        return <Badge status="success" text="已通过"/>
       case 3:
-        return <span className="refuse"><div></div>已拒绝</span>
+        return <Badge status="error" text="已拒绝"/>
       case 4:
-        return <span className="ub"><div></div>已退订</span>
+        return <Badge status="default" text="已退订"/>
       default:
-        return
+        return <span>未知</span>
     }
   }
 

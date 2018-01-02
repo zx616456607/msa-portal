@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Card, Pagination, Table, Input } from 'antd'
+import { Button, Card, Pagination, Table, Input, Badge } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEqual from 'lodash/isEqual'
 import isEmpty from 'lodash/isEmpty'
@@ -97,9 +97,9 @@ class SubscriptionServices extends React.Component {
   renderServiceStatusUI = status => {
     switch (status) {
       case 1:
-        return <span className="activated"><div className="status-icon"></div>已激活</span>
+        return <Badge status="success" text="已激活"/>
       case 2:
-        return <span className="cancelled"><div className="status-icon"></div>已停用</span>
+        return <Badge status="error" text="已停用"/>
       default:
         return <span>未知</span>
     }
