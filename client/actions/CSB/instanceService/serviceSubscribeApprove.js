@@ -24,7 +24,7 @@ export const GET_SERVICE_SUBSCRIBE_APPROVE_LIST_SUCCESS = 'GET_SERVICE_SUBSCRIBE
 export const GET_SERVICE_SUBSCRIBE_APPROVE_LIST_FALIURE = 'GET_SERVICE_SUBSCRIBE_APPROVE_LIST_FALIURE'
 
 const fetchGetServiceSubscribeApproveList = (instanceID, query) => {
-  let endpoint = `${CSB_API_URL}/instances/${instanceID}/service-request`
+  let endpoint = `${CSB_API_URL}/instances/${instanceID}/service-subscription`
   if (query) {
     const _query = cloneDeep(query)
     if (query.page) {
@@ -67,7 +67,7 @@ const fetchPutServiceApprove = (instanceID, requestId, body) => {
         PUT_SERVICE_APPROVAE_SUCCESS,
         PUT_SERVICE_APPROVAE_FALIURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-request/${requestId}/status`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription/${requestId}/status`,
       options: {
         method: 'PUT',
         body,

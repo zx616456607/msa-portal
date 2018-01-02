@@ -40,8 +40,8 @@ class ServiceApIDoc extends React.Component {
     if (loading) {
       return <div className="loading-status"><Spin /></div>
     }
-    const { serviceId } = currentService
-    const serviceDetial = serviceList[serviceId]
+    const { serviceId, id } = currentService
+    const serviceDetial = serviceList[serviceId] || serviceList[id]
     if ((!loading && !serviceDetial) || (!loading && isEmpty(serviceDetial))) {
       return <div>文档为空，请点击其他文档查看</div>
     }

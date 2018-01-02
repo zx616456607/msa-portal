@@ -224,4 +224,9 @@ export const Schemas = {
   CSB_INSTANCE_SERVICE_API_DOC: {
     data: csbPublishedSchema,
   },
+  CSB_INSTANCE_SERVICE_LIST_DATA: {
+    data: {
+      content: [ csbPublishedSchema ],
+    },
+  },
 }

@@ -29,59 +29,59 @@ import {
 import { formatDate, toQuerystring } from '../../../../common/utils'
 import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
+import ApproveService from './ApproveService'
 
 const Search = Input.Search
 const RadioGroup = Radio.Group
 
 class ServiceSubscriptionApproval extends React.Component {
   state = {
-    name: '',
+    serviceName: '',
     isToo: false,
     modalTitle: '',
     visible: false,
     currentRecord: {},
     confirmLoading: false,
-    status: [ 1 ],
+    requestStatus: [ 1 ],
   }
 
   componentDidMount() {
     const { location } = this.props
     const { query } = location
-    const { name, status } = query
+    const { serviceName, requestStatus } = query
     this.setState({
-      name,
-      status: this.renderStatus(status),
+      serviceName,
+      requestStatus: this.renderStatus(requestStatus),
     }, this.loadData)
   }
 
-  renderStatus = status => {
-    if (!status) {
+  renderStatus = requestStatus => {
+    if (!requestStatus) {
       return [ 1 ]
     }
-    if (typeof status === 'string') {
-      return [ status ]
+    if (typeof requestStatus === 'string') {
+      return [ requestStatus ]
     }
-    if (Array.isArray(status)) {
-      return status
+    if (Array.isArray(requestStatus)) {
+      return requestStatus
     }
     return [ 1 ]
   }
 
   approveStatusChange = e => {
     const approveStatus = e.target.value
-    let status = [ 1 ]
+    let requestStatus = [ 1 ]
     if (approveStatus === 5) {
-      status = [ 2, 3, 4 ]
+      requestStatus = [ 2, 3, 4 ]
     }
     this.setState({
-      status,
+      requestStatus,
+      serviceName: '',
     })
-    this.loadData({ status })
-  }
-
-  handleCancel = () => {
-    this.setState({
-      visible: false,
+    this.loadData({
+      requestStatus,
+      page: 1,
+      serviceName: '',
     })
   }
 
@@ -111,8 +111,11 @@ class ServiceSubscriptionApproval extends React.Component {
 
   loadData = (query = {}) => {
     const { getServiceSubscribeApproveList, instanceID, location, history } = this.props
-    const { name, status } = this.state
-    query = Object.assign({}, location.query, { name, status }, query)
+    const { serviceName, requestStatus } = this.state
+    query = Object.assign({}, { view: 'publisher' }, location.query,
+      { serviceName, requestStatus },
+      query
+    )
     if (query.page && query.page === 1) {
       delete query.page
     }
@@ -160,31 +163,31 @@ class ServiceSubscriptionApproval extends React.Component {
   tableChange = (pagination, filters) => {
     const { status } = filters
     this.setState({
-      status,
+      requestStatus: status,
     })
     this.loadData({
-      status: status.length === 0 ? [ 2, 3, 4 ] : status,
+      requestStatus: status.length === 0 ? [ 2, 3, 4 ] : status,
       page: 1,
     })
   }
 
-  renderFilteredValue = status => {
-    if (typeof status === 'string') {
-      return [ status ]
+  renderFilteredValue = requestStatus => {
+    if (typeof requestStatus === 'string') {
+      return [ requestStatus ]
     }
-    return status
+    return requestStatus
   }
 
   render() {
     const {
       modalTitle, isToo, currentRecord, confirmLoading,
-      name,
+      serviceName,
     } = this.state
     const { serviceSubscribeAppraveList, location } = this.props
     const { query } = location
     const { content, size, isFetching, totalElements } = serviceSubscribeAppraveList
     let radioGroupValue = 1
-    if (query.status && parseInt(query.status) !== 1) {
+    if (query.requestStatus && parseInt(query.requestStatus) !== 1) {
       radioGroupValue = 5
     }
     const filterArray = [
@@ -195,13 +198,13 @@ class ServiceSubscriptionApproval extends React.Component {
     const columns = [
       { title: '订阅人', dataIndex: 'subscriberName', width: '8%' },
       { title: '订阅服务名称', dataIndex: 'serviceName', width: '10%' },
-      { title: '服务版本', dataIndex: 'version', width: '8%' },
+      { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
       {
         title: '状态',
         dataIndex: 'status',
         width: '10%',
         filters: radioGroupValue === 1 ? null : filterArray,
-        filteredValue: radioGroupValue === 1 ? null : this.renderFilteredValue(query.status),
+        filteredValue: radioGroupValue === 1 ? null : this.renderFilteredValue(query.requestStatus),
         render: text => this.filterState(text),
       },
       { title: '消费凭证', dataIndex: 'evidenceName', width: '10%' },
@@ -225,7 +228,7 @@ class ServiceSubscriptionApproval extends React.Component {
         // sorter: (a, b) => a.time - b.time,
         render: requestTime => formatDate(requestTime),
       },
-      { title: '审批意见', dataIndex: 'response', width: '8%' }, {
+      { title: '审批意见', dataIndex: 'serviceDescription', width: '8%' }, {
         title: '操作',
         dataIndex: 'operation',
         key: 'operation',
@@ -268,8 +271,8 @@ class ServiceSubscriptionApproval extends React.Component {
                 <Search
                   placeholder="请输入订阅服务名称搜索"
                   style={{ width: 200 }}
-                  value={name}
-                  onChange={e => this.setState({ name: e.target.value })}
+                  value={serviceName}
+                  onChange={e => this.setState({ serviceName: e.target.value })}
                   onSearch={() => this.loadData({ page: 1 })}
                 />
                 {totalElements > 0 && <div className="page">

@@ -92,7 +92,7 @@ const fetchGetUnsubscribeService = (instanceID, requestId) => {
         GET_UNSUBSCRIBE_SERVICE_SUCCESS,
         GET_UNSUBSCRIBE_SERVICE_FALIURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-request/${requestId}`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription/${requestId}`,
       options: {
         method: 'DELETE',
       },
