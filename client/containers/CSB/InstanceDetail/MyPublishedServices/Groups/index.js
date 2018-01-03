@@ -26,6 +26,8 @@ import ServiceOrGroupSwitch from '../ServiceOrGroupSwitch'
 import {
   formatDate,
   toQuerystring,
+  parseQueryToSortorder,
+  parseOrderToQuery,
 } from '../../../../../common/utils'
 import {
   CSB_INSTANCE_SERVICE_STATUS_RUNNING,
@@ -215,13 +217,23 @@ class MyPublishedServiceGroups extends React.Component {
     />
   }
 
+  onTableChange = (pagination, filters, sorter) => {
+    this.loadData({
+      page: 1,
+      sort: parseOrderToQuery(sorter),
+    })
+  }
+
   render() {
     const { serviceGroups, instanceID, history, location } = this.props
     const { isFetching, content, totalElements, size } = serviceGroups
+    const { query } = location
     const {
       createServiceGroupModalVisible, currentHandle, currentRecord,
       searchType,
     } = this.state
+    let sortObj = { creationTime: false }
+    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '服务组名', dataIndex: 'name', key: 'name' },
       { title: '负责人', dataIndex: 'ownerName', key: 'ownerName' },
@@ -257,6 +269,8 @@ class MyPublishedServiceGroups extends React.Component {
         title: '创建时间',
         dataIndex: 'creationTime',
         key: 'creationTime',
+        sorter: true,
+        sortOrder: sortObj.creationTime,
         render: text => formatDate(text),
       },
       {
@@ -291,7 +305,6 @@ class MyPublishedServiceGroups extends React.Component {
         <Option value="serviceName">服务名称</Option>
       </Select>
     )
-    const { query } = location
     const paginationProps = {
       simple: true,
       total: totalElements,
@@ -345,6 +358,7 @@ class MyPublishedServiceGroups extends React.Component {
           pagination={false}
           rowKey={record => record.id}
           indentSize={0}
+          onChange={this.onTableChange}
         />
       </div>
       <div key="modals">
