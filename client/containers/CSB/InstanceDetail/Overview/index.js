@@ -14,12 +14,13 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Card, Button, Row, Col, Badge } from 'antd'
+import { Card, Button, Row, Col } from 'antd'
 import './style/index.less'
 import G2 from 'g2'
 import { formatDate } from '../../../../common/utils'
 import createG2 from '../../../../components/CreateG2'
 import { getInstanceOverview } from '../../../../actions/CSB/instance'
+import { renderCSBInstanceServiceApproveStatus, renderCSBInstanceServiceStatus } from '../../../../components/utils'
 
 const Chart = createG2(chart => {
   const Stat = G2.Stat
@@ -43,7 +44,7 @@ const Chart1 = createG2(chart => {
     inner: 0.75,
   })
   chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#ffbf00', '#5cb85c', '#f85a5a', '#d9d9d9' ])
+    .color('area', [ '#2db7f5', '#5cb85c', '#f85a5a', '#d9d9d9' ])
     .style({
       lineWidth: 1,
     })
@@ -131,92 +132,6 @@ class InstanceDetailOverview extends React.Component {
     }
   }
 
-  filterStatusCount = data => {
-    let countList
-    if (data && data.length > 0) {
-      let runCount = 0
-      let errorCount = 0
-      let offCount = 0
-      let approvalCount = 0
-      data.forEach(item => {
-        switch (item.status) {
-          case 1:
-            runCount = item.count
-            break
-          case 2:
-            errorCount = item.count
-            break
-          case 3:
-            approvalCount = item.count
-            break
-          case 4:
-            offCount = item.count
-            break
-          default:
-            return ''
-        }
-      })
-      countList = {
-        runCount,
-        offCount,
-        errorCount,
-        approvalCount,
-      }
-    }
-    return countList
-  }
-
-  filterServiceSubscription = data => {
-    let countList
-    if (data && data.length > 0) {
-      let runCount = 0
-      let errorCount = 0
-      let revokeCount = 0
-      let approvalCount = 0
-      data.forEach(item => {
-        switch (item.status) {
-          case 1:
-            approvalCount = item.count
-            break
-          case 2:
-            runCount = item.count
-            break
-          case 3:
-            errorCount = item.count
-            break
-          case 4:
-            revokeCount = item.count
-            break
-          default:
-            return ''
-        }
-      })
-      countList = {
-        runCount,
-        revokeCount,
-        errorCount,
-        approvalCount,
-      }
-    }
-    return countList
-  }
-
-  filterData = data => {
-    const { publishedServiceData, serviceubscribeData, subServiceData, cansubServiceData } =
-      data && data || {}
-    const publish = this.filterStatusCount(publishedServiceData)
-    const publishSub = this.filterServiceSubscription(serviceubscribeData)
-    const subService = this.filterStatusCount(subServiceData)
-    const canSubService = this.filterStatusCount(cansubServiceData)
-    const ListStatusCount = {
-      publish,
-      publishSub,
-      subService,
-      canSubService,
-    }
-    return ListStatusCount
-  }
-
   getOverviewData = data => {
     const { myPublishedService, mySubscribeRequest, mySubscribedService, subscribableService } =
       data || {}
@@ -268,25 +183,12 @@ class InstanceDetailOverview extends React.Component {
     return datalist
   }
 
-  getStatusDesc = (key, state, value) => {
-    let text = ''
-    switch (key) {
-      case 1:
-        text = '已激活'
-        break
-      case 2:
-        text = '已拒绝'
-        break
-      case 3:
-        text = '已注销'
-        break
-      case 4:
-        text = '待审批'
-        break
-      default:
-        return ''
-    }
-    return <div><Badge fontSize={20} status={state} text={text} /><span className="status-desc">{value}个</span></div>
+  getStatusDesc = (key, value, index) => {
+    return <div key={index}>{renderCSBInstanceServiceApproveStatus(key)}<span className="status-desc">{value}个</span></div>
+  }
+
+  getServiceStatusDesc = (key, value, index) => {
+    return <div key={index}>{renderCSBInstanceServiceStatus(key)}<span className="status-desc">{value}个</span></div>
   }
 
   render() {
@@ -302,8 +204,6 @@ class InstanceDetailOverview extends React.Component {
     const OverviewData = this.getOverviewData(instanceOverview)
     const { publishedServiceData, serviceubscribeData, subServiceData, cansubServiceData } =
       OverviewData && OverviewData || []
-    const { publish, publishSub, subService, canSubService } =
-      this.filterData(OverviewData) || {}
     return (
       <QueueAnim className="csb-overview">
         <div className="top" key="top">
@@ -355,18 +255,15 @@ class InstanceDetailOverview extends React.Component {
               >
                 <Chart
                   data={publishedServiceData || []}
-                  // data={this.state.data}
                   width={this.state.width}
                   height={this.state.height} />
-                {/* <span className="">共
-                  {
-                    publish !== undefined ?
-                      publish.runCount + publish.errorCount + publish.offCount : 0
-                  }个</span> */}
                 <div className="desc">
-                  {this.getStatusDesc(1, 'success', publish !== undefined ? publish.runCount : 0)}
-                  {this.getStatusDesc(2, 'error', publish !== undefined ? publish.errorCount : 0)}
-                  {this.getStatusDesc(3, 'default', publish !== undefined ? publish.offCount : 0)}
+                  {
+                    publishedServiceData ?
+                      publishedServiceData.map((item, index) => {
+                        return this.getServiceStatusDesc(item.status, item.count, index)
+                      }) : ''
+                  }
                 </div>
               </Card>
             </Col>
@@ -385,10 +282,12 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="desc-trial">
-                  {this.getStatusDesc(1, 'success', publishSub !== undefined ? publishSub.runCount : 0)}
-                  {this.getStatusDesc(2, 'error', publishSub !== undefined ? publishSub.errorCount : 0)}
-                  {this.getStatusDesc(4, 'warning', publishSub !== undefined ? publishSub.approvalCount : 0)}
-                  {this.getStatusDesc(3, 'default', publishSub !== undefined ? publishSub.revokeCount : 0)}
+                  {
+                    serviceubscribeData ?
+                      serviceubscribeData.map((item, index) => {
+                        return this.getStatusDesc(item.status, item.count, index)
+                      }) : ''
+                  }
                 </div>
               </Card>
             </Col>
@@ -424,8 +323,12 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="des">
-                  {this.getStatusDesc(1, 'success', subService !== undefined ? subService.runCount : 0)}
-                  {this.getStatusDesc(2, 'error', subService !== undefined ? subService.offCount : 0)}
+                  {
+                    subServiceData ?
+                      subServiceData.map((item, index) => {
+                        return this.getServiceStatusDesc(item.status, item.count, index)
+                      }) : ''
+                  }
                 </div>
               </Card>
             </Col>
@@ -444,9 +347,12 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="des">
-                  {this.getStatusDesc(1, 'success', canSubService !== undefined ? canSubService.runCount : 0)}
-                  {this.getStatusDesc(2, 'error', canSubService !== undefined ? canSubService.errorCount : 0)}
-                  {this.getStatusDesc(3, 'default', canSubService !== undefined ? canSubService.offCount : 0)}
+                  {
+                    cansubServiceData ?
+                      cansubServiceData.map((item, index) => {
+                        return this.getServiceStatusDesc(item.status, item.count, index)
+                      }) : ''
+                  }
                 </div>
               </Card>
             </Col>
