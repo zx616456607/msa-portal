@@ -113,13 +113,12 @@ export const omInstances = (state = {}, action) => {
 }
 
 export const instanceOverview = (state = {}, action) => {
-  const { query, type, instanceID } = action
-  const key = getQueryKey(query)
+  const { type, instanceID } = action
   switch (type) {
     case ActionTypes.GET_CSB_INSTANCE_OVERVIEW_REQUEST:
       return {
         ...state,
-        [instanceID]: Object.assign({}, state[key], {
+        [instanceID]: Object.assign({}, state[instanceID], {
           isFetching: true,
         }),
       }
@@ -134,7 +133,7 @@ export const instanceOverview = (state = {}, action) => {
     case ActionTypes.GET_CSB_INSTANCE_OVERVIEW_FAILURE:
       return {
         ...state,
-        [instanceID]: Object.assign({}, state[key], {
+        [instanceID]: Object.assign({}, state[instanceID], {
           isFetching: false,
         }),
       }
