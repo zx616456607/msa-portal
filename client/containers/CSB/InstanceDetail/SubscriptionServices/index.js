@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Card, Pagination, Table, Input, Badge } from 'antd'
+import { Button, Card, Pagination, Table, Input } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEqual from 'lodash/isEqual'
 import isEmpty from 'lodash/isEmpty'
@@ -23,6 +23,7 @@ import { subscribableServices } from '../../../../actions/CSB/instanceService'
 import { formatDate, toQuerystring } from '../../../../common/utils'
 import { CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
 
 const Search = Input.Search
 
@@ -94,17 +95,6 @@ class SubscriptionServices extends React.Component {
     })
   }
 
-  renderServiceStatusUI = status => {
-    switch (status) {
-      case 1:
-        return <Badge status="success" text="已激活"/>
-      case 2:
-        return <Badge status="error" text="已停用"/>
-      default:
-        return <span>未知</span>
-    }
-  }
-
   render() {
     const { services, location, match } = this.props
     let { subscriptServiceVisible, name, sorterInfo, filterInfo, currentService } = this.state
@@ -118,7 +108,7 @@ class SubscriptionServices extends React.Component {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: status => this.renderServiceStatusUI(status),
+        render: status => renderCSBInstanceServiceStatus(status),
         filters: [{
           text: '已激活',
           value: 1,

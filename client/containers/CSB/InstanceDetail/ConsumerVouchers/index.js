@@ -31,7 +31,12 @@ import {
 } from '../../../../actions/CSB/instanceService/consumerVouchers'
 import { connect } from 'react-redux'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
-import { formatDate, toQuerystring } from '../../../../common/utils'
+import {
+  formatDate,
+  toQuerystring,
+  parseOrderToQuery,
+  parseQueryToSortorder,
+} from '../../../../common/utils'
 import confirm from '../../../../components/Modal/confirm'
 import UpdateConsumerVoucher from './UpdateConsumerVoncher'
 import isEqual from 'lodash/isEqual'
@@ -190,6 +195,10 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
+  tableChange = (pagination, filters, sorter) => {
+    this.loadData({ sort: parseOrderToQuery(sorter) })
+  }
+
   handleOK = () => {
     const { isAdd } = this.state
     const { form, instanceID } = this.props
@@ -220,8 +229,11 @@ class ConsumerVouchers extends React.Component {
     }
   }
 
-  filterAs = (column, record) => {
+  filterAs = (column, record, text) => {
     const currentRecord = cloneDeep(record)
+    if (column === 2 && !text) {
+      return <Row><Col span={24}>-</Col></Row>
+    }
     if (column === 2) {
       currentRecord.secret = record.replacingSecret
     }
@@ -251,6 +263,11 @@ class ConsumerVouchers extends React.Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 15 },
     }
+    let sortObj = {
+      creationTime: false,
+      updatedAt: false,
+    }
+    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '凭证名称', width: '12%', dataIndex: 'name' },
       {
@@ -264,7 +281,7 @@ class ConsumerVouchers extends React.Component {
         dataIndex: 'replacingSecret',
         width: '12%',
         className: 'keys',
-        render: (text, record) => <span>{text ? this.filterAs(2, record) : '-'}</span>,
+        render: (text, record) => this.filterAs(2, record, text),
       }, {
         title: '订阅服务（个）',
         width: '10%',
@@ -274,11 +291,15 @@ class ConsumerVouchers extends React.Component {
         title: '创建时间',
         dataIndex: 'creationTime',
         width: '19%',
+        sorter: true,
+        sortOrder: sortObj.creationTime,
         render: creationTime => formatDate(creationTime),
       }, {
         title: '更新时间',
         dataIndex: 'updatedAt',
         width: '19%',
+        sorter: true,
+        sortOrder: sortObj.updatedAt,
         render: updatedAt => <span>{updatedAt ? formatDate(updatedAt) : '-'}</span>,
       }, {
         title: '操作',
@@ -333,6 +354,7 @@ class ConsumerVouchers extends React.Component {
             // rowSelection={rowSelection}
             loading={isFetching}
             rowKey={record => record.id}
+            onChange={this.tableChange}
           />
         </Card>
         {addVisible && <Modal

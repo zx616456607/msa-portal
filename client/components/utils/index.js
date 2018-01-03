@@ -87,3 +87,38 @@ export function renderCSBInstanceServiceStatus(serviceStatus) {
   }
   return <Badge status={status} text={text} />
 }
+
+/**
+ * render service approve status of CSB instance
+ *
+ * @export
+ * @param {number} serviceStatus status of service
+ * @return {element} badge element
+ */
+export function renderCSBInstanceServiceApproveStatus(serviceStatus) {
+  let status
+  let text
+  switch (serviceStatus) {
+    case 1:
+      text = '待审批'
+      status = 'processing'
+      break
+    case 2:
+      text = '已通过'
+      status = 'success'
+      break
+    case 3:
+      text = '已拒绝'
+      status = 'error'
+      break
+    case 4:
+      text = '已退订'
+      status = 'default'
+      break
+    default:
+      text = '未知'
+      status = 'default'
+      break
+  }
+  return <Badge status={status} text={text} />
+}
