@@ -14,7 +14,7 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Card, Button, Row, Col } from 'antd'
+import { Card, Button, Row, Col, Badge } from 'antd'
 import './style/index.less'
 import G2 from 'g2'
 import { formatDate } from '../../../../common/utils'
@@ -268,6 +268,27 @@ class InstanceDetailOverview extends React.Component {
     return datalist
   }
 
+  getStatusDesc = (key, state, value) => {
+    let text = ''
+    switch (key) {
+      case 1:
+        text = '已激活'
+        break
+      case 2:
+        text = '已拒绝'
+        break
+      case 3:
+        text = '已注销'
+        break
+      case 4:
+        text = '待审批'
+        break
+      default:
+        return ''
+    }
+    return <div><Badge fontSize={20} status={state} text={text} /><span className="status-desc">{value}个</span></div>
+  }
+
   render() {
     const { instanceID } = this.props
     const images = [
@@ -343,21 +364,9 @@ class InstanceDetailOverview extends React.Component {
                       publish.runCount + publish.errorCount + publish.offCount : 0
                   }个</span> */}
                 <div className="desc">
-                  <div>
-                    <div className="dec-run dec-pie"></div>
-                    <p>已激活</p>
-                    <span>{publish !== undefined ? publish.runCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-error dec-pie"></div>
-                    <p>已停用</p>
-                    <span>{publish !== undefined ? publish.errorCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-on dec-pie"></div>
-                    <p>已注销</p>
-                    <span>{publish !== undefined ? publish.offCount : 0}个</span>
-                  </div>
+                  {this.getStatusDesc(1, 'success', publish !== undefined ? publish.runCount : 0)}
+                  {this.getStatusDesc(2, 'error', publish !== undefined ? publish.errorCount : 0)}
+                  {this.getStatusDesc(3, 'default', publish !== undefined ? publish.offCount : 0)}
                 </div>
               </Card>
             </Col>
@@ -376,26 +385,10 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="desc-trial">
-                  <div>
-                    <div className="dec-run dec-pie"></div>
-                    <p>已通过</p>
-                    <span>{publishSub !== undefined ? publishSub.runCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-error dec-pie"></div>
-                    <p>已拒绝</p>
-                    <span>{publishSub !== undefined ? publishSub.errorCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-trial dec-pie"></div>
-                    <p>待审批</p>
-                    <span>{publishSub !== undefined ? publishSub.approvalCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-on dec-pie"></div>
-                    <p>已退订</p>
-                    <span>{publishSub !== undefined ? publishSub.revokeCount : 0}个</span>
-                  </div>
+                  {this.getStatusDesc(1, 'success', publishSub !== undefined ? publishSub.runCount : 0)}
+                  {this.getStatusDesc(2, 'error', publishSub !== undefined ? publishSub.errorCount : 0)}
+                  {this.getStatusDesc(4, 'warning', publishSub !== undefined ? publishSub.approvalCount : 0)}
+                  {this.getStatusDesc(3, 'default', publishSub !== undefined ? publishSub.revokeCount : 0)}
                 </div>
               </Card>
             </Col>
@@ -431,16 +424,8 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="des">
-                  <div>
-                    <div className="dec-runs dec-pie"></div>
-                    <p>已激活</p>
-                    <span>{subService !== undefined ? subService.runCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-errors dec-pie"></div>
-                    <p>已停用</p>
-                    <span>{subService !== undefined ? subService.offCount : 0}个</span>
-                  </div>
+                  {this.getStatusDesc(1, 'success', subService !== undefined ? subService.runCount : 0)}
+                  {this.getStatusDesc(2, 'error', subService !== undefined ? subService.offCount : 0)}
                 </div>
               </Card>
             </Col>
@@ -459,21 +444,9 @@ class InstanceDetailOverview extends React.Component {
                   width={this.state.width}
                   height={this.state.height} />
                 <div className="des">
-                  <div>
-                    <div className="dec-runs dec-pie"></div>
-                    <p>已激活</p>
-                    <span>{canSubService !== undefined ? canSubService.runCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-errors dec-pie"></div>
-                    <p>已停用</p>
-                    <span>{canSubService !== undefined ? canSubService.errorCount : 0}个</span>
-                  </div>
-                  <div>
-                    <div className="dec-on dec-pie"></div>
-                    <p>已注销</p>
-                    <span>{canSubService !== undefined ? canSubService.offCount : 0}个</span>
-                  </div>
+                  {this.getStatusDesc(1, 'success', canSubService !== undefined ? canSubService.runCount : 0)}
+                  {this.getStatusDesc(2, 'error', canSubService !== undefined ? canSubService.errorCount : 0)}
+                  {this.getStatusDesc(3, 'default', canSubService !== undefined ? canSubService.offCount : 0)}
                 </div>
               </Card>
             </Col>
