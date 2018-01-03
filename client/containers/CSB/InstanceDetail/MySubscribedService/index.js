@@ -15,7 +15,7 @@ import QueueAnim from 'rc-queue-anim'
 import {
   Card, Button, Radio,
   Input, Pagination, Table,
-  Menu, Dropdown, Badge,
+  Menu, Dropdown,
   Row, Col, Select, notification,
 } from 'antd'
 import './style/MySubscribedService.less'
@@ -32,11 +32,20 @@ import {
 } from '../../../../actions/CSB/instanceService/mySubscribedServices'
 import { getInstanceServiceOverview } from '../../../../actions/CSB/instanceService/index'
 import { mySbuscrivedServicesSlt } from '../../../../selectors/CSB/instanceService/mySubscribedService'
-import { formatDate, toQuerystring } from '../../../../common/utils'
+import {
+  formatDate,
+  toQuerystring,
+  parseOrderToQuery,
+  parseQueryToSortorder,
+} from '../../../../common/utils'
 import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import union from 'lodash/union'
 import SubscriptServiceModal from '../SubscriptionServices/SubscriptServiceModal'
+import {
+  renderCSBInstanceServiceStatus,
+  renderCSBInstanceServiceApproveStatus,
+} from '../../../../components/utils/index'
 
 const RadioGroup = Radio.Group
 const Search = Input.Search
@@ -146,31 +155,24 @@ class MySubscribedService extends React.Component {
     })
   }
 
-  renderServiceStatusUI = status => {
-    switch (status) {
-      case 1:
-        return <Badge status="success" text="已激活"/>
-      case 2:
-        return <Badge status="error" text="已停用"/>
-      case 4:
-        return <Badge status="default" text="已注销"/>
-      default:
-        return <span>未知</span>
-    }
-  }
-
-  tableChange = (pagination, filters) => {
-    const { status } = filters
+  tableChange = (pagination, filters, sorter) => {
+    const { status, serviceStatus } = filters
     let requestStatus = status
-    if (!status.length) {
+    if (status && !status.length) {
       requestStatus = [ '1', '2', '3' ]
     }
     this.setState({
       subFilteredValue: status,
-    })
-    this.loadData({
-      requestStatus,
-      page: 1,
+    }, () => {
+      if (!status) {
+        requestStatus = 4
+      }
+      return this.loadData({
+        requestStatus,
+        page: 1,
+        sort: parseOrderToQuery(sorter),
+        serviceStatus,
+      })
     })
   }
 
@@ -228,6 +230,7 @@ class MySubscribedService extends React.Component {
     }, () => this.loadData({
       requestStatus,
       page: 1,
+      sort: null,
     }))
   }
 
@@ -235,30 +238,13 @@ class MySubscribedService extends React.Component {
     const { getServiceApiDoc, instanceID } = this.props
     const { serviceId } = currentService
     const callback = () => getServiceApiDoc(instanceID, serviceId).then(() => {
-      this.setState({
-        confirmLoading: false,
-      })
+      this.setState({ confirmLoading: false })
     })
     this.setState({
       serviceApIDocModal: true,
       currentService,
       confirmLoading: true,
     }, callback)
-  }
-
-  renderSubstatus = status => {
-    switch (status) {
-      case 1:
-        return <Badge status="warning" text="待审批"/>
-      case 2:
-        return <Badge status="success" text="已通过"/>
-      case 3:
-        return <Badge status="error" text="已拒绝"/>
-      case 4:
-        return <Badge status="default" text="已退订"/>
-      default:
-        return <span>未知</span>
-    }
   }
 
   reSubscribeService = record => {
@@ -275,17 +261,18 @@ class MySubscribedService extends React.Component {
       name, subVisible,
     } = this.state
     const { mySubscribedServicelist, serviceList, location, match, instanceID } = this.props
-    const { query } = location
+    const { query = {} } = location
+    const { requestStatus, page, serviceStatus } = query
     const { isFetching, size, totalElements, content } = mySubscribedServicelist
     const paginationProps = {
       simple: true,
       total: totalElements,
       size,
-      current: parseInt(query.page) || 1,
+      current: parseInt(page) || 1,
       onChange: page => this.loadData({ page }),
     }
     let radioGroupValue = 1
-    if (query && query.requestStatus === '4') {
+    if (requestStatus === '4') {
       radioGroupValue = 4
     }
     const subFilters = [
@@ -293,6 +280,21 @@ class MySubscribedService extends React.Component {
       { text: '已通过', value: '2' },
       { text: '已拒绝', value: '3' },
     ]
+    let serviceStatusFilteredValue = [ '1', '2' ]
+    if (serviceStatus && serviceStatus.length === 1) {
+      serviceStatusFilteredValue = [ serviceStatus ]
+    }
+    if (serviceStatus && serviceStatus.length === 2) {
+      serviceStatusFilteredValue = serviceStatus
+    }
+    let sortObj = {
+      requestTime: false,
+      approvalTime: false,
+      totalCallCount: false,
+      totalErrorCallCount: false,
+      averageCallTime: false,
+    }
+    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '订阅服务名称', dataIndex: 'serviceName', width: '8%' },
       {
@@ -300,11 +302,11 @@ class MySubscribedService extends React.Component {
         dataIndex: 'serviceStatus',
         width: '8%',
         filters: [
-          { text: '已激活', value: 'Joe' },
-          { text: '已停用', value: 'Jim' },
+          { text: '已激活', value: 1 },
+          { text: '已停用', value: 2 },
         ],
-        // onFilter: (value, record) => record.charge.includes(value),
-        render: status => this.renderServiceStatusUI(status),
+        filteredValue: serviceStatusFilteredValue,
+        render: status => renderCSBInstanceServiceStatus(status),
       },
       { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
       { title: '所属服务组', dataIndex: 'serviceGroupName', width: '8%' },
@@ -315,33 +317,40 @@ class MySubscribedService extends React.Component {
         width: '8%',
         filters: radioGroupValue === 1 ? subFilters : null,
         filteredValue: radioGroupValue === 1 ? subFilteredValue : null,
-        render: text => this.renderSubstatus(text),
+        render: text => renderCSBInstanceServiceApproveStatus(text),
       },
       {
         title: '订阅时间', dataIndex: 'requestTime', width: '10%',
+        sorter: true,
+        sortOrder: sortObj.requestTime,
         render: text => formatDate(text),
       },
       {
         title: '审批时间', dataIndex: 'approvalTime', width: '10%',
+        sorter: true,
+        sortOrder: sortObj.approvalTime,
         render: text => formatDate(text),
       },
       {
         title: '累计调用量',
         dataIndex: 'totalCallCount',
         width: '8%',
-        // sorter: (a, b) => a.status - b.status,
+        // sorter: true,
+        // sortOrder: sortObj.totalCallCount,
         render: text => (text !== undefined ? text : '-'),
       }, {
         title: '累计错误量',
         dataIndex: 'totalErrorCallCount',
         width: '8%',
-        // sorter: (a, b) => a.num - b.num,
+        // sorter: true,
+        // sortOrder: sortObj.totalErrorCallCount,
         render: text => (text !== undefined ? text : '-'),
       }, {
         title: '平均RT（ms）',
         dataIndex: 'averageCallTime',
         width: '8%',
-        // sorter: (a, b) => a.desc - b.desc,
+        // sorter: true,
+        // sortOrder: sortObj.averageCallTime,
         render: text => (
           text !== undefined
             ? Math.ceil(text * 100) / 100

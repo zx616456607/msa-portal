@@ -14,17 +14,23 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import {
   Input, Table, Card, Button,
-  Pagination, Badge,
+  Pagination,
 } from 'antd'
 import './style/PublicServices.less'
 import { connect } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import ServiceApiDoc from '../MySubscribedService/ServiceApIDoc'
-import { formatDate, toQuerystring } from '../../../../common/utils'
+import {
+  formatDate,
+  toQuerystring,
+  parseOrderToQuery,
+  parseQueryToSortorder,
+} from '../../../../common/utils'
 import { getPublicServiceList } from '../../../../actions/CSB/instanceService/publicService'
 import { publicServiceSlt } from '../../../../selectors/CSB/instanceService/publicService'
 import { getServiceApiDoc } from '../../../../actions/CSB/instanceService/mySubscribedServices'
+import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
 
 const Search = Input.Search
 
@@ -60,20 +66,9 @@ class PublicServices extends React.Component {
     getPublicServiceList(instanceID, query)
   }
 
-  renderServiceStatusUI = status => {
-    switch (status) {
-      case 1:
-        return <Badge status="success" text="已激活"/>
-      case 2:
-        return <Badge status="error" text="已停用"/>
-      case 4:
-        return <Badge status="default" text="已注销"/>
-      default:
-        return <span>未知</span>
-    }
+  tableChange = (pagination, filters, sorter) => {
+    this.loadData({ sort: parseOrderToQuery(sorter) })
   }
-
-  tableChange = () => {}
 
   openServiceApiDoc = record => {
     const { getServiceApiDoc, instanceID } = this.props
@@ -95,18 +90,21 @@ class PublicServices extends React.Component {
     const { plubicServiceList, location, serviceList } = this.props
     const { isFetching, size, totalElements, content } = plubicServiceList
     const { query } = location
+    let sortObj = { publishTime: false }
+    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '公开服务名称', dataIndex: 'name', width: '12%' },
       {
         title: '服务状态', dataIndex: 'status', width: '11%',
-        render: status => this.renderServiceStatusUI(status),
+        render: status => renderCSBInstanceServiceStatus(status),
       },
       { title: '服务版本', dataIndex: 'version', width: '11%' },
       { title: '所属服务组', dataIndex: 'groupName', width: '11%' },
       { title: '订阅状态', dataIndex: 'dingyue', width: '12%', render: () => '无需订阅' },
       { title: '服务描述', dataIndex: 'desc', width: '12%', render: () => '无需订阅' },
       {
-        title: '服务发布时间', dataIndex: 'publishTime', width: '15%',
+        title: '服务发布时间', dataIndex: 'publishTime', width: '15%', sorter: true,
+        sortOrder: sortObj.publishTime,
         render: text => formatDate(text),
       },
       {

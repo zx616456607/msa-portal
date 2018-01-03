@@ -15,7 +15,7 @@ import QueueAnim from 'rc-queue-anim'
 import {
   Card, Button, Icon, Input,
   Radio, Table, Pagination,
-  Tooltip, notification, Badge,
+  Tooltip, notification,
 } from 'antd'
 import './style/index.less'
 import { connect } from 'react-redux'
@@ -26,10 +26,16 @@ import {
 import {
   serviceSubscribeApproveSlt,
 } from '../../../../selectors/CSB/instanceService/serviceSubscribeApprove'
-import { formatDate, toQuerystring } from '../../../../common/utils'
+import {
+  formatDate,
+  toQuerystring,
+  parseOrderToQuery,
+  parseQueryToSortorder,
+} from '../../../../common/utils'
 import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import ApproveService from './ApproveService'
+import { renderCSBInstanceServiceApproveStatus } from '../../../../components/utils/index'
 
 const Search = Input.Search
 const RadioGroup = Radio.Group
@@ -145,29 +151,15 @@ class ServiceSubscriptionApproval extends React.Component {
     }
   }
 
-  filterState = key => {
-    switch (key) {
-      case 1:
-        return <Badge status="warning" text="待审批"/>
-      case 2:
-        return <Badge status="success" text="已通过"/>
-      case 3:
-        return <Badge status="error" text="已拒绝"/>
-      case 4:
-        return <Badge status="default" text="已退订"/>
-      default:
-        return <span>未知</span>
-    }
-  }
-
-  tableChange = (pagination, filters) => {
+  tableChange = (pagination, filters, sorter) => {
     const { status } = filters
     this.setState({
       requestStatus: status,
     })
     this.loadData({
-      requestStatus: status.length === 0 ? [ 2, 3, 4 ] : status,
+      requestStatus: status && status.length === 0 ? [ 2, 3, 4 ] : status,
       page: 1,
+      sort: parseOrderToQuery(sorter),
     })
   }
 
@@ -190,6 +182,8 @@ class ServiceSubscriptionApproval extends React.Component {
     if (query.requestStatus && parseInt(query.requestStatus) !== 1) {
       radioGroupValue = 5
     }
+    let sortObj = { requestTime: false }
+    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const filterArray = [
       { text: '已通过', value: 2 },
       { text: '已拒绝', value: 3 },
@@ -205,7 +199,7 @@ class ServiceSubscriptionApproval extends React.Component {
         width: '10%',
         filters: radioGroupValue === 1 ? null : filterArray,
         filteredValue: radioGroupValue === 1 ? null : this.renderFilteredValue(query.requestStatus),
-        render: text => this.filterState(text),
+        render: text => renderCSBInstanceServiceApproveStatus(text),
       },
       { title: '消费凭证', dataIndex: 'evidenceName', width: '10%' },
       {
@@ -224,10 +218,10 @@ class ServiceSubscriptionApproval extends React.Component {
       },
       {
         title: '申请订阅时间',
-        key: 'requestTime',
         dataIndex: 'requestTime',
         width: '12%',
-        // sorter: (a, b) => a.time - b.time,
+        sorter: true,
+        sortOrder: sortObj.requestTime,
         render: requestTime => formatDate(requestTime),
       },
       {

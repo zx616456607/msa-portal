@@ -343,3 +343,46 @@ export const formatRole = filterString => {
       return []
   }
 }
+
+/**
+ * format instance service sorter query by sorter
+ *
+ * @param {object} sorter object
+ * @return {string} order conditions
+ */
+export function parseOrderToQuery(sorter = {}) {
+  const { columnKey, order } = sorter
+  if (!columnKey) {
+    return null
+  }
+  switch (order) {
+    case 'descend':
+      return `${columnKey},desc`
+    case 'ascend':
+      return `${columnKey},asc`
+    default:
+      return null
+  }
+}
+
+/**
+ * format instance service sortOrder by sortObj, query
+ *
+ * @param {object} sortObj object
+ * @param {object} query object
+ * @return {object} sortOrder object
+ */
+export function parseQueryToSortorder(sortObj = {}, query = {}) {
+  const { sort = '' } = query
+  const queryArray = sort.split(',')
+  const columnName = queryArray[0]
+  const sortValue = queryArray[1]
+  let order = false
+  switch (sortValue) {
+    case 'desc': order = 'descend'; break
+    case 'asc': order = 'ascend'; break
+    default: order = false; break
+  }
+  sortObj[columnName] = order
+  return sortObj
+}

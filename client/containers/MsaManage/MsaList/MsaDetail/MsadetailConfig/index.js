@@ -61,7 +61,7 @@ class MsaDetailConfig extends React.Component {
     const dataSource = []
     dataKeys.forEach(url => {
       Object.keys(data[url]).forEach(key => {
-        let gitUrl = url.substring(0, url.lastIndexOf('/'))
+        const gitUrl = url.substring(0, url.lastIndexOf('/'))
         dataSource.push({
           key,
           url: gitUrl,
