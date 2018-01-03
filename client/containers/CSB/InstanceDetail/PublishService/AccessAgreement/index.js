@@ -109,7 +109,7 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup>
               <RadioButton value="Restful-API">Restful-API</RadioButton>
-              <RadioButton value="WebService" disabled>WebService</RadioButton>
+              <RadioButton value="WebService">WebService</RadioButton>
             </RadioGroup>
           )}
         </FormItem>
