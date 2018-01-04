@@ -104,6 +104,16 @@ class SubscriptServiceModal extends React.Component {
             })
             return
           }
+          if (res.status === 409) {
+            notification.watch({
+              message: '订阅失败',
+              description: '您已经订阅了该服务，不能重复订阅',
+            })
+            this.setState({
+              confirmLoading: false,
+            })
+            return
+          }
           notification.error({
             message: '订阅失败',
             description: res.error,

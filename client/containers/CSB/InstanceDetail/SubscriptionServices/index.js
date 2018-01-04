@@ -19,7 +19,7 @@ import { parse as parseQuerystring } from 'query-string'
 import './style/SubscriptionServices.less'
 import SubscriptServiceModal from './SubscriptServiceModal'
 import { subscribableServices } from '../../../../actions/CSB/instanceService'
-import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData, parseOrderToQuery } from '../../../../common/utils'
 import { CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
@@ -67,22 +67,13 @@ class SubscriptionServices extends React.Component {
     let sortStr = ''
     let statusStr = ''
     if (!isEmpty(sorter)) {
-      const { columnKey, order } = sorter
-      sortStr = this.getSortString(columnKey, order)
+      sortStr = parseOrderToQuery(sorter)
     }
     if (!isEmpty(filters.status)) {
       const { status } = filters
       statusStr = status
     }
     this.loadData({ sort: sortStr, status: statusStr })
-  }
-
-  getSortString = (columnKey, order) => {
-    let str = ',asc'
-    if (order === 'descend') {
-      str = ',desc'
-    }
-    return `${columnKey}${str}`
   }
 
   openSubscriptServiceModal = record => {
