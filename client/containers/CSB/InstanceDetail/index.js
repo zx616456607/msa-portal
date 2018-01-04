@@ -20,12 +20,24 @@ import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstanceDetailChildRoutes } from '../../../RoutesDom'
 import { getMenuSelectedKeys } from '../../../common/utils'
-import { renderMenu } from '../../../components/utils'
+import { renderMenu, renderLoading } from '../../../components/utils'
+import {
+  UNUSED_CLUSTER_ID,
+} from '../../../constants'
+import { getInstanceByID } from '../../../actions/CSB/instance'
 import './style/index.less'
 
 class CSBInstanceDetail extends React.Component {
+  componentDidMount() {
+    const { instanceID, getInstanceByID } = this.props
+    getInstanceByID(UNUSED_CLUSTER_ID, instanceID)
+  }
+
   renderChildren = () => {
-    const { children } = this.props
+    const { children, currentInstance } = this.props
+    if (!currentInstance) {
+      return renderLoading('加载实例中 ...')
+    }
     return [
       children,
       <Switch key="switch">
@@ -37,8 +49,7 @@ class CSBInstanceDetail extends React.Component {
   }
 
   render() {
-    const { location, match } = this.props
-    const { instanceID } = match.params
+    const { location, instanceID, currentInstance } = this.props
     const menus = [
       {
         to: `/csb-instances-available/${instanceID}`,
@@ -50,6 +61,7 @@ class CSBInstanceDetail extends React.Component {
         text: '服务发布',
         icon: <Icon type="user" />,
         key: 'service-publish',
+        skiped: currentInstance && currentInstance.role === 1,
         children: [
           {
             to: `/csb-instances-available/${instanceID}/my-published-services`,
@@ -78,10 +90,12 @@ class CSBInstanceDetail extends React.Component {
           {
             to: `/csb-instances-available/${instanceID}/my-subscribed-service`,
             text: '我订阅的服务',
+            skiped: currentInstance && currentInstance.role === 2,
           },
           {
             to: `/csb-instances-available/${instanceID}/subscription-services`,
             text: '可订阅服务',
+            skiped: currentInstance && currentInstance.role === 2,
           },
           {
             to: `/csb-instances-available/${instanceID}/public-services`,
@@ -126,8 +140,17 @@ class CSBInstanceDetail extends React.Component {
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = (state, ownProps) => {
+  const { entities } = state
+  const { csbAvaInstances } = entities
+  const { match } = ownProps
+  const { instanceID } = match.params
+  return {
+    instanceID,
+    currentInstance: csbAvaInstances && csbAvaInstances[instanceID],
+  }
+}
 
 export default connect(mapStateToProps, {
-  //
+  getInstanceByID,
 })(CSBInstanceDetail)

@@ -24,7 +24,10 @@ const SubMenu = Menu.SubMenu
  * @return {element} menu element
  */
 export function renderMenu(menu) {
-  const { type, to, icon, text, children, ...otherProps } = menu
+  const { type, to, icon, text, children, skiped, ...otherProps } = menu
+  if (skiped) {
+    return
+  }
   if (type === 'SubMenu') {
     return (
       <SubMenu

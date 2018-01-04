@@ -163,6 +163,9 @@ export const Schemas = {
       content: [ csbPubInstancesSchema ],
     },
   },
+  CSB_AVA_INSNTANCE: {
+    data: csbAvaInstancesSchema,
+  },
   CSB_AVA_INSNTANCES_LIST_DATA: {
     data: {
       content: [ csbAvaInstancesSchema ],

@@ -21,6 +21,7 @@ import { formatDate } from '../../../../common/utils'
 import createG2 from '../../../../components/CreateG2'
 import { getInstanceOverview } from '../../../../actions/CSB/instance'
 import { renderCSBInstanceServiceApproveStatus, renderCSBInstanceServiceStatus } from '../../../../components/utils'
+import { renderInstanceRole } from '../../../../common/utils'
 
 const Chart = createG2(chart => {
   const Stat = G2.Stat
@@ -192,7 +193,7 @@ class InstanceDetailOverview extends React.Component {
   }
 
   render() {
-    const { instanceID } = this.props
+    const { instanceID, currentInstance } = this.props
     const images = [
       { src: require('../../../../assets/img/csb/csb.png') },
     ]
@@ -217,6 +218,7 @@ class InstanceDetailOverview extends React.Component {
                 <div>创建人：{creator}</div>
                 <div>创建时间：{formatDate(creationTime)}</div>
                 <div>描述：{description}</div>
+                <div>实例授权：{renderInstanceRole(currentInstance.role)}</div>
               </div>
             </div>
           </div>
@@ -364,7 +366,8 @@ class InstanceDetailOverview extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current, CSB } = state
+  const { current, CSB, entities } = state
+  const { csbAvaInstances } = entities
   const { match } = ownProps
   const { instanceID } = match.params
   const { cluster } = current.config
@@ -373,6 +376,7 @@ const mapStateToProps = (state, ownProps) => {
     cluster,
     dataList,
     instanceID,
+    currentInstance: csbAvaInstances[instanceID],
   }
 }
 

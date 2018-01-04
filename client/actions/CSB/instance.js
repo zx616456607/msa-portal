@@ -83,6 +83,29 @@ export const fetchInstances = (clusterID, query = {}) => {
   }
 }
 
+// 获取实例详情
+export const GET_CSB_INSTANCE_BY_ID_REQUEST = 'GET_CSB_INSTANCE_BY_ID_REQUEST'
+export const GET_CSB_INSTANCE_BY_ID_SUCCESS = 'GET_CSB_INSTANCE_BY_ID_SUCCESS'
+export const GET_CSB_INSTANCE_BY_ID_FAILURE = 'GET_CSB_INSTANCE_BY_ID_FAILURE'
+
+const fetchGetInstancebyID = (clusterID, instanceID) => {
+  return {
+    instanceID,
+    [CALL_API]: {
+      types: [
+        GET_CSB_INSTANCE_BY_ID_REQUEST,
+        GET_CSB_INSTANCE_BY_ID_SUCCESS,
+        GET_CSB_INSTANCE_BY_ID_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/${instanceID}`,
+      schema: Schemas.CSB_AVA_INSNTANCE,
+    },
+  }
+}
+
+export const getInstanceByID = (clusterID, instanceID) =>
+  dispatch => dispatch(fetchGetInstancebyID(clusterID, instanceID))
+
 // Fetches a page of CSB instances.
 // Relies on Redux Thunk middleware.
 export const getInstances = (clusterID, query) =>
