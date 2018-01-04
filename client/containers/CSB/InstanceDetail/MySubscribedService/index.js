@@ -162,7 +162,7 @@ class MySubscribedService extends React.Component {
       requestStatus = [ '1', '2', '3' ]
     }
     this.setState({
-      subFilteredValue: status,
+      subFilteredValue: requestStatus,
     }, () => {
       if (!status) {
         requestStatus = 4
@@ -369,11 +369,7 @@ class MySubscribedService extends React.Component {
             onClick={this.tableMenuClick.bind(this, record)}
           >
             <MenuItem key="details">订阅详情</MenuItem>
-            {
-              (record.status === 2 || record.status === 1) && <MenuItem key="unsubscibe">
-                退订
-              </MenuItem>
-            }
+            <MenuItem key="unsubscibe">退订</MenuItem>
             <MenuItem key="editIP">修改绑定 IP</MenuItem>
           </Menu>
           return <Dropdown.Button overlay={menu}

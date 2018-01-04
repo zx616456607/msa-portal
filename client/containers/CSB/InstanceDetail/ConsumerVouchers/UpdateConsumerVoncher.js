@@ -38,10 +38,12 @@ class UpdateConsumerVoucher extends React.Component {
 
   componentDidMount() {
     setTimeout(() => {
-      if (this.delayTimeInput) {
-        this.delayTimeInput.focus()
-      }
+      this.delayTimeInput && this.delayTimeInput.focus()
     }, 200)
+    const timeout = this.renderTimeout()
+    if (typeof timeout === 'number') {
+      this.setState({ delayTime: timeout })
+    }
   }
 
   handleOk = () => {
@@ -95,19 +97,22 @@ class UpdateConsumerVoucher extends React.Component {
       return false
     }
     const nowTime = new Date().getTime()
-    const updateTime = new Date(record.expireAt).getTime()
-    if (updateTime - nowTime < 0) {
-      return true
+    const updateTime = new Date(expireAt).getTime()
+    const timeDifference = updateTime - nowTime
+    if (timeDifference < 0) {
+      return 0
     }
-    return false
+    const min = parseInt(timeDifference / 1000 / 60)
+    return min
   }
 
   render() {
     const { loading, closeModalMethod, record } = this.props
     const { updateSetting, delayTime, hideOld } = this.state
+    const { expireAt, secret, clientId } = record
     const starStr = this.renderStarStr()
     const timeout = this.renderTimeout()
-    let oldKeys = `ak: ${record.clientId}\nsk: ${record.secret}`
+    let oldKeys = `ak: ${clientId}\nsk: ${secret}`
     if (hideOld) {
       oldKeys = `ak: ${starStr}\nsk: ${starStr}`
     }
@@ -122,7 +127,7 @@ class UpdateConsumerVoucher extends React.Component {
         maskClosable={false}
         confirmLoading={loading}
         wrapClassName="update-consumer-voucher"
-        okText={ record.expireAt ? '完成更新' : '确定' }
+        okText={ expireAt ? '完成更新' : '确定' }
       >
         <Row>
           <Col span={4}>
@@ -159,6 +164,7 @@ class UpdateConsumerVoucher extends React.Component {
             <RadioGroup
               defaultValue={updateSetting}
               onChange={e => this.setState({ updateSetting: e.target.value })}
+              disabled={!!expireAt}
             >
               <Radio value="delay">更新过渡，新旧凭证同时生效</Radio>
               <Radio value="immediately">立即生效，仅用新凭证</Radio>
@@ -173,18 +179,18 @@ class UpdateConsumerVoucher extends React.Component {
                 <InputNumber
                   min={1}
                   max={7000}
-                  defaultValue={1}
                   value={delayTime}
                   ref={input => { this.delayTimeInput = input }}
                   onChange={delayTime => this.setState({ delayTime })}
                   onBlur={this.testDelayTime}
+                  disabled={!!expireAt}
                 /> 分
               </Col>
             </Row>
           )
         }
         {
-          timeout && <Row>
+          timeout === 0 && <Row>
             <Col span={4}></Col>
             <Col span={20} className="timeout-style">
               已超时，旧 ak / sk 不生效，完成更新后方可进行下次更新。
