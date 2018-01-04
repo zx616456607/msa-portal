@@ -19,7 +19,7 @@ import { parse as parseQuerystring } from 'query-string'
 import './style/SubscriptionServices.less'
 import SubscriptServiceModal from './SubscriptServiceModal'
 import { subscribableServices } from '../../../../actions/CSB/instanceService'
-import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData, parseOrderToQuery } from '../../../../common/utils'
 import { CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
@@ -67,22 +67,13 @@ class SubscriptionServices extends React.Component {
     let sortStr = ''
     let statusStr = ''
     if (!isEmpty(sorter)) {
-      const { columnKey, order } = sorter
-      sortStr = this.getSortString(columnKey, order)
+      sortStr = parseOrderToQuery(sorter)
     }
     if (!isEmpty(filters.status)) {
       const { status } = filters
       statusStr = status
     }
     this.loadData({ sort: sortStr, status: statusStr })
-  }
-
-  getSortString = (columnKey, order) => {
-    let str = ',asc'
-    if (order === 'descend') {
-      str = ',desc'
-    }
-    return `${columnKey}${str}`
   }
 
   openSubscriptServiceModal = record => {
@@ -100,11 +91,11 @@ class SubscriptionServices extends React.Component {
     filterInfo = filterInfo || {}
     sorterInfo = sorterInfo || {}
     const columns = [
-      { title: '服务名称', dataIndex: 'name', key: 'name' },
+      { title: '服务名称', dataIndex: 'name', width: '14%' },
       {
         title: '状态',
         dataIndex: 'status',
-        key: 'status',
+        width: '12%',
         render: status => renderCSBInstanceServiceStatus(status),
         filters: [{
           text: '已激活',
@@ -116,18 +107,18 @@ class SubscriptionServices extends React.Component {
         filterMultiple: false,
         filteredValue: filterInfo.status || null,
       },
-      { title: '服务版本', dataIndex: 'version', key: 'version' },
-      { title: '所属服务组', dataIndex: 'groupName', key: 'groupName' },
+      { title: '服务版本', dataIndex: 'version', width: '12%' },
+      { title: '所属服务组', dataIndex: 'groupName', width: '12%' },
       {
         title: '服务开放类型',
         dataIndex: 'accessible',
-        key: 'accessible',
+        width: '12%',
         render: text => (text ? '公有' : '私有'),
       },
       {
         title: '服务描述',
         dataIndex: 'description',
-        key: 'description',
+        width: '12%',
         render: text => text || '-',
       },
       {
@@ -141,7 +132,7 @@ class SubscriptionServices extends React.Component {
       {
         title: '操作',
         dataIndex: 'handle',
-        key: 'handle',
+        width: '12%',
         render: (handle, record) => <Button type="primary" onClick={this.openSubscriptServiceModal.bind(this, record)}>订阅</Button>,
       },
     ]
