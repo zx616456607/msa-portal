@@ -33,13 +33,12 @@ import { connect } from 'react-redux'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
 import {
   formatDate,
-  toQuerystring,
   parseOrderToQuery,
   parseQueryToSortorder,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
 import confirm from '../../../../components/Modal/confirm'
 import UpdateConsumerVoucher from './UpdateConsumerVoncher'
-import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import IndentTip from './TipSvcDomain/index'
 
@@ -63,7 +62,7 @@ class ConsumerVouchers extends React.Component {
     const { name } = query
     this.setState({
       name,
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
   confirmDeleteConsumerVoucher = record => {
@@ -89,16 +88,14 @@ class ConsumerVouchers extends React.Component {
     })
   }
 
-  loadData = (query = {}) => {
+  loadData = (query = {}, isFirst) => {
     const { getConsumerVouchersList, instanceID, location, history } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
     if (query.page && query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getConsumerVouchersList(instanceID, query)
   }
 

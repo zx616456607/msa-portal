@@ -34,11 +34,10 @@ import { getInstanceServiceOverview } from '../../../../actions/CSB/instanceServ
 import { mySbuscrivedServicesSlt } from '../../../../selectors/CSB/instanceService/mySubscribedService'
 import {
   formatDate,
-  toQuerystring,
   parseOrderToQuery,
   parseQueryToSortorder,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
-import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import union from 'lodash/union'
 import SubscriptServiceModal from '../SubscriptionServices/SubscriptServiceModal'
@@ -91,7 +90,7 @@ class MySubscribedService extends React.Component {
       name,
       subFilteredValue: this.renderSubFilteredValue(requestStatus),
       searchType,
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
   renderSubFilteredValue = requestStatus => {
@@ -114,7 +113,7 @@ class MySubscribedService extends React.Component {
     })
   }
 
-  loadData = (query = {}) => {
+  loadData = (query = {}, isFirst) => {
     const {
       getMySubscribedServiceList, instanceID, location, history,
     } = this.props
@@ -131,9 +130,7 @@ class MySubscribedService extends React.Component {
     if (query.page && query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getMySubscribedServiceList(instanceID, query).then(res => {
       if (res.error) return
       const data = res.response.entities.csbInstanceMySubscribedServices

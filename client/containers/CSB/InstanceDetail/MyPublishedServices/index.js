@@ -17,9 +17,8 @@ import {
   Radio, Row, Col, Card, Button, Input, Pagination,
 } from 'antd'
 import { parse as parseQuerystring } from 'query-string'
-import isEqual from 'lodash/isEqual'
 import ServicesTable from './ServicesTable'
-import { toQuerystring } from '../../../../common/utils'
+import { handleHistoryForLoadData } from '../../../../common/utils'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import CreateServiceGroupModal from './Groups/CreateServiceGroupModal'
@@ -49,7 +48,7 @@ class MyPublishedServices extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData()
+    this.loadData({}, true)
   }
 
   openCreateServiceGroupModal = () => {
@@ -65,7 +64,7 @@ class MyPublishedServices extends React.Component {
   }
 
   // 加载数据
-  loadData = query => {
+  loadData = (query, isFirst) => {
     const { getInstanceService, getInstanceServiceOverview, history, match } = this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
@@ -87,9 +86,7 @@ class MyPublishedServices extends React.Component {
       delete query.filter
     }
     delete query.includeDeleted
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getInstanceService(instanceID, mergeQuery(query)).then(res => {
       if (res.error) {
         return

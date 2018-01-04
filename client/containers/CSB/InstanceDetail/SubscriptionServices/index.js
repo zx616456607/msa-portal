@@ -14,13 +14,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Card, Pagination, Table, Input } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import isEqual from 'lodash/isEqual'
 import isEmpty from 'lodash/isEmpty'
 import { parse as parseQuerystring } from 'query-string'
 import './style/SubscriptionServices.less'
 import SubscriptServiceModal from './SubscriptServiceModal'
 import { subscribableServices } from '../../../../actions/CSB/instanceService'
-import { formatDate, toQuerystring } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
 import { CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
@@ -36,7 +35,7 @@ class SubscriptionServices extends React.Component {
   }
 
   componentWillMount() {
-    this.loadData()
+    this.loadData({}, true)
   }
 
   closeSubscriptServiceModal = () => {
@@ -45,7 +44,7 @@ class SubscriptionServices extends React.Component {
     })
   }
 
-  loadData = query => {
+  loadData = (query, isFirst) => {
     const { subscribableServices, match, location, history } = this.props
     const { instanceID } = match.params
     const { name } = this.state
@@ -56,9 +55,7 @@ class SubscriptionServices extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     subscribableServices(instanceID, mergeQuery(query))
   }
 

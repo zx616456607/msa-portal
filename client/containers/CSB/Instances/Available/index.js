@@ -13,7 +13,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import isEqual from 'lodash/isEqual'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
 import { Button, Input, Icon, Card, Table, Pagination, notification } from 'antd'
@@ -33,9 +32,9 @@ import {
 import {
   formatDate,
   renderInstanceRole,
-  toQuerystring,
   formatFilterConditions,
   formatRole,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
 import './style/index.less'
 
@@ -60,19 +59,17 @@ class AvailableInstances extends React.Component {
       name,
       sortOrder,
       filteredValue,
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
-  loadData = query => {
+  loadData = (query, isFirst) => {
     const { getInstances, location, history } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
     if (query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 

@@ -18,14 +18,13 @@ import {
 } from 'antd'
 import './style/PublicServices.less'
 import { connect } from 'react-redux'
-import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import ServiceApiDoc from '../MySubscribedService/ServiceApIDoc'
 import {
   formatDate,
-  toQuerystring,
   parseOrderToQuery,
   parseQueryToSortorder,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
 import { getPublicServiceList } from '../../../../actions/CSB/instanceService/publicService'
 import { publicServiceSlt } from '../../../../selectors/CSB/instanceService/publicService'
@@ -48,10 +47,10 @@ class PublicServices extends React.Component {
     const { name } = query
     this.setState({
       name,
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
-  loadData = (query = {}) => {
+  loadData = (query = {}, isFirst) => {
     const { location, history, getPublicServiceList, instanceID } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, {
@@ -60,9 +59,7 @@ class PublicServices extends React.Component {
     if (query.page && query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getPublicServiceList(instanceID, query)
   }
 

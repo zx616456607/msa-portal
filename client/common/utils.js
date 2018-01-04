@@ -386,3 +386,37 @@ export function parseQueryToSortorder(sortObj = {}, query = {}) {
   sortObj[columnName] = order
   return sortObj
 }
+
+/**
+ * is query equal
+ *
+ * @export
+ * @param {object} q1 query
+ * @param {object} q2 another query
+ * @return {bool} is equal
+ */
+export function isQueryEqual(q1, q2) {
+  return toQuerystring(q1) === toQuerystring(q2)
+}
+
+/**
+ * handle history for loadData
+ *
+ * @export
+ * @param {object} history history in container props
+ * @param {object} mergedQuery merged query for loadData
+ * @param {object} location location in container props
+ * @param {bool} isFirstLoad if first loadData in componentWillMount or componentDidMount
+ */
+export function handleHistoryForLoadData(history, mergedQuery, location, isFirstLoad) {
+  const { query, pathname } = location
+  if (isQueryEqual(mergedQuery, query)) {
+    return
+  }
+  const path = `${pathname}?${toQuerystring(mergedQuery)}`
+  if (isFirstLoad) {
+    history.replace(path)
+    return
+  }
+  history.push(path)
+}

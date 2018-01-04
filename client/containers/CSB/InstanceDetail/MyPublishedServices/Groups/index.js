@@ -14,7 +14,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
-import isEqual from 'lodash/isEqual'
 import {
   Button, Select, Input, Pagination, Table, Menu, Dropdown,
   Modal, notification, Badge,
@@ -25,9 +24,9 @@ import CreateServiceGroupModal from './CreateServiceGroupModal'
 import ServiceOrGroupSwitch from '../ServiceOrGroupSwitch'
 import {
   formatDate,
-  toQuerystring,
   parseQueryToSortorder,
   parseOrderToQuery,
+  handleHistoryForLoadData,
 } from '../../../../../common/utils'
 import {
   CSB_INSTANCE_SERVICE_STATUS_RUNNING,
@@ -78,19 +77,25 @@ class MyPublishedServiceGroups extends React.Component {
     this.setState({
       searchType,
       name: name || serviceName,
-    })
-    this.loadData()
+    }, () => this.loadData({}, true))
   }
 
-  loadData = query => {
+  getSearchQuery = name => {
+    const { searchType } = this.state
+    name = name || this.state.name
+    return {
+      name: searchType === 'name' && name || '',
+      serviceName: searchType === 'serviceName' && name || '',
+    }
+  }
+
+  loadData = (query, isFirst) => {
     const { getGroups, instanceID, location, history } = this.props
-    query = Object.assign({}, location.query, { name }, query)
+    query = Object.assign({}, location.query, this.getSearchQuery(), query)
     if (query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getGroups(instanceID, mergeQuery(query))
   }
 
@@ -334,11 +339,7 @@ class MyPublishedServiceGroups extends React.Component {
           className="search-input"
           onChange={e => this.setState({ name: e.target.value })}
           onSearch={
-            name => this.loadData({
-              name: searchType === 'name' && name || '',
-              serviceName: searchType === 'serviceName' && name || '',
-              page: 1,
-            })
+            name => this.loadData(Object.assign({}, this.getSearchQuery(name), { page: 1 }))
           }
           value={this.state.name}
         />

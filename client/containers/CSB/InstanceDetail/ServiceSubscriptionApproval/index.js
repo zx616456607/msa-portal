@@ -28,11 +28,10 @@ import {
 } from '../../../../selectors/CSB/instanceService/serviceSubscribeApprove'
 import {
   formatDate,
-  toQuerystring,
   parseOrderToQuery,
   parseQueryToSortorder,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
-import isEqual from 'lodash/isEqual'
 import { parse as parseQuerystring } from 'query-string'
 import ApproveService from './ApproveService'
 import { renderCSBInstanceServiceApproveStatus } from '../../../../components/utils/index'
@@ -58,7 +57,7 @@ class ServiceSubscriptionApproval extends React.Component {
     this.setState({
       serviceName,
       requestStatus: this.renderStatus(requestStatus),
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
   renderStatus = requestStatus => {
@@ -115,7 +114,7 @@ class ServiceSubscriptionApproval extends React.Component {
     })
   }
 
-  loadData = (query = {}) => {
+  loadData = (query = {}, isFirst) => {
     const { getServiceSubscribeApproveList, instanceID, location, history } = this.props
     const { serviceName, requestStatus } = this.state
     query = Object.assign({}, { view: 'publisher' }, location.query,
@@ -125,9 +124,7 @@ class ServiceSubscriptionApproval extends React.Component {
     if (query.page && query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getServiceSubscribeApproveList(instanceID, query)
   }
 

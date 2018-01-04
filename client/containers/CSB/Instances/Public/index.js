@@ -28,9 +28,8 @@ import { connect } from 'react-redux'
 import { formatDate } from '../../../../common/utils'
 import { CSB_PUBLIC_INSTANCES_FLAG, UNUSED_CLUSTER_ID } from '../../../../constants/index'
 import {
-  toQuerystring,
+  handleHistoryForLoadData,
 } from '../../../../common/utils'
-import isEqual from 'lodash/isEqual'
 
 const Search = Input.Search
 const pubInstancesSlt = instancesSltMaker(CSB_PUBLIC_INSTANCES_FLAG)
@@ -53,7 +52,7 @@ class PublicInstances extends React.Component {
     this.setState({
       name,
       sortOrder,
-    }, this.loadData)
+    }, () => this.loadData({}, true))
   }
 
   componentWillMount() {
@@ -75,16 +74,14 @@ class PublicInstances extends React.Component {
     }
   }
 
-  loadData = query => {
+  loadData = (query, isFirst) => {
     const { getInstances, history, location } = this.props
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
     if (query.page === 1) {
       delete query.page
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 

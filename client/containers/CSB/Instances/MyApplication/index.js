@@ -10,7 +10,6 @@
  * @author zhaoyb
  */
 import React from 'react'
-import isEqual from 'lodash/isEqual'
 import isEmpty from 'lodash/isEmpty'
 import difference from 'lodash/difference'
 import { connect } from 'react-redux'
@@ -20,7 +19,12 @@ import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
 import CSBApplyStatus from '../../../../components/CSBApplyStatus'
 import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
-import { renderInstanceRole, toQuerystring, formatDate } from '../../../../common/utils'
+import {
+  renderInstanceRole,
+  toQuerystring,
+  formatDate,
+  handleHistoryForLoadData,
+} from '../../../../common/utils'
 import { loadApply, removeApply } from '../../../../actions/CSB/myApplication'
 import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/apply'
 import confirm from '../../../../components/Modal/confirm'
@@ -30,6 +34,7 @@ import { applyforInstance, abandonInstance } from '../../../../actions/CSB/insta
 const applysSlt = csbApplySltMaker(CSB_APPLY_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_APPLY_FLAG)
 const Search = Input.Search
+
 class MyApplication extends React.Component {
   state = {
     id: '',
@@ -51,10 +56,10 @@ class MyApplication extends React.Component {
   }
 
   componentWillMount() {
-    this.loadData()
+    this.loadData({}, true)
   }
 
-  loadData = query => {
+  loadData = (query, isFirst) => {
     const { loadApply, history } = this.props
     const { name, sort, filter } = this.state
     query = Object.assign({}, location.query, { name, sort, filter }, query)
@@ -70,9 +75,7 @@ class MyApplication extends React.Component {
     if (query.filter === '') {
       delete query.filter
     }
-    if (!isEqual(query, location.query)) {
-      history.push(`${location.pathname}?${toQuerystring(query)}`)
-    }
+    handleHistoryForLoadData(history, query, location, isFirst)
     loadApply(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
 
