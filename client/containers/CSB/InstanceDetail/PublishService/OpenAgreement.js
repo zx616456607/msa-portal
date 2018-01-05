@@ -74,13 +74,13 @@ export default class OpenAgreement extends React.Component {
           label="开放地址"
         >
           {getFieldDecorator('openUrl', {
-            initialValue: serviceProtocol === 'WebService' ? null : openUrlBefore,
+            initialValue: serviceProtocol === 'soap' ? null : openUrlBefore,
             rules: [{
               required: true,
               message: '输入自定义地址!',
             }],
           })(
-            serviceProtocol === 'WebService'
+            serviceProtocol === 'soap'
               ? <Input
                 addonBefore={openUrlBefore}
                 placeholder="输入自定义地址"
@@ -114,7 +114,7 @@ export default class OpenAgreement extends React.Component {
           )}
         </FormItem>
         {/*
-          serviceProtocol === 'Restful-API' &&
+          serviceProtocol === 'rest' &&
           <FormItem
             {...formItemLayout}
             label="Restful Path"

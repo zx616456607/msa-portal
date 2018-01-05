@@ -21,6 +21,9 @@ import {
   URL_REG,
 } from '../../../../../constants'
 import {
+  getCSBServiceOpenType,
+} from '../../../../../common/utils'
+import {
   pingService,
 } from '../../../../../actions/CSB/instanceService'
 import './style/index.less'
@@ -84,14 +87,32 @@ class AccessAgreement extends React.Component {
     const { getFieldValue } = this.props.form
     switch (getFieldValue('serviceRoutingStrategy')) {
       case 'route1':
-        return '直接路由是指直接接入，不需要路由；只能选择一种接入协议或一个接入地址，根据该协议所支持的开放接口协议，选择要开放的协议（可以选一个或者多个）。'
+        return '直接路由是指直接接入，不需要路由；只能选择一种接入协议或一个接入地址，根据该协议所支持的开放接口协议，选择要开放的协议（可以选一个或者多个）'
       case 'route2':
-        return '基于内容的路由是指，根据接入请求的参数值的不同，设置路由条件，路由到多个不同的后端接入地址；该路由方式仅支持开放支持 Restful 协议类型。'
+        return '基于内容的路由是指，根据接入请求的参数值的不同，设置路由条件，路由到多个不同的后端接入地址；该路由方式仅支持开放支持 Restful 协议类型'
       case 'route3':
-        return '无条件路由是指，服务支持添加多个不同的接入地址，随机路由到其中一个地址；该路由方式仅支持开放支持 Restful 协议类型。'
+        return '无条件路由是指，服务支持添加多个不同的接入地址，随机路由到其中一个地址；该路由方式仅支持开放支持 Restful 协议类型'
       default:
         return ''
     }
+  }
+
+  getOpenUrlBefore = (ssl, type) => {
+    const { form, servicesInbounds } = this.props
+    const { getFieldDecorator } = form
+    const protocol = ssl ? 'https' : 'http'
+    let port = '-'
+    servicesInbounds.data && servicesInbounds.data.every(inbound => {
+      if (inbound.type === type) {
+        port = inbound.port
+        getFieldDecorator('inboundId', {
+          initialValue: inbound.id,
+        })
+        return false
+      }
+      return true
+    })
+    return `${protocol}://csb-service-host:${port}/`
   }
 
   render() {
@@ -108,8 +129,13 @@ class AccessAgreement extends React.Component {
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
+    const serviceProtocol = getFieldValue('serviceProtocol')
     const ssl = getFieldValue('ssl')
-    const openUrlBefore = `${ssl ? 'https' : 'http'}://csb-service-host:8086/`
+    const serviceOpenType = getCSBServiceOpenType(serviceProtocol, ssl)
+    const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
+    getFieldDecorator('type', {
+      initialValue: serviceOpenType,
+    })
     getFieldDecorator('openUrlBefore', {
       initialValue: openUrlBefore,
     })
@@ -130,8 +156,8 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup>
               <Radio value="route1">直接路由</Radio>
-              <Radio value="route2">基于内容的路由</Radio>
-              <Radio value="route3">无条件路由</Radio>
+              <Radio value="route2" disabled>基于内容的路由</Radio>
+              <Radio value="route3" disabled>无条件路由</Radio>
             </RadioGroup>
           )}
           <div className="desc-text">{this.renderServiceRoutingStrategyTips()}</div>
@@ -141,14 +167,14 @@ class AccessAgreement extends React.Component {
           label="选择一个接入协议"
         >
           {getFieldDecorator('protocol', {
-            initialValue: 'Restful-API',
+            initialValue: 'rest',
             rules: [{
               required: true, message: 'Please input protocol!',
             }],
           })(
             <RadioGroup>
-              <RadioButton value="Restful-API">Restful-API</RadioButton>
-              <RadioButton value="WebService">WebService</RadioButton>
+              <RadioButton value="rest">Restful-API</RadioButton>
+              <RadioButton value="soap">WebService</RadioButton>
             </RadioGroup>
           )}
         </FormItem>
@@ -158,14 +184,14 @@ class AccessAgreement extends React.Component {
           className="service-protocols"
         >
           {getFieldDecorator('serviceProtocol', {
-            initialValue: 'Restful-API',
+            initialValue: 'rest',
             rules: [{
               required: true,
               message: '选择协议类型!',
             }],
             onChange: e => {
               let openUrl
-              if (e.target.value === 'Restful-API') {
+              if (e.target.value === 'rest') {
                 openUrl = openUrlBefore
               }
               setFieldsValue({
@@ -174,8 +200,8 @@ class AccessAgreement extends React.Component {
             },
           })(
             <RadioGroup>
-              <Radio value="Restful-API">Restful-API</Radio>
-              <Radio value="WebService">WebService</Radio>
+              <Radio value="rest">Restful-API</Radio>
+              <Radio value="soap">WebService</Radio>
             </RadioGroup>
           )}
         </FormItem>
@@ -192,7 +218,7 @@ class AccessAgreement extends React.Component {
           <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
         {
-          (!protocol || protocol === 'Restful-API') &&
+          (!protocol || protocol === 'rest') &&
           [
             <FormItem
               {...formItemLayout}
@@ -267,28 +293,31 @@ class AccessAgreement extends React.Component {
           ]
         }
         {
-          protocol === 'WebService' &&
-          [
-            <FormItem
-              {...formItemLayout}
-              label="WSDL 地址"
-              key="wsdlAddress"
-              className="publish-service-body-wsdl-address"
+          protocol === 'soap' &&
+          <FormItem
+            {...formItemLayout}
+            label="WSDL 地址"
+            key="targetDetail"
+            className="publish-service-body-wsdl-address"
+          >
+            {getFieldDecorator('targetDetail', {
+              rules: [{
+                required: true, message: 'Please input targetDetail!',
+              }],
+            })(
+              <Input placeholder="请提供地址" />
+            )}
+            <Button
+              className="right-btn"
+              onClick={() => this.setState({ checkWSDLModalVisible: true })}
             >
-              {getFieldDecorator('wsdlAddress', {
-                rules: [{
-                  required: true, message: 'Please input wsdlAddress!',
-                }],
-              })(
-                <Input placeholder="请提供地址" />
-              )}
-              <Button
-                className="right-btn"
-                onClick={() => this.setState({ checkWSDLModalVisible: true })}
-              >
-              本地 WSDL
-              </Button>
-            </FormItem>,
+            本地 WSDL
+            </Button>
+          </FormItem>
+        }
+        {
+          protocol === 'soap' && serviceProtocol === 'rest' &&
+          [
             <FormItem
               {...formItemLayout}
               label="命名空间"
@@ -296,7 +325,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('namespace', {
                 rules: [{
-                  required: true, message: 'Please input namespace!',
+                  // required: true,
+                  message: 'Please input namespace!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -309,7 +339,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('endPointAddress', {
                 rules: [{
-                  required: true, message: 'Please input endPointAddress!',
+                  // required: true,
+                  message: 'Please input endPointAddress!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -322,7 +353,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('bindingName', {
                 rules: [{
-                  required: true, message: 'Please input bindingName!',
+                  required: true,
+                  message: 'Please input bindingName!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -335,7 +367,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('soapAction', {
                 rules: [{
-                  required: true, message: 'Please input soapAction!',
+                  // required: true,
+                  message: 'Please input soapAction!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -348,7 +381,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('methodName', {
                 rules: [{
-                  required: true, message: 'Please input methodName!',
+                  required: true,
+                  message: 'Please input methodName!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -381,7 +415,7 @@ class AccessAgreement extends React.Component {
           </FormItem>
         </Modal>
         {
-          protocol === 'WebService' && this.state.securityHeaderModalVisible &&
+          protocol === 'soap' && this.state.securityHeaderModalVisible &&
           <SecurityHeaderModal
             visible={true}
             formItemLayout={formItemLayout}

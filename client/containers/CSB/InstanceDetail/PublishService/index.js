@@ -23,6 +23,12 @@ import OpenAgreement from './OpenAgreement'
 import ParameterSetting from './ParameterSetting'
 import ServiceControl from './ServiceControl'
 import {
+  transformCSBProtocols,
+} from '../../../../common/utils'
+import {
+  getInstanceServiceInbounds,
+} from '../../../../actions/CSB/instance'
+import {
   getGroups,
 } from '../../../../actions/CSB/instanceService/group'
 import {
@@ -49,11 +55,17 @@ class PublishService extends React.Component {
 
   componentDidMount() {
     this.loadServiceGroups()
+    this.loadInstanceServiceInbound()
   }
 
   loadServiceGroups = () => {
     const { getGroups, instanceID } = this.props
     getGroups(instanceID, { size: 2000 })
+  }
+
+  loadInstanceServiceInbound = () => {
+    const { getInstanceServiceInbounds, instanceID } = this.props
+    getInstanceServiceInbounds(instanceID)
   }
 
   validateFieldsAndGoNext = currentStep => {
@@ -130,6 +142,7 @@ class PublishService extends React.Component {
         confirmLoading: true,
       })
       const {
+        protocol,
         apiGatewayLimit,
         apiGatewayLimitType,
         maxElementNameLength,
@@ -158,10 +171,10 @@ class PublishService extends React.Component {
           name: values.name,
           version: values.version,
           description: values.description,
-          type: 'rest',
-          inboundId: 'default_rest',
+          type: values.type,
+          inboundId: values.inboundId,
           accessible: values.accessible,
-          targetType: 'url',
+          targetType: protocol === 'rest' ? 'url' : 'wsdl',
           targetDetail: values.targetDetail,
           transformationType: 'direct',
           transformationDetail: '{}',
@@ -190,7 +203,10 @@ class PublishService extends React.Component {
   }
 
   render() {
-    const { serviceGroups, form, instanceID, csbInstanceServiceGroups } = this.props
+    const {
+      serviceGroups, form, instanceID, csbInstanceServiceGroups,
+      servicesInbounds,
+    } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
     const formItemLayout = {
@@ -242,6 +258,7 @@ class PublishService extends React.Component {
                   form={form}
                   formItemLayout={formItemLayout}
                   instanceID={instanceID}
+                  servicesInbounds={servicesInbounds}
                 />
                 <OpenAgreement
                   className={stepOneClassNames}
@@ -335,12 +352,12 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {protocol}
+                      {transformCSBProtocols(protocol)}
                     </div>
                   </Col>
                 </Row>
                 {
-                  (!protocol || protocol === 'Restful-API')
+                  (!protocol || protocol === 'rest')
                     ? [
                       <Row key="endpoint">
                         <Col span={8}>
@@ -451,7 +468,9 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      <Tag key={serviceProtocol} color="blue">{serviceProtocol}</Tag>
+                      <Tag key={serviceProtocol} color="blue">
+                        {transformCSBProtocols(serviceProtocol)}
+                      </Tag>
                     </div>
                   </Col>
                 </Row>
@@ -468,7 +487,7 @@ class PublishService extends React.Component {
                   </Col>
                 </Row>
                 {
-                  /* serviceProtocol.indexOf('Restful-API') > -1 &&
+                  /* serviceProtocol.indexOf('rest') > -1 &&
                   <Row>
                     <Col span={8}>
                       <div className="field-label txt-of-ellipsis">
@@ -582,10 +601,12 @@ class PublishService extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { csbInstanceServiceGroups } = state.entities
+  const { servicesInbounds } = state.CSB
   const { match } = ownProps
   const { instanceID } = match.params
   return {
     csbInstanceServiceGroups,
+    servicesInbounds: servicesInbounds && servicesInbounds[instanceID] || {},
     instanceID,
     serviceGroups: serviceGroupsSlt(state),
   }
@@ -594,4 +615,5 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   getGroups,
   createService,
+  getInstanceServiceInbounds,
 })(Form.create()(PublishService))

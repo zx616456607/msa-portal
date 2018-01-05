@@ -141,3 +141,33 @@ export const instanceOverview = (state = {}, action) => {
       return state
   }
 }
+
+export const servicesInbounds = (state = {}, action) => {
+  const { type, instanceID } = action
+  switch (type) {
+    case ActionTypes.GET_CSB_INSTANCE_SERVICE_INBOUNDS_REQUEST:
+      return {
+        ...state,
+        [instanceID]: Object.assign({}, state[instanceID], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.GET_CSB_INSTANCE_SERVICE_INBOUNDS_SUCCESS:
+      return {
+        ...state,
+        [instanceID]: {
+          isFetching: false,
+          data: action.response.result.data,
+        },
+      }
+    case ActionTypes.GET_CSB_INSTANCE_SERVICE_INBOUNDS_FAILURE:
+      return {
+        ...state,
+        [instanceID]: Object.assign({}, state[instanceID], {
+          isFetching: false,
+        }),
+      }
+    default:
+      return state
+  }
+}

@@ -257,3 +257,26 @@ const fetchGetInstanceOverview = (clusterID, instanceID) => {
 
 export const getInstanceOverview = (clusterID, instanceID) =>
   dispatch => dispatch(fetchGetInstanceOverview(clusterID, instanceID))
+
+// 获取 dsb-server 入口
+export const GET_CSB_INSTANCE_SERVICE_INBOUNDS_REQUEST = 'GET_CSB_INSTANCE_SERVICE_INBOUNDS_REQUEST'
+export const GET_CSB_INSTANCE_SERVICE_INBOUNDS_SUCCESS = 'GET_CSB_INSTANCE_SERVICE_INBOUNDS_SUCCESS'
+export const GET_CSB_INSTANCE_SERVICE_INBOUNDS_FAILURE = 'GET_CSB_INSTANCE_SERVICE_INBOUNDS_FAILURE'
+
+const fetchGetInstanceServiceInbounds = instanceID => {
+  return {
+    instanceID,
+    [CALL_API]: {
+      types: [
+        GET_CSB_INSTANCE_SERVICE_INBOUNDS_REQUEST,
+        GET_CSB_INSTANCE_SERVICE_INBOUNDS_SUCCESS,
+        GET_CSB_INSTANCE_SERVICE_INBOUNDS_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/inbounds`,
+      schema: {},
+    },
+  }
+}
+
+export const getInstanceServiceInbounds = instanceID =>
+  dispatch => dispatch(fetchGetInstanceServiceInbounds(instanceID))

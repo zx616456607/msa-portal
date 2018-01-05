@@ -420,3 +420,37 @@ export function handleHistoryForLoadData(history, mergedQuery, location, isFirst
   }
   history.push(path)
 }
+
+/**
+ * get CSB service open protocol type
+ *
+ * @export
+ * @param {string} openProtocol rest or soap
+ * @param {bool} ssl is open ssl
+ * @return {string} type
+ */
+export function getCSBServiceOpenType(openProtocol, ssl) {
+  return `${openProtocol}${ssl ? '_ssl' : ''}`
+}
+
+/**
+ * transform CSB protocols
+ *
+ * @export
+ * @param {string} protocol protocol of service
+ * @return {string} protocol
+ */
+export function transformCSBProtocols(protocol) {
+  switch (protocol) {
+    case 'rest':
+      return 'Restful-API'
+    case 'soap':
+      return 'WebService'
+    case 'Restful-API':
+      return 'rest'
+    case 'WebService':
+      return 'soap'
+    default:
+      return ''
+  }
+}
