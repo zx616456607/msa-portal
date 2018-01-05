@@ -70,14 +70,6 @@ class MyPublishedServices extends React.Component {
     })
   }
 
-  getSearchQuery = (name, includeDeleted) => {
-    name = name || this.state.name
-    return {
-      name: name || '',
-      includeDeleted,
-    }
-  }
-
   // 加载数据
   loadData = (query, isFirst) => {
     const { getInstanceService, history, match, location } = this.props
