@@ -91,8 +91,14 @@ class MyPublishedServices extends React.Component {
     }
     delete query.includeDeleted
     handleHistoryForLoadData(history, query, location, isFirst)
-
-    getInstanceService(instanceID, mergeQuery(query))
+    getInstanceService(instanceID, mergeQuery(query)).then(res => {
+      if (res.error) {
+        return
+      }
+      const servicesIds = res.response.result.data.content
+      if (servicesIds.length === 0) { return }
+      getInstanceServiceOverview(instanceID, servicesIds)
+    })
   }
 
   // 发布服务
