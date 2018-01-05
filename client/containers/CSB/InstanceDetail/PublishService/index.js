@@ -190,7 +190,7 @@ class PublishService extends React.Component {
   }
 
   render() {
-    const { serviceGroups, form, instanceID } = this.props
+    const { serviceGroups, form, instanceID, csbInstanceServiceGroups } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
     const formItemLayout = {
@@ -307,7 +307,11 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.groupId}
+                      {
+                        csbInstanceServiceGroups
+                        && csbInstanceServiceGroups[fields.groupId]
+                        && csbInstanceServiceGroups[fields.groupId].name
+                      }
                     </div>
                   </Col>
                 </Row>
@@ -499,7 +503,47 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.apiGatewayLimit}
+                      {
+                        fields.apiGatewayLimit === 0
+                          ? '无限制'
+                          : fields.apiGatewayLimit
+                      }
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                    XML 元素名称长度
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                    最长 {fields.maxElementNameLength} 位
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                    XML 各元素属性数量
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                    最多 {fields.maxAttibuteCount} 个
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                    移除 DTDs
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.removeDTD ? '开启' : '关闭'}
                     </div>
                   </Col>
                 </Row>
@@ -537,9 +581,11 @@ class PublishService extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const { csbInstanceServiceGroups } = state.entities
   const { match } = ownProps
   const { instanceID } = match.params
   return {
+    csbInstanceServiceGroups,
     instanceID,
     serviceGroups: serviceGroupsSlt(state),
   }
