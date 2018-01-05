@@ -129,7 +129,14 @@ class PublishService extends React.Component {
       this.setState({
         confirmLoading: true,
       })
-      const { apiGatewayLimit, apiGatewayLimitType } = values
+      const {
+        apiGatewayLimit,
+        apiGatewayLimitType,
+        maxElementNameLength,
+        maxAttibuteCount,
+        removeDTD,
+      } = values
+      // 流量控制
       let limitationType = 'no_limitation'
       let limitationDetail = {}
       if (apiGatewayLimit > 0) {
@@ -138,6 +145,13 @@ class PublishService extends React.Component {
           limit: apiGatewayLimit,
           duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
         }
+      }
+      // 防止XML攻击
+      const xmlProtectionType = 'definition'
+      const xmlProtectionDetail = {
+        maxElementNameLength,
+        maxAttibuteCount,
+        removeDTD,
       }
       const body = [
         {
@@ -155,6 +169,8 @@ class PublishService extends React.Component {
           authenticationDetail: '{}',
           limitationType,
           limitationDetail: JSON.stringify(limitationDetail),
+          xmlProtectionType,
+          xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
           groupId: parseInt(values.groupId),
         },
       ]
@@ -448,7 +464,7 @@ class PublishService extends React.Component {
                   </Col>
                 </Row>
                 {
-                  serviceProtocol.indexOf('Restful-API') > -1 &&
+                  /* serviceProtocol.indexOf('Restful-API') > -1 &&
                   <Row>
                     <Col span={8}>
                       <div className="field-label txt-of-ellipsis">
@@ -460,7 +476,7 @@ class PublishService extends React.Component {
                         {fields.restfulPath}
                       </div>
                     </Col>
-                  </Row>
+                  </Row> */
                 }
                 <Row>
                   <Col span={8}>

@@ -12,13 +12,12 @@
 
 import React from 'react'
 import {
-  Form, Input, Select, Radio, Switch,
+  Form, Input, Select,
 } from 'antd'
 import ClassNames from 'classnames'
 import './style/OpenAgreement.less'
 
 const FormItem = Form.Item
-const RadioGroup = Radio.Group
 const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
@@ -27,8 +26,7 @@ export default class OpenAgreement extends React.Component {
     const { getFieldDecorator, getFieldValue } = form
     // const name = getFieldValue('name')
     // const version = getFieldValue('version')
-    const ssl = getFieldValue('ssl')
-    const openUrlBefore = `${ssl ? 'https' : 'http'}://csb-service-host:60080/`
+    const openUrlBefore = getFieldValue('openUrlBefore')
     /* if (name) {
       openUrlBefore += `${name}/`
     } else {
@@ -46,7 +44,7 @@ export default class OpenAgreement extends React.Component {
     })
     return (
       <div className={classNames}>
-        <div className="second-title">服务开放协议配置</div>
+        <div className="second-title">服务开放配置</div>
         <FormItem
           {...formItemLayout}
           label="服务名称"
@@ -75,17 +73,20 @@ export default class OpenAgreement extends React.Component {
           {...formItemLayout}
           label="开放地址"
         >
-          {serviceProtocol === 'WebService' ? getFieldDecorator('openUrl', {
+          {getFieldDecorator('openUrl', {
+            initialValue: serviceProtocol === 'WebService' ? null : openUrlBefore,
             rules: [{
-              required: true, message: '输入自定义地址!',
+              required: true,
+              message: '输入自定义地址!',
             }],
           })(
-            <Input
-              addonBefore={openUrlBefore}
-              placeholder="输入自定义地址"
-            />
-          ) : <Input value={openUrlBefore} />
-          }
+            serviceProtocol === 'WebService'
+              ? <Input
+                addonBefore={openUrlBefore}
+                placeholder="输入自定义地址"
+              />
+              : <Input readOnly />
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}
@@ -111,36 +112,6 @@ export default class OpenAgreement extends React.Component {
           {getFieldDecorator('description')(
             <Input.TextArea placeholder="请输入描述，支持1-128个汉字或字符" />
           )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="选择服务开放接口"
-          className="service-protocols"
-        >
-          {getFieldDecorator('serviceProtocol', {
-            initialValue: 'Restful-API',
-            rules: [{
-              required: true,
-              message: '选择协议类型!',
-            }],
-          })(
-            <RadioGroup>
-              <Radio value="Restful-API">Restful-API</Radio>
-              <Radio value="WebService">WebService</Radio>
-            </RadioGroup>
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="SSL 加密"
-          className="service-ssl"
-        >
-          {getFieldDecorator('ssl', {
-            valuePropName: 'checked',
-          })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
-          )}
-          <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
         {/*
           serviceProtocol === 'Restful-API' &&

@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {
-  Form, Input, Radio, Select, Button, Modal,
+  Form, Input, Radio, Select, Button, Modal, Switch,
 } from 'antd'
 import ClassNames from 'classnames'
 import SecurityHeaderModal from './SecurityHeaderModal'
@@ -83,7 +83,7 @@ class AccessAgreement extends React.Component {
   render() {
     const { formItemLayout, form, className } = this.props
     const { pingSuccess } = this.state
-    const { getFieldDecorator, getFieldValue } = form
+    const { getFieldDecorator, getFieldValue, setFieldsValue } = form
     const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
@@ -94,9 +94,14 @@ class AccessAgreement extends React.Component {
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
+    const ssl = getFieldValue('ssl')
+    const openUrlBefore = `${ssl ? 'https' : 'http'}://csb-service-host:8086/`
+    getFieldDecorator('openUrlBefore', {
+      initialValue: openUrlBefore,
+    })
     return (
       <div className={classNames}>
-        <div className="second-title">服务接入协议配置</div>
+        <div className="second-title">选择协议</div>
         <FormItem
           {...formItemLayout}
           label="选择一个接入协议"
@@ -112,6 +117,45 @@ class AccessAgreement extends React.Component {
               <RadioButton value="WebService">WebService</RadioButton>
             </RadioGroup>
           )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="选择服务开放接口"
+          className="service-protocols"
+        >
+          {getFieldDecorator('serviceProtocol', {
+            initialValue: 'Restful-API',
+            rules: [{
+              required: true,
+              message: '选择协议类型!',
+            }],
+            onChange: e => {
+              let openUrl
+              if (e.target.value === 'Restful-API') {
+                openUrl = openUrlBefore
+              }
+              setFieldsValue({
+                openUrl,
+              })
+            },
+          })(
+            <RadioGroup>
+              <Radio value="Restful-API">Restful-API</Radio>
+              <Radio value="WebService">WebService</Radio>
+            </RadioGroup>
+          )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="SSL 加密"
+          className="service-ssl"
+        >
+          {getFieldDecorator('ssl', {
+            valuePropName: 'checked',
+          })(
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          )}
+          <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
         {
           (!protocol || protocol === 'Restful-API') &&

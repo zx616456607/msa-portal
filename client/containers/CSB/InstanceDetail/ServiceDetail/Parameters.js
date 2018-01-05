@@ -40,14 +40,14 @@ export default class Parameters extends React.Component {
     return (
       <div className="service-parameters">
         <div className="error-code">
-          <div className="error-code-title">错误代码</div>
+          <div className="second-title">错误代码</div>
           <Table
             dataSource={errorCodeDataSource}
             columns={errorCodeColumns}
             pagination={false}
             size="middle"
           />
-          <div className="error-code-title">模拟返回结果</div>
+          <div className="second-title">模拟返回结果</div>
           <Input.TextArea />
         </div>
       </div>

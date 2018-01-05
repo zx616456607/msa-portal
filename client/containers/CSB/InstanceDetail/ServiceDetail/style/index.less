@@ -50,6 +50,7 @@
           border-radius: @border-radius-base;
           .ant-tabs-tab {
             margin-bottom: 0;
+            padding: @padding-base @padding-large;
             &:not(:last-child) {
               border-bottom: 1px @border-style-base @border-color-split;
             }
@@ -121,9 +122,6 @@
         & > * {
           margin-bottom: @padding-small;
         }
-        &-title {
-          font-size: 14px;
-        }
         .ant-table {
           .ant-table-thead, .ant-table-thead > tr > th {
             background-color: rgba(0, 0, 0, 0.05);
@@ -133,6 +131,9 @@
     }
     .service-control {
       margin-bottom: @padding-medium;
+      .row-table {
+        margin-bottom: @padding-medium;
+      }
     }
   }
   .status-icon {

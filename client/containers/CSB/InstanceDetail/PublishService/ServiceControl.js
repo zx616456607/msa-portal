@@ -31,6 +31,7 @@ export default class ServiceControl extends React.Component {
     })
     return (
       <div className={classNames}>
+        <div className="second-title">流量控制</div>
         <FormItem
           {...formItemLayout}
           label="API 流量限制"
@@ -56,14 +57,64 @@ export default class ServiceControl extends React.Component {
               {getFieldDecorator('apiGatewayLimit', {
                 initialValue: 0,
               })(
-                <InputNumber step={1} precision={0} placeholder="请填写整数" />
+                <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" />
               )}
-              次 <Tooltip title="设置为0或者为空时代表不限制访问频度">
+              次 <Tooltip title="设置为 0 或者为空时代表不限制访问频度">
                 <Icon type="question-circle-o" />
               </Tooltip>
             </Col>
           </Row>
         </FormItem>
+        <div className="second-title">防止 XML 攻击</div>
+        <FormItem
+          {...formItemLayout}
+          label="XML 元素名称长度"
+        >
+          最长
+          {getFieldDecorator('maxElementNameLength', {
+            initialValue: 1000,
+          })(
+            <InputNumber
+              style={{ width: 150 }}
+              min={1}
+              step={1}
+              precision={0}
+              placeholder="请填写整数"
+            />
+          )}
+          位
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="XML 各元素属性数量"
+        >
+          最多
+          {getFieldDecorator('maxAttibuteCount', {
+            initialValue: 1000,
+          })(
+            <InputNumber
+              style={{ width: 150 }}
+              min={1}
+              step={1}
+              precision={0}
+              placeholder="请填写整数"
+            />
+          )}
+          个
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="移除 DTDs"
+        >
+          {getFieldDecorator('removeDTD', {
+            valuePropName: 'checked',
+            initialValue: true,
+          })(
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          )}
+          <span className="desc-text">从传入的 XML 请求中移除 DTDs（文档类型定义）</span>
+        </FormItem>
+        <div className="second-title">访问控制</div>
         <FormItem
           {...formItemLayout}
           label="公开访问"
