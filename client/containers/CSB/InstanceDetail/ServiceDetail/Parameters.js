@@ -19,27 +19,22 @@ export default class Parameters extends React.Component {
   render() {
     const errorCodeDataSource = [{
       key: '1',
-      name: '胡彦斌',
-      age: 32,
-      address: '西湖区湖底公园1号',
-    }, {
-      key: '2',
-      name: '胡彦祖',
-      age: 42,
-      address: '西湖区湖底公园1号',
+      code: '401',
+      suggestion: '检查是否提供相应的授权信息',
+      comment: '访问服务时发生未授权错误',
     }]
 
     const errorCodeColumns = [{
       title: '错误代码',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'code',
+      key: 'code',
     }, {
       title: '处置建议',
-      dataIndex: 'age',
-      key: 'age',
+      dataIndex: 'suggestion',
+      key: 'suggestion',
     }, {
       title: '说明',
-      dataIndex: 'address',
+      dataIndex: 'comment',
       key: 'address',
     }]
     return (
