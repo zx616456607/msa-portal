@@ -28,13 +28,30 @@ import { getInstanceByID } from '../../../actions/CSB/instance'
 import './style/index.less'
 
 class CSBInstanceDetail extends React.Component {
+  state = {
+    error: null,
+  }
+
   componentDidMount() {
     const { instanceID, getInstanceByID } = this.props
-    getInstanceByID(UNUSED_CLUSTER_ID, instanceID)
+    getInstanceByID(UNUSED_CLUSTER_ID, instanceID).then(res => {
+      if (res.error) {
+        this.setState({
+          error: res.error,
+        })
+      }
+    })
   }
 
   renderChildren = () => {
-    const { children, currentInstance } = this.props
+    const { children, currentInstance, location } = this.props
+    if (this.state.error) {
+      return <div className="loading">
+        加载实例信息失败，请
+        <a href={location.pathname}>刷新重试</a>
+        或联系管理员。
+      </div>
+    }
     if (!currentInstance) {
       return renderLoading('加载实例中 ...')
     }
@@ -50,6 +67,9 @@ class CSBInstanceDetail extends React.Component {
 
   render() {
     const { location, instanceID, currentInstance } = this.props
+    const instanceName = currentInstance
+      && currentInstance.instance
+      && currentInstance.instance.name
     const menus = [
       {
         to: `/csb-instances-available/${instanceID}`,
@@ -114,7 +134,9 @@ class CSBInstanceDetail extends React.Component {
           <Breadcrumb.Item>
             <Link to="/csb-instances">CSB 实例列表</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>CSB 实例详情</Breadcrumb.Item>
+          <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
+            {instanceName || '...'}
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Layout>
           <Sider extra={false}>
