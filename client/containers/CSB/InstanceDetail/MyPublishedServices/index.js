@@ -48,7 +48,14 @@ class MyPublishedServices extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData({}, true)
+    const { location } = this.props
+    const { query } = location
+    const { name } = query
+    this.setState({
+      name,
+    }, () => {
+      this.loadData({}, true)
+    })
   }
 
   openCreateServiceGroupModal = () => {
@@ -63,15 +70,20 @@ class MyPublishedServices extends React.Component {
     })
   }
 
+  getSearchQuery = (name, includeDeleted) => {
+    name = name || this.state.name
+    return {
+      name: name || '',
+      includeDeleted,
+    }
+  }
+
   // 加载数据
   loadData = (query, isFirst) => {
-    const { getInstanceService, getInstanceServiceOverview, history, match } = this.props
+    const { getInstanceService, history, match, location } = this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
-    if (query.name === '') {
-      delete query.name
-    }
     if (query.page === 1) {
       delete query.page
     }
@@ -87,16 +99,8 @@ class MyPublishedServices extends React.Component {
     }
     delete query.includeDeleted
     handleHistoryForLoadData(history, query, location, isFirst)
-    getInstanceService(instanceID, mergeQuery(query)).then(res => {
-      if (res.error) {
-        return
-      }
-      const servicesIds = res.response.result.data.content
-      if (servicesIds.length === 0) {
-        return
-      }
-      getInstanceServiceOverview(instanceID, servicesIds)
-    })
+
+    getInstanceService(instanceID, mergeQuery(query))
   }
 
   // 发布服务
@@ -110,7 +114,7 @@ class MyPublishedServices extends React.Component {
     const { myPublished, match, history, instanceID, location } = this.props
     const { content, size, isFetching, totalElements } = myPublished
     const { query } = location
-    const { includeDeleted } = this.state
+    const { includeDeleted, name } = this.state
     const paginationProps = {
       simple: true,
       pageSize: size || 10,
@@ -146,12 +150,12 @@ class MyPublishedServices extends React.Component {
           <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
             创建服务组
           </Button>
-          <Button icon="sync" onClick={() => this.loadData()}>刷新</Button>
+          <Button icon="sync" onClick={this.loadData.bind(this, null)}>刷新</Button>
           <Search
             placeholder="按服务名称搜索"
             className="search-input"
             onChange={e => this.setState({ name: e.target.value })}
-            onSearch={name => this.loadData({ name, page: 1 })}
+            onSearch={() => this.loadData({ name, page: 1 })}
             value={this.state.name}
           />
           {
