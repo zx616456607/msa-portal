@@ -40,12 +40,12 @@ export default class Control extends React.Component {
           <div className="second-title">流量控制</div>
           <div className="row-table">
             <Row>
-              <Col span={4}>
+              <Col span={6}>
                 <div className="txt-of-ellipsis">
                 每{limitationUnit}最大调用量
                 </div>
               </Col>
-              <Col span={20}>
+              <Col span={18}>
                 <div className="txt-of-ellipsis">
                   { limit ? limit : '无限制' }
                 </div>
@@ -55,30 +55,30 @@ export default class Control extends React.Component {
           <div className="second-title">防止 XML 攻击</div>
           <div className="row-table">
             <Row>
-              <Col span={4}>
+              <Col span={6}>
                 <div className="txt-of-ellipsis">XML 元素名称长度</div>
               </Col>
-              <Col span={20}>
+              <Col span={18}>
                 <div className="txt-of-ellipsis">
                 最长 {maxElementNameLength} 位
                 </div>
               </Col>
             </Row>
             <Row>
-              <Col span={4}>
+              <Col span={6}>
                 <div className="txt-of-ellipsis">XML 各元素属性数量</div>
               </Col>
-              <Col span={20}>
+              <Col span={18}>
                 <div className="txt-of-ellipsis">
                 最多 {maxAttibuteCount} 个
                 </div>
               </Col>
             </Row>
             <Row>
-              <Col span={4}>
+              <Col span={6}>
                 <div className="txt-of-ellipsis">移除 DTDs</div>
               </Col>
-              <Col span={20}>
+              <Col span={18}>
                 <div className="txt-of-ellipsis">
                   { removeDTD ? '开启' : '关闭' }
                 </div>
@@ -88,10 +88,10 @@ export default class Control extends React.Component {
           <div className="second-title">访问控制</div>
           <div className="row-table">
             <Row>
-              <Col span={4}>
+              <Col span={6}>
                 <div className="txt-of-ellipsis">允许不授权访问</div>
               </Col>
-              <Col span={20}>
+              <Col span={18}>
                 <div className="txt-of-ellipsis">
                   { detail.accessible ? '允许' : '不允许' }
                 </div>

@@ -87,19 +87,7 @@ const callApi = (endpoint, options, schema) => {
             message: message || statusText,
           }
         }
-
-        // format error message
-        let errorMsg = message || statusText
-        console.log('errorMsg------')
-        console.log(errorMsg)
-        switch (errorMsg) {
-          case 'Failed to fetch':
-            errorMsg = '网络异常'
-            break
-          default:
-            break
-        }
-
+        const errorMsg = message || statusText
         const error = new Error(errorMsg)
         error.status = status
         return Promise.reject(error)

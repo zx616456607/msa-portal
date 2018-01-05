@@ -29,8 +29,8 @@ export default class ServiceControl extends React.Component {
       'service-control': true,
       [className]: !!className,
     })
-    return (
-      <div className={classNames}>
+    return [
+      <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
         <FormItem
           {...formItemLayout}
@@ -65,6 +65,8 @@ export default class ServiceControl extends React.Component {
             </Col>
           </Row>
         </FormItem>
+      </div>,
+      <div className={classNames} key="xml">
         <div className="second-title">防止 XML 攻击</div>
         <FormItem
           {...formItemLayout}
@@ -114,6 +116,8 @@ export default class ServiceControl extends React.Component {
           )}
           <span className="desc-text">从传入的 XML 请求中移除 DTDs（文档类型定义）</span>
         </FormItem>
+      </div>,
+      <div className={classNames} key="access">
         <div className="second-title">访问控制</div>
         <FormItem
           {...formItemLayout}
@@ -138,7 +142,7 @@ export default class ServiceControl extends React.Component {
           )}
           <span className="desc-text">开启后，可设置谁可以看到并订阅消费该API</span>
         </FormItem> */}
-      </div>
-    )
+      </div>,
+    ]
   }
 }

@@ -22,13 +22,17 @@ export default class Protocols extends React.Component {
       <div className="service-protocols">
         <div className="service-protocols-body row-table">
           <Row>
-            <Col span={4}>接入接口协议</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">接入接口协议</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 {detail.type}
               </div>
             </Col>
-            <Col span={4}>开放接口协议</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">开放接口协议</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 {
@@ -39,13 +43,17 @@ export default class Protocols extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col span={4}>端点</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">端点</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 {detail.targetDetail}
               </div>
             </Col>
-            <Col span={4}>开放地址</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">开放地址</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 --
@@ -53,13 +61,17 @@ export default class Protocols extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col span={4}>请求格式</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">请求格式</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 --
               </div>
             </Col>
-            <Col span={4}>方法</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">方法</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 --
@@ -67,13 +79,17 @@ export default class Protocols extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col span={4}>消息格式转换</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">消息格式转换</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 --
               </div>
             </Col>
-            <Col span={4}>响应格式</Col>
+            <Col span={4}>
+              <div className="txt-of-ellipsis">响应格式</div>
+            </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 --

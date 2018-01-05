@@ -80,6 +80,20 @@ class AccessAgreement extends React.Component {
     }
   }
 
+  renderServiceRoutingStrategyTips = () => {
+    const { getFieldValue } = this.props.form
+    switch (getFieldValue('serviceRoutingStrategy')) {
+      case 'route1':
+        return '直接路由是指直接接入，不需要路由；只能选择一种接入协议或一个接入地址，根据该协议所支持的开放接口协议，选择要开放的协议（可以选一个或者多个）。'
+      case 'route2':
+        return '基于内容的路由是指，根据接入请求的参数值的不同，设置路由条件，路由到多个不同的后端接入地址；该路由方式仅支持开放支持 Restful 协议类型。'
+      case 'route3':
+        return '无条件路由是指，服务支持添加多个不同的接入地址，随机路由到其中一个地址；该路由方式仅支持开放支持 Restful 协议类型。'
+      default:
+        return ''
+    }
+  }
+
   render() {
     const { formItemLayout, form, className } = this.props
     const { pingSuccess } = this.state
@@ -101,7 +115,27 @@ class AccessAgreement extends React.Component {
     })
     return (
       <div className={classNames}>
-        <div className="second-title">选择协议</div>
+        <div className="second-title">选择协议及接入配置</div>
+        <FormItem
+          {...formItemLayout}
+          label="选择路由策略"
+          className="service-routing-strategy"
+        >
+          {getFieldDecorator('serviceRoutingStrategy', {
+            initialValue: 'route1',
+            rules: [{
+              required: true,
+              message: '选择路由策略!',
+            }],
+          })(
+            <RadioGroup>
+              <Radio value="route1">直接路由</Radio>
+              <Radio value="route2">基于内容的路由</Radio>
+              <Radio value="route3">无条件路由</Radio>
+            </RadioGroup>
+          )}
+          <div className="desc-text">{this.renderServiceRoutingStrategyTips()}</div>
+        </FormItem>
         <FormItem
           {...formItemLayout}
           label="选择一个接入协议"
@@ -347,9 +381,9 @@ class AccessAgreement extends React.Component {
           </FormItem>
         </Modal>
         {
-          protocol === 'WebService' &&
+          protocol === 'WebService' && this.state.securityHeaderModalVisible &&
           <SecurityHeaderModal
-            visible={this.state.securityHeaderModalVisible}
+            visible={true}
             formItemLayout={formItemLayout}
             form={form}
             onCancel={() => this.setState({ securityHeaderModalVisible: false })}
