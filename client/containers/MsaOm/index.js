@@ -22,7 +22,7 @@ import { renderMenu } from '../../components/utils'
 import { ROLE_SYS_ADMIN } from '../../constants'
 import msaComponent from '../../assets/img/msa-om/msa-component.svg'
 import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
-import csbInstancesApproval from '../../assets/img/msa-om/csb-instances-approval.svg'
+// import csbInstancesApproval from '../../assets/img/msa-om/csb-instances-approval.svg'
 
 const menus = [
   {
@@ -35,6 +35,30 @@ const menus = [
     ),
   },
   {
+    type: 'SubMenu',
+    text: 'CSB 运维',
+    icon: (
+      <svg className="menu-icon">
+        <use xlinkHref={`#${csbInstancesOm.id}`} />
+      </svg>
+    ),
+    key: 'msa-om-csb',
+    children: [
+      {
+        to: '/msa-om/csb-instance-om',
+        text: '实例列表',
+      },
+      {
+        to: '/msa-om/csb-instance-approval',
+        text: '实例审批',
+      },
+      {
+        to: '/msa-om/csb-cascading-link-rules',
+        text: '级联链路规则',
+      },
+    ],
+  },
+  /* {
     to: '/msa-om/csb-instance-om',
     text: 'CSB 实例运维',
     icon: (
@@ -51,7 +75,7 @@ const menus = [
         <use xlinkHref={`#${csbInstancesApproval.id}`} />
       </svg>
     ),
-  },
+  }, */
   {
     to: '/msa-om/log',
     text: '日志查询',
@@ -95,6 +119,7 @@ class MsaOm extends React.Component {
           >
             <Menu mode="inline"
               defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
+              defaultOpenKeys={[ 'msa-om-csb' ]}
             >
               {
                 menus.map(renderMenu)
