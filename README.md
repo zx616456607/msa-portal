@@ -146,8 +146,8 @@ docker run --name msa-portal \
 ```
 
 ### 调试工具
-* [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
-* [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+* [React Developer Tools](https://173app.com/apps/fmkadmapgofadopljbjfkapdkoienihi)
+* [Redux DevTools](https://173app.com/apps/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
 ### FAQ
 #### 1.认证失败怎么办？
