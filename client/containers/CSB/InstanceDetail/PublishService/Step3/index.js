@@ -97,25 +97,21 @@ class Step3 extends React.Component {
           groupId: parseInt(values.groupId),
         },
       ]
-      try {
-        // soap 转 rest
-        if (protocol === 'soap' && openProtocol === 'rest') {
-          // uploadMsgConverters
-        }
-        const res = await createService(instanceID, body)
-        this.setState({
-          confirmLoading: false,
-        })
-        if (res.error) {
-          return
-        }
-        notification.success({
-          message: '创建服务成功',
-        })
-        history.push(`/csb-instances-available/${instanceID}/my-published-services`)
-      } catch (error) {
-        //
+      // soap 转 rest
+      if (protocol === 'soap' && openProtocol === 'rest') {
+        // uploadMsgConverters
       }
+      const res = await createService(instanceID, body)
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '创建服务成功',
+      })
+      history.push(`/csb-instances-available/${instanceID}/my-published-services`)
     })
   }
 
