@@ -19,9 +19,47 @@ import AccessAgreement from './AccessAgreement/'
 import OpenAgreement from './OpenAgreement'
 
 export default class Step1 extends React.Component {
+  getValidateFields = () => {
+    const { form } = this.props
+    const { getFieldsValue } = form
+    let fields = [
+      'protocol', 'openProtocol', 'targetDetail', 'name', 'version',
+      'openUrl', 'groupId',
+    ]
+    const { protocol, openProtocol } = getFieldsValue()
+    const transformationType = `${protocol}_to_${openProtocol}`
+    switch (transformationType) {
+      case 'rest_to_rest':
+        fields = fields.concat([
+          'targetDetail', 'method',
+        ])
+        break
+      case 'rest_to_soap':
+        fields = fields.concat([])
+        break
+      case 'soap_to_rest':
+        fields = fields.concat([
+          'bindingName', 'operationName',
+        ])
+        break
+      case 'soap_to_soap':
+        fields = fields.concat([])
+        break
+      default:
+        break
+    }
+    return fields
+  }
+
   validateFieldsAndGoNext = () => {
-    const { changeStep } = this.props
-    changeStep(1)
+    const { form, changeStep } = this.props
+    const { validateFieldsAndScroll } = form
+    validateFieldsAndScroll(this.getValidateFields(), errors => {
+      if (errors) {
+        return
+      }
+      changeStep(1)
+    })
   }
 
   render() {

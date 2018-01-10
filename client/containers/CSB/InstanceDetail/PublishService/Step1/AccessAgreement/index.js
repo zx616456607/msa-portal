@@ -151,7 +151,7 @@ class AccessAgreement extends React.Component {
             initialValue: 'route1',
             rules: [{
               required: true,
-              message: '选择路由策略!',
+              message: '选择路由策略',
             }],
           })(
             <RadioGroup>
@@ -169,7 +169,7 @@ class AccessAgreement extends React.Component {
           {getFieldDecorator('protocol', {
             initialValue: 'rest',
             rules: [{
-              required: true, message: 'Please input protocol!',
+              required: true, message: 'Please input protocol',
             }],
           })(
             <RadioGroup>
@@ -187,7 +187,7 @@ class AccessAgreement extends React.Component {
             initialValue: 'rest',
             rules: [{
               required: true,
-              message: '选择协议类型!',
+              message: '选择协议类型',
             }],
             onChange: e => {
               let openUrl
@@ -252,7 +252,8 @@ class AccessAgreement extends React.Component {
             >
               {getFieldDecorator('method', {
                 rules: [{
-                  required: true, message: 'Please input method!',
+                  required: true,
+                  message: '请选择方法',
                 }],
               })(
                 <Select placeholder="请选择方法">
@@ -302,7 +303,7 @@ class AccessAgreement extends React.Component {
           >
             {getFieldDecorator('targetDetail', {
               rules: [{
-                required: true, message: 'Please input targetDetail!',
+                required: true, message: 'Please input targetDetail',
               }],
             })(
               <Input placeholder="请提供地址" />
@@ -326,7 +327,7 @@ class AccessAgreement extends React.Component {
               {getFieldDecorator('namespace', {
                 rules: [{
                   // required: true,
-                  message: 'Please input namespace!',
+                  message: 'Please input namespace',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -340,7 +341,7 @@ class AccessAgreement extends React.Component {
               {getFieldDecorator('endPointAddress', {
                 rules: [{
                   // required: true,
-                  message: 'Please input endPointAddress!',
+                  message: 'Please input endPointAddress',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -354,7 +355,7 @@ class AccessAgreement extends React.Component {
               {getFieldDecorator('bindingName', {
                 rules: [{
                   required: true,
-                  message: 'Please input bindingName!',
+                  message: 'Please input bindingName',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -368,7 +369,7 @@ class AccessAgreement extends React.Component {
               {getFieldDecorator('soapAction', {
                 rules: [{
                   // required: true,
-                  message: 'Please input soapAction!',
+                  message: 'Please input soapAction',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
@@ -382,7 +383,7 @@ class AccessAgreement extends React.Component {
               {getFieldDecorator('operationName', {
                 rules: [{
                   required: true,
-                  message: 'Please input operationName!',
+                  message: 'Please input operationName',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />

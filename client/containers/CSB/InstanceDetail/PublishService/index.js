@@ -68,7 +68,7 @@ class PublishService extends React.Component {
   render() {
     const {
       serviceGroups, form, instanceID, csbInstanceServiceGroups,
-      servicesInbounds, history,
+      servicesInbounds, history, createService,
     } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state

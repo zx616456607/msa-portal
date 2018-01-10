@@ -51,7 +51,8 @@ export default class OpenAgreement extends React.Component {
         >
           {getFieldDecorator('name', {
             rules: [{
-              required: true, message: '输入合法的服务名!',
+              required: true,
+              message: '输入合法的服务名!',
             }],
           })(
             <Input placeholder="可由1-63个中文字符、英文字母、数字或中划线“-”组成" />
@@ -63,7 +64,8 @@ export default class OpenAgreement extends React.Component {
         >
           {getFieldDecorator('version', {
             rules: [{
-              required: true, message: '输入服务版本!',
+              required: true,
+              message: '输入服务版本!',
             }],
           })(
             <Input placeholder="自定义版本" />
@@ -95,7 +97,8 @@ export default class OpenAgreement extends React.Component {
         >
           {getFieldDecorator('groupId', {
             rules: [{
-              required: true, message: '选择服务组!',
+              required: true,
+              message: '选择服务组!',
             }],
           })(
             <Select showSearch optionFilterProp="children" placeholder="请选择">
