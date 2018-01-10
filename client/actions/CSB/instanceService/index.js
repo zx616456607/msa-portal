@@ -335,7 +335,7 @@ const fetchUploadMsgConverters = (instanceID, body) => {
         CSB_UPLOAD_MESSAGE_CONVERTERS_SUCCESS,
         CSB_UPLOAD_MESSAGE_CONVERTERS_FAILURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/message-converters`,
       options: {
         method: 'POST',
         body,

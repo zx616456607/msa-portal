@@ -13,7 +13,7 @@
 import fetch from 'isomorphic-fetch'
 import { normalize } from 'normalizr'
 import { JWT, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
-import { toQuerystring } from '../common/utils'
+import { toQuerystring, getType } from '../common/utils'
 
 const { PAAS_API_URL, PAAS_SPI_URL } = API_CONFIG
 // Fetches an API response and normalizes the result JSON according to schema.
@@ -42,7 +42,9 @@ const callApi = (endpoint, options, schema) => {
   // Other data structures need to be encoded before hand as one of these types.
   // https://github.github.io/fetch/#request-body
   const REQUEST_BODY_METHODS = [ 'POST', 'PUT', 'PATCH' ]
-  if (REQUEST_BODY_METHODS.indexOf(options.method) > -1) {
+  const bodyType = getType(options.body)
+  if (REQUEST_BODY_METHODS.indexOf(options.method) > -1
+    && (bodyType === 'object' || bodyType === 'array')) {
     if (!options.headers) options.headers = {}
     if (options.headers['Content-Type'] === undefined) {
       options.headers['Content-Type'] = CONTENT_TYPE_JSON

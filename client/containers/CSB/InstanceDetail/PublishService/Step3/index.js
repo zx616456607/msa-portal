@@ -40,7 +40,7 @@ class Step3 extends React.Component {
 
   submitService = async () => {
     const {
-      form, createService, instanceID, history,
+      form, createService, instanceID, history, uploadMsgConverters,
     } = this.props
     const { validateFieldsAndScroll } = form
     validateFieldsAndScroll(async (errors, values) => {
@@ -97,9 +97,47 @@ class Step3 extends React.Component {
           groupId: parseInt(values.groupId),
         },
       ]
+      const { requestXslt, responseXslt } = values
+      const _generatFile = (string, name) => {
+        return new File([ string ], name, { type: 'text/xml' })
+      }
       // soap 转 rest
       if (protocol === 'soap' && openProtocol === 'rest') {
-        // uploadMsgConverters
+        body[0].transformationType = `${protocol}_to_${openProtocol}`
+        const transformationDetail = {
+          requestXsltId: 4,
+          responseXsltId: 5,
+          exposedRegexPath: values.openUrl,
+          bindingName: values.bindingName,
+          operationName: values.operationName,
+          wsdl: values.targetDetail,
+        }
+        // 上传转换模板
+        const uplodaActions = []
+        // 请求转换模板
+        const reqXsltBody = new FormData()
+        reqXsltBody.append('file', _generatFile(requestXslt, 'request.xsl'))
+        reqXsltBody.append('type', 'xslt')
+        uplodaActions.push(uploadMsgConverters(instanceID, reqXsltBody))
+        // 响应转换模板
+        const resXsltBody = new FormData()
+        resXsltBody.append('file', _generatFile(responseXslt, 'response.xsl'))
+        resXsltBody.append('type', 'xslt')
+        uplodaActions.push(uploadMsgConverters(instanceID, resXsltBody))
+        const [ reqXsltResult, resXsltResult ] = await Promise.all(uplodaActions)
+        // 上传转换模板失败
+        if (reqXsltResult.error || resXsltResult.error) {
+          this.setState({
+            confirmLoading: false,
+          })
+          notification.error({
+            message: '上传转换模板失败',
+          })
+          return
+        }
+        transformationDetail.requestXsltId = reqXsltResult.response.result.data.id
+        transformationDetail.responseXsltId = resXsltResult.response.result.data.id
+        body[0].transformationDetail = JSON.stringify(transformationDetail)
       }
       const res = await createService(instanceID, body)
       this.setState({

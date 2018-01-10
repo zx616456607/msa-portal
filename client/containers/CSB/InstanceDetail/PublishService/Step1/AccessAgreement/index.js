@@ -169,7 +169,8 @@ class AccessAgreement extends React.Component {
           {getFieldDecorator('protocol', {
             initialValue: 'rest',
             rules: [{
-              required: true, message: 'Please input protocol',
+              required: true,
+              message: 'Please input protocol',
             }],
           })(
             <RadioGroup>
@@ -191,7 +192,7 @@ class AccessAgreement extends React.Component {
             }],
             onChange: e => {
               let openUrl
-              if (e.target.value === 'rest') {
+              if (!(protocol === 'soap' && e.target.value === 'rest')) {
                 openUrl = openUrlBefore
               }
               setFieldsValue({

@@ -37,6 +37,7 @@ export default class OpenAgreement extends React.Component {
     } else {
       openUrlBefore += '<服务版本>/'
     } */
+    const protocol = getFieldValue('protocol') || []
     const openProtocol = getFieldValue('openProtocol') || []
     const classNames = ClassNames({
       'open-agreement': true,
@@ -76,13 +77,15 @@ export default class OpenAgreement extends React.Component {
           label="开放地址"
         >
           {getFieldDecorator('openUrl', {
-            initialValue: openProtocol === 'soap' ? null : openUrlBefore,
+            initialValue: protocol === 'soap' && openProtocol === 'rest'
+              ? null
+              : openUrlBefore,
             rules: [{
               required: true,
               message: '输入自定义地址!',
             }],
           })(
-            openProtocol === 'soap'
+            protocol === 'soap' && openProtocol === 'rest'
               ? <Input
                 addonBefore={openUrlBefore}
                 placeholder="输入自定义地址"
