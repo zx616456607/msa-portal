@@ -102,7 +102,6 @@ class AccessAgreement extends React.Component {
     const { getFieldDecorator } = form
     const protocol = ssl ? 'https' : 'http'
     let port = '-'
-    console.log('servicesInbounds2', servicesInbounds)
     servicesInbounds.data && servicesInbounds.data.every(inbound => {
       if (inbound.type === type) {
         port = inbound.port

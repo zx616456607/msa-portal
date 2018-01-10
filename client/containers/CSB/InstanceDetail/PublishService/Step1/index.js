@@ -29,9 +29,6 @@ export default class Step1 extends React.Component {
       className, currentStep, servicesInbounds, serviceGroups, history,
       ...otherProps
     } = this.props
-    console.log('servicesInbounds', servicesInbounds)
-    console.log('serviceGroups', serviceGroups)
-    console.log('...otherProps', ...otherProps)
     const classNames = ClassNames({
       fields: true,
       [className]: !!className,
