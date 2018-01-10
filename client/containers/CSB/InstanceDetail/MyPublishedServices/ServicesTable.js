@@ -285,7 +285,7 @@ class ServicesTable extends React.Component {
   }
 
   render() {
-    const { dataSource, pageSize, total, loading, from, match, check } = this.props
+    const { dataSource, pageSize, total, loading, from, match, check, ...otherProps } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
       currentRow,
@@ -392,6 +392,7 @@ class ServicesTable extends React.Component {
           loading={loading}
           rowKey={row => row.id}
           onChange={this.handleChange}
+          {...otherProps}
         />
       </div>,
       <div key="modals">
