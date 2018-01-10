@@ -14,14 +14,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Form, Steps, Row, Col, Button, Tag, notification,
+  Form, Steps, Row, Col, Tag,
 } from 'antd'
 import ClassNames from 'classnames'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
-import AccessAgreement from './AccessAgreement/'
-import OpenAgreement from './OpenAgreement'
-import ParameterSetting from './ParameterSetting'
-import ServiceControl from './ServiceControl'
+import Step1 from './Step1'
+import Step2 from './Step2'
+import Step3 from './Step3'
 import {
   transformCSBProtocols,
 } from '../../../../common/utils'
@@ -39,12 +38,6 @@ import {
 } from '../../../../selectors/CSB/instanceService/group'
 import './style/index.less'
 
-const SECONDS_CONVERSION = {
-  second: 1,
-  minute: 60,
-  hour: 60 * 60,
-  day: 60 * 60 * 24,
-}
 const Step = Steps.Step
 
 class PublishService extends React.Component {
@@ -68,144 +61,14 @@ class PublishService extends React.Component {
     getInstanceServiceInbounds(instanceID)
   }
 
-  validateFieldsAndGoNext = currentStep => {
-    const { form } = this.props
-    const { validateFieldsAndScroll } = form
-    validateFieldsAndScroll(errors => {
-      if (errors) {
-        return
-      }
-      this.setState({ currentStep })
-    })
-  }
-
-  renderSteps = () => {
-    const { history } = this.props
-    const { currentStep, confirmLoading } = this.state
-    if (currentStep === 0) {
-      return [
-        <Button key="cancel" onClick={() => history.goBack(-1)}>取 消</Button>,
-        <Button
-          type="primary"
-          key="next"
-          onClick={this.validateFieldsAndGoNext.bind(this, 1)}
-        >
-        下一步
-        </Button>,
-      ]
-    }
-    if (currentStep === 1) {
-      return [
-        <Button
-          key="previous"
-          onClick={() => this.setState({ currentStep: 0 })}
-        >
-        上一步
-        </Button>,
-        <Button
-          type="primary"
-          key="next"
-          onClick={this.validateFieldsAndGoNext.bind(this, 2)}
-        >
-        下一步
-        </Button>,
-      ]
-    }
-    if (currentStep === 2) {
-      return [
-        <Button
-          key="previous"
-          onClick={() => this.setState({ currentStep: 1 })}
-        >
-        上一步
-        </Button>,
-        <Button
-          type="primary"
-          key="submit"
-          onClick={this.submitService}
-          loading={confirmLoading}
-        >
-        发 布
-        </Button>,
-      ]
-    }
-  }
-
-  submitService = () => {
-    const { form, createService, instanceID, history } = this.props
-    const { validateFieldsAndScroll } = form
-    validateFieldsAndScroll((errors, values) => {
-      if (errors) {
-        return
-      }
-      this.setState({
-        confirmLoading: true,
-      })
-      const {
-        protocol,
-        apiGatewayLimit,
-        apiGatewayLimitType,
-        maxElementNameLength,
-        maxAttibuteCount,
-        removeDTD,
-      } = values
-      // 流量控制
-      let limitationType = 'no_limitation'
-      let limitationDetail = {}
-      if (apiGatewayLimit > 0) {
-        limitationType = 'rate_limitation'
-        limitationDetail = {
-          limit: apiGatewayLimit,
-          duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
-        }
-      }
-      // 防止XML攻击
-      const xmlProtectionType = 'definition'
-      const xmlProtectionDetail = {
-        maxElementNameLength,
-        maxAttibuteCount,
-        removeDTD,
-      }
-      const body = [
-        {
-          name: values.name,
-          version: values.version,
-          description: values.description,
-          type: values.type,
-          inboundId: values.inboundId,
-          accessible: values.accessible,
-          targetType: protocol === 'rest' ? 'url' : 'wsdl',
-          targetDetail: values.targetDetail,
-          transformationType: 'direct',
-          transformationDetail: '{}',
-          authenticationType: 'bypass',
-          authenticationDetail: '{}',
-          limitationType,
-          limitationDetail: JSON.stringify(limitationDetail),
-          xmlProtectionType,
-          xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
-          groupId: parseInt(values.groupId),
-        },
-      ]
-      createService(instanceID, body).then(res => {
-        this.setState({
-          confirmLoading: false,
-        })
-        if (res.error) {
-          return
-        }
-        notification.success({
-          message: '创建服务成功',
-        })
-        history.push(`/csb-instances-available/${instanceID}/my-published-services`)
-      })
-    })
+  changeStep = currentStep => {
+    this.setState({ currentStep })
   }
 
   render() {
     const {
       serviceGroups, form, instanceID, csbInstanceServiceGroups,
-      servicesInbounds,
+      servicesInbounds, history,
     } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
@@ -221,7 +84,7 @@ class PublishService extends React.Component {
     }
     const fields = form.getFieldsValue()
     const protocol = fields.protocol
-    const serviceProtocol = fields.serviceProtocol || []
+    const openProtocol = fields.openProtocol
     const apiGatewayLimitType = fields.apiGatewayLimitType || API_GATEWAY_LIMIT_TYPES[0].key
     let apiGatewayLimitTypeText
     API_GATEWAY_LIMIT_TYPES.every(type => {
@@ -252,37 +115,35 @@ class PublishService extends React.Component {
               </Steps>
             </div>
             <Form className="publish-service-body">
-              <div className="fields">
-                <AccessAgreement
-                  className={stepOneClassNames}
-                  form={form}
-                  formItemLayout={formItemLayout}
-                  instanceID={instanceID}
-                  servicesInbounds={servicesInbounds}
-                />
-                <OpenAgreement
-                  className={stepOneClassNames}
-                  form={form}
-                  formItemLayout={formItemLayout}
-                  serviceGroups={content || []}
-                  instanceID={instanceID}
-                />
-                <ParameterSetting
-                  className={stepTwoClassNames}
-                  form={form}
-                  formItemLayout={formItemLayout}
-                  instanceID={instanceID}
-                />
-                <ServiceControl
-                  className={stepThreeClassNames}
-                  form={form}
-                  formItemLayout={formItemLayout}
-                  instanceID={instanceID}
-                />
-              </div>
-              <div className="btns">
-                {this.renderSteps()}
-              </div>
+              <Step1
+                className={stepOneClassNames}
+                currentStep={currentStep}
+                history={history}
+                form={form}
+                formItemLayout={formItemLayout}
+                instanceID={instanceID}
+                servicesInbounds={servicesInbounds}
+                serviceGroups={content || []}
+                changeStep={this.changeStep}
+              />
+              <Step2
+                className={stepTwoClassNames}
+                currentStep={currentStep}
+                form={form}
+                formItemLayout={formItemLayout}
+                instanceID={instanceID}
+                changeStep={this.changeStep}
+              />
+              <Step3
+                className={stepThreeClassNames}
+                currentStep={currentStep}
+                history={history}
+                createService={createService}
+                form={form}
+                formItemLayout={formItemLayout}
+                instanceID={instanceID}
+                changeStep={this.changeStep}
+              />
             </Form>
           </Col>
           <Col span={7} className="publish-service-right">
@@ -468,8 +329,8 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      <Tag key={serviceProtocol} color="blue">
-                        {transformCSBProtocols(serviceProtocol)}
+                      <Tag key={openProtocol} color="blue">
+                        {transformCSBProtocols(openProtocol)}
                       </Tag>
                     </div>
                   </Col>
@@ -487,7 +348,7 @@ class PublishService extends React.Component {
                   </Col>
                 </Row>
                 {
-                  /* serviceProtocol.indexOf('rest') > -1 &&
+                  /* openProtocol.indexOf('rest') > -1 &&
                   <Row>
                     <Col span={8}>
                       <div className="field-label txt-of-ellipsis">

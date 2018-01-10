@@ -15,7 +15,7 @@ import ClassNames from 'classnames'
 import {
   Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col,
 } from 'antd'
-import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
+import { API_GATEWAY_LIMIT_TYPES } from '../../../../../constants'
 import './style/ServiceControl.less'
 
 const FormItem = Form.Item

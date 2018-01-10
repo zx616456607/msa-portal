@@ -19,13 +19,13 @@ import ClassNames from 'classnames'
 import SecurityHeaderModal from './SecurityHeaderModal'
 import {
   URL_REG,
-} from '../../../../../constants'
+} from '../../../../../../constants'
 import {
   getCSBServiceOpenType,
-} from '../../../../../common/utils'
+} from '../../../../../../common/utils'
 import {
   pingService,
-} from '../../../../../actions/CSB/instanceService'
+} from '../../../../../../actions/CSB/instanceService'
 import './style/index.less'
 
 const FormItem = Form.Item
@@ -102,6 +102,7 @@ class AccessAgreement extends React.Component {
     const { getFieldDecorator } = form
     const protocol = ssl ? 'https' : 'http'
     let port = '-'
+    console.log('servicesInbounds2', servicesInbounds)
     servicesInbounds.data && servicesInbounds.data.every(inbound => {
       if (inbound.type === type) {
         port = inbound.port
@@ -129,9 +130,9 @@ class AccessAgreement extends React.Component {
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
-    const serviceProtocol = getFieldValue('serviceProtocol')
+    const openProtocol = getFieldValue('openProtocol')
     const ssl = getFieldValue('ssl')
-    const serviceOpenType = getCSBServiceOpenType(serviceProtocol, ssl)
+    const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
     getFieldDecorator('type', {
       initialValue: serviceOpenType,
@@ -183,7 +184,7 @@ class AccessAgreement extends React.Component {
           label="选择服务开放接口"
           className="service-protocols"
         >
-          {getFieldDecorator('serviceProtocol', {
+          {getFieldDecorator('openProtocol', {
             initialValue: 'rest',
             rules: [{
               required: true,
@@ -316,7 +317,7 @@ class AccessAgreement extends React.Component {
           </FormItem>
         }
         {
-          protocol === 'soap' && serviceProtocol === 'rest' &&
+          protocol === 'soap' && openProtocol === 'rest' &&
           [
             <FormItem
               {...formItemLayout}
@@ -377,12 +378,12 @@ class AccessAgreement extends React.Component {
             <FormItem
               {...formItemLayout}
               label="方法名称"
-              key="methodName"
+              key="operationName"
             >
-              {getFieldDecorator('methodName', {
+              {getFieldDecorator('operationName', {
                 rules: [{
                   required: true,
-                  message: 'Please input methodName!',
+                  message: 'Please input operationName!',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />

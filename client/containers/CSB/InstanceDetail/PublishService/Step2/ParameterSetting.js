@@ -197,7 +197,7 @@ export default class ParameterSetting extends React.Component {
     return (
       <div className={classNames}>
         {
-          getFieldValue('protocol') !== getFieldValue('serviceProtocol') &&
+          getFieldValue('protocol') !== getFieldValue('openProtocol') &&
           [
             <div key="title" className="second-title">参数映射</div>,
             <div key="dody" className="parameter-mapping-body">
@@ -205,7 +205,12 @@ export default class ParameterSetting extends React.Component {
                 {...formItemLayout}
                 label="请求转换模版"
               >
-                {getFieldDecorator('requestXslt')(
+                {getFieldDecorator('requestXslt', {
+                  rules: [{
+                    // required: true,
+                    message: '请提供请求转换模版!',
+                  }],
+                })(
                   <TextArea placeholder="请提供请求转换模版" />
                 )}
               </FormItem>
@@ -213,7 +218,12 @@ export default class ParameterSetting extends React.Component {
                 {...formItemLayout}
                 label="响应转换模版"
               >
-                {getFieldDecorator('responseXslt')(
+                {getFieldDecorator('responseXslt', {
+                  rules: [{
+                    // required: true,
+                    message: '请提供响应转换模版!',
+                  }],
+                })(
                   <TextArea placeholder="请提供响应转换模版" />
                 )}
               </FormItem>
