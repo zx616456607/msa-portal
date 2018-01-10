@@ -19,8 +19,19 @@ import ParameterSetting from './ParameterSetting'
 
 export default class Step2 extends React.Component {
   validateFieldsAndGoNext = () => {
-    const { changeStep } = this.props
-    changeStep(2)
+    const { form, changeStep } = this.props
+    const { getFieldsValue, validateFieldsAndScroll } = form
+    let fields = []
+    const { protocol, openProtocol } = getFieldsValue()
+    if (protocol !== openProtocol) {
+      fields = [ 'requestXslt', 'responseXslt' ]
+    }
+    validateFieldsAndScroll(fields, errors => {
+      if (errors) {
+        return
+      }
+      changeStep(2)
+    })
   }
 
   render() {

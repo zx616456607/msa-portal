@@ -12,9 +12,13 @@
 
 import React from 'react'
 import ClassNames from 'classnames'
+import { connect } from 'react-redux'
 import {
   Button, notification,
 } from 'antd'
+import {
+  createService, uploadMsgConverters,
+} from '../../../../../actions/CSB/instanceService'
 import ServiceControl from './ServiceControl'
 
 const SECONDS_CONVERSION = {
@@ -24,7 +28,7 @@ const SECONDS_CONVERSION = {
   day: 60 * 60 * 24,
 }
 
-export default class Step3 extends React.Component {
+class Step3 extends React.Component {
   state = {
     confirmLoading: false,
   }
@@ -34,10 +38,12 @@ export default class Step3 extends React.Component {
     changeStep(2)
   }
 
-  submitService = () => {
-    const { form, createService, instanceID, history } = this.props
+  submitService = async () => {
+    const {
+      form, createService, instanceID, history,
+    } = this.props
     const { validateFieldsAndScroll } = form
-    validateFieldsAndScroll((errors, values) => {
+    validateFieldsAndScroll(async (errors, values) => {
       if (errors) {
         return
       }
@@ -91,11 +97,12 @@ export default class Step3 extends React.Component {
           groupId: parseInt(values.groupId),
         },
       ]
-      // soap 转 rest
-      if (protocol === 'soap' && openProtocol === 'rest') {
-        //
-      }
-      createService(instanceID, body).then(res => {
+      try {
+        // soap 转 rest
+        if (protocol === 'soap' && openProtocol === 'rest') {
+          // uploadMsgConverters
+        }
+        const res = await createService(instanceID, body)
         this.setState({
           confirmLoading: false,
         })
@@ -106,7 +113,9 @@ export default class Step3 extends React.Component {
           message: '创建服务成功',
         })
         history.push(`/csb-instances-available/${instanceID}/my-published-services`)
-      })
+      } catch (error) {
+        //
+      }
     })
   }
 
@@ -143,3 +152,15 @@ export default class Step3 extends React.Component {
     ]
   }
 }
+
+
+const mapStateToProps = () => {
+  return {
+    //
+  }
+}
+
+export default connect(mapStateToProps, {
+  createService,
+  uploadMsgConverters,
+})(Step3)

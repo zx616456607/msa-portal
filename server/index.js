@@ -3,11 +3,11 @@
  * (C) Copyright 2017 TenxCloud. All Rights Reserved.
  */
 
-require('babel-register')({
+require('@babel/register')({
   babelrc: false,
   presets: [
     [
-      'env',
+      '@babel/env',
       {
         targets: {
           node: 'current',

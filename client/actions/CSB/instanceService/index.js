@@ -290,9 +290,6 @@ const fetchPingService = (instanceID, query) => {
         PING_CSB_INSTANCE_SERVICE_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/instances/${instanceID}/ping?${toQuerystring(query)}`,
-      /* options: {
-        method: 'OPTIONS',
-      }, */
       schema: {},
     },
   }
@@ -325,3 +322,28 @@ const fetchSubscribeService = (instanceID, body) => {
 
 export const subscribeService = (instanceID, body) =>
   dispatch => dispatch(fetchSubscribeService(instanceID, body))
+
+export const CSB_UPLOAD_MESSAGE_CONVERTERS_REQUEST = 'CSB_UPLOAD_MESSAGE_CONVERTERS_REQUEST'
+export const CSB_UPLOAD_MESSAGE_CONVERTERS_SUCCESS = 'CSB_UPLOAD_MESSAGE_CONVERTERS_SUCCESS'
+export const CSB_UPLOAD_MESSAGE_CONVERTERS_FAILURE = 'CSB_UPLOAD_MESSAGE_CONVERTERS_FAILURE'
+
+const fetchUploadMsgConverters = (instanceID, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CSB_UPLOAD_MESSAGE_CONVERTERS_REQUEST,
+        CSB_UPLOAD_MESSAGE_CONVERTERS_SUCCESS,
+        CSB_UPLOAD_MESSAGE_CONVERTERS_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const uploadMsgConverters = (instanceID, body) =>
+  dispatch => dispatch(fetchUploadMsgConverters(instanceID, body))

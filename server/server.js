@@ -11,7 +11,7 @@
  */
 
 // for webpack build backend files runtime
-import 'babel-polyfill'
+import '@babel/polyfill'
 // set root dir to global
 global.__root__dirname = __dirname
 // repalce native Promise by bluebird

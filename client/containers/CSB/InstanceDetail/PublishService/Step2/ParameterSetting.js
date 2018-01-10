@@ -207,11 +207,11 @@ export default class ParameterSetting extends React.Component {
               >
                 {getFieldDecorator('requestXslt', {
                   rules: [{
-                    // required: true,
+                    required: true,
                     message: '请提供请求转换模版!',
                   }],
                 })(
-                  <TextArea placeholder="请提供请求转换模版" />
+                  <TextArea rows={5} placeholder="请提供请求转换模版" />
                 )}
               </FormItem>
               <FormItem
@@ -220,11 +220,11 @@ export default class ParameterSetting extends React.Component {
               >
                 {getFieldDecorator('responseXslt', {
                   rules: [{
-                    // required: true,
+                    required: true,
                     message: '请提供响应转换模版!',
                   }],
                 })(
-                  <TextArea placeholder="请提供响应转换模版" />
+                  <TextArea rows={5} placeholder="请提供响应转换模版" />
                 )}
               </FormItem>
             </div>,

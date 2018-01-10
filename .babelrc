@@ -1,7 +1,7 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/env",
       {
         "targets": {
           "browsers": [
@@ -16,8 +16,8 @@
         "modules": false
       }
     ],
-    "react",
-    "stage-0"
+    "@babel/react",
+    "@babel/stage-0"
   ],
   "env": {
     "development": {
@@ -33,7 +33,7 @@
     "commonjs": {
       "presets": [
         [
-          "env",
+          "@babel/env",
           {
             "loose": true
           }
@@ -42,7 +42,7 @@
     }
   },
   "plugins": [
-    "transform-runtime",
+    "@babel/transform-runtime",
     [
       "import",
       {

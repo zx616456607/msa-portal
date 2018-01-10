@@ -10,4 +10,4 @@
  * @author zhangpc
  */
 
-import 'babel-polyfill'
+import '@babel/polyfill'

@@ -31,9 +31,6 @@ import {
   getGroups,
 } from '../../../../actions/CSB/instanceService/group'
 import {
-  createService,
-} from '../../../../actions/CSB/instanceService'
-import {
   serviceGroupsSlt,
 } from '../../../../selectors/CSB/instanceService/group'
 import './style/index.less'
@@ -68,7 +65,7 @@ class PublishService extends React.Component {
   render() {
     const {
       serviceGroups, form, instanceID, csbInstanceServiceGroups,
-      servicesInbounds, history, createService,
+      servicesInbounds, history,
     } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
@@ -138,7 +135,6 @@ class PublishService extends React.Component {
                 className={stepThreeClassNames}
                 currentStep={currentStep}
                 history={history}
-                createService={createService}
                 form={form}
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
@@ -475,6 +471,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(mapStateToProps, {
   getGroups,
-  createService,
   getInstanceServiceInbounds,
 })(Form.create()(PublishService))

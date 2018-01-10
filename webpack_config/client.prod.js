@@ -33,7 +33,7 @@ module.exports = {
       './client/entry/index.js',
     ],
     vendor: [
-      'babel-polyfill',
+      '@babel/polyfill',
       'g2',
       '@antv/g6',
       'moment',
