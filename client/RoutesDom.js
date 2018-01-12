@@ -38,6 +38,7 @@ import MsaComponents from './containers/MsaOm/Components'
 import CSBInstanceOm from './containers/MsaOm/CSBInstanceOm'
 import MsaOmCSBApproval from './containers/MsaOm/CSBApproval'
 import CSBCascadingLinkRules from './containers/MsaOm/CSBCascadingLinkRules'
+import CreateLinkRules from './containers/MsaOm/CSBCascadingLinkRules/CreateLinkRules'
 import Setting from './containers/Setting'
 import GlobalSetting from './containers/Setting/GlobalSetting'
 import ApmSetting from './containers/Setting/Apm'
@@ -252,6 +253,12 @@ export const msaOmChildRoutes = [
     component: CSBCascadingLinkRules,
     exact: true,
     key: 'csb-cascading-link-rules',
+  },
+  {
+    path: '/msa-om/csb-cascading-link-rules/create',
+    component: CreateLinkRules,
+    exact: true,
+    key: 'csb-cascading-link-rules-create',
   },
 ]
 

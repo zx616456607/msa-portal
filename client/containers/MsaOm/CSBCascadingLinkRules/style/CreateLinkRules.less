@@ -1,0 +1,79 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * CSB Create Link Rules Component
+ *
+ * 2018-1-11
+ * @author zhangcz
+ */
+@import '~assets/style/core/index.less';
+
+#create-link-rules {
+  .ant-card-body {
+    padding: 0;
+  }
+  .padding-style {
+    padding-left: 24px;
+  }
+  .ant-col-17 {
+    padding: 24px 0;
+    border-right: 1px solid @border-color-base;
+    .ant-form-item-control {
+      position: relative;
+    }
+    .reset-from-label-style {
+      .ant-form-item-required:before,
+      .ant-form-item-label label:after {
+        display: none;
+      }
+    }
+    .delete-icon-style {
+      position: absolute;
+      top: 4px;
+      right: -48px;
+    }
+    .delete-icon-style:hover {
+      color: @primary-color;
+    }
+    .add-button-style {
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    .hander-box {
+      border-top: 1px solid @border-color-base;
+      padding-top: 20px;
+      text-align: center;
+      > button:first-child {
+        margin-right: 12px;
+      }
+    }
+  }
+  .ant-col-7 {
+    padding: 24px;
+    .title {
+      margin-bottom: 16px;
+    }
+    .step-container {
+      position: relative;
+      .steps-row-style {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        margin-left: -60px;
+        .ant-steps-item {
+          width: 120px;
+        }
+        .step-dec-style {
+          height: 30px;
+        }
+        .StepIcon {
+          height: 25px;
+          width: 25px;
+        }
+      }
+    }
+  }
+}
