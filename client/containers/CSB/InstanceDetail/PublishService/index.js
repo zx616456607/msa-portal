@@ -39,7 +39,7 @@ const Step = Steps.Step
 
 class PublishService extends React.Component {
   state = {
-    currentStep: 2,
+    currentStep: 0,
     confirmLoading: false,
   }
 
