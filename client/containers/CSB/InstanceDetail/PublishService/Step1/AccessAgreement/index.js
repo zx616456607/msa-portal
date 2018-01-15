@@ -304,7 +304,10 @@ class AccessAgreement extends React.Component {
           >
             {getFieldDecorator('targetDetail', {
               rules: [{
-                required: true, message: 'Please input targetDetail',
+                required: true,
+                whitespace: true,
+                pattern: URL_REG,
+                message: 'Please input targetDetail',
               }],
             })(
               <Input placeholder="请提供地址" />

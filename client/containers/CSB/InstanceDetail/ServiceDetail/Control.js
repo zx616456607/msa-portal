@@ -28,12 +28,19 @@ export default class Control extends React.Component {
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
     const { limit, duration } = limitationDetail
     const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/))] || '秒'
-    const xmlProtectionDetail = JSON.parse(detail.xmlProtectionDetail)
+    const xmlProtectionDetail = JSON.parse(detail.xmlProtectionDetail || '{}')
     const {
       maxElementNameLength,
       maxAttibuteCount,
       removeDTD,
     } = xmlProtectionDetail
+    const oauth2Detail = JSON.parse(detail.oauth2Detail || '{}')
+    const {
+      endpoint,
+      clientId,
+      clientSecret,
+    } = oauth2Detail
+    const openOAuth = detail.oauth2Type && detail.oauth2Type !== 'no_oauth'
     return (
       <div className="service-control">
         <div className="service-control-body">
@@ -97,6 +104,63 @@ export default class Control extends React.Component {
                 </div>
               </Col>
             </Row>
+          </div>
+          <div className="second-title">OAuth 授权</div>
+          <div className="row-table">
+            <Row>
+              <Col span={6}>
+                <div className="txt-of-ellipsis">是否开启</div>
+              </Col>
+              <Col span={18}>
+                <div className="txt-of-ellipsis">
+                  { openOAuth ? '是' : '否' }
+                </div>
+              </Col>
+            </Row>
+            {
+              openOAuth && [
+                <Row key="oauth2Type">
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">授权服务中心</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      {detail.oauth2Type}
+                    </div>
+                  </Col>
+                </Row>,
+                <Row key="endpoint">
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">OAuth Server</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      {endpoint}
+                    </div>
+                  </Col>
+                </Row>,
+                <Row key="clientId">
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">OAuth ID</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      {clientId}
+                    </div>
+                  </Col>
+                </Row>,
+                <Row key="clientSecret">
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">OAuth Secret</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      {clientSecret}
+                    </div>
+                  </Col>
+                </Row>,
+              ]
+            }
           </div>
         </div>
       </div>

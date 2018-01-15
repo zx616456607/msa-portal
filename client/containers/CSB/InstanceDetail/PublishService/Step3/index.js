@@ -19,7 +19,8 @@ import {
 import {
   createService, uploadMsgConverters,
 } from '../../../../../actions/CSB/instanceService'
-import ServiceControl from './ServiceControl'
+import Control from './Control'
+import OAuth from './OAuth'
 
 const SECONDS_CONVERSION = {
   second: 1,
@@ -58,6 +59,11 @@ class Step3 extends React.Component {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
+        openOAuth,
+        oauth2Type,
+        endpoint,
+        clientId,
+        clientSecret,
       } = values
       // 流量控制
       let limitationType = 'no_limitation'
@@ -75,6 +81,15 @@ class Step3 extends React.Component {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
+      }
+      // OAuth
+      let oauth2Detail = {}
+      if (openOAuth) {
+        oauth2Detail = {
+          endpoint,
+          clientId,
+          clientSecret,
+        }
       }
       const body = [
         {
@@ -94,6 +109,8 @@ class Step3 extends React.Component {
           limitationDetail: JSON.stringify(limitationDetail),
           xmlProtectionType,
           xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
+          oauth2Type,
+          oauth2Detail: JSON.stringify(oauth2Detail),
           groupId: parseInt(values.groupId),
         },
       ]
@@ -164,7 +181,8 @@ class Step3 extends React.Component {
     })
     return [
       <div className={classNames} key="fields">
-        <ServiceControl {...otherProps} />
+        <Control {...otherProps} />
+        <OAuth {...otherProps} />
       </div>,
       currentStep === 2 &&
       <div className="btns" key="btns">

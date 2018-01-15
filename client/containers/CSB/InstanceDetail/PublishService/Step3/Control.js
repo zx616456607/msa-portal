@@ -16,12 +16,12 @@ import {
   Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col,
 } from 'antd'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../../constants'
-import './style/ServiceControl.less'
+import './style/Control.less'
 
 const FormItem = Form.Item
 const Option = Select.Option
 
-export default class ServiceControl extends React.Component {
+export default class Control extends React.Component {
   render() {
     const { className, formItemLayout, form } = this.props
     const { getFieldDecorator } = form
