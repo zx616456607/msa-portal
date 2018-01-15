@@ -63,7 +63,14 @@ class Step3 extends React.Component {
         endpoint,
         clientId,
         clientSecret,
+        errCodeKeys,
       } = values
+      // 错误代码
+      const errorCode = errCodeKeys.map(key => ({
+        code: values[`code-${key}`],
+        advice: values[`advice-${key}`],
+        description: values[`description-${key}`],
+      }))
       // 流量控制
       let limitationType = 'no_limitation'
       let limitationDetail = {}
@@ -105,6 +112,7 @@ class Step3 extends React.Component {
           transformationDetail: '{}',
           authenticationType: 'bypass',
           authenticationDetail: '{}',
+          errorCode,
           limitationType,
           limitationDetail: JSON.stringify(limitationDetail),
           xmlProtectionType,

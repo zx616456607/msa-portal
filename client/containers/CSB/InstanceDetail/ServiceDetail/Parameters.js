@@ -17,32 +17,27 @@ import {
 
 export default class Parameters extends React.Component {
   render() {
-    const errorCodeDataSource = [{
-      key: '1',
-      code: '401',
-      suggestion: '检查是否提供相应的授权信息',
-      comment: '访问服务时发生未授权错误',
-    }]
-
+    const { detail } = this.props
+    const errorCode = detail.errorCode || []
     const errorCodeColumns = [{
       title: '错误代码',
       dataIndex: 'code',
       key: 'code',
     }, {
       title: '处置建议',
-      dataIndex: 'suggestion',
-      key: 'suggestion',
+      dataIndex: 'advice',
+      key: 'advice',
     }, {
       title: '说明',
-      dataIndex: 'comment',
-      key: 'address',
+      dataIndex: 'description',
+      key: 'description',
     }]
     return (
       <div className="service-parameters">
         <div className="error-code">
           <div className="second-title">错误代码</div>
           <Table
-            dataSource={errorCodeDataSource}
+            dataSource={errorCode}
             columns={errorCodeColumns}
             pagination={false}
             size="middle"

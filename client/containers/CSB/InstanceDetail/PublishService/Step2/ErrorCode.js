@@ -13,12 +13,12 @@
 import React from 'react'
 import ClassNames from 'classnames'
 import { Row, Col, Input, Button, Icon, Form } from 'antd'
-import './style/ParameterSetting.less'
+import './style/ErrorCode.less'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea
 
-export default class ParameterSetting extends React.Component {
+export default class ErrorCode extends React.Component {
   state = {
     fields: {},
   }
@@ -28,13 +28,13 @@ export default class ParameterSetting extends React.Component {
   add = () => {
     this.uuid++
     const { form } = this.props
-    const keys = form.getFieldValue('parameterKeys')
+    const keys = form.getFieldValue('errCodeKeys')
     const nextKeys = keys.concat(this.uuid)
     const validateKeys = []
     keys.forEach(key => {
-      const errorCodeKey = `errorCode-${key}`
-      const errorCodeAdviceKey = `errorCodeAdvice-${key}`
-      const errorCodeDescKey = `errorCodeDesc-${key}`
+      const errorCodeKey = `code-${key}`
+      const errorCodeAdviceKey = `advice-${key}`
+      const errorCodeDescKey = `description-${key}`
       validateKeys.push(errorCodeKey)
       validateKeys.push(errorCodeAdviceKey)
       validateKeys.push(errorCodeDescKey)
@@ -44,16 +44,16 @@ export default class ParameterSetting extends React.Component {
         return
       }
       form.setFieldsValue({
-        parameterKeys: nextKeys,
+        errCodeKeys: nextKeys,
       })
     })
   }
 
   remove = k => {
     const { form } = this.props
-    const keys = form.getFieldValue('parameterKeys')
+    const keys = form.getFieldValue('errCodeKeys')
     form.setFieldsValue({
-      parameterKeys: keys.filter(key => key !== k),
+      errCodeKeys: keys.filter(key => key !== k),
     })
   }
 
@@ -62,9 +62,9 @@ export default class ParameterSetting extends React.Component {
     const { fields } = this.state
     const { setFieldsValue, getFieldValue, validateFields } = form
     const isEditKey = `isEdit-${key}`
-    const errorCodeKey = `errorCode-${key}`
-    const errorCodeAdviceKey = `errorCodeAdvice-${key}`
-    const errorCodeDescKey = `errorCodeDesc-${key}`
+    const errorCodeKey = `code-${key}`
+    const errorCodeAdviceKey = `advice-${key}`
+    const errorCodeDescKey = `description-${key}`
     const isEdit = getFieldValue(isEditKey)
     let fieldsValue = {
       [isEditKey]: !isEdit,
@@ -120,25 +120,25 @@ export default class ParameterSetting extends React.Component {
     const { form } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const isEditKey = `isEdit-${key}`
-    const errorCodeKey = `errorCode-${key}`
-    const errorCodeAdviceKey = `errorCodeAdvice-${key}`
-    const errorCodeDescKey = `errorCodeDesc-${key}`
+    const errorCodeKey = `code-${key}`
+    const errorCodeAdviceKey = `advice-${key}`
+    const errorCodeDescKey = `description-${key}`
     getFieldDecorator(isEditKey, { initialValue: true })
     const isEdit = getFieldValue(isEditKey)
     return [
       <Row key={`text-${key}`} className={isEdit ? 'hide' : ''}>
         <Col span={6}>
-          <div className="parameter-setting-text txt-of-ellipsis">
+          <div className="error-code-text txt-of-ellipsis">
             {getFieldValue(errorCodeKey)}
           </div>
         </Col>
         <Col span={6}>
-          <div className="parameter-setting-text txt-of-ellipsis">
+          <div className="error-code-text txt-of-ellipsis">
             {getFieldValue(errorCodeAdviceKey)}
           </div>
         </Col>
         <Col span={6}>
-          <div className="parameter-setting-text txt-of-ellipsis">
+          <div className="error-code-text txt-of-ellipsis">
             {getFieldValue(errorCodeDescKey)}
           </div>
         </Col>
@@ -152,7 +152,8 @@ export default class ParameterSetting extends React.Component {
           <FormItem>
             {getFieldDecorator(errorCodeKey, {
               rules: [{
-                required: true, message: 'Please input errorCode!',
+                required: true,
+                message: '请填写错误代码!',
               }],
             })(
               <Input placeholder="请填写错误代码" />
@@ -163,7 +164,8 @@ export default class ParameterSetting extends React.Component {
           <FormItem>
             {getFieldDecorator(errorCodeAdviceKey, {
               rules: [{
-                required: true, message: 'Please input errorCodeAdvice!',
+                required: true,
+                message: '请填写处置建议!',
               }],
             })(
               <Input placeholder="请填写处置建议" />
@@ -188,10 +190,10 @@ export default class ParameterSetting extends React.Component {
   render() {
     const { className, form, formItemLayout } = this.props
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('parameterKeys', { initialValue: [] })
-    const keys = getFieldValue('parameterKeys')
+    getFieldDecorator('errCodeKeys', { initialValue: [] })
+    const keys = getFieldValue('errCodeKeys')
     const classNames = ClassNames({
-      'parameter-setting': true,
+      'error-code': true,
       [className]: !!className,
     })
     return (
@@ -231,9 +233,9 @@ export default class ParameterSetting extends React.Component {
           ]
         }
         <div className="second-title">编辑错误代码</div>
-        <div className="parameter-setting-body">
-          <div className="parameter-setting-box">
-            <Row className="parameter-setting-box-header">
+        <div className="error-code-body">
+          <div className="error-code-box">
+            <Row className="error-code-box-header">
               <Col span={6}>错误代码</Col>
               <Col span={6}>处置建议</Col>
               <Col span={6}>说明</Col>
@@ -247,7 +249,7 @@ export default class ParameterSetting extends React.Component {
               <Row className="empty-text">空空如也~</Row>
             }
           </div>
-          <a className="parameter-setting-add-btn" onClick={this.add}>
+          <a className="error-code-add-btn" onClick={this.add}>
             <Icon type="plus-circle-o" /> 添加一条错误代码
           </a>
         </div>
