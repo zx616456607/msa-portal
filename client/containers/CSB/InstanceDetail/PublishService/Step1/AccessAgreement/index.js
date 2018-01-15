@@ -307,7 +307,7 @@ class AccessAgreement extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: URL_REG,
-                message: 'Please input targetDetail',
+                message: '请填写正确的 WSDL 地址',
               }],
             })(
               <Input placeholder="请提供地址" />

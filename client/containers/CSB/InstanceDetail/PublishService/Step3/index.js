@@ -60,7 +60,6 @@ class Step3 extends React.Component {
         maxAttibuteCount,
         removeDTD,
         openOAuth,
-        oauth2Type,
         endpoint,
         clientId,
         clientSecret,
@@ -83,6 +82,7 @@ class Step3 extends React.Component {
         removeDTD,
       }
       // OAuth
+      const oauth2Type = values.oauth2Type || 'no_oauth'
       let oauth2Detail = {}
       if (openOAuth) {
         oauth2Detail = {
