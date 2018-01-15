@@ -55,6 +55,9 @@ const menus = [
       {
         to: '/msa-om/csb-cascading-link-rules',
         text: '级联链路规则',
+        includePaths: [
+          '/msa-om/csb-cascading-link-rules/create',
+        ],
       },
     ],
   },
