@@ -12,7 +12,7 @@
 
 import React from 'react'
 import {
-  Row, Col,
+  Row, Col, Icon,
 } from 'antd'
 
 const SECONDS_CONVERSION = {
@@ -23,6 +23,19 @@ const SECONDS_CONVERSION = {
 }
 
 export default class Control extends React.Component {
+  renderOAuth2Type = type => {
+    switch (type) {
+      case 'github':
+        return <span><Icon type="github" /> Github</span>
+      case 'google':
+        return <span><Icon type="google" /> Google</span>
+      case 'customer':
+        return <span><Icon type="star-o" /> 自定义</span>
+      default:
+        break
+    }
+  }
+
   render() {
     const { detail } = this.props
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
@@ -125,7 +138,7 @@ export default class Control extends React.Component {
                   </Col>
                   <Col span={18}>
                     <div className="txt-of-ellipsis">
-                      {detail.oauth2Type}
+                      {this.renderOAuth2Type(detail.oauth2Type)}
                     </div>
                   </Col>
                 </Row>,
