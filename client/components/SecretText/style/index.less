@@ -1,0 +1,31 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of SecretText component
+ *
+ * 2018-01-15
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.secret-text {
+  font-family: Consolas, Menlo, Courier, monospace;
+  font {
+    vertical-align: middle;
+  }
+  .eye-icon {
+    cursor: pointer;
+    fill: @primary-color;
+    height: 14px;
+    width: 14px;
+    vertical-align: middle;
+    margin-left: @padding-base;
+    &:hover {
+      fill: @a-hover-color;
+    }
+  }
+}

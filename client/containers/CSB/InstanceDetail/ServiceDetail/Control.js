@@ -14,6 +14,7 @@ import React from 'react'
 import {
   Row, Col, Icon,
 } from 'antd'
+import SecretText from '../../../../components/SecretText'
 
 const SECONDS_CONVERSION = {
   1: '秒',
@@ -168,7 +169,9 @@ export default class Control extends React.Component {
                   </Col>
                   <Col span={18}>
                     <div className="txt-of-ellipsis">
-                      {clientSecret}
+                      <SecretText>
+                        {clientSecret}
+                      </SecretText>
                     </div>
                   </Col>
                 </Row>,
