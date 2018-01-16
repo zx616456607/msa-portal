@@ -21,6 +21,7 @@ import ServiceStatistics from './Statistics'
 import ServiceProtocols from './Protocols'
 import ServiceParameters from './Parameters'
 import ServiceControl from './Control'
+import ServiceLinkRules from './LinkRules'
 import './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -133,6 +134,9 @@ class ServiceDetail extends React.Component {
             </TabPane>
             <TabPane tab="控制信息" key="control">
               <ServiceControl detail={detail} />
+            </TabPane>
+            <TabPane tab="级联发布" key="linkRules">
+              <ServiceLinkRules />
             </TabPane>
           </Tabs>
         </div>

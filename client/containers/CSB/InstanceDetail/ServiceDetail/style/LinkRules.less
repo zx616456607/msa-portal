@@ -1,0 +1,145 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Link Rules Style
+ *
+ * 2018-1-15
+ * @author zhangcz
+ */
+
+@import '~assets/style/core/index.less';
+
+#link-rules-style {
+  padding-bottom: 24px;
+  .status-step-container {
+    padding: 20px 0;
+  }
+  .ant-col-1 {
+    line-height: 100px;
+    font-size: 16px;
+    .anticon-left,
+    .anticon-right {
+      cursor: pointer;
+    }
+    .anticon-left:hover,
+    .anticon-right:hover {
+      color: @primary-color;
+    }
+  }
+  .active-style {
+    .icon-style {
+      border-color: @success-color;
+    }
+    .ant-steps-item-title:after {
+      background: @success-color;
+    }
+    .status-style {
+      color: @success-color;
+    }
+  }
+  .stop-style {
+    .icon-style {
+      border-color: @error-color;
+    }
+    .ant-steps-item-title:after {
+      background: @error-color;
+    }
+    .status-style {
+      color: @error-color;
+    }
+  }
+  .cancel-style {
+    .icon-style {
+      border-color: @border-color-base;
+    }
+    .ant-steps-item-title:after {
+      background: @border-color-base;
+    }
+    .status-style {
+      color: @border-color-base;
+    }
+  }
+  .common-style {
+    padding-top: 20px;
+    height: 120px;
+    .ant-steps-item-content {
+      position: relative;
+      .ant-steps-item-title {
+        position: absolute;
+        top: 63px;
+        left: -68px;
+      }
+      .ant-steps-item-description {
+        position: absolute;
+        top: -22px;
+        left: -73px;
+      }
+    }
+    .ant-steps-item-title:after {
+      top: -33px;
+      left: calc(~"100% - -15px");
+    }
+    .icon-style {
+      height: 60px;
+      width: 80px;
+      border-radius: 4px;
+      border-width: 1px;
+      border-style: solid;
+      font-size: 12px;
+      line-height: 24px;
+      padding-top: 5px;
+      .top-style {
+        color: @font-color-3;
+      }
+    }
+    .current-active,
+    .current-stop,
+    .current-cancel {
+      .top-style,
+      .status-style {
+        color: #fff;
+      }
+    }
+    .current-stop {
+      background: @error-color;
+      border-color: @error-color;
+    }
+    .current-active {
+      background: @success-color;
+      border-color: @success-color;
+    }
+    .current-cancel {
+      background: @border-color-base;
+      border-color: @border-color-base;
+    }
+  }
+  .event {
+    .tips {
+      font-size: 12px;
+      color: @font-color-3;
+      padding-left: 20px;
+    }
+    .log-container {
+      height: 450px;
+      padding-top: 5px;
+      overflow-y: scroll;
+      .margin-style {
+        margin-left: 8px;
+      }
+      .color-style {
+        color: @primary-color;
+      }
+      .ant-timeline-item-last {
+        padding-bottom: 0;
+      }
+      .show-all {
+        color: @primary-color;
+        cursor: pointer;
+        text-align: center;
+      }
+    }
+  }
+}
