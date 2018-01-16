@@ -100,7 +100,7 @@ class ServiceSubscriptionApproval extends React.Component {
     }
     const body = {
       status,
-      values,
+      ...values,
     }
     this.setState({ confirmLoading: true })
     putServiceApprove(instanceID, requestID, body).then(res => {
@@ -186,8 +186,15 @@ class ServiceSubscriptionApproval extends React.Component {
       { text: '已拒绝', value: 3 },
       { text: '已退订', value: 4 },
     ]
+    const responseCol = {
+      title: '审批意见', dataIndex: 'response', width: '8%',
+      render: text => <span>{text ? text : '-'}</span>,
+    }
     const columns = [
-      { title: '订阅人', dataIndex: 'subscriberName', width: '8%' },
+      {
+        title: '订阅人', dataIndex: 'subscriberName',
+        width: radioGroupValue === 5 ? '8%' : '12%',
+      },
       { title: '订阅服务名称', dataIndex: 'serviceName', width: '10%' },
       { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
       {
@@ -216,14 +223,10 @@ class ServiceSubscriptionApproval extends React.Component {
       {
         title: '申请订阅时间',
         dataIndex: 'requestTime',
-        width: '12%',
+        width: radioGroupValue === 5 ? '12%' : '16%',
         sorter: true,
         sortOrder: sortObj.requestTime,
         render: requestTime => formatDate(requestTime),
-      },
-      {
-        title: '审批意见', dataIndex: 'serviceDescription', width: '8%',
-        render: text => <span>{text ? text : '-'}</span>,
       },
       {
         title: '操作',
@@ -241,6 +244,9 @@ class ServiceSubscriptionApproval extends React.Component {
         },
       },
     ]
+    if (radioGroupValue === 5) {
+      columns.splice(8, 0, responseCol)
+    }
     const pagination = {
       simple: true,
       total: totalElements,
