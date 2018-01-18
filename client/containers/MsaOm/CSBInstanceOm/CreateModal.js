@@ -15,8 +15,11 @@ import { connect } from 'react-redux'
 import { Modal, Form, Input, Select } from 'antd'
 import { getAllClusters } from '../../../actions/current'
 import { createInstance, editInstance } from '../../../actions/CSB/instance'
-const { TextArea } = Input
+import {
+  HOST_REG,
+} from '../../../constants'
 
+const { TextArea } = Input
 const FormItem = Form.Item
 // const RadioGroup = Radio.Group
 const Option = Select.Option
@@ -38,10 +41,11 @@ class InstanceModal extends React.Component {
       if (errors) {
         return
       }
-      const { name, description, cluster } = values
+      const { name, description, cluster, host } = values
       const body = {
         name,
         namespace,
+        host,
         description,
       }
       if (currentInstance) {
@@ -98,10 +102,10 @@ class InstanceModal extends React.Component {
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: {
-        span: 4,
+        span: 6,
       },
       wrapperCol: {
-        span: 20,
+        span: 18,
       },
     }
     const optionChildren = clusterList.map(item =>
@@ -124,6 +128,7 @@ class InstanceModal extends React.Component {
             {getFieldDecorator('name', {
               rules: [
                 {
+                  required: true,
                   validator: this.checkName,
                 },
               ],
@@ -142,6 +147,7 @@ class InstanceModal extends React.Component {
             {getFieldDecorator('cluster', {
               rules: [
                 {
+                  required: true,
                   validator: this.checkCluster,
                 },
               ],
@@ -156,12 +162,34 @@ class InstanceModal extends React.Component {
             )}
           </FormItem>
           <FormItem
+            label="实例出口地址"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('host', {
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  pattern: HOST_REG,
+                  message: '请输入实例出口地址',
+                },
+              ],
+              initialValue: currentInstance ? currentInstance.host : '',
+            })(
+              <Input
+                placeholder="输入 IP 或域名，用于实例中发布服务开放地址"
+                // disabled={!!currentInstance}
+              />
+            )}
+          </FormItem>
+          <FormItem
             label="实例描述"
             {...formItemLayout}
           >
             {getFieldDecorator('description', {
               rules: [
                 {
+                  required: true,
                   validator: this.checkDesc,
                 },
               ],

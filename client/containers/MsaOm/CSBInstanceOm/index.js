@@ -218,7 +218,13 @@ class CSBInstanceOm extends React.Component {
         title: '部署集群',
         dataIndex: 'clusterId',
         width: '15%',
-        render: (text, row) => row.cluster && row.cluster.clusterName,
+        render: (text, row) => row.cluster && row.cluster.clusterName || '-',
+      },
+      {
+        title: '实例出口地址',
+        dataIndex: 'host',
+        width: '15%',
+        render: text => text || '-',
       },
       { title: '状态', dataIndex: 'status', width: '10%',
         filters: [{
@@ -259,12 +265,12 @@ class CSBInstanceOm extends React.Component {
       {
         title: '创建时间',
         dataIndex: 'creationTime',
-        width: '20%',
+        width: '10%',
         sorter: (a, b) => a.creationTime - b.creationTime,
         sortOrder: sorterInfo.columnKey === 'creationTime' && sorterInfo.order,
         render: text => formatDate(text),
       },
-      { title: '操作', width: '20%',
+      { title: '操作', width: '15',
         render: (text, row) => {
           const menu = (
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
