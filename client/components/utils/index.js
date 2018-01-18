@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Menu, Spin, Badge } from 'antd'
+import { Menu, Spin, Badge, Icon } from 'antd'
 import { Link } from 'react-router-dom'
 
 const SubMenu = Menu.SubMenu
@@ -124,4 +124,22 @@ export function renderCSBInstanceServiceApproveStatus(serviceStatus) {
       break
   }
   return <Badge status={status} text={text} />
+}
+/**
+ * render OAuth type
+ *
+ * @export
+ * @param {string} type 'github' | 'google' | 'customer'
+ * @return {element} type element
+ */
+export function renderOAuth2Type(type) {
+  switch (type) {
+    case 'github':
+      return <span><Icon type="github" /> Github</span>
+    case 'google':
+      return <span><Icon type="google" /> Google</span>
+    case 'customer':
+    default:
+      return <span><Icon type="star-o" /> 自定义</span>
+  }
 }

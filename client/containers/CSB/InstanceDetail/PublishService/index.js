@@ -21,6 +21,7 @@ import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
 import Step1 from './Step1'
 import Step2 from './Step2'
 import Step3 from './Step3'
+import { renderOAuth2Type } from '../../../../components/utils'
 import {
   transformCSBProtocols,
 } from '../../../../common/utils'
@@ -367,7 +368,7 @@ class PublishService extends React.Component {
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                      {fields.parameterKeys && fields.parameterKeys.length || 0} 个
+                      {fields.errCodeKeys && fields.errCodeKeys.length || 0} 个
                     </div>
                   </Col>
                 </Row>
@@ -436,6 +437,21 @@ class PublishService extends React.Component {
                     </div>
                   </Col>
                 </Row>
+                {
+                  fields.openOAuth &&
+                  <Row>
+                    <Col span={8}>
+                      <div className="field-label txt-of-ellipsis">
+                      OAuth 授权
+                      </div>
+                    </Col>
+                    <Col span={16}>
+                      <div className="field-value txt-of-ellipsis">
+                        {renderOAuth2Type(fields.oauth2Type)}
+                      </div>
+                    </Col>
+                  </Row>
+                }
                 {/* <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
