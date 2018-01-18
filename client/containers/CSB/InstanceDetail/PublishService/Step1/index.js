@@ -65,7 +65,7 @@ export default class Step1 extends React.Component {
   render() {
     const {
       className, currentStep, servicesInbounds, serviceGroups, history,
-      ...otherProps
+      currentInstance, ...otherProps
     } = this.props
     const classNames = ClassNames({
       fields: true,
@@ -74,6 +74,7 @@ export default class Step1 extends React.Component {
     return [
       <div className={classNames} key="fields">
         <AccessAgreement
+          currentInstance={currentInstance}
           servicesInbounds={servicesInbounds}
           {...otherProps}
         />

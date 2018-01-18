@@ -98,7 +98,7 @@ class AccessAgreement extends React.Component {
   }
 
   getOpenUrlBefore = (ssl, type) => {
-    const { form, servicesInbounds } = this.props
+    const { form, servicesInbounds, currentInstance } = this.props
     const { getFieldDecorator } = form
     const protocol = ssl ? 'https' : 'http'
     let port = '-'
@@ -112,7 +112,8 @@ class AccessAgreement extends React.Component {
       }
       return true
     })
-    return `${protocol}://csb-service-host:${port}/`
+    const host = currentInstance && currentInstance.instance.host || 'csb-service-host'
+    return `${protocol}://${host}:${port}/`
   }
 
   render() {

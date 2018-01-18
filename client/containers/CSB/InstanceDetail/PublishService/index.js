@@ -65,7 +65,7 @@ class PublishService extends React.Component {
   render() {
     const {
       serviceGroups, form, instanceID, csbInstanceServiceGroups,
-      servicesInbounds, history,
+      servicesInbounds, history, currentInstance,
     } = this.props
     const { content } = serviceGroups
     const { currentStep } = this.state
@@ -119,6 +119,7 @@ class PublishService extends React.Component {
                 form={form}
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
+                currentInstance={currentInstance}
                 servicesInbounds={servicesInbounds}
                 serviceGroups={content || []}
                 changeStep={this.changeStep}
@@ -457,15 +458,17 @@ class PublishService extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { csbInstanceServiceGroups } = state.entities
-  const { servicesInbounds } = state.CSB
+  const { entities, CSB } = state
+  const { csbAvaInstances, csbInstanceServiceGroups } = entities
   const { match } = ownProps
   const { instanceID } = match.params
+  const { servicesInbounds } = CSB
   return {
     csbInstanceServiceGroups,
     servicesInbounds: servicesInbounds && servicesInbounds[instanceID] || {},
     instanceID,
     serviceGroups: serviceGroupsSlt(state),
+    currentInstance: csbAvaInstances && csbAvaInstances[instanceID],
   }
 }
 
