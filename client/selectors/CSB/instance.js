@@ -15,6 +15,7 @@ import {
   CSB_PUBLIC_INSTANCES_FLAG,
   CSB_AVAILABLE_INSTANCES_FLAG,
   CSB_OM_INSTANCES_FLAG,
+  CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY,
 } from '../../constants'
 import {
   getQueryKey,
@@ -68,7 +69,10 @@ const getCsbInstances = (flag, state, props) => {
   const { location } = props
   const { CSB } = state
   const { mergeQuery } = getQueryAndFuncs(flag)
-  const instancesKey = getQueryKey(mergeQuery(location.query))
+  let instancesKey = getQueryKey(mergeQuery(location.query))
+  if (location.from === 'createLinkRule') {
+    instancesKey = getQueryKey(mergeQuery(CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY))
+  }
   return CSB[instancesType][instancesKey] || {}
 }
 

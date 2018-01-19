@@ -108,6 +108,10 @@ const csbInstanceServiceDetailSchema = new schema.Entity('csbInstanceServiceDeta
   idAttribute: 'id',
 })
 
+const csbCascadingLinkRuleSchema = new schema.Entity('csbCascadingLinkRule', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -230,6 +234,11 @@ export const Schemas = {
   CSB_INSTANCE_SERVICE_LIST_DATA: {
     data: {
       content: [ csbPublishedSchema ],
+    },
+  },
+  CSB_CASCADING_LINK_RULE_LIST_DATA: {
+    data: {
+      content: [ csbCascadingLinkRuleSchema ],
     },
   },
 }

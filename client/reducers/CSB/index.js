@@ -20,6 +20,7 @@ import { consumerVouchers } from './instanceService/consumerVouchers'
 import { mySubscribedServices } from './instanceService/mySubscribedServices'
 import { serviceSubscribeApprove } from './instanceService/serviceSubscribeApprove'
 import { publicService } from './instanceService/publicService'
+import { cascadingLinkRule } from './cascadingLinkRules'
 
 const CSB = (state = {
   myApplication: {},
@@ -30,6 +31,7 @@ const CSB = (state = {
   groupServices: {},
   instanceOverview: {},
   plubicService: {},
+  cascadingLinkRule: {},
 }, action) => {
   return {
     myApplication: myApplication(state.myApplication, action),
@@ -49,6 +51,7 @@ const CSB = (state = {
     instanceOverview: instanceOverview(state.instanceOverview, action),
     servicesInbounds: servicesInbounds(state.servicesInbounds, action),
     publicService: publicService(state.publicService, action),
+    cascadingLinkRule: cascadingLinkRule(state.cascadingLinkRule, action),
   }
 }
 

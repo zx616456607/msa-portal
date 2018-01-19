@@ -12,12 +12,13 @@
 
 import React from 'react'
 // import propTypes from 'prop-types'
-import { Row, Col, Steps, Icon } from 'antd'
+import { Row, Col, Steps, Icon, Tooltip } from 'antd'
 import StepIcon from '../../../assets/img/csb/StepIcon.svg'
 import './style/ExpandRowSteps.less'
 import classNames from 'classnames'
 
 const Step = Steps.Step
+const STEP_SIZE = 4
 
 class ExpandRowSteps extends React.Component {
   static propTypes = {}
@@ -29,12 +30,12 @@ class ExpandRowSteps extends React.Component {
   renderSteps = stepItem => {
     const { currentStep } = this.state
     let mapArry = stepItem
-    if (stepItem.length > 6) {
-      mapArry = stepItem.slice(currentStep, currentStep + 6)
+    if (stepItem.length > STEP_SIZE) {
+      mapArry = stepItem.slice(currentStep, currentStep + STEP_SIZE)
     }
     let shortStepLength = 0
-    if (stepItem.length > 0 && stepItem.length < 6) {
-      shortStepLength = 6 - stepItem.length
+    if (stepItem.length > 0 && stepItem.length < STEP_SIZE) {
+      shortStepLength = STEP_SIZE - stepItem.length
     }
     const shortStepArray = Array.from(new Array(shortStepLength), n => n || 3)
     return <Steps className="steps-row-style">
@@ -42,13 +43,19 @@ class ExpandRowSteps extends React.Component {
         const lastStepClass = classNames({
           'short-step-style': index === mapArry.length - 1 && shortStepLength,
         })
+        const svgClass = classNames({
+          running: true,
+          stopped: false,
+          deleted: false,
+          StepIcon: true,
+        })
         return <Step
-          key={step}
+          key={`${step.id}-${index}`}
           className={lastStepClass}
           status="finish"
           // title={<span className="step-item-title-content">已授权</span>}
-          description="实例a"
-          icon={<svg className="StepIcon">
+          description={this.renderStepDescription(step)}
+          icon={<svg className={svgClass}>
             <use xlinkHref={`#${StepIcon.id}`}/>
           </svg>}/>
       })}
@@ -65,6 +72,25 @@ class ExpandRowSteps extends React.Component {
     </Steps>
   }
 
+  renderStepDescription = step => {
+    // const message = '调用链上已删除／停止的实例后的实例中发布的服务将被注销'
+    return (
+      <div>
+        <div>
+          <Tooltip title={`实例  ${step.name}`} placement="top">
+            {`实例  ${step.name}`}
+          </Tooltip>
+        </div>
+        {/* <div>
+          运行中
+          <Tooltip title={message} placement="top">
+            <Icon type="question-circle-o" style={{ marginLeft: 8 }}/>
+          </Tooltip>
+        </div> */}
+      </div>
+    )
+  }
+
   subtractStep = () => {
     const { currentStep } = this.state
     if (currentStep === 0) return
@@ -76,7 +102,7 @@ class ExpandRowSteps extends React.Component {
   addStep = () => {
     const { currentStep } = this.state
     const { stepItem } = this.props
-    const maxStep = stepItem.length - 6
+    const maxStep = stepItem.length - STEP_SIZE
     if (currentStep >= maxStep) return
     this.setState(preState => {
       return { currentStep: preState.currentStep + 1 }
@@ -85,17 +111,17 @@ class ExpandRowSteps extends React.Component {
 
   render() {
     const { stepItem } = this.props
-    if (!stepItem) {
+    if (!stepItem || !stepItem.length) {
       return <div>暂无实例授信</div>
     }
     const stepSize = stepItem.length
     const arrowIconClass = classNames({
       'direction-icon': true,
-      'hide-Arrow-icon': stepSize <= 6,
+      'hide-Arrow-icon': stepSize <= STEP_SIZE,
     })
     return (
       <Row id="expand-row-steps-style">
-        <Col span={4} className="title-style">实例授信</Col>
+        <Col span={4} className="title-style">链路方向</Col>
         <Col span={20} className="steps-style">
           <Row>
             <Col span={1}>
