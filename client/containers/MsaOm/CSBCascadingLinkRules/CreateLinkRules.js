@@ -20,19 +20,34 @@ import QueueAnim from 'rc-queue-anim'
 import cloneDeep from 'lodash/cloneDeep'
 import classNames from 'classnames'
 import StepIcon from '../../../assets/img/csb/StepIcon.svg'
+import { connect } from 'react-redux'
+import { getInstances } from '../../../actions/CSB/instance'
+import { createCsbCascadingLinkRule } from '../../../actions/CSB/cascadingLinkRules'
+import {
+  CSB_OM_INSTANCES_FLAG,
+  UNUSED_CLUSTER_ID,
+  CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY,
+} from '../../../constants'
+import { instancesSltMaker } from '../../../selectors/CSB/instance'
+import { parse as parseQuerystring } from 'query-string'
 
 const FormItem = Form.Item
 const Option = Select.Option
 const TextArea = Input.TextArea
 const Step = Steps.Step
+const omInstancesSlt = instancesSltMaker(CSB_OM_INSTANCES_FLAG)
 
 class CreateLinkRules extends React.Component {
   state = {
     confirmLoading: false,
     targetInstancesArray: [{
-      index: 0,
+      index: 1,
       isDelete: false,
     }],
+  }
+
+  componentWillMount() {
+    this.loadInstancesList()
   }
 
   addTargetInstances = () => {
@@ -60,18 +75,37 @@ class CreateLinkRules extends React.Component {
     history.push('/msa-om/csb-cascading-link-rules')
   }
 
-  createLinkRules = () => {
-    const { form } = this.props
-    form.validateFields((errors, values) => {
+  createLinkRules = async () => {
+    const { form, createCsbCascadingLinkRule } = this.props
+    form.validateFields(async (errors, values) => {
       if (errors) return
       this.setState({ confirmLoading: true })
-      console.log('values=', values)
-      setTimeout(() => {
-        notification.success({ message: '创建级联链路规则成功' })
-        this.setState({
-          confirmLoading: false,
-        }, this.cancelCreateLinkRules)
-      }, 2000)
+      const { name, description } = values
+      const keys = Object.keys(values)
+      const literalArray = keys.sort().filter(target => {
+        if (target.substring(0, 7) === 'target-') {
+          return true
+        }
+        return false
+      })
+      const [ startId ] = values['target-0'].split('/')
+      let literalPath = `${startId}`
+      literalArray.forEach(item => {
+        literalPath += `<-${values[item].split('/')[0]}`
+      })
+      const body = {
+        name,
+        description,
+        instanceId: startId,
+        literalPath,
+      }
+      const res = await createCsbCascadingLinkRule(body)
+      this.setState({
+        confirmLoading: false,
+      })
+      if (res.error) return
+      notification.success({ message: '创建级联链路规则成功' })
+      this.cancelCreateLinkRules()
     })
   }
 
@@ -82,20 +116,51 @@ class CreateLinkRules extends React.Component {
     this.setState({ targetInstancesArray: preList })
   }
 
+  loadInstancesList = () => {
+    const { getInstances } = this.props
+    getInstances(UNUSED_CLUSTER_ID, CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY)
+  }
+
   renderLinkRulesSteps = () => {
     const { targetInstancesArray } = this.state
     const { form } = this.props
-    if (!targetInstancesArray.length) return <span>暂无实例授信</span>
+    const instanceList = cloneDeep(targetInstancesArray)
+    const instanceKeyList = [ 'target-0' ]
+    instanceList.forEach(item => {
+      if (!item.isDelete) {
+        instanceKeyList.push(`target-${item.index}`)
+      }
+    })
+    const instanceValues = form.getFieldsValue(instanceKeyList)
+    let noInstance = true
+    for (const key in instanceValues) {
+      if (instanceValues[key] !== undefined) {
+        noInstance = false
+        break
+      }
+    }
+    if (noInstance) {
+      return <div className="no-instance-list">
+        <div>
+          <svg className="StepIconSize no-instance-fill">
+            <use xlinkHref={`#${StepIcon.id}`}/>
+          </svg>
+        </div>
+        <div>
+          请选择实例
+        </div>
+      </div>
+    }
     const values = form.getFieldsValue()
     return (
       <Steps direction="vertical" className="steps-row-style">
         {
-          values.start && <Step
-            key="start"
+          values['target-0'] && <Step
+            key="target-0"
             status="finish"
-            title={<span>{values.start}</span>}
+            title={<span>{values['target-0'].split('/')[1]}</span>}
             description={<div className="step-dec-style"></div>}
-            icon={<svg className="StepIcon">
+            icon={<svg className="StepIcon StepIconSize">
               <use xlinkHref={`#${StepIcon.id}`}/>
             </svg>}
           />
@@ -103,12 +168,13 @@ class CreateLinkRules extends React.Component {
         {
           targetInstancesArray.map(step => {
             if (step.isDelete || !values[`target-${step.index}`]) return null
+            const instanceName = values[`target-${step.index}`].split('/')[1]
             return <Step
               key={`step-${step.index}`}
               status="finish"
-              title={<span>{values[`target-${step.index}`]}</span>}
+              title={<span>{instanceName}</span>}
               description={<div className="step-dec-style"></div>}
-              icon={<svg className="StepIcon">
+              icon={<svg className="StepIcon StepIconSize">
                 <use xlinkHref={`#${StepIcon.id}`}/>
               </svg>}
             />
@@ -119,12 +185,38 @@ class CreateLinkRules extends React.Component {
   }
 
   renderInstanceSelect = item => {
+    const { omInstances, form } = this.props
+    const { targetInstancesArray } = this.state
+    const { content } = omInstances
+    const values = form.getFieldsValue()
+    const instanceIndexList = targetInstancesArray.filter(target => {
+      if (!target.isDelete) return true
+      return false
+    })
+    const instanceValuesIdList = [ 'target-0' ]
+    instanceIndexList.forEach(item => {
+      instanceValuesIdList.push(`target-${item.index}`)
+    })
     return (
-      <Select placeholder={`请选择${item === 'start' ? '起点' : '目标'}实例`}>
-        <Option value="实例a">实例a</Option>
-        <Option value="实例b">实例b</Option>
-        <Option value="实例c">实例c</Option>
-        <Option value="实例d">实例d</Option>
+      <Select placeholder={`请选择${item === 'target-0' ? '起点' : '目标'}实例`}>
+        {
+          content.map(instance => {
+            let disabled = false
+            instanceValuesIdList.forEach(item => {
+              if (values[item] && parseInt(values[item].split('/')[0]) === parseInt(instance.id)) {
+                disabled = true
+              }
+            })
+            return (
+              <Option
+                value={`${instance.id}/${instance.name}`}
+                key={instance.id}
+                disabled={disabled}
+              >
+                {instance.name}
+              </Option>
+            )
+          })}
       </Select>
     )
   }
@@ -137,11 +229,11 @@ class CreateLinkRules extends React.Component {
     return targetInstancesArray.map(item => {
       if (!item.isDelete) {
         const resetFormLabelClass = classNames({
-          'reset-from-label-style': item.index !== 0,
+          'reset-from-label-style': item.index !== 1,
         })
         return (
           <FormItem
-            label={ item.index === 0 ? '选择目标实例' : <span></span>}
+            label={ item.index === 1 ? '选择目标实例' : <span></span>}
             key={`target-${item.index}`}
             {...formItemLayout}
             className={resetFormLabelClass}
@@ -154,7 +246,7 @@ class CreateLinkRules extends React.Component {
                 }],
               })(instanceList)
             }
-            <Button icon="delete" disabled={item.index === 0} className="delete-icon-style"
+            <Button icon="delete" disabled={item.index === 1} className="delete-icon-style"
               onClick={this.deleteTargetInstances.bind(this, item.index)}
             />
           </FormItem>
@@ -172,7 +264,7 @@ class CreateLinkRules extends React.Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 15 },
     }
-    const instanceList = this.renderInstanceSelect('start')
+    const instanceList = this.renderInstanceSelect('target-0')
     return (
       <QueueAnim>
         <div key="second"></div>
@@ -201,11 +293,11 @@ class CreateLinkRules extends React.Component {
                 </FormItem>
                 <FormItem
                   label="选择起点实例"
-                  key="start"
+                  key="target-0"
                   {...formItemLayout}
                 >
                   {
-                    getFieldDecorator('start', {
+                    getFieldDecorator('target-0', {
                       rules: [{
                         required: true,
                         message: '起点实例不能为空',
@@ -226,11 +318,11 @@ class CreateLinkRules extends React.Component {
                 </Row>
                 <FormItem
                   label="链路规则描述"
-                  key="desc"
+                  key="description"
                   {...formItemLayout}
                 >
                   {
-                    getFieldDecorator('desc', {
+                    getFieldDecorator('description', {
                       rules: [{
                         required: true,
                         message: '链路规则描述不能为空',
@@ -260,4 +352,19 @@ class CreateLinkRules extends React.Component {
   }
 }
 
-export default Form.create()(CreateLinkRules)
+const mapStateToProps = (state, props) => {
+  const { match } = props
+  const { instanceID } = match.params
+  const { location } = props
+  location.query = parseQuerystring(location.search)
+  location.from = 'createLinkRule'
+  return {
+    instanceID,
+    omInstances: omInstancesSlt(state, props),
+  }
+}
+
+export default connect(mapStateToProps, {
+  getInstances,
+  createCsbCascadingLinkRule,
+})(Form.create()(CreateLinkRules))
