@@ -14,6 +14,7 @@ import React from 'react'
 import {
   Row, Col, Form, Input, Select,
   Button, Card, notification, Steps,
+  Spin,
 } from 'antd'
 import './style/CreateLinkRules.less'
 import QueueAnim from 'rc-queue-anim'
@@ -88,16 +89,14 @@ class CreateLinkRules extends React.Component {
         }
         return false
       })
-      const [ startId ] = values['target-0'].split('/')
-      let literalPath = `${startId}`
+      let literalPath = ''
       literalArray.forEach(item => {
         literalPath += `<-${values[item].split('/')[0]}`
       })
       const body = {
         name,
         description,
-        instanceId: startId,
-        literalPath,
+        literalPath: literalPath.substring(2, literalPath.length),
       }
       const res = await createCsbCascadingLinkRule(body)
       this.setState({
@@ -158,7 +157,7 @@ class CreateLinkRules extends React.Component {
           values['target-0'] && <Step
             key="target-0"
             status="finish"
-            title={<span>{values['target-0'].split('/')[1]}</span>}
+            title={<div className="instance-name">实例 {values['target-0'].split('/')[1]}</div>}
             description={<div className="step-dec-style"></div>}
             icon={<svg className="StepIcon StepIconSize">
               <use xlinkHref={`#${StepIcon.id}`}/>
@@ -172,7 +171,7 @@ class CreateLinkRules extends React.Component {
             return <Step
               key={`step-${step.index}`}
               status="finish"
-              title={<span>{instanceName}</span>}
+              title={<div className="instance-name">实例 {instanceName}</div>}
               description={<div className="step-dec-style"></div>}
               icon={<svg className="StepIcon StepIconSize">
                 <use xlinkHref={`#${StepIcon.id}`}/>
@@ -187,7 +186,7 @@ class CreateLinkRules extends React.Component {
   renderInstanceSelect = item => {
     const { omInstances, form } = this.props
     const { targetInstancesArray } = this.state
-    const { content } = omInstances
+    const { content, isFetching } = omInstances
     const values = form.getFieldsValue()
     const instanceIndexList = targetInstancesArray.filter(target => {
       if (!target.isDelete) return true
@@ -197,26 +196,27 @@ class CreateLinkRules extends React.Component {
     instanceIndexList.forEach(item => {
       instanceValuesIdList.push(`target-${item.index}`)
     })
+    const loadingOption = <Option value={null} disabled><Spin /></Option>
+    const instanceOption = content.map(instance => {
+      let disabled = false
+      instanceValuesIdList.forEach(item => {
+        if (values[item] && parseInt(values[item].split('/')[0]) === parseInt(instance.id)) {
+          disabled = true
+        }
+      })
+      return (
+        <Option
+          value={`${instance.id}/${instance.name}`}
+          key={instance.id}
+          disabled={disabled}
+        >
+          {instance.name}
+        </Option>
+      )
+    })
     return (
       <Select placeholder={`请选择${item === 'target-0' ? '起点' : '目标'}实例`}>
-        {
-          content.map(instance => {
-            let disabled = false
-            instanceValuesIdList.forEach(item => {
-              if (values[item] && parseInt(values[item].split('/')[0]) === parseInt(instance.id)) {
-                disabled = true
-              }
-            })
-            return (
-              <Option
-                value={`${instance.id}/${instance.name}`}
-                key={instance.id}
-                disabled={disabled}
-              >
-                {instance.name}
-              </Option>
-            )
-          })}
+        {isFetching ? loadingOption : instanceOption}
       </Select>
     )
   }
@@ -324,8 +324,11 @@ class CreateLinkRules extends React.Component {
                   {
                     getFieldDecorator('description', {
                       rules: [{
-                        required: true,
-                        message: '链路规则描述不能为空',
+                        validator: (rule, value, callback) => {
+                          if (!value) return callback('链路规则描述不能为空')
+                          if (value.length < 5) return callback('请输入至少五个字符')
+                          return callback()
+                        },
                       }],
                     })(
                       <TextArea placeholder="请输入至少五个字符"/>

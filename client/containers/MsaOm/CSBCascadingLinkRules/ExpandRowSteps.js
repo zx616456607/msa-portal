@@ -77,8 +77,8 @@ class ExpandRowSteps extends React.Component {
     return (
       <div>
         <div>
-          <Tooltip title={`实例  ${step.name}`} placement="top">
-            {`实例  ${step.name}`}
+          <Tooltip title={`实例  ${step.name}`} placement="topLeft">
+            <div className="txt-of-ellipsis">{`实例  ${step.name}`}</div>
           </Tooltip>
         </div>
         {/* <div>
