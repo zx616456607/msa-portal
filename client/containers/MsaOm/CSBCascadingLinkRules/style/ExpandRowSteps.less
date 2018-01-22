@@ -49,12 +49,20 @@
   }
   .steps-row-style {
     height: 50px;
+    .ant-steps-item:last-child {
+      min-width: 80px;
+    }
+    .ant-steps-item-icon {
+      padding-left: 16px;
+    }
     .ant-steps-item-content {
       position: relative;
       .ant-steps-item-description {
         position: absolute;
+        display: block;
+        width: 80px;
         top: 30px;
-        left: -33px;
+        left: -47px;
       }
     }
     .step-item-title-content {
