@@ -1,0 +1,33 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of CascadingLinkRules
+ *
+ * 2018-01-23
+ * @author zhangpc
+ */
+
+@import '~assets/style/core/index.less';
+
+.cascading-link-rules {
+  .desc-text {
+    line-height: initial;
+    padding: @padding-base 0;
+  }
+  .path-targets {
+    margin-bottom: 0;
+  }
+  .path-instances {
+    .ant-form-item-label {
+      label:after {
+        visibility: hidden;
+      }
+    }
+    .ant-checkbox-group > label {
+      padding: 4px 0;
+    }
+  }
+}

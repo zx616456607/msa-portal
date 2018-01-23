@@ -17,6 +17,7 @@ import {
 } from 'antd'
 import AccessAgreement from './AccessAgreement/'
 import OpenAgreement from './OpenAgreement'
+import CascadingLinkRules from './CascadingLinkRules'
 
 export default class Step1 extends React.Component {
   getValidateFields = () => {
@@ -80,6 +81,9 @@ export default class Step1 extends React.Component {
         />
         <OpenAgreement
           serviceGroups={serviceGroups}
+          {...otherProps}
+        />
+        <CascadingLinkRules
           {...otherProps}
         />
       </div>,
