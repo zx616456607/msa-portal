@@ -26,7 +26,7 @@ export default class Sider extends React.Component {
     title: PropTypes.node, // 侧边栏标题
     extra: PropTypes.bool, // 是否需要展示 title 以外的内容
     location: PropTypes.object.isRequired, // react-router 对应的 location，用于处理菜单选中状态
-    menu: PropTypes.objectOf({ // 菜单相关配置
+    menu: PropTypes.shape({ // 菜单相关配置
       mode: PropTypes.string, // 菜单模式
       items: PropTypes.array.isRequired, // menu items json 配置
       defaultOpenKeys: PropTypes.array, // 默认展开的 SubMenu
