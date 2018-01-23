@@ -111,7 +111,7 @@ class CreateLinkRules extends React.Component {
   deleteTargetInstances = index => {
     const { targetInstancesArray } = this.state
     const preList = cloneDeep(targetInstancesArray)
-    preList[index].isDelete = true
+    preList[index - 1].isDelete = true
     this.setState({ targetInstancesArray: preList })
   }
 
