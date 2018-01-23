@@ -14,13 +14,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Layout, Menu, Icon, Card, Breadcrumb } from 'antd'
+import { Layout, Icon, Breadcrumb } from 'antd'
 import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstanceDetailChildRoutes } from '../../../RoutesDom'
-import { getMenuSelectedKeys } from '../../../common/utils'
-import { renderMenu, renderLoading } from '../../../components/utils'
+import { renderLoading } from '../../../components/utils'
 import {
   UNUSED_CLUSTER_ID,
 } from '../../../constants'
@@ -139,20 +138,15 @@ class CSBInstanceDetail extends React.Component {
           </Breadcrumb.Item>
         </Breadcrumb>
         <Layout>
-          <Sider extra={false}>
-            <Card
-              className="left-menu-card"
-            >
-              <Menu mode="inline"
-                selectedKeys={getMenuSelectedKeys(location, menus)}
-                defaultOpenKeys={[ 'service-publish', 'service-subscription' ]}
-              >
-                {
-                  menus.map(renderMenu)
-                }
-              </Menu>
-            </Card>
-          </Sider>
+          <Sider
+            key="sider"
+            extra={false}
+            location={location}
+            menu={{
+              items: menus,
+              defaultOpenKeys: [ 'service-publish', 'service-subscription' ],
+            }}
+          />
           <Content>
             {this.renderChildren()}
           </Content>

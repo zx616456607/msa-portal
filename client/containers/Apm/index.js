@@ -12,14 +12,13 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
+import { Layout, Menu, Icon, Dropdown } from 'antd'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
-import { getMenuSelectedKeys } from '../../common/utils'
-import { renderMenu, renderLoading } from '../../components/utils'
+import { renderLoading } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/topology.svg'
 import performanceIcon from '../../assets/img/apm/performance.svg'
 import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
@@ -139,20 +138,14 @@ class Apm extends React.Component {
     )
     return (
       <Layout className="apm">
-        <Sider>
-          <Card
-            className="left-menu-card"
-            title={title}
-          >
-            <Menu mode="inline"
-              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
-            >
-              {
-                menus.map(renderMenu)
-              }
-            </Menu>
-          </Card>
-        </Sider>
+        <Sider
+          key="sider"
+          title={title}
+          location={location}
+          menu={{
+            items: menus,
+          }}
+        />
         <Content>
           {this.renderChildren()}
         </Content>

@@ -12,13 +12,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card } from 'antd'
+import { Layout, Icon } from 'antd'
 import { Route, Switch } from 'react-router-dom'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { msaOmChildRoutes } from '../../RoutesDom'
-import { getMenuSelectedKeys } from '../../common/utils'
-import { renderMenu } from '../../components/utils'
 import { ROLE_SYS_ADMIN } from '../../constants'
 import msaComponent from '../../assets/img/msa-om/msa-component.svg'
 import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
@@ -115,21 +113,16 @@ class MsaOm extends React.Component {
     )
     return (
       <Layout className="msa-om">
-        <Sider key="sider" extra={false}>
-          <Card
-            className="left-menu-card"
-            title={title}
-          >
-            <Menu mode="inline"
-              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
-              defaultOpenKeys={[ 'msa-om-csb' ]}
-            >
-              {
-                menus.map(renderMenu)
-              }
-            </Menu>
-          </Card>
-        </Sider>
+        <Sider
+          key="sider"
+          extra={false}
+          title={title}
+          location={location}
+          menu={{
+            items: menus,
+            defaultOpenKeys: [ 'msa-om-csb' ],
+          }}
+        />
         <Content key="content">
           {this.renderChildren()}
         </Content>

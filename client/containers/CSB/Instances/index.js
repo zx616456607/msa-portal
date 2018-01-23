@@ -13,13 +13,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card } from 'antd'
+import { Layout, Icon } from 'antd'
 import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstancesChildRoutes } from '../../../RoutesDom'
-import { getMenuSelectedKeys } from '../../../common/utils'
-import { renderMenu } from '../../../components/utils'
 import { getAllClusters } from '../../../actions/current'
 import './style/index.less'
 
@@ -81,21 +79,16 @@ class CSBInstances extends React.Component {
     )
     return (
       <Layout className="csb-instances">
-        <Sider extra={false}>
-          <Card
-            className="left-menu-card"
-            title={title}
-          >
-            <Menu mode="inline"
-              selectedKeys={getMenuSelectedKeys(location, menus)}
-              defaultOpenKeys={[ 'mine-csb-instances', 'public-csb-instances' ]}
-            >
-              {
-                menus.map(renderMenu)
-              }
-            </Menu>
-          </Card>
-        </Sider>
+        <Sider
+          key="sider"
+          extra={false}
+          title={title}
+          location={location}
+          menu={{
+            items: menus,
+            defaultOpenKeys: [ 'mine-csb-instances', 'public-csb-instances' ],
+          }}
+        />
         <Content>
           {this.renderChildren()}
         </Content>
