@@ -16,6 +16,7 @@ import { Row, Col, Steps, Icon, Tooltip } from 'antd'
 import StepIcon from '../../../assets/img/csb/StepIcon.svg'
 import './style/ExpandRowSteps.less'
 import classNames from 'classnames'
+import cloneDeep from 'lodash/cloneDeep'
 
 const Step = Steps.Step
 const STEP_SIZE = 4
@@ -27,9 +28,15 @@ class ExpandRowSteps extends React.Component {
     currentStep: 0,
   }
 
-  renderSteps = stepItem => {
+  renderSteps = stepArray => {
     const { currentStep } = this.state
-    let mapArry = stepItem
+    const stepItem = cloneDeep(stepArray)
+    let mapArry = stepItem.filter(item => {
+      if (item === null) {
+        return false
+      }
+      return true
+    })
     if (stepItem.length > STEP_SIZE) {
       mapArry = stepItem.slice(currentStep, currentStep + STEP_SIZE)
     }
