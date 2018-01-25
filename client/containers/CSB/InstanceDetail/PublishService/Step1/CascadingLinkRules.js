@@ -49,11 +49,31 @@ class CascadingLinkRules extends React.Component {
     const pathId = parseInt(getFieldValue('pathId'))
     const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
     const instances = selectPath && selectPath.instances || []
-    return instances.map((instance, index) => ({
-      label: instance ? instance.name : '实例已删除',
-      value: instance ? instance.id : `deleted|${index}`,
-      disabled: !instance,
-    }))
+    const firstDeletedInstanceIndex = instances.indexOf(null)
+    return instances.map((instance, index) => {
+      const { id, name, privilege, services, groups } = instance || {}
+      let disabled = (firstDeletedInstanceIndex > -1 && index >= firstDeletedInstanceIndex)
+      const tips = []
+      if (privilege === false) {
+        disabled = true
+        tips.push('无发布权限')
+      }
+      if (groups === false) {
+        disabled = true
+        tips.push('无同名服务组')
+      }
+      if (services === false) {
+        disabled = true
+        tips.push('有同名及同版本服务')
+      }
+      return {
+        label: instance
+          ? `${name}${tips.length > 0 ? `（${tips.join('/')}）` : ''}`
+          : '实例已删除',
+        value: instance ? id : `deleted|${index}`,
+        disabled,
+      }
+    })
   }
 
   onPathChange = pathId => {
@@ -133,8 +153,25 @@ class CascadingLinkRules extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const cascadingLinkRules = cascadingLinkRuleSlt(state, ownProps)
+  const { CSB } = state
+  const { cascadedServicePrerequisite = {} } = CSB
+  cascadingLinkRules.content.map(clr => {
+    const csp = cascadedServicePrerequisite[clr.id]
+    if (csp) {
+      clr.instances && clr.instances.forEach(instance => {
+        if (!instance) {
+          return
+        }
+        instance.privilege = csp.privilege && csp.privilege[instance.id]
+        instance.groups = csp.groups && csp.groups[instance.id]
+        instance.services = csp.services && csp.services[instance.id]
+      })
+    }
+    return clr
+  })
   return {
-    cascadingLinkRules: cascadingLinkRuleSlt(state, ownProps),
+    cascadingLinkRules,
   }
 }
 
