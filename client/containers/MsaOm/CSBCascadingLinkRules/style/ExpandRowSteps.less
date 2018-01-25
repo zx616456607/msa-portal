@@ -48,12 +48,17 @@
     }
   }
   .steps-row-style {
-    height: 50px;
+    height: 80px;
     .ant-steps-item:last-child {
       min-width: 80px;
     }
     .ant-steps-item-icon {
       padding-left: 16px;
+    }
+    .deleted-instance {
+      .ant-steps-item-title:after {
+        background-color: @border-color-base;
+      }
     }
     .ant-steps-item-content {
       position: relative;
