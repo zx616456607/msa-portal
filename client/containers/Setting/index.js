@@ -12,13 +12,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Card } from 'antd'
+import { Layout } from 'antd'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
-import { getMenuSelectedKeys } from '../../common/utils'
-import { renderMenu } from '../../components/utils'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import globalSetting from '../../assets/img/system-settings/global-setting.svg'
@@ -76,20 +74,14 @@ class Setting extends React.Component {
     const { location } = this.props
     return (
       <Layout className="apm-setting">
-        <Sider extra={false}>
-          <Card
-            className="left-menu-card"
-            title="系统设置"
-          >
-            <Menu mode="inline"
-              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
-            >
-              {
-                menus.map(renderMenu)
-              }
-            </Menu>
-          </Card>
-        </Sider>
+        <Sider
+          key="sider"
+          extra={false}
+          location={location}
+          menu={{
+            items: menus,
+          }}
+        />
         <Content>
           {this.renderChildren()}
         </Content>

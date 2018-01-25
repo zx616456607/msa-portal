@@ -12,13 +12,12 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Card, Dropdown } from 'antd'
+import { Layout, Menu, Icon, Dropdown } from 'antd'
 import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
-import { getMenuSelectedKeys } from '../../common/utils'
-import { renderMenu, renderLoading } from '../../components/utils'
+import { renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import confirm from '../../components/Modal/confirm'
 import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
@@ -192,20 +191,14 @@ class MsaManage extends React.Component {
     )
     return (
       <Layout className="msa-manage">
-        <Sider key="sider">
-          <Card
-            className="left-menu-card"
-            title={title}
-          >
-            <Menu mode="inline"
-              defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
-            >
-              {
-                menus.map(renderMenu)
-              }
-            </Menu>
-          </Card>
-        </Sider>
+        <Sider
+          key="sider"
+          title={title}
+          location={location}
+          menu={{
+            items: menus,
+          }}
+        />
         <Content key="content">
           {this.renderChildren()}
         </Content>
