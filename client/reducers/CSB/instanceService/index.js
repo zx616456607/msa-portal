@@ -109,7 +109,6 @@ export const subscribableServices = (state = {}, action) => {
   }
 }
 
-
 export const serviceOverview = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -128,6 +127,36 @@ export const serviceOverview = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+export const cascadedServicePrerequisite = (state = {}, action) => {
+  const { type, pathId } = action
+  switch (type) {
+    case ActionTypes.CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST:
+      return {
+        ...state,
+        [pathId]: {
+          isFetching: true,
+        },
+      }
+    case ActionTypes.CSB_CASCADED_SERVICES_PREREQUISITE_SUCCESS:
+      return {
+        ...state,
+        [pathId]: {
+          isFetching: false,
+          ...action.response.result.data,
+        },
+      }
+    case ActionTypes.CSB_CASCADED_SERVICES_PREREQUISITE_FAILURE:
+      return {
+        ...state,
+        [pathId]: {
+          isFetching: false,
+        },
       }
     default:
       return state

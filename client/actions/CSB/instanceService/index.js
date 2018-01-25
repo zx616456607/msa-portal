@@ -347,3 +347,27 @@ const fetchUploadMsgConverters = (instanceID, body) => {
 
 export const uploadMsgConverters = (instanceID, body) =>
   dispatch => dispatch(fetchUploadMsgConverters(instanceID, body))
+
+// cascaded-services/prerequisite
+export const CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST = 'CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST'
+export const CSB_CASCADED_SERVICES_PREREQUISITE_SUCCESS = 'CSB_CASCADED_SERVICES_PREREQUISITE_SUCCESS'
+export const CSB_CASCADED_SERVICES_PREREQUISITE_FAILURE = 'CSB_CASCADED_SERVICES_PREREQUISITE_FAILURE'
+
+const fetchCascadedServicesPrerequisite = (query = {}) => {
+  const { pathId } = query
+  return {
+    pathId,
+    [CALL_API]: {
+      types: [
+        CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST,
+        CSB_CASCADED_SERVICES_PREREQUISITE_SUCCESS,
+        CSB_CASCADED_SERVICES_PREREQUISITE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/cascaded-services/prerequisite?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const getCascadedServicesPrerequisite = query =>
+  dispatch => dispatch(fetchCascadedServicesPrerequisite(query))

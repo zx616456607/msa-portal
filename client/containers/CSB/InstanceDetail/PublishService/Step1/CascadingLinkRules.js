@@ -22,6 +22,9 @@ import {
   getCascadingLinkRulesList,
 } from '../../../../../actions/CSB/cascadingLinkRules'
 import {
+  getCascadedServicesPrerequisite,
+} from '../../../../../actions/CSB/instanceService'
+import {
   cascadingLinkRuleSlt,
 } from '../../../../../selectors/CSB/cascadingLinkRules'
 import './style/CascadingLinkRules.less'
@@ -53,6 +56,14 @@ class CascadingLinkRules extends React.Component {
     }))
   }
 
+  onPathChange = pathId => {
+    if (pathId === 'default') {
+      return
+    }
+    const { getCascadedServicesPrerequisite } = this.props
+    getCascadedServicesPrerequisite({ pathId })
+  }
+
   render() {
     const { formItemLayout, form, className, cascadingLinkRules } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -70,6 +81,11 @@ class CascadingLinkRules extends React.Component {
         >
           {getFieldDecorator('pathId', {
             initialValue: 'default',
+            rules: [{
+              required: true,
+              message: '请选择链路!',
+            }],
+            onChange: this.onPathChange,
           })(
             <Select
               placeholder="选择级联链路"
@@ -101,7 +117,12 @@ class CascadingLinkRules extends React.Component {
             label=" "
             className="path-instances"
           >
-            {getFieldDecorator('targetInstancesIDs')(
+            {getFieldDecorator('targetInstancesIDs', {
+              rules: [{
+                required: true,
+                message: '请选择目标实例!',
+              }],
+            })(
               <CheckboxGroup options={instancesOptions} />
             )}
           </FormItem>
@@ -119,4 +140,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(mapStateToProps, {
   getCascadingLinkRulesList,
+  getCascadedServicesPrerequisite,
 })(CascadingLinkRules)

@@ -12,22 +12,26 @@
 
 import React from 'react'
 import ClassNames from 'classnames'
+import { connect } from 'react-redux'
 import {
   Button,
 } from 'antd'
 import AccessAgreement from './AccessAgreement/'
 import OpenAgreement from './OpenAgreement'
 import CascadingLinkRules from './CascadingLinkRules'
+import {
+  getCascadedServicesPrerequisite,
+} from '../../../../../actions/CSB/instanceService'
 
-export default class Step1 extends React.Component {
+class Step1 extends React.Component {
   getValidateFields = () => {
     const { form } = this.props
     const { getFieldsValue } = form
     let fields = [
       'protocol', 'openProtocol', 'targetDetail', 'name', 'version',
-      'openUrl', 'groupId',
+      'openUrl', 'groupId', 'pathId',
     ]
-    const { protocol, openProtocol } = getFieldsValue()
+    const { protocol, openProtocol, pathId } = getFieldsValue()
     const transformationType = `${protocol}_to_${openProtocol}`
     switch (transformationType) {
       case 'rest_to_rest':
@@ -49,17 +53,42 @@ export default class Step1 extends React.Component {
       default:
         break
     }
+    if (pathId !== 'default') {
+      fields.push('targetInstancesIDs')
+    }
     return fields
   }
 
   validateFieldsAndGoNext = () => {
-    const { form, changeStep } = this.props
-    const { validateFieldsAndScroll } = form
+    const {
+      form, changeStep, getCascadedServicesPrerequisite,
+      csbInstanceServiceGroups,
+    } = this.props
+    const { validateFieldsAndScroll, getFieldsValue } = form
     validateFieldsAndScroll(this.getValidateFields(), errors => {
       if (errors) {
         return
       }
-      changeStep(1)
+      const { pathId, groupId, name, version } = getFieldsValue()
+      if (pathId === 'default') {
+        return changeStep(1)
+      }
+      const groupName = csbInstanceServiceGroups
+        && csbInstanceServiceGroups[groupId]
+        && csbInstanceServiceGroups[groupId].name
+      const query = {
+        pathId,
+        groupName,
+        serviceName: name,
+        serviceVersion: version,
+      }
+      getCascadedServicesPrerequisite(query).then(res => {
+        if (res.error) {
+          return
+        }
+        // console.log('res', res)
+        changeStep(1)
+      })
     })
   }
 
@@ -103,3 +132,14 @@ export default class Step1 extends React.Component {
     ]
   }
 }
+
+const mapStateToProps = state => {
+  const { csbInstanceServiceGroups } = state.entities
+  return {
+    csbInstanceServiceGroups,
+  }
+}
+
+export default connect(mapStateToProps, {
+  getCascadedServicesPrerequisite,
+})(Step1)

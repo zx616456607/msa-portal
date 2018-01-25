@@ -22,8 +22,10 @@
   }
   .path-instances {
     .ant-form-item-label {
-      label:after {
-        visibility: hidden;
+      label {
+        &:before, &:after {
+          visibility: hidden;
+        }
       }
     }
     .ant-checkbox-group > label {
