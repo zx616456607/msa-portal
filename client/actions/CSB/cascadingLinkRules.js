@@ -98,3 +98,22 @@ const fetchDeleteCsbCascadingLinkRule = id => {
 export const deleteCsbCascadingLinkRule = id => {
   return dispatch => dispatch(fetchDeleteCsbCascadingLinkRule(id))
 }
+
+// 级联链路名称重名验证
+export const CHECK_CSB_CASCADING_LINK_RULE_NAME_REQUEST = 'CHECK_CSB_CASCADING_LINK_RULE_NAME_REQUEST'
+export const CHECK_CSB_CASCADING_LINK_RULE_NAME_SUCCESS = 'CHECK_CSB_CASCADING_LINK_RULE_NAME_SUCCESS'
+export const CHECK_CSB_CASCADING_LINK_RULE_NAME_FALIURE = 'CHECK_CSB_CASCADING_LINK_RULE_NAME_FALIURE'
+
+export const checkCascadingLinkRuleName = name => {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_CSB_CASCADING_LINK_RULE_NAME_REQUEST,
+        CHECK_CSB_CASCADING_LINK_RULE_NAME_SUCCESS,
+        CHECK_CSB_CASCADING_LINK_RULE_NAME_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/cascaded-instances-path/${name}`,
+      schema: {},
+    },
+  }
+}

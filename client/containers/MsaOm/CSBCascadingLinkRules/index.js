@@ -16,7 +16,7 @@ import QueueAnim from 'rc-queue-anim'
 import './style/CSBCascadingLinkRules.less'
 import {
   Button, Input, Select, Pagination, Card,
-  Table, notification,
+  Table, notification, Badge,
 } from 'antd'
 import { formatDate, handleHistoryForLoadData } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
@@ -104,8 +104,25 @@ class CSBCascadingLinkRules extends React.Component {
     }
     const columns = [
       { title: '级联链路规则名称', dataIndex: 'name', width: '17%' },
-      { title: '起点实例', dataIndex: 'instance.name', width: '17%' },
-      { title: '目标实例', dataIndex: 'count', width: '16%' },
+      {
+        title: '链路状态', dataIndex: 'instances', width: '10%',
+        render: instances => {
+          for (let i = 0; i < instances.length; i++) {
+            if (instances[i] === null) {
+              return <Badge status="error" text="异常"/>
+            }
+          }
+          return <Badge status="success" text="正常" />
+        },
+      },
+      {
+        title: '起点实例', dataIndex: 'instances[0]', width: '13%',
+        render: text => {
+          if (text === null) return '起点实例已删除'
+          return text.name
+        },
+      },
+      { title: '目标实例', dataIndex: 'count', width: '10%' },
       { title: '创建人', dataIndex: 'creatorName', width: '16%' },
       {
         title: '创建时间', dataIndex: 'createdAt', width: '17%',
