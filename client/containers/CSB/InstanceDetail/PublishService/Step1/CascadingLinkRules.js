@@ -16,7 +16,7 @@ import {
   Form, Checkbox, Select,
 } from 'antd'
 import ClassNames from 'classnames'
-import { find } from 'lodash'
+import find from 'lodash/find'
 // import SockJS from 'sockjs-client'
 import {
   getCascadingLinkRulesList,
@@ -77,6 +77,7 @@ class CascadingLinkRules extends React.Component {
   }
 
   onPathChange = pathId => {
+    this.props.form.resetFields([ 'targetInstancesIDs' ])
     if (pathId === 'default') {
       return
     }

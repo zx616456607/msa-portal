@@ -22,8 +22,16 @@ import CascadingLinkRules from './CascadingLinkRules'
 import {
   getCascadedServicesPrerequisite,
 } from '../../../../../actions/CSB/instanceService'
+import {
+  cascadingLinkRuleSlt,
+} from '../../../../../selectors/CSB/cascadingLinkRules'
+import find from 'lodash/find'
 
 class Step1 extends React.Component {
+  state = {
+    loading: false,
+  }
+
   getValidateFields = () => {
     const { form } = this.props
     const { getFieldsValue } = form
@@ -62,17 +70,25 @@ class Step1 extends React.Component {
   validateFieldsAndGoNext = () => {
     const {
       form, changeStep, getCascadedServicesPrerequisite,
-      csbInstanceServiceGroups,
+      csbInstanceServiceGroups, cascadingLinkRules,
     } = this.props
-    const { validateFieldsAndScroll, getFieldsValue } = form
+    const { validateFieldsAndScroll, getFieldsValue, setFields } = form
     validateFieldsAndScroll(this.getValidateFields(), errors => {
       if (errors) {
         return
       }
-      const { pathId, groupId, name, version } = getFieldsValue()
+      const values = getFieldsValue()
+      const { targetInstancesIDs, groupId, name, version } = values
+      let pathId = values.pathId
       if (pathId === 'default') {
         return changeStep(1)
       }
+      this.setState({
+        loading: true,
+      })
+      pathId = parseInt(pathId)
+      const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
+      const instances = selectPath && selectPath.instances || []
       const groupName = csbInstanceServiceGroups
         && csbInstanceServiceGroups[groupId]
         && csbInstanceServiceGroups[groupId].name
@@ -83,11 +99,48 @@ class Step1 extends React.Component {
         serviceVersion: version,
       }
       getCascadedServicesPrerequisite(query).then(res => {
+        this.setState({
+          loading: false,
+        })
         if (res.error) {
           return
         }
-        // console.log('res', res)
-        changeStep(1)
+        const data = res.response.result.data
+        const errors = []
+        Object.keys(data).forEach(key => {
+          Object.keys(data[key]).forEach(itemKey => {
+            itemKey = parseInt(itemKey)
+            const instance = find(instances, { id: itemKey }) || {}
+            if (data[key][itemKey] === false) {
+              switch (key) {
+                case 'privilege':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上无发布权限`))
+                  break
+                case 'groups':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上无同名服务组 ${groupName}`))
+                  break
+                case 'services':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上有同名及同版本服务`))
+                  break
+                default:
+                  break
+              }
+              const instanceIdIndex = targetInstancesIDs.indexOf(itemKey)
+              if (instanceIdIndex > -1) {
+                targetInstancesIDs.splice(instanceIdIndex, 1)
+              }
+            }
+          })
+        })
+        if (errors.length === 0) {
+          return changeStep(1)
+        }
+        setFields({
+          targetInstancesIDs: {
+            value: targetInstancesIDs,
+            errors,
+          },
+        })
       })
     })
   }
@@ -124,6 +177,7 @@ class Step1 extends React.Component {
         <Button
           type="primary"
           key="next"
+          loading={this.state.loading}
           onClick={this.validateFieldsAndGoNext}
         >
         下一步
@@ -133,10 +187,11 @@ class Step1 extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const { csbInstanceServiceGroups } = state.entities
   return {
     csbInstanceServiceGroups,
+    cascadingLinkRules: cascadingLinkRuleSlt(state, ownProps),
   }
 }
 
