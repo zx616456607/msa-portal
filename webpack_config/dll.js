@@ -16,21 +16,31 @@ const webpack = require('webpack')
 console.log('Build webpack dll ...')
 
 const vendors = [
+  '@antv/g6',
   'antd',
+  'classnames',
+  'codemirror',
+  'g2',
+  'history',
   'isomorphic-fetch',
   'lodash',
   'normalizr',
   'query-string',
+  'rc-queue-anim',
   'react',
+  'react-codemirror2',
+  'react-copy-to-clipboard',
   'react-dock',
   'react-dom',
+  'react-helmet',
   'react-redux',
   'react-router-dom',
   'react-router-redux',
   'redux',
-  'redux-thunk',
   'redux-devtools-extension',
-  'react-copy-to-clipboard',
+  'redux-thunk',
+  'reselect',
+  'sockjs-client',
   // ...其它库
 ]
 
