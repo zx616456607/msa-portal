@@ -24,6 +24,7 @@ const MSA_API = 'http://192.168.1.58:8080'
 const MSA_API_PREFIX = '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
 const CSB_API = 'http://192.168.1.58:9090'
+// const CSB_API = 'http://192.168.0.19:8081'
 const CSB_API_PREFIX = '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
 let apiConfig = {

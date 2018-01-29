@@ -15,8 +15,9 @@ import {
   servicesInbounds,
 } from './instance'
 import {
-  publishedService, serviceCAL, serviceOverview, subscribableServices, serviceDetailMap,
-  cascadedServicePrerequisite,
+  publishedService, serviceCAL, serviceOverview, subscribableServices,
+  serviceDetailMap, cascadedServicePrerequisite, cascadedServicesWebsocket,
+  cascadedServicesProgresses,
 } from './instanceService'
 import { serviceGroups, groupServices } from './instanceService/group'
 import { consumerVouchers } from './instanceService/consumerVouchers'
@@ -47,6 +48,14 @@ const CSB = (state = {
     serviceOverview: serviceOverview(state.serviceOverview, action),
     cascadedServicePrerequisite: cascadedServicePrerequisite(
       state.cascadedServicePrerequisite,
+      action
+    ),
+    cascadedServicesWebsocket: cascadedServicesWebsocket(
+      state.cascadedServicesWebsocket,
+      action
+    ),
+    cascadedServicesProgresses: cascadedServicesProgresses(
+      state.cascadedServicesProgresses,
       action
     ),
     groupServices: groupServices(state.groupServices, action),

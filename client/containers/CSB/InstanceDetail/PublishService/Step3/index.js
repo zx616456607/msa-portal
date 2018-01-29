@@ -13,12 +13,19 @@
 import React from 'react'
 import ClassNames from 'classnames'
 import { connect } from 'react-redux'
+import find from 'lodash/find'
 import {
   Button, notification,
 } from 'antd'
 import {
   createService, uploadMsgConverters,
 } from '../../../../../actions/CSB/instanceService'
+import {
+  cascadingLinkRuleSlt,
+} from '../../../../../selectors/CSB/cascadingLinkRules'
+import {
+  sleep,
+} from '../../../../../common/utils'
 import Control from './Control'
 import OAuth from './OAuth'
 
@@ -42,6 +49,7 @@ class Step3 extends React.Component {
   submitService = async () => {
     const {
       form, createService, instanceID, history, uploadMsgConverters,
+      cascadingLinkRules, cascadedServicesWebsocket, csbInstanceServiceGroups,
     } = this.props
     const { validateFieldsAndScroll } = form
     validateFieldsAndScroll(async (errors, values) => {
@@ -52,6 +60,8 @@ class Step3 extends React.Component {
         confirmLoading: true,
       })
       const {
+        name,
+        version,
         protocol,
         openProtocol,
         apiGatewayLimit,
@@ -65,6 +75,7 @@ class Step3 extends React.Component {
         clientSecret,
         errCodeKeys,
       } = values
+      const groupId = parseInt(values.groupId)
       // 错误代码
       const errorCode = errCodeKeys.map(key => ({
         code: values[`code-${key}`],
@@ -100,8 +111,8 @@ class Step3 extends React.Component {
       }
       const body = [
         {
-          name: values.name,
-          version: values.version,
+          name,
+          version,
           description: values.description,
           type: values.type,
           inboundId: values.inboundId,
@@ -119,19 +130,28 @@ class Step3 extends React.Component {
           xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
           oauth2Type,
           oauth2Detail: JSON.stringify(oauth2Detail),
-          groupId: parseInt(values.groupId),
+          groupId,
         },
       ]
       const { requestXslt, responseXslt } = values
       const _generatFile = (string, name) => {
         return new File([ string ], name, { type: 'text/xml' })
       }
+      // 上传转换模板的实例 ID
+      let uploadInstanceID = instanceID
+      let pathId = values.pathId
+      let cascadedInstances
+      // [cascadedService] 如果为级联发布，将转换模板上传到链路的第一个实例中
+      if (pathId !== 'default') {
+        pathId = parseInt(pathId)
+        const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
+        cascadedInstances = selectPath && selectPath.instances || []
+        uploadInstanceID = cascadedInstances[0] && cascadedInstances[0].id
+      }
       // soap 转 rest
       if (protocol === 'soap' && openProtocol === 'rest') {
         body[0].transformationType = `${protocol}_to_${openProtocol}`
         const transformationDetail = {
-          requestXsltId: 4,
-          responseXsltId: 5,
           exposedRegexPath: values.openUrl,
           bindingName: values.bindingName,
           operationName: values.operationName,
@@ -143,12 +163,12 @@ class Step3 extends React.Component {
         const reqXsltBody = new FormData()
         reqXsltBody.append('file', _generatFile(requestXslt, 'request.xsl'))
         reqXsltBody.append('type', 'xslt')
-        uplodaActions.push(uploadMsgConverters(instanceID, reqXsltBody))
+        uplodaActions.push(uploadMsgConverters(uploadInstanceID, reqXsltBody))
         // 响应转换模板
         const resXsltBody = new FormData()
         resXsltBody.append('file', _generatFile(responseXslt, 'response.xsl'))
         resXsltBody.append('type', 'xslt')
-        uplodaActions.push(uploadMsgConverters(instanceID, resXsltBody))
+        uplodaActions.push(uploadMsgConverters(uploadInstanceID, resXsltBody))
         const [ reqXsltResult, resXsltResult ] = await Promise.all(uplodaActions)
         // 上传转换模板失败
         if (reqXsltResult.error || resXsltResult.error) {
@@ -164,15 +184,43 @@ class Step3 extends React.Component {
         transformationDetail.responseXsltId = resXsltResult.response.result.data.id
         body[0].transformationDetail = JSON.stringify(transformationDetail)
       }
-      const res = await createService(instanceID, body)
+      if (pathId === 'default') {
+        const res = await createService(instanceID, body)
+        if (res.error) {
+          return
+        }
+      } else {
+        // [cascadedService] 发布级联服务
+        const { targetInstancesIDs } = values
+        const groupName = csbInstanceServiceGroups
+        && csbInstanceServiceGroups[groupId]
+        && csbInstanceServiceGroups[groupId].name
+        const serviceBehaviourPerInstance = {}
+        cascadedInstances.forEach(instance => {
+          const { id } = instance
+          serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
+            ? 2 // 2 - 为可订阅
+            : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
+        })
+        const cascadedBody = {
+          type: 'publish',
+          cascadedService: {
+            pathId,
+            groupName,
+            serviceName: name,
+            serviceVersion: version,
+            serviceBehaviourPerInstance: JSON.stringify(serviceBehaviourPerInstance),
+          },
+          service: body[0],
+        }
+        cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(cascadedBody))
+        await sleep(200)
+      }
       this.setState({
         confirmLoading: false,
       })
-      if (res.error) {
-        return
-      }
       notification.success({
-        message: '创建服务成功',
+        message: '发布服务成功',
       })
       history.push(`/csb-instances-available/${instanceID}/my-published-services`)
     })
@@ -214,9 +262,14 @@ class Step3 extends React.Component {
 }
 
 
-const mapStateToProps = () => {
+const mapStateToProps = (state, ownProps) => {
+  const { entities, CSB } = state
+  const { csbInstanceServiceGroups } = entities
+  const { cascadedServicesWebsocket } = CSB
   return {
-    //
+    csbInstanceServiceGroups,
+    cascadedServicesWebsocket,
+    cascadingLinkRules: cascadingLinkRuleSlt(state, ownProps),
   }
 }
 

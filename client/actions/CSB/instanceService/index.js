@@ -371,3 +371,35 @@ const fetchCascadedServicesPrerequisite = (query = {}) => {
 
 export const getCascadedServicesPrerequisite = query =>
   dispatch => dispatch(fetchCascadedServicesPrerequisite(query))
+
+// save cascaded services websocket to store
+export const SAVE_CASCADED_SERVICES_WEBSOCKET = 'SAVE_CASCADED_SERVICES_WEBSOCKET'
+
+export const saveCascadedServicesWs = ws => ({
+  ws,
+  type: SAVE_CASCADED_SERVICES_WEBSOCKET,
+})
+
+// remove cascaded services websocket from store
+export const REMOVE_CASCADED_SERVICES_WEBSOCKET = 'REMOVE_CASCADED_SERVICES_WEBSOCKET'
+
+export const removeCascadedServicesWs = () => ({
+  type: REMOVE_CASCADED_SERVICES_WEBSOCKET,
+})
+
+// save cascaded services websocket progress to store
+export const SAVE_CASCADED_SERVICES_PROGRESS = 'SAVE_CASCADED_SERVICES_PROGRESS'
+
+export const saveCascadedServicesProgress = progress => ({
+  progress,
+  type: SAVE_CASCADED_SERVICES_PROGRESS,
+})
+
+// remove cascaded services websocket progress from store
+export const REMOVE_CASCADED_SERVICES_PROGRESS = 'REMOVE_CASCADED_SERVICES_PROGRESS'
+
+export const removeCascadedServicesProgress = (serviceName, serviceVersion) => ({
+  serviceName,
+  serviceVersion,
+  type: REMOVE_CASCADED_SERVICES_PROGRESS,
+})

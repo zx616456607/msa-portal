@@ -40,7 +40,7 @@ class MyPublishedServices extends React.Component {
 
   // 是否显示已注销服务
   logoutServiceChange = e => {
-    const includeDeleted = e.target.value
+    const includeDeleted = e.target.value === 1
     this.setState({
       includeDeleted,
     })
@@ -134,9 +134,9 @@ class MyPublishedServices extends React.Component {
             </Col>
             <Col span="12">
               <label>已注销服务：</label>
-              <RadioGroup onChange={this.logoutServiceChange} defaultValue={false}>
-                <Radio value={false}>不显示</Radio>
-                <Radio value={true}>显示</Radio>
+              <RadioGroup onChange={this.logoutServiceChange} defaultValue={0}>
+                <Radio value={0}>不显示</Radio>
+                <Radio value={1}>显示</Radio>
               </RadioGroup>
             </Col>
           </Row>

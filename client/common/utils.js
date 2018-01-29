@@ -454,3 +454,15 @@ export function transformCSBProtocols(protocol) {
       return ''
   }
 }
+/**
+ * sleep function
+ *
+ * @export
+ * @param {number} [timeout=50] sleep timeout
+ * @return {promise} timeout promise
+ */
+export function sleep(timeout = 50) {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout)
+  })
+}

@@ -11,6 +11,8 @@
  */
 import * as ActionTypes from '../../../actions/CSB/instanceService'
 import { getQueryKey } from '../../../common/utils'
+import union from 'lodash/union'
+import pick from 'lodash/pick'
 
 export const publishedService = (state = {}, action) => {
   const { type, query } = action
@@ -193,3 +195,34 @@ export const serviceDetailMap = (state = {}, action) => {
   }
 }
 
+export const cascadedServicesWebsocket = (state = {}, action) => {
+  const { type, ws } = action
+  switch (type) {
+    case ActionTypes.SAVE_CASCADED_SERVICES_WEBSOCKET:
+      return ws
+    case ActionTypes.REMOVE_CASCADED_SERVICES_WEBSOCKET:
+      return null
+    default:
+      return state
+  }
+}
+
+export const cascadedServicesProgresses = (state = {}, action) => {
+  const { type, progress, serviceName, serviceVersion } = action
+  const cascadedService = progress && progress.action && progress.action.cascadedService
+  let fullname
+  if (cascadedService) {
+    fullname = `${cascadedService.serviceName}:${cascadedService.serviceVersion}`
+  }
+  switch (type) {
+    case ActionTypes.SAVE_CASCADED_SERVICES_PROGRESS:
+      return {
+        ...state,
+        [fullname]: union(state[fullname], [ progress ]),
+      }
+    case ActionTypes.REMOVE_CASCADED_SERVICES_PROGRESS:
+      return pick(state, Object.keys(state).filter(key => key !== `${serviceName}:${serviceVersion}`))
+    default:
+      return state
+  }
+}

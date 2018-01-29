@@ -15,16 +15,26 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Layout, Icon, Breadcrumb } from 'antd'
+import SockJS from 'sockjs-client'
+import { Stomp } from 'stompjs/lib/stomp'
 import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstanceDetailChildRoutes } from '../../../RoutesDom'
 import { renderLoading } from '../../../components/utils'
 import {
-  UNUSED_CLUSTER_ID,
+  UNUSED_CLUSTER_ID, API_CONFIG,
 } from '../../../constants'
+import {
+  toQuerystring,
+} from '../../../common/utils'
 import { getInstanceByID } from '../../../actions/CSB/instance'
+import {
+  saveCascadedServicesWs, removeCascadedServicesWs, saveCascadedServicesProgress,
+} from '../../../actions/CSB/instanceService'
 import './style/index.less'
+
+const { CSB_API_URL } = API_CONFIG
 
 class CSBInstanceDetail extends React.Component {
   state = {
@@ -32,7 +42,11 @@ class CSBInstanceDetail extends React.Component {
   }
 
   componentDidMount() {
-    const { instanceID, getInstanceByID } = this.props
+    const {
+      instanceID, getInstanceByID, jwtToken, saveCascadedServicesWs,
+      cascadedServicesWebsocket, saveCascadedServicesProgress,
+    } = this.props
+    // get instance by id
     getInstanceByID(UNUSED_CLUSTER_ID, instanceID).then(res => {
       if (res.error) {
         this.setState({
@@ -40,6 +54,43 @@ class CSBInstanceDetail extends React.Component {
         })
       }
     })
+    // connect to the websocket
+    try {
+      if (cascadedServicesWebsocket && cascadedServicesWebsocket.connected) {
+        console.log('already connected before: ', cascadedServicesWebsocket)
+        return
+      }
+      const query = {
+        jwt: jwtToken,
+      }
+      const ws = new SockJS(`${CSB_API_URL}/cascaded-services?${toQuerystring(query)}`)
+      const stompWs = Stomp.over(ws)
+      const connectCb = frame => {
+        console.log('frame', frame)
+        this.stompWsSubscribe = stompWs.subscribe('/user/api/v1/cascaded-services/progress', ({ body, ack }) => {
+          const progress = JSON.parse(body)
+          saveCascadedServicesProgress(progress)
+          ack()
+        })
+        saveCascadedServicesWs(stompWs)
+      }
+      const errorCb = error => {
+        // console.log('----errorCb----error----')
+        console.log('error', error)
+      }
+      stompWs.connect({}, connectCb, errorCb)
+      /* stompWs.disconnect(() => {
+        console.log('See you next time!')
+        removeCascadedServicesWs()
+      }) */
+    } catch (error) {
+      console.log('error', error)
+      console.log('stack', error.stack)
+    }
+  }
+
+  componentWillUnmount() {
+    // this.stompWsSubscribe.unsubscribe()
   }
 
   renderChildren = () => {
@@ -157,16 +208,22 @@ class CSBInstanceDetail extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { entities } = state
-  const { csbAvaInstances } = entities
+  const { entities, CSB } = state
+  const { csbAvaInstances, auth } = entities
+  const { cascadedServicesWebsocket } = CSB
   const { match } = ownProps
   const { instanceID } = match.params
   return {
     instanceID,
     currentInstance: csbAvaInstances && csbAvaInstances[instanceID],
+    jwtToken: auth.jwt.token,
+    cascadedServicesWebsocket,
   }
 }
 
 export default connect(mapStateToProps, {
   getInstanceByID,
+  saveCascadedServicesWs,
+  removeCascadedServicesWs,
+  saveCascadedServicesProgress,
 })(CSBInstanceDetail)

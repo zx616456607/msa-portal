@@ -103,7 +103,7 @@ class Step1 extends React.Component {
           loading: false,
         })
         if (res.error) {
-          return
+          return changeStep(1)
         }
         const data = res.response.result.data
         const errors = []

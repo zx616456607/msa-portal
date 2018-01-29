@@ -17,7 +17,6 @@ import {
 } from 'antd'
 import ClassNames from 'classnames'
 import find from 'lodash/find'
-// import SockJS from 'sockjs-client'
 import {
   getCascadingLinkRulesList,
 } from '../../../../../actions/CSB/cascadingLinkRules'
