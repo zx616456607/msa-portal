@@ -21,11 +21,11 @@ import './style/index.less'
 
 const LayoutHeader = Layout.Header
 const MENUS = [
-  {
+  /* {
     to: '/',
     key: '/',
     text: '总览',
-  },
+  }, */
   {
     to: '/msa-manage',
     key: 'msa-manage',
