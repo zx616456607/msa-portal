@@ -22,7 +22,6 @@
     "lint-fix:es": "eslint . --fix",
     "lint-fix:style": "stylelint \"client/{containers,components,assets}/**/*.less\" --syntax less --fix",
     "pro": "cross-env NODE_ENV=production npm start",
-    "pre-commit-msg": "echo 'Pre-commit checks...' && exit 0",
     "start": "node server/index.js | bunyan -o short",
     "test": "cross-env BABEL_ENV=commonjs jest"
   },
@@ -35,10 +34,6 @@
     "koa",
     "react",
     "redux"
-  ],
-  "pre-commit": [
-    "pre-commit-msg",
-    "lint"
   ],
   "author": "zhangpc@tenxcloud.com",
   "license": "ISC",
@@ -79,6 +74,7 @@
     "cross-env": "^5.1.1",
     "css-loader": "^0.26.2",
     "eslint": "^4.12.0",
+    "eslint-config-egg": "^7.0.0",
     "eslint-config-umi": "^0.1.3",
     "eslint-plugin-flowtype": "^2.46.1",
     "eslint-plugin-import": "^2.9.0",
@@ -91,6 +87,7 @@
     "g2": "^2.3.13",
     "history": "^4.7.2",
     "html-webpack-plugin": "^2.29.0",
+    "husky": "^0.15.0-rc.9",
     "isomorphic-fetch": "^2.2.1",
     "jest": "^21.2.1",
     "koa-webpack": "^1.0.0",
@@ -98,7 +95,6 @@
     "less-loader": "^4.0.5",
     "normalizr": "^3.2.2",
     "postcss-loader": "^2.0.8",
-    "pre-commit": "^1.2.2",
     "prop-types": "^15.5.10",
     "rc-queue-anim": "^1.4.0",
     "react": "^16.2.0",
@@ -136,5 +132,10 @@
     "setupFiles": [
       "./client/test/.setup.js"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-fix"
+    }
   }
 }

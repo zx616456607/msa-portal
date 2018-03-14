@@ -126,7 +126,6 @@ class Performance extends React.Component {
           serviceName: value,
         })
       }
-      if (Object.keys(res.response.result).length > 0) {}
       Object.keys(res.response.result).length > 0 &&
         this.loadChartData(res.response.result[value][0].agentId)
     })
