@@ -34,8 +34,8 @@ export default class TransactionInspector extends React.Component {
     const callStack = dataSource.callStack || []
     let data = callStack.map(stack => (
       {
-        id: parseInt(stack[6]),
-        parentID: parseInt(stack[7] || '0'),
+        id: parseInt(stack[6], 10),
+        parentID: parseInt(stack[7] || '0', 10),
         method: stack[10],
         argument: stack[11],
         startTime: stack[12],
@@ -79,7 +79,7 @@ export default class TransactionInspector extends React.Component {
     formatData = formatData.reverse()
     return {
       data: formatData,
-      parentKeys: Object.keys(parentObj).map(key => parseInt(key)),
+      parentKeys: Object.keys(parentObj).map(key => parseInt(key, 10)),
       rootParentExecMs,
     }
   }
@@ -148,7 +148,7 @@ export default class TransactionInspector extends React.Component {
       width: '8%',
       render: (text, record) => {
         let { execMs, selfMs } = record
-        selfMs && (selfMs = parseInt(selfMs))
+        selfMs && (selfMs = parseInt(selfMs, 10))
         return (
           <div>
             {

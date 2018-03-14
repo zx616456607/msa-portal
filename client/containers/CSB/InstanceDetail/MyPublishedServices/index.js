@@ -80,8 +80,9 @@ class MyPublishedServices extends React.Component {
       delete query.page
     }
     if (query.includeDeleted === true) {
-      query.status ? query.status :
+      if (!query.status) {
         query.status = [ '1', '2', '4' ]
+      }
     }
     if (query.sort === '') {
       delete query.sort
@@ -117,7 +118,7 @@ class MyPublishedServices extends React.Component {
       simple: true,
       pageSize: size || 10,
       total: totalElements,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     const { createServiceGroupModalVisible } = this.state

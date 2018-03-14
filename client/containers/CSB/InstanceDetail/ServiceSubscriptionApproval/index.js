@@ -176,7 +176,7 @@ class ServiceSubscriptionApproval extends React.Component {
     const { query } = location
     const { content, size, isFetching, totalElements } = serviceSubscribeAppraveList
     let radioGroupValue = 1
-    if (query.requestStatus && parseInt(query.requestStatus) !== 1) {
+    if (query.requestStatus && parseInt(query.requestStatus, 10) !== 1) {
       radioGroupValue = 5
     }
     let sortObj = { requestTime: false }
@@ -251,7 +251,7 @@ class ServiceSubscriptionApproval extends React.Component {
       simple: true,
       total: totalElements,
       size,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     return (

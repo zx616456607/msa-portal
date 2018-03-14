@@ -182,7 +182,7 @@ class MsaManage extends React.Component {
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link" href="#">
+            <a className="ant-dropdown-link">
               基于 SpringCloud <Icon type="down" />
             </a>
           </Dropdown>

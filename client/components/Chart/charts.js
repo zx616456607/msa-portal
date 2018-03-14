@@ -11,6 +11,7 @@
  */
 
 import React from 'react'
+import { Row, Button } from 'antd'
 import './style/index.less'
 import createG2 from 'g2-react'
 

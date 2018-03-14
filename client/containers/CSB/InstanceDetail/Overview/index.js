@@ -210,7 +210,7 @@ class InstanceDetailOverview extends React.Component {
         <div className="top" key="top">
           <div className="topLeft">
             <div className="imgs">
-              <img src={images[0].src} />
+              <img alt="csb" src={images[0].src} />
             </div>
             <div className="desc">
               <h2>实例名称：{instanceName}</h2>

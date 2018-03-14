@@ -208,7 +208,7 @@ class CSBInstanceOm extends React.Component {
       simple: true,
       total: totalElements,
       pageSize: size,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: page => this.getInstanceList({ page }),
     }
     const columns = [

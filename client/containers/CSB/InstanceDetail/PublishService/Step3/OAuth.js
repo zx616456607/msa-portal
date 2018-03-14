@@ -34,7 +34,7 @@ export default class OAuth extends React.Component {
         return <div className="desc-text">
           选择 GitHub 作为第三方授权服务中心，需提供在 GitHub 注册生成的 Client ID
           和 Client Secret ，点击
-          <a href="https://github.com/settings/applications/new" target="_blank">
+          <a href="https://github.com/settings/applications/new" rel="noopener noreferrer" target="_blank">
           去注册
           </a>。
         </div>
@@ -42,7 +42,7 @@ export default class OAuth extends React.Component {
         return <div className="desc-text">
           选择 Google 作为第三方授权服务中心，需提供在 Google 注册生成的 Client ID
           和 Client Secret ，点击
-          <a href="https://console.developers.google.com/start" target="_blank">
+          <a href="https://console.developers.google.com/start" rel="noopener noreferrer" target="_blank">
           去注册
           </a>。
         </div>

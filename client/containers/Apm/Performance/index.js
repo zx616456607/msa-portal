@@ -97,7 +97,7 @@ class Performance extends React.Component {
       this.setState({
         timers: curTimer,
       })
-      serviceName ? this.handleSelect(serviceName) : ''
+      serviceName && this.handleSelect(serviceName)
     }
   }
 
@@ -126,8 +126,9 @@ class Performance extends React.Component {
           serviceName: value,
         })
       }
-      Object.keys(res.response.result).length > 0 ?
-        this.loadChartData(res.response.result[value][0].agentId) : null
+      if (Object.keys(res.response.result).length > 0) {}
+      Object.keys(res.response.result).length > 0 &&
+        this.loadChartData(res.response.result[value][0].agentId)
     })
     this.setState({
       isRowData: true,
@@ -281,7 +282,7 @@ class Performance extends React.Component {
   }
   handleRefresh = () => {
     const { serverName } = this.state
-    serverName ? this.handleSelect(serverName) : ''
+    serverName && this.handleSelect(serverName)
   }
   serverType = type => {
     switch (type) {
@@ -438,8 +439,8 @@ class Performance extends React.Component {
       })
       chart.legend(false)
       chart.area().position('time*value').color('type')
-      chart.line().position('time*value').color('type').
-        size(2)
+      chart.line().position('time*value').color('type')
+        .size(2)
       chart.render()
       chart.on('plotdblclick', () => {
         chart.get('options').filters = {} // 清空 filters
@@ -469,9 +470,9 @@ class Performance extends React.Component {
         alias: 'TPS',
       })
       chart.legend(false)
-      chart.area().position('time*count').color('type', [ '#43b5d8' ]).
-        size(2).
-        shape('smooth')
+      chart.area().position('time*count').color('type', [ '#43b5d8' ])
+        .size(2)
+        .shape('smooth')
       // chart.line().position('time*unsampledNew')
       // chart.line().position('time*sampledContinuation')
       // chart.line().position('time*sampledNew')
@@ -580,7 +581,7 @@ class Performance extends React.Component {
             <div key="data">
               <Row className="layout-content-body">
                 <div className="section">
-                  <img className="imgs" src={this.serverType(agentData.serverType)} />
+                  <img className="imgs" alt="service-type" src={this.serverType(agentData.serverType)} />
                   <div className="left">
                     <span style={{ fontSize: 16 }}>
                       微服务名称 {exampleData.applicationName}
@@ -641,7 +642,9 @@ class Performance extends React.Component {
                 </div>
               </Row>
             </div> :
-            <div key="no-data"><img style={{ marginTop: 7 + '%', marginLeft: 33 + '%' }} src={performance} /> </div>
+            <div key="no-data">
+              <img alt="no-data" style={{ marginTop: 7 + '%', marginLeft: 33 + '%' }} src={performance} />
+            </div>
         }
       </QueueAnim>
     )

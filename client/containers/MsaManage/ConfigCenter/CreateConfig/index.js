@@ -38,6 +38,7 @@ class CreateConfig extends React.Component {
     releaseLoading: false,
   }
   componentWillMount() {
+    const { location } = this.props
     const { detal } = parse(location.search)
     this.setState({
       detal,
@@ -46,8 +47,8 @@ class CreateConfig extends React.Component {
   }
 
   version = () => {
+    const { getService, getBranchList, clusterID, location } = this.props
     const { branch, detal } = parse(location.search)
-    const { getService, getBranchList, clusterID } = this.props
     getService(clusterID).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
@@ -75,10 +76,10 @@ class CreateConfig extends React.Component {
   }
 
   fetchYaml = (branch, url) => {
-    const { getCenterConfig, clusterID } = this.props
+    const { getCenterConfig, clusterID, location } = this.props
     const { id } = parse(location.search)
     const query = {
-      file_path: this.props.location.pathname.split('/')[3],
+      file_path: location.pathname.split('/')[3],
       branch_name: branch,
       project_url: url,
     }

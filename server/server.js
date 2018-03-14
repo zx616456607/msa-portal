@@ -12,13 +12,6 @@
 
 // for webpack build backend files runtime
 import '@babel/polyfill'
-// set root dir to global
-global.__root__dirname = __dirname
-// repalce native Promise by bluebird
-global.Promise = require('bluebird')
-// disabled reject unauthorized
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
 import http from 'http'
 import path from 'path'
 import Koa from 'koa'
@@ -31,6 +24,12 @@ import packageJSON from '../package.json'
 import middlewares from './middlewares'
 import indexRoutes from './routes'
 import { format as formatError } from './service/errors'
+// set root dir to global
+global.__root__dirname = __dirname
+// repalce native Promise by bluebird
+global.Promise = require('bluebird')
+// disabled reject unauthorized
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const { env } = process
 const { NODE_ENV } = env

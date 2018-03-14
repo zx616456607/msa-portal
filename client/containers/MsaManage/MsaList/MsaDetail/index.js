@@ -44,7 +44,7 @@ class MsaDetail extends React.Component {
       <QueueAnim className="msa-detail">
         <Row className="msa-detail-header" key="header">
           <Col span={3}>
-            <img className="msa-detail-header-icon" src="/img/service/java.png"/>
+            <img alt="java" className="msa-detail-header-icon" src="/img/service/java.png"/>
           </Col>
           <Col span={21} className="msa-detail-header-right">
             <div className="msa-detail-header-name">
@@ -89,7 +89,7 @@ class MsaDetail extends React.Component {
             </TabPane>
             <TabPane tab="日志信息" key="3" disabled><MsaDetailLogs/></TabPane>
             <TabPane tab="监控" key="4" disabled>
-              <img width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
+              <img alt="monitor" width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
             </TabPane>
             <TabPane tab="配置" key="5">
               <MsaDetailConfig

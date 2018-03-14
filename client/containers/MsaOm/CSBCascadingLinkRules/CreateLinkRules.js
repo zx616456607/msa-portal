@@ -200,7 +200,7 @@ class CreateLinkRules extends React.Component {
     const instanceOption = content.map(instance => {
       let disabled = false
       instanceValuesIdList.forEach(item => {
-        if (values[item] && parseInt(values[item].split('/')[0]) === parseInt(instance.id)) {
+        if (values[item] && parseInt(values[item].split('/')[0], 10) === parseInt(instance.id, 10)) {
           disabled = true
         }
       })

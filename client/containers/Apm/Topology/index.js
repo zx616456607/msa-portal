@@ -22,13 +22,13 @@ import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
 import createG6 from '../../../components/CreateG6'
-const G2 = require('g2')
 import G6 from '@antv/g6'
 import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 import flatten from 'lodash/flatten'
-const Option = Select.Option
 
+const G2 = require('g2')
+const Option = Select.Option
 const images = {
   JAVA: '/img/service/java.png',
   MYSQL: '/img/service/mysql.png',
@@ -61,7 +61,7 @@ const Chart1 = createG2(chart => {
   })
   chart.axis('x', {
     formatter(val) {
-      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+      return formatDate(parseInt(val, 10), TIMES_WITHOUT_YEAR)
     },
     grid: {
       line: {
@@ -90,8 +90,8 @@ const Chart1 = createG2(chart => {
   chart.render()
   chart.on('rangeselectend', ev => {
     const selectRange = ev.selected.x
-    const start = new Date(parseInt(selectRange[0])).toISOString()
-    const end = new Date(parseInt(selectRange[1])).toISOString()
+    const start = new Date(parseInt(selectRange[0], 10)).toISOString()
+    const end = new Date(parseInt(selectRange[1], 10)).toISOString()
     window.open(`${window.location.origin}/apms/call-link-tracking?application=${appName}&from=${start}&to=${end}`)
   })
   // 监听双击事件，这里用于复原图表
@@ -106,7 +106,7 @@ const Chart1 = createG2(chart => {
   chart.on('tooltipchange', function(ev) {
     const item = ev.items[0] // 获取tooltip要显示的内容
     item.name = '请求时刻'
-    item.value = formatDate(parseInt(item.value), TIMES_WITHOUT_YEAR)
+    item.value = formatDate(parseInt(item.value, 10), TIMES_WITHOUT_YEAR)
   })
 })
 
@@ -152,7 +152,7 @@ const Chart3 = createG2(chart => {
   chart.axis('time', {
     title: null,
     formatter(val) {
-      return formatDate(parseInt(val), TIMES_WITHOUT_YEAR)
+      return formatDate(parseInt(val, 10), TIMES_WITHOUT_YEAR)
     },
   })
   chart.col('请求数量', {
@@ -299,7 +299,7 @@ class Topology extends React.Component {
         const time = dotList[i][0]
         const req = dotList[i][1]
         if (currentAgent && (currentAgent.split(',')[1] !== '0')) {
-          if (parseInt(currentAgent.split(',')[1]) !== dotList[i][2]) {
+          if (parseInt(currentAgent.split(',')[1], 10) !== dotList[i][2]) {
             continue
           }
         }
@@ -314,7 +314,7 @@ class Topology extends React.Component {
         }
         if (j === 1) {
           objFirst = Object.assign({
-            x: parseInt(time + from),
+            x: parseInt(time + from, 10),
             y: req,
           })
         }
@@ -660,7 +660,7 @@ class Topology extends React.Component {
           (!application || !rangeDateTime.length)
             ?
             <div className="topology-default" key="topology">
-              <img src={require('../../../assets/img/apm/topology-default.png')}/>
+              <img alt="topology" src={require('../../../assets/img/apm/topology-default.png')}/>
               <p>请选择微服务</p>
             </div>
             :
@@ -681,6 +681,7 @@ class Topology extends React.Component {
                   <Col span={6}>
                     <img
                       className="service-info-type"
+                      alt="service-type"
                       src={this.getServiceType(currentNode && currentNode.serviceType)}
                     />
                   </Col>

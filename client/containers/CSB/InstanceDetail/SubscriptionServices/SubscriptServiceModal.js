@@ -81,7 +81,7 @@ class SubscriptServiceModal extends React.Component {
       const { consumer } = values
       const body = {
         serviceId: dateSource.id,
-        evidenceId: parseInt(consumer),
+        evidenceId: parseInt(consumer, 10),
         reason: '',
         accessConfig: '',
       }

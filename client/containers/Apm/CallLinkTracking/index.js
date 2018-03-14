@@ -213,7 +213,7 @@ class CallLinkTracking extends React.Component {
       title: '#',
       dataIndex: 'index',
       key: 'index',
-      render: text => <a href="#">{text}</a>,
+      render: text => <a>{text}</a>,
     }, {
       title: 'Stat time',
       dataIndex: 'startTime',

@@ -116,7 +116,7 @@ class PublicServices extends React.Component {
       simple: true,
       total: totalElements,
       size,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     return <QueueAnim id="plubic-services">

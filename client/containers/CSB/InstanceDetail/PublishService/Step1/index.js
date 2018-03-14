@@ -86,7 +86,7 @@ class Step1 extends React.Component {
       this.setState({
         loading: true,
       })
-      pathId = parseInt(pathId)
+      pathId = parseInt(pathId, 10)
       const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
       const instances = selectPath && selectPath.instances || []
       const groupName = csbInstanceServiceGroups
@@ -109,7 +109,7 @@ class Step1 extends React.Component {
         const errors = []
         Object.keys(data).forEach(key => {
           Object.keys(data[key]).forEach(itemKey => {
-            itemKey = parseInt(itemKey)
+            itemKey = parseInt(itemKey, 10)
             const instance = find(instances, { id: itemKey }) || {}
             if (data[key][itemKey] === false) {
               switch (key) {

@@ -99,7 +99,7 @@ class CSBCascadingLinkRules extends React.Component {
       simple: true,
       total: totalElements,
       size,
-      current: parseInt(page) || 1,
+      current: parseInt(page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     const columns = [

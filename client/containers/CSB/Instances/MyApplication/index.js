@@ -60,7 +60,7 @@ class MyApplication extends React.Component {
   }
 
   loadData = (query, isFirst) => {
-    const { loadApply, history } = this.props
+    const { loadApply, history, location } = this.props
     const { name, sort, filter } = this.state
     query = Object.assign({}, location.query, { name, sort, filter }, query)
     if (query.name === '') {
@@ -212,7 +212,7 @@ class MyApplication extends React.Component {
       case 1:
         return <Button onClick={() => this.handleRevokeApply(row.id, row.status)}>撤销申请</Button>
       case 3:
-        return <Button type="primary" onClick={() => this.handleAgainApply(name, row)}>重新申请</Button>
+        return <Button type="primary" onClick={() => this.handleAgainApply(row.name, row)}>重新申请</Button>
       default:
         return
     }
@@ -376,7 +376,7 @@ class MyApplication extends React.Component {
       simple: true,
       pageSize: size || 10,
       total: totalElements,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     return (

@@ -72,7 +72,7 @@ class UpdateConsumerVoucher extends React.Component {
 
   testDelayTime = () => {
     const { delayTime } = this.state
-    const delayNumber = parseInt(delayTime)
+    const delayNumber = parseInt(delayTime, 10)
     if (isNaN(delayNumber)) {
       this.setState({
         delayTime: 1,
@@ -102,7 +102,7 @@ class UpdateConsumerVoucher extends React.Component {
     if (timeDifference < 0) {
       return 0
     }
-    const min = parseInt(timeDifference / 1000 / 60)
+    const min = parseInt(timeDifference / 1000 / 60, 10)
     return min
   }
 

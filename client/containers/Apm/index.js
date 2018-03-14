@@ -129,7 +129,7 @@ class Apm extends React.Component {
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link" href="#">
+            <a className="ant-dropdown-link">
               基于 PinPoint <Icon type="down" />
             </a>
           </Dropdown>

@@ -265,7 +265,7 @@ class MySubscribedService extends React.Component {
       simple: true,
       total: totalElements,
       size,
-      current: parseInt(page) || 1,
+      current: parseInt(page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
     let radioGroupValue = 1

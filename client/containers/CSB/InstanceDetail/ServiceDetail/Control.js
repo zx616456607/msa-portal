@@ -29,7 +29,7 @@ export default class Control extends React.Component {
     const { detail } = this.props
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
     const { limit, duration } = limitationDetail
-    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/))] || '秒'
+    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
     const xmlProtectionDetail = JSON.parse(detail.xmlProtectionDetail || '{}')
     const {
       maxElementNameLength,

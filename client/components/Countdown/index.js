@@ -21,7 +21,7 @@ export default class Countdown extends React.Component {
   }
 
   state = {
-    seconds: parseInt(this.props.seconds),
+    seconds: parseInt(this.props.seconds, 10),
   }
 
   componentDidMount() {

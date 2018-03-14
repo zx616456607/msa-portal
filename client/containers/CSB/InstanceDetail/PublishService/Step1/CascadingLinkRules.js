@@ -45,7 +45,7 @@ class CascadingLinkRules extends React.Component {
   getInstancesOptions = () => {
     const { form, cascadingLinkRules } = this.props
     const { getFieldValue } = form
-    const pathId = parseInt(getFieldValue('pathId'))
+    const pathId = parseInt(getFieldValue('pathId'), 10)
     const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
     const instances = selectPath && selectPath.instances || []
     const firstDeletedInstanceIndex = instances.indexOf(null)

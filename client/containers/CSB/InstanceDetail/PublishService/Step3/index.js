@@ -75,7 +75,7 @@ class Step3 extends React.Component {
         clientSecret,
         errCodeKeys,
       } = values
-      const groupId = parseInt(values.groupId)
+      const groupId = parseInt(values.groupId, 10)
       // 错误代码
       const errorCode = errCodeKeys.map(key => ({
         code: values[`code-${key}`],
@@ -143,7 +143,7 @@ class Step3 extends React.Component {
       let cascadedInstances
       // [cascadedService] 如果为级联发布，将转换模板上传到链路的第一个实例中
       if (pathId !== 'default') {
-        pathId = parseInt(pathId)
+        pathId = parseInt(pathId, 10)
         const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
         cascadedInstances = selectPath && selectPath.instances || []
         uploadInstanceID = cascadedInstances[0] && cascadedInstances[0].id

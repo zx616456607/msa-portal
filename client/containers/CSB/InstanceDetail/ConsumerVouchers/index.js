@@ -320,7 +320,7 @@ class ConsumerVouchers extends React.Component {
     const pagination = {
       total: totalElements,
       size,
-      current: parseInt(query.page) || 1,
+      current: parseInt(query.page, 10) || 1,
       onChange: current => this.loadData({ page: current }),
     }
     return (
