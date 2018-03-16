@@ -106,10 +106,21 @@ class MySubscribedService extends React.Component {
     return [ '1', '2', '3' ]
   }
 
-  confirmEditBindIp = () => {
-    this.setState({
-      confirmLoading: false,
-      editBindIpModalVisible: false,
+  confirmEditBindIp = values => {
+    const { editServiceBindIp, instanceID } = this.props
+    const { currentService } = this.state
+    const { id: subscriptionId } = currentService
+    this.setState({ confirmLoading: true })
+    editServiceBindIp(instanceID, subscriptionId, values).then(res => {
+      this.setState({ confirmLoading: false })
+      if (res.error) {
+        return
+      }
+      notification.success({ message: '修改绑定 IP 成功' })
+      this.loadData()
+      this.setState({
+        editBindIpModalVisible: false,
+      })
     })
   }
 
@@ -177,12 +188,12 @@ class MySubscribedService extends React.Component {
     const { key } = item
     this.setState({
       confirmLoading: false,
+      currentService: record,
     })
     switch (key) {
       case 'details':
         return this.setState({
           subDetailVisible: true,
-          currentService: record,
         })
       case 'unsubscibe':
         return this.unsubscibeService(record)
@@ -438,6 +449,7 @@ class MySubscribedService extends React.Component {
             closeModalMethod={() => this.setState({ editBindIpModalVisible: false })}
             callback={this.confirmEditBindIp}
             loading={confirmLoading}
+            currentService={currentService}
           />
         }
         { subDetailVisible && <SubscriptionDetailDock

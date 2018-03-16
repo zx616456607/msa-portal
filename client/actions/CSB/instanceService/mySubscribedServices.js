@@ -110,7 +110,7 @@ export const PUT_EDIT_SERVICE_BIND_IP_REQUEST = 'PUT_EDIT_SERVICE_BIND_IP_REQUES
 export const PUT_EDIT_SERVICE_BIND_IP_SUCCESS = 'PUT_EDIT_SERVICE_BIND_IP_SUCCESS'
 export const PUT_EDIT_SERVICE_BIND_IP_FALIURE = 'PUT_EDIT_SERVICE_BIND_IP_FALIURE'
 
-const fetchEditServiceBindIp = (instanceID, serviceId) => {
+const fetchEditServiceBindIp = (instanceID, subscriptionId, body) => {
   return {
     [CALL_API]: {
       types: [
@@ -118,17 +118,18 @@ const fetchEditServiceBindIp = (instanceID, serviceId) => {
         PUT_EDIT_SERVICE_BIND_IP_SUCCESS,
         PUT_EDIT_SERVICE_BIND_IP_FALIURE,
       ],
-      endpoint: `${CSB_API_URL}/instances/${instanceID}/services/${serviceId}`,
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/service-subscription/${subscriptionId}/bindips`,
       options: {
-        method: 'GET',
+        method: 'PUT',
+        body,
       },
-      schema: Schemas.CSB_INSTANCE_SERVICE_API_DOC,
+      schema: Schemas.CSB_INSTANCE_MY_SUBSCRIBED_SERVICES_LIST_DATA,
     },
   }
 }
 
-export const editServiceBindIp = (instanceID, serviceId) => {
-  return dispatch => dispatch(fetchEditServiceBindIp(instanceID, serviceId))
+export const editServiceBindIp = (instanceID, subscriptionId, body) => {
+  return dispatch => dispatch(fetchEditServiceBindIp(instanceID, subscriptionId, body))
 }
 
 // 重新订阅服务
