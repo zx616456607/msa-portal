@@ -78,12 +78,13 @@ class SubscriptServiceModal extends React.Component {
       if (errors) {
         return
       }
-      const { consumer } = values
+      const { consumer, bindIps } = values
       const body = {
         serviceId: dateSource.id,
         evidenceId: parseInt(consumer, 10),
         reason: '',
         accessConfig: '',
+        bindIps,
       }
       this.setState({
         confirmLoading: true,
@@ -93,14 +94,14 @@ class SubscriptServiceModal extends React.Component {
         return
       }
       subscribeService(instanceID, body).then(res => {
+        this.setState({
+          confirmLoading: false,
+        })
         if (res.error) {
           if (res.status === 403) {
             notification.warn({
               message: '订阅失败',
               description: '没有订阅服务权限',
-            })
-            this.setState({
-              confirmLoading: false,
             })
             return
           }
@@ -109,25 +110,16 @@ class SubscriptServiceModal extends React.Component {
               message: '订阅失败',
               description: '您已经订阅了该服务，不能重复订阅',
             })
-            this.setState({
-              confirmLoading: false,
-            })
             return
           }
           notification.error({
             message: '订阅失败',
             description: res.error,
           })
-          this.setState({
-            confirmLoading: false,
-          })
           return
         }
         notification.success({
           message: '订阅成功',
-        })
-        this.setState({
-          confirmLoading: false,
         })
         closeModalMethod()
       })
@@ -160,6 +152,7 @@ class SubscriptServiceModal extends React.Component {
       width="570px"
       confirmLoading={confirmLoading}
       wrapClassName="subscript-service-modal"
+      maskClosable={false}
     >
       <Form>
         <Row className="row-style">
@@ -218,7 +211,17 @@ class SubscriptServiceModal extends React.Component {
           style={{ marginBottom: 24 }}
         >
           {
-            getFieldDecorator('bindIp')(
+            getFieldDecorator('bindIps', {
+              initialValue: undefined,
+              rules: [{
+                validator: (rule, value, callback) => {
+                  if (value && !/^(\d{1,3}(\.\d{1,3}){3})*(,\d{1,3}(\.\d{1,3}){3})*$/.test(value)) {
+                    return callback('用于限制访问该服务的 IP 地址，空表示不需要限制 IP 访问；用"，"号隔开；')
+                  }
+                  return callback()
+                },
+              }],
+            })(
               <TextArea placeholder={'用于限制访问该服务的 IP 地址，空表示不需要限制 IP 访问；\n用"，"号隔开；'}/>
             )
           }

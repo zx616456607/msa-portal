@@ -11,7 +11,6 @@
  */
 
 import React from 'react'
-import { Input } from 'antd'
 import DetailPageDock from '../../../../components/Dock/DetailPageDock'
 import './style/SubscriptionDetailDock.less'
 
@@ -30,6 +29,14 @@ export default class SubscriptionDetailDock extends React.Component {
       default:
         return '未知'
     }
+  }
+
+  renderBindIps = bindIps => {
+    if (!bindIps) return <span>-</span>
+    const bindIPsArray = bindIps.split(',')
+    return bindIPsArray.map((item, index) => {
+      return <span key={`ip-${index}`} className="ip-style">{item}</span>
+    })
   }
 
   render() {
@@ -70,7 +77,7 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div className="bind-ip">
                   <span className="sub-label">绑定 IP：</span>
-                  <Input.TextArea />
+                  <span>{this.renderBindIps(currentService.bindIps)}</span>
                 </div>
               </div>
             </div>
