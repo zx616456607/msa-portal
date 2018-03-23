@@ -66,7 +66,7 @@ const csbPubInstancesSchema = new schema.Entity('csbPubInstances', {}, {
   idAttribute: 'id',
 })
 const csbAvaInstancesSchema = new schema.Entity('csbAvaInstances', {}, {
-  idAttribute: 'id',
+  idAttribute: 'instanceId',
 })
 const csbOmInstancesSchema = new schema.Entity('csbOmInstances', {}, {
   idAttribute: 'id',

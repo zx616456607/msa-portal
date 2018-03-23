@@ -142,7 +142,7 @@ class CSBInstanceOm extends React.Component {
     const { deleteInstance } = this.props
     const { currentInstance } = this.state
     confirm({
-      modalTitle: '放弃使用 CSB 实例',
+      modalTitle: '删除 CSB 实例',
       title: '放弃使用后将不能在此实例中发布、订阅服务；已发布的服务将被\n' +
       '注销，已订购的服务将被退订。',
       content: `确定是否放弃使用 ${currentInstance.name} 实例？`,

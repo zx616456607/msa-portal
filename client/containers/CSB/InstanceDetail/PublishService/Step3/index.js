@@ -123,7 +123,7 @@ class Step3 extends React.Component {
           transformationDetail: '{}',
           authenticationType: 'bypass',
           authenticationDetail: '{}',
-          errorCode,
+          errorCode: JSON.stringify(errorCode),
           limitationType,
           limitationDetail: JSON.stringify(limitationDetail),
           xmlProtectionType,
