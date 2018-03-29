@@ -109,7 +109,6 @@ class Step1 extends React.Component {
         const errors = []
         Object.keys(data).forEach(key => {
           Object.keys(data[key]).forEach(itemKey => {
-            itemKey = parseInt(itemKey, 10)
             const instance = find(instances, { id: itemKey }) || {}
             if (data[key][itemKey] === false) {
               switch (key) {

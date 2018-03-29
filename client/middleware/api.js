@@ -82,7 +82,7 @@ const callApi = (endpoint, options, schema) => {
       }).catch(json => {
         const { message } = json || {}
         const { status, statusText } = response
-        // handle for unjson response
+        // handle for non-JSON response
         if (status < 300) {
           return {
             status,
