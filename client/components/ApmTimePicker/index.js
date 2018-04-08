@@ -28,9 +28,9 @@ const btnArr = [{
 }, {
   key: 'today',
   text: '今天',
-}, {
-  key: 'yesterday',
-  text: '昨天',
+//}, {
+//  key: 'yesterday',
+//  text: '昨天',
 }, {
   key: 'beforeYes',
   text: '最近2天',

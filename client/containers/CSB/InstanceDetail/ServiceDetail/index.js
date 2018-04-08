@@ -28,22 +28,16 @@ const TabPane = Tabs.TabPane
 
 class ServiceDetail extends React.Component {
 
-  state = {
-    serviceId: '',
-    statusState: 0,
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { serviceId } = this.state
-    const serviceList = nextProps.detailData[`${serviceId}`]
-    if (serviceList !== undefined) {
-      this.setState({
-        statusState: serviceList.status,
-      })
-    }
+  renderCurrentService() {
+    const { detail, detailData } = this.props
+    const { id } = detail
+    const currentService = detailData[id] || {}
+    return currentService
   }
 
   renderDropdown = () => {
+    const currentService = this.renderCurrentService()
+    const { status } = currentService
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
         <Menu.Item key="list">黑／白名单</Menu.Item>
@@ -52,30 +46,30 @@ class ServiceDetail extends React.Component {
     )
     return (
       <Dropdown.Button overlay={menu} onClick={this.handleDown}>
-        停止服务
+        { status === 1 ? '停止服务' : '启动服务' }
       </Dropdown.Button>
     )
   }
 
   handleDown = () => {
+    const currentService = this.renderCurrentService()
+    const { status } = currentService
     const item = {
-      key: 'stop',
+      key: status === 1 ? 'stop' : 'start',
     }
     this.handleMenu(item)
   }
 
   handleMenu = item => {
     const { key } = item
-    const { callback, detail } = this.props
-    this.setState({
-      serviceId: detail.id,
-    })
+    const { callback } = this.props
+    const detail = this.renderCurrentService()
     callback(detail, key)
   }
 
   render() {
-    const { statusState } = this.state
-    const { detail, instanceId } = this.props
+    const { instanceId } = this.props
+    const detail = this.renderCurrentService()
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -92,7 +86,7 @@ class ServiceDetail extends React.Component {
               <Col span={6}>
                 <div className="txt-of-ellipsis">
                   运行状态：
-                  {renderCSBInstanceServiceStatus(statusState > 0 ? statusState : detail.status)}
+                  {renderCSBInstanceServiceStatus(detail.status)}
                 </div>
               </Col>
               <Col span={14}>
@@ -136,7 +130,7 @@ class ServiceDetail extends React.Component {
               <ServiceControl detail={detail} />
             </TabPane>
             <TabPane tab="级联发布" key="linkRules">
-              <ServiceLinkRules />
+              <ServiceLinkRules detail={detail} instanceId={instanceId} />
             </TabPane>
           </Tabs>
         </div>
