@@ -43,7 +43,14 @@ class ServiceDetail extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const { detail } = this.props
+    const { status } = detail
+    this.setState({ statusState: status })
+  }
+
   renderDropdown = () => {
+    const { statusState } = this.state
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
         <Menu.Item key="list">黑／白名单</Menu.Item>
@@ -52,14 +59,15 @@ class ServiceDetail extends React.Component {
     )
     return (
       <Dropdown.Button overlay={menu} onClick={this.handleDown}>
-        停止服务
+        { statusState === 1 ? '停止服务' : '启动服务' }
       </Dropdown.Button>
     )
   }
 
   handleDown = () => {
+    const { statusState } = this.state
     const item = {
-      key: 'stop',
+      key: statusState === 1 ? 'stop' : 'start',
     }
     this.handleMenu(item)
   }
@@ -136,7 +144,7 @@ class ServiceDetail extends React.Component {
               <ServiceControl detail={detail} />
             </TabPane>
             <TabPane tab="级联发布" key="linkRules">
-              <ServiceLinkRules />
+              <ServiceLinkRules detail={detail} instanceId={instanceId} />
             </TabPane>
           </Tabs>
         </div>
