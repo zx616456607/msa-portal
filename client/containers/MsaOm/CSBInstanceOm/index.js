@@ -143,9 +143,8 @@ class CSBInstanceOm extends React.Component {
     const { currentInstance } = this.state
     confirm({
       modalTitle: '删除 CSB 实例',
-      title: '放弃使用后将不能在此实例中发布、订阅服务；已发布的服务将被\n' +
-      '注销，已订购的服务将被退订。',
-      content: `确定是否放弃使用 ${currentInstance.name} 实例？`,
+      title: '删除实例后实例使用者将不能在此实例中发布、订阅服务；已发布的服务将被注销，已订购的服务将被退订；若实例存在级联链路中，链路上该实例后方向的实例将受影响。',
+      content: `确定是否删除 ${currentInstance.name} 实例？`,
       onOk: () => {
         return new Promise((resolve, reject) => {
           deleteInstance(currentInstance.clusterId, currentInstance.id).then(res => {
