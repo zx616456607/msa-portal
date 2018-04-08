@@ -345,7 +345,7 @@ class CreateLinkRules extends React.Component {
               </div>
             </Col>
             <Col span={7}>
-              <div className="title">实例授信</div>
+              <div className="title">链路方向</div>
               <div className="step-container">{this.renderLinkRulesSteps()}</div>
             </Col>
           </Row>
