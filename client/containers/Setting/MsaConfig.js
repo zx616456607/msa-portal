@@ -337,7 +337,7 @@ const mapStateToProps = state => {
   const { current, entities } = state
   const { projects } = entities
   const { info } = current.user
-  const projectID = current.projects.ids
+  const projectID = current.projects.ids || []
   const namespace = info.namespace
   const { project, cluster } = current.config
   return {
