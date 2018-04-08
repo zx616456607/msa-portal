@@ -287,7 +287,7 @@ class MsaConfig extends React.Component {
                     <span className="des">未安装项目</span>
                     <div className="notInstalled">
                       {
-                        Object.keys(notCurAry).length > 0 ?
+                        Object.keys(notCurAry || {}).length > 0 ?
                           notCurAry.map((item, index) => (
                             <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                               <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
