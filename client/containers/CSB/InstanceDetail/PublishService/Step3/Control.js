@@ -24,11 +24,12 @@ const Option = Select.Option
 export default class Control extends React.Component {
   render() {
     const { className, formItemLayout, form } = this.props
-    const { getFieldDecorator } = form
+    const { getFieldDecorator, getFieldValue } = form
     const classNames = ClassNames({
       'service-control': true,
       [className]: !!className,
     })
+    const accessibleValue = getFieldValue('accessible')
     return [
       <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
@@ -129,7 +130,9 @@ export default class Control extends React.Component {
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
-          <span className="desc-text">此 API 无需授权即可访问</span>
+          <span className="desc-text">
+            { accessibleValue ? '关闭『公开访问』，则此 API 无需订阅即可访问。' : '开启『公开访问』，需使用消费凭证订阅后访问。' }
+          </span>
         </FormItem>
         {/* <FormItem
           {...formItemLayout}
