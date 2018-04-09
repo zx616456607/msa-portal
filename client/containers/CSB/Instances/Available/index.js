@@ -112,13 +112,15 @@ class AvailableInstances extends React.Component {
     this.loadData(query)
   }
 
-  abandonInstance = id => {
+  abandonInstance = row => {
     const { abandonInstance, currentUser } = this.props
+    const { instance = {} } = row
+    const { id, name } = instance
     const self = this
     confirm({
-      modalTitle: '放弃使用实例',
-      title: '是否确定放弃使用实例？',
-      content: '',
+      modalTitle: '放弃使用 CSB 实例',
+      title: '放弃使用后将不能在此实例中发布、订阅服务；已发布的服务将被注销，已订购的服务将被退订。',
+      content: `确定是否放弃使用 ${name} 实例？`,
       onOk() {
         return new Promise((resolve, reject) => {
           const query = {
@@ -219,7 +221,7 @@ class AvailableInstances extends React.Component {
               >
               查看实例
               </Button>
-              <Button onClick={this.abandonInstance.bind(this, row.instance.id)}>
+              <Button onClick={this.abandonInstance.bind(this, row)}>
                 放弃使用
               </Button>
             </div>
