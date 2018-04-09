@@ -113,7 +113,7 @@ class AccessAgreement extends React.Component {
       return true
     })
     const host = currentInstance && currentInstance.instance.host || 'csb-service-host'
-    return `${protocol}://${host}:${port}/`
+    return `${protocol}://${host}:${port}`
   }
 
   render() {

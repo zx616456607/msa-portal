@@ -274,7 +274,7 @@ class ConfigCenter extends React.Component {
                 <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
               </div>
               <div style={{ marginTop: 10 }}>
-                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认删除该配置 ?</span>
+                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定删除该配置 ?</span>
                 <div className="remark">
                   <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
                   <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />

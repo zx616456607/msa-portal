@@ -286,7 +286,7 @@ class CreateConfig extends React.Component {
                 </div> :
                 <div>
                   <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
-                  <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确认</Button>
+                  <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确定</Button>
                 </div>
             }
           </div>
