@@ -50,8 +50,7 @@ class ServiceApIDoc extends React.Component {
       { title: '开放地址', dataIndex: 'address', key: 'address' },
     ]
     const basicInfoData = [
-      { type: 'resetful', address: 'http://eqwew' },
-      { type: 'webservice', address: 'http://qweqweqweq' },
+      { type: serviceDetial.type, address: 'http://eqwew' },
     ]
     const errorCodeColumns = [
       { title: '错误代码', dataIndex: 'errorCode', key: 'errorCode' },
