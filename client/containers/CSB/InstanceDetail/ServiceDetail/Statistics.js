@@ -20,6 +20,20 @@ import CreateG2 from '../../../../components/CreateG2'
 import ApmTimePicker from '../../../../components/ApmTimePicker'
 import { getInstanceServiceOverview, getInstanceServiceDetailMap } from '../../../../actions/CSB/instanceService'
 
+const btnArr = [{
+  key: 'fiveMin',
+  text: '最近5分钟',
+}, {
+  key: 'threeHour',
+  text: '最近3小时',
+}, {
+  key: 'today',
+  text: '今天',
+}, {
+  key: 'beforeYes',
+  text: '最近2天',
+}]
+
 const Chart = CreateG2(chart => {
   chart.col('dateTime', {
     alias: '时间',
@@ -141,6 +155,7 @@ class Statistics extends React.Component {
                 value={rangeDateTime}
                 onChange={rangeDateTime => this.setState({ rangeDateTime })}
                 onOk={this.loadData}
+                timeArr={btnArr}
               />
             </Col>
           </Row>

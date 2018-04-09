@@ -28,9 +28,9 @@ const btnArr = [{
 }, {
   key: 'today',
   text: '今天',
-//}, {
-//  key: 'yesterday',
-//  text: '昨天',
+}, {
+  key: 'yesterday',
+  text: '昨天',
 }, {
   key: 'beforeYes',
   text: '最近2天',
@@ -153,6 +153,7 @@ export default class ApmTimePicker extends React.Component {
   }
   render() {
     const { value, isRangeTime, currentRadio } = this.state
+    const { timeArr } = this.props
     return (
       <div className="apm-timepicker">
         <Button
@@ -182,7 +183,7 @@ export default class ApmTimePicker extends React.Component {
               value={currentRadio}
             >
               {
-                btnArr.map(item => (
+                (timeArr || btnArr).map(item => (
                   <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
                 ))
               }
