@@ -21,6 +21,15 @@ const FormItem = Form.Item
 const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
+  serverVersion = (rule, value, callback) => {
+    if (value.length > 64) {
+      return callback('最多可输入63位字符')
+    }
+    if (!/^[a-zA-Z0-9.]+$/.test(value)) {
+      return callback('支持字母、数字和 "."')
+    }
+    callback()
+  }
   render() {
     const { formItemLayout, form, className, serviceGroups } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -66,8 +75,9 @@ export default class OpenAgreement extends React.Component {
           {getFieldDecorator('version', {
             rules: [{
               required: true,
-              message: '输入服务版本!',
-            }],
+              message: '请输入服务版本',
+            },
+            { validator: this.serverVersion }],
           })(
             <Input placeholder="自定义版本" />
           )}
