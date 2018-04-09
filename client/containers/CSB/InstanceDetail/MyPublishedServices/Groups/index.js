@@ -24,7 +24,7 @@ import CreateServiceGroupModal from './CreateServiceGroupModal'
 import ServiceOrGroupSwitch from '../ServiceOrGroupSwitch'
 import {
   formatDate,
-  parseQueryToSortorder,
+  // parseQueryToSortorder,
   parseOrderToQuery,
   handleHistoryForLoadData,
 } from '../../../../../common/utils'
@@ -77,7 +77,7 @@ class MyPublishedServiceGroups extends React.Component {
     this.setState({
       searchType,
       name: name || serviceName,
-    }, () => this.loadData({}, true))
+    }, () => this.loadData({ sort: 'creationTime,desc' }, true))
   }
 
   getSearchQuery = name => {
@@ -237,8 +237,8 @@ class MyPublishedServiceGroups extends React.Component {
       createServiceGroupModalVisible, currentHandle, currentRecord,
       searchType,
     } = this.state
-    let sortObj = { creationTime: false }
-    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
+    // let sortObj = { creationTime: false }
+    // sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '服务组名', dataIndex: 'name', key: 'name' },
       { title: '负责人', dataIndex: 'ownerName', key: 'ownerName' },
@@ -275,7 +275,7 @@ class MyPublishedServiceGroups extends React.Component {
         dataIndex: 'creationTime',
         key: 'creationTime',
         sorter: true,
-        sortOrder: sortObj.creationTime,
+        // sortOrder: sortObj.creationTime,
         render: text => formatDate(text),
       },
       {

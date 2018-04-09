@@ -54,7 +54,7 @@ class MyPublishedServices extends React.Component {
     this.setState({
       name,
     }, () => {
-      this.loadData({}, true)
+      this.loadData({ sort: 'publishTime,desc' }, true)
     })
   }
 

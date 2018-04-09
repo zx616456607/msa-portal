@@ -163,8 +163,7 @@ class CreateServiceGroupModal extends React.Component {
           {
             getFieldDecorator('ownerName', {
               rules: [{
-                required: true,
-                message: '服务组负责人姓名不能为空',
+                required: false,
               }],
             })(
               <Input placeholder="服务负责人姓名"/>
@@ -179,8 +178,7 @@ class CreateServiceGroupModal extends React.Component {
           {
             getFieldDecorator('ownerEmail', {
               rules: [{
-                required: true,
-                message: '服务负责人邮件不能为空',
+                required: false,
               }],
             })(
               <Input placeholder="服务负责人邮件"/>
@@ -195,8 +193,7 @@ class CreateServiceGroupModal extends React.Component {
           {
             getFieldDecorator('ownerPhone', {
               rules: [{
-                required: true,
-                message: '服务负责人电话不能为空',
+                required: false,
               }],
             })(
               <Input placeholder="服务负责人电话"/>
@@ -204,7 +201,7 @@ class CreateServiceGroupModal extends React.Component {
           }
         </FormItem>
         <FormItem
-          label="服务组描述（可选）"
+          label="服务组描述"
           key="description"
           {...formItemLayout}
         >
