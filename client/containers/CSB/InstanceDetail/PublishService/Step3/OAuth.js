@@ -75,7 +75,7 @@ export default class OAuth extends React.Component {
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
           <span className="desc-text">
-          开启 OAuth 授权后，服务将受到授权中心保护，需提供授权方可调用
+          开启 OAuth 授权后，服务将受授权中心保护，需提供授权方可调用
           </span>
         </FormItem>
         {
