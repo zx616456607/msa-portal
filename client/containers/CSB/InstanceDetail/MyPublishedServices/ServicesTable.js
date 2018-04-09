@@ -334,6 +334,12 @@ class ServicesTable extends React.Component {
         render: (text, row) => renderCSBInstanceServiceStatus(row.status),
       },
       {
+        title: '是否级联',
+        dataIndex: 'cascadedType',
+        key: 'cascadedType',
+        render: text => <div>{text ? '是' : '否'}</div>,
+      },
+      {
         title: '待审批订阅',
         dataIndex: 'waitApprovingCount',
         key: 'waitApprovingCount',
