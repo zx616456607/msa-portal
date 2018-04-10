@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import propTypes from 'prop-types'
 import {
   Modal, Form, InputNumber, Row, Col,
-  Select, Input, notification, Radio,
+  Select, Input, notification, Radio, Tooltip, Icon,
 } from 'antd'
 import './style/SubscriptServiceModal.less'
 import { consumeVoucherSlt } from '../../../../selectors/CSB/instanceService/consumerVoucher'
@@ -156,7 +156,7 @@ class SubscriptServiceModal extends React.Component {
     >
       <Form>
         <Row className="row-style">
-          <Col span={4} className="require">QPS</Col>
+          <Col span={4} className="require">QPS:</Col>
           <Col span={15} className="input-col-style">
             希望每秒最大访问<FormItem>
               {
@@ -169,12 +169,14 @@ class SubscriptServiceModal extends React.Component {
                 })(
                   <InputNumber
                     min={1}
-                    max={20}
                     placeholder="请填写整数"
                   />
                 )
               }
-            </FormItem>次
+            </FormItem>&nbsp;次&nbsp;
+            <Tooltip placement="top" title="用于设置该服务的访问量（每秒钟访问量），最终值由服务提供方决定" >
+              <Icon type="question-circle-o" />
+            </Tooltip>
           </Col>
         </Row>
         <FormItem
@@ -253,7 +255,7 @@ class SubscriptServiceModal extends React.Component {
                   <td>{dateSource.status === 1 ? '已激活' : '已停用'}</td>
                 </tr>
                 <tr>
-                  <td>开放接口</td>
+                  <td>开放协议</td>
                   <td>-</td>
                 </tr>
               </tbody>

@@ -25,8 +25,8 @@ export default class OpenAgreement extends React.Component {
     if (value.length > 64) {
       return callback('最多可输入63位字符')
     }
-    if (!/^[a-zA-Z0-9.]+$/.test(value)) {
-      return callback('支持字母、数字和 "."')
+    if (!/^[a-zA-Z0-9_.-]+$/.test(value)) {
+      return callback('支持字母、数字、下划线、中划线和 "."')
     }
     callback()
   }

@@ -35,7 +35,7 @@ class SubscriptionServices extends React.Component {
   }
 
   componentWillMount() {
-    this.loadData({}, true)
+    this.loadData({ sort: 'publishTime,desc' }, true)
   }
 
   closeSubscriptServiceModal = () => {
