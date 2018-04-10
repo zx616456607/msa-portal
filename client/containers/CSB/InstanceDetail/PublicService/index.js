@@ -23,7 +23,7 @@ import ServiceApiDoc from '../MySubscribedService/ServiceApIDoc'
 import {
   formatDate,
   parseOrderToQuery,
-  parseQueryToSortorder,
+  // parseQueryToSortorder,
   handleHistoryForLoadData,
 } from '../../../../common/utils'
 import { getPublicServiceList } from '../../../../actions/CSB/instanceService/publicService'
@@ -47,7 +47,7 @@ class PublicServices extends React.Component {
     const { name } = query
     this.setState({
       name,
-    }, () => this.loadData({}, true))
+    }, () => this.loadData({ sort: 'publishTime,desc' }, true))
   }
 
   loadData = (query = {}, isFirst) => {
@@ -87,8 +87,8 @@ class PublicServices extends React.Component {
     const { plubicServiceList, location, serviceList } = this.props
     const { isFetching, size, totalElements, content } = plubicServiceList
     const { query } = location
-    let sortObj = { publishTime: false }
-    sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
+    // let sortObj = { publishTime: false }
+    // sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
       { title: '公开服务名称', dataIndex: 'name', width: '12%' },
       {
@@ -98,10 +98,10 @@ class PublicServices extends React.Component {
       { title: '服务版本', dataIndex: 'version', width: '11%' },
       { title: '所属服务组', dataIndex: 'groupName', width: '11%' },
       { title: '订阅状态', dataIndex: 'dingyue', width: '12%', render: () => '无需订阅' },
-      { title: '服务描述', dataIndex: 'desc', width: '12%', render: () => '无需订阅' },
+      { title: '服务描述', dataIndex: 'description', width: '12%' },
       {
         title: '服务发布时间', dataIndex: 'publishTime', width: '15%', sorter: true,
-        sortOrder: sortObj.publishTime,
+        // sortOrder: sortObj.publishTime,
         render: text => formatDate(text),
       },
       {
