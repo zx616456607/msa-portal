@@ -401,7 +401,7 @@ class MsaComponents extends React.Component {
           <Button type="primary" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
           <Search className="input" placeholder="按微服务名称搜索" />
           <div className="pages">
-            <span className="total">共计{metaData.length}条</span>
+            <span className="total">共计 {metaData.length} 条&nbsp;&nbsp;</span>
             <Pagination {...pagination} />
           </div>
         </div>

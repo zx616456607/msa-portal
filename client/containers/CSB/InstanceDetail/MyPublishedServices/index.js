@@ -79,10 +79,9 @@ class MyPublishedServices extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
+    query.status = [ '1', '2' ]
     if (query.includeDeleted === true) {
-      if (!query.status) {
-        query.status = [ '1', '2', '4' ]
-      }
+      query.status = [ '1', '2', '4' ]
     }
     if (query.sort === '') {
       delete query.sort

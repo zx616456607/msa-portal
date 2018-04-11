@@ -35,7 +35,7 @@ const errorMessageCloseObj = {}
 
 // the routes need hide namespace switch
 const HIDE_NAMESPACE_SWITCH_ROUTES = [
-  /^\/csb/,
+  /^\/csb/, /msa-om\/csb-instance-om/,
 ]
 
 class App extends React.Component {
