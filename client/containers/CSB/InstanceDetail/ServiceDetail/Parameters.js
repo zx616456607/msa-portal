@@ -18,7 +18,7 @@ import {
 export default class Parameters extends React.Component {
   render() {
     const { detail } = this.props
-    const errorCode = detail.errorCode || []
+    const errorCode = JSON.parse(detail.errorCode || '[]')
     const errorCodeColumns = [{
       title: '错误代码',
       dataIndex: 'code',
