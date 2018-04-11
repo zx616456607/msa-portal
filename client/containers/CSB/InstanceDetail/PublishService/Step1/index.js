@@ -110,7 +110,7 @@ class Step1 extends React.Component {
         Object.keys(data).forEach(key => {
           Object.keys(data[key]).forEach(itemKey => {
             const instance = find(instances, { id: itemKey }) || {}
-            if (data[key][itemKey] === false) {
+            if (targetInstancesIDs.indexOf(itemKey) > -1 && data[key][itemKey] === false) {
               switch (key) {
                 case 'privilege':
                   errors.push(new Error(`用户在实例 ${instance.name} 上无发布权限`))
