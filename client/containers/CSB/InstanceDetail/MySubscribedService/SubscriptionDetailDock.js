@@ -91,6 +91,10 @@ export default class SubscriptionDetailDock extends React.Component {
                   {currentService.serviceName}
                 </div>
                 <div>
+                  <span className="sub-label">服务版本：</span>
+                  {currentService.serviceVersion}
+                </div>
+                <div>
                   <span className="sub-label">所属服务组：</span>
                   {currentService.serviceGroupName ? currentService.serviceGroupName : '-'}
                 </div>
