@@ -182,59 +182,6 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                      服务名称
-                    </div>
-                  </Col>
-                  <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      {fields.name}
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      服务版本
-                    </div>
-                  </Col>
-                  <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      {fields.version}
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      所属服务组
-                    </div>
-                  </Col>
-                  <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      {
-                        csbInstanceServiceGroups
-                        && csbInstanceServiceGroups[fields.groupId]
-                        && csbInstanceServiceGroups[fields.groupId].name ||
-                        fields.groupId
-                      }
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      服务描述
-                    </div>
-                  </Col>
-                  <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      {fields.description}
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
                       接入协议
                     </div>
                   </Col>
@@ -359,6 +306,71 @@ class PublishService extends React.Component {
                       <Tag key={openProtocol} color="blue">
                         {transformCSBProtocols(openProtocol)}
                       </Tag>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      开放地址
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.openUrl}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      服务名称
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.name}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      服务版本
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.version}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      所属服务组
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {
+                        csbInstanceServiceGroups
+                        && csbInstanceServiceGroups[fields.groupId]
+                        && csbInstanceServiceGroups[fields.groupId].name ||
+                        fields.groupId
+                      }
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      服务描述
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.description}
                     </div>
                   </Col>
                 </Row>
