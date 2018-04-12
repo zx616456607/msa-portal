@@ -18,7 +18,7 @@ import {
   Button, notification,
 } from 'antd'
 import {
-  createService, uploadMsgConverters,
+  createService, editService, uploadMsgConverters,
 } from '../../../../../actions/CSB/instanceService'
 import {
   cascadingLinkRuleSlt,
@@ -35,9 +35,9 @@ const SECONDS_CONVERSION = {
   hour: 60 * 60,
   day: 60 * 60 * 24,
 }
-
 class Step3 extends React.Component {
   state = {
+    isEdit: '',
     confirmLoading: false,
   }
 
@@ -48,8 +48,9 @@ class Step3 extends React.Component {
 
   submitService = async () => {
     const {
-      form, createService, instanceID, history, uploadMsgConverters,
-      cascadingLinkRules, cascadedServicesWebsocket, csbInstanceServiceGroups,
+      form, createService, editService, instanceID, history, uploadMsgConverters,
+      cascadingLinkRules, cascadedServicesWebsocket, csbInstanceServiceGroups, isEdit,
+      serviceId,
     } = this.props
     const { validateFieldsAndScroll } = form
     validateFieldsAndScroll(async (errors, values) => {
@@ -185,8 +186,16 @@ class Step3 extends React.Component {
         body[0].transformationDetail = JSON.stringify(transformationDetail)
       }
       if (pathId === 'default') {
-        const res = await createService(instanceID, body)
+        let res
+        if (isEdit === 'true') {
+          res = await editService(instanceID, serviceId, body[0])
+        } else {
+          res = await createService(instanceID, body)
+        }
         if (res.error) {
+          this.setState({
+            confirmLoading: false,
+          })
           return
         }
       } else {
@@ -228,7 +237,7 @@ class Step3 extends React.Component {
 
   render() {
     const {
-      className, currentStep, changeStep, ...otherProps
+      className, currentStep, changeStep, data, ...otherProps
     } = this.props
     const { confirmLoading } = this.state
     const classNames = ClassNames({
@@ -237,8 +246,8 @@ class Step3 extends React.Component {
     })
     return [
       <div className={classNames} key="fields">
-        <Control {...otherProps} />
-        <OAuth {...otherProps} />
+        <Control data={data} {...otherProps} />
+        <OAuth data={data} {...otherProps} />
       </div>,
       currentStep === 2 &&
       <div className="btns" key="btns">
@@ -274,6 +283,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export default connect(mapStateToProps, {
+  editService,
   createService,
   uploadMsgConverters,
 })(Step3)

@@ -31,7 +31,7 @@ export default class OpenAgreement extends React.Component {
     callback()
   }
   render() {
-    const { formItemLayout, form, className, serviceGroups } = this.props
+    const { formItemLayout, form, className, serviceGroups, dataList, isEdit } = this.props
     const { getFieldDecorator, getFieldValue } = form
     // const name = getFieldValue('name')
     // const version = getFieldValue('version')
@@ -52,6 +52,7 @@ export default class OpenAgreement extends React.Component {
       'open-agreement': true,
       [className]: !!className,
     })
+    const isDisabled = isEdit === 'true'
     return (
       <div className={classNames}>
         <div className="second-title">服务开放配置</div>
@@ -60,12 +61,13 @@ export default class OpenAgreement extends React.Component {
           label="服务名称"
         >
           {getFieldDecorator('name', {
+            initialValue: dataList ? dataList.name : '',
             rules: [{
               required: true,
               message: '输入合法的服务名!',
             }],
           })(
-            <Input placeholder="可由1-63个中文字符、英文字母、数字或中划线“-”组成" />
+            <Input disabled={isDisabled} placeholder="可由1-63个中文字符、英文字母、数字或中划线“-”组成" />
           )}
         </FormItem>
         <FormItem
@@ -73,13 +75,14 @@ export default class OpenAgreement extends React.Component {
           label="服务版本"
         >
           {getFieldDecorator('version', {
+            initialValue: dataList ? dataList.version : '',
             rules: [{
               required: true,
               message: '请输入服务版本',
             },
             { validator: this.serverVersion }],
           })(
-            <Input placeholder="自定义版本" />
+            <Input disabled={isDisabled} placeholder="自定义版本" />
           )}
         </FormItem>
         <FormItem
@@ -100,7 +103,7 @@ export default class OpenAgreement extends React.Component {
                 addonBefore={openUrlBefore}
                 placeholder="输入自定义地址"
               />
-              : <Input readOnly />
+              : <Input disabled={isDisabled} readOnly />
           )}
         </FormItem>
         <FormItem
@@ -109,6 +112,7 @@ export default class OpenAgreement extends React.Component {
           key="serviceGroup"
         >
           {getFieldDecorator('groupId', {
+            initialValue: dataList ? dataList.groupName : '',
             rules: [{
               required: true,
               message: '选择服务组!',
@@ -125,7 +129,9 @@ export default class OpenAgreement extends React.Component {
           {...formItemLayout}
           label="服务描述"
         >
-          {getFieldDecorator('description')(
+          {getFieldDecorator('description', {
+            initialValue: dataList ? dataList.description : '',
+          })(
             <Input.TextArea placeholder="请输入描述，支持1-128个汉字或字符" />
           )}
         </FormItem>

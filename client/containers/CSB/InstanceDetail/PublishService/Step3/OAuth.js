@@ -56,11 +56,12 @@ export default class OAuth extends React.Component {
   }
 
   render() {
-    const { className, formItemLayout, form } = this.props
+    const { className, formItemLayout, form, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const classNames = ClassNames('service-oauth', {
       [className]: !!className,
     })
+    const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.oauth2Detail) : ''
     return (
       <div className={classNames} key="limit">
         <div className="second-title">OAuth 授权</div>
@@ -70,7 +71,7 @@ export default class OAuth extends React.Component {
         >
           {getFieldDecorator('openOAuth', {
             valuePropName: 'checked',
-            initialValue: false,
+            initialValue: !!(oauthObj && data.oauth2Type === 'customer'),
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
@@ -116,6 +117,7 @@ export default class OAuth extends React.Component {
                 label="OAuth Server"
               >
                 {getFieldDecorator('endpoint', {
+                  initialValue: oauthObj ? oauthObj.endpoint : '',
                   rules: [{
                     required: true,
                     whitespace: true,
@@ -147,6 +149,7 @@ export default class OAuth extends React.Component {
               label="Client ID"
             >
               {getFieldDecorator('clientId', {
+                initialValue: oauthObj ? oauthObj.clientId : '',
                 rules: [{
                   required: true,
                   message: '输入 clientId!',
@@ -161,6 +164,7 @@ export default class OAuth extends React.Component {
               label="Client Secret"
             >
               {getFieldDecorator('clientSecret', {
+                initialValue: oauthObj ? oauthObj.clientSecret : '',
                 rules: [{
                   required: true,
                   message: '输入 clientSecret!',

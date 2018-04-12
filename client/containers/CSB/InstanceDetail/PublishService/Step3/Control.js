@@ -23,13 +23,16 @@ const Option = Select.Option
 
 export default class Control extends React.Component {
   render() {
-    const { className, formItemLayout, form } = this.props
+    const { className, formItemLayout, form, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const classNames = ClassNames({
       'service-control': true,
       [className]: !!className,
     })
     const accessibleValue = getFieldValue('accessible')
+    const { accessible, limitationDetail, xmlProtectionDetail } = data
+    const limitDetail = limitationDetail && JSON.parse(limitationDetail)
+    const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
     return [
       <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
@@ -56,7 +59,7 @@ export default class Control extends React.Component {
             <Col span={12}>
               最大调用
               {getFieldDecorator('apiGatewayLimit', {
-                initialValue: 0,
+                initialValue: limitDetail !== undefined ? limitDetail.limit : 0,
               })(
                 <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" />
               )}
@@ -75,7 +78,7 @@ export default class Control extends React.Component {
         >
           最长
           {getFieldDecorator('maxElementNameLength', {
-            initialValue: 1000,
+            initialValue: xml !== undefined ? xml.maxElementNameLength : 1000,
           })(
             <InputNumber
               style={{ width: 150 }}
@@ -93,7 +96,7 @@ export default class Control extends React.Component {
         >
           最多
           {getFieldDecorator('maxAttibuteCount', {
-            initialValue: 1000,
+            initialValue: xml !== undefined ? xml.maxAttibuteCount : 1000,
           })(
             <InputNumber
               style={{ width: 150 }}
@@ -111,7 +114,7 @@ export default class Control extends React.Component {
         >
           {getFieldDecorator('removeDTD', {
             valuePropName: 'checked',
-            initialValue: true,
+            initialValue: xml !== undefined ? xml.removeDTD : true,
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
@@ -126,7 +129,7 @@ export default class Control extends React.Component {
         >
           {getFieldDecorator('accessible', {
             valuePropName: 'checked',
-            initialValue: false,
+            initialValue: accessible || false,
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
