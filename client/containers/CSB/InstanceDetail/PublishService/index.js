@@ -40,8 +40,30 @@ const Step = Steps.Step
 
 class PublishService extends React.Component {
   state = {
+    isEdit: '',
+    serviceId: '',
+    dataList: {},
     currentStep: 0,
     confirmLoading: false,
+  }
+
+  componentWillMount() {
+    this.fetchEditData()
+  }
+
+  fetchEditData() {
+    const queryAry = this.props.location.search.split('&')
+    if (queryAry[0] !== '') {
+      if (queryAry[1].split('=')[1] === 'true') {
+        const { publishData } = this.props
+        const publishAry = publishData[queryAry[0].split('=')[1]]
+        this.setState({
+          dataList: publishAry,
+          isEdit: queryAry[1].split('=')[1],
+          serviceId: queryAry[0].split('=')[1],
+        })
+      }
+    }
   }
 
   componentDidMount() {
@@ -69,7 +91,7 @@ class PublishService extends React.Component {
       servicesInbounds, history, currentInstance,
     } = this.props
     const { content } = serviceGroups
-    const { currentStep } = this.state
+    const { currentStep, dataList, isEdit, serviceId } = this.state
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -124,6 +146,8 @@ class PublishService extends React.Component {
                 servicesInbounds={servicesInbounds}
                 serviceGroups={content || []}
                 changeStep={this.changeStep}
+                data={dataList}
+                isEdit={isEdit}
               />
               <Step2
                 className={stepTwoClassNames}
@@ -132,6 +156,7 @@ class PublishService extends React.Component {
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
                 changeStep={this.changeStep}
+                data={dataList}
               />
               <Step3
                 className={stepThreeClassNames}
@@ -141,20 +166,23 @@ class PublishService extends React.Component {
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
                 changeStep={this.changeStep}
+                data={dataList}
+                isEdit={isEdit}
+                serviceId={serviceId}
               />
             </Form>
           </Col>
           <Col span={7} className="publish-service-right">
             <div className="publish-service-detail">
               <div className="publish-service-detail-header">
-              发布详情
+                发布详情
               </div>
               <div className="publish-service-detail-body">
                 <Row className="step-header txt-of-ellipsis">服务接入协议信息</Row>
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    服务名称
+                      服务名称
                     </div>
                   </Col>
                   <Col span={16}>
@@ -166,7 +194,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    服务版本
+                      服务版本
                     </div>
                   </Col>
                   <Col span={16}>
@@ -178,7 +206,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    所属服务组
+                      所属服务组
                     </div>
                   </Col>
                   <Col span={16}>
@@ -186,7 +214,8 @@ class PublishService extends React.Component {
                       {
                         csbInstanceServiceGroups
                         && csbInstanceServiceGroups[fields.groupId]
-                        && csbInstanceServiceGroups[fields.groupId].name
+                        && csbInstanceServiceGroups[fields.groupId].name ||
+                        fields.groupId
                       }
                     </div>
                   </Col>
@@ -194,7 +223,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    服务描述
+                      服务描述
                     </div>
                   </Col>
                   <Col span={16}>
@@ -206,7 +235,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    接入协议
+                      接入协议
                     </div>
                   </Col>
                   <Col span={16}>
@@ -221,7 +250,7 @@ class PublishService extends React.Component {
                       <Row key="endpoint">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          端点
+                            端点
                           </div>
                         </Col>
                         <Col span={16}>
@@ -233,7 +262,7 @@ class PublishService extends React.Component {
                       <Row key="method">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          方法
+                            方法
                           </div>
                         </Col>
                         <Col span={16}>
@@ -247,7 +276,7 @@ class PublishService extends React.Component {
                       <Row key="wsdlAddress">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          WSDL 地址
+                            WSDL 地址
                           </div>
                         </Col>
                         <Col span={16}>
@@ -259,7 +288,7 @@ class PublishService extends React.Component {
                       <Row key="namespace">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          命名空间
+                            命名空间
                           </div>
                         </Col>
                         <Col span={16}>
@@ -271,7 +300,7 @@ class PublishService extends React.Component {
                       <Row key="endPointAddress">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          EndPoint 地址
+                            EndPoint 地址
                           </div>
                         </Col>
                         <Col span={16}>
@@ -283,7 +312,7 @@ class PublishService extends React.Component {
                       <Row key="bindingName">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          Binding 名称
+                            Binding 名称
                           </div>
                         </Col>
                         <Col span={16}>
@@ -295,7 +324,7 @@ class PublishService extends React.Component {
                       <Row key="soapAction">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          SoapAction
+                            SoapAction
                           </div>
                         </Col>
                         <Col span={16}>
@@ -307,7 +336,7 @@ class PublishService extends React.Component {
                       <Row key="methodName">
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
-                          方法名称
+                            方法名称
                           </div>
                         </Col>
                         <Col span={16}>
@@ -322,7 +351,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    开放接口
+                      开放接口
                     </div>
                   </Col>
                   <Col span={16}>
@@ -336,7 +365,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    是否 SSL 加密
+                      是否 SSL 加密
                     </div>
                   </Col>
                   <Col span={16}>
@@ -363,7 +392,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    错误码
+                      错误码
                     </div>
                   </Col>
                   <Col span={16}>
@@ -376,7 +405,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    每{apiGatewayLimitTypeText}最大调用量
+                      每{apiGatewayLimitTypeText}最大调用量
                     </div>
                   </Col>
                   <Col span={16}>
@@ -392,31 +421,31 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    XML 元素名称长度
+                      XML 元素名称长度
                     </div>
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                    最长 {fields.maxElementNameLength} 位
+                      最长 {fields.maxElementNameLength} 位
                     </div>
                   </Col>
                 </Row>
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    XML 各元素属性数量
+                      XML 各元素属性数量
                     </div>
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
-                    最多 {fields.maxAttibuteCount} 个
+                      最多 {fields.maxAttibuteCount} 个
                     </div>
                   </Col>
                 </Row>
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    移除 DTDs
+                      移除 DTDs
                     </div>
                   </Col>
                   <Col span={16}>
@@ -428,7 +457,7 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                    允许不授权访问
+                      允许不授权访问
                     </div>
                   </Col>
                   <Col span={16}>
@@ -442,7 +471,7 @@ class PublishService extends React.Component {
                   <Row>
                     <Col span={8}>
                       <div className="field-label txt-of-ellipsis">
-                      OAuth 授权
+                        OAuth 授权
                       </div>
                     </Col>
                     <Col span={16}>
@@ -479,7 +508,9 @@ const mapStateToProps = (state, ownProps) => {
   const { match } = ownProps
   const { instanceID } = match.params
   const { servicesInbounds } = CSB
+  const publishData = entities.cbsPublished
   return {
+    publishData,
     csbInstanceServiceGroups,
     servicesInbounds: servicesInbounds && servicesInbounds[instanceID] || {},
     instanceID,

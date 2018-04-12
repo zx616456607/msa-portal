@@ -120,12 +120,13 @@ class ServicesTable extends React.Component {
 
   serviceMenuClick = (record, item) => {
     const { key } = item
-    const { history } = this.props
+    const { match, history } = this.props
+    const { instanceID } = match.params
     if (key === 'list') {
       return this.openBlackAndWhiteListModal(record)
     }
     if (key === 'edit') {
-      return history.push(`/csb-instances-available/63/publish-service?id=${record.id}&model=edit`)
+      return history.push(`/csb-instances-available/${instanceID}/publish-service?serviceID=${record.id}&isEdit=true`)
     }
     this.serviceOperation(record, key)
   }
@@ -260,6 +261,7 @@ class ServicesTable extends React.Component {
 
   handleChange = (pagination, filters, sorter) => {
     const { check, loadData } = this.props
+    let cascadedType = filters.cascadedType
     let filtersStr = ''
     let sorterStr = ''
     if (!isEmpty(filters)) {
@@ -281,7 +283,21 @@ class ServicesTable extends React.Component {
     if (!isEmpty(sorter)) {
       sorterStr = this.getSort(sorter)
     }
-    loadData({ status: filtersStr, sort: sorterStr, page: pagination.current })
+    if (cascadedType.length === 2) {
+      cascadedType = []
+    } else if (cascadedType.length === 1) {
+      if (parseInt(cascadedType[ 0 ]) === 1) {
+        cascadedType = [ 1, 2 ]
+      }
+    } else {
+      cascadedType = []
+    }
+    loadData({
+      status: filtersStr,
+      sort: sorterStr,
+      page: pagination.current,
+      cascadedType,
+    })
   }
 
   render() {
@@ -337,6 +353,13 @@ class ServicesTable extends React.Component {
         title: '是否级联',
         dataIndex: 'cascadedType',
         key: 'cascadedType',
+        filters: [{
+          text: '是',
+          value: '1',
+        }, {
+          text: '否',
+          value: '0',
+        }],
         render: text => <div>{text ? '是' : '否'}</div>,
       },
       {
@@ -423,9 +446,11 @@ class ServicesTable extends React.Component {
   }
 }
 
-const mapStateToProps = () => {
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
   return {
-    //
+    instanceID,
   }
 }
 

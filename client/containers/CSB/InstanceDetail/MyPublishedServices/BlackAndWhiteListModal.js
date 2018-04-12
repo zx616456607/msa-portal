@@ -53,7 +53,8 @@ class BlackAndWhiteListModal extends React.Component {
 
   addlist = (list, type) => {
     const preList = cloneDeep(list)
-    const preIndex = preList[preList.length - 1].index
+    const length = preList.length
+    const preIndex = length ? preList[length - 1].index : 0
     const item = {
       index: preIndex + 1,
     }

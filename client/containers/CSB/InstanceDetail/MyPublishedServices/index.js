@@ -72,17 +72,16 @@ class MyPublishedServices extends React.Component {
 
   // 加载数据
   loadData = (query, isFirst) => {
-    const { getInstanceService, history, match, location } = this.props
+    const { getInstanceService, history, match, location, getInstanceServiceOverview } = this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
     if (query.page === 1) {
       delete query.page
     }
+    query.status = [ '1', '2' ]
     if (query.includeDeleted === true) {
-      if (!query.status) {
-        query.status = [ '1', '2', '4' ]
-      }
+      query.status = [ '1', '2', '4' ]
     }
     if (query.sort === '') {
       delete query.sort
