@@ -42,7 +42,7 @@ export default class Step2 extends React.Component {
 
   render() {
     const {
-      className, currentStep, changeStep, ...otherProps
+      className, currentStep, changeStep, data, ...otherProps
     } = this.props
     const classNames = ClassNames({
       fields: true,
@@ -50,7 +50,7 @@ export default class Step2 extends React.Component {
     })
     return [
       <div className={classNames} key="fields">
-        <ErrorCode {...otherProps} />
+        <ErrorCode data={data} {...otherProps} />
       </div>,
       currentStep === 1 &&
       <div className="btns" key="btns">

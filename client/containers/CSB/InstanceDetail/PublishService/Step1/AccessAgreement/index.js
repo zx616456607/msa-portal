@@ -117,7 +117,7 @@ class AccessAgreement extends React.Component {
   }
 
   render() {
-    const { formItemLayout, form, className } = this.props
+    const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form
     const protocol = getFieldValue('protocol')
@@ -134,12 +134,21 @@ class AccessAgreement extends React.Component {
     const ssl = getFieldValue('ssl')
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
+    let protocolType = 'rest'
+    if (dataList) {
+      if (dataList.type === 'rest_ssl' || dataList.type === 'rest') {
+        protocolType = 'rest'
+      } else {
+        protocolType = 'soap'
+      }
+    }
     getFieldDecorator('type', {
       initialValue: serviceOpenType,
     })
     getFieldDecorator('openUrlBefore', {
       initialValue: openUrlBefore,
     })
+    const isDisabled = isEdit === 'true'
     return (
       <div className={classNames}>
         <div className="second-title">选择协议及接入配置</div>
@@ -168,13 +177,13 @@ class AccessAgreement extends React.Component {
           label="选择一个接入协议"
         >
           {getFieldDecorator('protocol', {
-            initialValue: 'rest',
+            initialValue: protocolType,
             rules: [{
               required: true,
               message: 'Please input protocol',
             }],
           })(
-            <RadioGroup>
+            <RadioGroup disabled={isDisabled}>
               <RadioButton value="rest">Restful-API</RadioButton>
               <RadioButton value="soap">WebService</RadioButton>
             </RadioGroup>
@@ -186,7 +195,7 @@ class AccessAgreement extends React.Component {
           className="service-protocols"
         >
           {getFieldDecorator('openProtocol', {
-            initialValue: 'rest',
+            initialValue: protocolType,
             rules: [{
               required: true,
               message: '选择协议类型',
@@ -201,7 +210,7 @@ class AccessAgreement extends React.Component {
               })
             },
           })(
-            <RadioGroup>
+            <RadioGroup disabled={isDisabled}>
               <Radio value="rest">Restful-API</Radio>
               <Radio value="soap">WebService</Radio>
             </RadioGroup>
@@ -213,9 +222,10 @@ class AccessAgreement extends React.Component {
           className="service-ssl"
         >
           {getFieldDecorator('ssl', {
+            initialValue: dataList ? dataList.type === 'rest_ssl' : false,
             valuePropName: 'checked',
           })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
+            <Switch disabled={isDisabled} checkedChildren="开" unCheckedChildren="关" />
           )}
           <span className="desc-text">开启后将提高 API 访问的安全性</span>
         </FormItem>
@@ -229,6 +239,7 @@ class AccessAgreement extends React.Component {
               className="publish-service-body-endpoint"
             >
               {getFieldDecorator('targetDetail', {
+                initialValue: dataList ? dataList.targetDetail : '',
                 rules: [{
                   required: true,
                   whitespace: true,
@@ -253,6 +264,7 @@ class AccessAgreement extends React.Component {
               key="method"
             >
               {getFieldDecorator('method', {
+                initialValue: dataList ? dataList.method : '',
                 rules: [{
                   required: true,
                   message: '请选择方法',
@@ -270,7 +282,9 @@ class AccessAgreement extends React.Component {
               label="请求格式"
               key="requestType"
             >
-              {getFieldDecorator('requestType')(
+              {getFieldDecorator('requestType', {
+                initialValue: dataList ? dataList.requestType : '',
+              })(
                 <Select placeholder="请选择请求格式">
                   {
                     ENDPOINT_REQUEST_TYPE.map(type => <Option key={type}>{type}</Option>)
@@ -283,7 +297,9 @@ class AccessAgreement extends React.Component {
               label="响应格式"
               key="responseType"
             >
-              {getFieldDecorator('responseType')(
+              {getFieldDecorator('responseType', {
+                initialValue: dataList ? dataList.responseType : '',
+              })(
                 <Select placeholder="请选择响应格式">
                   {
                     ENDPOINT_RESPONSE_TYPE.map(({ key, text }) =>
@@ -304,6 +320,7 @@ class AccessAgreement extends React.Component {
             className="publish-service-body-wsdl-address"
           >
             {getFieldDecorator('targetDetail', {
+              initialValue: dataList ? dataList.targetDetail : '',
               rules: [{
                 required: true,
                 whitespace: true,
@@ -330,6 +347,7 @@ class AccessAgreement extends React.Component {
               key="namespace"
             >
               {getFieldDecorator('namespace', {
+                initialValue: dataList ? dataList.namespace : '',
                 rules: [{
                   // required: true,
                   message: 'Please input namespace',
@@ -344,6 +362,7 @@ class AccessAgreement extends React.Component {
               key="endPointAddress"
             >
               {getFieldDecorator('endPointAddress', {
+                initialValue: dataList ? dataList.endPointAddress : '',
                 rules: [{
                   // required: true,
                   message: 'Please input endPointAddress',
@@ -358,6 +377,7 @@ class AccessAgreement extends React.Component {
               key="bindingName"
             >
               {getFieldDecorator('bindingName', {
+                initialValue: dataList ? dataList.bindingName : '',
                 rules: [{
                   required: true,
                   message: 'Please input bindingName',
@@ -372,6 +392,7 @@ class AccessAgreement extends React.Component {
               key="soapAction"
             >
               {getFieldDecorator('soapAction', {
+                initialValue: dataList ? dataList.soapAction : '',
                 rules: [{
                   // required: true,
                   message: 'Please input soapAction',
@@ -386,6 +407,7 @@ class AccessAgreement extends React.Component {
               key="operationName"
             >
               {getFieldDecorator('operationName', {
+                initialValue: dataList ? dataList.operationName : '',
                 rules: [{
                   required: true,
                   message: 'Please input operationName',

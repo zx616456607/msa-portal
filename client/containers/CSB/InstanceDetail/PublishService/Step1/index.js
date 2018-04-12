@@ -147,7 +147,7 @@ class Step1 extends React.Component {
   render() {
     const {
       className, currentStep, servicesInbounds, serviceGroups, history,
-      currentInstance, ...otherProps
+      currentInstance, data, isEdit, ...otherProps
     } = this.props
     const classNames = ClassNames({
       fields: true,
@@ -156,11 +156,15 @@ class Step1 extends React.Component {
     return [
       <div className={classNames} key="fields">
         <AccessAgreement
+          isEdit={isEdit}
+          dataList={data}
           currentInstance={currentInstance}
           servicesInbounds={servicesInbounds}
           {...otherProps}
         />
         <OpenAgreement
+          isEdit={isEdit}
+          dataList={data}
           serviceGroups={serviceGroups}
           {...otherProps}
         />

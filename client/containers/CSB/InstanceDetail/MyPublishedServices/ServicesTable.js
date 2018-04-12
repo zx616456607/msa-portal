@@ -120,12 +120,13 @@ class ServicesTable extends React.Component {
 
   serviceMenuClick = (record, item) => {
     const { key } = item
-    const { history } = this.props
+    const { match, history } = this.props
+    const { instanceID } = match.params
     if (key === 'list') {
       return this.openBlackAndWhiteListModal(record)
     }
     if (key === 'edit') {
-      return history.push(`/csb-instances-available/63/publish-service?id=${record.id}&model=edit`)
+      return history.push(`/csb-instances-available/${instanceID}/publish-service?serviceID=${record.id}&isEdit=true`)
     }
     this.serviceOperation(record, key)
   }
@@ -445,9 +446,11 @@ class ServicesTable extends React.Component {
   }
 }
 
-const mapStateToProps = () => {
+const mapStateToProps = (state, ownProps) => {
+  const { match } = ownProps
+  const { instanceID } = match.params
   return {
-    //
+    instanceID,
   }
 }
 

@@ -76,6 +76,34 @@ const fetchCreateService = (instanceID, body) => {
 export const createService = (instanceID, body) =>
   dispatch => dispatch(fetchCreateService(instanceID, body))
 
+export const UPDATE_CSB_INSTANCE_SERVICE_REQUEST = 'UPDATE_CSB_INSTANCE_SERVICE_REQUEST'
+export const UPDATE_CSB_INSTANCE_SERVICE_SUCCESS = 'UPDATE_CSB_INSTANCE_SERVICE_SUCCESS'
+export const UPDATE_CSB_INSTANCE_SERVICE_FAILURE = 'UPDATE_CSB_INSTANCE_SERVICE_FAILURE'
+
+// edit an instance services
+// Relies on the custom API middleware defined in ../middleware/api.js
+const uptateService = (instanceId, serviceId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_CSB_INSTANCE_SERVICE_REQUEST,
+        UPDATE_CSB_INSTANCE_SERVICE_SUCCESS,
+        UPDATE_CSB_INSTANCE_SERVICE_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const editService = (instanceId, serviceId, body) => dispatch => {
+  return dispatch(uptateService(instanceId, serviceId, body))
+}
+
 export const PUT_CSB_INSTANCE_SERVICE_REQUEST = 'PUT_CSB_INSTANCE_SERVICE_REQUEST'
 export const PUT_CSB_INSTANCE_SERVICE_SUCCESS = 'PUT_CSB_INSTANCE_SERVICE_SUCCESS'
 export const PUT_CSB_INSTANCE_SERVICE_FAILURE = 'PUT_CSB_INSTANCE_SERVICE_FAILURE'

@@ -125,6 +125,7 @@ export default class ErrorCode extends React.Component {
     const errorCodeDescKey = `description-${key}`
     getFieldDecorator(isEditKey, { initialValue: true })
     const isEdit = getFieldValue(isEditKey)
+    const { code, advice, description } = key
     return [
       <Row key={`text-${key}`} className={isEdit ? 'hide' : ''}>
         <Col span={6}>
@@ -151,6 +152,7 @@ export default class ErrorCode extends React.Component {
         <Col span={6}>
           <FormItem>
             {getFieldDecorator(errorCodeKey, {
+              initialValue: code || '',
               rules: [{
                 required: true,
                 message: '请填写错误代码!',
@@ -163,6 +165,7 @@ export default class ErrorCode extends React.Component {
         <Col span={6}>
           <FormItem>
             {getFieldDecorator(errorCodeAdviceKey, {
+              initialValue: advice || '',
               rules: [{
                 required: true,
                 message: '请填写处置建议!',
@@ -174,7 +177,9 @@ export default class ErrorCode extends React.Component {
         </Col>
         <Col span={6}>
           <FormItem>
-            {getFieldDecorator(errorCodeDescKey)(
+            {getFieldDecorator(errorCodeDescKey, {
+              initialValue: description || '',
+            })(
               <Input placeholder="请填写说明" />
             )}
           </FormItem>
@@ -188,7 +193,7 @@ export default class ErrorCode extends React.Component {
   }
 
   render() {
-    const { className, form, formItemLayout } = this.props
+    const { className, form, formItemLayout, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
     getFieldDecorator('errCodeKeys', { initialValue: [] })
     const keys = getFieldValue('errCodeKeys')
@@ -196,6 +201,7 @@ export default class ErrorCode extends React.Component {
       'error-code': true,
       [className]: !!className,
     })
+    const Arykes = Object.keys(data).length > 0 ? JSON.parse(data.errorCode) : ''
     return (
       <div className={classNames}>
         {
@@ -242,7 +248,8 @@ export default class ErrorCode extends React.Component {
               <Col span={6}>操作</Col>
             </Row>
             {
-              keys.map(this.renderItem)
+              Arykes ? Arykes.map(this.renderItem) :
+                keys.map(this.renderItem)
             }
             {
               keys.length === 0 &&
