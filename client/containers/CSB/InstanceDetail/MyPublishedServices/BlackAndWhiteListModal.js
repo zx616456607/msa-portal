@@ -117,13 +117,21 @@ class BlackAndWhiteListModal extends React.Component {
       formProps = 'white'
     }
     return list.map((item, index) => {
-      return <FormItem key={`${formProps}-${index}`}>
+      return <FormItem key={`${formProps}-${index}`}
+      >
         {
           getFieldDecorator(`${formProps}-${item.index}`, {
-            initialValue: listArray[item.index] ? listArray[item.index].IP : undefined,
+            initialValue: listArray[ item.index ] ? listArray[ item.index ].IP : undefined,
             rules: [{
-              required: true,
-              message: 'IP地址或者IP网段不能为空',
+              validator: (rule, value, callback) => {
+                if (!value) {
+                  return callback('IP地址或者IP网段不能为空')
+                }
+                if (!/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,3})?$/.test(value)) {
+                  return callback('IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24')
+                }
+                return callback()
+              },
             }],
           })(
             <Input placeholder="IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24" />
@@ -168,7 +176,7 @@ class BlackAndWhiteListModal extends React.Component {
           黑名单中添加某个调用者的 IP 后，该调用者不能访问该服务
         </Col>
       </Row>
-      <Row className="row-style">
+      <Row className="row-style add-row">
         <Col span="4"></Col>
         <Col span="20">
           {this.renderList(blacklist, blacklistArray, 'black')}
@@ -199,7 +207,7 @@ class BlackAndWhiteListModal extends React.Component {
           白名单中添加某个调用者 IP 后，该调用者不用鉴权即可访问该服务。
         </Col>
       </Row>
-      <Row className="row-style">
+      <Row className="row-style add-row">
         <Col span="4"></Col>
         <Col span="20">
           {this.renderList(whitelist, whitelistArray, 'white')}
@@ -216,6 +224,14 @@ class BlackAndWhiteListModal extends React.Component {
       <Row className="row-style">
         <Col span="4">
           默认配置
+          <Tooltip
+            title={`对于即不在白名单里，也在黑名单里的IP地址，\n
+            通过：表示无需鉴权即可访问；\n
+            拒绝：代表该服务默认不允许任何 IP 地址访问`}
+            placement="top"
+          >
+            <Icon type="question-circle-o" />
+          </Tooltip>
         </Col>
         <Col span="20">
           设置服务的默认访问策略，即不在白名单里，也不在黑名单里的 IP 地址
@@ -225,14 +241,15 @@ class BlackAndWhiteListModal extends React.Component {
         label={<span></span>}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 15 }}
+        className="reset-form-label-style"
       >
         {
-          getFieldDecorator('default-setting', {
-            initialValue: 'allow',
+          getFieldDecorator('blackOrWhite', {
+            initialValue: false,
           })(
             <RadioGroup>
-              <Radio value="allow">无需鉴权即可访问</Radio>
-              <Radio value="none">不允许任何 IP 地址访问</Radio>
+              <Radio value={false}>无需鉴权即可访问</Radio>
+              <Radio value={true}>不允许任何 IP 地址访问</Radio>
             </RadioGroup>
           )
         }
