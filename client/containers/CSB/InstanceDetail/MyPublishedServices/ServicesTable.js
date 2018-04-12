@@ -20,7 +20,11 @@ import { formatDate } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
-import { PutInstanceService, delInstanceService } from '../../../../actions/CSB/instanceService'
+import {
+  PutInstanceService,
+  delInstanceService,
+  createBlackAndWhiteList,
+} from '../../../../actions/CSB/instanceService'
 
 const modalTooptip = [
   {
@@ -86,7 +90,38 @@ class ServicesTable extends React.Component {
 
   handleCreateModalValues = () => { }
 
-  handleSaveBlackAndWhiteList = () => { }
+  handleSaveBlackAndWhiteList = values => {
+    const { createBlackAndWhiteList, instanceID } = this.props
+    const { serviceId } = this.state
+    this.setState({ confirmLoading: true })
+    const whiteArray = []
+    const blackArray = []
+    const keys = Object.keys(values)
+    keys.forEach(item => {
+      if (item.substring(0, 5) === 'white') {
+        whiteArray.push(values[item])
+      }
+      if (item.substring(0, 5) === 'black') {
+        blackArray.push(values[item])
+      }
+    })
+    const body = {
+      white: whiteArray.join(','),
+      black: blackArray.join(','),
+      serviceId,
+      blackOrWhite: values.blackOrWhite,
+    }
+    createBlackAndWhiteList(instanceID, serviceId, body).then(res => {
+      this.setState({ confirmLoading: false })
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '修改黑白名单成功',
+      })
+      this.setState({ blackAndWhiteListModalVisible: false })
+    })
+  }
 
   openBlackAndWhiteListModal = record => {
     this.setState({
@@ -457,4 +492,5 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   delInstanceService,
   PutInstanceService,
+  createBlackAndWhiteList,
 })(ServicesTable)
