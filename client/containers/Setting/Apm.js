@@ -376,7 +376,7 @@ class ApmSetting extends React.Component {
                     <div className="notInstalled">
                       {
                         Object.keys(projectNames).length > 0 ?
-                          projectNames[0].map((item, index) => (
+                          projectNames[0] && projectNames[0].map((item, index) => (
                             <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
                               <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
                             </div>
