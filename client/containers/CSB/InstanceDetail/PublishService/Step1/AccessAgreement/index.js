@@ -196,10 +196,10 @@ class AccessAgreement extends React.Component {
         >
           {getFieldDecorator('openProtocol', {
             initialValue: protocolType,
-            rules: [{
-              required: true,
-              message: '选择协议类型',
-            }],
+            // rules: [{
+            //   required: true,
+            //   message: '选择协议类型',
+            // }],
             onChange: e => {
               let openUrl
               if (!(protocol === 'soap' && e.target.value === 'rest')) {
