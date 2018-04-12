@@ -94,6 +94,7 @@ class CreateServiceGroupModal extends React.Component {
             iconType: 'check-circle-o',
             okText: '去查看',
             width: 520,
+            type: 'success',
             onOk() {
               history.push(`/csb-instances-available/${instanceID}/my-published-services-groups`)
             },
