@@ -9,8 +9,12 @@
  * 2017-12-05
  * @author zhangcz
  */
+@import "../../../../../assets/style/core/index.less";
 
 .blackAndWhiteList {
+  .ant-modal-body {
+    padding: 24px 0;
+  }
   .anticon-delete {
     cursor: pointer;
   }
@@ -19,6 +23,11 @@
   }
   .row-style {
     margin-bottom: 20px;
+    padding: 0 24px;
+  }
+  .add-row {
+    padding: 0 0 20px 0;
+    border-bottom: 1px dashed @border-color-base;
   }
   .ant-input {
     width: 355px;
@@ -26,5 +35,12 @@
   }
   .add-btn {
     width: 355px;
+  }
+  .reset-form-label-style {
+    .ant-form-item-label {
+      > label:after {
+        display: none;
+      }
+    }
   }
 }

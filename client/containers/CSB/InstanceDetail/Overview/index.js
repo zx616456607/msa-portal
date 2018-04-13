@@ -192,6 +192,22 @@ class InstanceDetailOverview extends React.Component {
     return <div key={index}>{renderCSBInstanceServiceStatus(key)}<span className="status-desc">{value}个</span></div>
   }
 
+  filterStateType() {
+    const { currentInstance } = this.props
+    switch (currentInstance.role) {
+      case 1:
+        return <Button className="subscribe" onClick={this.goSubscriptService}>订阅服务</Button>
+      case 2:
+        return <Button onClick={this.goPublishService} type="primary">发布服务</Button>
+      case 4:
+        return <div>
+          <Button onClick={this.goPublishService} type="primary">发布服务</Button>
+          <Button className="subscribe" onClick={this.goSubscriptService}>订阅服务</Button></div>
+      default:
+        break
+    }
+  }
+
   render() {
     const { instanceID, currentInstance } = this.props
     const images = [
@@ -223,15 +239,10 @@ class InstanceDetailOverview extends React.Component {
             </div>
           </div>
           <div className="btn">
-            <Button onClick={this.goPublishService} type="primary">
-              发布服务
-            </Button>
-            <Button className="subscribe" onClick={this.goSubscriptService}>
-              订阅服务
-            </Button>
+            {this.filterStateType()}
           </div>
         </div>
-        <div className="release" key="release">
+        <div className={`release ${currentInstance.role === 2 || currentInstance.role === 4 ? 'show' : 'hide'}`} key="release">
           <span className="first-title">服务发布</span>
           <Row className="content" gutter={8} style={{ marginTop: 16 }}>
             <Col span={6}>
@@ -310,7 +321,7 @@ class InstanceDetailOverview extends React.Component {
                 <h1>{incompleteEvidenceCount || 0} 个</h1>
               </Card>
             </Col>
-            <Col span={9}>
+            <Col span={9} className={`${currentInstance.role === 1 || currentInstance.role === 4 ? 'show' : 'hide'}`}>
               <Card
                 title="我订阅的服务"
                 extra={<Link to={`/csb-instances-available/${instanceID}/my-subscribed-service`}>
@@ -334,7 +345,7 @@ class InstanceDetailOverview extends React.Component {
                 </div>
               </Card>
             </Col>
-            <Col span={9}>
+            <Col span={9} className={`${currentInstance.role === 1 || currentInstance.role === 4 ? 'show' : 'hide'}`}>
               <Card
                 title="可订阅的服务"
                 extra={<Link to={`/csb-instances-available/${instanceID}/subscription-services`}>

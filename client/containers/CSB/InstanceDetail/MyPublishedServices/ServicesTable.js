@@ -16,11 +16,15 @@ import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
 import { Dropdown, Menu, Table, notification } from 'antd'
-import { formatDate } from '../../../../common/utils'
+import { formatDate, parseOrderToQuery } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
-import { PutInstanceService, delInstanceService } from '../../../../actions/CSB/instanceService'
+import {
+  PutInstanceService,
+  delInstanceService,
+  createBlackAndWhiteList,
+} from '../../../../actions/CSB/instanceService'
 
 const modalTooptip = [
   {
@@ -86,7 +90,38 @@ class ServicesTable extends React.Component {
 
   handleCreateModalValues = () => { }
 
-  handleSaveBlackAndWhiteList = () => { }
+  handleSaveBlackAndWhiteList = values => {
+    const { createBlackAndWhiteList, instanceID } = this.props
+    const { serviceId } = this.state
+    this.setState({ confirmLoading: true })
+    const whiteArray = []
+    const blackArray = []
+    const keys = Object.keys(values)
+    keys.forEach(item => {
+      if (item.substring(0, 5) === 'white') {
+        whiteArray.push(values[item])
+      }
+      if (item.substring(0, 5) === 'black') {
+        blackArray.push(values[item])
+      }
+    })
+    const body = {
+      white: whiteArray.join(','),
+      black: blackArray.join(','),
+      serviceId,
+      blackOrWhite: values.blackOrWhite,
+    }
+    createBlackAndWhiteList(instanceID, serviceId, body).then(res => {
+      this.setState({ confirmLoading: false })
+      if (res.error) {
+        return
+      }
+      notification.success({
+        message: '修改黑白名单成功',
+      })
+      this.setState({ blackAndWhiteListModalVisible: false })
+    })
+  }
 
   openBlackAndWhiteListModal = record => {
     this.setState({
@@ -251,14 +286,6 @@ class ServicesTable extends React.Component {
     })
   }
 
-  getSort = value => {
-    let orderStr = 'publishTime,asc'
-    if (value.order === 'descend') {
-      orderStr = 'publishTime,desc'
-    }
-    return orderStr
-  }
-
   handleChange = (pagination, filters, sorter) => {
     const { check, loadData } = this.props
     let cascadedType = filters.cascadedType
@@ -281,16 +308,18 @@ class ServicesTable extends React.Component {
       filtersStr = status
     }
     if (!isEmpty(sorter)) {
-      sorterStr = this.getSort(sorter)
+      sorterStr = parseOrderToQuery(sorter)
     }
-    if (cascadedType.length === 2) {
-      cascadedType = []
-    } else if (cascadedType.length === 1) {
-      if (parseInt(cascadedType[ 0 ]) === 1) {
-        cascadedType = [ 1, 2 ]
+    if(cascadedType){
+      if (cascadedType.length === 2) {
+        cascadedType = []
+      } else if (cascadedType.length === 1) {
+        if (parseInt(cascadedType[ 0 ]) === 1) {
+          cascadedType = [ 1, 2 ]
+        }
+      } else {
+        cascadedType = []
       }
-    } else {
-      cascadedType = []
     }
     loadData({
       status: filtersStr,
@@ -386,10 +415,10 @@ class ServicesTable extends React.Component {
       },
       {
         title: '发布时间',
-        dataIndex: 'time',
-        key: 'time',
-        sorter: (a, b) => a.time - b.time,
-        render: (text, row) => formatDate(row.publishTime),
+        dataIndex: 'publishTime',
+        key: 'publishTime',
+        sorter: true,
+        render: text => formatDate(text),
       },
       {
         title: '操作',
@@ -457,4 +486,5 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   delInstanceService,
   PutInstanceService,
+  createBlackAndWhiteList,
 })(ServicesTable)

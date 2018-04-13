@@ -431,3 +431,29 @@ export const removeCascadedServicesProgress = (serviceName, serviceVersion) => (
   serviceVersion,
   type: REMOVE_CASCADED_SERVICES_PROGRESS,
 })
+
+// 黑白名单
+export const CREATE_BLACK_AND_WHITE_LIST_REQUEST = 'CREATE_BLACK_AND_WHITE_LIST_REQUEST'
+export const CREATE_BLACK_AND_WHITE_LIST_SUCCESS = 'CREATE_BLACK_AND_WHITE_LIST_SUCCESS'
+export const CREATE_BLACK_AND_WHITE_LIST_FALIURE = 'CREATE_BLACK_AND_WHITE_LIST_FALIURE'
+
+function fetchCreateBlackAndWhiteList(instanceId, serviceId, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_BLACK_AND_WHITE_LIST_REQUEST,
+        CREATE_BLACK_AND_WHITE_LIST_SUCCESS,
+        CREATE_BLACK_AND_WHITE_LIST_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instance/${instanceId}/service/${serviceId}`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const createBlackAndWhiteList = (instanceId, serviceId, body) =>
+  dispatch => dispatch(fetchCreateBlackAndWhiteList(instanceId, serviceId, body))

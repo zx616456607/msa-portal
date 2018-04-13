@@ -122,8 +122,12 @@ class CSBInstanceOm extends React.Component {
   }
 
   handleButtonClick = row => {
-    const { history } = this.props
-    history.push(`/csb-instances-available/${row.id}`)
+    // const { history } = this.props
+    // history.push(`/csb-instances-available/${row.id}`)
+    this.setState({
+      createModal: true,
+      currentInstance: row,
+    })
   }
 
   stopConfirm = () => {
@@ -274,13 +278,13 @@ class CSBInstanceOm extends React.Component {
           const menu = (
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
               {/* <Menu.Item key="stop">停止</Menu.Item>*/}
-              <Menu.Item key="edit">修改实例</Menu.Item>
+              {/* <Menu.Item key="edit">修改实例</Menu.Item> */}
               <Menu.Item key="delete">删除</Menu.Item>
             </Menu>
           )
           return (
             <Dropdown.Button onClick={() => this.handleButtonClick(row)} overlay={menu}>
-              实例详情
+              修改实例
             </Dropdown.Button>
           )
         },
