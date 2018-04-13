@@ -38,8 +38,8 @@ class CascadingLinkRules extends React.Component {
   }
 
   loadData = () => {
-    const { getCascadingLinkRulesList } = this.props
-    getCascadingLinkRulesList({ size: 2000 })
+    const { getCascadingLinkRulesList, instanceID: instanceId } = this.props
+    getCascadingLinkRulesList({ size: 2000, instanceId })
   }
 
   getInstancesOptions = () => {
