@@ -200,9 +200,11 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  loadGroupServices = (groupID, query = {}) => {
+  loadGroupServices = (groupID, query = {}, loadGroup) => {
     const { instanceID, getGroupServices } = this.props
-    getGroupServices(instanceID, groupID, query)
+    getGroupServices(instanceID, groupID, query).then(() => {
+      loadGroup && loadGroup()
+    })
   }
 
   handleExpandedRowRender = record => {
@@ -211,7 +213,7 @@ class MyPublishedServiceGroups extends React.Component {
     const { isFetching, content, totalElements, size } = currentGroupServices
     return <ServicesTable
       from="group"
-      loadData={this.loadGroupServices.bind(this, record.id)}
+      loadData={this.loadGroupServices.bind(this, record.id, {}, this.loadData)}
       dataSource={content}
       total={totalElements}
       pageSize={size}
