@@ -21,6 +21,15 @@ const FormItem = Form.Item
 const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
+  selectServerName = (rule, value, callback) => {
+    if (value.length > 64) {
+      return callback('最多可输入63位字符')
+    }
+    if (!/^[a-zA-Z0-9\-]+$/.test(value)) {
+      return callback('支持字母、数字、中划线')
+    }
+    callback()
+  }
   serverVersion = (rule, value, callback) => {
     if (value.length > 64) {
       return callback('最多可输入63位字符')
@@ -64,10 +73,11 @@ export default class OpenAgreement extends React.Component {
             initialValue: dataList ? dataList.name : '',
             rules: [{
               required: true,
-              message: '输入合法的服务名!',
-            }],
+              message: '请输入服务名称',
+            },
+            { validator: this.selectServerName }],
           })(
-            <Input disabled={isDisabled} placeholder="可由1-63个中文字符、英文字母、数字或中划线“-”组成" />
+            <Input disabled={isDisabled} placeholder="支持1-63位字母、数字或中划线组成" />
           )}
         </FormItem>
         <FormItem
