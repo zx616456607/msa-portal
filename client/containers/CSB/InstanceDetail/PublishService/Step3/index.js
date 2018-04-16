@@ -120,6 +120,9 @@ class Step3 extends React.Component {
           accessible: values.accessible,
           targetType: protocol === 'rest' ? 'url' : 'wsdl',
           targetDetail: values.targetDetail,
+          method: values.method,
+          requestType: values.requestType,
+          responseType: values.responseType,
           transformationType: 'direct',
           transformationDetail: '{}',
           authenticationType: 'bypass',
@@ -237,7 +240,7 @@ class Step3 extends React.Component {
 
   render() {
     const {
-      className, currentStep, changeStep, data, ...otherProps
+      className, currentStep, changeStep, data, isEdit, ...otherProps
     } = this.props
     const { confirmLoading } = this.state
     const classNames = ClassNames({
@@ -263,7 +266,7 @@ class Step3 extends React.Component {
           onClick={this.submitService}
           loading={confirmLoading}
         >
-        发 布
+          { isEdit ? '保 存' : '发 布' }
         </Button>
       </div>,
     ]
