@@ -132,6 +132,7 @@ class Step3 extends React.Component {
           oauth2Type,
           oauth2Detail: JSON.stringify(oauth2Detail),
           groupId,
+          blackOrWhite: false,
         },
       ]
       const { requestXslt, responseXslt } = values
