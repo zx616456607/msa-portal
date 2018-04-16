@@ -13,7 +13,6 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import cloneDeep from 'lodash/cloneDeep'
-
 import {
   Button, Icon, Input, Pagination,
   Dropdown, Table, Card, Menu, Modal,
@@ -41,6 +40,7 @@ import confirm from '../../../../components/Modal/confirm'
 import UpdateConsumerVoucher from './UpdateConsumerVoncher'
 import { parse as parseQuerystring } from 'query-string'
 import IndentTip from './TipSvcDomain/index'
+import SubscribedServiceNamePop from './SubscribedServiceNamesPop'
 
 const Search = Input.Search
 const FormItem = Form.Item
@@ -282,8 +282,15 @@ class ConsumerVouchers extends React.Component {
       }, {
         title: '订阅服务（个）',
         width: '10%',
-        dataIndex: 'subscribedCount',
-        render: text => <span>{text ? text : 0}</span>,
+        dataIndex: 'subscribedServiceNames',
+        render: (text = []) => {
+          return (
+            <span>
+              <span style={{ marginRight: 8 }}>{text.length}</span>
+              <SubscribedServiceNamePop serviceList={text}/>
+            </span>
+          )
+        },
       }, {
         title: '创建时间',
         dataIndex: 'creationTime',
