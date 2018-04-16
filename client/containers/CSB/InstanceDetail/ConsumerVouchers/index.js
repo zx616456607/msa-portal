@@ -366,12 +366,11 @@ class ConsumerVouchers extends React.Component {
           visible={true}
           onCancel={() => this.setState({ addVisible: false })}
           maskClosable={false}
-          footer={[
-            <Button key="back" type="ghost" onClick={() => this.setState({ addVisible: false })}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleOK}>
-              {isAdd ? '确 定' : '保 存'}
-            </Button>,
-          ]}>
+          cancelText="取 消"
+          okText={isAdd ? '确 定' : '保 存'}
+          onOk={this.handleOK}
+          confirmLoading={confirmLoading}
+        >
           <FormItem
             label="凭证名称"
             key="name"
