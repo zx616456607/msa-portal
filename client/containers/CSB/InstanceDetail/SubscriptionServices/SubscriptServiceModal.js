@@ -78,13 +78,14 @@ class SubscriptServiceModal extends React.Component {
       if (errors) {
         return
       }
-      const { consumer, bindIps } = values
+      const { consumer, bindIps, limitDetail } = values
       const body = {
         serviceId: dateSource.id,
         evidenceId: parseInt(consumer, 10),
         reason: '',
         accessConfig: '',
         bindIps,
+        limitDetail,
       }
       this.setState({
         confirmLoading: true,
@@ -160,7 +161,7 @@ class SubscriptServiceModal extends React.Component {
           <Col span={15} className="input-col-style">
             希望每秒最大访问<FormItem>
               {
-                getFieldDecorator('qps', {
+                getFieldDecorator('limitDetail', {
                   initialValue: 1,
                   rules: [{
                     required: true,
