@@ -12,11 +12,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Modal, Form, Input, Select } from 'antd'
+import { Modal, Form, Input, Select, notification } from 'antd'
 import { getAllClusters } from '../../../actions/current'
-import { createInstance, editInstance } from '../../../actions/CSB/instance'
+import { createInstance, editInstance, checkInstanceName } from '../../../actions/CSB/instance'
 import {
-  HOST_REG,
+  HOST_REG, ASYNC_VALIDATOR_TIMEOUT
 } from '../../../constants'
 
 const { TextArea } = Input
@@ -25,6 +25,8 @@ const FormItem = Form.Item
 const Option = Select.Option
 
 class InstanceModal extends React.Component {
+
+  state = {}
 
   componentDidMount() {
     const { getAllClusters } = this.props
@@ -41,6 +43,9 @@ class InstanceModal extends React.Component {
       if (errors) {
         return
       }
+      this.setState({
+        confirmLoading: true
+      })
       const { name, description, cluster, host } = values
       const body = {
         name,
@@ -51,8 +56,20 @@ class InstanceModal extends React.Component {
       if (currentInstance) {
         editInstance(cluster, currentInstance.id, body).then(res => {
           if (res.error) {
+            this.setState({
+              confirmLoading: false
+            })
+            notification.warn({
+              message: '修改实例失败'
+            })
             return
           }
+          this.setState({
+            confirmLoading: false
+          })
+          notification.success({
+            message: '修改实例成功'
+          })
           callback()
           closeCreateModal()
         })
@@ -60,9 +77,21 @@ class InstanceModal extends React.Component {
       }
       createInstance(cluster, null, body).then(res => {
         if (res.error) {
+          notification.warn({
+            message: '创建实例失败'
+          })
+          this.setState({
+            confirmLoading: false
+          })
           return
         }
         callback()
+        this.setState({
+          confirmLoading: false
+        })
+        notification.success({
+          message: '创建实例成功'
+        })
         closeCreateModal()
       })
     })
@@ -74,10 +103,20 @@ class InstanceModal extends React.Component {
   }
 
   checkName = (rule, value, callback) => {
+    const { clusterID, checkInstanceName } = this.props;
     if (!value) {
       return callback('请输入实例名称')
     }
-    callback()
+    clearTimeout(this.checkNameTimeout)
+    this.checkNameTimeout = setTimeout(() => {
+      checkInstanceName(clusterID, {name: value}).then(res => {
+        if (!res.response.result.data) {
+          callback('实例名称重复复')
+        } else {
+          callback()
+        }
+      })
+    }, ASYNC_VALIDATOR_TIMEOUT)
   }
 
   checkCluster = (rule, value, callback) => {
@@ -98,6 +137,7 @@ class InstanceModal extends React.Component {
   }
 
   render() {
+    const { confirmLoading } = this.state
     const { form, currentInstance, clusterList, visible } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
@@ -119,6 +159,7 @@ class InstanceModal extends React.Component {
         visible={visible}
         onOk={this.confirmModal}
         onCancel={this.cancelModal}
+        confirmLoading={confirmLoading}
       >
         <Form>
           <FormItem
@@ -218,15 +259,18 @@ class InstanceModal extends React.Component {
 const mapStateToProps = state => {
   const { entities, current } = state
   const { clusters } = entities
-  const { allClusters: allClusterIDs } = current
+  const { allClusters: allClusterIDs, config } = current
+  const { id: clusterID } = config.cluster
   const { ids } = allClusterIDs
   const clusterList = ids && ids && ids.length && ids.map(item => clusters[item]) || []
   return {
     clusterList,
+    clusterID
   }
 }
 export default connect(mapStateToProps, {
   getAllClusters,
   createInstance,
   editInstance,
+  checkInstanceName
 })(Form.create()(InstanceModal))
