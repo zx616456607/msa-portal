@@ -16,7 +16,7 @@ import { Modal, Form, Input, Select, notification } from 'antd'
 import { getAllClusters } from '../../../actions/current'
 import { createInstance, editInstance, checkInstanceName } from '../../../actions/CSB/instance'
 import {
-  HOST_REG, ASYNC_VALIDATOR_TIMEOUT
+  HOST_REG, ASYNC_VALIDATOR_TIMEOUT,
 } from '../../../constants'
 
 const { TextArea } = Input
@@ -44,7 +44,7 @@ class InstanceModal extends React.Component {
         return
       }
       this.setState({
-        confirmLoading: true
+        confirmLoading: true,
       })
       const { name, description, cluster, host } = values
       const body = {
@@ -57,18 +57,18 @@ class InstanceModal extends React.Component {
         editInstance(cluster, currentInstance.id, body).then(res => {
           if (res.error) {
             this.setState({
-              confirmLoading: false
+              confirmLoading: false,
             })
             notification.warn({
-              message: '修改实例失败'
+              message: '修改实例失败',
             })
             return
           }
           this.setState({
-            confirmLoading: false
+            confirmLoading: false,
           })
           notification.success({
-            message: '修改实例成功'
+            message: '修改实例成功',
           })
           callback()
           closeCreateModal()
@@ -78,19 +78,19 @@ class InstanceModal extends React.Component {
       createInstance(cluster, null, body).then(res => {
         if (res.error) {
           notification.warn({
-            message: '创建实例失败'
+            message: '创建实例失败',
           })
           this.setState({
-            confirmLoading: false
+            confirmLoading: false,
           })
           return
         }
         callback()
         this.setState({
-          confirmLoading: false
+          confirmLoading: false,
         })
         notification.success({
-          message: '创建实例成功'
+          message: '创建实例成功',
         })
         closeCreateModal()
       })
@@ -103,15 +103,22 @@ class InstanceModal extends React.Component {
   }
 
   checkName = (rule, value, callback) => {
-    const { clusterID, checkInstanceName } = this.props;
+    const { clusterID, checkInstanceName } = this.props
     if (!value) {
       return callback('请输入实例名称')
     }
+    if (value.length < 3 || value.length > 63) {
+      return callback('实例名称需在3-63个字符之间')
+    }
+    const reg = /^[a-zA-Z0-9_.-]+$/
+    if (!reg.test(value)) {
+      return callback('支持字母、数字、下划线、中划线和 "."')
+    }
     clearTimeout(this.checkNameTimeout)
     this.checkNameTimeout = setTimeout(() => {
-      checkInstanceName(clusterID, {name: value}).then(res => {
+      checkInstanceName(clusterID, { name: value }).then(res => {
         if (!res.response.result.data) {
-          callback('实例名称重复复')
+          callback('实例名称重复')
         } else {
           callback()
         }
@@ -265,12 +272,12 @@ const mapStateToProps = state => {
   const clusterList = ids && ids && ids.length && ids.map(item => clusters[item]) || []
   return {
     clusterList,
-    clusterID
+    clusterID,
   }
 }
 export default connect(mapStateToProps, {
   getAllClusters,
   createInstance,
   editInstance,
-  checkInstanceName
+  checkInstanceName,
 })(Form.create()(InstanceModal))

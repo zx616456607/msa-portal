@@ -126,6 +126,11 @@ class ConsumerVouchers extends React.Component {
     const { createConsumerVoucher } = this.props
     createConsumerVoucher(instanceID, values).then(res => {
       this.setState({ confirmLoading: false })
+      if (res.status === 409) {
+        notification.warn({
+          message: '消费凭证名称重复',
+        })
+      }
       if (res.error) return
       notification.success({
         message: '创建消费凭证成功',
@@ -141,6 +146,11 @@ class ConsumerVouchers extends React.Component {
     const { id } = currentConsumerVoucher
     editConsumerVoucher(instanceID, id, values).then(res => {
       this.setState({ confirmLoading: false })
+      if (res.status === 409) {
+        notification.warn({
+          message: '消费名称重复',
+        })
+      }
       if (res.error) return
       notification.success({ message: '编辑消费凭证成功' })
       this.setState({ addVisible: false })

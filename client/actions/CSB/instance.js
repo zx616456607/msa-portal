@@ -295,8 +295,8 @@ const fetchCheckInstanceName = (clusterID, query) => {
         CHECK_CSB_INSTANCE_NAME_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/name?${toQuerystring(query)}`,
-      schema: {}
-    }
+      schema: {},
+    },
   }
 }
 
