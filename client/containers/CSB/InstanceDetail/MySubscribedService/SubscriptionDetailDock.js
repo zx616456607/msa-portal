@@ -13,6 +13,7 @@
 import React from 'react'
 import DetailPageDock from '../../../../components/Dock/DetailPageDock'
 import './style/SubscriptionDetailDock.less'
+import { formatDate } from '../../../../common/utils'
 
 export default class SubscriptionDetailDock extends React.Component {
 
@@ -69,11 +70,11 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div>
                   <span className="sub-label">订阅时间：</span>
-                  2017-01-19 14:22:33
+                  <span className="desc-text">{formatDate(currentService.requestTime)}</span>
                 </div>
                 <div>
                   <span className="sub-label">QPS：</span>
-                  -
+                  <span className="desc-text">{currentService.limitDetail}</span>
                 </div>
                 <div className="bind-ip">
                   <span className="sub-label">绑定 IP：</span>
