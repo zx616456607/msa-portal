@@ -156,6 +156,9 @@ class CSBInstanceOm extends React.Component {
               return reject()
             }
             resolve()
+            this.setState({
+              currentInstance: null,
+            })
             this.getInstanceList()
           })
         })
