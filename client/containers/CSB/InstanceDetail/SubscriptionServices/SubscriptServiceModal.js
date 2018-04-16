@@ -136,6 +136,12 @@ class SubscriptServiceModal extends React.Component {
     const mode = e.target.value
     this.setState({ mode })
   }
+  renderOpenssl(type) {
+    if (/^rest/.test(type)) {
+      return 'Restful-API'
+    }
+    return 'WebService'
+  }
   render() {
     const { form, visible, dateSource, vouchers } = this.props
     const { mode, confirmLoading } = this.state
@@ -257,7 +263,7 @@ class SubscriptServiceModal extends React.Component {
                 </tr>
                 <tr>
                   <td>开放协议</td>
-                  <td>-</td>
+                  <td>{this.renderOpenssl(dateSource.type)}</td>
                 </tr>
               </tbody>
             </table>
