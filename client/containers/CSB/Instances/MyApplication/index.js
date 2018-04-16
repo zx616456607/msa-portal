@@ -197,7 +197,7 @@ class MyApplication extends React.Component {
       id: row.instance.id,
       confirmLoading: false,
       currentRecord: content,
-      desc: row.ownerResponse,
+      desc: row.reason,
     })
   }
 
