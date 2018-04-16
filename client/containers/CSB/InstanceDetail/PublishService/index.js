@@ -312,18 +312,6 @@ class PublishService extends React.Component {
                 <Row>
                   <Col span={8}>
                     <div className="field-label txt-of-ellipsis">
-                      开放地址
-                    </div>
-                  </Col>
-                  <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      {fields.openUrl}
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
                       服务名称
                     </div>
                   </Col>
@@ -342,6 +330,18 @@ class PublishService extends React.Component {
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
                       {fields.version}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <div className="field-label txt-of-ellipsis">
+                      开放地址
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div className="field-value txt-of-ellipsis">
+                      {fields.openUrl}
                     </div>
                   </Col>
                 </Row>
