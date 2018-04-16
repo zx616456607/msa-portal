@@ -25,6 +25,9 @@ import {
   delInstanceService,
   createBlackAndWhiteList,
 } from '../../../../actions/CSB/instanceService'
+import CenterSvg from '../../../../assets/img/csb/center.svg'
+import PutinSvg from '../../../../assets/img/csb/putin.svg'
+import PutoutSvg from '../../../../assets/img/csb/putout.svg'
 
 const modalTooptip = [
   {
@@ -329,6 +332,35 @@ class ServicesTable extends React.Component {
     })
   }
 
+  renderServiceCascadedType = record => {
+    const { cascadedType } = record
+    const type = parseInt(cascadedType)
+    const svgArray = [
+      <svg className="menu-icon" key="PutinSvg">
+        <use xlinkHref={`#${PutinSvg.id}`} />
+      </svg>,
+      <svg className="menu-icon" key="CenterSvg">
+        <use xlinkHref={`#${CenterSvg.id}`} />
+      </svg>,
+      <svg className="menu-icon" key="PutoutSvg">
+        <use xlinkHref={`#${PutoutSvg.id}`} />
+      </svg>,
+    ]
+    switch (type) {
+      case 1:
+        return [ svgArray[ 1 ] ]
+      case 2:
+        return [ svgArray[ 2 ] ]
+      case 5:
+        return [ svgArray[ 0 ], svgArray[ 1 ] ]
+      case 6:
+        return [ ...svgArray ]
+      case 0:
+      default:
+        return null
+    }
+  }
+
   render() {
     const { dataSource, pageSize, total, loading, from, match, check, ...otherProps } = this.props
     const {
@@ -341,9 +373,10 @@ class ServicesTable extends React.Component {
         title: '服务名',
         dataIndex: 'name',
         key: 'name',
-        render: (text, row) => <a onClick={this.viewServiceDetails.bind(this, row)}>
-          {text}
-        </a>,
+        render: (text, row) => <div>
+          <a onClick={this.viewServiceDetails.bind(this, row)}>{text}</a>
+          <div>{this.renderServiceCascadedType(row)}</div>
+        </div>,
       },
       {
         title: '服务版本',
