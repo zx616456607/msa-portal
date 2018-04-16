@@ -24,6 +24,7 @@ import {
   PutInstanceService,
   delInstanceService,
   createBlackAndWhiteList,
+  editPublishedService,
 } from '../../../../actions/CSB/instanceService'
 import CenterSvg from '../../../../assets/img/csb/center.svg'
 import PutinSvg from '../../../../assets/img/csb/putin.svg'
@@ -68,6 +69,7 @@ class ServicesTable extends React.Component {
 
   static defaultProps = {
     from: 'services',
+    currentService: {},
   }
 
   state = {
@@ -94,35 +96,43 @@ class ServicesTable extends React.Component {
   handleCreateModalValues = () => { }
 
   handleSaveBlackAndWhiteList = values => {
-    const { createBlackAndWhiteList, instanceID } = this.props
+    const { createBlackAndWhiteList, instanceID, editPublishedService } = this.props
     const { serviceId } = this.state
+    const { blackOrWhite } = values
     this.setState({ confirmLoading: true })
-    const whiteArray = []
-    const blackArray = []
     const keys = Object.keys(values)
+    const requestList = []
     keys.forEach(item => {
       if (item.substring(0, 5) === 'white') {
-        whiteArray.push(values[item])
+        requestList.push({
+          serviceId,
+          ipOrNet: values[item],
+          blackOrWhite: false,
+        })
       }
       if (item.substring(0, 5) === 'black') {
-        blackArray.push(values[item])
+        requestList.push({
+          serviceId,
+          ipOrNet: values[item],
+          blackOrWhite: true,
+        })
       }
     })
-    const body = {
-      white: whiteArray.join(','),
-      black: blackArray.join(','),
-      serviceId,
-      blackOrWhite: values.blackOrWhite,
-    }
-    createBlackAndWhiteList(instanceID, serviceId, body).then(res => {
-      this.setState({ confirmLoading: false })
-      if (res.error) {
-        return
-      }
-      notification.success({
-        message: '修改黑白名单成功',
+    createBlackAndWhiteList(instanceID, serviceId, requestList).then(res => {
+      if (res.error) { return }
+      const body = { blackOrWhite }
+      editPublishedService(instanceID, serviceId, body).then(res => {
+        this.setState({ confirmLoading: false })
+        if (res.error) {
+          return
+        }
+        notification.success({
+          message: '修改黑白名单成功',
+        })
+        const { loadData } = this.props
+        loadData()
+        this.setState({ blackAndWhiteListModalVisible: false })
       })
-      this.setState({ blackAndWhiteListModalVisible: false })
     })
   }
 
@@ -131,6 +141,7 @@ class ServicesTable extends React.Component {
       serviceId: record.id,
       blackAndWhiteListModalVisible: true,
       confirmLoading: false,
+      currentService: record,
     })
   }
 
@@ -365,7 +376,7 @@ class ServicesTable extends React.Component {
     const { dataSource, pageSize, total, loading, from, match, check, ...otherProps } = this.props
     const {
       confirmLoading, blackAndWhiteListModalVisible, visible,
-      currentRow,
+      currentRow, currentService,
     } = this.state
     let columns = [
       {
@@ -494,6 +505,7 @@ class ServicesTable extends React.Component {
             closeblackAndWhiteModal={this.closeblackAndWhiteModal.bind(this)}
             callback={this.handleSaveBlackAndWhiteList}
             loading={confirmLoading}
+            currentService={currentService}
           />
         }
         <ServiceDetailDock
@@ -520,4 +532,5 @@ export default connect(mapStateToProps, {
   delInstanceService,
   PutInstanceService,
   createBlackAndWhiteList,
+  editPublishedService,
 })(ServicesTable)
