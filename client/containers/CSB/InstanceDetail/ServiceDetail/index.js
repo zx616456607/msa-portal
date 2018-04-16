@@ -70,6 +70,7 @@ class ServiceDetail extends React.Component {
   render() {
     const { instanceId } = this.props
     const detail = this.renderCurrentService()
+    const { cascadedType } = detail
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -129,9 +130,9 @@ class ServiceDetail extends React.Component {
             <TabPane tab="控制信息" key="control">
               <ServiceControl detail={detail} />
             </TabPane>
-            <TabPane tab="级联发布" key="linkRules">
+            { cascadedType && <TabPane tab="级联发布" key="linkRules">
               <ServiceLinkRules detail={detail} instanceId={instanceId} />
-            </TabPane>
+            </TabPane> }
           </Tabs>
         </div>
       </div>
