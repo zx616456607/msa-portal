@@ -54,8 +54,8 @@ class CSBCascadingLinkRules extends React.Component {
     const self = this
     confirm({
       modalTitle: '删除级联链路规则',
-      title: `你确定要删除级联链路规则 ${name} 吗？`,
-      content: '删除规则后，已经基于此链路发布的级联服务将被注销，已订阅的服务将被退订',
+      title: '删除规则后，已经基于此链路发布的级联服务将被注销，已订阅的服务将被退订',
+      content: `确定是否删除级联链路 ${name} ？`,
       onOk() {
         return new Promise((resolve, reject) => {
           deleteCsbCascadingLinkRule(id).then(res => {
