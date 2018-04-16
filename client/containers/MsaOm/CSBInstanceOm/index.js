@@ -330,7 +330,7 @@ class CSBInstanceOm extends React.Component {
             onSearch={value => this.getInstanceList({ [currentSearchType]: value, page: 1 })}
           />
           {
-            totalElements &&
+            totalElements > 0 &&
             <div className="page-box">
               <span className="total">共计 {totalElements} 条</span>
               <Pagination {...pagination}/>
