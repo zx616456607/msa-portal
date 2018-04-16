@@ -33,6 +33,7 @@ export default function confirm(config) {
     okText,
     onCancel,
     onOk,
+    hideCancelButton,
     ...otherProps
   } = config
 
@@ -85,6 +86,10 @@ export default function confirm(config) {
       </ActionButton>,
     ]
   )
+
+  if (hideCancelButton) {
+    footer.shift()
+  }
 
   const classString = classNames(prefixCls, {
     [`${prefixCls}-${type}`]: true,

@@ -139,6 +139,7 @@ class MsaManage extends React.Component {
           modalTitle: '提示',
           title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
           okText: '前往安装',
+          hideCancelButton: true,
           cancelText: '返回首页',
           onOk: () => {
             history.push('/setting/msa-config')

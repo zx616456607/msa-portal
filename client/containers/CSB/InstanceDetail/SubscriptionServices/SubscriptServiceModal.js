@@ -147,6 +147,7 @@ class SubscriptServiceModal extends React.Component {
     const { mode, confirmLoading } = this.state
     const { getFieldDecorator } = form
     const { content } = vouchers
+    const { name: serviceName } = dateSource
     const formItemLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
@@ -206,7 +207,16 @@ class SubscriptServiceModal extends React.Component {
               >
                 {
                   content ? content.map(item => {
-                    return <Option key={item.id} value={item.id}>{item.name}</Option>
+                    const { subscribedServiceNames = [] } = item
+                    let isUsed = false
+                    subscribedServiceNames.forEach(item => {
+                      if (item === serviceName) {
+                        isUsed = true
+                      }
+                    })
+                    return <Option key={item.id} value={item.id} disabled={isUsed}>
+                      {item.name}
+                    </Option>
                   }) : []
                 }
               </Select>

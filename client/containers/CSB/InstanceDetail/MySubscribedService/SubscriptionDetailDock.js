@@ -74,7 +74,7 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div>
                   <span className="sub-label">QPS：</span>
-                  <span className="desc-text">{currentService.limitDetail}</span>
+                  {currentService.limitDetail}
                 </div>
                 <div className="bind-ip">
                   <span className="sub-label">绑定 IP：</span>
