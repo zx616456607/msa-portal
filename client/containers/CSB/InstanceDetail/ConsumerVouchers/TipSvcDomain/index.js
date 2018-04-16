@@ -12,8 +12,8 @@
 
 import React from 'react'
 import propTypes from 'prop-types'
-import { Popover, Icon, Tooltip } from 'antd'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { Popover, Icon } from 'antd'
+import CopyToClipboardComponent from '../../../../../components/CopyToClipboard'
 
 export default class IndentTip extends React.Component {
   static propTypes = {
@@ -23,39 +23,23 @@ export default class IndentTip extends React.Component {
 
   state = {
     icoTip: false,
-    copyStatus: false,
-    inputID: '',
-  }
-
-  copyKey = () => {
-    this.setState({ copyStatus: true })
-    setTimeout(() => {
-      this.setState({ copyStatus: false })
-    }, 1000)
   }
 
   renderPopoverContent = () => {
     const { record } = this.props
-    const { copyStatus } = this.state
     return (
       <div>
         <div>
-          <span className="key-value">ak:{record.clientId}</span>
-          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-            <CopyToClipboard text={record.clientId} onCopy={() => this.copyKey()}>
-              <Icon type="copy"/>
-            </CopyToClipboard>
-          </Tooltip>
+          <CopyToClipboardComponent
+            content={<span>ak:{record.clientId}</span>}
+            message={record.clientId}
+          />
         </div>
         <div>
-          <span className="key-value">
-            sk:{record.secret}
-          </span>
-          <Tooltip placement="top" title={copyStatus ? '复制成功' : '点击复制'}>
-            <CopyToClipboard text={record.secret} onCopy={() => this.copyKey()}>
-              <Icon type="copy"/>
-            </CopyToClipboard>
-          </Tooltip>
+          <CopyToClipboardComponent
+            content={<span>ak:{record.secret}</span>}
+            message={record.secret}
+          />
         </div>
       </div>
     )
