@@ -445,7 +445,7 @@ function fetchCreateBlackAndWhiteList(instanceId, serviceId, body) {
         CREATE_BLACK_AND_WHITE_LIST_SUCCESS,
         CREATE_BLACK_AND_WHITE_LIST_FALIURE,
       ],
-      endpoint: `${CSB_API_URL}/instance/${instanceId}/service/${serviceId}`,
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/blackorwhite`,
       options: {
         method: 'POST',
         body,
@@ -457,3 +457,75 @@ function fetchCreateBlackAndWhiteList(instanceId, serviceId, body) {
 
 export const createBlackAndWhiteList = (instanceId, serviceId, body) =>
   dispatch => dispatch(fetchCreateBlackAndWhiteList(instanceId, serviceId, body))
+
+// 获取 dsb-server
+export const GET_DSB_SERVER_REQUEST = 'GET_DSB_SERVER_REQUEST'
+export const GET_DSB_SERVER_SUCCESS = 'GET_DSB_SERVER_SUCCESS'
+export const GET_DSB_SERVER_FALIURE = 'GET_DSB_SERVER_FALIURE'
+
+function fetchGetDsbServer(instanceId) {
+  return {
+    instanceId,
+    [CALL_API]: {
+      types: [
+        GET_DSB_SERVER_REQUEST,
+        GET_DSB_SERVER_SUCCESS,
+        GET_DSB_SERVER_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/inbounds`,
+      schema: {},
+    },
+  }
+}
+
+export const getDsbServer = instanceId =>
+  dispatch => dispatch(fetchGetDsbServer(instanceId))
+
+// 获取当前服务的黑白名单
+export const GET_SERVICE_BLACK_AND_WHITE_LIST_REQUEST = 'GET_SERVICE_BLACK_AND_WHITE_LIST_REQUEST'
+export const GET_SERVICE_BLACK_AND_WHITE_LIST_SUCCESS = 'GET_SERVICE_BLACK_AND_WHITE_LIST_SUCCESS'
+export const GET_SERVICE_BLACK_AND_WHITE_LIST_FALIURE = 'GET_SERVICE_BLACK_AND_WHITE_LIST_FALIURE'
+
+function fetchGetServiceBlackAndWhiteList(instanceId, serviceId) {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_SERVICE_BLACK_AND_WHITE_LIST_REQUEST,
+        GET_SERVICE_BLACK_AND_WHITE_LIST_SUCCESS,
+        GET_SERVICE_BLACK_AND_WHITE_LIST_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}/blackorwhite`,
+      schema: {},
+    },
+  }
+}
+
+export const getServiceBlackAndWhiteList = (instanceId, serviceId) =>
+  dispatch => dispatch(fetchGetServiceBlackAndWhiteList(instanceId, serviceId))
+
+// 修改已发布的服务
+export const EIDT_PUBLISHED_SERVICE_REQUEST = 'EIDT_PUBLISHED_SERVICE_REQUEST'
+export const EIDT_PUBLISHED_SERVICE_SUCCESS = 'EIDT_PUBLISHED_SERVICE_SUCCESS'
+export const EIDT_PUBLISHED_SERVICE_FALIURE = 'EIDT_PUBLISHED_SERVICE_FALIURE'
+
+function fetchEditPublishedService(instanceId, serviceId, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        EIDT_PUBLISHED_SERVICE_REQUEST,
+        EIDT_PUBLISHED_SERVICE_SUCCESS,
+        EIDT_PUBLISHED_SERVICE_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/${serviceId}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const editPublishedService = (instanceId, serviceId, body) =>
+  dispatch => dispatch(fetchEditPublishedService(instanceId, serviceId, body))
+

@@ -16,11 +16,15 @@ import PropTypes from 'prop-types'
 import {
   Form, Modal, Row, Col,
   Input, Icon, Button, Radio,
-  Tooltip,
+  Tooltip, Spin,
 } from 'antd'
 import './style/BlackAndWhiteListModal.less'
 import cloneDeep from 'lodash/cloneDeep'
-import { getInstanceServiceACL, delInstanceServiceACL } from '../../../../actions/CSB/instanceService'
+import {
+  getInstanceServiceACL,
+  delInstanceServiceACL,
+  getServiceBlackAndWhiteList,
+} from '../../../../actions/CSB/instanceService'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -40,6 +44,7 @@ class BlackAndWhiteListModal extends React.Component {
     whitelistArray: [{ IP: '1.1.1.1' }],
     blacklist: [],
     whitelist: [],
+    isFetching: true,
   }
 
   componentWillMount() {
@@ -47,8 +52,40 @@ class BlackAndWhiteListModal extends React.Component {
   }
 
   loadData = () => {
-    const { getInstanceServiceACL, instanceId, serviceId } = this.props
-    getInstanceServiceACL(instanceId, serviceId)
+    const { getServiceBlackAndWhiteList, instanceId, serviceId } = this.props
+    getServiceBlackAndWhiteList(instanceId, serviceId).then(res => {
+      this.setState({ isFetching: false })
+      if (res.error) {
+        return
+      }
+      const arr = res.response.result.data || []
+      const blacklistArray = []
+      const whitelistArray = []
+      const blacklist = []
+      const whitelist = []
+      let blackcount = 0
+      let whitecount = 0
+      arr.forEach(item => {
+        if (/^\d{1,3}\./.test(item.ipOrNet)) {
+          if (item.blackOrWhite) {
+            blacklistArray.push({ IP: item.ipOrNet })
+            blacklist.push({ index: blackcount })
+            blackcount++
+          }
+          if (!item.blackOrWhite) {
+            whitelistArray.push({ IP: item.ipOrNet })
+            whitelist.push({ index: whitecount })
+            whitecount++
+          }
+        }
+      })
+      this.setState({
+        blacklist,
+        blacklistArray,
+        whitelistArray,
+        whitelist,
+      })
+    })
   }
 
   addlist = (list, type) => {
@@ -143,9 +180,10 @@ class BlackAndWhiteListModal extends React.Component {
   }
 
   render() {
-    const { blacklist, whitelist, blacklistArray, whitelistArray } = this.state
-    const { form, loading } = this.props
+    const { blacklist, whitelist, blacklistArray, whitelistArray, isFetching } = this.state
+    const { form, loading, currentService } = this.props
     const { getFieldDecorator } = form
+    const { blackOrWhite } = currentService
     return <Modal
       title="设置黑／白名单"
       visible={true}
@@ -159,101 +197,107 @@ class BlackAndWhiteListModal extends React.Component {
         <Button key="save" size="large" type="primary" onClick={this.saveEdit} loading={loading}>保存</Button>,
       ]}
     >
-      <Row className="row-style">
-        <Col span="4">
-          黑名单
-          <Tooltip
-            title={`IP黑名单支持ip网段添加，例如127.0.0.1/24\n
+      {
+        isFetching
+          ? <div><Spin/></div>
+          : <div>
+            <Row className="row-style">
+              <Col span="4">
+                黑名单
+                <Tooltip
+                  title={`IP黑名单支持ip网段添加，例如127.0.0.1/24\n
             例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
             即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
             主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
-            placement="top"
-          >
-            <Icon type="question-circle-o" />
-          </Tooltip>
-        </Col>
-        <Col span="20">
-          黑名单中添加某个调用者的 IP 后，该调用者不能访问该服务
-        </Col>
-      </Row>
-      <Row className="row-style add-row">
-        <Col span="4"></Col>
-        <Col span="20">
-          {this.renderList(blacklist, blacklistArray, 'black')}
-          <Button
-            type="dashed"
-            icon="plus"
-            className="add-btn"
-            onClick={this.addlist.bind(this, blacklist, 'black')}
-          >
-            添加
-          </Button>
-        </Col>
-      </Row>
-      <Row className="row-style">
-        <Col span="4">
-          白名单
-          <Tooltip
-            title={`IP白名单支持ip网段添加，例如127.0.0.1/24
+                  placement="top"
+                >
+                  <Icon type="question-circle-o"/>
+                </Tooltip>
+              </Col>
+              <Col span="20">
+                黑名单中添加某个调用者的 IP 后，该调用者不能访问该服务
+              </Col>
+            </Row>
+            <Row className="row-style add-row">
+              <Col span="4"></Col>
+              <Col span="20">
+                {this.renderList(blacklist, blacklistArray, 'black')}
+                <Button
+                  type="dashed"
+                  icon="plus"
+                  className="add-btn"
+                  onClick={this.addlist.bind(this, blacklist, 'black')}
+                >
+                  添加
+                </Button>
+              </Col>
+            </Row>
+            <Row className="row-style">
+              <Col span="4">
+                白名单
+                <Tooltip
+                  title={`IP白名单支持ip网段添加，例如127.0.0.1/24
             例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
             即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
             主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
-            placement="top"
-          >
-            <Icon type="question-circle-o" />
-          </Tooltip>
-        </Col>
-        <Col span="20">
-          白名单中添加某个调用者 IP 后，该调用者不用鉴权即可访问该服务。
-        </Col>
-      </Row>
-      <Row className="row-style add-row">
-        <Col span="4"></Col>
-        <Col span="20">
-          {this.renderList(whitelist, whitelistArray, 'white')}
-          <Button
-            type="dashed"
-            icon="plus"
-            className="add-btn"
-            onClick={this.addlist.bind(this, whitelist, 'white')}
-          >
-            添加
-          </Button>
-        </Col>
-      </Row>
-      <Row className="row-style">
-        <Col span="4">
-          默认配置
-          <Tooltip
-            title={`对于即不在白名单里，也在黑名单里的IP地址，\n
+                  placement="top"
+                >
+                  <Icon type="question-circle-o"/>
+                </Tooltip>
+              </Col>
+              <Col span="20">
+                白名单中添加某个调用者 IP 后，该调用者不用鉴权即可访问该服务。
+              </Col>
+            </Row>
+            <Row className="row-style add-row">
+              <Col span="4"></Col>
+              <Col span="20">
+                {this.renderList(whitelist, whitelistArray, 'white')}
+                <Button
+                  type="dashed"
+                  icon="plus"
+                  className="add-btn"
+                  onClick={this.addlist.bind(this, whitelist, 'white')}
+                >
+                  添加
+                </Button>
+              </Col>
+            </Row>
+            <Row className="row-style">
+              <Col span="4">
+                默认配置
+                <Tooltip
+                  title={`对于即不在白名单里，也在黑名单里的IP地址，\n
             通过：表示无需鉴权即可访问；\n
             拒绝：代表该服务默认不允许任何 IP 地址访问`}
-            placement="top"
-          >
-            <Icon type="question-circle-o" />
-          </Tooltip>
-        </Col>
-        <Col span="20">
-          设置服务的默认访问策略，即不在白名单里，也不在黑名单里的 IP 地址
-        </Col>
-      </Row>
-      <FormItem
-        label={<span></span>}
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 15 }}
-        className="reset-form-label-style"
-      >
-        {
-          getFieldDecorator('blackOrWhite', {
-            initialValue: false,
-          })(
-            <RadioGroup>
-              <Radio value={false}>无需鉴权即可访问</Radio>
-              <Radio value={true}>不允许任何 IP 地址访问</Radio>
-            </RadioGroup>
-          )
-        }
-      </FormItem>
+                  placement="top"
+                >
+                  <Icon type="question-circle-o"/>
+                </Tooltip>
+              </Col>
+              <Col span="20">
+                设置服务的默认访问策略，即不在白名单里，也不在黑名单里的 IP 地址
+              </Col>
+            </Row>
+            <FormItem
+              label={<span></span>}
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 15 }}
+              className="reset-form-label-style"
+            >
+              {
+                getFieldDecorator('blackOrWhite', {
+                  initialValue: blackOrWhite,
+                })(
+                  <RadioGroup>
+                    <Radio value={false}>无需鉴权即可访问</Radio>
+                    <Radio value={true}>不允许任何 IP 地址访问</Radio>
+                  </RadioGroup>
+                )
+              }
+            </FormItem>
+          </div>
+      }
     </Modal>
   }
 }
@@ -267,4 +311,5 @@ const mapStateToProps = () => {
 export default connect(mapStateToProps, {
   getInstanceServiceACL,
   delInstanceServiceACL,
+  getServiceBlackAndWhiteList,
 })(Form.create()(BlackAndWhiteListModal))
