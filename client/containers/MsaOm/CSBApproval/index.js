@@ -500,7 +500,7 @@ class CSBApplication extends React.Component {
               <CheckboxGroup
                 options={rolePlainOptions}
                 value={currentCheckedValues}
-                readOnly
+                disabled
               />
             </Col>
           </Row>
