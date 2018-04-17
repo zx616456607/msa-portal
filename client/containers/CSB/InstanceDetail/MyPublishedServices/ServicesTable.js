@@ -347,13 +347,13 @@ class ServicesTable extends React.Component {
     const { cascadedType } = record
     const type = parseInt(cascadedType)
     const svgArray = [
-      <svg className="menu-icon" key="PutinSvg">
+      <svg className="menu-icon PutinSvg" key="PutinSvg">
         <use xlinkHref={`#${PutinSvg.id}`} />
       </svg>,
-      <svg className="menu-icon" key="CenterSvg">
+      <svg className="menu-icon CenterSvg" key="CenterSvg">
         <use xlinkHref={`#${CenterSvg.id}`} />
       </svg>,
-      <svg className="menu-icon" key="PutoutSvg">
+      <svg className="menu-icon PutoutSvg" key="PutoutSvg">
         <use xlinkHref={`#${PutoutSvg.id}`} />
       </svg>,
     ]
