@@ -25,11 +25,9 @@ import {
   getQueryAndFuncs,
 } from '../../../../selectors/CSB/instance'
 import { connect } from 'react-redux'
-import { formatDate } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
 import { CSB_PUBLIC_INSTANCES_FLAG, UNUSED_CLUSTER_ID } from '../../../../constants/index'
-import {
-  handleHistoryForLoadData,
-} from '../../../../common/utils'
+import { renderCSBInstanceStatus } from '../../../../components/utils'
 
 const Search = Input.Search
 const pubInstancesSlt = instancesSltMaker(CSB_PUBLIC_INSTANCES_FLAG)
@@ -130,13 +128,6 @@ class PublicInstances extends React.Component {
     })
   }
 
-  renderServiceStatusUI = status => {
-    if (status) {
-      return <span className="may-apply"><div className="status-icon"></div>可申请</span>
-    }
-    return <span>-</span>
-  }
-
   tableOnchange = (pagination, filters, sorter) => {
     const { columnKey, order } = sorter
     if (order) {
@@ -174,10 +165,10 @@ class PublicInstances extends React.Component {
       },
       {
         title: '状态',
-        dataIndex: 'creator.status',
-        key: 'creator.status',
+        dataIndex: 'status',
+        key: 'status',
         width: '15%',
-        render: status => this.renderServiceStatusUI(status),
+        render: status => renderCSBInstanceStatus(status),
       },
       { title: '创建人', dataIndex: 'creator.name', key: 'creator', width: '15%' },
       { title: '描述', dataIndex: 'description', key: 'description', width: '15%' },

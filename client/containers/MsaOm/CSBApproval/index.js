@@ -41,6 +41,7 @@ import {
 import './style/index.less'
 import CSBApplyStatus from '../../../components/CSBApplyStatus'
 import { csbApplySltMaker, getQueryAndFuncs } from '../../../selectors/CSB/apply'
+import { renderCSBInstanceStatus } from '../../../components/utils'
 
 const approvalSlt = csbApplySltMaker(CSB_APPROVAL_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_APPROVAL_FLAG)
@@ -298,19 +299,24 @@ class CSBApplication extends React.Component {
       {
         title: '申请人',
         dataIndex: 'applicant',
-        width: radioValue === 'status-eq-1' ? '15%' : '10%',
+        width: radioValue === 'status-eq-1' ? '10%' : '10%',
         render: (text, row) => row.requestor.name,
       },
       {
         title: '申请实例',
-        dataIndex: 'instance',
-        width: radioValue === 'status-eq-1' ? '15%' : '15%',
-        render: (text, row) => row.instance.name,
+        dataIndex: 'instance.name',
+        width: radioValue === 'status-eq-1' ? '15%' : '10%',
+      },
+      {
+        title: '状态',
+        dataIndex: 'instance.status',
+        width: radioValue === 'status-eq-1' ? '10%' : '10%',
+        render: text => renderCSBInstanceStatus(text),
       },
       {
         title: '实例授权',
         dataIndex: 'role',
-        width: radioValue === 'status-eq-1' ? '20%' : '15%',
+        width: radioValue === 'status-eq-1' ? '15%' : '10%',
         filters: radioValue === 'status-eq-1' ? null : [{
           text: '仅发布服务',
           value: 2,
