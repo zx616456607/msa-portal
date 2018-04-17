@@ -103,3 +103,34 @@ export function renderOAuth2Type(type) {
       return <span><Icon type="star-o" /> 自定义</span>
   }
 }
+
+/**
+ * render CSB instance status
+ *
+ * @export
+ * @param {number} instanceStatus status of instance
+ * @return {element} badge element
+ */
+export function renderCSBInstanceStatus(instanceStatus) {
+  let status
+  let text
+  switch (instanceStatus) {
+    case 0:
+      text = '停止'
+      status = 'error'
+      break
+    case 1:
+      text = '运行中'
+      status = 'success'
+      break
+    case 2:
+      text = '启动中'
+      status = 'processing'
+      break
+    default:
+      text = '未知'
+      status = 'default'
+      break
+  }
+  return <Badge status={status} text={text} />
+}

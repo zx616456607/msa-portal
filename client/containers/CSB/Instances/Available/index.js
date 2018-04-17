@@ -37,6 +37,7 @@ import {
   handleHistoryForLoadData,
 } from '../../../../common/utils'
 import './style/index.less'
+import { renderCSBInstanceStatus } from '../../../../components/utils'
 
 const Search = Input.Search
 const avaInstancesSlt = instancesSltMaker(CSB_AVAILABLE_INSTANCES_FLAG)
@@ -159,17 +160,17 @@ class AvailableInstances extends React.Component {
         title: '状态',
         dataIndex: 'status',
         width: '10%',
-        filters: [{
-          text: '运行中',
-          value: 'run',
-        }, {
-          text: '正在启动',
-          value: 'starting',
-        }, {
-          text: '已停止',
-          value: 'stop',
-        }],
-        render: () => '-',
+        // filters: [{
+        //  text: '运行中',
+        //  value: 'run',
+        // }, {
+        //  text: '正在启动',
+        //  value: 'starting',
+        // }, {
+        //  text: '已停止',
+        //  value: 'stop',
+        // }],
+        render: (text, row) => renderCSBInstanceStatus(row.instance.status),
       },
       {
         title: '部署集群',

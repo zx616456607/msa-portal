@@ -29,6 +29,7 @@ import {
 } from '../../../selectors/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
 import { formatDate, toQuerystring } from '../../../common/utils'
+import { renderCSBInstanceStatus } from '../../../components/utils'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -238,18 +239,18 @@ class CSBInstanceOm extends React.Component {
         render: text => text || '-',
       },
       { title: '状态', dataIndex: 'status', width: '10%',
-        filters: [{
-          text: '运行中',
-          value: 'running',
-        }, {
-          text: '正在启动',
-          value: 'starting',
-        }, {
-          text: '已停止',
-          value: 'stop',
-        }],
-        filteredValue: filterInfo.status || null,
-        render: text => (text ? text : '-'),
+        // filters: [{
+        //  text: '运行中',
+        //  value: 'running',
+        // }, {
+        //  text: '正在启动',
+        //  value: 'starting',
+        // }, {
+        //  text: '已停止',
+        //  value: 'stop',
+        // }],
+       filteredValue: filterInfo.status || null,
+        render: text => renderCSBInstanceStatus(text),
       },
       {
         title: '累计调用量',

@@ -30,6 +30,7 @@ import { csbApplySltMaker, getQueryAndFuncs } from '../../../../selectors/CSB/ap
 import confirm from '../../../../components/Modal/confirm'
 import ApplyforCSBInstanceModal from '../Public/ApplyforCSBInstanceModal'
 import { applyforInstance, abandonInstance } from '../../../../actions/CSB/instance'
+import { renderCSBInstanceStatus } from '../../../../components/utils'
 
 const applysSlt = csbApplySltMaker(CSB_APPLY_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_APPLY_FLAG)
@@ -310,6 +311,11 @@ class MyApplication extends React.Component {
         width: '10%',
         render: (text, row) => row.instance.name,
       }, {
+        title: '状态',
+        dataIndex: 'instance.status',
+        width: '8%',
+        render: text => renderCSBInstanceStatus(text),
+      }, {
         title: '部署集群',
         dataIndex: 'cluster',
         width: '10%',
@@ -324,7 +330,7 @@ class MyApplication extends React.Component {
       }, {
         title: '实例授权',
         dataIndex: 'empower',
-        width: '11%',
+        width: '10%',
         render: (text, row) => renderInstanceRole(row.role),
         filters: [{
           text: '仅发布服务',
@@ -339,7 +345,7 @@ class MyApplication extends React.Component {
       }, {
         title: '审批状态',
         dataIndex: 'status',
-        width: '11%',
+        width: '10%',
         render: (text, row) => <CSBApplyStatus stateKey={row.status}></CSBApplyStatus>,
         filters: [{
           text: '已拒绝',
@@ -354,7 +360,7 @@ class MyApplication extends React.Component {
       }, {
         title: '审批原因',
         dataIndex: 'ownerresponse',
-        width: '10%',
+        width: '8%',
         render: (text, row) => row.ownerResponse,
       }, {
         title: '审批时间',
@@ -364,7 +370,7 @@ class MyApplication extends React.Component {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        width: '22%',
+        width: '20%',
         render: (text, row) => <div>
           {
             this.filterBtn(row)
