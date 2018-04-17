@@ -26,9 +26,9 @@ import {
   createBlackAndWhiteList,
   editPublishedService,
 } from '../../../../actions/CSB/instanceService'
-import CenterSvg from '../../../../assets/img/csb/centerPng.png'
-import PutinSvg from '../../../../assets/img/csb/putinPng.png'
-import PutoutSvg from '../../../../assets/img/csb/putoutPng.png'
+import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
+import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
+import serviceOut from '../../../../assets/img/csb/serviceOut.svg'
 
 const modalTooptip = [
   {
@@ -347,14 +347,20 @@ class ServicesTable extends React.Component {
     const { cascadedType } = record
     const type = parseInt(cascadedType)
     const svgArray = [
-      <Tooltip title="接入" placement="top" key="PutinSvg">
-        <img src={PutinSvg} className="img-style" alt="PutinSvg"/>
+      <Tooltip title="接入" placement="top" key="serviceAccess">
+        <svg className="serviceAccess">
+          <use xlinkHref={`#${serviceAccess.id}`} />
+        </svg>
       </Tooltip>,
-      <Tooltip title="接力" placement="top" key="CenterSvg">
-        <img src={CenterSvg} className="img-style" alt="CenterSvg"/>
+      <Tooltip title="接力" placement="top" key="serviceRelay">
+        <svg className="serviceRelay">
+          <use xlinkHref={`#${serviceRelay.id}`} />
+        </svg>
       </Tooltip>,
-      <Tooltip title="开放" placement="top" key="PutoutSvg">
-        <img src={PutoutSvg} className="img-style" alt="PutoutSvg"/>
+      <Tooltip title="开放" placement="top" key="serviceOut">
+        <svg className="serviceOut">
+          <use xlinkHref={`#${serviceOut.id}`} />
+        </svg>
       </Tooltip>,
     ]
     switch (type) {
