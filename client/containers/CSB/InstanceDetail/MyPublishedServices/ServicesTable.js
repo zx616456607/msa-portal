@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
-import { Dropdown, Menu, Table, notification } from 'antd'
+import { Dropdown, Menu, Table, notification, Tooltip } from 'antd'
 import { formatDate, parseOrderToQuery } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
@@ -26,9 +26,9 @@ import {
   createBlackAndWhiteList,
   editPublishedService,
 } from '../../../../actions/CSB/instanceService'
-import CenterSvg from '../../../../assets/img/csb/center.svg'
-import PutinSvg from '../../../../assets/img/csb/putin.svg'
-import PutoutSvg from '../../../../assets/img/csb/putout.svg'
+import CenterSvg from '../../../../assets/img/csb/centerPng.png'
+import PutinSvg from '../../../../assets/img/csb/putinPng.png'
+import PutoutSvg from '../../../../assets/img/csb/putoutPng.png'
 
 const modalTooptip = [
   {
@@ -347,15 +347,15 @@ class ServicesTable extends React.Component {
     const { cascadedType } = record
     const type = parseInt(cascadedType)
     const svgArray = [
-      <svg className="menu-icon PutinSvg" key="PutinSvg">
-        <use xlinkHref={`#${PutinSvg.id}`} />
-      </svg>,
-      <svg className="menu-icon CenterSvg" key="CenterSvg">
-        <use xlinkHref={`#${CenterSvg.id}`} />
-      </svg>,
-      <svg className="menu-icon PutoutSvg" key="PutoutSvg">
-        <use xlinkHref={`#${PutoutSvg.id}`} />
-      </svg>,
+      <Tooltip title="接入" placement="top" key="PutinSvg">
+        <img src={PutinSvg} className="img-style" alt="PutinSvg"/>
+      </Tooltip>,
+      <Tooltip title="接力" placement="top" key="CenterSvg">
+        <img src={CenterSvg} className="img-style" alt="CenterSvg"/>
+      </Tooltip>,
+      <Tooltip title="开放" placement="top" key="PutoutSvg">
+        <img src={PutoutSvg} className="img-style" alt="PutoutSvg"/>
+      </Tooltip>,
     ]
     switch (type) {
       case 1:
