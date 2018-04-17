@@ -91,8 +91,10 @@ class InstanceDetailOverview extends React.Component {
   }
 
   loadData = () => {
-    const { instanceID, cluster, getInstanceOverview } = this.props
-    getInstanceOverview(cluster.id, instanceID)
+    const { instanceID, currentInstance, getInstanceOverview } = this.props
+    const { instance } = currentInstance
+    const { clusterId } = instance
+    getInstanceOverview(clusterId, instanceID)
   }
 
   goPublishService = () => {
@@ -377,14 +379,12 @@ class InstanceDetailOverview extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current, CSB, entities } = state
+  const { CSB, entities } = state
   const { csbAvaInstances } = entities
   const { match } = ownProps
   const { instanceID } = match.params
-  const { cluster } = current.config
   const dataList = CSB.instanceOverview[instanceID]
   return {
-    cluster,
     dataList,
     instanceID,
     currentInstance: csbAvaInstances[instanceID],
