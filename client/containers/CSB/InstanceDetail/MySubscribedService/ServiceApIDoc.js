@@ -51,7 +51,7 @@ class ServiceApIDoc extends React.Component {
     ]
     const { errorCode, type, exposedPath } = serviceDetial
     const basicInfoData = [
-      { type: type, address: exposedPath },
+      { type, address: exposedPath },
     ]
     const errorCodeColumns = [
       { title: '错误代码', dataIndex: 'code', key: 'code' },
