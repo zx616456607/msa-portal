@@ -15,11 +15,15 @@ import React from 'react'
 import './style/LinkRules.less'
 import {
   Steps, Row, Col, Icon, Timeline,
-  Tooltip,
+  Tooltip, Spin,
 } from 'antd'
 import classNames from 'classnames'
+import { connect } from 'react-redux'
+import { getServiceCascadedInfo } from '../../../../actions/CSB/instanceService'
+import { formatDate } from '../../../../common/utils'
 
 const Step = Steps.Step
+const STEP_SIZE = 4
 
 class LinkRules extends React.Component {
   static propTypes = {}
@@ -28,17 +32,30 @@ class LinkRules extends React.Component {
     currentStep: 0,
   }
 
+  componentWillMount() {
+    this.loadData()
+  }
+
+  loadData = () => {
+    const { getServiceCascadedInfo, detail, currentInstance } = this.props
+    const { instance } = currentInstance
+    const { clusterId } = instance
+    const { name, version } = detail
+    getServiceCascadedInfo(clusterId, name, version)
+  }
+
   reloadHandler = () => {}
 
   rollbackHandler = () => {}
 
   renderStepIcon = detail => {
     const { status } = detail
-    let instanceStatus = '已激活'
-    switch (status % 3) {
-      case 0: instanceStatus = '已激活'; break
-      case 1: instanceStatus = '已停止'; break
-      case 2: instanceStatus = '已注销'; break
+    const intStatus = parseInt(status)
+    let instanceStatus
+    switch (intStatus) {
+      case 0: instanceStatus = '已停止'; break
+      case 1: instanceStatus = '运行中'; break
+      case 2: instanceStatus = '启动中'; break
       default: instanceStatus = '未知'; break
     }
     const iconClass = classNames({
@@ -55,31 +72,28 @@ class LinkRules extends React.Component {
     )
   }
 
-  renderLinkRulesStatusSteps = () => {
-    const array = []
-    for (let i = 0; i < 4; i++) {
-      const item = {
-        key: i,
-        instance: '实例a',
-        status: i,
-      }
-      array.push(item)
+  renderLinkRulesStatusSteps = instances => {
+    const { instanceId } = this.props
+    const { currentStep } = this.state
+    let showInstancesList = instances
+    if (instances.length > 4) {
+      showInstancesList = instances.splice(currentStep, currentStep + 4)
     }
     return (
       <Steps>
-        {array.map(item => {
+        {showInstancesList.map(item => {
           const { status } = item
           const iconClass = classNames({
-            'active-style': status % 3 === 0,
-            'stop-style': status % 3 === 1,
-            'cancel-style': status % 3 === 2,
+            'active-style': parseInt(status) === 1,
+            'stop-style': parseInt(status) === 0,
+            'cancel-style': parseInt(status) === 2,
             'common-style': true,
           })
           return <Step
-            key={item.key}
+            key={item.id}
             icon={this.renderStepIcon(item)}
-            title={item.instance}
-            description={<span>当前实例</span>}
+            title={item.name}
+            description={<span>{ instanceId === item.id ? '当前实例' : '' }</span>}
             className={iconClass}
           />
         })}
@@ -87,56 +101,55 @@ class LinkRules extends React.Component {
     )
   }
 
-  renderTimeLineItem = () => {
+  renderTimeLineItem = events => {
     const { onlyShowFiveLogs } = this.state
-    const array = []
-    for (let i = 0; i < 20; i++) {
-      const item = {
-        key: i,
-        message: 'hello',
-      }
-      array.push(item)
-    }
-    let mapArray = array
-    if (array.length > 5 && onlyShowFiveLogs) {
-      mapArray = array.slice(0, 5)
+    let mapArray = events
+    if (events.length > 5 && onlyShowFiveLogs) {
+      mapArray = events.slice(0, 5)
     }
     return mapArray.map(item => {
       return (
         <Timeline.Item
-          key={item.key}
+          key={item.id}
         >
           <Row>
-            <Col span={19}>
-              {item.message}
-              <Tooltip title="由于网络原因，导致注销操作执行到实例b时失效" placement="top">
+            <Col span={16}>
+              {item.event}
+              {item.error && <Tooltip title="由于网络原因，导致注销操作执行到实例b时失效" placement="top">
                 <Icon type="question-circle-o" className="margin-style color-style"/>
-              </Tooltip>
+              </Tooltip>}
             </Col>
             <Col span={3}>
-              <Tooltip title="撤销注销" placement="top">
-                <Icon type="rollback" onClick={() => this.rollbackHandler()} />
-              </Tooltip>
-              <Tooltip title="重试注销" placement="top">
+              {item.error && [ <Tooltip title="撤销注销" placement="top" key="cancel">
+                <Icon type="rollback" onClick={() => this.rollbackHandler()}/>
+              </Tooltip>,
+              <Tooltip title="重试注销" placement="top" key="reload">
                 <Icon type="reload" className="margin-style" onClick={() => this.reloadHandler()}/>
-              </Tooltip>
+              </Tooltip> ]}
             </Col>
-            <Col span={2}>11-08</Col>
+            <Col span={5}>{formatDate(item.updateTime)}</Col>
           </Row>
         </Timeline.Item>
       )
     })
   }
 
-  renderAllEventLogButton = () => {
+  renderAllEventLogButton = events => {
     const { onlyShowFiveLogs } = this.state
-    const length = 7
-    if (length <= 5 || !onlyShowFiveLogs) {
+    if (events.length <= 5) {
       return null
     }
-    return <div className="show-all"
-      onClick={() => this.setState({ onlyShowFiveLogs: false })}
-    >显示全部</div>
+    if (events.length > 5 && !onlyShowFiveLogs) {
+      return <div className="show-all"
+        onClick={() => this.setState({ onlyShowFiveLogs: true })}
+      >收起</div>
+    }
+    if (events.length > 5 && onlyShowFiveLogs) {
+      return <div className="show-all"
+        onClick={() => this.setState({ onlyShowFiveLogs: false })}
+      >显示全部</div>
+    }
+    return null
   }
 
   subtractStep = () => {
@@ -147,10 +160,9 @@ class LinkRules extends React.Component {
     })
   }
 
-  addStep = () => {
+  addStep = instances => {
     const { currentStep } = this.state
-    const { stepItem } = this.props
-    const maxStep = stepItem.length - 6
+    const maxStep = instances.length - STEP_SIZE
     if (currentStep >= maxStep) return
     this.setState(preState => {
       return { currentStep: preState.currentStep + 1 }
@@ -158,6 +170,15 @@ class LinkRules extends React.Component {
   }
 
   render() {
+    const { detail, serviceCascadedInfo } = this.props
+    const { currentStep } = this.state
+    const { name } = detail
+    const currentService = serviceCascadedInfo[name] || { isFetching: true }
+    const { isFetching, result } = currentService
+    if (isFetching) {
+      return <div><Spin /></div>
+    }
+    const { instances = [], recordCascadedServiceEvents = [] } = result
     return (
       <div id="link-rules-style">
         <div className="status">
@@ -165,11 +186,11 @@ class LinkRules extends React.Component {
           <div>链路名称：xxxxx</div>
           <Row className="status-step-container">
             <Col span={1}>
-              <Icon type="left" />
+              {(instances.length > 4 || currentStep === 0) && <Icon type="left" onClick={this.subtractStep}/>}
             </Col>
-            <Col span={22}>{this.renderLinkRulesStatusSteps()}</Col>
+            <Col span={22}>{this.renderLinkRulesStatusSteps(instances)}</Col>
             <Col span={1}>
-              <Icon type="right" />
+              {(instances.length > 4 || instances.length - currentStep <= 4) && <Icon type="right" onClick={() => this.addStep(instances)}/>}
             </Col>
           </Row>
         </div>
@@ -180,9 +201,9 @@ class LinkRules extends React.Component {
           </div>
           <div className="log-container">
             <Timeline>
-              {this.renderTimeLineItem()}
+              {this.renderTimeLineItem(recordCascadedServiceEvents)}
             </Timeline>
-            {this.renderAllEventLogButton()}
+            {this.renderAllEventLogButton(recordCascadedServiceEvents)}
           </div>
         </div>
       </div>
@@ -190,4 +211,18 @@ class LinkRules extends React.Component {
   }
 }
 
-export default LinkRules
+const mapStateToProps = (state, ownProps) => {
+  const { entities, CSB } = state
+  const { csbAvaInstances } = entities
+  const { instanceId } = ownProps
+  const currentInstance = csbAvaInstances[instanceId]
+  const { serviceCascadedInfo } = CSB
+  return {
+    currentInstance,
+    serviceCascadedInfo,
+  }
+}
+
+export default connect(mapStateToProps, {
+  getServiceCascadedInfo,
+})(LinkRules)

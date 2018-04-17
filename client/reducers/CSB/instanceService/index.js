@@ -226,3 +226,33 @@ export const cascadedServicesProgresses = (state = {}, action) => {
       return state
   }
 }
+
+export const serviceCascadedInfo = (state = {}, action) => {
+  const { serviceName, type } = action
+  switch (type) {
+    case ActionTypes.GET_SERVICE_CASCADED_INFO_REQUEST:
+      return {
+        ...state,
+        [serviceName]: {
+          isFetching: true,
+        },
+      }
+    case ActionTypes.GET_SERVICE_CASCADED_INFO_SUCCESS:
+      return {
+        ...state,
+        [serviceName]: {
+          isFetching: false,
+          result: action.response.result.data,
+        },
+      }
+    case ActionTypes.GET_SERVICE_CASCADED_INFO_FALIURE:
+      return {
+        ...state,
+        [serviceName]: {
+          isFetching: false,
+        },
+      }
+    default:
+      return state
+  }
+}

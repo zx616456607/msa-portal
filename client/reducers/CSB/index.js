@@ -17,7 +17,7 @@ import {
 import {
   publishedService, serviceCAL, serviceOverview, subscribableServices,
   serviceDetailMap, cascadedServicePrerequisite, cascadedServicesWebsocket,
-  cascadedServicesProgresses,
+  cascadedServicesProgresses, serviceCascadedInfo,
 } from './instanceService'
 import { serviceGroups, groupServices } from './instanceService/group'
 import { consumerVouchers } from './instanceService/consumerVouchers'
@@ -36,6 +36,7 @@ const CSB = (state = {
   instanceOverview: {},
   plubicService: {},
   cascadingLinkRule: {},
+  serviceCascadedInfo: {},
 }, action) => {
   return {
     myApplication: myApplication(state.myApplication, action),
@@ -68,6 +69,7 @@ const CSB = (state = {
     servicesInbounds: servicesInbounds(state.servicesInbounds, action),
     publicService: publicService(state.publicService, action),
     cascadingLinkRule: cascadingLinkRule(state.cascadingLinkRule, action),
+    serviceCascadedInfo: serviceCascadedInfo(state.serviceCascadedInfo, action),
   }
 }
 
