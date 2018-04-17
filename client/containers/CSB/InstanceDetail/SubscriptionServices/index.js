@@ -111,9 +111,8 @@ class SubscriptionServices extends React.Component {
       { title: '所属服务组', dataIndex: 'groupName', width: '12%' },
       {
         title: '服务开放类型',
-        dataIndex: 'accessible',
+        dataIndex: 'type',
         width: '12%',
-        render: text => (text ? '公有' : '私有'),
       },
       {
         title: '服务描述',
