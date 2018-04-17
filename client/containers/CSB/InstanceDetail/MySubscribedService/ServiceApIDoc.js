@@ -50,7 +50,7 @@ class ServiceApIDoc extends React.Component {
       { title: '开放地址', dataIndex: 'address', key: 'address' },
     ]
     const basicInfoData = [
-      { type: serviceDetial.type, address: 'http://eqwew' },
+      { type: serviceDetial.type, address: serviceDetial.exposedPath },
     ]
     const errorCodeColumns = [
       { title: '错误代码', dataIndex: 'errorCode', key: 'errorCode' },

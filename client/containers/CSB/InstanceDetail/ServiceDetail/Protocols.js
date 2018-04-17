@@ -56,7 +56,7 @@ export default class Protocols extends React.Component {
             </Col>
             <Col span={8}>
               <div className="txt-of-ellipsis">
-                没有开放地址
+                {detail.exposedPath}
               </div>
             </Col>
           </Row>
