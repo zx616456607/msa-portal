@@ -325,14 +325,12 @@ class ServicesTable extends React.Component {
       sorterStr = parseOrderToQuery(sorter)
     }
     if (cascadedType) {
-      if (cascadedType.length === 2) {
-        cascadedType = []
-      } else if (cascadedType.length === 1) {
+      if (cascadedType.length === 1) {
         if (parseInt(cascadedType[ 0 ]) === 1) {
-          cascadedType = [ 1, 2 ]
+          cascadedType = [ 1, 2, 5, 6 ]
         }
       } else {
-        cascadedType = []
+        cascadedType = [ 0, 1, 2, 5, 6 ]
       }
     }
     loadData({
