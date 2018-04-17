@@ -186,11 +186,11 @@ class LinkRules extends React.Component {
           <div>链路名称：xxxxx</div>
           <Row className="status-step-container">
             <Col span={1}>
-              {(instances.length > 4 || currentStep === 0) && <Icon type="left" onClick={this.subtractStep}/>}
+              {(instances.length > 4 || currentStep !== 0) && <Icon type="left" onClick={this.subtractStep}/>}
             </Col>
             <Col span={22}>{this.renderLinkRulesStatusSteps(instances)}</Col>
             <Col span={1}>
-              {(instances.length > 4 || instances.length - currentStep <= 4) && <Icon type="right" onClick={() => this.addStep(instances)}/>}
+              {(instances.length > 4 && instances.length - currentStep <= 4) && <Icon type="right" onClick={() => this.addStep(instances)}/>}
             </Col>
           </Row>
         </div>
