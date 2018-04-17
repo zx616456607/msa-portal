@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
 import classNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
 import { formatFromnow } from '../../../common/utils'
@@ -118,7 +119,7 @@ class MsaComponents extends React.Component {
     const { apmID } = this.state
     const { fetchMsaComponentList, clusterId, nameSpace, info } = this.props
     const project = nameSpace === 'default' ? info.namespace : nameSpace
-    if (Object.keys(apmID).length > 0) {
+    if (!isEmpty(apmID)) {
       apmID.forEach(item => {
         if (item.namespace === project) {
           const query = {
@@ -156,7 +157,7 @@ class MsaComponents extends React.Component {
 
   filterData = data => {
     const curData = []
-    if (Object.keys(data).length > 0) {
+    if (!isEmpty(data)) {
       data.forEach(item => {
         const curColumns = {
           id: item.deployment.metadata.uid,

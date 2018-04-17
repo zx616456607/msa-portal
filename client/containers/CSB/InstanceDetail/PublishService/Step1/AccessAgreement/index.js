@@ -87,7 +87,7 @@ class AccessAgreement extends React.Component {
     const { getFieldValue } = this.props.form
     switch (getFieldValue('serviceRoutingStrategy')) {
       case 'route1':
-        return '直接路由是指直接接入，不需要路由；只能选择一种接入协议或一个接入地址，根据该协议所支持的开放接口协议'
+        return '直接路由是指直接接入，不需要路由；只能选择一种接入协议或一个接入地址，根据该协议所支持的开放接口协议，选择一种要开放的协议'
       case 'route2':
         return '基于内容的路由是指，根据接入请求的参数值的不同，设置路由条件，路由到多个不同的后端接入地址；该路由方式仅支持开放支持 Restful 协议类型'
       case 'route3':

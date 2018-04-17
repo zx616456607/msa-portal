@@ -128,7 +128,7 @@ export default class OpenAgreement extends React.Component {
               message: '选择服务组!',
             }],
           })(
-            <Select showSearch optionFilterProp="children" placeholder="请选择">
+            <Select disabled={isDisabled} showSearch optionFilterProp="children" placeholder="请选择">
               {
                 serviceGroups.map(group => <Option key={group.id}>{group.name}</Option>)
               }

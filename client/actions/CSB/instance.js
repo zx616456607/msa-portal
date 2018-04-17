@@ -280,3 +280,25 @@ const fetchGetInstanceServiceInbounds = instanceID => {
 
 export const getInstanceServiceInbounds = instanceID =>
   dispatch => dispatch(fetchGetInstanceServiceInbounds(instanceID))
+
+// 校验实例名称
+const CHECK_CSB_INSTANCE_NAME_REQUEST = 'CHECK_CSB_INSTANCE_NAME_REQUEST'
+const CHECK_CSB_INSTANCE_NAME_SUCCESS = 'CHECK_CSB_INSTANCE_NAME_SUCCESS'
+const CHECK_CSB_INSTANCE_NAME_FAILURE = 'CHECK_CSB_INSTANCE_NAME_FAILURE'
+
+const fetchCheckInstanceName = (clusterID, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_CSB_INSTANCE_NAME_REQUEST,
+        CHECK_CSB_INSTANCE_NAME_SUCCESS,
+        CHECK_CSB_INSTANCE_NAME_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterID}/instance/name?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const checkInstanceName = (clusterID, name) =>
+  dispatch => dispatch(fetchCheckInstanceName(clusterID, name))
