@@ -458,29 +458,6 @@ function fetchCreateBlackAndWhiteList(instanceId, serviceId, body) {
 export const createBlackAndWhiteList = (instanceId, serviceId, body) =>
   dispatch => dispatch(fetchCreateBlackAndWhiteList(instanceId, serviceId, body))
 
-// 获取 dsb-server
-export const GET_DSB_SERVER_REQUEST = 'GET_DSB_SERVER_REQUEST'
-export const GET_DSB_SERVER_SUCCESS = 'GET_DSB_SERVER_SUCCESS'
-export const GET_DSB_SERVER_FALIURE = 'GET_DSB_SERVER_FALIURE'
-
-function fetchGetDsbServer(instanceId) {
-  return {
-    instanceId,
-    [CALL_API]: {
-      types: [
-        GET_DSB_SERVER_REQUEST,
-        GET_DSB_SERVER_SUCCESS,
-        GET_DSB_SERVER_FALIURE,
-      ],
-      endpoint: `${CSB_API_URL}/instances/${instanceId}/services/inbounds`,
-      schema: {},
-    },
-  }
-}
-
-export const getDsbServer = instanceId =>
-  dispatch => dispatch(fetchGetDsbServer(instanceId))
-
 // 获取当前服务的黑白名单
 export const GET_SERVICE_BLACK_AND_WHITE_LIST_REQUEST = 'GET_SERVICE_BLACK_AND_WHITE_LIST_REQUEST'
 export const GET_SERVICE_BLACK_AND_WHITE_LIST_SUCCESS = 'GET_SERVICE_BLACK_AND_WHITE_LIST_SUCCESS'
@@ -529,3 +506,25 @@ function fetchEditPublishedService(instanceId, serviceId, body) {
 export const editPublishedService = (instanceId, serviceId, body) =>
   dispatch => dispatch(fetchEditPublishedService(instanceId, serviceId, body))
 
+// 获取服务详情中级联发布相关的信息
+export const GET_SERVICE_CASCADED_INFO_REQUEST = 'GET_SERVICE_CASCADED_INFO_REQUEST'
+export const GET_SERVICE_CASCADED_INFO_SUCCESS = 'GET_SERVICE_CASCADED_INFO_SUCCESS'
+export const GET_SERVICE_CASCADED_INFO_FALIURE = 'GET_SERVICE_CASCADED_INFO_FALIURE'
+
+function fetchGetServiceCascadedInfo(clusterId, serviceName, serviceVersion) {
+  return {
+    serviceName,
+    [CALL_API]: {
+      types: [
+        GET_SERVICE_CASCADED_INFO_REQUEST,
+        GET_SERVICE_CASCADED_INFO_SUCCESS,
+        GET_SERVICE_CASCADED_INFO_FALIURE,
+      ],
+      endpoint: `${CSB_API_URL}/clusters/${clusterId}/instance/${serviceName}/versions/${serviceVersion}/status`,
+      schema: {},
+    },
+  }
+}
+
+export const getServiceCascadedInfo = (clusterId, serviceName, serviceVersion) =>
+  dispatch => dispatch(fetchGetServiceCascadedInfo(clusterId, serviceName, serviceVersion))
