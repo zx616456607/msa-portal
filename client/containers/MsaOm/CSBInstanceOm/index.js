@@ -249,7 +249,7 @@ class CSBInstanceOm extends React.Component {
         //  text: '已停止',
         //  value: 'stop',
         // }],
-       filteredValue: filterInfo.status || null,
+        filteredValue: filterInfo.status || null,
         render: text => renderCSBInstanceStatus(text),
       },
       {
