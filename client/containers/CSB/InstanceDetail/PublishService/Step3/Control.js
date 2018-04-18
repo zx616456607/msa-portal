@@ -42,12 +42,12 @@ export default class Control extends React.Component {
           className="api-gateway-limit"
         >
           <Row gutter={16}>
-            <Col span={6}>
+            <Col span={18}>
               每
               {getFieldDecorator('apiGatewayLimitType', {
-                initialValue: API_GATEWAY_LIMIT_TYPES[0].key,
+                initialValue: API_GATEWAY_LIMIT_TYPES[ 0 ].key,
               })(
-                <Select>
+                <Select className="select-time">
                   {
                     API_GATEWAY_LIMIT_TYPES.map(type =>
                       <Option key={type.key}>{type.text}</Option>
@@ -55,16 +55,15 @@ export default class Control extends React.Component {
                   }
                 </Select>
               )}
-            </Col>
-            <Col span={12}>
-              最大调用
+              秒最大调用
               {getFieldDecorator('apiGatewayLimit', {
                 initialValue: limitDetail !== undefined ? limitDetail.limit : 0,
               })(
-                <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" />
+                <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
               )}
-              次 <Tooltip title="设置为 0 或者为空时代表不限制访问频度">
-                <Icon type="question-circle-o" />
+              次
+              <Tooltip title="设置为 0 或者为空时代表不限制访问频度">
+                <Icon type="question-circle-o" className="qps-tips"/>
               </Tooltip>
             </Col>
           </Row>
