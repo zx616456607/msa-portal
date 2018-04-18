@@ -49,20 +49,22 @@ class LinkRules extends React.Component {
   rollbackHandler = () => {}
 
   renderStepIcon = detail => {
-    const { status } = detail
+    const { instanceId } = this.props
+    const { status = 3, id } = detail || {}
     const intStatus = parseInt(status)
     let instanceStatus
     switch (intStatus) {
       case 0: instanceStatus = '已停止'; break
       case 1: instanceStatus = '运行中'; break
       case 2: instanceStatus = '启动中'; break
+      case 3: instanceStatus = '已注销'; break
       default: instanceStatus = '未知'; break
     }
     const iconClass = classNames({
       'icon-style': true,
-      'current-active': true,
-      'current-stop': false,
-      'current-cancel': false,
+      'current-active': instanceId === id,
+      'current-stop': intStatus === 0,
+      'current-cancel': intStatus === 3,
     })
     return (
       <div className={iconClass}>
@@ -81,19 +83,30 @@ class LinkRules extends React.Component {
     }
     return (
       <Steps>
-        {showInstancesList.map(item => {
-          const { status } = item
+        {showInstancesList.map((item, index) => {
+          const { status, id, name } = item || {}
           const iconClass = classNames({
             'active-style': parseInt(status) === 1,
             'stop-style': parseInt(status) === 0,
             'cancel-style': parseInt(status) === 2,
             'common-style': true,
           })
+          const descClass = classNames({
+            'font-color': instanceId === id,
+          })
+          const deletedInstance = (
+            <span>
+              <span>已删除</span>
+              <Tooltip title="调用链上已删除／停止的实例后的实例中发布的服务将被注销" placement="top">
+                <Icon type="question-circle-o" className="deleted-tips"/>
+              </Tooltip>
+            </span>
+          )
           return <Step
-            key={item.id}
+            key={id ? id : `${item}-${index}`}
             icon={this.renderStepIcon(item)}
-            title={item.name}
-            description={<span>{ instanceId === item.id ? '当前实例' : '' }</span>}
+            title={<span className={descClass}>{name ? name : deletedInstance}</span>}
+            description={<span>{ instanceId === id ? '当前实例' : null }</span>}
             className={iconClass}
           />
         })}
@@ -186,11 +199,11 @@ class LinkRules extends React.Component {
           <div>链路名称：xxxxx</div>
           <Row className="status-step-container">
             <Col span={1}>
-              {(instances.length > 4 || currentStep === 0) && <Icon type="left" onClick={this.subtractStep}/>}
+              {(instances.length > 4 || currentStep !== 0) && <Icon type="left" onClick={this.subtractStep}/>}
             </Col>
             <Col span={22}>{this.renderLinkRulesStatusSteps(instances)}</Col>
             <Col span={1}>
-              {(instances.length > 4 || instances.length - currentStep <= 4) && <Icon type="right" onClick={() => this.addStep(instances)}/>}
+              {(instances.length > 4 && instances.length - currentStep <= 4) && <Icon type="right" onClick={() => this.addStep(instances)}/>}
             </Col>
           </Row>
         </div>

@@ -49,18 +49,16 @@ class ServiceApIDoc extends React.Component {
       { title: '开放协议类型', dataIndex: 'type', key: 'type' },
       { title: '开放地址', dataIndex: 'address', key: 'address' },
     ]
+    const { errorCode, type, exposedPath } = serviceDetial
     const basicInfoData = [
-      { type: serviceDetial.type, address: serviceDetial.exposedPath },
+      { type, address: exposedPath },
     ]
     const errorCodeColumns = [
-      { title: '错误代码', dataIndex: 'errorCode', key: 'errorCode' },
-      { title: '处置建议', dataIndex: 'suggestion', key: 'suggestion' },
-      { title: '说明', dataIndex: 'desc', key: 'desc' },
+      { title: '错误代码', dataIndex: 'code', key: 'code' },
+      { title: '处置建议', dataIndex: 'advice', key: 'advice' },
+      { title: '说明', dataIndex: 'description', key: 'description' },
     ]
-    const errorCodeData = [
-      { errorCode: 'arg0', suggestion: 'arg0', desc: 'int' },
-      { errorCode: 'arg1', suggestion: 'arg1', desc: 'int' },
-    ]
+    const errorCodeData = errorCode ? JSON.parse(errorCode) : []
     return <div>
       <div className="basicInfo">
         <div className="second-title header">服务基本信息及开放协议</div>
