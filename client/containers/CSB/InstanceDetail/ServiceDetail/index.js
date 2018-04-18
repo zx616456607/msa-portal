@@ -40,7 +40,7 @@ class ServiceDetail extends React.Component {
     const { status } = currentService
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
-        <Menu.Item key="list">黑／白名单</Menu.Item>
+        {/* <Menu.Item key="list">黑／白名单</Menu.Item>*/}
         <Menu.Item key="logout">注销</Menu.Item>
       </Menu>
     )

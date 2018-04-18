@@ -30,6 +30,7 @@ import {
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
 import { formatDate, toQuerystring } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
+import InstanceDetailDock from './InstanceDetail/Dock'
 
 const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -45,6 +46,7 @@ class CSBInstanceOm extends React.Component {
       createModal: false,
       currentSearchType: 'creator',
       searchValue: '',
+      instanceDetailVisible: false,
     }
   }
 
@@ -188,6 +190,12 @@ class CSBInstanceOm extends React.Component {
           currentInstance: row,
         }, this.deleteConfirm)
         break
+      case 'instanceDetail':
+        this.setState({
+          currentInstance: row,
+          instanceDetailVisible: true,
+        })
+        return
       default:
         break
     }
@@ -209,7 +217,7 @@ class CSBInstanceOm extends React.Component {
   render() {
     let {
       radioValue, createModal, currentInstance, searchValue,
-      currentSearchType, sorterInfo, filterInfo,
+      currentSearchType, sorterInfo, filterInfo, instanceDetailVisible,
     } = this.state
     const { omInstances, namespace, location } = this.props
     const { totalElements, isFetching, content, size } = omInstances
@@ -288,6 +296,7 @@ class CSBInstanceOm extends React.Component {
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
               {/* <Menu.Item key="stop">停止</Menu.Item>*/}
               {/* <Menu.Item key="edit">修改实例</Menu.Item> */}
+              <Menu.Item key="instanceDetail">实例详情</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
             </Menu>
           )
@@ -354,6 +363,11 @@ class CSBInstanceOm extends React.Component {
             rowKey={row => row.id}
           />
         </div>
+        {instanceDetailVisible && <InstanceDetailDock
+          detail={currentInstance}
+          visible={instanceDetailVisible}
+          onVisibleChange={visible => this.setState({ instanceDetailVisible: visible })}
+        />}
       </QueueAnim>
     )
   }

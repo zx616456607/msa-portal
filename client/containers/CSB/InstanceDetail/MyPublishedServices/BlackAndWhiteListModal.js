@@ -165,13 +165,13 @@ class BlackAndWhiteListModal extends React.Component {
                   return callback('IP地址或者IP网段不能为空')
                 }
                 if (!/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,3})?$/.test(value)) {
-                  return callback('IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24')
+                  return callback('IP地址如：192.168.1.0，或IP网段如：192.168.1.0/24')
                 }
                 return callback()
               },
             }],
           })(
-            <Input placeholder="IP地址如：192.168.1.1，或IP网段如：192.168.1.1/24" />
+            <Input placeholder="IP地址如：192.168.1.0，或IP网段如：192.168.1.0/24" />
           )
         }
         <Icon type="delete" onClick={this.deletelist.bind(this, item, list, formProps)} />
@@ -199,16 +199,16 @@ class BlackAndWhiteListModal extends React.Component {
     >
       {
         isFetching
-          ? <div><Spin/></div>
+          ? <div style={{ textAlign: 'center' }}><Spin/></div>
           : <div>
             <Row className="row-style">
               <Col span="4">
                 黑名单
                 <Tooltip
-                  title={`IP黑名单支持ip网段添加，例如127.0.0.1/24\n
-            例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
+                  title={`IP黑名单支持ip网段添加，例如192.168.1.0/24\n
+            例如：192.168.1.0/24 24表示采用子网掩码中的前24位为有效位，
             即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
-            主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
+            主机。故192.168.1.0/24 表示IP网段范围是：192.168.1.0~192.168.1.255`}
                   placement="top"
                 >
                   <Icon type="question-circle-o"/>
@@ -236,10 +236,10 @@ class BlackAndWhiteListModal extends React.Component {
               <Col span="4">
                 白名单
                 <Tooltip
-                  title={`IP白名单支持ip网段添加，例如127.0.0.1/24
-            例如：127.0.0.1/24 24表示采用子网掩码中的前24位为有效位，
+                  title={`IP白名单支持ip网段添加，例如192.168.1.0/24
+            例如：192.168.1.0/24 24表示采用子网掩码中的前24位为有效位，
             即用32-24=8bit来表示主机号，该子网可以容纳2^8 - 2 = 254 台
-            主机。故127.0.0.1/24 表示IP网段范围是：127.0.0.1~127.0.0.255`}
+            主机。故192.168.1.0/24 表示IP网段范围是：192.168.1.0~192.168.1.255`}
                   placement="top"
                 >
                   <Icon type="question-circle-o"/>
