@@ -62,6 +62,12 @@
       color: @border-color-base;
     }
   }
+  .font-color {
+    color: @primary-color;
+  }
+  .deleted-tips {
+    margin-left: 5px;
+  }
   .common-style {
     padding-top: 20px;
     height: 120px;
@@ -91,29 +97,25 @@
       font-size: 12px;
       line-height: 24px;
       padding-top: 5px;
-      .top-style {
-        color: @font-color-3;
-      }
     }
-    .current-active,
-    .current-stop,
-    .current-cancel {
+    .current-active {
+      background: @success-color;
       .top-style,
       .status-style {
         color: #fff;
       }
     }
     .current-stop {
-      background: @error-color;
       border-color: @error-color;
-    }
-    .current-active {
-      background: @success-color;
-      border-color: @success-color;
+      .top-style {
+        color: @font-color-3;
+      }
+      .status-style {
+        color: @error-color;
+      }
     }
     .current-cancel {
-      background: @border-color-base;
-      border-color: @border-color-base;
+      border-color: @font-color-3;
     }
   }
   .event {
