@@ -1,0 +1,40 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * log list style
+ *
+ * 2018-2-1
+ * @author zhangcz
+ */
+@import "../../../assets/style/core/index.less";
+
+.normal-style {
+  width: 100%;
+  color: #fff;
+  background: #000;
+  .no-log-style {
+    padding: 10px;
+    color: @success-color;
+  }
+  .list-style {
+    outline: none;
+  }
+  .log-item-style {
+    padding: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    color: red;
+    background: blue !important;
+    width: 12px;
+    height: 24px;
+  }
+}
+.small-style {
+  height: 550px;
+}
+.big-style {
+  height: calc(~"100% - 40px");
+}
