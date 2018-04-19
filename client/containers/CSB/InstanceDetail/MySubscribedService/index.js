@@ -12,6 +12,7 @@
 
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
+import { Link } from 'react-router-dom'
 import {
   Card, Button, Radio,
   Input, Pagination, Table,
@@ -318,7 +319,12 @@ class MySubscribedService extends React.Component {
       },
       { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
       { title: '所属服务组', dataIndex: 'serviceGroupName', width: '11%' },
-      { title: '我的消费凭证', dataIndex: 'evidenceName', width: '11%' },
+      {
+        title: '我的消费凭证', dataIndex: 'evidenceName', width: '11%',
+        render: text => <Link to={`/csb-instances-available/${instanceID}/consumer-vouchers`}>
+          {text}
+        </Link>,
+      },
       {
         title: '订阅状态',
         dataIndex: 'status',
