@@ -17,32 +17,26 @@ import 'react-virtualized/styles.css'
 import './style/LogList.less'
 import classNames from 'classnames'
 
-const list = []
-
-for (let i = 0; i < 100000; i++) {
-  list.push(`hello${i}`)
-}
-
-
 class LogList extends React.Component {
   static propTypes = {
-    list: propTypes.array.isRequired,
+    data: propTypes.array.isRequired,
   }
 
-  rowRenderer = ({ key, index, style }) => {
+  rowRenderer = ({ index, style }) => {
+    const { data } = this.props
     return (
       <div
-        key={key}
+        key={data[index].id}
         style={style}
         className="log-item-style"
       >
-        {list[index]}
+        {data[index].log}
       </div>
     )
   }
 
   render() {
-    const { size } = this.props
+    const { size, data } = this.props
     const logListClass = classNames({
       'normal-style': true,
       'small-style': size === 'small',
@@ -51,14 +45,14 @@ class LogList extends React.Component {
     return (
       <div className={logListClass}>
         {
-          list.length
+          !data.length
             ? <div className="no-log-style">无日志</div>
             : <AutoSizer>
               {({ height, width }) => (
                 <List
                   height={height}
-                  rowCount={list.length}
-                  rowHeight={30}
+                  rowCount={data.length}
+                  rowHeight={50}
                   rowRenderer={this.rowRenderer}
                   // disableWidth={true}
                   width={width}

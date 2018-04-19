@@ -12,7 +12,7 @@
 import { myApplication } from './myApplication'
 import {
   publicInstances, availableInstances, omInstances, instanceOverview,
-  servicesInbounds,
+  servicesInbounds, instanceLogs,
 } from './instance'
 import {
   publishedService, serviceCAL, serviceOverview, subscribableServices,
@@ -37,6 +37,7 @@ const CSB = (state = {
   plubicService: {},
   cascadingLinkRule: {},
   serviceCascadedInfo: {},
+  instanceLogs: {},
 }, action) => {
   return {
     myApplication: myApplication(state.myApplication, action),
@@ -70,6 +71,7 @@ const CSB = (state = {
     publicService: publicService(state.publicService, action),
     cascadingLinkRule: cascadingLinkRule(state.cascadingLinkRule, action),
     serviceCascadedInfo: serviceCascadedInfo(state.serviceCascadedInfo, action),
+    instanceLogs: instanceLogs(state.instanceLogs, action),
   }
 }
 

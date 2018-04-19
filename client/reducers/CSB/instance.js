@@ -171,3 +171,34 @@ export const servicesInbounds = (state = {}, action) => {
       return state
   }
 }
+
+export const instanceLogs = (state = {}, action) => {
+  const { type, instanceNameSpace } = action
+  switch (type) {
+    case ActionTypes.GET_INSTANCE_LOGS_REQUEST:
+      return {
+        ...state,
+        [instanceNameSpace]: {
+          isFetching: true,
+        },
+      }
+    case ActionTypes.GET_INSTANCE_LOGS_SUCCESS:
+      return {
+        ...state,
+        [instanceNameSpace]: {
+          isFetching: false,
+          data: action.response.result.data || [],
+        },
+      }
+    case ActionTypes.GET_INSTANCE_LOGS_FALIURE:
+      return {
+        ...state,
+        [instanceNameSpace]: {
+          isFetching: false,
+          data: [],
+        },
+      }
+    default:
+      return state
+  }
+}

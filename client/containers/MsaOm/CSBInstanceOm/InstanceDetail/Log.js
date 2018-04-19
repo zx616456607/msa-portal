@@ -14,28 +14,43 @@ import React from 'react'
 import { loadInstanceLogs } from '../../../../actions/CSB/instance'
 import { connect } from 'react-redux'
 import LogTemplate from '../../../../components/Log'
+import { Spin } from 'antd'
 
 
 class Log extends React.Component {
   static propTypes = {}
 
+  componentWillMount() {
+    this.loadData()
+  }
+
   loadData = (query = {}) => {
-    const { loadInstanceLogs, instacneID, clusterID } = this.props
+    const { loadInstanceLogs, instance, clusterID } = this.props
+    const { namespace } = instance
     query = Object.assign({}, query)
-    loadInstanceLogs(clusterID, instacneID, query).then(res => {
-      console.log('res=', res)
-    })
+    loadInstanceLogs(clusterID, namespace, query)
   }
 
   render() {
+    const { instanceLogs, instance } = this.props
+    const { namespace } = instance
+    const logs = instanceLogs[namespace] || { isFetching: true }
+    const { isFetching, data } = logs
+    if (isFetching) {
+      return <div><Spin /></div>
+    }
     return <div>
-      <LogTemplate loadData={this.loadData}/>
+      <LogTemplate loadData={this.loadData} data={data}/>
     </div>
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  const { CSB } = state
+  const { instanceLogs } = CSB
+  return {
+    instanceLogs,
+  }
 }
 
 export default connect(mapStateToProps, {

@@ -60,6 +60,7 @@ class LogTemplate extends React.Component {
 
   render() {
     const { size } = this.state
+    const { data } = this.props
     const logContaierClass = classNames({
       'big-container-style': size === 'big',
       'small-container-style': size === 'small',
@@ -80,7 +81,7 @@ class LogTemplate extends React.Component {
             onClick={() => this.toggleContainerSize()}
           />
         </div>
-        <LogList data={[]} size={size}/>
+        <LogList data={data} size={size}/>
       </div>
     )
   }
