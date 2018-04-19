@@ -29,7 +29,7 @@ export default class Control extends React.Component {
       'service-control': true,
       [className]: !!className,
     })
-    const accessibleValue = getFieldValue('accessible')
+    const accessibleValue = getFieldValue('authenticationType')
     const { accessible, limitationDetail, xmlProtectionDetail } = data
     const limitDetail = limitationDetail && JSON.parse(limitationDetail)
     const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
@@ -126,7 +126,7 @@ export default class Control extends React.Component {
           {...formItemLayout}
           label="公开访问"
         >
-          {getFieldDecorator('accessible', {
+          {getFieldDecorator('authenticationType', {
             valuePropName: 'checked',
             initialValue: accessible || false,
           })(
