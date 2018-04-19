@@ -317,8 +317,8 @@ class MySubscribedService extends React.Component {
         render: status => renderCSBInstanceServiceStatus(status),
       },
       { title: '服务版本', dataIndex: 'serviceVersion', width: '8%' },
-      { title: '所属服务组', dataIndex: 'serviceGroupName', width: '8%' },
-      { title: '我的消费凭证', dataIndex: 'evidenceName', width: '8%' },
+      { title: '所属服务组', dataIndex: 'serviceGroupName', width: '11%' },
+      { title: '我的消费凭证', dataIndex: 'evidenceName', width: '11%' },
       {
         title: '订阅状态',
         dataIndex: 'status',
@@ -328,47 +328,48 @@ class MySubscribedService extends React.Component {
         render: text => renderCSBInstanceServiceApproveStatus(text),
       },
       {
-        title: '订阅时间', dataIndex: 'requestTime', width: '10%',
+        title: '订阅时间', dataIndex: 'requestTime', width: '15%',
         sorter: true,
         sortOrder: sortObj.requestTime,
         render: text => formatDate(text),
       },
       {
-        title: '审批时间', dataIndex: 'approvalTime', width: '10%',
+        title: '审批时间', dataIndex: 'approvalTime', width: '15%',
         sorter: true,
         sortOrder: sortObj.approvalTime,
         render: text => formatDate(text),
       },
+      // {
+      //  title: '累计调用量',
+      //  dataIndex: 'totalCallCount',
+      //  width: '8%',
+      //  // sorter: true,
+      //  // sortOrder: sortObj.totalCallCount,
+      //  render: text => (text !== undefined ? text : '-'),
+      // }, {
+      //  title: '累计错误量',
+      //  dataIndex: 'totalErrorCallCount',
+      //  width: '8%',
+      //  // sorter: true,
+      //  // sortOrder: sortObj.totalErrorCallCount,
+      //  render: text => (text !== undefined ? text : '-'),
+      // }, {
+      //  title: '平均RT（ms）',
+      //  dataIndex: 'averageCallTime',
+      //  width: '8%',
+      //  // sorter: true,
+      //  // sortOrder: sortObj.averageCallTime,
+      //  render: text => (
+      //    text !== undefined
+      //      ? Math.ceil(text * 100) / 100
+      //      : '-'
+      //  ),
+      // },
       {
-        title: '累计调用量',
-        dataIndex: 'totalCallCount',
-        width: '8%',
-        // sorter: true,
-        // sortOrder: sortObj.totalCallCount,
-        render: text => (text !== undefined ? text : '-'),
-      }, {
-        title: '累计错误量',
-        dataIndex: 'totalErrorCallCount',
-        width: '8%',
-        // sorter: true,
-        // sortOrder: sortObj.totalErrorCallCount,
-        render: text => (text !== undefined ? text : '-'),
-      }, {
-        title: '平均RT（ms）',
-        dataIndex: 'averageCallTime',
-        width: '8%',
-        // sorter: true,
-        // sortOrder: sortObj.averageCallTime,
-        render: text => (
-          text !== undefined
-            ? Math.ceil(text * 100) / 100
-            : '-'
-        ),
-      }, {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '8%',
+        width: '16%',
         render: (text, record) => {
           if (record.status === 4) {
             return <Button type="primary" onClick={this.reSubscribeService.bind(this, record)}>重新订阅</Button>
