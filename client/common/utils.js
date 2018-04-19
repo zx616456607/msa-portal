@@ -466,3 +466,20 @@ export function sleep(timeout = 50) {
     setTimeout(resolve, timeout)
   })
 }
+
+/**
+ * formatServiceOpenProtocol function
+ *
+ * @export
+ * @param {string} type service type
+ * @return {string} service openProtocol
+ */
+export function formatServiceOpenProtocol(type) {
+  if (/^soap/.test(type)) {
+    return 'WebService'
+  }
+  if (/^rest/.test(type)) {
+    return 'Restful'
+  }
+  return '-'
+}

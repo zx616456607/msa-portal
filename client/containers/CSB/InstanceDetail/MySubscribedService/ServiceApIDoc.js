@@ -18,6 +18,7 @@ import {
 } from 'antd'
 import './style/ServiceApiDoc.less'
 import isEmpty from 'lodash/isEmpty'
+import { formatServiceOpenProtocol } from '../../../../common/utils'
 
 const TextArea = Input.TextArea
 
@@ -51,7 +52,7 @@ class ServiceApIDoc extends React.Component {
     ]
     const { errorCode, type, exposedPath } = serviceDetial
     const basicInfoData = [
-      { type, address: exposedPath },
+      { type: formatServiceOpenProtocol(type), address: exposedPath },
     ]
     const errorCodeColumns = [
       { title: '错误代码', dataIndex: 'code', key: 'code' },
