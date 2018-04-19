@@ -201,10 +201,15 @@ class AccessAgreement extends React.Component {
             //   message: '选择协议类型',
             // }],
             onChange: e => {
-              let openUrl
-              if (!(protocol === 'soap' && e.target.value === 'rest')) {
-                openUrl = openUrlBefore
+              // let openUrl
+              // if (!(protocol === 'soap' && e.target.value === 'rest')) {
+              //  openUrl = openUrlBefore
+              // }
+              let type = e.target.value
+              if (ssl) {
+                type += '_ssl'
               }
+              const openUrl = this.getOpenUrlBefore(ssl, type)
               setFieldsValue({
                 openUrl,
               })
@@ -224,6 +229,16 @@ class AccessAgreement extends React.Component {
           {getFieldDecorator('ssl', {
             initialValue: dataList ? dataList.type === 'rest_ssl' : false,
             valuePropName: 'checked',
+            onChange: e => {
+              let type = openProtocol
+              if (e) {
+                type += '_ssl'
+              }
+              const openUrl = this.getOpenUrlBefore(e, type)
+              setFieldsValue({
+                openUrl,
+              })
+            },
           })(
             <Switch disabled={isDisabled} checkedChildren="开" unCheckedChildren="关" />
           )}
