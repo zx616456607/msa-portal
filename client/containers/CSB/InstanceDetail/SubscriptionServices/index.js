@@ -19,7 +19,7 @@ import { parse as parseQuerystring } from 'query-string'
 import './style/SubscriptionServices.less'
 import SubscriptServiceModal from './SubscriptServiceModal'
 import { subscribableServices } from '../../../../actions/CSB/instanceService'
-import { formatDate, handleHistoryForLoadData, parseOrderToQuery } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData, parseOrderToQuery, formatServiceOpenProtocol } from '../../../../common/utils'
 import { CSB_SUBSCRIBE_INSTANCES_SEFVICE_FLAG } from '../../../../constants'
 import { getQueryAndFuncs, csbInstanceServiceSltMaker } from '../../../../selectors/CSB/instanceService'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
@@ -113,6 +113,7 @@ class SubscriptionServices extends React.Component {
         title: '服务开放类型',
         dataIndex: 'type',
         width: '12%',
+        render: text => formatServiceOpenProtocol(text),
       },
       {
         title: '服务描述',
