@@ -36,7 +36,7 @@ export default class Protocols extends React.Component {
             <Col span={8}>
               <div className="txt-of-ellipsis">
                 {
-                  detail.type === 'rest' ? <Tag color="blue">Restful-API</Tag> :
+                  detail.type === 'rest' ? <Tag color="blue">Restful</Tag> :
                     <Tag color="blue">WebService</Tag>
                 }
               </div>

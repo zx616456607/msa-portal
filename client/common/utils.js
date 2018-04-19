@@ -443,10 +443,10 @@ export function getCSBServiceOpenType(openProtocol, ssl) {
 export function transformCSBProtocols(protocol) {
   switch (protocol) {
     case 'rest':
-      return 'Restful-API'
+      return 'Restful'
     case 'soap':
       return 'WebService'
-    case 'Restful-API':
+    case 'Restful':
       return 'rest'
     case 'WebService':
       return 'soap'

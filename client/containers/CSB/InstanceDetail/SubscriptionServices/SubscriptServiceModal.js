@@ -138,7 +138,7 @@ class SubscriptServiceModal extends React.Component {
   }
   renderOpenssl(type) {
     if (/^rest/.test(type)) {
-      return 'Restful-API'
+      return 'Restful'
     }
     return 'WebService'
   }
