@@ -184,7 +184,7 @@ class AccessAgreement extends React.Component {
             }],
           })(
             <RadioGroup disabled={isDisabled}>
-              <RadioButton value="rest">Restful-API</RadioButton>
+              <RadioButton value="rest">Restful</RadioButton>
               <RadioButton value="soap">WebService</RadioButton>
             </RadioGroup>
           )}
@@ -216,7 +216,7 @@ class AccessAgreement extends React.Component {
             },
           })(
             <RadioGroup disabled={isDisabled}>
-              <Radio value="rest">Restful-API</Radio>
+              <Radio value="rest">Restful</Radio>
               <Radio value="soap">WebService</Radio>
             </RadioGroup>
           )}
