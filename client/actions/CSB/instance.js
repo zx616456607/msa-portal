@@ -322,7 +322,7 @@ function fetchGetInstanceLogs(clusterId, instanceNameSpace, body) {
         method: 'POST',
         body,
         headers: {
-          onbehalfuser: 'csb-instance-j4lrz',
+          onbehalfuser: instanceNameSpace,
         },
       },
       schema: {},

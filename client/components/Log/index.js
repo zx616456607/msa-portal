@@ -27,24 +27,23 @@ class LogTemplate extends React.Component {
   }
   state = {
     size: 'small',
-    currentDate: 13,
+    date_start: null,
   }
 
   changeDate = (data, dataString) => {
-    console.log('data=', data)
-    console.log('dataString=', dataString)
-    this.setState({ currentDate: dataString })
+    this.setState({
+      date_start: dataString,
+    }, this.loadData)
   }
 
   loadData = (query = {}) => {
-    const { currentDate } = this.state
+    const { date_start } = this.state
     const { loadData } = this.props
-    query = Object.assign({}, { date_end: currentDate }, query)
+    query = Object.assign({}, {
+      date_start,
+      date_end: date_start,
+    }, query)
     loadData(query)
-  }
-
-  reloadLog = () => {
-
   }
 
   toggleContainerSize = () => {
@@ -60,7 +59,7 @@ class LogTemplate extends React.Component {
 
   render() {
     const { size } = this.state
-    const { data } = this.props
+    const { data, isFetching } = this.props
     const logContaierClass = classNames({
       'big-container-style': size === 'big',
       'small-container-style': size === 'small',
@@ -75,13 +74,13 @@ class LogTemplate extends React.Component {
             onChange={(data, dataString) => this.changeDate(data, dataString)}
             showToday={true}
           />
-          <Icon type="reload" onClick={() => this.reloadLog()}/>
+          <Icon type="reload" onClick={() => this.loadData()}/>
           <Icon
             type={size === 'small' ? 'arrows-alt' : 'shrink'}
             onClick={() => this.toggleContainerSize()}
           />
         </div>
-        <LogList data={data} size={size}/>
+        <LogList data={data} size={size} isFetching={isFetching}/>
       </div>
     )
   }
