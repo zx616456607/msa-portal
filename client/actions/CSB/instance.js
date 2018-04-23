@@ -21,7 +21,7 @@ import {
   CSB_OM_INSTANCES_FLAG,
 } from '../../constants'
 
-const { CSB_API_URL } = API_CONFIG
+const { CSB_API_URL, PAAS_API_URL } = API_CONFIG
 
 export const CSB_AVAILABLE_INSTANCES_REQUEST = 'CSB_AVAILABLE_INSTANCES_REQUEST'
 export const CSB_AVAILABLE_INSTANCES_SUCCESS = 'CSB_AVAILABLE_INSTANCES_SUCCESS'
@@ -302,3 +302,33 @@ const fetchCheckInstanceName = (clusterID, query) => {
 
 export const checkInstanceName = (clusterID, name) =>
   dispatch => dispatch(fetchCheckInstanceName(clusterID, name))
+
+// 获取当前实例的日志
+export const GET_INSTANCE_LOGS_REQUEST = 'GET_INSTANCE_LOGS_REQUEST'
+export const GET_INSTANCE_LOGS_SUCCESS = 'GET_INSTANCE_LOGS_SUCCESS'
+export const GET_INSTANCE_LOGS_FALIURE = 'GET_INSTANCE_LOGS_FALIURE'
+
+function fetchGetInstanceLogs(clusterId, instanceNameSpace, body) {
+  return {
+    instanceNameSpace,
+    [CALL_API]: {
+      types: [
+        GET_INSTANCE_LOGS_REQUEST,
+        GET_INSTANCE_LOGS_SUCCESS,
+        GET_INSTANCE_LOGS_FALIURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/logs/services/dsb-server/logs`,
+      options: {
+        method: 'POST',
+        body,
+        headers: {
+          onbehalfuser: 'csb-instance-j4lrz',
+        },
+      },
+      schema: {},
+    },
+  }
+}
+
+export const loadInstanceLogs = (clusterId, instanceNameSpace, body = {}) =>
+  dispatch => dispatch(fetchGetInstanceLogs(clusterId, instanceNameSpace, body))

@@ -28,7 +28,7 @@ class InstanceDetail extends React.Component {
 
   render() {
     const { detail } = this.props
-    const { name, clusterId, id, status } = detail
+    const { name, clusterId, status } = detail
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -77,7 +77,7 @@ class InstanceDetail extends React.Component {
               <Monitor />
             </TabPane>
             <TabPane tab="日志" key="log">
-              <Log clusterID={clusterId} instanceID={id}/>
+              <Log clusterID={clusterId} instance={detail}/>
             </TabPane>
           </Tabs>
         </div>
