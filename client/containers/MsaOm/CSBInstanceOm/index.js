@@ -12,7 +12,11 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Radio, Button, Icon, Input, Table, Dropdown, Menu, Select, Pagination } from 'antd'
+import {
+  Radio, Button, Icon, Input, Table,
+  Dropdown, Menu, Select, Pagination,
+  notification,
+} from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEqual from 'lodash/isEqual'
 import isEmpty from 'lodash/isEmpty'
@@ -22,12 +26,18 @@ import './style/index.less'
 import CreateModal from './CreateModal'
 import confirm from '../../../components/Modal/confirm'
 import { getAllClusters } from '../../../actions/current'
-import { getInstances, deleteInstance } from '../../../actions/CSB/instance'
+import {
+  getInstances,
+  deleteInstance,
+  stopInstance,
+  startInstance,
+  restartInstance,
+} from '../../../actions/CSB/instance'
 import {
   instancesSltMaker,
   getQueryAndFuncs,
 } from '../../../selectors/CSB/instance'
-import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG } from '../../../constants'
+import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG, INSTANCE_SERVICES } from '../../../constants'
 import { formatDate, toQuerystring } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
 import InstanceDetailDock from './InstanceDetail/Dock'
@@ -38,6 +48,25 @@ const Option = Select.Option
 
 const omInstancesSlt = instancesSltMaker(CSB_OM_INSTANCES_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_OM_INSTANCES_FLAG)
+
+const HANDER_MESSAGE = {
+  stop: {
+    hander: 'stop',
+    modalTitle: '停止',
+    title: '停止后，不能使用实例发布或订阅服务，重新启动后不影响实例中\n' +
+    '已发布或已订阅的服务。',
+  },
+  start: {
+    hander: 'start',
+    modalTitle: '启动',
+    title: '',
+  },
+  restart: {
+    hander: 'restart',
+    modalTitle: '重新部署',
+    title: '',
+  },
+}
 
 class CSBInstanceOm extends React.Component {
   constructor(props) {
@@ -133,14 +162,28 @@ class CSBInstanceOm extends React.Component {
     })
   }
 
-  stopConfirm = () => {
+  handerConfirm = (content, callback) => {
+    const { currentInstance } = this.state
+    const { clusterId, namespace, name } = currentInstance
+    const body = {
+      services: INSTANCE_SERVICES,
+    }
+    const { modalTitle, title } = content
+    const self = this
     confirm({
-      modalTitle: '停止 CSB 实例',
-      title: '停止后，不能使用实例发布或订阅服务，重新启动后不影响实例中\n' +
-      '已发布或已订阅的服务。',
-      content: '确定是否停止该实例？',
+      modalTitle: `${modalTitle} CSB 实例`,
+      title,
+      content: `确定是否${modalTitle} ${name} 实例？`,
       onOk: () => {
-
+        callback && callback(clusterId, namespace, body).then(res => {
+          if (res.error) {
+            return
+          }
+          notification.success({
+            message: `实例 ${name} ${modalTitle}成功`,
+          })
+          self.getInstanceList()
+        })
       },
     })
   }
@@ -148,13 +191,14 @@ class CSBInstanceOm extends React.Component {
   deleteConfirm = () => {
     const { deleteInstance } = this.props
     const { currentInstance } = this.state
+    const { name, clusterId, id } = currentInstance
     confirm({
       modalTitle: '删除 CSB 实例',
       title: '删除实例后实例使用者将不能在此实例中发布、订阅服务；已发布的服务将被注销，已订购的服务将被退订；若实例存在级联链路中，链路上该实例后方向的实例将受影响。',
-      content: `确定是否删除 ${currentInstance.name} 实例？`,
+      content: `确定是否删除 ${name} 实例？`,
       onOk: () => {
         return new Promise((resolve, reject) => {
-          deleteInstance(currentInstance.clusterId, currentInstance.id).then(res => {
+          deleteInstance(clusterId, id).then(res => {
             if (res.error) {
               return reject()
             }
@@ -175,30 +219,37 @@ class CSBInstanceOm extends React.Component {
   }
 
   handleMenuClick = (e, row) => {
-    switch (e.key) {
-      case 'stop':
-        this.stopConfirm()
-        break
-      case 'edit':
-        this.setState({
-          createModal: true,
-          currentInstance: row,
-        })
-        break
-      case 'delete':
-        this.setState({
-          currentInstance: row,
-        }, this.deleteConfirm)
-        break
-      case 'instanceDetail':
-        this.setState({
-          currentInstance: row,
-          instanceDetailVisible: true,
-        })
-        return
-      default:
-        break
-    }
+    const { stopInstance, startInstance, restartInstance } = this.props
+    this.setState({
+      currentInstance: row,
+    }, () => {
+      switch (e.key) {
+        case 'start':
+          this.handerConfirm(HANDER_MESSAGE.start, startInstance)
+          break
+        case 'stop':
+          this.handerConfirm(HANDER_MESSAGE.stop, stopInstance)
+          break
+        case 'restart':
+          this.handerConfirm(HANDER_MESSAGE.restart, restartInstance)
+          break
+        case 'edit':
+          this.setState({
+            createModal: true,
+          })
+          break
+        case 'delete':
+          this.deleteConfirm()
+          break
+        case 'instanceDetail':
+          this.setState({
+            instanceDetailVisible: true,
+          })
+          return
+        default:
+          break
+      }
+    })
   }
 
   openCreateModal = () => {
@@ -292,12 +343,15 @@ class CSBInstanceOm extends React.Component {
       },
       { title: '操作', width: '15',
         render: (text, row) => {
+          const { status } = row
           const menu = (
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
-              {/* <Menu.Item key="stop">停止</Menu.Item>*/}
               {/* <Menu.Item key="edit">修改实例</Menu.Item> */}
               <Menu.Item key="instanceDetail">实例详情</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
+              <Menu.Item key="start" disabled={parseInt(status) !== 0}>启动</Menu.Item>
+              <Menu.Item key="stop" disabled={parseInt(status) !== 1}>停止</Menu.Item>
+              <Menu.Item key="restart" disabled={parseInt(status) === 0}>重新部署</Menu.Item>
             </Menu>
           )
           return (
@@ -392,4 +446,7 @@ export default connect(mapStateToProps, {
   getAllClusters,
   getInstances,
   deleteInstance,
+  stopInstance,
+  startInstance,
+  restartInstance,
 })(CSBInstanceOm)

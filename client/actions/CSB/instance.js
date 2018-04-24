@@ -332,3 +332,90 @@ function fetchGetInstanceLogs(clusterId, instanceNameSpace, body) {
 
 export const loadInstanceLogs = (clusterId, instanceNameSpace, body = {}) =>
   dispatch => dispatch(fetchGetInstanceLogs(clusterId, instanceNameSpace, body))
+
+// 启动当前实例
+export const START_INSTANCE_REQUEST = 'START_INSTANCE_REQUEST'
+export const START_INSTANCE_SUCCESS = 'START_INSTANCE_SUCCESS'
+export const START_INSTANCE_FALIURE = 'START_INSTANCE_FALIURE'
+
+function fetchStartInstance(clusterId, instanceNameSpace, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        START_INSTANCE_REQUEST,
+        START_INSTANCE_SUCCESS,
+        START_INSTANCE_FALIURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/services/batch-start`,
+      options: {
+        method: 'PUT',
+        body,
+        headers: {
+          onbehalfuser: instanceNameSpace,
+        },
+      },
+      schema: {},
+    },
+  }
+}
+
+export const startInstance = (clusterId, instanceNameSpace, body) =>
+  dispatch => dispatch(fetchStartInstance(clusterId, instanceNameSpace, body))
+
+// 停止当前实例
+export const STOP_INSTANCE_REQUEST = 'STOP_INSTANCE_REQUEST'
+export const STOP_INSTANCE_SUCCESS = 'STOP_INSTANCE_SUCCESS'
+export const STOP_INSTANCE_FALIURE = 'STOP_INSTANCE_FALIURE'
+
+function fetchStopInstance(clusterId, instanceNameSpace, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        STOP_INSTANCE_REQUEST,
+        STOP_INSTANCE_SUCCESS,
+        STOP_INSTANCE_FALIURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/services/batch-stop`,
+      options: {
+        method: 'PUT',
+        body,
+        headers: {
+          onbehalfuser: instanceNameSpace,
+        },
+      },
+      schema: {},
+    },
+  }
+}
+
+export const stopInstance = (clusterId, instanceNameSpace, body) =>
+  dispatch => dispatch(fetchStopInstance(clusterId, instanceNameSpace, body))
+
+// 重新部署实例
+export const RESTART_INSTANCE_REQUEST = 'RESTART_INSTANCE_REQUEST'
+export const RESTART_INSTANCE_SUCCESS = 'RESTART_INSTANCE_SUCCESS'
+export const RESTART_INSTANCE_FALIURE = 'RESTART_INSTANCE_FALIURE'
+
+function fetchRestartInstance(clusterId, instanceNameSpace, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        RESTART_INSTANCE_REQUEST,
+        RESTART_INSTANCE_SUCCESS,
+        RESTART_INSTANCE_FALIURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/services/batch-restart`,
+      options: {
+        method: 'PUT',
+        body,
+        headers: {
+          onbehalfuser: instanceNameSpace,
+        },
+      },
+      schema: {},
+    },
+  }
+}
+
+export const restartInstance = (clusterId, instanceNameSpace, body) =>
+  dispatch => dispatch(fetchRestartInstance(clusterId, instanceNameSpace, body))
