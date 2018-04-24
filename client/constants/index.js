@@ -111,3 +111,9 @@ export const CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY = {
   size: 1000,
   flag: CSB_OM_INSTANCES_FLAG,
 }
+export const INSTANCE_SERVICES = [
+  'dsb-server',
+  'dsb-server-elasticsearch',
+  'dsb-server-mysql',
+  'dsb-server-redis',
+]
