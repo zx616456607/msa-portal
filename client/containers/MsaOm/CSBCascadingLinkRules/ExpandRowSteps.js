@@ -64,11 +64,15 @@ class ExpandRowSteps extends React.Component {
           deleted: step === null,
           StepIcon: true,
         })
+        const StepClass = classNames({
+          'short-step-style': index === mapArry.length - 1 && shortStepLength,
+          'deleted-instance': step === null,
+        })
         if (step === null) {
           return <Step
             key={`delete-${index}`}
             status="finish"
-            className="deleted-instance"
+            className={StepClass}
             description={<div>
               <div>实例 未知</div>
               <div>
@@ -83,10 +87,6 @@ class ExpandRowSteps extends React.Component {
             </svg>}
           />
         }
-        const StepClass = classNames({
-          'short-step-style': index === mapArry.length - 1 && shortStepLength,
-          'deleted-instance': step.isDeleted,
-        })
         return <Step
           key={`${step.id}-${index}`}
           className={StepClass}

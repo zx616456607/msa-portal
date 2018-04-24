@@ -321,9 +321,16 @@ class MySubscribedService extends React.Component {
       { title: '所属服务组', dataIndex: 'serviceGroupName', width: '11%' },
       {
         title: '我的消费凭证', dataIndex: 'evidenceName', width: '11%',
-        render: text => <Link to={`/csb-instances-available/${instanceID}/consumer-vouchers`}>
-          {text}
-        </Link>,
+        render: (text, record) => (
+          <div>
+            <Link to={`/csb-instances-available/${instanceID}/consumer-vouchers?clickedId=${record.evidenceId}`}
+              className="evidenceId-style"
+            >
+              {text}
+              {!record.evidenceIsNew && <div className="new-icon">新</div>}
+            </Link>
+          </div>
+        ),
       },
       {
         title: '订阅状态',

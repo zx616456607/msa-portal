@@ -14,8 +14,6 @@ import React from 'react'
 import { loadInstanceLogs } from '../../../../actions/CSB/instance'
 import { connect } from 'react-redux'
 import LogTemplate from '../../../../components/Log'
-import { Spin } from 'antd'
-
 
 class Log extends React.Component {
   static propTypes = {}
@@ -35,12 +33,9 @@ class Log extends React.Component {
     const { instanceLogs, instance } = this.props
     const { namespace } = instance
     const logs = instanceLogs[namespace] || { isFetching: true }
-    const { isFetching, data } = logs
-    if (isFetching) {
-      return <div><Spin /></div>
-    }
+    const { isFetching, data = [] } = logs
     return <div>
-      <LogTemplate loadData={this.loadData} data={data}/>
+      <LogTemplate loadData={this.loadData} data={data} isFetching={isFetching}/>
     </div>
   }
 }
