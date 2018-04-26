@@ -327,7 +327,7 @@ class MySubscribedService extends React.Component {
               className="evidenceId-style"
             >
               {text}
-              {!record.evidenceIsNew && <div className="new-icon">新</div>}
+              {record.evidenceIsNew && <div className="new-icon">新</div>}
             </Link>
           </div>
         ),
