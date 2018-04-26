@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {
-  Radio, Button, Icon, Input, Table,
+  Button, Icon, Input, Table,
   Dropdown, Menu, Select, Pagination,
   notification,
 } from 'antd'
@@ -42,7 +42,7 @@ import { formatDate, toQuerystring } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
 import InstanceDetailDock from './InstanceDetail/Dock'
 
-const RadioGroup = Radio.Group
+// const RadioGroup = Radio.Group
 const SearchInput = Input.Search
 const Option = Select.Option
 
@@ -267,7 +267,7 @@ class CSBInstanceOm extends React.Component {
 
   render() {
     let {
-      radioValue, createModal, currentInstance, searchValue,
+      createModal, currentInstance, searchValue,
       currentSearchType, sorterInfo, filterInfo, instanceDetailVisible,
     } = this.state
     const { omInstances, namespace, location } = this.props
@@ -380,13 +380,13 @@ class CSBInstanceOm extends React.Component {
             closeCreateModal={this.closeCreateModal}
           />
         }
-        <div className="csb-om-radio" key="radios">
+        {/* <div className="csb-om-radio" key="radios">
           实例状态：
           <RadioGroup onChange={this.radioChange} value={radioValue}>
             <Radio value={false}>全部实例</Radio>
             <Radio value={true}>待启动</Radio>
           </RadioGroup>
-        </div>
+        </div> */}
         <div className="layout-content-btns" key="btns">
           <Button type="primary" onClick={this.openCreateModal}><Icon type="plus"/>创建实例</Button>
           <Button type="primary" onClick={() => this.getInstanceList()}><Icon type="sync" /> 刷新</Button>
