@@ -102,7 +102,7 @@ class CreateLinkRules extends React.Component {
       this.setState({
         confirmLoading: false,
       })
-      if (res.error && res.message.filter('The same order linkPath') > 1) {
+      if (res.error && res.error.includes('The same order linkPath')) {
         return notification.error({
           message: '链路方向与已有级联链路完全一致，需重新添加链路实例',
         })
