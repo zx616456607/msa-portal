@@ -317,7 +317,7 @@ class CSBApplication extends React.Component {
         title: '实例授权',
         dataIndex: 'role',
         width: radioValue === 'status-eq-1' ? '15%' : '10%',
-        filters: radioValue === 'status-eq-1' ? null : [{
+        filters: [{
           text: '仅发布服务',
           value: 2,
         }, {
