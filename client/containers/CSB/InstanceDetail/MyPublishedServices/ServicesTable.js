@@ -146,16 +146,18 @@ class ServicesTable extends React.Component {
   }
 
   renderHandleServiceDropdown = record => {
+    const cantUesed = record.status === 4
     const menu = <Menu style={{ width: 100 }}
       onClick={this.serviceMenuClick.bind(this, record)}
     >
-      <Menu.Item key="edit">编辑</Menu.Item>
+      <Menu.Item key="edit" disabled={cantUesed}>编辑</Menu.Item>
       {
-        record.status === 2 ? <Menu.Item key="start">启动</Menu.Item> :
-          <Menu.Item key="stop">停止</Menu.Item>
+        record.status === 2
+          ? <Menu.Item key="start" disabled={cantUesed}>启动</Menu.Item>
+          : <Menu.Item key="stop" disabled={cantUesed}>停止</Menu.Item>
       }
-      <Menu.Item key="list">黑／白名单</Menu.Item>
-      <Menu.Item key="logout">注销</Menu.Item>
+      <Menu.Item key="list" disabled={cantUesed}>黑／白名单</Menu.Item>
+      <Menu.Item key="logout" disabled={cantUesed}>注销</Menu.Item>
     </Menu>
     return (
       <Dropdown.Button
