@@ -34,13 +34,13 @@ const RadioGroup = Radio.Group
 const Option = Select.Option
 
 const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE' ]
-const ENDPOINT_REQUEST_TYPE = [ 'HTTP', 'JSON' ]
-const ENDPOINT_RESPONSE_TYPE = [
-  {
-    key: 'penetrate',
-    text: '透传',
-  },
-]
+// const ENDPOINT_REQUEST_TYPE = [ 'HTTP', 'JSON' ]
+// const ENDPOINT_RESPONSE_TYPE = [
+//   {
+//     key: 'penetrate',
+//     text: '透传',
+//   },
+// ]
 
 class AccessAgreement extends React.Component {
   state = {
@@ -182,6 +182,14 @@ class AccessAgreement extends React.Component {
               required: true,
               message: 'Please input protocol',
             }],
+            onChange: e => {
+              const type = e.target.value
+              if (type === 'rest') {
+                setFieldsValue({
+                  openProtocol: 'rest',
+                })
+              }
+            },
           })(
             <RadioGroup disabled={isDisabled}>
               <RadioButton value="rest">Restful</RadioButton>
@@ -217,7 +225,7 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup disabled={isDisabled}>
               <Radio value="rest">Restful</Radio>
-              <Radio value="soap">WebService</Radio>
+              <Radio value="soap" disabled={getFieldValue('protocol') === 'rest'}>WebService</Radio>
             </RadioGroup>
           )}
         </FormItem>
@@ -292,38 +300,6 @@ class AccessAgreement extends React.Component {
                 </Select>
               )}
             </FormItem>,
-            <FormItem
-              {...formItemLayout}
-              label="请求格式"
-              key="requestType"
-            >
-              {getFieldDecorator('requestType', {
-                initialValue: dataList ? dataList.requestType : '',
-              })(
-                <Select placeholder="请选择请求格式">
-                  {
-                    ENDPOINT_REQUEST_TYPE.map(type => <Option key={type}>{type}</Option>)
-                  }
-                </Select>
-              )}
-            </FormItem>,
-            <FormItem
-              {...formItemLayout}
-              label="响应格式"
-              key="responseType"
-            >
-              {getFieldDecorator('responseType', {
-                initialValue: dataList ? dataList.responseType : '',
-              })(
-                <Select placeholder="请选择响应格式">
-                  {
-                    ENDPOINT_RESPONSE_TYPE.map(({ key, text }) =>
-                      <Option key={key}>{text}</Option>
-                    )
-                  }
-                </Select>
-              )}
-            </FormItem>,
           ]
         }
         {
@@ -358,36 +334,6 @@ class AccessAgreement extends React.Component {
           [
             <FormItem
               {...formItemLayout}
-              label="命名空间"
-              key="namespace"
-            >
-              {getFieldDecorator('namespace', {
-                initialValue: dataList ? dataList.namespace : '',
-                rules: [{
-                  // required: true,
-                  message: 'Please input namespace',
-                }],
-              })(
-                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
-              )}
-            </FormItem>,
-            <FormItem
-              {...formItemLayout}
-              label="EndPoint 地址"
-              key="endPointAddress"
-            >
-              {getFieldDecorator('endPointAddress', {
-                initialValue: dataList ? dataList.endPointAddress : '',
-                rules: [{
-                  // required: true,
-                  message: 'Please input endPointAddress',
-                }],
-              })(
-                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
-              )}
-            </FormItem>,
-            <FormItem
-              {...formItemLayout}
               label="Binding 名称"
               key="bindingName"
             >
@@ -396,21 +342,6 @@ class AccessAgreement extends React.Component {
                 rules: [{
                   required: true,
                   message: 'Please input bindingName',
-                }],
-              })(
-                <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />
-              )}
-            </FormItem>,
-            <FormItem
-              {...formItemLayout}
-              label="SoapAction"
-              key="soapAction"
-            >
-              {getFieldDecorator('soapAction', {
-                initialValue: dataList ? dataList.soapAction : '',
-                rules: [{
-                  // required: true,
-                  message: 'Please input soapAction',
                 }],
               })(
                 <Input placeholder="长度为1-128字符，允许英文字母、数字，或“-”" />

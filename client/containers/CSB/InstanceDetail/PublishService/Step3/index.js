@@ -14,6 +14,7 @@ import React from 'react'
 import ClassNames from 'classnames'
 import { connect } from 'react-redux'
 import find from 'lodash/find'
+import isEmpty from 'lodash/isEmpty'
 import {
   Button, notification,
 } from 'antd'
@@ -84,24 +85,28 @@ class Step3 extends React.Component {
         description: values[`description-${key}`],
       }))
       // 流量控制
-      let limitationType = 'no_limitation'
+      const limitationType = []
+      // let limitationType = 'no_limitation'
       let limitationDetail = {}
       if (apiGatewayLimit > 0) {
-        limitationType = 'rate_limitation'
+        // limitationType = 'rate_limitation'
+        limitationType.push('rate_limitation')
         limitationDetail = {
           limit: apiGatewayLimit,
           duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
         }
       }
       // 防止XML攻击
-      const xmlProtectionType = 'definition'
+      // const xmlProtectionType = 'definition'
+      limitationType.push('xml_protecting')
       const xmlProtectionDetail = {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
       }
+      let mergeLimitationDetail = Object.assign({}, limitationDetail, xmlProtectionDetail)
       // OAuth
-      const oauth2Type = values.oauth2Type || 'no_oauth'
+      // const oauth2Type = values.oauth2Type || 'no_oauth'
       let oauth2Detail = {}
       if (openOAuth) {
         oauth2Detail = {
@@ -110,6 +115,22 @@ class Step3 extends React.Component {
           clientSecret,
         }
       }
+      // 请求方式
+      if (values.method) {
+        limitationType.push('http_method')
+        mergeLimitationDetail = Object.assign(mergeLimitationDetail, { method: values.method })
+      }
+
+      const getAuthType = () => {
+        if (openOAuth) {
+          return 'oauth2'
+        }
+        if (values.authenticationType) {
+          return 'bypass'
+        }
+        return 'aksk'
+      }
+
       const body = [
         {
           name,
@@ -120,20 +141,20 @@ class Step3 extends React.Component {
           accessible: true,
           targetType: protocol === 'rest' ? 'url' : 'wsdl',
           targetDetail: values.targetDetail,
-          method: values.method,
-          requestType: values.requestType,
-          responseType: values.responseType,
+          // method: values.method,
+          // requestType: values.requestType,
+          // responseType: values.responseType,
           transformationType: 'direct',
           transformationDetail: '{}',
-          authenticationType: values.authenticationType ? 'bypass' : 'aksk',
-          authenticationDetail: '{}',
+          authenticationType: getAuthType(),
+          authenticationDetail: openOAuth ? JSON.stringify(oauth2Detail) : '{}',
           errorCode: JSON.stringify(errorCode),
-          limitationType,
-          limitationDetail: JSON.stringify(limitationDetail),
-          xmlProtectionType,
-          xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
-          oauth2Type,
-          oauth2Detail: JSON.stringify(oauth2Detail),
+          limitationType: isEmpty(limitationType) ? 'no_limitation' : limitationType.join('__'),
+          limitationDetail: JSON.stringify(mergeLimitationDetail),
+          // xmlProtectionType,
+          // xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
+          // oauth2Type,
+          // oauth2Detail: JSON.stringify(oauth2Detail),
           groupId,
           blackOrWhite: false,
         },
@@ -157,7 +178,7 @@ class Step3 extends React.Component {
       if (protocol === 'soap' && openProtocol === 'rest') {
         body[0].transformationType = `${protocol}_to_${openProtocol}`
         const transformationDetail = {
-          exposedRegexPath: values.openUrl,
+          exposedRegexPath: values.exposedRegexPath,
           bindingName: values.bindingName,
           operationName: values.operationName,
           wsdl: values.targetDetail,

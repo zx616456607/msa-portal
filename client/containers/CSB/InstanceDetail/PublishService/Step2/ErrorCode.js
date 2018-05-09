@@ -236,6 +236,18 @@ export default class ErrorCode extends React.Component {
                 )}
               </FormItem>
             </div>,
+            <Row>
+              <Col span={14} offset={6}>
+                如需从 URL 中解析相关参数用于 WebService 调用，请根据需求填写 URL 正则，并在转换模板中匹配使用
+              </Col>
+            </Row>,
+            <FormItem
+              wrapperCol={{ offset: 6, span: 14 }}
+            >
+              {getFieldDecorator('exposedRegexPath')(
+                <Input placeholder="如：/bank/.*" />
+              )}
+            </FormItem>,
           ]
         }
         <div className="second-title">编辑错误代码</div>
