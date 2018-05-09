@@ -14,6 +14,7 @@ import React from 'react'
 import {
   Row, Col, Tag,
 } from 'antd'
+import { transformCSBProtocols } from '../../../../common/utils'
 
 export default class Protocols extends React.Component {
   renderCurrentServiceProtocolsInfo = () => {
@@ -44,13 +45,13 @@ export default class Protocols extends React.Component {
       value: detail,
     }]
     const openProtocolInfo = [{
-      id: 'exposedPath',
-      title: '开放接口协议',
-      value: detail.exposedPath,
-    }, {
       id: 'type',
-      title: '开放地址',
+      title: '开放接口协议',
       value: detail.type,
+    }, {
+      id: 'exposedPath',
+      title: '开放地址',
+      value: detail.exposedPath,
     }]
     return {
       accessProtocolInfo,
@@ -58,19 +59,35 @@ export default class Protocols extends React.Component {
     }
   }
 
+  renderTypeTag = type => {
+    switch (type) {
+      case 'rest':
+        return <Tag color="blue">Restful-API</Tag>
+      default:
+        return <Tag color="blue">WebService</Tag>
+    }
+  }
+
   renderOpenProtocolType = item => {
-    if (item.id === 'type') {
+    if (item.id === 'exposedPath') {
       return item.value
     }
-    if (item.value === 'rest') {
-      return <Tag color="blue">Restful-API</Tag>
+    return this.renderTypeTag(item.value)
+  }
+
+  renderProtocolType = detail => {
+    const { type, transformationType } = detail
+    if (transformationType === 'direct') {
+      return transformCSBProtocols(type)
     }
-    return <Tag color="blue">WebService</Tag>
+    return transformCSBProtocols(transformationType.split('_')[0])
   }
 
   render() {
     const { detail } = this.props
+    const { type, transformationType } = detail
     const { openProtocolInfo } = this.renderCurrentServiceProtocolsInfo()
+    const protocolType = transformationType === 'direct' ? type : transformationType.split('_')[0]
     return (
       <div className="service-protocols">
         <div className="first-title">接入协议信息</div>
@@ -82,7 +99,7 @@ export default class Protocols extends React.Component {
             </Col>
             <Col span={10}>
               <div className="txt-of-ellipsis">
-                {detail.type}
+                {this.renderProtocolType(detail)}
               </div>
             </Col>
           </Row>
@@ -96,46 +113,44 @@ export default class Protocols extends React.Component {
               </div>
             </Col>
           </Row>
-          <Row>
-            <Col span={5}>
-              <div className="txt-of-ellipsis">请求格式</div>
-            </Col>
-            <Col span={10}>
-              <div className="txt-of-ellipsis">
-                --
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={5}>
-              <div className="txt-of-ellipsis">消息格式转换</div>
-            </Col>
-            <Col span={10}>
-              <div className="txt-of-ellipsis">
-                --
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={5}>
-              <div className="txt-of-ellipsis">方法</div>
-            </Col>
-            <Col span={10}>
-              <div className="txt-of-ellipsis">
-                --
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={5}>
-              <div className="txt-of-ellipsis">响应格式</div>
-            </Col>
-            <Col span={10}>
-              <div className="txt-of-ellipsis">
-                --
-              </div>
-            </Col>
-          </Row>
+          {
+            protocolType === 'rest' &&
+            <Row>
+              <Col span={5}>
+                <div className="txt-of-ellipsis">方法</div>
+              </Col>
+              <Col span={10}>
+                <div className="txt-of-ellipsis">
+                  {JSON.parse(detail.limitationDetail).method || '--'}
+                </div>
+              </Col>
+            </Row>
+          }
+          {
+            type === 'soap' && protocolType === 'rest' &&
+              [
+                <Row key={'binding'}>
+                  <Col span={5}>
+                    <div className="txt-of-ellipsis">Binding 名称</div>
+                  </Col>
+                  <Col span={10}>
+                    <div className="txt-of-ellipsis">
+                      {detail.targetDetail}
+                    </div>
+                  </Col>
+                </Row>,
+                <Row key={'operationName'}>
+                  <Col span={5}>
+                    <div className="txt-of-ellipsis">方法名称</div>
+                  </Col>
+                  <Col span={10}>
+                    <div className="txt-of-ellipsis">
+                      {detail.targetDetail}
+                    </div>
+                  </Col>
+                </Row>,
+              ]
+          }
         </div>
         <div className="first-title exposed-title">开放协议信息</div>
         <div className="service-protocols-body row-table">

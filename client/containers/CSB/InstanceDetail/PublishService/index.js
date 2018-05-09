@@ -232,31 +232,7 @@ class PublishService extends React.Component {
                           </div>
                         </Col>
                       </Row>,
-                      <Row key="namespace">
-                        <Col span={8}>
-                          <div className="field-label txt-of-ellipsis">
-                            命名空间
-                          </div>
-                        </Col>
-                        <Col span={16}>
-                          <div className="field-value txt-of-ellipsis">
-                            {fields.namespace}
-                          </div>
-                        </Col>
-                      </Row>,
-                      <Row key="endPointAddress">
-                        <Col span={8}>
-                          <div className="field-label txt-of-ellipsis">
-                            EndPoint 地址
-                          </div>
-                        </Col>
-                        <Col span={16}>
-                          <div className="field-value txt-of-ellipsis">
-                            {fields.endPointAddress}
-                          </div>
-                        </Col>
-                      </Row>,
-                      <Row key="bindingName">
+                      <Row key="bindingName" className={ClassNames({ hide: openProtocol === 'soap' })}>
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
                             Binding 名称
@@ -268,19 +244,7 @@ class PublishService extends React.Component {
                           </div>
                         </Col>
                       </Row>,
-                      <Row key="soapAction">
-                        <Col span={8}>
-                          <div className="field-label txt-of-ellipsis">
-                            SoapAction
-                          </div>
-                        </Col>
-                        <Col span={16}>
-                          <div className="field-value txt-of-ellipsis">
-                            {fields.soapAction}
-                          </div>
-                        </Col>
-                      </Row>,
-                      <Row key="methodName">
+                      <Row key="methodName" className={ClassNames({ hide: openProtocol === 'soap' })}>
                         <Col span={8}>
                           <div className="field-label txt-of-ellipsis">
                             方法名称
