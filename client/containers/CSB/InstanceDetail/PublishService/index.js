@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Form, Steps, Row, Col, Tag, Tooltip
+  Form, Steps, Row, Col, Tag, Tooltip,
 } from 'antd'
 import ClassNames from 'classnames'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
