@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Form, Steps, Row, Col, Tag,
+  Form, Steps, Row, Col, Tag, Tooltip
 } from 'antd'
 import ClassNames from 'classnames'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
@@ -340,9 +340,11 @@ class PublishService extends React.Component {
                 </Row>
                 <Row>
                   <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      是否 SSL 加密
-                    </div>
+                    <Tooltip title={'是否 SSL 加密'}>
+                      <div className="field-label txt-of-ellipsis">
+                        是否 SSL 加密
+                      </div>
+                    </Tooltip>
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
@@ -380,9 +382,11 @@ class PublishService extends React.Component {
                 <Row className="step-header txt-of-ellipsis">服务控制信息</Row>
                 <Row>
                   <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      每{apiGatewayLimitTypeText}最大调用量
-                    </div>
+                    <Tooltip title={`每${apiGatewayLimitTypeText}最大调用量`}>
+                      <div className="field-label txt-of-ellipsis">
+                        每{apiGatewayLimitTypeText}最大调用量
+                      </div>
+                    </Tooltip>
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
@@ -396,26 +400,34 @@ class PublishService extends React.Component {
                 </Row>
                 <Row>
                   <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      XML 元素名称长度
-                    </div>
+                    <Tooltip title={'XML 元素名称长度'}>
+                      <div className="field-label txt-of-ellipsis">
+                        XML 元素名称长度
+                      </div>
+                    </Tooltip>
                   </Col>
                   <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      最长 {fields.maxElementNameLength} 位
-                    </div>
+                    <Tooltip title={`最长 ${fields.maxElementNameLength} 位`}>
+                      <div className="field-value txt-of-ellipsis">
+                        最长 {fields.maxElementNameLength} 位
+                      </div>
+                    </Tooltip>
                   </Col>
                 </Row>
                 <Row>
                   <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      XML 各元素属性数量
-                    </div>
+                    <Tooltip title={'XML 各元素属性数量'}>
+                      <div className="field-label txt-of-ellipsis">
+                        XML 各元素属性数量
+                      </div>
+                    </Tooltip>
                   </Col>
                   <Col span={16}>
-                    <div className="field-value txt-of-ellipsis">
-                      最多 {fields.maxAttibuteCount} 个
-                    </div>
+                    <Tooltip title={`最多 ${fields.maxAttibuteCount} 个`}>
+                      <div className="field-value txt-of-ellipsis">
+                        最多 {fields.maxAttibuteCount} 个
+                      </div>
+                    </Tooltip>
                   </Col>
                 </Row>
                 <Row>
@@ -432,9 +444,11 @@ class PublishService extends React.Component {
                 </Row>
                 <Row>
                   <Col span={8}>
-                    <div className="field-label txt-of-ellipsis">
-                      允许不授权访问
-                    </div>
+                    <Tooltip title={'允许不授权访问'}>
+                      <div className="field-label txt-of-ellipsis">
+                        允许不授权访问
+                      </div>
+                    </Tooltip>
                   </Col>
                   <Col span={16}>
                     <div className="field-value txt-of-ellipsis">
