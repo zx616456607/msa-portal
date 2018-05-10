@@ -17,13 +17,14 @@ import {
   Form, Steps, Row, Col, Tag, Tooltip,
 } from 'antd'
 import ClassNames from 'classnames'
+import { parse } from 'query-string'
 import { API_GATEWAY_LIMIT_TYPES } from '../../../../constants'
 import Step1 from './Step1'
 import Step2 from './Step2'
 import Step3 from './Step3'
 import { renderOAuth2Type } from '../../../../components/utils'
 import {
-  transformCSBProtocols,
+  transformCSBProtocols
 } from '../../../../common/utils'
 import {
   getInstanceServiceInbounds,
@@ -52,17 +53,16 @@ class PublishService extends React.Component {
   }
 
   fetchEditData() {
-    const queryAry = this.props.location.search.split('&')
-    if (queryAry[0] !== '') {
-      if (queryAry[1].split('=')[1] === 'true') {
-        const { publishData } = this.props
-        const publishAry = publishData[queryAry[0].split('=')[1]]
-        this.setState({
-          dataList: publishAry,
-          isEdit: queryAry[1].split('=')[1],
-          serviceId: queryAry[0].split('=')[1],
-        })
-      }
+    const query = parse(this.props.location.search)
+    const { isEdit, serviceID } = query
+    if (serviceID && isEdit === 'true') {
+      const { publishData } = this.props
+      const publishAry = publishData[serviceID]
+      this.setState({
+        dataList: publishAry,
+        isEdit: isEdit,
+        serviceId: serviceID,
+      })
     }
   }
 
