@@ -461,6 +461,7 @@ class ServicesTable extends React.Component {
         title: '待审批订阅',
         dataIndex: 'waitApprovingCount',
         key: 'waitApprovingCount',
+        sorter: true,
         render: text => (text !== undefined ? text : '-'),
       },
       {
