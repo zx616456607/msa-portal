@@ -16,6 +16,7 @@ import { Row, Col, Steps, Icon, Tooltip } from 'antd'
 import StepIcon from '../../../assets/img/csb/StepIcon.svg'
 import './style/ExpandRowSteps.less'
 import classNames from 'classnames'
+import cloneDeep from 'lodash/cloneDeep'
 
 const Step = Steps.Step
 const STEP_SIZE = 5
@@ -32,7 +33,7 @@ class ExpandRowSteps extends React.Component {
     const { currentStep } = this.state
     let isDelete = false
     let deletedIndex
-    let mapArry = stepItem
+    let mapArry = cloneDeep(stepItem)
     for (let i = 0; i < stepItem.length; i++) {
       if (stepItem[i] === null) {
         isDelete = true
@@ -55,7 +56,7 @@ class ExpandRowSteps extends React.Component {
     if (stepItem.length > 0 && stepItem.length < STEP_SIZE) {
       shortStepLength = STEP_SIZE - stepItem.length
     }
-    const shortStepArray = Array.from(new Array(shortStepLength), n => n || 3)
+    // const shortStepArray = Array.from(new Array(shortStepLength), n => n || 3)
     return <Steps className="steps-row-style">
       {mapArry.map((step, index) => {
         const svgClass = classNames({
@@ -98,16 +99,16 @@ class ExpandRowSteps extends React.Component {
           </svg>}
         />
       })}
-      {
-        shortStepArray.map((item, index) => {
-          return <Step
-            title={<div className="short-title"></div>}
-            icon={<span></span>}
-            key={`short-${index}`}
-            className="short-step-style"
-          />
-        })
-      }
+      {/* {*/}
+      {/* shortStepArray.map((item, index) => {*/}
+      {/* return <Step*/}
+      {/* title={<div className="short-title"></div>}*/}
+      {/* icon={<span></span>}*/}
+      {/* key={`short-${index}`}*/}
+      {/* className="short-step-style"*/}
+      {/* />*/}
+      {/* })*/}
+      {/* }*/}
     </Steps>
   }
 
