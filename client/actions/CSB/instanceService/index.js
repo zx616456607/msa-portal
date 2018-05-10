@@ -540,11 +540,11 @@ function fetchCascadedDetail(name, version) {
       types: [
         GET_CASCADED_SERVICE_DETAIL_REQUEST,
         GET_CASCADED_SERVICE_DETAIL_SUCCESS,
-        GET_CASCADED_SERVICE_DETAIL_FAILURE
+        GET_CASCADED_SERVICE_DETAIL_FAILURE,
       ],
       endpoint: `${CSB_API_URL}/cascaded-services/${name}/versions/${version}`,
       schema: {},
-    }
+    },
   }
 }
 

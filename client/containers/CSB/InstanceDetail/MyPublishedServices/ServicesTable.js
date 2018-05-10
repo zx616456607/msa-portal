@@ -25,7 +25,7 @@ import {
   delInstanceService,
   createBlackAndWhiteList,
   editPublishedService,
-  getCascadedDetail
+  getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
 import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
 import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
@@ -253,7 +253,7 @@ class ServicesTable extends React.Component {
 
   serviceOperation = async (record, type) => {
     const { loadData, match, PutInstanceService, delInstanceService,
-      cascadedServicesWebsocket, getCascadedDetail
+      cascadedServicesWebsocket, getCascadedDetail,
     } = this.props
     const { instanceID } = match.params
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
@@ -285,8 +285,8 @@ class ServicesTable extends React.Component {
           const body = {
             type: 'conceal',
             cascadedService: {
-              id: cascadedServiceDetail.data.id
-            }
+              id: cascadedServiceDetail.data.id,
+            },
           }
           cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
           await sleep(200)
@@ -550,7 +550,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     instanceID,
     cascadedServicesWebsocket,
-    cascadedServiceDetail
+    cascadedServiceDetail,
   }
 }
 
@@ -559,5 +559,5 @@ export default connect(mapStateToProps, {
   PutInstanceService,
   createBlackAndWhiteList,
   editPublishedService,
-  getCascadedDetail
+  getCascadedDetail,
 })(ServicesTable)

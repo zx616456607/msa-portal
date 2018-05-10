@@ -49,8 +49,8 @@ class LinkRules extends React.Component {
     const body = {
       type: 'retry_conceal',
       cascadedService: {
-        id
-      }
+        id,
+      },
     }
     cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
     await sleep(200)
@@ -271,7 +271,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     currentInstance,
     serviceCascadedInfo,
-    cascadedServicesWebsocket
+    cascadedServicesWebsocket,
   }
 }
 
