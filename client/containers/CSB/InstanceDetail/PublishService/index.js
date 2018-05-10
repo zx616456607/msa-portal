@@ -24,7 +24,7 @@ import Step2 from './Step2'
 import Step3 from './Step3'
 import { renderOAuth2Type } from '../../../../components/utils'
 import {
-  transformCSBProtocols
+  transformCSBProtocols,
 } from '../../../../common/utils'
 import {
   getInstanceServiceInbounds,
@@ -60,7 +60,7 @@ class PublishService extends React.Component {
       const publishAry = publishData[serviceID]
       this.setState({
         dataList: publishAry,
-        isEdit: isEdit,
+        isEdit,
         serviceId: serviceID,
       })
     }
