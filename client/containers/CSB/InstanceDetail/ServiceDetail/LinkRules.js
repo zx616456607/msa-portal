@@ -20,7 +20,7 @@ import {
 import classNames from 'classnames'
 import { connect } from 'react-redux'
 import { getServiceCascadedInfo } from '../../../../actions/CSB/instanceService'
-import { formatDate } from '../../../../common/utils'
+import { formatDate, sleep } from '../../../../common/utils'
 
 const Step = Steps.Step
 const STEP_SIZE = 4
@@ -44,7 +44,18 @@ class LinkRules extends React.Component {
     getServiceCascadedInfo(clusterId, name, version)
   }
 
-  reloadHandler = () => {}
+  reloadHandler = async id => {
+    const { cascadedServicesWebsocket } = this.props
+    const body = {
+      type: 'retry_conceal',
+      cascadedService: {
+        id
+      }
+    }
+    cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
+    await sleep(200)
+    this.loadData()
+  }
 
   rollbackHandler = () => {}
 
@@ -160,10 +171,10 @@ class LinkRules extends React.Component {
             </Col>
             <Col span={3}>
               {item.code !== 200 && item.eventType === 4 && [ <Tooltip title="撤销注销" placement="top" key="cancel">
-                <Icon type="rollback" onClick={() => this.rollbackHandler()}/>
+                <Icon type="rollback" className="pointer" onClick={() => this.rollbackHandler()}/>
               </Tooltip>,
               <Tooltip title="重试注销" placement="top" key="reload">
-                <Icon type="reload" className="margin-style" onClick={() => this.reloadHandler()}/>
+                <Icon type="reload" className="margin-style pointer" onClick={() => this.reloadHandler(item.id)}/>
               </Tooltip> ]}
             </Col>
             <Col span={5}>{formatDate(item.updateTime)}</Col>
@@ -256,10 +267,11 @@ const mapStateToProps = (state, ownProps) => {
   const { csbAvaInstances } = entities
   const { instanceId } = ownProps
   const currentInstance = csbAvaInstances[instanceId]
-  const { serviceCascadedInfo } = CSB
+  const { serviceCascadedInfo, cascadedServicesWebsocket } = CSB
   return {
     currentInstance,
     serviceCascadedInfo,
+    cascadedServicesWebsocket
   }
 }
 

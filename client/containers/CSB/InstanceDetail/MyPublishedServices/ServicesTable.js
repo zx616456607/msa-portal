@@ -16,7 +16,7 @@ import PropTypes from 'prop-types'
 import isEmpty from 'lodash/isEmpty'
 import ServiceDetailDock from '../ServiceDetail/Dock'
 import { Dropdown, Menu, Table, notification, Tooltip } from 'antd'
-import { formatDate, parseOrderToQuery } from '../../../../common/utils'
+import { formatDate, parseOrderToQuery, sleep } from '../../../../common/utils'
 import BlackAndWhiteListModal from './BlackAndWhiteListModal'
 import confirm from '../../../../components/Modal/confirm'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils'
@@ -25,6 +25,7 @@ import {
   delInstanceService,
   createBlackAndWhiteList,
   editPublishedService,
+  getCascadedDetail
 } from '../../../../actions/CSB/instanceService'
 import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
 import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
@@ -250,8 +251,10 @@ class ServicesTable extends React.Component {
     }
   }
 
-  serviceOperation = (record, type) => {
-    const { loadData, match, PutInstanceService, delInstanceService } = this.props
+  serviceOperation = async (record, type) => {
+    const { loadData, match, PutInstanceService, delInstanceService,
+      cascadedServicesWebsocket, getCascadedDetail
+    } = this.props
     const { instanceID } = match.params
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
     const self = this
@@ -259,22 +262,35 @@ class ServicesTable extends React.Component {
       title,
       content,
       modalTitle,
-      onOk() {
+      async onOk() {
         if (type === 'logout') {
-          delInstanceService(instanceID, record.id).then(res => {
-            if (res.error) {
-              notification.error({
-                message: self.serviceMessages(type, true),
-              })
-              return
+          if (!record.cascadedType) {
+            delInstanceService(instanceID, record.id).then(res => {
+              if (res.error) {
+                notification.error({
+                  message: self.serviceMessages(type, true),
+                })
+                return
+              }
+              if (res.response.result.code === 200) {
+                notification.success({
+                  message: self.serviceMessages(type, false),
+                })
+                loadData()
+              }
+            })
+          }
+          await getCascadedDetail(record.name, record.version)
+          const { cascadedServiceDetail } = self.props
+          const body = {
+            type: 'conceal',
+            cascadedService: {
+              id: cascadedServiceDetail.data.id
             }
-            if (res.response.result.code === 200) {
-              notification.success({
-                message: self.serviceMessages(type, false),
-              })
-              loadData()
-            }
-          })
+          }
+          cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
+          await sleep(200)
+          loadData()
           return
         }
         PutInstanceService(instanceID, record.id, body).then(res => {
@@ -527,10 +543,14 @@ class ServicesTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const { CSB } = state
+  const { cascadedServicesWebsocket, cascadedServiceDetail } = CSB
   const { match } = ownProps
   const { instanceID } = match.params
   return {
     instanceID,
+    cascadedServicesWebsocket,
+    cascadedServiceDetail
   }
 }
 
@@ -539,4 +559,5 @@ export default connect(mapStateToProps, {
   PutInstanceService,
   createBlackAndWhiteList,
   editPublishedService,
+  getCascadedDetail
 })(ServicesTable)

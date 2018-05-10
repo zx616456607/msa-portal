@@ -528,3 +528,25 @@ function fetchGetServiceCascadedInfo(clusterId, serviceName, serviceVersion) {
 
 export const getServiceCascadedInfo = (clusterId, serviceName, serviceVersion) =>
   dispatch => dispatch(fetchGetServiceCascadedInfo(clusterId, serviceName, serviceVersion))
+
+// 获取某一个级联服务
+export const GET_CASCADED_SERVICE_DETAIL_REQUEST = 'GET_CASCADED_SERVICE_DETAIL_REQUEST'
+export const GET_CASCADED_SERVICE_DETAIL_SUCCESS = 'GET_CASCADED_SERVICE_DETAIL_SUCCESS'
+export const GET_CASCADED_SERVICE_DETAIL_FAILURE = 'GET_CASCADED_SERVICE_DETAIL_FAILURE'
+
+function fetchCascadedDetail(name, version) {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_CASCADED_SERVICE_DETAIL_REQUEST,
+        GET_CASCADED_SERVICE_DETAIL_SUCCESS,
+        GET_CASCADED_SERVICE_DETAIL_FAILURE
+      ],
+      endpoint: `${CSB_API_URL}/cascaded-services/${name}/versions/${version}`,
+      schema: {},
+    }
+  }
+}
+
+export const getCascadedDetail = (name, version) =>
+  dispatch => dispatch(fetchCascadedDetail(name, version))
