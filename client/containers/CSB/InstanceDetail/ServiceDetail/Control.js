@@ -44,14 +44,11 @@ export default class Control extends React.Component {
   render() {
     const { detail } = this.props
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
-    const { limit, duration } = limitationDetail
-    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
-    const xmlProtectionDetail = JSON.parse(detail.xmlProtectionDetail || '{}')
     const {
-      maxElementNameLength,
-      maxAttibuteCount,
-      removeDTD,
-    } = xmlProtectionDetail
+      limit, duration, maxElementNameLength, maxAttibuteCount, removeDTD,
+    } = limitationDetail
+    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
+   
     const oauth2Detail = JSON.parse(detail.authenticationDetail || '{}')
     const {
       endpoint,
