@@ -16,6 +16,7 @@ import {
   Form, Input, Radio, Select, Button, Modal, Switch,
 } from 'antd'
 import ClassNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 import SecurityHeaderModal from './SecurityHeaderModal'
 import {
   URL_REG,
@@ -135,7 +136,7 @@ class AccessAgreement extends React.Component {
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
     let protocolType = 'rest'
-    if (dataList) {
+    if (!isEmpty(dataList)) {
       if (dataList.type === 'rest_ssl' || dataList.type === 'rest') {
         protocolType = 'rest'
       } else {

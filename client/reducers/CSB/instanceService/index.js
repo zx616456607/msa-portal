@@ -256,3 +256,24 @@ export const serviceCascadedInfo = (state = {}, action) => {
       return state
   }
 }
+
+export const cascadedServiceDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_CASCADED_SERVICE_DETAIL_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+      })
+    case ActionTypes.GET_CASCADED_SERVICE_DETAIL_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.GET_CASCADED_SERVICE_DETAIL_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+      })
+    default:
+      return state
+  }
+}

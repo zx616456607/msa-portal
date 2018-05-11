@@ -223,6 +223,9 @@ class Step3 extends React.Component {
           })
           return
         }
+        notification.success({
+          message: '发布服务成功',
+        })
       } else {
         // [cascadedService] 发布级联服务
         const { targetInstancesIDs } = values
@@ -230,11 +233,16 @@ class Step3 extends React.Component {
         && csbInstanceServiceGroups[groupId]
         && csbInstanceServiceGroups[groupId].name
         const serviceBehaviourPerInstance = {}
-        cascadedInstances.forEach(instance => {
+        cascadedInstances.forEach((instance, index) => {
           const { id } = instance
-          serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
-            ? 2 // 2 - 为可订阅
-            : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
+          // serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
+          //   ? 2 // 2 - 为可订阅
+          //   : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
+          if (index === 0) {
+            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 6 : 5
+          } else {
+            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 2 : 1
+          }
         })
         const cascadedBody = {
           type: 'publish',
@@ -248,13 +256,10 @@ class Step3 extends React.Component {
           service: body[0],
         }
         cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(cascadedBody))
-        await sleep(200)
+        await sleep(300)
       }
       this.setState({
         confirmLoading: false,
-      })
-      notification.success({
-        message: '发布服务成功',
       })
       history.push(`/csb-instances-available/${instanceID}/my-published-services`)
     })

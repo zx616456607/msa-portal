@@ -138,3 +138,83 @@ export function renderCSBInstanceStatus(instanceStatus) {
   }
   return <Badge status={status} text={text} />
 }
+
+export function formatWSMessage(message) {
+  const { type } = message
+  let notifyType = 'warning'
+  let msg = ''
+  switch (type) {
+    // error
+    case 'service_already_exist':
+      msg = '同名同版本号的服务已经存在'
+      notifyType = 'warning'
+      break
+    case 'service_already_exist_in_instance':
+      msg = '同名同版本号的服务已经存在'
+      notifyType = 'warning'
+      break
+    case 'service_group_not_exist_in_instance':
+      msg = '实例中没有同名服务组'
+      notifyType = 'warning'
+      break
+    case 'instance_not_exist':
+      msg = '实例不存在'
+      notifyType = 'warning'
+      break
+    case 'bad_request':
+      msg = '请求错误（有可能是在发布服务时serviceBehaviourPerInstance字段不符合格式）'
+      notifyType = 'warning'
+      break
+    case 'cascaded_service_not_exist':
+      msg = '重试发布或注销服务时，该级联服务不存在'
+      notifyType = 'warning'
+      break
+    case 'unfinished_publishing':
+      msg = '注销服务时，该服务并未完成发布'
+      notifyType = 'warning'
+      break
+    case 'no_publishing_privilege':
+      msg = '在实例上没有发布权限'
+      notifyType = 'warning'
+      break
+    case 'unknown_error':
+      msg = '未知错误'
+      notifyType = 'warning'
+      break
+
+    // success
+    case 'publishing_started':
+      msg = '级联服务开始发布'
+      notifyType = 'success'
+      break
+    case 'finished_one_instance_publishing':
+      msg = '在一个实例上发布成功'
+      notifyType = 'success'
+      break
+    case 'finished_all_publishing':
+      msg = '在所有实例中发布成功'
+      notifyType = 'success'
+      break
+    case 'concealing_started':
+      msg = '级联服务开始注销'
+      notifyType = 'success'
+      break
+    case 'finished_one_instance_concealing':
+      msg = '在一个实例上注销成功'
+      notifyType = 'success'
+      break
+    case 'finished_all_concealing':
+      msg = '在所有实例上注销成功'
+      notifyType = 'success'
+      break
+    case 'publishing_already_finished':
+      msg = '服务发布成功'
+      notifyType = 'success'
+      break
+    default:
+      msg = '未知错误'
+      notifyType = 'warning'
+      break
+  }
+  return { msg, notifyType }
+}
