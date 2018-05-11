@@ -25,24 +25,37 @@ const SECONDS_CONVERSION = {
 }
 
 export default class Control extends React.Component {
+
+  renderAuthType = () => {
+    const { detail } = this.props
+    const { authenticationType } = detail
+    switch (authenticationType) {
+      case 'bypass':
+        return '无需订阅 - 公开服务'
+      case 'aksk':
+        return '需订阅'
+      case 'oauth2':
+        return '无需订阅 - Oauth 授权'
+      default:
+        return ''
+    }
+  }
+
   render() {
     const { detail } = this.props
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
-    const { limit, duration } = limitationDetail
-    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
-    const xmlProtectionDetail = JSON.parse(detail.xmlProtectionDetail || '{}')
     const {
-      maxElementNameLength,
-      maxAttibuteCount,
-      removeDTD,
-    } = xmlProtectionDetail
-    const oauth2Detail = JSON.parse(detail.oauth2Detail || '{}')
+      limit, duration, maxElementNameLength, maxAttibuteCount, removeDTD,
+    } = limitationDetail
+    const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
+
+    const oauth2Detail = JSON.parse(detail.authenticationDetail || '{}')
     const {
       endpoint,
       clientId,
       clientSecret,
     } = oauth2Detail
-    const openOAuth = detail.oauth2Type && detail.oauth2Type !== 'no_oauth'
+    const openOAuth = detail.authenticationType && detail.authenticationType === 'oauth2'
     return (
       <div className="service-control">
         <div className="service-control-body">
@@ -98,24 +111,11 @@ export default class Control extends React.Component {
           <div className="row-table">
             <Row>
               <Col span={6}>
-                <div className="txt-of-ellipsis">允许不授权访问</div>
+                <div className="txt-of-ellipsis">访问控制方式</div>
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                  { detail.accessible ? '允许' : '不允许' }
-                </div>
-              </Col>
-            </Row>
-          </div>
-          <div className="second-title">OAuth 授权</div>
-          <div className="row-table">
-            <Row>
-              <Col span={6}>
-                <div className="txt-of-ellipsis">是否开启</div>
-              </Col>
-              <Col span={18}>
-                <div className="txt-of-ellipsis">
-                  { openOAuth ? '是' : '否' }
+                  { this.renderAuthType() }
                 </div>
               </Col>
             </Row>

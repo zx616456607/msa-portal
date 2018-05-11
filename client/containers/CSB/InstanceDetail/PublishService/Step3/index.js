@@ -28,7 +28,6 @@ import {
   sleep,
 } from '../../../../../common/utils'
 import Control from './Control'
-import OAuth from './OAuth'
 
 const SECONDS_CONVERSION = {
   second: 1,
@@ -71,7 +70,7 @@ class Step3 extends React.Component {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
-        openOAuth,
+        authenticationType,
         endpoint,
         clientId,
         clientSecret,
@@ -108,7 +107,7 @@ class Step3 extends React.Component {
       // OAuth
       // const oauth2Type = values.oauth2Type || 'no_oauth'
       let oauth2Detail = {}
-      if (openOAuth) {
+      if (authenticationType === 'oauth2') {
         oauth2Detail = {
           endpoint,
           clientId,
@@ -121,16 +120,6 @@ class Step3 extends React.Component {
         mergeLimitationDetail = Object.assign(mergeLimitationDetail, { method: values.method })
       }
 
-      const getAuthType = () => {
-        if (openOAuth) {
-          return 'oauth2'
-        }
-        if (values.authenticationType) {
-          return 'bypass'
-        }
-        return 'aksk'
-      }
-
       const body = [
         {
           name,
@@ -141,20 +130,13 @@ class Step3 extends React.Component {
           accessible: true,
           targetType: protocol === 'rest' ? 'url' : 'wsdl',
           targetDetail: values.targetDetail,
-          // method: values.method,
-          // requestType: values.requestType,
-          // responseType: values.responseType,
           transformationType: 'direct',
           transformationDetail: '{}',
-          authenticationType: getAuthType(),
-          authenticationDetail: openOAuth ? JSON.stringify(oauth2Detail) : '{}',
+          authenticationType,
+          authenticationDetail: authenticationType ? JSON.stringify(oauth2Detail) : '{}',
           errorCode: JSON.stringify(errorCode),
           limitationType: isEmpty(limitationType) ? 'no_limitation' : limitationType.join('__'),
           limitationDetail: JSON.stringify(mergeLimitationDetail),
-          // xmlProtectionType,
-          // xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
-          // oauth2Type,
-          // oauth2Detail: JSON.stringify(oauth2Detail),
           groupId,
           blackOrWhite: false,
         },
@@ -277,7 +259,6 @@ class Step3 extends React.Component {
     return [
       <div className={classNames} key="fields">
         <Control data={data} {...otherProps} />
-        <OAuth data={data} {...otherProps} />
       </div>,
       currentStep === 2 &&
       <div className="btns" key="btns">

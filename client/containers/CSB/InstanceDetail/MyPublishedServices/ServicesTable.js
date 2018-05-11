@@ -158,7 +158,7 @@ class ServicesTable extends React.Component {
           : <Menu.Item key="stop" disabled={cantUesed}>停止</Menu.Item>
       }
       <Menu.Item key="list" disabled={cantUesed}>黑／白名单</Menu.Item>
-      <Menu.Item key="logout" disabled={cantUesed}>注销</Menu.Item>
+      <Menu.Item key="logout" disabled={cantUesed || ![ 5, 6 ].includes(record.cascadedType)}>注销</Menu.Item>
     </Menu>
     return (
       <Dropdown.Button
