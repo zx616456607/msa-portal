@@ -48,7 +48,7 @@ export default class Control extends React.Component {
       limit, duration, maxElementNameLength, maxAttibuteCount, removeDTD,
     } = limitationDetail
     const limitationUnit = SECONDS_CONVERSION[parseInt(duration && duration.match(/[0-9]+/), 10)] || '秒'
-   
+
     const oauth2Detail = JSON.parse(detail.authenticationDetail || '{}')
     const {
       endpoint,
