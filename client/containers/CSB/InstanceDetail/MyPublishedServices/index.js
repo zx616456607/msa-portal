@@ -17,6 +17,7 @@ import {
   Radio, Row, Col, Card, Button, Input, Pagination,
 } from 'antd'
 import { parse as parseQuerystring } from 'query-string'
+import isEmpty from 'lodash/isEmpty'
 import ServicesTable from './ServicesTable'
 import { handleHistoryForLoadData } from '../../../../common/utils'
 import { CSB_RELEASE_INSTANCES_SERVICE_FLAG } from '../../../../constants'
@@ -36,6 +37,7 @@ class MyPublishedServices extends React.Component {
     includeDeleted: false,
     name: '',
     createServiceGroupModalVisible: false,
+    showDeleted: 0,
   }
 
   // 是否显示已注销服务
@@ -43,8 +45,9 @@ class MyPublishedServices extends React.Component {
     const includeDeleted = e.target.value === 1
     this.setState({
       includeDeleted,
+      showDeleted: e.target.value,
     })
-    this.loadData({ includeDeleted })
+    this.loadData(this.props, { includeDeleted })
   }
 
   componentDidMount() {
@@ -54,10 +57,22 @@ class MyPublishedServices extends React.Component {
     this.setState({
       name,
     }, () => {
-      this.loadData({ sort: 'publishTime,desc' }, true)
+      this.loadData(this.props, { sort: 'publishTime,desc' }, true)
     })
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { location } = nextProps
+    const { location: oldLocation } = this.props
+    if (location.search !== oldLocation.search && isEmpty(location.search)) {
+      this.setState({
+        includeDeleted: false,
+        showDeleted: 0,
+      }, () => {
+        this.loadData(nextProps, { sort: 'publishTime,desc' })
+      })
+    }
+  }
   openCreateServiceGroupModal = () => {
     this.setState({
       createServiceGroupModalVisible: true,
@@ -71,8 +86,10 @@ class MyPublishedServices extends React.Component {
   }
 
   // 加载数据
-  loadData = (query, isFirst) => {
-    const { getInstanceService, history, match, location, getInstanceServiceOverview } = this.props
+  loadData = (props, query, isFirst) => {
+    const {
+      getInstanceService, history, match, location, getInstanceServiceOverview,
+    } = props || this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
@@ -112,13 +129,13 @@ class MyPublishedServices extends React.Component {
     const { myPublished, match, history, instanceID, location } = this.props
     const { content, size, isFetching, totalElements } = myPublished
     const { query } = location
-    const { includeDeleted, name } = this.state
+    const { includeDeleted, name, showDeleted } = this.state
     const paginationProps = {
       simple: true,
       pageSize: size || 10,
       total: totalElements,
       current: parseInt(query.page, 10) || 1,
-      onChange: page => this.loadData({ page }),
+      onChange: page => this.loadData(this.props, { page }),
     }
     const { createServiceGroupModalVisible } = this.state
     return (
@@ -134,7 +151,7 @@ class MyPublishedServices extends React.Component {
             </Col>
             <Col span="12">
               <label>已注销服务：</label>
-              <RadioGroup onChange={this.logoutServiceChange} defaultValue={0}>
+              <RadioGroup onChange={this.logoutServiceChange} value={showDeleted}>
                 <Radio value={0}>不显示</Radio>
                 <Radio value={1}>显示</Radio>
               </RadioGroup>
@@ -148,12 +165,12 @@ class MyPublishedServices extends React.Component {
           <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
             创建服务组
           </Button>
-          <Button icon="sync" onClick={this.loadData.bind(this, null)}>刷新</Button>
+          <Button icon="sync" onClick={this.loadData.bind(this, this.props, null)}>刷新</Button>
           <Search
             placeholder="按服务名称搜索"
             className="search-input"
             onChange={e => this.setState({ name: e.target.value })}
-            onSearch={() => this.loadData({ name, page: 1 })}
+            onSearch={() => this.loadData(this.props, { name, page: 1 })}
             value={this.state.name}
           />
           {
