@@ -351,7 +351,7 @@ class ServicesTable extends React.Component {
         cascadedType = [ 0, 1, 2, 5, 6 ]
       }
     }
-    loadData({
+    loadData(null, {
       status: filtersStr,
       sort: sorterStr,
       page: pagination.current,
