@@ -52,6 +52,7 @@ export function webpack() {
       },
     },
     hot: {
+      /* eslint-disable */
       log: console.log,
       path: '/__webpack_hmr',
       heartbeat: 10 * 1000,

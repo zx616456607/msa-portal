@@ -13,7 +13,7 @@
 const path = require('path')
 const webpack = require('webpack')
 
-console.log('Build webpack dll ...')
+console.warn('Build webpack dll ...')
 
 const vendors = [
   '@antv/g6',

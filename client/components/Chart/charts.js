@@ -22,14 +22,7 @@ export default class Charts extends React.Component {
     height: 300,
   }
   compoentWillMount() {
-    this.handleData()
-  }
-
-  handleData() {
-    const { data } = this.props
-    if (data) {
-      console.log(data)
-    }
+    //
   }
 
   render() {

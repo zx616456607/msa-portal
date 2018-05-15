@@ -18,7 +18,7 @@ const postcssConfig = require('./postcss')
 const hotMiddleWareConfig = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 
-console.log('Use development webpack config ...')
+console.warn('Use development webpack config ...')
 
 module.exports = {
   devtool: '#cheap-module-eval-source-map',

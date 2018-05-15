@@ -57,7 +57,7 @@ class CSBInstanceDetail extends React.Component {
     // connect to the websocket
     try {
       if (cascadedServicesWebsocket && cascadedServicesWebsocket.connected) {
-        console.log('already connected before: ', cascadedServicesWebsocket)
+        console.warn('already connected before: ', cascadedServicesWebsocket)
         return
       }
       const query = {
@@ -66,7 +66,7 @@ class CSBInstanceDetail extends React.Component {
       const ws = new SockJS(`${CSB_API_URL}/cascaded-services?${toQuerystring(query)}`)
       const stompWs = Stomp.over(ws)
       const connectCb = frame => {
-        console.log('frame', frame)
+        console.warn('frame', frame)
         this.stompWsSubscribe = stompWs.subscribe('/user/api/v1/cascaded-services/progress', ({ body, ack }) => {
           const progress = JSON.parse(body)
           saveCascadedServicesProgress(progress)
@@ -75,17 +75,17 @@ class CSBInstanceDetail extends React.Component {
         saveCascadedServicesWs(stompWs)
       }
       const errorCb = error => {
-        // console.log('----errorCb----error----')
-        console.log('error', error)
+        // console.warn('----errorCb----error----')
+        console.warn('error', error)
       }
       stompWs.connect({}, connectCb, errorCb)
       /* stompWs.disconnect(() => {
-        console.log('See you next time!')
+        console.warn('See you next time!')
         removeCascadedServicesWs()
       }) */
     } catch (error) {
-      console.log('error', error)
-      console.log('stack', error.stack)
+      console.warn('error', error)
+      console.warn('stack', error.stack)
     }
   }
 

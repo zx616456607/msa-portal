@@ -20,7 +20,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const postcssConfig = require('./postcss')
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 
-console.log('Use production webpack config ...')
+console.warn('Use production webpack config ...')
 
 const publicPath = '/public/'
 const svgHash = +new Date()
