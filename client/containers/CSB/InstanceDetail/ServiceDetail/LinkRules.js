@@ -20,7 +20,7 @@ import {
 import classNames from 'classnames'
 import { connect } from 'react-redux'
 import { getServiceCascadedInfo } from '../../../../actions/CSB/instanceService'
-import { formatDate } from '../../../../common/utils'
+import { formatDate, sleep } from '../../../../common/utils'
 
 const Step = Steps.Step
 const STEP_SIZE = 4
@@ -44,7 +44,18 @@ class LinkRules extends React.Component {
     getServiceCascadedInfo(clusterId, name, version)
   }
 
-  reloadHandler = () => {}
+  reloadHandler = async id => {
+    const { cascadedServicesWebsocket } = this.props
+    const body = {
+      type: 'retry_conceal',
+      cascadedService: {
+        id,
+      },
+    }
+    cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
+    await sleep(200)
+    this.loadData()
+  }
 
   rollbackHandler = () => {}
 
@@ -75,6 +86,9 @@ class LinkRules extends React.Component {
   }
 
   renderLinkRulesStatusSteps = instances => {
+    if (!instances.length) {
+      return '暂无数据'
+    }
     const { instanceId } = this.props
     const { currentStep } = this.state
     let showInstancesList = instances
@@ -114,30 +128,53 @@ class LinkRules extends React.Component {
     )
   }
 
+  formatEventTypeMessage = (eventType, code) => {
+    let operationResult = '成功'
+    if (code !== 200) {
+      operationResult = '失败'
+    }
+    switch (eventType) {
+      case 1:
+        return `服务启动${operationResult}`
+      case 2:
+        return `服务停止${operationResult}`
+      case 4:
+        return `服务注销${operationResult}`
+      default:
+        return '未知'
+    }
+  }
+
   renderTimeLineItem = events => {
+    if (!events.length) {
+      return <div>暂无数据</div>
+    }
     const { onlyShowFiveLogs } = this.state
     let mapArray = events
     if (events.length > 5 && onlyShowFiveLogs) {
       mapArray = events.slice(0, 5)
     }
-    return mapArray.map(item => {
+    const TimeItem = mapArray.map(item => {
+      const { eventType, code } = item
+      const eventClass = classNames({
+        'event-success': code === 200,
+        'event-error': code !== 200,
+      })
       return (
-        <Timeline.Item
-          key={item.id}
-        >
+        <Timeline.Item key={item.id} className={eventClass}>
           <Row>
             <Col span={16}>
-              {item.event}
-              {item.error && <Tooltip title="由于网络原因，导致注销操作执行到实例b时失效" placement="top">
+              {this.formatEventTypeMessage(eventType, code)}
+              {item.code !== 200 && item.eventType === 4 && <Tooltip title={item.message} placement="top">
                 <Icon type="question-circle-o" className="margin-style color-style"/>
               </Tooltip>}
             </Col>
             <Col span={3}>
-              {item.error && [ <Tooltip title="撤销注销" placement="top" key="cancel">
-                <Icon type="rollback" onClick={() => this.rollbackHandler()}/>
+              {item.code !== 200 && item.eventType === 4 && [ <Tooltip title="撤销注销" placement="top" key="cancel">
+                <Icon type="rollback" className="pointer" onClick={() => this.rollbackHandler()}/>
               </Tooltip>,
               <Tooltip title="重试注销" placement="top" key="reload">
-                <Icon type="reload" className="margin-style" onClick={() => this.reloadHandler()}/>
+                <Icon type="reload" className="margin-style pointer" onClick={() => this.reloadHandler(item.id)}/>
               </Tooltip> ]}
             </Col>
             <Col span={5}>{formatDate(item.updateTime)}</Col>
@@ -145,6 +182,9 @@ class LinkRules extends React.Component {
         </Timeline.Item>
       )
     })
+    return <Timeline>
+      {TimeItem}
+    </Timeline>
   }
 
   renderAllEventLogButton = events => {
@@ -191,12 +231,12 @@ class LinkRules extends React.Component {
     if (isFetching) {
       return <div><Spin /></div>
     }
-    const { instances = [], recordCascadedServiceEvents = [] } = result
+    const { instances = [], recordCascadedServiceEvents = [], instancePath = {} } = result
     return (
       <div id="link-rules-style">
         <div className="status">
           <div className="second-title">级联服务链路状态</div>
-          <div>链路名称：xxxxx</div>
+          <div>链路名称：{instancePath.name ? instancePath.name : '暂无数据'}</div>
           <Row className="status-step-container">
             <Col span={1}>
               {(instances.length > 4 || currentStep !== 0) && <Icon type="left" onClick={this.subtractStep}/>}
@@ -213,9 +253,7 @@ class LinkRules extends React.Component {
             <span className="tips">保留一个月内的操作事件</span>
           </div>
           <div className="log-container">
-            <Timeline>
-              {this.renderTimeLineItem(recordCascadedServiceEvents)}
-            </Timeline>
+            <div>{this.renderTimeLineItem(recordCascadedServiceEvents)}</div>
             {this.renderAllEventLogButton(recordCascadedServiceEvents)}
           </div>
         </div>
@@ -229,10 +267,11 @@ const mapStateToProps = (state, ownProps) => {
   const { csbAvaInstances } = entities
   const { instanceId } = ownProps
   const currentInstance = csbAvaInstances[instanceId]
-  const { serviceCascadedInfo } = CSB
+  const { serviceCascadedInfo, cascadedServicesWebsocket } = CSB
   return {
     currentInstance,
     serviceCascadedInfo,
+    cascadedServicesWebsocket,
   }
 }
 

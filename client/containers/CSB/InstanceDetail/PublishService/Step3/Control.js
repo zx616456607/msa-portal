@@ -13,15 +13,61 @@
 import React from 'react'
 import ClassNames from 'classnames'
 import {
-  Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col,
+  Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col, Radio, Input,
 } from 'antd'
-import { API_GATEWAY_LIMIT_TYPES } from '../../../../../constants'
+import { API_GATEWAY_LIMIT_TYPES, URL_REG } from '../../../../../constants'
 import './style/Control.less'
 
 const FormItem = Form.Item
 const Option = Select.Option
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 
 export default class Control extends React.Component {
+  renderOAuthServerDesc = () => {
+    const { form } = this.props
+    const { getFieldValue } = form
+    const oauth2Type = getFieldValue('oauth2Type')
+    switch (oauth2Type) {
+      case 'github':
+        return <div className="desc-text">
+          选择 GitHub 作为第三方授权服务中心，需提供在 GitHub 注册生成的 Client ID
+          和 Client Secret ，点击
+          <a href="https://github.com/settings/applications/new" rel="noopener noreferrer" target="_blank">
+            去注册
+          </a>。
+        </div>
+      case 'google':
+        return <div className="desc-text">
+          选择 Google 作为第三方授权服务中心，需提供在 Google 注册生成的 Client ID
+          和 Client Secret ，点击
+          <a href="https://console.developers.google.com/start" rel="noopener noreferrer" target="_blank">
+            去注册
+          </a>。
+        </div>
+      case 'customer':
+        return <div className="desc-text">
+          选择自定义的授权服务中心，需提供以下参数：
+        </div>
+      default:
+        break
+    }
+  }
+
+  renderText = () => {
+    const { getFieldValue } = this.props.form
+    const authenticationType = getFieldValue('authenticationType')
+    switch (authenticationType) {
+      case 'aksk':
+        return '需使用消费凭证订阅后，方可调用'
+      case 'bypass':
+        return '此服务无任何访问控制，可直接访问'
+      case 'oauth2':
+        return '服务受到授权中心保护，需提供收取方可调用'
+      default:
+        return ''
+    }
+  }
   render() {
     const { className, formItemLayout, form, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -29,10 +75,11 @@ export default class Control extends React.Component {
       'service-control': true,
       [className]: !!className,
     })
-    const accessibleValue = getFieldValue('authenticationType')
-    const { accessible, limitationDetail, xmlProtectionDetail } = data
+    const { authenticationType, limitationDetail, xmlProtectionDetail } = data
+
     const limitDetail = limitationDetail && JSON.parse(limitationDetail)
     const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
+    const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.oauth2Detail) : ''
     return [
       <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
@@ -124,18 +171,23 @@ export default class Control extends React.Component {
         <div className="second-title">访问控制</div>
         <FormItem
           {...formItemLayout}
-          label="公开访问"
+          label="访问控制方式"
         >
           {getFieldDecorator('authenticationType', {
-            valuePropName: 'checked',
-            initialValue: accessible || false,
+            initialValue: authenticationType || 'bypass',
           })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
+            <RadioGroup>
+              <Radio value="aksk"> 需订阅</Radio>
+              <Radio value="bypass"> 无需订阅 - 公开服务</Radio>
+              <Radio value="oauth2"> 无需订阅 - Oauth 授权</Radio>
+            </RadioGroup>
           )}
-          <span className="desc-text">
-            { accessibleValue ? '关闭『公开访问』，则此 API 无需订阅即可访问。' : '开启『公开访问』，需使用消费凭证订阅后访问。' }
-          </span>
         </FormItem>
+        <Row>
+          <Col className="desc-text" offset={6}>
+            {this.renderText()}
+          </Col>
+        </Row>
         {/* <FormItem
           {...formItemLayout}
           label="可见域限制"
@@ -147,6 +199,102 @@ export default class Control extends React.Component {
           )}
           <span className="desc-text">开启后，可设置谁可以看到并订阅消费该API</span>
         </FormItem> */}
+        {
+          getFieldValue('authenticationType') === 'oauth2' &&
+          [
+            <FormItem
+              {...formItemLayout}
+              key="oauth2Type"
+              label="选择一个授权中心"
+              className="oauth-server"
+            >
+              {getFieldDecorator('oauth2Type', {
+                initialValue: 'customer',
+                rules: [{
+                  required: true,
+                  message: 'Please select oauth2Type',
+                }],
+              })(
+                <RadioGroup>
+                  <RadioButton value="github" disabled>
+                    <Icon type="github" /> Github
+                  </RadioButton>
+                  <RadioButton value="google" disabled>
+                    <Icon type="google" /> Google
+                  </RadioButton>
+                  <RadioButton value="customer">
+                    <Icon type="star-o" /> 自定义
+                  </RadioButton>
+                </RadioGroup>
+              )}
+              {this.renderOAuthServerDesc()}
+            </FormItem>,
+            getFieldValue('oauth2Type') === 'customer' &&
+            [
+              <FormItem
+                {...formItemLayout}
+                key="endpoint"
+                label="OAuth Server"
+              >
+                {getFieldDecorator('endpoint', {
+                  initialValue: oauthObj ? oauthObj.endpoint : '',
+                  rules: [{
+                    required: true,
+                    whitespace: true,
+                    pattern: URL_REG,
+                    message: '输入 OAuth Server!',
+                  }],
+                })(
+                  <Input />
+                )}
+              </FormItem>,
+              /* <FormItem
+                {...formItemLayout}
+                key="redirectUrl"
+                label="授权重定向 URL"
+              >
+                {getFieldDecorator('redirectUrl', {
+                  rules: [{
+                    required: true,
+                    message: '输入 redirectUrl!',
+                  }],
+                })(
+                  <Input />
+                )}
+              </FormItem>, */
+            ],
+            <FormItem
+              {...formItemLayout}
+              key="clientId"
+              label="Client ID"
+            >
+              {getFieldDecorator('clientId', {
+                initialValue: oauthObj ? oauthObj.clientId : '',
+                rules: [{
+                  required: true,
+                  message: '输入 clientId!',
+                }],
+              })(
+                <Input />
+              )}
+            </FormItem>,
+            <FormItem
+              {...formItemLayout}
+              key="clientSecret"
+              label="Client Secret"
+            >
+              {getFieldDecorator('clientSecret', {
+                initialValue: oauthObj ? oauthObj.clientSecret : '',
+                rules: [{
+                  required: true,
+                  message: '输入 clientSecret!',
+                }],
+              })(
+                <Input />
+              )}
+            </FormItem>,
+          ]
+        }
       </div>,
     ]
   }

@@ -14,6 +14,7 @@ import React from 'react'
 import ClassNames from 'classnames'
 import { connect } from 'react-redux'
 import find from 'lodash/find'
+import isEmpty from 'lodash/isEmpty'
 import {
   Button, notification,
 } from 'antd'
@@ -27,7 +28,6 @@ import {
   sleep,
 } from '../../../../../common/utils'
 import Control from './Control'
-import OAuth from './OAuth'
 
 const SECONDS_CONVERSION = {
   second: 1,
@@ -70,7 +70,7 @@ class Step3 extends React.Component {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
-        openOAuth,
+        authenticationType,
         endpoint,
         clientId,
         clientSecret,
@@ -84,32 +84,42 @@ class Step3 extends React.Component {
         description: values[`description-${key}`],
       }))
       // 流量控制
-      let limitationType = 'no_limitation'
+      const limitationType = []
+      // let limitationType = 'no_limitation'
       let limitationDetail = {}
       if (apiGatewayLimit > 0) {
-        limitationType = 'rate_limitation'
+        // limitationType = 'rate_limitation'
+        limitationType.push('rate_limitation')
         limitationDetail = {
           limit: apiGatewayLimit,
           duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
         }
       }
       // 防止XML攻击
-      const xmlProtectionType = 'definition'
+      // const xmlProtectionType = 'definition'
+      limitationType.push('xml_protecting')
       const xmlProtectionDetail = {
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
       }
+      let mergeLimitationDetail = Object.assign({}, limitationDetail, xmlProtectionDetail)
       // OAuth
-      const oauth2Type = values.oauth2Type || 'no_oauth'
+      // const oauth2Type = values.oauth2Type || 'no_oauth'
       let oauth2Detail = {}
-      if (openOAuth) {
+      if (authenticationType === 'oauth2') {
         oauth2Detail = {
           endpoint,
           clientId,
           clientSecret,
         }
       }
+      // 请求方式
+      if (values.method) {
+        limitationType.push('http_method')
+        mergeLimitationDetail = Object.assign(mergeLimitationDetail, { method: values.method })
+      }
+
       const body = [
         {
           name,
@@ -120,20 +130,13 @@ class Step3 extends React.Component {
           accessible: true,
           targetType: protocol === 'rest' ? 'url' : 'wsdl',
           targetDetail: values.targetDetail,
-          method: values.method,
-          requestType: values.requestType,
-          responseType: values.responseType,
           transformationType: 'direct',
           transformationDetail: '{}',
-          authenticationType: values.authenticationType ? 'bypass' : 'aksk',
-          authenticationDetail: '{}',
+          authenticationType,
+          authenticationDetail: authenticationType ? JSON.stringify(oauth2Detail) : '{}',
           errorCode: JSON.stringify(errorCode),
-          limitationType,
-          limitationDetail: JSON.stringify(limitationDetail),
-          xmlProtectionType,
-          xmlProtectionDetail: JSON.stringify(xmlProtectionDetail),
-          oauth2Type,
-          oauth2Detail: JSON.stringify(oauth2Detail),
+          limitationType: isEmpty(limitationType) ? 'no_limitation' : limitationType.join('__'),
+          limitationDetail: JSON.stringify(mergeLimitationDetail),
           groupId,
           blackOrWhite: false,
         },
@@ -157,7 +160,7 @@ class Step3 extends React.Component {
       if (protocol === 'soap' && openProtocol === 'rest') {
         body[0].transformationType = `${protocol}_to_${openProtocol}`
         const transformationDetail = {
-          exposedRegexPath: values.openUrl,
+          exposedRegexPath: values.exposedRegexPath,
           bindingName: values.bindingName,
           operationName: values.operationName,
           wsdl: values.targetDetail,
@@ -202,6 +205,9 @@ class Step3 extends React.Component {
           })
           return
         }
+        notification.success({
+          message: '发布服务成功',
+        })
       } else {
         // [cascadedService] 发布级联服务
         const { targetInstancesIDs } = values
@@ -209,11 +215,16 @@ class Step3 extends React.Component {
         && csbInstanceServiceGroups[groupId]
         && csbInstanceServiceGroups[groupId].name
         const serviceBehaviourPerInstance = {}
-        cascadedInstances.forEach(instance => {
+        cascadedInstances.forEach((instance, index) => {
           const { id } = instance
-          serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
-            ? 2 // 2 - 为可订阅
-            : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
+          // serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
+          //   ? 2 // 2 - 为可订阅
+          //   : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
+          if (index === 0) {
+            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 6 : 5
+          } else {
+            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 2 : 1
+          }
         })
         const cascadedBody = {
           type: 'publish',
@@ -227,13 +238,10 @@ class Step3 extends React.Component {
           service: body[0],
         }
         cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(cascadedBody))
-        await sleep(200)
+        await sleep(300)
       }
       this.setState({
         confirmLoading: false,
-      })
-      notification.success({
-        message: '发布服务成功',
       })
       history.push(`/csb-instances-available/${instanceID}/my-published-services`)
     })
@@ -251,7 +259,6 @@ class Step3 extends React.Component {
     return [
       <div className={classNames} key="fields">
         <Control data={data} {...otherProps} />
-        <OAuth data={data} {...otherProps} />
       </div>,
       currentStep === 2 &&
       <div className="btns" key="btns">

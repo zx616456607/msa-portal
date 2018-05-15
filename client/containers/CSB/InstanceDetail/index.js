@@ -14,14 +14,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Layout, Icon, Breadcrumb } from 'antd'
+import { Layout, Icon, Breadcrumb, notification } from 'antd'
 import SockJS from 'sockjs-client'
 import { Stomp } from 'stompjs/lib/stomp'
 import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { csbInstanceDetailChildRoutes } from '../../../RoutesDom'
-import { renderLoading } from '../../../components/utils'
+import { renderLoading, formatWSMessage } from '../../../components/utils'
 import {
   UNUSED_CLUSTER_ID, API_CONFIG,
 } from '../../../constants'
@@ -69,6 +69,10 @@ class CSBInstanceDetail extends React.Component {
         console.warn('frame', frame)
         this.stompWsSubscribe = stompWs.subscribe('/user/api/v1/cascaded-services/progress', ({ body, ack }) => {
           const progress = JSON.parse(body)
+          const { msg, notifyType } = formatWSMessage(progress)
+          notification[notifyType]({
+            message: msg,
+          })
           saveCascadedServicesProgress(progress)
           ack()
         })

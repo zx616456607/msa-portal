@@ -14,13 +14,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import './style/index.less'
-import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
 import { formatFromnow } from '../../../common/utils'
+import { renderCSBInstanceStatus } from '../../../components/utils'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
-import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, Progress, notification } from 'antd'
+import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, notification } from 'antd'
 const Search = Input.Search
 
 const tooltip = [{
@@ -36,40 +36,6 @@ const tooltip = [{
   title: '水平扩展',
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
-const running = (
-  <div>
-    <span className={classNames('msa-table-status-box msa-table-running')}>
-      <i className="msa-table-status" />运行中
-    </span>
-  </div>
-)
-const start = (
-  <div>
-    <span style={{ color: '#2db7f5' }}>正在重启中</span>
-    <Progress percent={30} showInfo={false} />
-  </div>
-)
-const restart = (
-  <div>
-    <span style={{ color: '#2db7f5' }}>正在扩展中</span>
-    <Progress percent={30} showInfo={false} />
-  </div>
-)
-const stop = (
-  <div>
-    <div className="stop"></div>
-    <span style={{ color: '#f85a5a', marginLeft: 5, verticalAlign: 'text-bottom' }}>
-      已停止
-    </span>
-  </div>
-)
-const remove = (
-  <div>
-    <span className={classNames('msa-table-status-box msa-table-error')}>
-      <i className="msa-table-status" />已删除
-    </span>
-  </div>
-)
 
 class MsaComponents extends React.Component {
   state = {
@@ -163,7 +129,7 @@ class MsaComponents extends React.Component {
           id: item.deployment.metadata.uid,
           name: this.nameList(item.deployment.metadata.name),
           component: item.deployment.metadata.name,
-          state: this.filterState(item.deployment.spec.replicas,
+          status: this.filterState(item.deployment.spec.replicas,
             item.deployment.status.availableReplicas),
           count: item.deployment.spec.replicas,
           time: this.filterTimer(item.deployment.metadata.creationTimestamp),
@@ -185,13 +151,13 @@ class MsaComponents extends React.Component {
 
   filterState = (replicas, available) => {
     if (replicas > 0 || available > 0) {
-      return '运行中'
+      return 1
     } if (replicas === 0 || available > 0) {
-      return '停止中'
+      return 3
     } if (replicas === 0 || available === 0) {
-      return '已停止'
+      return 0
     } if (replicas > 0 || available <= 0) {
-      return '启动中'
+      return 2
     }
   }
 
@@ -325,25 +291,6 @@ class MsaComponents extends React.Component {
     }
   }
 
-  fetchState = text => {
-    switch (text) {
-      case '运行中':
-        return running
-      case '停止中':
-        return stop
-      case '已停止':
-        return stop
-      case '已删除':
-        return remove
-      case '正在扩展中':
-        return restart
-      case '启动中':
-        return start
-      default:
-        return
-    }
-  }
-
   handleRefresh = () => {
     this.setState({
       loading: true,
@@ -369,10 +316,10 @@ class MsaComponents extends React.Component {
       title: '名称',
       dataIndex: 'name',
     }, {
-      key: 'state',
+      key: 'status',
       title: '状态',
-      dataIndex: 'state',
-      render: text => (this.fetchState(text)),
+      dataIndex: 'status',
+      render: text => renderCSBInstanceStatus(text),
     }, {
       key: 'count',
       title: '实例数量',

@@ -52,6 +52,20 @@
     .ant-steps-item:last-child {
       min-width: 80px;
     }
+    .ant-steps-item:not(:nth-last-of-type(1)):after {
+      content: '';
+      width: 0;
+      height: 0;
+      right: 0;
+      top: 11px;
+      position: absolute;
+      border-left: 10px @border-style-base @primary-color;
+      border-top: 5px @border-style-base white;
+      border-bottom: 5px @border-style-base white;
+    }
+    .ant-steps-item {
+      flex: 0 0 25%;
+    }
     .ant-steps-item-icon {
       padding-left: 16px;
     }
@@ -59,6 +73,17 @@
       .ant-steps-item-title:after {
         background-color: @border-color-base;
       }
+    }
+    .deleted-instance:not(:nth-last-of-type(1)):after {
+      content: '';
+      width: 0;
+      height: 0;
+      right: 0;
+      top: 11px;
+      position: absolute;
+      border-left: 10px @border-style-base @border-color-base;
+      border-top: 5px @border-style-base white;
+      border-bottom: 5px @border-style-base white;
     }
     .ant-steps-item-content {
       position: relative;
