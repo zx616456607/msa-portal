@@ -139,11 +139,11 @@ app.use(indexRoutes(Router))
 // create http server
 const { port, hostname } = config
 const server = http.createServer(app.callback()).listen(port, hostname, () => {
-  console.info(`${app.name}@${app.version} is listening on port ${port}`)
-  console.info(`Open up http://${hostname}:${port}/ in your browser`)
+  console.warn(`${app.name}@${app.version} is listening on port ${port}`)
+  console.warn(`Open up http://${hostname}:${port}/ in your browser`)
   // Set server timeout to 5 mins
   const serverTimeOut = 1000 * 60 * 5
-  console.info('Set server timeout to ' + serverTimeOut + ' ms')
+  console.warn('Set server timeout to ' + serverTimeOut + ' ms')
   server.setTimeout(serverTimeOut, () => {
     console.warn('Server timeout occurs')
   })
