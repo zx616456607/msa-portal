@@ -96,7 +96,6 @@ const menus = [
       {
         to: '/msa-manage/certification-manage/clients',
         text: '客户端管理',
-        disabled: true,
       },
       {
         to: '/msa-manage/certification-manage/auth-mode',

@@ -112,6 +112,11 @@ const csbCascadingLinkRuleSchema = new schema.Entity('csbCascadingLinkRule', {},
   idAttribute: 'id',
 })
 
+// MSA Certification client list
+const msaClientListSchema = new schema.Entity('msaClientList', {}, {
+  idAttribute: 'client_id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -240,5 +245,8 @@ export const Schemas = {
     data: {
       content: [ csbCascadingLinkRuleSchema ],
     },
+  },
+  MSA_CLIENT_LIST_DATA: {
+    resources: [ msaClientListSchema ],
   },
 }
