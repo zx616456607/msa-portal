@@ -7,4 +7,14 @@
       display: none;
     }
   }
+  .scope-row {
+    .ant-form-item:not(:last-of-type) {
+      margin-bottom: 0;
+    }
+    &:not(:first-of-type) {
+      label:after {
+        content: '';
+      }
+    }
+  }
 }
