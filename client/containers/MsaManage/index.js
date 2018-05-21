@@ -13,102 +13,102 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Dropdown } from 'antd'
-import Sider from '../../components/Sider'
+// import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import confirm from '../../components/Modal/confirm'
-import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
-import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
-import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
+// import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
+// import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
+// import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 // import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
-import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
-import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
+// import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
+// import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 
-const menus = [
-  {
-    to: '/msa-manage',
-    text: '微服务列表',
-    icon: <Icon type="bars" style={{ fontSize: 16 }} />,
-  },
-  {
-    to: '/msa-manage/config-center',
-    text: '配置中心',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${configCenterIcon.id}`} />
-      </svg>
-    ),
-  },
-  {
-    to: '/msa-manage/call-link-tracking',
-    text: '服务调用链',
-    icon: <Icon type="link" />,
-  },
-  {
-    to: '/msa-manage/routing-manage',
-    text: '路由管理',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${routingManageIcon.id}`} />
-      </svg>
-    ),
-  },
-  {
-    to: '/msa-manage/api-gateway',
-    text: '服务限流',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${apiGatewayIcon.id}`} />
-      </svg>
-    ),
-  },
-  /* {
-    to: '/msa-manage/api-gateway-monitoring',
-    text: 'API 网关监控',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${apiGatewayMonitoringIcon.id}`} />
-      </svg>
-    ),
-  }, */
-  {
-    to: '/msa-manage/blown-monitoring',
-    text: '熔断监控',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${blownMonitoringIcon.id}`} />
-      </svg>
-    ),
-  },
-  {
-    type: 'SubMenu',
-    text: '认证管理',
-    to: '/msa-manage/certification-manage',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${certificationManageIcon.id}`} />
-      </svg>
-    ),
-    children: [
-      {
-        to: '/msa-manage/certification-manage/clients',
-        text: '客户端管理',
-        disabled: true,
-      },
-      {
-        to: '/msa-manage/certification-manage/auth-mode',
-        text: '授权方式查看',
-      },
-      {
-        to: '/msa-manage/certification-manage/auth-scope',
-        text: '授权范围查看',
-      },
-    ],
-  },
-]
+// const menus = [
+//   {
+//     to: '/msa-manage',
+//     text: '微服务列表',
+//     icon: <Icon type="bars" style={{ fontSize: 16 }} />,
+//   },
+//   {
+//     to: '/msa-manage/config-center',
+//     text: '配置中心',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${configCenterIcon.id}`} />
+//       </svg>
+//     ),
+//   },
+//   {
+//     to: '/msa-manage/call-link-tracking',
+//     text: '服务调用链',
+//     icon: <Icon type="link" />,
+//   },
+//   {
+//     to: '/msa-manage/routing-manage',
+//     text: '路由管理',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${routingManageIcon.id}`} />
+//       </svg>
+//     ),
+//   },
+//   {
+//     to: '/msa-manage/api-gateway',
+//     text: '服务限流',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${apiGatewayIcon.id}`} />
+//       </svg>
+//     ),
+//   },
+//   /* {
+//     to: '/msa-manage/api-gateway-monitoring',
+//     text: 'API 网关监控',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${apiGatewayMonitoringIcon.id}`} />
+//       </svg>
+//     ),
+//   }, */
+//   {
+//     to: '/msa-manage/blown-monitoring',
+//     text: '熔断监控',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${blownMonitoringIcon.id}`} />
+//       </svg>
+//     ),
+//   },
+//   {
+//     type: 'SubMenu',
+//     text: '认证管理',
+//     to: '/msa-manage/certification-manage',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${certificationManageIcon.id}`} />
+//       </svg>
+//     ),
+//     children: [
+//       {
+//         to: '/msa-manage/certification-manage/clients',
+//         text: '客户端管理',
+//         disabled: true,
+//       },
+//       {
+//         to: '/msa-manage/certification-manage/auth-mode',
+//         text: '授权方式查看',
+//       },
+//       {
+//         to: '/msa-manage/certification-manage/auth-scope',
+//         text: '授权范围查看',
+//       },
+//     ],
+//   },
+// ]
 
 class MsaManage extends React.Component {
   state = {
@@ -169,7 +169,7 @@ class MsaManage extends React.Component {
   }
 
   render() {
-    const { location } = this.props
+    // const { location } = this.props
     const title = (
       <div>
         微服务治理
@@ -192,15 +192,16 @@ class MsaManage extends React.Component {
     )
     return (
       <Layout className="msa-manage">
-        <Sider
+        {/* <Sider
           key="sider"
           title={title}
           location={location}
           menu={{
             items: menus,
           }}
-        />
+        />*/}
         <Content key="content">
+          {title}
           {this.renderChildren()}
         </Content>
       </Layout>
