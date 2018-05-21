@@ -11,54 +11,209 @@
  */
 import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
+import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import logo from '../../assets/img/logo.svg'
-import globalSetting from '../../assets/img/system-settings/global-setting.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaComponent from '../../assets/img/msa-om/msa-component.svg'
 import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
-
+import performanceIcon from '../../assets/img/apm/performance.svg'
+import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
+import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
+import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
+import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
+import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
+import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
 
-// const menus = [
-//   {
-//     path: '/cluster',
-//     name: '微服务运维',
-//     icon: 'appstore',
-//     children: [{
-//       path: '/cluster',
-//       name: '微服务组件',
-//       icon: msaComponent,
-//     }, {
-//       path: '/cluster',
-//       name: 'CSB 运维',
-//       icon: csbInstancesOm,
-//       children: [
-//         {
-//           path: '/cluster',
-//           name: '实例列表',
-//         }, {
-//           path: '/cluster',
-//           name: '实例审批',
-//         }, {
-//           path: '/cluster',
-//           name: '级联链路规则',
-//         },
-//       ],
-//     }, {
-//       path: '/cluster',
-//       name: '日志查询',
-//       icon: 'file-text',
-//     }],
-//   },
-// ]
+const menus = [
+  {
+    to: '/msa-manage',
+    key: 'msa-manage',
+    name: '微服务治理',
+    icon: msaComponent,
+    children: [
+      {
+        key: 'k40',
+        to: '/msa-manage',
+        icon: 'bars',
+        name: '微服务列表',
+      }, {
+        key: 'k41',
+        to: '/msa-manage/config-center',
+        icon: configCenterIcon,
+        name: '配置中心',
+      }, {
+        key: 'k42',
+        to: '/msa-manage/call-link-tracking',
+        icon: 'link',
+        name: '服务调用链',
+      }, {
+        key: 'k43',
+        to: '/msa-manage/routing-manage',
+        icon: routingManageIcon,
+        name: '路由管理',
+      }, {
+        key: 'k44',
+        to: '/msa-manage/api-gateway',
+        icon: apiGatewayIcon,
+        name: '服务限流',
+      }, {
+        key: 'k45',
+        to: '/msa-manage/blown-monitoring',
+        icon: blownMonitoringIcon,
+        name: '熔断监控',
+      }, {
+        key: 'k46',
+        to: '/msa-manage/certification-manage',
+        icon: certificationManageIcon,
+        name: '认证管理',
+        children: [
+          {
+            key: 'k461',
+            to: '/msa-manage/certification-manage/clients',
+            name: '客户端管理',
+            disabled: true,
+          }, {
+            key: 'k462',
+            to: '/msa-manage/certification-manage/auth-mode',
+            name: '授权方式查看',
+          }, {
+            key: 'k63',
+            to: '/msa-manage/certification-manage/auth-scope',
+            name: '授权范围查看',
+          },
+        ],
+      },
+    ],
+  }, {
+    key: 'k3',
+    to: '/csb-instances',
+    icon: 'bar-chart',
+    name: '服务总线',
+    children: [
+      {
+        key: 'mine-csb-instances',
+        icon: 'user',
+        name: '我的实例',
+        children: [
+          {
+            key: 'k300',
+            to: '/csb-instances/available',
+            name: '可用实例',
+          }, {
+            key: 'k301',
+            to: '/csb-instances/my-application',
+            name: '我的申请',
+          },
+        ],
+      }, {
+        key: 'k31',
+        icon: 'unlock',
+        name: '可申请实例',
+        children: [
+          {
+            key: 'k310',
+            to: '/csb-instances/public',
+            name: '可申请实例',
+          },
+        ],
+      },
+    ],
+  }, {
+    key: 'k2',
+    to: '/apms',
+    icon: 'bar-chart',
+    name: '性能管理（APM）',
+    children: [
+      {
+        key: 'k20',
+        to: '/apms/topology',
+        icon: topologyIcon,
+        name: '微服务拓扑',
+      }, {
+        key: 'k21',
+        to: '/apms/performance',
+        icon: performanceIcon,
+        name: '微服务性能',
+      }, {
+        key: 'k22',
+        to: '/apms/call-link-tracking',
+        icon: callLinkTrackingIcon,
+        name: '调用链路跟踪',
+      },
+    ],
+  }, {
+    key: 'k0',
+    to: '/msa-om',
+    name: '微服务运维',
+    icon: 'appstore',
+    children: [
+      {
+        key: 'k00',
+        to: '/msa-om/components',
+        name: '微服务组件',
+        icon: msaComponent,
+      }, {
+        key: 'k01',
+        to: '/cluster',
+        name: 'CSB 运维',
+        icon: csbInstancesOm,
+        children: [
+          {
+            key: 'k010',
+            to: '/msa-om/csb-instance-om',
+            name: '实例列表',
+          }, {
+            key: 'k011',
+            to: '/msa-om/csb-instance-approval',
+            name: '实例审批',
+          }, {
+            key: 'k012',
+            to: '/msa-om/csb-cascading-link-rules',
+            name: '级联链路规则',
+          },
+        ],
+      }, {
+        key: 'k02',
+        to: '/msa-om/log',
+        name: '日志查询',
+        icon: 'file-text',
+      },
+    ],
+  }, {
+    key: 'k1',
+    to: '/setting',
+    name: '系统设置',
+    icon: 'setting',
+    children: [
+      {
+        key: 'k10',
+        to: '/setting/global-setting',
+        name: '全局配置',
+        icon: 'setting',
+      }, {
+        key: 'k11',
+        to: '/setting/msa-config',
+        name: '微服务配置',
+        icon: msaconfig,
+      }, {
+        key: 'k12',
+        to: '/setting/apms',
+        name: 'APM 配置',
+        icon: topologyIcon,
+      },
+    ],
+  },
+]
 const svgIcon = icon => (
   <svg className="itemIcon">
     <use xlinkHref={`#${icon.id}`} />
   </svg>
 )
+@withRouter
 class SiderNav extends React.Component {
   state = {
     collapsed: false,
@@ -67,19 +222,17 @@ class SiderNav extends React.Component {
     this.setState({ collapsed })
   }
   renderMenuItem = data => {
-    const { children, name, icon } = data
+    const { children, name, icon, key, to, ...otherProps } = data
+    let iconDOM
+    if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
+    if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
     if (children) {
       return (
         <SubMenu
-          key="sub1"
-          title={<span>
-            { icon && (typeof icon === 'object') && svgIcon(icon) }
-            {
-              icon && (typeof icon === 'string') &&
-              <Icon type={icon} />
-            }
-            <span>{name}</span>
-          </span>}>
+          key={key}
+          title={<span>{ iconDOM }<span>{name}</span></span>}
+          {...otherProps}
+        >
           {
             children.map(item => this.renderMenuItem(item))
           }
@@ -87,10 +240,40 @@ class SiderNav extends React.Component {
       )
     }
     return (
-      <Menu.Item key="3">{name}</Menu.Item>
+      <Menu.Item key={key} {...otherProps}>
+        <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+      </Menu.Item>
     )
   }
+  findSelectedNOpenKeys = () => {
+    const { location } = this.props
+    const { pathname } = location
+    const pathnameList = pathname.split('/').filter(item => item !== '')
+    const defaultOpen = []
+    menus.map(menu => {
+      let firstPathList = []
+      menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
+      if (pathnameList[0] === firstPathList[0]) defaultOpen.push(menu.key)
+      return null
+    })
+    const finderPath = (obj, list) => {
+      const { to, children } = obj
+      if (children) {
+        children.map(item => finderPath(item, list))
+        return
+      }
+      (to === pathname) && list.push(obj.key)
+      return list
+    }
+    const s = []
+    menus.map(menu => finderPath(menu, s))
+    return {
+      defaultOpenKeys: defaultOpen,
+      selectedKeys: s,
+    }
+  }
   render() {
+    const selectedNOpenKeys = this.findSelectedNOpenKeys()
     return (
       <Sider
         trigger={null}
@@ -100,48 +283,13 @@ class SiderNav extends React.Component {
         <svg className={'logo'}>
           <use xlinkHref={`#${logo.id}`} />
         </svg>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={[ '1' ]}>
-          <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>微服务运维</span></span>}>
-            <Menu.Item key="5">
-              <svg className="itemIcon">
-                <use xlinkHref={`#${msaComponent.id}`} />
-              </svg>
-              微服务组件</Menu.Item>
-            <SubMenu
-              key="sub1"
-              title={<span>
-                <svg className="itemIcon">
-                  <use xlinkHref={`#${csbInstancesOm.id}`} />
-                </svg>
-                <span>CSB 运维</span>
-              </span>}>
-              <Menu.Item key="3">实例列表</Menu.Item>
-              <Menu.Item key="4">实例审批</Menu.Item>
-              <Menu.Item key="66">级联链路规则</Menu.Item>
-            </SubMenu>
-            <Menu.Item key="5">
-              <Icon type="file-text" style={{ fontSize: 15 }} />
-              日志查询</Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub4" title={<span><Icon type="setting" /><span>系统设置</span></span>}>
-            <Menu.Item key="9">
-              <svg className="itemIcon">
-                <use xlinkHref={`#${globalSetting.id}`} />
-              </svg>
-              全局配置</Menu.Item>
-            <Menu.Item key="10">
-              <svg className="itemIcon">
-                <use xlinkHref={`#${msaconfig.id}`} />
-              </svg>
-              微服务配置</Menu.Item>
-            <Menu.Item key="11">
-              <svg className="itemIcon">
-                <use xlinkHref={`#${topologyIcon.id}`} />
-              </svg>
-              APM 配置</Menu.Item>
-          </SubMenu>
+        <Menu
+          theme="dark"
+          mode="inline"
+          {...selectedNOpenKeys}
+        >
           {
-            // menus.map(item => this.renderMenuItem(item))
+            menus.map(item => this.renderMenuItem(item))
           }
         </Menu>
       </Sider>
