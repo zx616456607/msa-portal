@@ -15,6 +15,17 @@
 .transaction-inspector {
   height: 100%;
   overflow: hidden;
+  .transaction-inspector-close {
+    height: 20px;
+    &:after {
+      clear: both;
+      content: '';
+    }
+    i {
+      font-size: @font-size-medium;
+      margin-top: 3px;
+    }
+  }
   .ant-spin-nested-loading, .ant-spin-container {
     height: 100%;
   }

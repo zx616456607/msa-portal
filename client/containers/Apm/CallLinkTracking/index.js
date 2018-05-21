@@ -199,6 +199,14 @@ class CallLinkTracking extends React.Component {
 
   changeDockSize = dockSize => this.setState({ dockSize })
 
+  closeDock = () => {
+    this.setState({
+      isVisible: !this.state.isVisible,
+      currentRecord: {},
+    })
+    this.onDockSizeChange(0)
+  }
+
   render() {
     const { apps, transaction, transactionInfo } = this.props
     const {
@@ -332,6 +340,7 @@ class CallLinkTracking extends React.Component {
               dockSize={this.state.dockSize}
               defaultDockSize={DEFAULT_DOCK_SIZE}
               maxDockSize={DEFAULT_MAX_DOCK_SIZE}
+              closeDock={this.closeDock}
             />
           </Dock>
         </div>
