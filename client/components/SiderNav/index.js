@@ -70,6 +70,7 @@ const menus = [
         to: '/msa-manage/certification-manage',
         icon: certificationManageIcon,
         name: '认证管理',
+        defaultOpen: true,
         children: [
           {
             key: 'k461',
@@ -98,6 +99,7 @@ const menus = [
         key: 'mine-csb-instances',
         icon: 'user',
         name: '我的实例',
+        defaultOpen: true,
         children: [
           {
             key: 'k300',
@@ -113,6 +115,7 @@ const menus = [
         key: 'k31',
         icon: 'unlock',
         name: '可申请实例',
+        defaultOpen: true,
         children: [
           {
             key: 'k310',
@@ -161,6 +164,7 @@ const menus = [
         to: '/cluster',
         name: 'CSB 运维',
         icon: csbInstancesOm,
+        defaultOpen: true,
         children: [
           {
             key: 'k010',
@@ -249,26 +253,27 @@ class SiderNav extends React.Component {
     const { location } = this.props
     const { pathname } = location
     const pathnameList = pathname.split('/').filter(item => item !== '')
-    const defaultOpen = []
+    const defaultOpenKeys = []
     menus.map(menu => {
       let firstPathList = []
       menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
-      if (pathnameList[0] === firstPathList[0]) defaultOpen.push(menu.key)
+      if (pathnameList[0] === firstPathList[0]) defaultOpenKeys.push(menu.key)
       return null
     })
     const finderPath = (obj, list) => {
-      const { to, children } = obj
+      const { to, children, defaultOpen, key } = obj
+      if (defaultOpen) defaultOpenKeys.push(key)
       if (children) {
         children.map(item => finderPath(item, list))
         return
       }
-      (to === pathname) && list.push(obj.key)
+      (to === pathname) && list.push(key)
       return list
     }
     const s = []
     menus.map(menu => finderPath(menu, s))
     return {
-      defaultOpenKeys: defaultOpen,
+      defaultOpenKeys,
       selectedKeys: s,
     }
   }
