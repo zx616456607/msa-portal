@@ -76,7 +76,7 @@ const menus = [
             key: 'k461',
             to: '/msa-manage/certification-manage/clients',
             name: '客户端管理',
-            disabled: true,
+            // disabled: true,
           }, {
             key: 'k462',
             to: '/msa-manage/certification-manage/auth-mode',

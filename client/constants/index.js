@@ -28,6 +28,9 @@ const CSB_API = 'http://192.168.1.58:9090'
 // const CSB_API = 'http://192.168.0.19:8081'
 const CSB_API_PREFIX = '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
+const CLIENT_API = 'http://192.168.1.254:8080'
+const CLIENT_API_PREFIX = '/uaa'
+const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
 let apiConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -41,6 +44,7 @@ let apiConfig = {
   CSB_API,
   CSB_API_PREFIX,
   CSB_API_URL,
+  CLIENT_API_URL,
 }
 // prod api config
 if (isProd) {
@@ -76,6 +80,7 @@ export const MSA_TYPES_TEXT = {
 export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
+export const REDIRECT_URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_,\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 
 export const API_GATEWAY_LIMIT_TYPES = [
   {
@@ -107,6 +112,8 @@ export const CANCEL_APPROVAL_TIMEOUT = 6 * 60 * 60 * 1000
 export const CSB_INSTANCE_SERVICE_STATUS_RUNNING = 1
 export const CSB_INSTANCE_SERVICE_STATUS_STOPPED = 2
 export const CSB_INSTANCE_SERVICE_STATUS_LOGOUT = 4
+export const DEFAULT_PAGE = 1
+export const DEFAULT_PAGESIZE = 10
 export const CREATE_CSB_CASCADING_LINK_RLUE_DEFAULT_INSTANCE_QUERY = {
   page: 1,
   size: 1000,
@@ -118,3 +125,4 @@ export const INSTANCE_SERVICES = [
   'dsb-server-mysql',
   'dsb-server-redis',
 ]
+export const CLIENT_JWT = 'eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiIxNmFiOGQwZDYxM2Q0ZjEzOTRlOWRhZGE0Njc1MTQ5MCIsInN1YiI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwic2NvcGUiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwiY2xpZW50X2lkIjoiYWRtaW4iLCJjaWQiOiJhZG1pbiIsImF6cCI6ImFkbWluIiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsInJldl9zaWciOiJkMTI1YmJlZiIsImlhdCI6MTUyNjUyNzM2NCwiZXhwIjoxNTI2NTcwNTY0LCJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjI1NDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsImF1ZCI6WyJzY2ltIiwiY2xpZW50cyIsInVhYSIsImFkbWluIl19.jqnIuQCYYKcWNCFY-PHWpSo8ScQQSMV5gofwktAfEY4'
