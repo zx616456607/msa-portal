@@ -25,6 +25,9 @@ import {
   getCSBServiceOpenType,
 } from '../../../../../../common/utils'
 import {
+  getValueFromLimitDetail,
+} from '../../../../../../components/utils'
+import {
   pingService,
 } from '../../../../../../actions/CSB/instanceService'
 import './style/index.less'
@@ -116,7 +119,6 @@ class AccessAgreement extends React.Component {
     const host = currentInstance && currentInstance.instance.host || 'csb-service-host'
     return `${protocol}://${host}:${port}`
   }
-
   render() {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
@@ -131,6 +133,7 @@ class AccessAgreement extends React.Component {
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
+    const limitationDetail = JSON.parse(dataList.limitationDetail)
     const openProtocol = getFieldValue('openProtocol')
     const ssl = getFieldValue('ssl')
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
@@ -288,7 +291,7 @@ class AccessAgreement extends React.Component {
               key="method"
             >
               {getFieldDecorator('method', {
-                initialValue: dataList ? dataList.method : '',
+                initialValue: getValueFromLimitDetail(limitationDetail, 'method'),
                 rules: [{
                   required: true,
                   message: '请选择方法',
