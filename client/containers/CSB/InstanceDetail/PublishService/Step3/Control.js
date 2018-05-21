@@ -194,7 +194,7 @@ export default class Control extends React.Component {
           label="访问控制方式"
         >
           {getFieldDecorator('authenticationType', {
-            initialValue: authenticationType || 'bypass',
+            initialValue: authenticationType || 'aksk',
           })(
             <RadioGroup>
               <Radio value="aksk"> 需订阅</Radio>
