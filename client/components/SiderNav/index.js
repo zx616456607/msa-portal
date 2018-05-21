@@ -14,6 +14,7 @@ import { Layout, Menu, Icon } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import logo from '../../assets/img/logo.svg'
+import logoSmall from '../../assets/img/logo-small.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
 import topologyIcon from '../../assets/img/apm/apm.svg'
 import msaComponent from '../../assets/img/msa-om/msa-component.svg'
@@ -279,18 +280,21 @@ class SiderNav extends React.Component {
   }
   render() {
     const selectedNOpenKeys = this.findSelectedNOpenKeys()
+    const { collapsed } = this.state
     return (
       <Sider
-        trigger={null}
         collapsible
-        collapsed={this.state.collapsed}
+        collapsed={collapsed}
+        onCollapse={this.onCollapse}
       >
-        <svg className={'logo'}>
-          <use xlinkHref={`#${logo.id}`} />
+        <svg className={collapsed ? 'logoSmall' : 'logo'}>
+          <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
         </svg>
         <Menu
           theme="dark"
           mode="inline"
+          // onOpenChange={data => console.log('onopenChange', data)}
+          // onClick={data => console.log('ddd', data) }
           {...selectedNOpenKeys}
         >
           {
