@@ -63,7 +63,7 @@ export default class Protocols extends React.Component {
   renderTypeTag = type => {
     switch (type) {
       case 'rest':
-        return <Tag color="blue">Restful-API</Tag>
+        return <Tag color="blue">Restful</Tag>
       default:
         return <Tag color="blue">WebService</Tag>
     }

@@ -15,14 +15,7 @@ import {
   Row, Col,
 } from 'antd'
 import SecretText from '../../../../components/SecretText'
-import { renderOAuth2Type } from '../../../../components/utils'
-
-const SECONDS_CONVERSION = {
-  1: '秒',
-  60: '分钟',
-  [60 * 60]: '小时',
-  [60 * 60 * 24]: '天',
-}
+import { renderOAuth2Type, getValueFromLimitDetail } from '../../../../components/utils'
 
 export default class Control extends React.Component {
 
@@ -39,40 +32,6 @@ export default class Control extends React.Component {
       default:
         return ''
     }
-  }
-
-  getServiceValueByType = (limitationDetail, type) => {
-    if (!Array.isArray(limitationDetail)) {
-      const value = limitationDetail[type]
-      switch (type) {
-        case 'duration':
-          return SECONDS_CONVERSION[parseInt(value && value.match(/[0-9]+/), 10)] || '秒'
-        case 'removeDTD':
-          return value ? '开启' : '关闭'
-        default:
-          return value
-      }
-    }
-    let result = ''
-    limitationDetail.some(item => {
-      const value = item[`${type}`]
-      if (value) {
-        switch (type) {
-          case 'duration':
-            result = SECONDS_CONVERSION[parseInt(value.match(/[0-9]+/), 10)]
-            break
-          case 'removeDTD':
-            result = value ? '开启' : '关闭'
-            break
-          default:
-            result = value
-            break
-        }
-        return true
-      }
-      return false
-    })
-    return result
   }
 
   render() {
@@ -94,12 +53,12 @@ export default class Control extends React.Component {
             <Row>
               <Col span={6}>
                 <div className="txt-of-ellipsis">
-                每{ this.getServiceValueByType(limitationDetail, 'duration') }最大调用量
+                每{ getValueFromLimitDetail(limitationDetail, 'duration') }最大调用量
                 </div>
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                  { this.getServiceValueByType(limitationDetail, 'limit') }
+                  { getValueFromLimitDetail(limitationDetail, 'limit') }
                 </div>
               </Col>
             </Row>
@@ -112,7 +71,7 @@ export default class Control extends React.Component {
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                最长 { this.getServiceValueByType(limitationDetail, 'maxElementNameLength') } 位
+                最长 { getValueFromLimitDetail(limitationDetail, 'maxElementNameLength') } 位
                 </div>
               </Col>
             </Row>
@@ -122,7 +81,7 @@ export default class Control extends React.Component {
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                最多 { this.getServiceValueByType(limitationDetail, 'maxAttibuteCount') } 个
+                最多 { getValueFromLimitDetail(limitationDetail, 'maxAttibuteCount') } 个
                 </div>
               </Col>
             </Row>
@@ -132,7 +91,7 @@ export default class Control extends React.Component {
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                  { this.getServiceValueByType(limitationDetail, 'removeDTD') }
+                  { getValueFromLimitDetail(limitationDetail, 'removeDTD') }
                 </div>
               </Col>
             </Row>
