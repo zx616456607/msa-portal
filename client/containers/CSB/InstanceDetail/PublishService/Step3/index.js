@@ -35,6 +35,9 @@ const SECONDS_CONVERSION = {
   hour: 60 * 60,
   day: 60 * 60 * 24,
 }
+
+const DEFINITION = 'com.tenxcloud.dsb.pojo.definition'
+
 class Step3 extends React.Component {
   state = {
     isEdit: '',
@@ -85,39 +88,56 @@ class Step3 extends React.Component {
       }))
       // 流量控制
       const limitationType = []
-      // let limitationType = 'no_limitation'
-      let limitationDetail = {}
+      const limitationDetailArray = []
+
       if (apiGatewayLimit > 0) {
-        // limitationType = 'rate_limitation'
         limitationType.push('rate_limitation')
-        limitationDetail = {
+        limitationDetailArray.push({
+          '@class': `${DEFINITION}.limitation.Rate`,
           limit: apiGatewayLimit,
           duration: `PT${SECONDS_CONVERSION[apiGatewayLimitType]}S`,
-        }
+        })
+      } else {
+        limitationDetailArray.push({
+          '@class': `${DEFINITION}.limitation.None`,
+        })
       }
       // 防止XML攻击
       // const xmlProtectionType = 'definition'
       limitationType.push('xml_protecting')
       const xmlProtectionDetail = {
+        '@class': `${DEFINITION}.limitation.XmlProtecting`,
         maxElementNameLength,
         maxAttibuteCount,
         removeDTD,
       }
-      let mergeLimitationDetail = Object.assign({}, limitationDetail, xmlProtectionDetail)
-      // OAuth
-      // const oauth2Type = values.oauth2Type || 'no_oauth'
-      let oauth2Detail = {}
-      if (authenticationType === 'oauth2') {
-        oauth2Detail = {
+      limitationDetailArray.push(xmlProtectionDetail)
+
+      let authenticationDetail = {}
+      if (authenticationType === 'bypass') {
+        authenticationDetail = Object.assign({}, authenticationDetail, {
+          '@class': `${DEFINITION}.authentication.Bypass`,
+        })
+      } else if (authenticationType === 'aksk') {
+        authenticationDetail = Object.assign({}, authenticationDetail, {
+          '@class': `${DEFINITION}.authentication.AccessKeySecretKey`,
+        })
+      } else {
+        authenticationDetail = Object.assign({}, authenticationDetail, {
+          '@class': `${DEFINITION}.authentication.OAuth2`,
           endpoint,
           clientId,
           clientSecret,
-        }
+        })
       }
+
       // 请求方式
       if (values.method) {
         limitationType.push('http_method')
-        mergeLimitationDetail = Object.assign(mergeLimitationDetail, { method: values.method })
+        limitationDetailArray.push({
+          '@class': `${DEFINITION}.limitation.HttpMethod`,
+          method: values.method,
+        })
       }
 
       const body = [
@@ -133,10 +153,10 @@ class Step3 extends React.Component {
           transformationType: 'direct',
           transformationDetail: '{}',
           authenticationType,
-          authenticationDetail: authenticationType ? JSON.stringify(oauth2Detail) : '{}',
+          authenticationDetail: JSON.stringify(authenticationDetail),
           errorCode: JSON.stringify(errorCode),
           limitationType: isEmpty(limitationType) ? 'no_limitation' : limitationType.join('__'),
-          limitationDetail: JSON.stringify(mergeLimitationDetail),
+          limitationDetail: JSON.stringify(limitationDetailArray),
           groupId,
           blackOrWhite: false,
         },
@@ -156,10 +176,15 @@ class Step3 extends React.Component {
         cascadedInstances = selectPath && selectPath.instances || []
         uploadInstanceID = cascadedInstances[0] && cascadedInstances[0].id
       }
+
+      body[0].transformationDetail = JSON.stringify({
+        '@class': `${DEFINITION}.transformation.Direct`,
+      })
       // soap 转 rest
       if (protocol === 'soap' && openProtocol === 'rest') {
         body[0].transformationType = `${protocol}_to_${openProtocol}`
         const transformationDetail = {
+          '@class': `${DEFINITION}.transformation.SoapToRest`,
           exposedRegexPath: values.exposedRegexPath,
           bindingName: values.bindingName,
           operationName: values.operationName,

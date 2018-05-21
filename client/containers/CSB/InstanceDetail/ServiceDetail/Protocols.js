@@ -15,6 +15,7 @@ import {
   Row, Col, Tag,
 } from 'antd'
 import { transformCSBProtocols } from '../../../../common/utils'
+import isEmpty from 'lodash/isEmpty'
 
 export default class Protocols extends React.Component {
   renderCurrentServiceProtocolsInfo = () => {
@@ -83,6 +84,25 @@ export default class Protocols extends React.Component {
     return transformCSBProtocols(transformationType.split('_')[0])
   }
 
+  renderHttpMethod = detail => {
+    const { limitationDetail } = detail
+    let method = '--'
+    if (isEmpty(limitationDetail)) {
+      return method
+    }
+    const parseLimitDetail = JSON.parse(limitationDetail)
+    if (!Array.isArray(parseLimitDetail)) {
+      return parseLimitDetail.method
+    }
+    parseLimitDetail.some(item => {
+      if (item.method) {
+        method = item.method
+        return true
+      }
+      return false
+    })
+    return method
+  }
   render() {
     const { detail } = this.props
     const { type, transformationType } = detail
@@ -121,7 +141,7 @@ export default class Protocols extends React.Component {
               </Col>
               <Col span={10}>
                 <div className="txt-of-ellipsis">
-                  {JSON.parse(detail.limitationDetail).method || '--'}
+                  {this.renderHttpMethod(detail)}
                 </div>
               </Col>
             </Row>
