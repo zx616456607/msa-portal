@@ -12,9 +12,10 @@
 
 import React from 'react'
 import { Layout,
-  // Menu, Dropdown, Icon
+  Menu, Dropdown, Icon,
 } from 'antd'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import classNames from 'classnames'
 // import cloneDeep from 'lodash/cloneDeep'
 // import { getMenuSelectedKeys } from '../../common/utils'
 // import { ROLE_SYS_ADMIN } from '../../constants'
@@ -58,10 +59,10 @@ const LayoutHeader = Layout.Header
 
 export default class Header extends React.Component {
   render() {
-    // const {
-    //   location,
-    //   currentUser,
-    // } = this.props
+    const {
+      // location,
+      currentUser,
+    } = this.props
     // const { pathname } = location
     // const pathArray = pathname.split('/')
     // let key = pathArray[1]
@@ -72,15 +73,38 @@ export default class Header extends React.Component {
     // } else {
     //   key = '/'
     // }
-    // const selectedKeys = [ key ]
-    // let menus = cloneDeep(MENUS)
-    // if (currentUser.role !== ROLE_SYS_ADMIN) {
-    //   menus = menus.filter(menu => menu.key !== 'msa-om')
-    // }
-    const { children } = this.props
+
+    const { children, collapsed } = this.props
+    const containerStyles = classNames({
+      'layout-header': true,
+      'width-wide': collapsed,
+      'width-small': !collapsed,
+    })
     return (
-      <LayoutHeader className="layout-header">
+      <LayoutHeader className={containerStyles}>
         {children}
+        <div className="">
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="apm-setting">
+                  <Link to="/setting/apms">
+                    APM 配置
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="test2">
+                  <Link to="/setting/msa-config">
+                    微服务配置
+                  </Link>
+                </Menu.Item>
+              </Menu>
+            }
+            trigger={[ 'click' ]}>
+            <a className="ant-dropdown-link">
+              {currentUser.userName || '...'} <Icon type="down" />
+            </a>
+          </Dropdown>
+        </div>
         {/* <Link to="/">
           <svg className="logo">
             <use xlinkHref={`#${logo.id}`} />

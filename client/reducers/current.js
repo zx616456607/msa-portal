@@ -133,12 +133,25 @@ function allClusters(state = {}, action) {
       return state
   }
 }
-
+function ui(state = {
+  collapsed: false,
+}, action) {
+  switch (action.type) {
+    case ActionTypes.TOGGLE_COLLAPSED:
+      return {
+        ...state,
+        collapsed: action.collapsed,
+      }
+    default:
+      return state
+  }
+}
 const current = (state = {
   config: { project: {}, cluster: {} },
   user: {},
   projects: {},
   clusters: {},
+  ui: { collapsed: false },
 }, action) => {
   return {
     config: config(state.config, action),
@@ -146,6 +159,7 @@ const current = (state = {
     projects: projects(state.projects, action),
     clusters: clusters(state.clusters, action),
     allClusters: allClusters(state.allClusters, action),
+    ui: ui(state.ui, action),
   }
 }
 

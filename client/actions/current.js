@@ -15,6 +15,15 @@ import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
 import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
 
+export const TOGGLE_COLLAPSED = 'TOGGLE_COLLAPSED'
+
+export function toggleCollapsed(collapsed) {
+  return {
+    type: TOGGLE_COLLAPSED,
+    collapsed,
+  }
+}
+
 export const SET_CURRENT_CONFIG = 'SET_CURRENT_CONFIG'
 
 export function setCurrentConfig(current) {

@@ -26,6 +26,7 @@ import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
+
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
 
@@ -225,6 +226,8 @@ class SiderNav extends React.Component {
   };
   onCollapse = collapsed => {
     this.setState({ collapsed })
+    const { toggleCollapsed } = this.props
+    toggleCollapsed && toggleCollapsed(collapsed)
   }
   renderMenuItem = data => {
     const { children, name, icon, key, to, ...otherProps } = data
@@ -316,7 +319,7 @@ class SiderNav extends React.Component {
     )
   }*/
   render() {
-    const { collapsed } = this.state
+    const { collapsed } = this.props
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh' }}
