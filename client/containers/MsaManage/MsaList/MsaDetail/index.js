@@ -50,12 +50,6 @@ class MsaDetail extends React.Component {
             <div className="msa-detail-header-name">
               {msaDetail.appName}
             </div>
-            <div className="msa-detail-header-address">
-              服务地址：-
-            </div>
-            <div className="msa-detail-header-time">
-              注册时间：-
-            </div>
             <div className="msa-detail-header-status">
               实例状态：
               <span className="success-status">在线</span>/总数

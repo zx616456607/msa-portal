@@ -247,8 +247,8 @@ class AddClientModal extends React.Component {
       if (errors) {
         return
       }
-      const nextKeys = keys.concat(uuid)
       uuid++
+      const nextKeys = keys.concat(uuid)
 
       setFieldsValue({
         keys: nextKeys,
