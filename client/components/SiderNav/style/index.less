@@ -48,4 +48,25 @@
   width: 250px;
   background-color: #031528;
 }
+.sider-nav {
+  .ant-menu {
+    .ant-menu-item > a {
+      &:hover {
+        .itemIcon {
+          fill: #fff;
+        }
+      }
+    }
+    .ant-menu-item-selected.ant-menu-item > a {
+      & > .itemIcon, &:hover > .itemIcon {
+        fill: #fff;
+      }
+    }
+    .ant-menu-item-selected.ant-menu-item {
+      a {
+        color: #fff;
+      }
+    }
+  }
+}
 

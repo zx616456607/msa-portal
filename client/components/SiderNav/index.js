@@ -323,30 +323,28 @@ class SiderNav extends React.Component {
         collapsed={collapsed}
         onCollapse={this.onCollapse}
       >
-        <div className={'logoContainer'}>
-          <svg className={collapsed ? 'logoSmall ' : 'logo'}>
-            <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
-          </svg>
+        <div className="sider-nav">
+          <div className={'logoContainer'}>
+            <svg className={collapsed ? 'logoSmall ' : 'logo'}>
+              <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
+            </svg>
+          </div>
+          {
+            <Menu
+              style={{ marginTop: 70 }}
+              theme="dark"
+              mode="inline"
+              onOpenChange={this.onOpenChange}
+              // onClick={data => console.log('ddd', data) }
+              selectedKeys={this.findSelectedNOpenKeys().selectedKeys}
+              openKeys={this.state.openKeys}
+            >
+              {
+                menus.map(item => this.renderMenuItem(item))
+              }
+            </Menu>
+          }
         </div>
-        {
-          <Menu
-            style={{ marginTop: 70 }}
-            theme="dark"
-            mode="inline"
-            onOpenChange={this.onOpenChange}
-            // onClick={data => console.log('ddd', data) }
-            selectedKeys={this.findSelectedNOpenKeys().selectedKeys}
-            openKeys={this.state.openKeys}
-          >
-            {
-              menus.map(item => this.renderMenuItem(item))
-            }
-          </Menu>
-        }
-        {
-          false &&
-            this.renderCollapsedMenu()
-        }
       </Sider>
     )
   }
