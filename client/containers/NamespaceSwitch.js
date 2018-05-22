@@ -190,7 +190,7 @@ class NamespaceSwitch extends React.Component {
         <div className={'divider'}/>
         <Dropdown
           overlay={
-            <Menu selectable onSelect={this.jumpToOtherPlatform}>
+            <Menu selectable  onSelect={this.jumpToOtherPlatform}>
               <Menu.Item key="paas">PaaS 平台</Menu.Item>
               <Menu.Item key="msa">微服务治理中心</Menu.Item>
               <Menu.Item key="ability">能力认证授权中心</Menu.Item>

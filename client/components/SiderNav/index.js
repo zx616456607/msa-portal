@@ -327,7 +327,7 @@ class SiderNav extends React.Component {
         collapsed={collapsed}
         onCollapse={this.onCollapse}
       >
-        <div style={{ position: 'fixed', top: 0, zIndex: 2, height: 60, backgroundColor: '#031528' }} className={{ }}>
+        <div className={'logoContainer'}>
           <svg className={collapsed ? 'logoSmall ' : 'logo'}>
             <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
           </svg>
