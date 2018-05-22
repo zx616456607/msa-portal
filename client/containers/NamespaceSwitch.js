@@ -171,13 +171,14 @@ class NamespaceSwitch extends React.Component {
       projects,
       projectClusters,
       className,
+      noSelfClassName,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
     const currentProjectClusters = projectClusters[project.namespace] || []
     const { projectsText, clustersText, clustersDropdownVisible } = this.state
     const classNames = ClassNames({
-      'namespace-switch': true,
+      'namespace-switch': !noSelfClassName,
       [className]: !!className,
     })
     return (
@@ -207,7 +208,7 @@ class NamespaceSwitch extends React.Component {
             </Menu>
           }
           trigger={[ 'click' ]}>
-          <a href="javascrip:void(0)">
+          <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
             <svg className="menu-icon">
               <use xlinkHref={`#${projectIcon.id}`} />
             </svg>

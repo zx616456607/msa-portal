@@ -77,8 +77,10 @@ export default class Header extends React.Component {
     // if (currentUser.role !== ROLE_SYS_ADMIN) {
     //   menus = menus.filter(menu => menu.key !== 'msa-om')
     // }
+    const { children } = this.props
     return (
       <LayoutHeader className="layout-header">
+        {children}
         {/* <Link to="/">
           <svg className="logo">
             <use xlinkHref={`#${logo.id}`} />

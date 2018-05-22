@@ -13,7 +13,6 @@ import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
-import styles from './style/index.less'
 import logo from '../../assets/img/logo.svg'
 import logoSmall from '../../assets/img/logo-small.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
@@ -279,7 +278,7 @@ class SiderNav extends React.Component {
       selectedKeys: s,
     }
   }
-  renderCollapsedMenu = () => {
+  /*  renderCollapsedMenu = () => {
     const { location } = this.props
     const { pathname } = location
     const pathnameList = pathname.split('/').filter(item => item !== '')
@@ -315,7 +314,7 @@ class SiderNav extends React.Component {
         }
       </Menu>
     )
-  }
+  }*/
   render() {
     const { collapsed } = this.state
     return (
@@ -325,7 +324,7 @@ class SiderNav extends React.Component {
         collapsed={collapsed}
         onCollapse={this.onCollapse}
       >
-        <div style={{ position: 'fixed', top: 0, zIndex: 2, backgroundColor: '#031528' }} className={styles.logo}>
+        <div style={{ position: 'fixed', top: 0, zIndex: 2, height: 60, backgroundColor: '#031528' }} className={{ }}>
           <svg className={collapsed ? 'logoSmall ' : 'logo'}>
             <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
           </svg>

@@ -231,8 +231,14 @@ class App extends React.Component {
           <Header
             location={location}
             currentUser={current.user.info || {}}
-          />
-          <NamespaceSwitch userID={jwt.userID} className={namespaceSwitchClassname} />
+          >
+            <NamespaceSwitch
+              noSelfClassName
+              userID={jwt.userID}
+              className={namespaceSwitchClassname}
+            />
+          </Header>
+
           { this.renderChildren() }
           <Footer style={{ textAlign: 'center' }} id="footer">
             © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
