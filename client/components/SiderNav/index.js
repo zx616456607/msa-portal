@@ -13,6 +13,7 @@ import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
+import styles from './style/index.less'
 import logo from '../../assets/img/logo.svg'
 import logoSmall from '../../assets/img/logo-small.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
@@ -34,7 +35,7 @@ const menus = [
     to: '/msa-manage',
     key: 'msa-manage',
     name: '微服务治理',
-    icon: msaComponent,
+    icon: 'api',
     children: [
       {
         key: 'k40',
@@ -93,7 +94,7 @@ const menus = [
   }, {
     key: 'k3',
     to: '/csb-instances',
-    icon: 'bar-chart',
+    icon: 'fork',
     name: '服务总线',
     children: [
       {
@@ -278,29 +279,75 @@ class SiderNav extends React.Component {
       selectedKeys: s,
     }
   }
+  renderCollapsedMenu = () => {
+    const { location } = this.props
+    const { pathname } = location
+    const pathnameList = pathname.split('/').filter(item => item !== '')
+    let selected = []
+    menus.map(menu => {
+      const p = menu.to.split('/').filter(item => item !== '')
+      if (p[0] === pathnameList[0]) {
+        selected = [ menu.key ]
+      }
+      return null
+    })
+    return (
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={selected}
+      >
+        {
+          menus.map(menu => {
+            const { key, icon, to, name, ...otherProps } = menu
+            let iconDOM
+            if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
+            if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
+            return (
+              <Menu.Item key={key} {...otherProps}>
+                <Link to={to}>
+                  <span className={'ant-menu-item'}>{iconDOM}</span>
+                  <span>{name}</span>
+                </Link>
+              </Menu.Item>
+            )
+          })
+        }
+      </Menu>
+    )
+  }
   render() {
-    const selectedNOpenKeys = this.findSelectedNOpenKeys()
     const { collapsed } = this.state
     return (
       <Sider
+        style={{ overflow: 'auto', height: '100vh' }}
         collapsible
         collapsed={collapsed}
         onCollapse={this.onCollapse}
       >
-        <svg className={collapsed ? 'logoSmall' : 'logo'}>
-          <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
-        </svg>
-        <Menu
-          theme="dark"
-          mode="inline"
-          // onOpenChange={data => console.log('onopenChange', data)}
-          // onClick={data => console.log('ddd', data) }
-          {...selectedNOpenKeys}
-        >
-          {
-            menus.map(item => this.renderMenuItem(item))
-          }
-        </Menu>
+        <div style={{ position: 'fixed', top: 0, zIndex: 2, backgroundColor: '#031528' }} className={styles.logo}>
+          <svg className={collapsed ? 'logoSmall ' : 'logo'}>
+            <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
+          </svg>
+        </div>
+        {
+          <Menu
+            style={{ marginTop: 70 }}
+            theme="dark"
+            mode="inline"
+            // onOpenChange={data => console.log('onopenChange', data)}
+            // onClick={data => console.log('ddd', data) }
+            {...this.findSelectedNOpenKeys()}
+          >
+            {
+              menus.map(item => this.renderMenuItem(item))
+            }
+          </Menu>
+        }
+        {
+          false &&
+            this.renderCollapsedMenu()
+        }
       </Sider>
     )
   }
