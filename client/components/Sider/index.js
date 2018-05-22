@@ -85,7 +85,7 @@ export default class Sider extends React.Component {
     })
     const { items, ...otherMenuProps } = menu
     return (
-      <LayoutSider className={classNames} style={{ position: 'fixed' }} {...otherProps}>
+      <LayoutSider className={classNames} style={{ }} {...otherProps}>
         <Card
           className="left-menu-card"
           title={title}

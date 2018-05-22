@@ -13,46 +13,46 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout, Menu, Icon, Dropdown } from 'antd'
-import Sider from '../../components/Sider'
+// import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
 import { Route, Switch } from 'react-router-dom'
 import { apmChildRoutes } from '../../RoutesDom'
 import { renderLoading } from '../../components/utils'
-import topologyIcon from '../../assets/img/apm/topology.svg'
-import performanceIcon from '../../assets/img/apm/performance.svg'
-import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
+// import topologyIcon from '../../assets/img/apm/topology.svg'
+// import performanceIcon from '../../assets/img/apm/performance.svg'
+// import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
 import confirm from '../../components/Modal/confirm'
 
-const menus = [
-  {
-    to: '/apms/topology',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${topologyIcon.id}`} />
-      </svg>
-    ),
-    text: '微服务拓扑',
-  },
-  {
-    to: '/apms/performance',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${performanceIcon.id}`} />
-      </svg>
-    ),
-    text: '微服务性能',
-  },
-  {
-    to: '/apms/call-link-tracking',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${callLinkTrackingIcon.id}`} />
-      </svg>
-    ),
-    text: '调用链路跟踪',
-  },
-]
+// const menus = [
+//   {
+//     to: '/apms/topology',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${topologyIcon.id}`} />
+//       </svg>
+//     ),
+//     text: '微服务拓扑',
+//   },
+//   {
+//     to: '/apms/performance',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${performanceIcon.id}`} />
+//       </svg>
+//     ),
+//     text: '微服务性能',
+//   },
+//   {
+//     to: '/apms/call-link-tracking',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${callLinkTrackingIcon.id}`} />
+//       </svg>
+//     ),
+//     text: '调用链路跟踪',
+//   },
+// ]
 
 class Apm extends React.Component {
   componentWillMount() {
@@ -116,7 +116,7 @@ class Apm extends React.Component {
   }
 
   render() {
-    const { location } = this.props
+    // const { location } = this.props
     const title = (
       <div>
         性能管理（APM）
@@ -139,15 +139,16 @@ class Apm extends React.Component {
     )
     return (
       <Layout className="apm">
-        <Sider
+        {/* <Sider
           key="sider"
           title={title}
           location={location}
           menu={{
             items: menus,
           }}
-        />
+        />*/}
         <Content>
+          {title}
           {this.renderChildren()}
         </Content>
       </Layout>
