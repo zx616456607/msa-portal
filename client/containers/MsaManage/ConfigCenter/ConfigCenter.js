@@ -200,8 +200,8 @@ class ConfigCenter extends React.Component {
                 {data}
               </Select>
             </div>
-            <div type="card" >
-              <div className="exploit">
+            <div>
+              <div className="exploit layout-content-btns">
                 <div className="headers">
                   <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
                     <Icon type="plus" style={{ color: '#fff' }} />
