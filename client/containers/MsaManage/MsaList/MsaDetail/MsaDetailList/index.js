@@ -101,10 +101,12 @@ class MsaDetailList extends React.Component {
         return (
           <div>
             {
-              msaDetail.type === MSA_TYPE_MAN &&
-              <Button onClick={this.removeRegister.bind(this, record)}>
+              msaDetail.type === MSA_TYPE_MAN ?
+                <Button onClick={this.removeRegister.bind(this, record)}>
               移除注册
-              </Button>
+                </Button>
+                :
+                '-'
             }
           </div>
         )
