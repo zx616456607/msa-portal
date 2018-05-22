@@ -231,6 +231,7 @@ class App extends React.Component {
         <Layout id="app">
           {this.renderErrorMessage()}
           <Header
+            collapsed={current.ui.collapsed}
             location={location}
             currentUser={current.user.info || {}}
           >

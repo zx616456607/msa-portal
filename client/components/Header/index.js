@@ -15,6 +15,7 @@ import { Layout,
   Menu, Dropdown, Icon,
 } from 'antd'
 import { Link } from 'react-router-dom'
+import classNames from 'classnames'
 // import cloneDeep from 'lodash/cloneDeep'
 // import { getMenuSelectedKeys } from '../../common/utils'
 // import { ROLE_SYS_ADMIN } from '../../constants'
@@ -73,9 +74,14 @@ export default class Header extends React.Component {
     //   key = '/'
     // }
 
-    const { children } = this.props
+    const { children, collapsed } = this.props
+    const containerStyles = classNames({
+      'layout-header': true,
+      'width-wide': collapsed,
+      'width-small': !collapsed,
+    })
     return (
-      <LayoutHeader className="layout-header">
+      <LayoutHeader className={containerStyles}>
         {children}
         <div className="">
           <Dropdown
