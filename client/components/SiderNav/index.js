@@ -301,8 +301,7 @@ class SiderNav extends React.Component {
     let finalKeys = []
     data.map(i => (openKeys.indexOf(i) < 0) && (add = i))
     add && menus.map(menu => {
-      if (menu.key !== add) return null // 新增的位于一级目录
-      addIsFirst = true
+      if (menu.key === add) addIsFirst = true
       return null
     })
     if (addIsFirst) {
