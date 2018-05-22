@@ -133,7 +133,10 @@ class AccessAgreement extends React.Component {
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
-    const limitationDetail = JSON.parse(dataList.limitationDetail)
+    let limitationDetail = null
+    if (!isEmpty(dataList)) {
+      limitationDetail = JSON.parse(dataList.limitationDetail)
+    }
     const openProtocol = getFieldValue('openProtocol')
     const ssl = getFieldValue('ssl')
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)

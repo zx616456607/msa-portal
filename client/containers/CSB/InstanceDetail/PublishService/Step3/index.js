@@ -240,15 +240,17 @@ class Step3 extends React.Component {
         && csbInstanceServiceGroups[groupId]
         && csbInstanceServiceGroups[groupId].name
         const serviceBehaviourPerInstance = {}
-        cascadedInstances.forEach((instance, index) => {
+        cascadedInstances.forEach((instance, index, arr) => {
           const { id } = instance
           // serviceBehaviourPerInstance[id] = targetInstancesIDs.indexOf(id) > -1
           //   ? 2 // 2 - 为可订阅
           //   : 1 // 1 - 接力端（即，只接力，不可订阅，在对应的实例 ID 上，可订阅的服务里不会显示这个服务）
           if (index === 0) {
             serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 6 : 5
-          } else {
-            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 2 : 1
+          } else if (index < arr.length - 1) {
+            serviceBehaviourPerInstance[id] = targetInstancesIDs.includes(id) ? 8 : 1
+          } else if (targetInstancesIDs.includes(id)) {
+            serviceBehaviourPerInstance[id] = 2
           }
         })
         const cascadedBody = {

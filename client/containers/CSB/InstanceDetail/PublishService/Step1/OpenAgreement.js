@@ -22,6 +22,9 @@ const Option = Select.Option
 
 export default class OpenAgreement extends React.Component {
   selectServerName = (rule, value, callback) => {
+    if (!value) {
+      return callback('请输入服务名称')
+    }
     if (value.length > 64) {
       return callback('最多可输入63位字符')
     }
@@ -31,6 +34,9 @@ export default class OpenAgreement extends React.Component {
     callback()
   }
   serverVersion = (rule, value, callback) => {
+    if (!value) {
+      return callback('请输入服务版本')
+    }
     if (value.length > 64) {
       return callback('最多可输入63位字符')
     }
