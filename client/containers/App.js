@@ -20,7 +20,7 @@ import Header from '../components/Header'
 import NamespaceSwitch from './NamespaceSwitch'
 import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
 import {
-  getCurrentUser,
+  getCurrentUser, toggleCollapsed,
 } from '../actions/current'
 import { scrollToTop, toQuerystring } from '../common/utils'
 import { renderLoading } from '../components/utils'
@@ -51,6 +51,7 @@ class App extends React.Component {
     resetErrorMessage: PropTypes.func.isRequired,
     // Injected by React Router
     children: PropTypes.node,
+    toggleCollapsed: PropTypes.func.isRequired,
   }
 
   componentWillMount() {
@@ -207,6 +208,7 @@ class App extends React.Component {
       auth,
       location,
       current,
+      toggleCollapsed,
     } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
@@ -225,7 +227,7 @@ class App extends React.Component {
     })
     return (
       <Layout>
-        <CustomizeSider/>
+        <CustomizeSider collapsed={current.ui.collapsed} toggleCollapsed={toggleCollapsed}/>
         <Layout id="app">
           {this.renderErrorMessage()}
           <Header
@@ -265,4 +267,5 @@ export default connect(mapStateToProps, {
   resetErrorMessage,
   getAuth,
   getCurrentUser,
+  toggleCollapsed,
 })(App)
