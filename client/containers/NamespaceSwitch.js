@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import ClassNames from 'classnames'
 import { Menu, Dropdown, Icon, notification } from 'antd'
 import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
+import './style/NamespaceSwitch.less'
 import {
   setCurrentConfig,
   getUserProjects,
@@ -177,12 +178,36 @@ class NamespaceSwitch extends React.Component {
     const project = currentConfig.project || {}
     const currentProjectClusters = projectClusters[project.namespace] || []
     const { projectsText, clustersText, clustersDropdownVisible } = this.state
-    const classNames = ClassNames({
+    const containerStyle = ClassNames({
       'namespace-switch': !noSelfClassName,
       [className]: !!className,
+      container: true,
     })
     return (
-      <div className={classNames}>
+      <div className={containerStyle}>
+        <Icon type={'appstore-o'} className={'productionIcon'}/>
+        <div> 产品</div>
+        <div className={'divider'}/>
+        <Dropdown
+          overlay={
+            <Menu selectable onSelect={this.jumpToOtherPlatform}>
+              <Menu.Item key="paas">PaaS 平台</Menu.Item>
+              <Menu.Item key="msa">微服务治理中心</Menu.Item>
+              <Menu.Item key="ability">能力认证授权中心</Menu.Item>
+            </Menu>
+          }
+          trigger={[ 'click' ]}>
+          <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
+            微服务治理中心
+            <Icon type="down" />
+          </a>
+        </Dropdown>
+        <div className={'bigDivider'}/>
+        <svg className="menu-icon">
+          <use xlinkHref={`#${projectIcon.id}`} />
+        </svg>
+        <div>工作台</div>
+        <div className={'divider'}/>
         <Dropdown
           overlay={
             <Menu selectable onSelect={this.handleProjectChange}>
@@ -209,13 +234,16 @@ class NamespaceSwitch extends React.Component {
           }
           trigger={[ 'click' ]}>
           <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
-            <svg className="menu-icon">
-              <use xlinkHref={`#${projectIcon.id}`} />
-            </svg>
             {projectsText}
             <Icon type="down" />
           </a>
         </Dropdown>
+        <div className={'bigDivider'}/>
+        <svg className="menu-icon">
+          <use xlinkHref={`#${clusterIcon.id}`} />
+        </svg>
+        <div>集群环境</div>
+        <div className={'divider'}/>
         <Dropdown
           visible={clustersDropdownVisible}
           onVisibleChange={visible => this.setState({ clustersDropdownVisible: visible })}
@@ -239,9 +267,6 @@ class NamespaceSwitch extends React.Component {
           }
           trigger={[ 'click' ]}>
           <a href="javascrip:void(0)">
-            <svg className="menu-icon">
-              <use xlinkHref={`#${clusterIcon.id}`} />
-            </svg>
             {clustersText}
             <Icon type="down" />
           </a>
