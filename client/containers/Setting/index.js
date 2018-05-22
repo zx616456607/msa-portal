@@ -13,42 +13,42 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout } from 'antd'
-import Sider from '../../components/Sider'
+// import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { settingChildRoutes } from '../../RoutesDom'
-import topologyIcon from '../../assets/img/apm/apm.svg'
-import msaconfig from '../../assets/img/msa-manage/msa.svg'
-import globalSetting from '../../assets/img/system-settings/global-setting.svg'
+// import topologyIcon from '../../assets/img/apm/apm.svg'
+// import msaconfig from '../../assets/img/msa-manage/msa.svg'
+// import globalSetting from '../../assets/img/system-settings/global-setting.svg'
 import './style/index.less'
 
-const menus = [
-  {
-    to: '/setting/global-setting',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${globalSetting.id}`} />
-      </svg>
-    ),
-    text: '全局配置',
-  }, {
-    to: '/setting/msa-config',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${msaconfig.id}`} />
-      </svg>
-    ),
-    text: '微服务配置',
-  }, {
-    to: '/setting/apms',
-    icon: (
-      <svg className="menu-icon">
-        <use xlinkHref={`#${topologyIcon.id}`} />
-      </svg>
-    ),
-    text: 'APM 配置',
-  },
-]
+// const menus = [
+//   {
+//     to: '/setting/global-setting',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${globalSetting.id}`} />
+//       </svg>
+//     ),
+//     text: '全局配置',
+//   }, {
+//     to: '/setting/msa-config',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${msaconfig.id}`} />
+//       </svg>
+//     ),
+//     text: '微服务配置',
+//   }, {
+//     to: '/setting/apms',
+//     icon: (
+//       <svg className="menu-icon">
+//         <use xlinkHref={`#${topologyIcon.id}`} />
+//       </svg>
+//     ),
+//     text: 'APM 配置',
+//   },
+// ]
 
 class Setting extends React.Component {
   componentWillMount() {
@@ -71,17 +71,10 @@ class Setting extends React.Component {
   }
 
   render() {
-    const { location } = this.props
+    // const { location } = this.props
     return (
       <Layout className="apm-setting">
-        <Sider
-          key="sider"
-          extra={false}
-          location={location}
-          menu={{
-            items: menus,
-          }}
-        />
+
         <Content>
           {this.renderChildren()}
         </Content>

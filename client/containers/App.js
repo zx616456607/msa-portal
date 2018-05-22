@@ -27,6 +27,7 @@ import { renderLoading } from '../components/utils'
 import { JWT, AUTH_URL } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
+import CustomizeSider from '../components/SiderNav'
 
 const { Footer } = Layout
 let errorMessageBefore
@@ -223,17 +224,26 @@ class App extends React.Component {
       hide: isHideNamespaceSwitch,
     })
     return (
-      <Layout id="app">
-        {this.renderErrorMessage()}
-        <Header
-          location={location}
-          currentUser={current.user.info || {}}
-        />
-        <NamespaceSwitch userID={jwt.userID} className={namespaceSwitchClassname} />
-        { this.renderChildren() }
-        <Footer style={{ textAlign: 'center' }} id="footer">
-          © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
-        </Footer>
+      <Layout>
+        <CustomizeSider/>
+        <Layout id="app">
+          {this.renderErrorMessage()}
+          <Header
+            location={location}
+            currentUser={current.user.info || {}}
+          >
+            <NamespaceSwitch
+              noSelfClassName
+              userID={jwt.userID}
+              className={namespaceSwitchClassname}
+            />
+          </Header>
+
+          { this.renderChildren() }
+          <Footer style={{ textAlign: 'center' }} id="footer">
+            © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
+          </Footer>
+        </Layout>
       </Layout>
     )
   }

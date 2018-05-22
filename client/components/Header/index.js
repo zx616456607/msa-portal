@@ -11,73 +11,77 @@
  */
 
 import React from 'react'
-import { Layout, Menu, Dropdown, Icon } from 'antd'
-import { Link } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
-import { getMenuSelectedKeys } from '../../common/utils'
-import { ROLE_SYS_ADMIN } from '../../constants'
-import logo from '../../assets/img/logo.svg'
+import { Layout,
+  // Menu, Dropdown, Icon
+} from 'antd'
+// import { Link } from 'react-router-dom'
+// import cloneDeep from 'lodash/cloneDeep'
+// import { getMenuSelectedKeys } from '../../common/utils'
+// import { ROLE_SYS_ADMIN } from '../../constants'
+// import logo from '../../assets/img/logo.svg'
 import './style/index.less'
 
 const LayoutHeader = Layout.Header
-const MENUS = [
-  /* {
-    to: '/',
-    key: '/',
-    text: '总览',
-  }, */
-  {
-    to: '/msa-manage',
-    key: 'msa-manage',
-    text: '微服务治理',
-  },
-  {
-    to: '/csb-instances',
-    key: 'csb-instances',
-    text: '服务总线',
-    title: 'Cloud Service Bus',
-  },
-  {
-    to: '/apms',
-    key: 'apms',
-    text: '性能管理（APM）',
-  },
-  {
-    to: '/msa-om',
-    key: 'msa-om',
-    text: '微服务运维',
-  },
-  {
-    to: '/setting',
-    key: 'setting',
-    text: '系统设置',
-  },
-]
+// const MENUS = [
+//   /* {
+//     to: '/',
+//     key: '/',
+//     text: '总览',
+//   }, */
+//   {
+//     to: '/msa-manage',
+//     key: 'msa-manage',
+//     text: '微服务治理',
+//   },
+//   {
+//     to: '/csb-instances',
+//     key: 'csb-instances',
+//     text: '服务总线',
+//     title: 'Cloud Service Bus',
+//   },
+//   {
+//     to: '/apms',
+//     key: 'apms',
+//     text: '性能管理（APM）',
+//   },
+//   {
+//     to: '/msa-om',
+//     key: 'msa-om',
+//     text: '微服务运维',
+//   },
+//   {
+//     to: '/setting',
+//     key: 'setting',
+//     text: '系统设置',
+//   },
+// ]
 
 export default class Header extends React.Component {
   render() {
-    const {
-      location,
-      currentUser,
-    } = this.props
-    const { pathname } = location
-    const pathArray = pathname.split('/')
-    let key = pathArray[1]
-    if (key) {
-      if (key === 'csb-instances-available') {
-        key = 'csb-instances'
-      }
-    } else {
-      key = '/'
-    }
-    const selectedKeys = [ key ]
-    let menus = cloneDeep(MENUS)
-    if (currentUser.role !== ROLE_SYS_ADMIN) {
-      menus = menus.filter(menu => menu.key !== 'msa-om')
-    }
+    // const {
+    //   location,
+    //   currentUser,
+    // } = this.props
+    // const { pathname } = location
+    // const pathArray = pathname.split('/')
+    // let key = pathArray[1]
+    // if (key) {
+    //   if (key === 'csb-instances-available') {
+    //     key = 'csb-instances'
+    //   }
+    // } else {
+    //   key = '/'
+    // }
+    // const selectedKeys = [ key ]
+    // let menus = cloneDeep(MENUS)
+    // if (currentUser.role !== ROLE_SYS_ADMIN) {
+    //   menus = menus.filter(menu => menu.key !== 'msa-om')
+    // }
+    const { children } = this.props
     return (
       <LayoutHeader className="layout-header">
-        <Link to="/">
+        {children}
+        {/* <Link to="/">
           <svg className="logo">
             <use xlinkHref={`#${logo.id}`} />
           </svg>
@@ -126,7 +130,7 @@ export default class Header extends React.Component {
               )
             })
           }
-        </Menu>
+        </Menu>*/}
       </LayoutHeader>
     )
   }
