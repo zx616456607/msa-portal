@@ -322,7 +322,7 @@ class SiderNav extends React.Component {
     const { collapsed } = this.props
     return (
       <Sider
-        style={{ overflow: 'auto', height: '100vh' }}
+        style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
         collapsible
         collapsed={collapsed}
         onCollapse={this.onCollapse}

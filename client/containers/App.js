@@ -225,10 +225,11 @@ class App extends React.Component {
     const namespaceSwitchClassname = ClassNames({
       hide: isHideNamespaceSwitch,
     })
+    const { collapsed } = current.ui
     return (
       <Layout>
-        <CustomizeSider collapsed={current.ui.collapsed} toggleCollapsed={toggleCollapsed}/>
-        <Layout id="app">
+        <CustomizeSider collapsed={collapsed} toggleCollapsed={toggleCollapsed}/>
+        <Layout id="app" style={{ marginLeft: collapsed ? 80 : 200 }}>
           {this.renderErrorMessage()}
           <Header
             collapsed={current.ui.collapsed}

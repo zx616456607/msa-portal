@@ -79,6 +79,7 @@ export default class Header extends React.Component {
       'layout-header': true,
       'width-wide': collapsed,
       'width-small': !collapsed,
+      'layout-border': true,
     })
     return (
       <LayoutHeader className={containerStyles}>
