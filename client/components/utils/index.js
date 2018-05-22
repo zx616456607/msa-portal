@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Spin, Badge, Icon } from 'antd'
+import isEmpty from 'lodash/isEmpty'
 import { SECONDS_CONVERSION } from '../../constants'
 
 
@@ -221,6 +222,9 @@ export function formatWSMessage(message) {
 }
 
 export function getValueFromLimitDetail(detail, type) {
+  if (isEmpty(detail)) {
+    return
+  }
   if (!Array.isArray(detail)) {
     const value = detail[type]
     switch (type) {

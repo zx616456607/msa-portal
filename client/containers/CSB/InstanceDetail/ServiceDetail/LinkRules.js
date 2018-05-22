@@ -57,7 +57,18 @@ class LinkRules extends React.Component {
     this.loadData()
   }
 
-  rollbackHandler = () => {}
+  rollbackHandler = async id => {
+    const { cascadedServicesWebsocket } = this.props
+    const body = {
+      type: 'cancel_conceal',
+      cascadedService: {
+        id,
+      },
+    }
+    cascadedServicesWebsocket.send('/api/v1/cascaded-services', {}, JSON.stringify(body))
+    await sleep(200)
+    this.loadData()
+  }
 
   renderStepIcon = detail => {
     const { instanceId } = this.props
@@ -171,7 +182,7 @@ class LinkRules extends React.Component {
             </Col>
             <Col span={3}>
               {item.code !== 200 && item.eventType === 4 && [ <Tooltip title="撤销注销" placement="top" key="cancel">
-                <Icon type="rollback" className="pointer" onClick={() => this.rollbackHandler()}/>
+                <Icon type="rollback" className="pointer" onClick={() => this.rollbackHandler(item.id)}/>
               </Tooltip>,
               <Tooltip title="重试注销" placement="top" key="reload">
                 <Icon type="reload" className="margin-style pointer" onClick={() => this.reloadHandler(item.id)}/>
