@@ -152,6 +152,9 @@ class NamespaceSwitch extends React.Component {
       },
     })
   }
+  jumpToOtherPlatform = ({ key }) => {
+    if (key === 'paas') window.location = 'http://enterprise.tenxcloud.com/'
+  }
   handleClusterChange = ({ item, key }) => {
     const { setCurrentConfig } = this.props
     this.setState({
@@ -184,10 +187,28 @@ class NamespaceSwitch extends React.Component {
     })
     return (
       <div className={containerStyle}>
+        <Icon type={'appstore-o'} className={'productionIcon'}/>
+        <div> 产品</div>
+        <div className={'divider'}/>
+        <Dropdown
+          overlay={
+            <Menu selectable selectedKeys={[ 'msa' ]} onSelect={this.jumpToOtherPlatform}>
+              <Menu.Item key="paas">PaaS 平台</Menu.Item>
+              <Menu.Item key="msa">微服务治理中心</Menu.Item>
+              <Menu.Item key="ability">能力认证授权中心</Menu.Item>
+            </Menu>
+          }
+          trigger={[ 'click' ]}>
+          <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
+            微服务治理中心
+            <Icon type="down" />
+          </a>
+        </Dropdown>
+        <div className={'bigDivider'}/>
         <svg className="menu-icon">
           <use xlinkHref={`#${projectIcon.id}`} />
         </svg>
-        <div>项目</div>
+        <div>工作台</div>
         <div className={'divider'}/>
         <Dropdown
           overlay={
@@ -223,7 +244,7 @@ class NamespaceSwitch extends React.Component {
         <svg className="menu-icon">
           <use xlinkHref={`#${clusterIcon.id}`} />
         </svg>
-        <div>集群</div>
+        <div>集群环境</div>
         <div className={'divider'}/>
         <Dropdown
           visible={clustersDropdownVisible}
