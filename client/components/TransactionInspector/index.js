@@ -105,7 +105,7 @@ export default class TransactionInspector extends React.Component {
   }
 
   render() {
-    const { dataSource } = this.props
+    const { dataSource, closeDock } = this.props
     const { expandedRowKeys } = this.state
     const { data, rootParentExecMs } = this.formatData(dataSource)
     const columns = [{
@@ -201,6 +201,7 @@ export default class TransactionInspector extends React.Component {
     return (
       <div className="transaction-inspector">
         <Spin spinning={dataSource.isFetching}>
+          <div onClick={closeDock} className="transaction-inspector-close"><Icon type="close" className="float-right pointer"/></div>
           <div className="transaction-inspector-toggler" onDoubleClick={this.changeDockSize}>
             <div
               className="transaction-inspector-toggler-center"

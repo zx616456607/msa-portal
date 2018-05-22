@@ -100,6 +100,14 @@ export const API_GATEWAY_LIMIT_TYPES = [
     text: '天',
   },
 ]
+
+export const SECONDS_CONVERSION = {
+  1: '秒',
+  60: '分钟',
+  [60 * 60]: '小时',
+  [60 * 60 * 24]: '天',
+}
+
 export const CSB_PUBLIC_INSTANCES_FLAG = 0
 export const CSB_AVAILABLE_INSTANCES_FLAG = 1
 export const CSB_OM_INSTANCES_FLAG = 2

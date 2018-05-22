@@ -12,6 +12,7 @@
 
 import React from 'react'
 import { Spin, Badge, Icon } from 'antd'
+import { SECONDS_CONVERSION } from '../../constants'
 
 
 export function renderLoading(tip) {
@@ -217,4 +218,38 @@ export function formatWSMessage(message) {
       break
   }
   return { msg, notifyType }
+}
+
+export function getValueFromLimitDetail(detail, type) {
+  if (!Array.isArray(detail)) {
+    const value = detail[type]
+    switch (type) {
+      case 'duration':
+        return SECONDS_CONVERSION[parseInt(value && value.match(/[0-9]+/), 10)] || '秒'
+      case 'removeDTD':
+        return value ? '开启' : '关闭'
+      default:
+        return value || '--'
+    }
+  }
+  let result = ''
+  detail.some(item => {
+    const value = item[`${type}`]
+    if (value) {
+      switch (type) {
+        case 'duration':
+          result = SECONDS_CONVERSION[parseInt(value.match(/[0-9]+/), 10)]
+          break
+        case 'removeDTD':
+          result = value ? '开启' : '关闭'
+          break
+        default:
+          result = value
+          break
+      }
+      return true
+    }
+    return false
+  })
+  return result
 }

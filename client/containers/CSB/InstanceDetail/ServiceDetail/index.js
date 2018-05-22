@@ -37,11 +37,12 @@ class ServiceDetail extends React.Component {
 
   renderDropdown = () => {
     const currentService = this.renderCurrentService()
-    const { status } = currentService
+    const { status, cascadedType } = currentService
+    const disabled = status === 4 || ![ 5, 6 ].includes(cascadedType)
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
         {/* <Menu.Item key="list">黑／白名单</Menu.Item>*/}
-        <Menu.Item key="logout">注销</Menu.Item>
+        <Menu.Item key="logout" disabled={disabled}>注销</Menu.Item>
       </Menu>
     )
     return (

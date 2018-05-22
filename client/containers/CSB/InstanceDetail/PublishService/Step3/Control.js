@@ -15,6 +15,7 @@ import ClassNames from 'classnames'
 import {
   Form, InputNumber, Select, Switch, Icon, Tooltip, Row, Col, Radio, Input,
 } from 'antd'
+import isEmpty from 'lodash/isEmpty'
 import { API_GATEWAY_LIMIT_TYPES, URL_REG } from '../../../../../constants'
 import './style/Control.less'
 
@@ -68,6 +69,25 @@ export default class Control extends React.Component {
         return ''
     }
   }
+
+  renderLimit = limitDetail => {
+    if (isEmpty(limitDetail)) {
+      return 0
+    }
+    if (!Array.isArray(limitDetail)) {
+      return limitDetail.limit
+    }
+    let result = ''
+    limitDetail.some(item => {
+      if (item.limit) {
+        result = item.limit
+        return true
+      }
+      return false
+    })
+    return result
+  }
+
   render() {
     const { className, formItemLayout, form, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -79,7 +99,7 @@ export default class Control extends React.Component {
 
     const limitDetail = limitationDetail && JSON.parse(limitationDetail)
     const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
-    const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.oauth2Detail) : ''
+    const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.authenticationDetail) : ''
     return [
       <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
@@ -104,7 +124,7 @@ export default class Control extends React.Component {
               )}
               秒最大调用
               {getFieldDecorator('apiGatewayLimit', {
-                initialValue: limitDetail !== undefined ? limitDetail.limit : 0,
+                initialValue: this.renderLimit(limitDetail),
               })(
                 <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
               )}
@@ -174,7 +194,7 @@ export default class Control extends React.Component {
           label="访问控制方式"
         >
           {getFieldDecorator('authenticationType', {
-            initialValue: authenticationType || 'bypass',
+            initialValue: authenticationType || 'aksk',
           })(
             <RadioGroup>
               <Radio value="aksk"> 需订阅</Radio>
