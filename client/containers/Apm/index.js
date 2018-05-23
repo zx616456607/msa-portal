@@ -12,7 +12,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Dropdown } from 'antd'
+import { Layout,
+  // Menu, Icon, Dropdown
+} from 'antd'
 // import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
@@ -117,26 +119,26 @@ class Apm extends React.Component {
 
   render() {
     // const { location } = this.props
-    const title = (
-      <div>
-        性能管理（APM）
-        <div className="apm-switch">
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key="PinPoint">
-                  PinPoint
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link">
-              基于 PinPoint <Icon type="down" />
-            </a>
-          </Dropdown>
-        </div>
-      </div>
-    )
+    // const title = (
+    //   <div>
+    //     性能管理（APM）
+    //     <div className="apm-switch">
+    //       <Dropdown
+    //         overlay={
+    //           <Menu>
+    //             <Menu.Item key="PinPoint">
+    //               PinPoint
+    //             </Menu.Item>
+    //           </Menu>
+    //         }
+    //         trigger={[ 'click' ]}>
+    //         <a className="ant-dropdown-link">
+    //           基于 PinPoint <Icon type="down" />
+    //         </a>
+    //       </Dropdown>
+    //     </div>
+    //   </div>
+    // )
     return (
       <Layout className="apm">
         {/* <Sider
@@ -148,7 +150,6 @@ class Apm extends React.Component {
           }}
         />*/}
         <Content>
-          {title}
           {this.renderChildren()}
         </Content>
       </Layout>

@@ -13,6 +13,7 @@ import React from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
+import find from 'lodash/find'
 import logo from '../../assets/img/logo.svg'
 import logoSmall from '../../assets/img/logo-small.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
@@ -223,7 +224,13 @@ const svgIcon = icon => (
 class SiderNav extends React.Component {
   state = {
     collapsed: false,
+    openKeys: [],
   };
+  componentDidMount() {
+    this.setState({
+      openKeys: this.findSelectedNOpenKeys().openKeys,
+    })
+  }
   onCollapse = collapsed => {
     this.setState({ collapsed })
     const { toggleCollapsed } = this.props
@@ -277,79 +284,67 @@ class SiderNav extends React.Component {
     const s = []
     menus.map(menu => finderPath(menu, s))
     return {
-      defaultOpenKeys,
+      openKeys: defaultOpenKeys,
       selectedKeys: s,
     }
   }
-  /*  renderCollapsedMenu = () => {
-    const { location } = this.props
-    const { pathname } = location
-    const pathnameList = pathname.split('/').filter(item => item !== '')
-    let selected = []
-    menus.map(menu => {
-      const p = menu.to.split('/').filter(item => item !== '')
-      if (p[0] === pathnameList[0]) {
-        selected = [ menu.key ]
-      }
+  onOpenChange = data => {
+    const { openKeys } = this.state
+    if (openKeys.length >= data.length) {
+      this.setState({
+        openKeys: data,
+      })
+      return
+    }
+    let add = ''
+    let addIsFirst = false
+    let finalKeys = []
+    data.map(i => (openKeys.indexOf(i) < 0) && (add = i))
+    add && menus.map(menu => {
+      if (menu.key === add) addIsFirst = true
       return null
     })
-    return (
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={selected}
-      >
-        {
-          menus.map(menu => {
-            const { key, icon, to, name, ...otherProps } = menu
-            let iconDOM
-            if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
-            if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
-            return (
-              <Menu.Item key={key} {...otherProps}>
-                <Link to={to}>
-                  <span className={'ant-menu-item'}>{iconDOM}</span>
-                  <span>{name}</span>
-                </Link>
-              </Menu.Item>
-            )
-          })
-        }
-      </Menu>
-    )
-  }*/
+    if (addIsFirst) {
+      openKeys.map(k => (!find(menus, [ 'key', k ])) && finalKeys.push(k))
+      add && finalKeys.push(add)
+    }
+    if (!addIsFirst) finalKeys = data
+    this.setState({
+      openKeys: finalKeys,
+    })
+  }
+
   render() {
     const { collapsed } = this.props
     return (
       <Sider
-        style={{ overflow: 'auto', height: '100vh' }}
+        style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
         collapsible
         collapsed={collapsed}
         onCollapse={this.onCollapse}
       >
-        <div style={{ position: 'fixed', top: 0, zIndex: 2, height: 60, backgroundColor: '#031528' }} className={{ }}>
-          <svg className={collapsed ? 'logoSmall ' : 'logo'}>
-            <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
-          </svg>
+        <div className="sider-nav">
+          <div className={'logoContainer'}>
+            <svg className={collapsed ? 'logoSmall ' : 'logo'}>
+              <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
+            </svg>
+          </div>
+          {
+            <Menu
+              style={{ marginTop: 70 }}
+              theme="dark"
+              mode="inline"
+              onOpenChange={this.onOpenChange}
+              // onClick={data => console.log('ddd', data) }
+              selectedKeys={this.findSelectedNOpenKeys().selectedKeys}
+              openKeys={this.state.openKeys}
+            >
+              {
+                menus.map(item => this.renderMenuItem(item))
+              }
+            </Menu>
+          }
         </div>
-        {
-          <Menu
-            style={{ marginTop: 70 }}
-            theme="dark"
-            mode="inline"
-            // onOpenChange={data => console.log('onopenChange', data)}
-            // onClick={data => console.log('ddd', data) }
-            {...this.findSelectedNOpenKeys()}
-          >
-            {
-              menus.map(item => this.renderMenuItem(item))
-            }
-          </Menu>
-        }
-        {
-          false &&
-            this.renderCollapsedMenu()
-        }
       </Sider>
     )
   }

@@ -12,7 +12,9 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Layout, Menu, Icon, Dropdown } from 'antd'
+import { Layout,
+  // Menu, Icon, Dropdown,
+} from 'antd'
 // import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
@@ -170,26 +172,26 @@ class MsaManage extends React.Component {
 
   render() {
     // const { location } = this.props
-    const title = (
-      <div>
-        微服务治理
-        <div className="apm-switch">
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key="SpringCloud">
-                  SpringCloud
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link">
-              基于 SpringCloud <Icon type="down" />
-            </a>
-          </Dropdown>
-        </div>
-      </div>
-    )
+    // const title = (
+    //   <div>
+    //     微服务治理
+    //     <div className="apm-switch">
+    //       <Dropdown
+    //         overlay={
+    //           <Menu>
+    //             <Menu.Item key="SpringCloud">
+    //               SpringCloud
+    //             </Menu.Item>
+    //           </Menu>
+    //         }
+    //         trigger={[ 'click' ]}>
+    //         <a className="ant-dropdown-link">
+    //           基于 SpringCloud <Icon type="down" />
+    //         </a>
+    //       </Dropdown>
+    //     </div>
+    //   </div>
+    // )
     return (
       <Layout className="msa-manage">
         {/* <Sider
@@ -201,7 +203,7 @@ class MsaManage extends React.Component {
           }}
         />*/}
         <Content key="content">
-          {title}
+          {/* {title}*/}
           {this.renderChildren()}
         </Content>
       </Layout>
