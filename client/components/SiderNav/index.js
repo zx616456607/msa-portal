@@ -14,6 +14,7 @@ import { Layout, Menu, Icon } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import find from 'lodash/find'
+import { ROLE_SYS_ADMIN } from '../../constants'
 import logo from '../../assets/img/logo.svg'
 import logoSmall from '../../assets/img/logo-small.svg'
 import msaconfig from '../../assets/img/msa-manage/msa.svg'
@@ -152,7 +153,7 @@ const menus = [
       },
     ],
   }, {
-    key: 'k0',
+    key: 'msa-om',
     to: '/msa-om',
     name: '微服务运维',
     icon: 'appstore',
@@ -315,7 +316,8 @@ class SiderNav extends React.Component {
   }
 
   render() {
-    const { collapsed } = this.props
+    const { collapsed, currentUser } = this.props
+    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ? menus.filter(menu => menu.key !== 'msa-om') : menus
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
@@ -340,7 +342,7 @@ class SiderNav extends React.Component {
               openKeys={this.state.openKeys}
             >
               {
-                menus.map(item => this.renderMenuItem(item))
+                finalMenus.map(item => this.renderMenuItem(item))
               }
             </Menu>
           }
