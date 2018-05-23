@@ -28,6 +28,7 @@ import { JWT, AUTH_URL } from '../constants'
 import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
 import CustomizeSider from '../components/SiderNav'
+import './style/App.less'
 
 const { Footer } = Layout
 let errorMessageBefore
@@ -226,14 +227,18 @@ class App extends React.Component {
       hide: isHideNamespaceSwitch,
     })
     const { collapsed } = current.ui
+    const appStyle = ClassNames({
+      appSiderWide: collapsed,
+      appSiderSmall: !collapsed,
+    })
     return (
-      <Layout>
+      <Layout className={'app'}>
         <CustomizeSider
           currentUser={current.user.info || {}}
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
         />
-        <Layout id="app" style={{ marginLeft: collapsed ? 80 : 200 }}>
+        <Layout id="app" className={appStyle} >
           {this.renderErrorMessage()}
           <Header
             collapsed={current.ui.collapsed}
