@@ -100,6 +100,7 @@ export default class Control extends React.Component {
     const limitDetail = limitationDetail && JSON.parse(limitationDetail)
     const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
     const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.authenticationDetail) : ''
+    const protocol = getFieldValue('protocol')
     return [
       <div className={classNames} key="limit">
         <div className="second-title">流量控制</div>
@@ -136,6 +137,7 @@ export default class Control extends React.Component {
           </Row>
         </FormItem>
       </div>,
+      protocol === 'soap' &&
       <div className={classNames} key="xml">
         <div className="second-title">防止 XML 攻击</div>
         <FormItem
