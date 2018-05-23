@@ -133,7 +133,8 @@ class App extends React.Component {
   }
 
   renderErrorMessage = () => {
-    const { errorObject, resetErrorMessage } = this.props
+    const { errorObject, resetErrorMessage, location } = this.props
+    const { pathname } = location
     if (!errorObject) {
       return null
     }
@@ -159,6 +160,16 @@ class App extends React.Component {
             }
             window.location = `${authUrl}?${toQuerystring(query)}`
           }
+        },
+      })
+      return
+    }
+    if (status === 404 && pathname.includes('/msa-manage/detail/')) {
+      notification.warn({
+        message: '没有相关配置',
+        onClose: () => {
+          resetErrorMessage()
+          errorMessageCloseObj[errorMessageBeforeDateTime] = true
         },
       })
       return
