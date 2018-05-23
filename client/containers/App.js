@@ -228,7 +228,11 @@ class App extends React.Component {
     const { collapsed } = current.ui
     return (
       <Layout>
-        <CustomizeSider collapsed={collapsed} toggleCollapsed={toggleCollapsed}/>
+        <CustomizeSider
+          currentUser={current.user.info || {}}
+          collapsed={collapsed}
+          toggleCollapsed={toggleCollapsed}
+        />
         <Layout id="app" style={{ marginLeft: collapsed ? 80 : 200 }}>
           {this.renderErrorMessage()}
           <Header
