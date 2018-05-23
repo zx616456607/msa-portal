@@ -84,6 +84,8 @@ export default class Header extends React.Component {
     return (
       <LayoutHeader className={containerStyles}>
         {children}
+        {/* <div/>作为占位符, 当children不存在时, 防止name跑到左侧 */}
+        <div/>
         <div className="">
           <Dropdown
             overlay={
