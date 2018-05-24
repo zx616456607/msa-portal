@@ -234,6 +234,11 @@ class SiderNav extends React.Component {
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
+    if (collapsed) {
+      this.setState({
+        openKeys: [],
+      })
+    }
     const { toggleCollapsed } = this.props
     toggleCollapsed && toggleCollapsed(collapsed)
   }
@@ -262,10 +267,10 @@ class SiderNav extends React.Component {
     )
   }
   findSelectedNOpenKeys = () => {
-    const { location } = this.props
+    const { location, collapsed } = this.props
     const { pathname } = location
     const pathnameList = pathname.split('/').filter(item => item !== '')
-    const defaultOpenKeys = []
+    let defaultOpenKeys = []
     menus.map(menu => {
       let firstPathList = []
       menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
@@ -282,8 +287,12 @@ class SiderNav extends React.Component {
       (to === pathname) && list.push(key)
       return list
     }
-    const s = []
+    let s = []
     menus.map(menu => finderPath(menu, s))
+    if (collapsed) {
+      defaultOpenKeys = []
+      s = []
+    }
     return {
       openKeys: defaultOpenKeys,
       selectedKeys: s,
