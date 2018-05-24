@@ -1,0 +1,29 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of event page
+ *
+ * @author zhangxuan
+ * @date 2018-05-24
+ */
+@import "../../../../../assets/style/core/index";
+
+.event-page {
+  &-btns {
+    & > * {
+      margin-bottom: @padding-small !important;
+    }
+  }
+  &-urgent {
+    width: 12px;
+    height: 12px;
+    fill: @error-color;
+  }
+  &-status {
+    display: flex;
+    align-items: center;
+  }
+}

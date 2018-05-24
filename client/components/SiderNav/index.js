@@ -28,6 +28,7 @@ import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
 import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
+import eventManageIcon from '../../assets/img/msa-manage/event-manage.svg'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
@@ -89,6 +90,19 @@ const menus = [
             key: 'k63',
             to: '/msa-manage/certification-manage/auth-scope',
             name: '授权范围查看',
+          },
+        ],
+      }, {
+        key: 'event-manage',
+        to: '/msa-manage/event-manage',
+        icon: eventManageIcon,
+        name: '事件管理',
+        defaultOpen: true,
+        children: [
+          {
+            key: 'event',
+            to: '/msa-manage/event-manage/event',
+            name: '事件',
           },
         ],
       },
