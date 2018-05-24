@@ -28,6 +28,7 @@ import BlownMonitoring from './containers/MsaManage/BlownMonitoring'
 import CertificationManageClients from './containers/MsaManage/CertificationManage/Clients'
 import CertificationManageAuthMode from './containers/MsaManage/CertificationManage/AuthMode'
 import CertificationManageAuthScope from './containers/MsaManage/CertificationManage/AuthScope'
+import Event from './containers/MsaManage/EventManage/Event/index'
 import Apm from './containers/Apm'
 import Topology from './containers/Apm/Topology'
 import Performance from './containers/Apm/Performance'
@@ -188,6 +189,12 @@ export const msaManageChildRoutes = [
     exact: true,
     component: CertificationManageAuthScope,
     key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/event-manage/event',
+    exact: true,
+    component: Event,
+    key: 'event-manage',
   },
 ]
 

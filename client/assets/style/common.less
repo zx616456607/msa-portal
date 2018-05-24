@@ -240,6 +240,9 @@ body {
 .error-status {
   color: @error-color;
 }
+.warning-status {
+  color: @warning-color;
+}
 .primary-color {
   color: @primary-color;
 }
@@ -279,4 +282,15 @@ body {
       }
     }
   }
+}
+
+.alert-row {
+  margin-bottom: @padding-medium;
+  padding: @padding-small @padding-medium @padding-small @padding-small;
+  line-height: 20px;
+  color: @primary-color;
+  font-size: @font-size-base;
+  background-color: #d9edf6;
+  border: @border-width-base dashed @primary-color;
+  border-radius: @border-radius-medium;
 }
