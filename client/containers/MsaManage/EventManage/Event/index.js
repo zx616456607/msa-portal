@@ -16,7 +16,10 @@ import isEmpty from 'lodash/isEmpty'
 import { Card, Table, Select, Input, DatePicker, Button, Pagination, Icon } from 'antd'
 import './style/index.less'
 import { eventLogList } from '../../../../actions/eventManage'
-import { formatDate, handleHistoryForLoadData, parseOrderToQuery } from '../../../../common/utils'
+import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
+import {
+  eventListSlt,
+} from '../../../../selectors/event'
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
 import URGENT_ICON from '../../../../assets/img/msa-manage/urgent.svg'
@@ -26,20 +29,20 @@ const Option = Select.Option
 
 const EVENT_TYPES = [
   {
-    type: 'EurekaInstanceCanceledEvent',
+    type: 'InstanceDown',
     text: '服务下线事件',
   }, {
-    type: 'EurekaInstanceRegisteredEvent',
+    type: 'InstanceUp',
     text: '服务注册事件',
   }, {
-    type: 'EurekaInstanceRenewedEvent',
+    type: 'InstanceRenewed',
     text: '服务续约事件',
   }, {
-    type: 'EurekaRegistryAvailableEvent',
-    text: 'Eureka注册中心启动事件',
+    type: 'EurekaServerStart',
+    text: '注册服务启动',
   }, {
-    type: 'EurekaServerStartedEvent',
-    text: 'Eureka Server启动事件',
+    type: 'EurekaREgistryStart',
+    text: '注册中心启动',
   },
 ]
 
@@ -47,6 +50,9 @@ const EVENT_LEVELS = [
   {
     level: 'Major',
     text: '重要',
+  }, {
+    level: 'Minor',
+    text: '轻微',
   }, {
     level: 'Normal',
     text: '正常',
@@ -58,7 +64,7 @@ const EVENT_LEVELS = [
 
 const ROOT_PLACES = [
   {
-    root: 'eureka-server',
+    root: 'discovery:spring-cloud-discovery:8761',
     text: '注册中心',
   },
 ]
@@ -109,7 +115,16 @@ class Event extends React.Component {
   tableChange = (pagination, filters, sorter) => {
     let sorterStr = ''
     if (!isEmpty(sorter)) {
-      sorterStr = parseOrderToQuery(sorter)
+      switch (sorter.order) {
+        case 'descend':
+          sorterStr = 'DESC'
+          break
+        case 'ascend':
+          sorterStr = 'ASC'
+          break
+        default:
+          break
+      }
     }
     this.loadData({
       page: pagination.current,
@@ -140,6 +155,23 @@ class Event extends React.Component {
     })
   }
 
+  renderEventType = text => {
+    switch (text) {
+      case 'InstanceDown':
+        return 'InstanceDown'
+      case 'InstanceUp':
+        return '服务上线'
+      case 'InstanceRenewed':
+        return '服务续约'
+      case 'EurekaServerStart':
+        return '注册服务启动'
+      case 'EurekaREgistryStart':
+        return '注册中心启动'
+      default:
+        return '未知'
+    }
+  }
+
   renderEventLevel = text => {
     let displayName = ''
     let icon
@@ -151,6 +183,11 @@ class Event extends React.Component {
           <use xlinkHref={`${URGENT_ICON}`} />
         </svg>)
         classname = 'error-status'
+        break
+      case 'Minor':
+        displayName = '轻微'
+        icon = <Icon type="exclamation-circle" />
+        classname = 'success-status'
         break
       case 'Major':
         displayName = '重要'
@@ -172,7 +209,7 @@ class Event extends React.Component {
   }
 
   render() {
-    const { location } = this.props
+    const { location, eventList, isFetching, totalElements } = this.props
     const { query } = location
 
     const columns = [
@@ -180,27 +217,29 @@ class Event extends React.Component {
         title: '事件类型',
         width: '10%',
         dataIndex: 'eventType',
+        render: this.renderEventType,
       }, {
         title: '事件级别',
-        width: '10%',
+        width: '5%',
         dataIndex: 'eventLevel',
         render: this.renderEventLevel,
       }, {
         title: '事件源',
-        width: '10%',
+        width: '20%',
         dataIndex: 'rootPlace',
       }, {
         title: '服务名称',
-        width: '10%',
+        width: '15%',
         dataIndex: 'appName',
       }, {
         title: '服务实例 ID',
-        width: '10%',
+        width: '20%',
         dataIndex: 'instanceId',
       }, {
         title: '事件详情',
-        width: '30%',
+        width: '10%',
         dataIndex: 'describe',
+        render: _ => _ || '-',
       }, {
         title: '产生时间',
         width: '10%',
@@ -209,23 +248,10 @@ class Event extends React.Component {
         render: text => formatDate(text),
       },
     ]
-    const data = []
-    for (let i = 0; i < 11; i++) {
-      data.push({
-        key: i,
-        eventType: '注册',
-        eventLevel: i === 1 ? 'Major' : 'Critical',
-        rootPlace: '注册中心',
-        appName: 'abc',
-        instanceId: i + 1,
-        describe: 'hahdfhasfasf',
-        eventTime: Date.now(),
-      })
-    }
     const pagination = {
       simple: true,
       pageSize: DEFAULT_PAGESIZE,
-      total: data.length,
+      total: totalElements,
       current: parseInt(query.page, 10) || 1,
       onChange: page => this.loadData({ page }),
     }
@@ -286,7 +312,7 @@ class Event extends React.Component {
           <Button type="primary" icon="search" onClick={() => this.loadData()}>搜索</Button>
           <Button type="primary" icon="reload" onClick={() => this.resetConfig()}>重置</Button>
           <div className="page-box">
-            <span className="total">共计 10 条</span>
+            <span className="total">共计 {totalElements} 条</span>
             <Pagination {...pagination}/>
           </div>
         </div>
@@ -295,7 +321,8 @@ class Event extends React.Component {
             <Table
               columns={columns}
               pagination={false}
-              dataSource={data}
+              dataSource={eventList}
+              loading={isFetching}
               onChange={this.tableChange}
               rowKey={row => row.key}
             />
@@ -307,14 +334,19 @@ class Event extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { current } = state
+  const { current, eventManage } = state
   const { config } = current
   const { cluster } = config
   const { id } = cluster
+  const { eventList } = eventManage
+  const { isFetching, totalElements } = eventList
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
   return {
     clusterID: id,
+    ...eventListSlt(state),
+    isFetching,
+    totalElements,
   }
 }
 
