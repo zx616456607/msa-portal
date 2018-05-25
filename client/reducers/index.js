@@ -23,6 +23,7 @@ import * as configCenter from './configcenter'
 import * as sringcloudComponent from './springcloud'
 import CSB from './CSB'
 import certification from './certification'
+import eventManage from './eventManage'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -73,6 +74,7 @@ const rootReducer = combineReducers({
   ...configCenter,
   CSB,
   certification,
+  eventManage,
 })
 
 export default rootReducer

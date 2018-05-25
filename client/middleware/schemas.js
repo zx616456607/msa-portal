@@ -117,6 +117,11 @@ const msaClientListSchema = new schema.Entity('msaClientList', {}, {
   idAttribute: 'client_id',
 })
 
+// MSA Event list
+const msaEventListSchema = new schema.Entity('msaEventList', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -248,5 +253,10 @@ export const Schemas = {
   },
   MSA_CLIENT_LIST_DATA: {
     resources: [ msaClientListSchema ],
+  },
+  MSA_EVENT_LIST_DATA: {
+    data: {
+      content: [ msaEventListSchema ],
+    },
   },
 }
