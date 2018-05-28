@@ -23,6 +23,7 @@ import {
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
 import URGENT_ICON from '../../../../assets/img/msa-manage/urgent.svg'
+import SLIGHT_ICON from '../../../../assets/img/msa-manage/slight.svg'
 
 const { RangePicker } = DatePicker
 const Option = Select.Option
@@ -186,7 +187,9 @@ class Event extends React.Component {
         break
       case 'Minor':
         displayName = '轻微'
-        icon = <Icon type="exclamation-circle" />
+        icon = (<svg className="event-page-slight">
+          <use xlinkHref={`${SLIGHT_ICON}`} />
+        </svg>)
         classname = 'success-status'
         break
       case 'Major':

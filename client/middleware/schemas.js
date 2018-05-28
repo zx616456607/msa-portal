@@ -122,6 +122,11 @@ const msaEventListSchema = new schema.Entity('msaEventList', {}, {
   idAttribute: 'id',
 })
 
+// MSA Client identity zone list
+const msaClientIdentityZoneListSchema = new schema.Entity('msaClientIdentityZoneList', {}, {
+  idAttribute: 'id',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -259,4 +264,5 @@ export const Schemas = {
       content: [ msaEventListSchema ],
     },
   },
+  MSA_CLIENT_IDENTITY_ZONE_LIST_DATA: [ msaClientIdentityZoneListSchema ],
 }

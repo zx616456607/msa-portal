@@ -17,7 +17,8 @@ import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col } 
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/AddClientModal.less'
-import { createClient, editClient } from '../../../../actions/certification'
+import { createClient, editClient, getIdentityZones } from '../../../../actions/certification'
+import { identityZoneListSlt } from '../../../../selectors/certification'
 import { REDIRECT_URL_REG } from '../../../../constants'
 import { sleep } from '../../../../common/utils'
 
@@ -26,15 +27,6 @@ const CheckboxGroup = Checkbox.Group
 const Option = Select.Option
 
 const authModeOpts = [ 'authorization_code', 'refresh_token', 'password', 'client_credentials' ]
-const authScopes = [
-  'uaa.user', 'uaa.none', 'uaa.admin', 'scim.write', 'scim.read', 'scim.create', 'scim.userids',
-  'scim.invite', 'groups.update', 'password.write', 'openid', 'idps.read', 'idps.write',
-  'clients.admin', 'clients.write', 'clients.read', 'clients.secret', 'zones.read', 'zones.write',
-  'scim.zones', 'oauth.approval', 'oauth.login', 'approvals.me', 'uaa.resource', 'zones.ZONE-ID.admin',
-  'zones.ZONE-ID.read', 'zones.ZONE-ID.clients.admin', 'zones.ZONE-ID.clients.read', 'zones.ZONE-ID.clients.write',
-  'zones.ZONE-ID.clients.scim.read', 'zones.ZONE-ID.clients.scim.create', 'zones.ZONE-ID.clients.scim.write',
-  'zones.ZONE-ID.idps.read',
-]
 
 let uuid = 0
 
@@ -50,7 +42,8 @@ class AddClientModal extends React.Component {
   state = {}
 
   async componentDidMount() {
-    const { form, currentClient } = this.props
+    const { form, currentClient, getIdentityZones } = this.props
+    await getIdentityZones()
     if (isEmpty(currentClient)) {
       return
     }
@@ -268,12 +261,25 @@ class AddClientModal extends React.Component {
   }
 
   renderItem = (key, index) => {
-    const { form, isView } = this.props
+    const { form, isView, identityZoneList, zonesFetching } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 },
     }
+    if (zonesFetching) {
+      return
+    }
+    const ZONE_ID = identityZoneList[0].id
+    const authScopes = [
+      'uaa.user', 'uaa.none', 'uaa.admin', 'scim.write', 'scim.read', 'scim.create', 'scim.userids',
+      'scim.invite', 'groups.update', 'password.write', 'openid', 'idps.read', 'idps.write',
+      'clients.admin', 'clients.write', 'clients.read', 'clients.secret', 'zones.read', 'zones.write',
+      'scim.zones', 'oauth.approval', 'oauth.login', 'approvals.me', 'uaa.resource', `zones.${ZONE_ID}.admin`,
+      `zones.${ZONE_ID}.read`, `zones.${ZONE_ID}.clients.admin`, `zones.${ZONE_ID}.clients.read`,
+      `zones.${ZONE_ID}.clients.write`, `zones.${ZONE_ID}.clients.scim.read`, `zones.${ZONE_ID}.clients.scim.create`,
+      `zones.${ZONE_ID}.clients.scim.write`, `zones.${ZONE_ID}.idps.read`,
+    ]
     return (
       <Row key={`item-${key}`} className="scope-row">
         <Col span={12}>
@@ -450,7 +456,14 @@ class AddClientModal extends React.Component {
   }
 }
 
-export default connect(null, {
+const mapStateToProps = state => {
+  return {
+    ...identityZoneListSlt(state),
+  }
+}
+
+export default connect(mapStateToProps, {
   createClient,
   editClient,
+  getIdentityZones,
 })(Form.create()(AddClientModal))
