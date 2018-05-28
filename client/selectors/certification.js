@@ -26,3 +26,16 @@ export const clientListSlt = createSelector(
     }
   }
 )
+
+export const identityZoneListSlt = createSelector(
+  [ getCertification, getEntities ],
+  (certification, entities) => {
+    const { identityZoneList } = certification || { identityZoneList: {} }
+    const { data, isFetching: zonesFetching } = identityZoneList || { data: [], isFetching: false }
+    const { msaClientIdentityZoneList } = entities || { msaClientIdentityZoneList: {} }
+    return {
+      identityZoneList: (data || []).map(item => msaClientIdentityZoneList[item]),
+      zonesFetching,
+    }
+  }
+)

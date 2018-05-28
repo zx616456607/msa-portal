@@ -147,3 +147,28 @@ const fetchChangeClientSecret = (body, callback) => {
 
 export const changeClientSecret = (body, callback) =>
   dispatch => dispatch(fetchChangeClientSecret(body, callback))
+
+export const GET_IDENTITY_ZONES_REQUEST = 'GET_IDENTITY_ZONES_REQUEST'
+export const GET_IDENTITY_ZONES_SUCCESS = 'GET_IDENTITY_ZONES_SUCCESS'
+export const GET_IDENTITY_ZONES_FAILURE = 'GET_IDENTITY_ZONES_FAILURE'
+
+const fetchIdentityZones = () => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_IDENTITY_ZONES_REQUEST,
+        GET_IDENTITY_ZONES_SUCCESS,
+        GET_IDENTITY_ZONES_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/identity-zones`,
+      isCpi: true,
+      schema: Schemas.MSA_CLIENT_IDENTITY_ZONE_LIST_DATA,
+      options: {
+        headers: clientHeaders,
+      },
+    },
+  }
+}
+
+export const getIdentityZones = () =>
+  dispatch => dispatch(fetchIdentityZones())
