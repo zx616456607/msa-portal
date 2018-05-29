@@ -298,11 +298,16 @@ class SiderNav extends React.Component {
         children.map(item => finderPath(item, list))
         return
       }
-      (to === pathname) && list.push(key)
+      // (to === pathname) && list.push(key)
+      if (pathname.indexOf(to) > -1) {
+        (list.length === 0) && list.push(obj)
+        ;(list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
+      }
       return list
     }
     let s = []
     menus.map(menu => finderPath(menu, s))
+    ;(s.length > 0) && (s = [ s[0].key ])
     if (collapsed) {
       defaultOpenKeys = []
       s = []
