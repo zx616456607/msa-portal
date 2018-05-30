@@ -26,7 +26,7 @@ export default class Protocols extends React.Component {
       value: detail.type,
     }, {
       id: 'targetDetail',
-      title: '端点',
+      title: detail.type ? '端点' : 'WSDL 地址',
       value: detail.targetDetail,
     }, {
       id: 'responseType',
