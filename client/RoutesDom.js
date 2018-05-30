@@ -25,7 +25,8 @@ import MsaRoutingManage from './containers/MsaManage/RoutingManage/index'
 import ApiGateway from './containers/MsaManage/ApiGateway'
 import ApiGatewayMonitoring from './containers/MsaManage/ApiGatewayMonitoring'
 import BlownMonitoring from './containers/MsaManage/BlownMonitoring'
-import CertificationManageClients from './containers/MsaManage/CertificationManage/Clients'
+import CertificationManageAuthZone from './containers/MsaManage/CertificationManage/AuthZone'
+import AuthZoneDetail from './containers/MsaManage/CertificationManage/AuthZone/AuthZoneDetail'
 import CertificationManageAuthMode from './containers/MsaManage/CertificationManage/AuthMode'
 import CertificationManageAuthScope from './containers/MsaManage/CertificationManage/AuthScope'
 import Event from './containers/MsaManage/EventManage/Event/index'
@@ -169,13 +170,19 @@ export const msaManageChildRoutes = [
   {
     path: '/msa-manage/certification-manage',
     exact: true,
-    render: () => <Redirect to="/msa-manage/certification-manage/auth-mode" component={CertificationManageAuthMode} />,
+    render: () => <Redirect to="/msa-manage/certification-manage/auth-zone" component={CertificationManageAuthZone} />,
     key: 'certification-manage',
   },
   {
-    path: '/msa-manage/certification-manage/clients',
+    path: '/msa-manage/certification-manage/auth-zone',
     exact: true,
-    component: CertificationManageClients,
+    component: CertificationManageAuthZone,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/certification-manage/auth-zone/:zoneId',
+    exact: true,
+    component: AuthZoneDetail,
     key: 'certification-manage',
   },
   {
@@ -188,6 +195,12 @@ export const msaManageChildRoutes = [
     path: '/msa-manage/certification-manage/auth-scope',
     exact: true,
     component: CertificationManageAuthScope,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/event-manage',
+    exact: true,
+    render: () => <Redirect to="/msa-manage/event-manage/event" component={Event}/>,
     key: 'certification-manage',
   },
   {

@@ -151,7 +151,6 @@ export default store => next => action => {
     jwt = localStorage.getItem(JWT)
   }
   options.headers = Object.assign({}, { Authorization: `Bearer ${jwt}` }, options.headers)
-
   // Set project to headers
   const currentConfig = store.getState().current.config
   const project = currentConfig.project && currentConfig.project.namespace
