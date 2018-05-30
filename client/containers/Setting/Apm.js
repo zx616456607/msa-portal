@@ -68,8 +68,13 @@ class ApmSetting extends React.Component {
       }
       getApmState(query).then(res => {
         if (res.error) return
+        let isHealthy = ''
+        // TODO: use the status code to show the actual status
+        if (res.response.result.data.status === 1) {
+          isHealthy = 'true'
+        }
         this.setState({
-          state: res.response.result.data ? res.response.result.data.running : '',
+          state: isHealthy,
         })
       })
     }
@@ -289,7 +294,7 @@ class ApmSetting extends React.Component {
     const { apmState, serviceData, state, projectNames } = this.state
     let healthy = null
     if (state !== '') {
-      healthy = state ? <span className="desc">健康</span> :
+      healthy = state ? <span className="desc"><font color="#5cb85c">健康</font></span> :
         <span className="descs">不健康</span>
     } else {
       healthy = <span className="descs">未安装</span>

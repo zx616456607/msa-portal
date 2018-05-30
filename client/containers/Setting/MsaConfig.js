@@ -72,8 +72,13 @@ class MsaConfig extends React.Component {
         getMsaState(cluster.id, item.id).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
+            let isHealthy = ''
+            // TODO: use the status code to show the actual status
+            if (res.response.result.data.status === 1) {
+              isHealthy = 'true'
+            }
             this.setState({
-              springcloudState: res.response.result.data.running,
+              springcloudState: isHealthy,
             })
           }
         })
@@ -215,7 +220,7 @@ class MsaConfig extends React.Component {
     const gitUrl = gitLab.gitUrl
     let healthy = null
     if (springcloudState !== '') {
-      healthy = springcloudState ? <span className="desc">健康</span> :
+      healthy = springcloudState ? <span className="desc"><font color="#5cb85c">健康</font></span> :
         <span className="descs">不健康</span>
     } else {
       healthy = <span className="descs">未安装</span>
