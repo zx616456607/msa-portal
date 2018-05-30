@@ -52,14 +52,18 @@ class NamespaceSwitch extends React.Component {
       }
       let namespace
       let clusterID
-      let setCurrentConfigFlag
+      // let setCurrentConfigFlag
+      let currentNamespace
+      let currentClusterID
       if (localStorage) {
         const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
         if (currentConfig) {
           const configArray = currentConfig.split(',')
           namespace = configArray[0]
           clusterID = configArray[1]
-          setCurrentConfigFlag = true
+          currentNamespace = namespace
+          currentClusterID = clusterID
+          // setCurrentConfigFlag = true
           setCurrentConfig({
             project: { namespace },
             cluster: { id: clusterID },
@@ -97,7 +101,7 @@ class NamespaceSwitch extends React.Component {
           projectsText,
           clustersText,
         })
-        if (!setCurrentConfigFlag) {
+        if (namespace !== currentNamespace || clusterID !== currentClusterID) {
           setCurrentConfig({
             project: { namespace },
             cluster: { id: clusterID },
