@@ -66,6 +66,7 @@ const fetchUaaRefreshToken = body => {
         headers: {
           Accept: CONTENT_TYPE_JSON,
           'Content-Type': CONTENT_TYPE_URLENCODED,
+          Authorization: '',
         },
         body,
       },

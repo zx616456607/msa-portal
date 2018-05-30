@@ -14,7 +14,6 @@ import fetch from 'isomorphic-fetch'
 import { normalize } from 'normalizr'
 import { JWT, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring, getType } from '../common/utils'
-import { UAA_REFRESH_TOKEN_REQUEST } from '../actions/certification'
 
 const { PAAS_API_URL, PAAS_SPI_URL, CLIENT_API_URL } = API_CONFIG
 // Fetches an API response and normalizes the result JSON according to schema.
@@ -152,11 +151,6 @@ export default store => next => action => {
     jwt = localStorage.getItem(JWT)
   }
   options.headers = Object.assign({}, { Authorization: `Bearer ${jwt}` }, options.headers)
-
-  // UAA refresh token Authorization is unnecessary
-  if (requestType === UAA_REFRESH_TOKEN_REQUEST) {
-    delete options.headers.Authorization
-  }
   // Set project to headers
   const currentConfig = store.getState().current.config
   const project = currentConfig.project && currentConfig.project.namespace
