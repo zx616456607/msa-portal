@@ -53,6 +53,7 @@ if (isProd) {
 export const API_CONFIG = apiConfig
 
 export const JWT = 'jwt'
+export const UAA_JWT = 'uaa_jwt'
 export const AUTH_URL = 'auth_url'
 export const DEFAULT = 'default'
 export const ROLE_SYS_ADMIN = 2
@@ -62,6 +63,7 @@ export const CONTENT_TYPE_JSON = 'application/json'
 export const CONTENT_TYPE_TEXT = 'text/plain'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
 export const PINPOINT_LIMIT = 5000
+export const UAA_TOKEN_EXPIRE = 43199
 export const X_GROUP_UNIT = 284211
 export const Y_GROUP_UNIT = 57
 export const ALL = 'all'
@@ -133,4 +135,9 @@ export const INSTANCE_SERVICES = [
   'dsb-server-mysql',
   'dsb-server-redis',
 ]
-export const CLIENT_JWT = 'eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiIyYTNmYjVhYjIwYzc0ZjU4OThhNDdmMTEyMGJkNGNhMS1yIiwic3ViIjoiZWRkYjk3NzgtMmE0ZS00NTBhLTgwM2ItMDg3NDUwZWNjMjZkIiwic2NvcGUiOlsidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInVhYS51c2VyIl0sImlhdCI6MTUyNjkwMDk2MiwiZXhwIjoxNTI5NDkyOTYyLCJjaWQiOiJhZG1pbiIsImNsaWVudF9pZCI6ImFkbWluIiwiaXNzIjoiaHR0cDovLzE5Mi4xNjguMS4yNTQ6ODA4MC91YWEvb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJ1c2VyX25hbWUiOiJ3ZWl3ZWkiLCJvcmlnaW4iOiJ1YWEiLCJ1c2VyX2lkIjoiZWRkYjk3NzgtMmE0ZS00NTBhLTgwM2ItMDg3NDUwZWNjMjZkIiwicmV2X3NpZyI6IjJjOGUyZWI3IiwiYXVkIjpbImNsaWVudHMiLCJ1YWEiLCJhZG1pbiJdfQ.HZ3XXTihHI43nMG3LwhanklapV5hjWqrkRPtwSuX2nY'
+export const DEFAULT_UAA = {
+  client_id: 'admin',
+  client_secret: 'adminsecret',
+  username: 'weiwei',
+  password: 'weiwei',
+}

@@ -15,12 +15,12 @@ import { connect } from 'react-redux'
 import { Card, Table, Button, Input, Dropdown, Menu, notification } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
-import { getClientList, deleteClient } from '../../../../actions/certification'
-import { clientListSlt } from '../../../../selectors/certification'
-import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../constants'
+import { getClientList, deleteClient } from '../../../../../actions/certification'
+import { clientListSlt } from '../../../../../selectors/certification'
+import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../../constants/index'
 import AddClientModal from './AddClientModal'
 import SecretModal from './SecretModal'
-import confirm from '../../../../components/Modal/confirm'
+import confirm from '../../../../../components/Modal/confirm'
 import './style/index.less'
 
 const Search = Input.Search
@@ -229,7 +229,7 @@ class Clients extends React.Component {
           />
         </div>
         <div className="layout-content-body" key="body">
-          <Card>
+          <Card bordered={false}>
             <Table
               columns={columns}
               dataSource={clientList}
