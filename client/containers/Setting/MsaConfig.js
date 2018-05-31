@@ -215,7 +215,7 @@ class MsaConfig extends React.Component {
   }
 
   render() {
-    const { msaState, springcloudState, gitLab, version, serviceData, notCurAry,
+    const { msaState, springcloudState, gitLab, version,
       configDetail } = this.state
     const gitUrl = gitLab.gitUrl
     let healthy = null
@@ -282,41 +282,6 @@ class MsaConfig extends React.Component {
                     <span className="desc">{version}</span>
                   </Col>
                 </Row>
-              </Col>
-              <Col className="rigth" span={12}>
-                <Select className="select" defaultValue="SpringCloud">
-                  <Option value="SpringCloud">SpringCloud</Option>
-                </Select>
-                <div className="projet">
-                  <div className="not">
-                    <span className="des">未安装项目</span>
-                    <div className="notInstalled">
-                      {
-                        Object.keys(notCurAry || {}).length > 0 ?
-                          notCurAry.map((item, index) => (
-                            <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                              <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                            </div>
-                          )) : ''
-                      }
-                    </div>
-                  </div>
-                  <div className="already">
-                    <div className="yes">
-                      <span className="des">已安装项目</span>
-                      <div className="yesInstalled" style={{ marginTop: 5 }}>
-                        {
-                          Object.keys(serviceData).length > 0 ?
-                            serviceData.map((item, index) => (
-                              <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                                <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                              </div>
-                            )) : ''
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </Col>
             </Row>
             <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
