@@ -28,8 +28,8 @@ const MSA_API_URL = MSA_API + MSA_API_PREFIX
 const CSB_API = env.CSB_API || 'http://192.168.1.58:9090'
 const CSB_API_PREFIX = env.CSB_API_PREFIX || '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
-const CLIENT_API = 'http://192.168.1.254:8080'
-const CLIENT_API_PREFIX = '/uaa'
+const CLIENT_API = env.CLIENT_API || 'http://192.168.1.254:8080'
+const CLIENT_API_PREFIX = env.CLIENT_API_PREFIX || '/uaa'
 const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
 const initialConfig = {
   PAAS_API_PROTOCOL,
