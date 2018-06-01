@@ -51,6 +51,8 @@ class Step1 extends React.Component {
         />
         <CascadingLinkRules
           {...otherProps}
+          data={data}
+          isEdit={isEdit}
         />
       </div>,
     ]

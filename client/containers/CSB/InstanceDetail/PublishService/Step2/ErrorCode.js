@@ -29,6 +29,9 @@ export default class ErrorCode extends React.Component {
 
   async componentDidMount() {
     const { data, form } = this.props
+    if (isEmpty(data)) {
+      return
+    }
     const { errorCode } = data
     const parseError = JSON.parse(errorCode)
     if (isEmpty(parseError)) {
