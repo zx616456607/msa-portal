@@ -277,7 +277,7 @@ class ServicesTable extends React.Component {
       async onOk() {
         if (type === 'logout') {
           if (!record.cascadedType) {
-            delInstanceService(instanceID, record.id).then(res => {
+            return delInstanceService(instanceID, record.id).then(res => {
               if (res.error) {
                 notification.error({
                   message: self.serviceMessages(type, true),
