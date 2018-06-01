@@ -78,10 +78,9 @@ const menus = [
         defaultOpen: true,
         children: [
           {
-            key: 'k461',
-            to: '/msa-manage/certification-manage/clients',
-            name: '客户端管理',
-            // disabled: true,
+            key: 'auth-zone',
+            to: '/msa-manage/certification-manage/auth-zone',
+            name: '认证域管理',
           }, {
             key: 'k462',
             to: '/msa-manage/certification-manage/auth-mode',

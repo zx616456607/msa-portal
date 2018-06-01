@@ -68,8 +68,13 @@ class ApmSetting extends React.Component {
       }
       getApmState(query).then(res => {
         if (res.error) return
+        let isHealthy = ''
+        // TODO: use the status code to show the actual status
+        if (res.response.result.data.status === 1) {
+          isHealthy = 'true'
+        }
         this.setState({
-          state: res.response.result.data ? res.response.result.data.running : '',
+          state: isHealthy,
         })
       })
     }
@@ -286,10 +291,10 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { apmState, serviceData, state, projectNames } = this.state
+    const { apmState, state } = this.state
     let healthy = null
     if (state !== '') {
-      healthy = state ? <span className="desc">健康</span> :
+      healthy = state ? <span className="desc"><font color="#5cb85c">健康</font></span> :
         <span className="descs">不健康</span>
     } else {
       healthy = <span className="descs">未安装</span>
@@ -365,44 +370,6 @@ class ApmSetting extends React.Component {
                     <span className="version">{this.state.version.version}</span>
                   </Col>
                 </Row>
-              </Col>
-              <Col className="rigth" span="12">
-                <Select className="select" defaultValue="Pinpoint">
-                  <Option value="pinpoint">Pinpoint</Option>
-                </Select>
-                <div className="projet">
-                  <div className="not">
-                    <span className="des">未安装项目</span>
-                    <div className="notInstalled">
-                      {
-                        Object.keys(projectNames).length > 0 ?
-                          projectNames[0] && projectNames[0].map((item, index) => (
-                            <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                              <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                            </div>
-                          )) : ''
-                      }
-                    </div>
-                  </div>
-                  <div className="already">
-                    <div className="yes">
-                      <span className="des">已安装项目</span>
-                      <div className="yesInstalled" style={{ marginTop: 5 }}>
-                        {/* <div style={{ width: 90, display: 'inline-block' }}>
-                         <span style={{ color: '#2db7f5', fontSize: 14 }}>{MY_PORJECT}</span>
-                         </div> */}
-                        {
-                          Object.keys(serviceData).length > 0 ?
-                            serviceData.map((item, index) => (
-                              <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                                <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                              </div>
-                            )) : ''
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </Col>
             </Row>
             <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}

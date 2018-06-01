@@ -37,7 +37,7 @@ export default class IndentTip extends React.Component {
         </div>
         <div>
           <CopyToClipboardComponent
-            content={<span>ak:{record.secret}</span>}
+            content={<span>sk:{record.secret}</span>}
             message={record.secret}
           />
         </div>

@@ -142,7 +142,7 @@ export default class Control extends React.Component {
         <div className="second-title">防止 XML 攻击</div>
         <FormItem
           {...formItemLayout}
-          label="XML 元素名称长度"
+          label="元素名称长度"
         >
           最长
           {getFieldDecorator('maxElementNameLength', {
@@ -156,11 +156,11 @@ export default class Control extends React.Component {
               placeholder="请填写整数"
             />
           )}
-          位
+          字符
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="XML 各元素属性数量"
+          label="元素属性数量"
         >
           最多
           {getFieldDecorator('maxAttibuteCount', {

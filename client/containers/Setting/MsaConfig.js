@@ -72,8 +72,13 @@ class MsaConfig extends React.Component {
         getMsaState(cluster.id, item.id).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
+            let isHealthy = ''
+            // TODO: use the status code to show the actual status
+            if (res.response.result.data.status === 1) {
+              isHealthy = 'true'
+            }
             this.setState({
-              springcloudState: res.response.result.data.running,
+              springcloudState: isHealthy,
             })
           }
         })
@@ -210,12 +215,12 @@ class MsaConfig extends React.Component {
   }
 
   render() {
-    const { msaState, springcloudState, gitLab, version, serviceData, notCurAry,
+    const { msaState, springcloudState, gitLab, version,
       configDetail } = this.state
     const gitUrl = gitLab.gitUrl
     let healthy = null
     if (springcloudState !== '') {
-      healthy = springcloudState ? <span className="desc">健康</span> :
+      healthy = springcloudState ? <span className="desc"><font color="#5cb85c">健康</font></span> :
         <span className="descs">不健康</span>
     } else {
       healthy = <span className="descs">未安装</span>
@@ -277,41 +282,6 @@ class MsaConfig extends React.Component {
                     <span className="desc">{version}</span>
                   </Col>
                 </Row>
-              </Col>
-              <Col className="rigth" span={12}>
-                <Select className="select" defaultValue="SpringCloud">
-                  <Option value="SpringCloud">SpringCloud</Option>
-                </Select>
-                <div className="projet">
-                  <div className="not">
-                    <span className="des">未安装项目</span>
-                    <div className="notInstalled">
-                      {
-                        Object.keys(notCurAry || {}).length > 0 ?
-                          notCurAry.map((item, index) => (
-                            <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                              <span style={{ color: '#2db7f5', fontSize: 14 }}>{item}</span>
-                            </div>
-                          )) : ''
-                      }
-                    </div>
-                  </div>
-                  <div className="already">
-                    <div className="yes">
-                      <span className="des">已安装项目</span>
-                      <div className="yesInstalled" style={{ marginTop: 5 }}>
-                        {
-                          Object.keys(serviceData).length > 0 ?
-                            serviceData.map((item, index) => (
-                              <div key={index} style={{ marginRight: 10, display: 'inline-block' }}>
-                                <span style={{ color: '#2db7f5', fontSize: 14 }}>{item.namespace}</span>
-                              </div>
-                            )) : ''
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </Col>
             </Row>
             <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}

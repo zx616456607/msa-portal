@@ -34,7 +34,7 @@ const callApi = (endpoint, options, schema) => {
 
   // Support cpi
   if (options.isCpi) {
-    fullUrl = (endpoint.indexOf(CLIENT_API_URL) === -1) ? PAAS_API_URL + endpoint : endpoint
+    fullUrl = (endpoint.indexOf(CLIENT_API_URL) === -1) ? CLIENT_API_URL + endpoint : endpoint
     delete options.isCpi
   }
   fullUrl = encodeURI(fullUrl)
@@ -151,7 +151,6 @@ export default store => next => action => {
     jwt = localStorage.getItem(JWT)
   }
   options.headers = Object.assign({}, { Authorization: `Bearer ${jwt}` }, options.headers)
-
   // Set project to headers
   const currentConfig = store.getState().current.config
   const project = currentConfig.project && currentConfig.project.namespace

@@ -229,7 +229,7 @@ class NamespaceSwitch extends React.Component {
           visible={clustersDropdownVisible}
           onVisibleChange={visible => this.setState({ clustersDropdownVisible: visible })}
           overlay={
-            <Menu selectable onSelect={this.handleClusterChange}>
+            <Menu selectable onClick={this.handleClusterChange}>
               {
                 currentProjectClusters.map(cluster => (
                   <Menu.Item key={cluster.clusterID} disabled={!cluster.isOk}>

@@ -148,11 +148,11 @@ export function formatWSMessage(message) {
   switch (type) {
     // error
     case 'service_already_exist':
-      msg = '同名同版本号的服务已经存在'
+      msg = '该csb实例中已有相同名称相同版本号的服务发布'
       notifyType = 'warning'
       break
     case 'service_already_exist_in_instance':
-      msg = '同名同版本号的服务已经存在'
+      msg = '该csb实例中已有相同名称相同版本号的服务发布'
       notifyType = 'warning'
       break
     case 'service_group_not_exist_in_instance':

@@ -17,10 +17,10 @@ import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col } 
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/AddClientModal.less'
-import { createClient, editClient, getIdentityZones } from '../../../../actions/certification'
-import { identityZoneListSlt } from '../../../../selectors/certification'
-import { REDIRECT_URL_REG } from '../../../../constants'
-import { sleep } from '../../../../common/utils'
+import { createClient, editClient, getIdentityZones } from '../../../../../actions/certification'
+import { identityZoneListSlt } from '../../../../../selectors/certification'
+import { REDIRECT_URL_REG } from '../../../../../constants'
+import { sleep } from '../../../../../common/utils'
 
 const FormItem = Form.Item
 const CheckboxGroup = Checkbox.Group
@@ -267,7 +267,7 @@ class AddClientModal extends React.Component {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 },
     }
-    if (zonesFetching) {
+    if (zonesFetching || isEmpty(identityZoneList)) {
       return
     }
     const ZONE_ID = identityZoneList[0].id

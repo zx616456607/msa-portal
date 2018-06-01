@@ -267,7 +267,7 @@ class BlackAndWhiteListModal extends React.Component {
               <Col span="4">
                 默认配置
                 <Tooltip
-                  title={`对于即不在白名单里，也在黑名单里的IP地址，\n
+                  title={`对于既不在白名单里，也不在黑名单里的IP地址，\n
             通过：表示无需鉴权即可访问；\n
             拒绝：代表该服务默认不允许任何 IP 地址访问`}
                   placement="top"
