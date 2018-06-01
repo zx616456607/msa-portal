@@ -12,8 +12,10 @@
 
 import React from 'react'
 import ClassNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 import { Row, Col, Input, Button, Icon, Form } from 'antd'
 import './style/ErrorCode.less'
+import { sleep } from '../../../../../common/utils'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea
@@ -24,6 +26,34 @@ export default class ErrorCode extends React.Component {
   }
 
   uuid = 0
+
+  async componentDidMount() {
+    const { data, form } = this.props
+    const { errorCode } = data
+    const parseError = JSON.parse(errorCode)
+    if (isEmpty(parseError)) {
+      return
+    }
+    const keys = []
+    const errObj = {}
+    parseError.forEach((err, index) => {
+      this.uuid = index
+      keys.push(index)
+      const { code, advice, description } = err
+      Object.assign(errObj, {
+        [`code-${index}`]: code,
+        [`advice-${index}`]: advice,
+        [`description-${index}`]: description,
+      })
+    })
+    form.setFieldsValue({
+      errCodeKeys: keys,
+    })
+    await sleep()
+    form.setFieldsValue({
+      ...errObj,
+    })
+  }
 
   add = () => {
     this.uuid++
@@ -193,7 +223,7 @@ export default class ErrorCode extends React.Component {
   }
 
   render() {
-    const { className, form, formItemLayout, data } = this.props
+    const { className, form, formItemLayout } = this.props
     const { getFieldDecorator, getFieldValue } = form
     getFieldDecorator('errCodeKeys', { initialValue: [] })
     const keys = getFieldValue('errCodeKeys')
@@ -201,7 +231,6 @@ export default class ErrorCode extends React.Component {
       'error-code': true,
       [className]: !!className,
     })
-    const Arykes = Object.keys(data).length > 0 ? JSON.parse(data.errorCode) : ''
     return (
       <div className={classNames}>
         {
@@ -260,8 +289,7 @@ export default class ErrorCode extends React.Component {
               <Col span={6}>操作</Col>
             </Row>
             {
-              Arykes ? Arykes.map(this.renderItem) :
-                keys.map(this.renderItem)
+              keys.map(this.renderItem)
             }
             {
               keys.length === 0 &&
