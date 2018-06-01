@@ -34,7 +34,7 @@ const callApi = (endpoint, options, schema) => {
 
   // Support cpi
   if (options.isCpi) {
-    fullUrl = (endpoint.indexOf(CLIENT_API_URL) === -1) ? PAAS_API_URL + endpoint : endpoint
+    fullUrl = (endpoint.indexOf(CLIENT_API_URL) === -1) ? CLIENT_API_URL + endpoint : endpoint
     delete options.isCpi
   }
   fullUrl = encodeURI(fullUrl)
