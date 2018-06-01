@@ -94,7 +94,7 @@ class MsaConfig extends React.Component {
         this.setState({
           serviceData: res.response.result.data,
         }, () => {
-          this.filters()
+          // this.filters()
         })
       }
     })
