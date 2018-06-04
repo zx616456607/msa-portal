@@ -14,14 +14,16 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
-import { Card, Table, Button, Input, Dropdown, Menu, Modal } from 'antd'
+import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
 import {
-  getUaaAuth, getIdentityZones, getUaaRefreshToken, UAA_AUTH_FAILURE,
+  getUaaAuth, getIdentityZones, getUaaRefreshToken, UAA_AUTH_FAILURE, deleteIdentityZone,
 } from '../../../../actions/certification'
 import { identityZoneListSlt } from '../../../../selectors/certification'
 import './style/index.less'
 import { DEFAULT_PAGE, DEFAULT_PAGESIZE, UAA_JWT, UAA_TOKEN_EXPIRE, DEFAULT_UAA } from '../../../../constants'
 import { formatDate } from '../../../../common/utils'
+import AuthZoneModal from './AuthZoneModal'
+import Confirm from '../../../../components/Modal/confirm'
 
 const Search = Input.Search
 
@@ -31,7 +33,6 @@ class AuthZone extends React.Component {
   }
 
   async componentDidMount() {
-    const { getIdentityZones } = this.props
     const uaaInfo = JSON.parse(localStorage.getItem(UAA_JWT))
     if (!isEmpty(uaaInfo)) {
       const { from, refresh_token } = uaaInfo
@@ -47,19 +48,25 @@ class AuthZone extends React.Component {
       // 本地存储中没有uaa token
       await this.getUaaAuthToken()
     }
-    await getIdentityZones()
+    this.getZones()
+  }
+
+  getZones = () => {
+    const { getIdentityZones } = this.props
+    getIdentityZones()
   }
 
   getUaaAuthToken = async () => {
     const { getUaaAuth, history } = this.props
     const { client_id, client_secret, username, password } = DEFAULT_UAA
-    const query = {
+    const body = {
       username,
       password,
       client_id,
+      client_secret,
       grant_type: 'password',
     }
-    const accessRes = await getUaaAuth(client_id, client_secret, query)
+    const accessRes = await getUaaAuth(body)
     if (accessRes.type === UAA_AUTH_FAILURE) {
       Modal.error({
         title: '认证失败',
@@ -99,20 +106,53 @@ class AuthZone extends React.Component {
     }
   }
 
-  handleClick = e => {
+  handleClick = (e, record) => {
     switch (e.key) {
       case 'edit':
+        this.setState({
+          visible: true,
+          currentAuthZone: record,
+        })
         break
       case 'delete':
+        this.deleteZone(record)
         break
       default:
         break
     }
   }
 
+  deleteZone = record => {
+    const { deleteIdentityZone } = this.props
+    Confirm({
+      modalTitle: '删除认证域',
+      title: '确定要删除该认证域吗？',
+      content: '注：删除后将无法恢复',
+      onOk: () => {
+        return deleteIdentityZone(record.id).then(() => {
+          notification.success({
+            message: '删除成功',
+          })
+          this.getZones()
+        }).catch(() => {
+          notification.warn({
+            message: '删除失败',
+          })
+        })
+      },
+    })
+  }
+
+  closeAuthZoneModal = () => {
+    this.setState({
+      visible: false,
+      currentAuthZone: {},
+    })
+  }
+
   render() {
-    const { inputValue, current } = this.state
-    const { identityZoneList, zonesFetching } = this.props
+    const { inputValue, current, visible, currentAuthZone } = this.state
+    const { identityZoneList, zonesFetching, history } = this.props
     const pagination = {
       simple: true,
       total: 10 || 0,
@@ -137,6 +177,7 @@ class AuthZone extends React.Component {
         title: 'SubDomain',
         dataIndex: 'subdomain',
         width: '20%',
+        render: text => text || '-',
       },
       {
         title: '更新时间',
@@ -150,7 +191,7 @@ class AuthZone extends React.Component {
         render: (_, record) => (
           <Dropdown.Button
             className="auth-zone-dropdown"
-            // onClick={() => this.viewClient(record)}
+            onClick={() => history.push(`/msa-manage/certification-manage/auth-zone/${record.id}`)}
             overlay={
               <Menu style={{ width: 110 }} onClick={e => this.handleClick(e, record)}>
                 <Menu.Item key="edit">编辑</Menu.Item>
@@ -166,10 +207,17 @@ class AuthZone extends React.Component {
     return (
       <QueueAnim className="auto-zone">
         <div className="layout-content-btns" key="btns">
-          <Button icon="plus" type="primary">
+          {
+            visible &&
+            <AuthZoneModal
+              {...{ visible, currentAuthZone }}
+              closeModal={this.closeAuthZoneModal}
+            />
+          }
+          <Button icon="plus" type="primary" onClick={() => this.setState({ visible: true })}>
             添加认证域
           </Button>
-          <Button icon="reload">
+          <Button icon="reload" onClick={this.getZones}>
             刷新
           </Button>
           {/* <Button icon="delete">*/}
@@ -182,13 +230,17 @@ class AuthZone extends React.Component {
             onChange={e => this.setState({ inputValue: e.target.value })}
             // onSearch={this.loadClientList}
           />
+          <div className="page-box">
+            <span className="total">共 10 条</span>
+            <Pagination {...pagination}/>
+          </div>
         </div>
         <div className="layout-content-body" key="body">
           <Card>
             <Table
               columns={columns}
               dataSource={identityZoneList}
-              pagination={pagination}
+              pagination={false}
               loading={zonesFetching}
               rowKey={record => record.id}
             />
@@ -209,4 +261,5 @@ export default connect(mapStateToProps, {
   getUaaAuth,
   getUaaRefreshToken,
   getIdentityZones,
+  deleteIdentityZone,
 })(AuthZone)

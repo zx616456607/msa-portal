@@ -21,11 +21,9 @@ export const UAA_AUTH_REQUEST = 'UAA_AUTH_REQUEST'
 export const UAA_AUTH_SUCCESS = 'UAA_AUTH_SUCCESS'
 export const UAA_AUTH_FAILURE = 'UAA_AUTH_FAILURE'
 
-const fetchUaaAuth = (client_id, client_secret, query) => {
-  let endpoint = `${CLIENT_API_URL}/oauth/token`
-  if (query) {
-    endpoint += `?${toQuerystring(query)}`
-  }
+const fetchUaaAuth = body => {
+  const endpoint = `${CLIENT_API_URL}/oauth/token`
+
   return {
     [CALL_API]: {
       types: [
@@ -37,15 +35,19 @@ const fetchUaaAuth = (client_id, client_secret, query) => {
       schema: Schemas.UAA_AUTH,
       options: {
         headers: {
-          Authorization: 'Basic ' + btoa(`${client_id}:${client_secret}`),
+          'Content-Type': CONTENT_TYPE_URLENCODED,
+          Accept: CONTENT_TYPE_JSON,
+          Authorization: '',
         },
+        method: 'POST',
+        body,
       },
     },
   }
 }
 
-export const getUaaAuth = (clientId, clientSecret, query) =>
-  dispatch => dispatch(fetchUaaAuth(clientId, clientSecret, query))
+export const getUaaAuth = body =>
+  dispatch => dispatch(fetchUaaAuth(body))
 
 export const UAA_REFRESH_TOKEN_REQUEST = 'UAA_REFRESH_TOKEN_REQUEST'
 export const UAA_REFRESH_TOKEN_SUCCESS = 'UAA_REFRESH_TOKEN_SUCCESS'
@@ -255,4 +257,132 @@ export const getIdentityZones = () =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     return dispatch(fetchIdentityZones(access_token))
+  }
+
+const CREATE_IDENTITY_ZONES_REQUEST = 'CREATE_IDENTITY_ZONES_REQUEST'
+const CREATE_IDENTITY_ZONES_SUCCESS = 'CREATE_IDENTITY_ZONES_SUCCESS'
+const CREATE_IDENTITY_ZONES_FAILURE = 'CREATE_IDENTITY_ZONES_FAILURE'
+
+const fetchCreateIdentityZones = (body, token) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_IDENTITY_ZONES_REQUEST,
+        CREATE_IDENTITY_ZONES_SUCCESS,
+        CREATE_IDENTITY_ZONES_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/identity-zones`,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          'Content-Type': CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const createIdentityZones = body =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchCreateIdentityZones(body, access_token))
+  }
+
+export const IDENTITY_ZONE_DETAIL_REQUEST = 'IDENTITY_ZONE_DETAIL_REQUEST'
+export const IDENTITY_ZONE_DETAIL_SUCCESS = 'IDENTITY_ZONE_DETAIL_SUCCESS'
+export const IDENTITY_ZONE_DETAIL_FAILURE = 'IDENTITY_ZONE_DETAIL_FAILURE'
+
+const fetchIdentityZoneDetail = (id, token) => {
+  return {
+    [CALL_API]: {
+      types: [
+        IDENTITY_ZONE_DETAIL_REQUEST,
+        IDENTITY_ZONE_DETAIL_SUCCESS,
+        IDENTITY_ZONE_DETAIL_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/identity-zones/${id}`,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    },
+  }
+}
+
+export const getIdentityZoneDetail = id =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchIdentityZoneDetail(id, access_token))
+  }
+
+const UPDATE_IDENTITY_ZONE_REQUEST = 'UPDATE_IDENTITY_ZONE_REQUEST'
+const UPDATE_IDENTITY_ZONE_SUCCESS = 'UPDATE_IDENTITY_ZONE_SUCCESS'
+const UPDATE_IDENTITY_ZONE_FAILURE = 'UPDATE_IDENTITY_ZONE_FAILURE'
+
+const fetchUpdateIdentityZone = (body, token) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_IDENTITY_ZONE_REQUEST,
+        UPDATE_IDENTITY_ZONE_SUCCESS,
+        UPDATE_IDENTITY_ZONE_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/identity-zones/${body.id}`,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': CONTENT_TYPE_JSON,
+        },
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateIdentityZone = body =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUpdateIdentityZone(body, access_token))
+  }
+
+const DELETE_IDENTITY_ZONE_REQUEST = 'DELETE_IDENTITY_ZONE_REQUEST'
+const DELETE_IDENTITY_ZONE_SUCCESS = 'DELETE_IDENTITY_ZONE_SUCCESS'
+const DELETE_IDENTITY_ZONE_FAILURE = 'DELETE_IDENTITY_ZONE_FAILURE'
+
+const fetchDeleteIdentityZone = (id, token) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_IDENTITY_ZONE_REQUEST,
+        DELETE_IDENTITY_ZONE_SUCCESS,
+        DELETE_IDENTITY_ZONE_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/identity-zones/${id}`,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': CONTENT_TYPE_JSON,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteIdentityZone = id =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDeleteIdentityZone(id, access_token))
   }
