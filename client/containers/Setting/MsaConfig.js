@@ -93,32 +93,9 @@ class MsaConfig extends React.Component {
       if (res.response.result.code === 200) {
         this.setState({
           serviceData: res.response.result.data,
-        }, () => {
-          this.filters()
         })
       }
     })
-  }
-
-  filters = () => {
-    const { projectID } = this.props
-    const { serviceData } = this.state
-    const DataAry = []
-    if (Object.keys(serviceData).length === 0) {
-      this.setState({
-        notCurAry: projectID,
-      })
-    } else {
-      serviceData.forEach(item => {
-        if (projectID.indexOf(item.namespace) > -1) {
-          projectID.splice(projectID.indexOf(item.namespace), 1)
-        }
-      })
-      DataAry.push(projectID)
-      this.setState({
-        notCurAry: DataAry[0],
-      })
-    }
   }
 
   /**
