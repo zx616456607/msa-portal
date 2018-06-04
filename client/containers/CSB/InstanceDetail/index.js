@@ -173,7 +173,7 @@ class CSBInstanceDetail extends React.Component {
           },
           {
             to: `/csb-instances-available/${instanceID}/public-services`,
-            text: '公开服务',
+            text: '无需订阅服务',
           },
           {
             to: `/csb-instances-available/${instanceID}/consumer-vouchers`,

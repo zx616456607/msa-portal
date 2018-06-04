@@ -14,6 +14,7 @@ import { connect } from 'react-redux'
 import { Card, Row, Col, Tabs } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
+import { getIdentityZoneDetail } from '../../../../../actions/certification'
 import AUTH_ZONE_ICON from '../../../../../assets/img/msa-manage/auth-zone.png'
 import Client from '../Clients/index'
 import './style/index.less'
@@ -23,7 +24,9 @@ const TabPane = Tabs.TabPane
 class AuthZoneDetail extends React.Component {
 
   componentDidMount() {
-    const { uaaAuth, history } = this.props
+    const { uaaAuth, history, getIdentityZoneDetail, match } = this.props
+    const { zoneId } = match.params
+    getIdentityZoneDetail(zoneId)
     if (isEmpty(uaaAuth)) {
       history.push('/msa-manage/certification-manage')
     }
@@ -41,20 +44,19 @@ class AuthZoneDetail extends React.Component {
 
   render() {
     const { activeKey } = this.state
-    const { match } = this.props
-    const { zoneId } = match.params
+    const { identityZoneDetail } = this.props
     return (
       <QueueAnim className="auth-zone-detail">
         <Card key={'auth-zone-detail-header'} className="auth-zone-detail-header">
           <div className="header-detail-box">
             <img src={AUTH_ZONE_ICON} className="auth-zone-icon" alt="auth-zone-icon"/>
             <div className="auth-zone-info">
-              <div className="auth-zone-name">认证域：{zoneId}</div>
+              <div className="auth-zone-name">认证域：{identityZoneDetail.name}</div>
               <Row>
-                <Col span={12}>认证域 ID：{zoneId}</Col>
-                <Col span={12}>描述：xxxxx</Col>
+                <Col span={12}>认证域 ID：{identityZoneDetail.id}</Col>
+                <Col span={12}>描述：{identityZoneDetail.description || '-'}</Col>
               </Row>
-              <div>SubDomain：xxx</div>
+              <div>SubDomain：{identityZoneDetail.subdomain || '-'}</div>
             </div>
           </div>
         </Card>
@@ -71,10 +73,15 @@ class AuthZoneDetail extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { uaaAuth } = state.entities
+  const { entities, certification } = state
+  const { uaaAuth } = entities
+  const { identityZoneDetail } = certification
   return {
     uaaAuth,
+    identityZoneDetail,
   }
 }
 
-export default connect(mapStateToProps)(AuthZoneDetail)
+export default connect(mapStateToProps, {
+  getIdentityZoneDetail,
+})(AuthZoneDetail)

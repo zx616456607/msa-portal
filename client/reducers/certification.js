@@ -54,6 +54,27 @@ const identityZoneList = (state = {}, action) => {
   }
 }
 
+const identityZoneDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.IDENTITY_ZONE_DETAIL_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+      })
+    case ActionTypes.IDENTITY_ZONE_DETAIL_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        ...action.response.result,
+      })
+    case ActionTypes.IDENTITY_ZONE_DETAIL_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+      })
+    default:
+      return state
+  }
+}
+
 const certification = (state = {
   clientList: {},
   identityZoneList: {},
@@ -61,6 +82,7 @@ const certification = (state = {
   return {
     clientList: clientList(state.clientList, action),
     identityZoneList: identityZoneList(state.identityList, action),
+    identityZoneDetail: identityZoneDetail(state.identityZoneDetail, action),
   }
 }
 
