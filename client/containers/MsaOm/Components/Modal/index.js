@@ -90,6 +90,7 @@ export default class MsaModal extends React.Component {
                         min={1}
                         max={20}
                         value={this.state.inputValue}
+                        onChange={this.handleRealNum}
                       /> 个
                     </Col>
                   </Row>
