@@ -161,10 +161,18 @@ class CSBInstanceOm extends React.Component {
           if (res.error) {
             return
           }
+          this.setState({
+            currentInstance: null,
+          })
           notification.success({
             message: `实例 ${name} ${modalTitle}成功`,
           })
           self.getInstanceList()
+        })
+      },
+      onCancel: () => {
+        this.setState({
+          currentInstance: null,
         })
       },
     })
