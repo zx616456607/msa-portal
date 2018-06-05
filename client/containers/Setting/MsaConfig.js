@@ -15,22 +15,20 @@ import { connect } from 'react-redux'
 import './style/MsaConfig.less'
 import isEmpty from 'lodash/isEmpty'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
-import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card } from 'antd'
+import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card, Form, Tooltip } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 const Option = Select.Option
+const FormItem = Form.Item
 
 class MsaConfig extends React.Component {
   state = {
-    gitLab: '',
+    gitLab: {},
     percent: 0,
-    version: '',
-    configDetail: '',
     isEdit: false,
     msaState: false,
     uninstall: false,
     installSate: false,
     notCurAry: [],
-    serviceData: [],
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -38,7 +36,6 @@ class MsaConfig extends React.Component {
 
   componentWillMount() {
     this.load()
-    this.fetchSpingCloudState()
   }
 
   load = () => {
@@ -68,7 +65,6 @@ class MsaConfig extends React.Component {
         this.setState({
           msaState: true,
           gitLab: JSON.parse(item.configDetail),
-          version: JSON.parse(item.configDetail).version,
         })
         getMsaState(cluster.id, item.id).then(res => {
           if (res.error) return
@@ -87,18 +83,6 @@ class MsaConfig extends React.Component {
     })
   }
 
-  fetchSpingCloudState = () => {
-    const { fetchSpingCloud, cluster } = this.props
-    fetchSpingCloud(cluster.id).then(res => {
-      if (res.error) return
-      if (res.response.result.code === 200) {
-        this.setState({
-          serviceData: res.response.result.data,
-        })
-      }
-    })
-  }
-
   /**
    * 卸载 Spring Cloud
    */
@@ -110,12 +94,12 @@ class MsaConfig extends React.Component {
   handleDel = () => {
     const { springcloudID } = this.state
     const { uninstallMsaConfig, cluster, project, namespace } = this.props
-    let filterSpring = springcloudID.filter(item => item.namespace === namespace)
+    let filterSpring = springcloudID.filter(item => item.namespace === project.namespace)
     if (isEmpty(filterSpring)) {
       return
     }
     this.setState({
-      delLoading: true
+      delLoading: true,
     })
     filterSpring = filterSpring[0]
     const query = {
@@ -125,7 +109,7 @@ class MsaConfig extends React.Component {
     uninstallMsaConfig(cluster.id, projects, query).then(res => {
       if (res.error) {
         this.setState({
-          delLoading: false
+          delLoading: false,
         })
         return
       }
@@ -133,7 +117,7 @@ class MsaConfig extends React.Component {
         this.setState({
           msaState: false,
           uninstall: false,
-          delLoading: false
+          delLoading: false,
         })
       }
     })
@@ -142,27 +126,49 @@ class MsaConfig extends React.Component {
    * 安装 Spring Cloud
    */
   handleInstall = () => {
-    const { configDetail } = this.state
-    const { installMsaConfig, cluster, project } = this.props
-    const body = {
-      type: 'springcloud',
-      configDetail,
-    }
-    if (configDetail === '') {
-      notification.error({
-        message: 'Config Server Gitlab信息不可以空',
-      })
-      return
-    }
-    const namespace = project.namespace === 'default' ? '' : project.namespace
-    installMsaConfig(body, cluster.id, namespace).then(res => {
-      if (res.error) return
-      this.play()
+    const { installMsaConfig, cluster, project, form } = this.props
+    const { validateFields } = form
+    validateFields((errors, values) => {
+      if (errors) {
+        return
+      }
+      const { gitUrl, gitUser, gitPassword, gitToken } = values
+      let configDetail = {
+        gitUrl,
+        gitUser,
+        gitPassword,
+        gitToken,
+      }
       this.setState({
-        msaState: true,
-        installSate: true,
+        installLoading: true,
       })
-      this.fetchSpingCloudState()
+      configDetail = JSON.stringify(configDetail)
+      const body = {
+        type: 'springcloud',
+        configDetail,
+      }
+      const namespace = project.namespace === 'default' ? '' : project.namespace
+      installMsaConfig(body, cluster.id, namespace).then(res => {
+        if (res.error) {
+          this.setState({
+            installLoading: false,
+          })
+          notification.warn({
+            message: '安装失败',
+          })
+          return
+        }
+        notification.success({
+          message: '安装成功',
+        })
+        this.load()
+        this.play()
+        this.setState({
+          msaState: true,
+          installSate: true,
+          installLoading: false,
+        })
+      })
     })
   }
 
@@ -196,16 +202,52 @@ class MsaConfig extends React.Component {
     })
   }
 
-  handlechange = e => {
-    this.setState({
-      configDetail: e.target.value,
-    })
+  gitUrlCheck = (rules, value, callback) => {
+    if (!value) {
+      return callback('Config Server Gitlab信息不可以空')
+    }
+    if (!/^https?/.test(value)) {
+      return callback('请输入 http 协议地址')
+    }
+    callback()
+  }
+
+  gitUserCheck = (rules, value, callback) => {
+    if (!value) {
+      return callback('Gitlab 用户名不能为空')
+    }
+    callback()
+  }
+
+  gitPasswordCheck = (rules, value, callback) => {
+    if (!value) {
+      return callback('Gitlab 密码不能为空')
+    }
+    callback()
+  }
+
+  gitTokenCheck = (rules, value, callback) => {
+    if (!value) {
+      return callback('token 不能为空')
+    }
+    callback()
   }
 
   render() {
-    const { msaState, springcloudState, gitLab, version,
-      configDetail } = this.state
-    const gitUrl = gitLab.gitUrl
+    const {
+      msaState, springcloudState, installLoading, gitLab,
+    } = this.state
+    const { gitUrl, version } = gitLab
+    let parseGit = {}
+    if (!isEmpty(gitUrl)) {
+      parseGit = JSON.parse(gitUrl)
+    }
+    const { form } = this.props
+    const { getFieldDecorator } = form
+    const formItemLayout = {
+      labelCol: { span: 5 },
+      wrapperCol: { span: 19 },
+    }
     let healthy = null
     if (springcloudState !== '') {
       healthy = springcloudState ? <span className="desc"><font color="#5cb85c">健康</font></span> :
@@ -221,29 +263,126 @@ class MsaConfig extends React.Component {
             className="msa_config_style"
           >
             <Row className="conten">
-              <Col className="left">
-                <Row className="msa first_row">
-                  <Col span={5}>基础服务</Col>
-                  <Col span={19}>
-                    <Select style={{ width: 300 }} defaultValue="SpringCloud">
-                      <Option value="pinpoint">SpringCloud</Option>
-                    </Select>
-                  </Col>
-                </Row>
-                <Row className="msa">
-                  <Col span={5}>Gitlab 地址</Col>
-                  <Col span={19}>
-                    <Input style={{ width: 300 }} disabled={!this.state.isEdit} className="gitlab" placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
-                      onChange={this.handlechange} value={configDetail !== '' ? configDetail : gitUrl} />
+              <Col className="left" span={12}>
+                <FormItem
+                  label={'基础服务'}
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('service', {
+                      initialValue: 'SpringCloud',
+                    })(
+                      <Select style={{ width: 300 }}>
+                        <Option value="SpringCloud">SpringCloud</Option>
+                      </Select>
+                    )
+                  }
+                </FormItem>
+                <FormItem
+                  label={'Gitlab 地址'}
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('gitUrl', {
+                      rules: [
+                        {
+                          validator: this.gitUrlCheck,
+                        },
+                      ],
+                      initialValue: !isEmpty(parseGit) ? parseGit.gitUrl : '',
+                    })(
+                      <Input
+                        style={{ width: 300 }}
+                        disabled={!this.state.isEdit}
+                        placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
+                      />
+                    )
+                  }
+                </FormItem>
+                <FormItem
+                  label={'用户名'}
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('gitUser', {
+                      rules: [
+                        {
+                          validator: this.gitUserCheck,
+                        },
+                      ],
+                      initialValue: !isEmpty(parseGit) ? parseGit.gitUser : '',
+                    })(
+                      <Input
+                        style={{ width: 300 }}
+                        disabled={!this.state.isEdit}
+                        placeholder="请输入 Gitlab 用户名"
+                      />
+                    )
+                  }
+                </FormItem>
+                <FormItem
+                  label={'密码'}
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('gitPassword', {
+                      rules: [
+                        {
+                          validator: this.gitPasswordCheck,
+                        },
+                      ],
+                      initialValue: !isEmpty(parseGit) ? parseGit.gitPassword : '',
+                    })(
+                      <Input
+                        style={{ width: 300 }}
+                        type={'password'}
+                        disabled={!this.state.isEdit}
+                        placeholder="请输入 Gitlab 密码"
+                      />
+                    )
+                  }
+                </FormItem>
+                <FormItem
+                  label={'Token'}
+                  {...formItemLayout}
+                >
+                  {
+                    getFieldDecorator('gitToken', {
+                      rules: [
+                        {
+                          validator: this.gitTokenCheck,
+                        },
+                      ],
+                      initialValue: !isEmpty(parseGit) ? parseGit.gitToken : '',
+                    })(
+                      <Input
+                        style={{ width: 300 }}
+                        type={'password'}
+                        disabled={!this.state.isEdit}
+                        placeholder="Private Token:（位于 Profile Settings → Account）"
+                      />
+                    )
+                  }
+                </FormItem>
+                <Row>
+                  <Col offset={5}>
                     {
                       this.state.isEdit ?
                         <div className="btn_save">
                           <Button className="close" onClick={this.handleClose}>取消</Button>
                           <Button className="save" type="primary" onClick={this.handleClose}>保存</Button>
-                        </div> : <Button className="btn_edit" type="primary" onClick={this.handleEdit}>编辑</Button>
+                        </div> :
+                        <Tooltip
+                          title={'编辑配置即可安装'} placement={'right'} defaultVisible={true}
+                          getTooltipContainer={() => document.getElementsByClassName('btn_edit')[0]}
+                        >
+                          <Button className="btn_edit" type="primary" onClick={this.handleEdit}>编辑</Button>
+                        </Tooltip>
                     }
                   </Col>
                 </Row>
+              </Col>
+              <Col className="rigth" span={12}>
                 <Row className="msa">
                   <Col span={5}>安装情况</Col>
                   <Col span={19}>
@@ -254,7 +393,14 @@ class MsaConfig extends React.Component {
                           <span className="existence" >已安装</span>
                           <span className="unload" onClick={this.handleUnload}>卸载</span>
                         </Row> :
-                        <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                        <Button
+                          type="primary"
+                          disabled={this.state.isEdit}
+                          onClick={this.handleInstall}
+                          loading={installLoading}
+                        >
+                          安装
+                        </Button>
                     }
                   </Col>
                 </Row>
@@ -313,4 +459,4 @@ export default connect(mapStateToProps, {
   fetchSpingCloud,
   installMsaConfig,
   uninstallMsaConfig,
-})(MsaConfig)
+})(Form.create()(MsaConfig))
