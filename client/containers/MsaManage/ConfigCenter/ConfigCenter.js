@@ -166,18 +166,16 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
+      width: '80%',
       render: (text, record) =>
         <Link to={`/msa-manage/config-center/${text}?detal=true&id=${record.id}&branch=${branch}`}>
           {text}
         </Link>,
     }, {
-      title: '更新时间',
-      dataIndex: 'time',
-      render: () => <span>1分钟</span>,
-    }, {
       id: 'id',
       title: '操作',
       dataIndex: 'operation',
+      width: '20%',
       render: (text, record) => <div>
         <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
         <Button onClick={() => this.handleDelVisible(record.name)}>删除</Button>
