@@ -11,13 +11,18 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import propTypes from 'prop-types'
 import serviceIcon from '../../../../assets/img/csb/service.png'
 import './style/InstanceDetail.less'
 import { Button, Row, Col, Tabs } from 'antd'
 import Monitor from './Monitor'
 import Log from './Log'
-import { renderCSBInstanceStatus } from '../../../../components/utils'
+import { renderCSBInstanceStatus, HANDlE_INSTANCE_MESSAGE } from '../../../../components/utils'
+import {
+  stopInstance,
+  restartInstance,
+} from '../../../../actions/CSB/instance'
 
 const TabPane = Tabs.TabPane
 
@@ -27,7 +32,7 @@ class InstanceDetail extends React.Component {
   }
 
   render() {
-    const { detail } = this.props
+    const { detail, callback, stopInstance, restartInstance } = this.props
     const { name, clusterId, status } = detail
     return (
       <div className="service-detail">
@@ -53,8 +58,16 @@ class InstanceDetail extends React.Component {
                 </div>
               </Col>
               <Col span={12} className="service-detail-header-btns">
-                <Button type="primary" style={{ marginRight: 12 }}>停止 CSB 实例</Button>
-                <Button>重新部署</Button>
+                <Button
+                  type="primary"
+                  style={{ marginRight: 12 }}
+                  onClick={() => callback(HANDlE_INSTANCE_MESSAGE.stop, stopInstance)}
+                >
+                  停止 CSB 实例
+                </Button>
+                <Button onClick={() => callback(HANDlE_INSTANCE_MESSAGE.restart, restartInstance)}>
+                  重新部署
+                </Button>
               </Col>
             </Row>
             <Row>
@@ -86,4 +99,7 @@ class InstanceDetail extends React.Component {
   }
 }
 
-export default InstanceDetail
+export default connect(null, {
+  stopInstance,
+  restartInstance,
+})(InstanceDetail)
