@@ -13,6 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/MsaConfig.less'
+import isEmpty from 'lodash/isEmpty'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
 import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
@@ -109,20 +110,30 @@ class MsaConfig extends React.Component {
   handleDel = () => {
     const { springcloudID } = this.state
     const { uninstallMsaConfig, cluster, project, namespace } = this.props
-    springcloudID.forEach(item => {
-      if (item.namespace === namespace) {
-        const query = {
-          id: item.id,
-        }
-        const projects = project.namespace === 'default' ? namespace : project.namespace
-        uninstallMsaConfig(cluster.id, projects, query).then(res => {
-          if (res.error) return
-          if (res.response.result.code === 200) {
-            this.setState({
-              msaState: false,
-              uninstall: false,
-            })
-          }
+    let filterSpring = springcloudID.filter(item => item.namespace === namespace)
+    if (isEmpty(filterSpring)) {
+      return
+    }
+    this.setState({
+      delLoading: true
+    })
+    filterSpring = filterSpring[0]
+    const query = {
+      id: filterSpring.id,
+    }
+    const projects = project.namespace === 'default' ? namespace : project.namespace
+    uninstallMsaConfig(cluster.id, projects, query).then(res => {
+      if (res.error) {
+        this.setState({
+          delLoading: false
+        })
+        return
+      }
+      if (res.response.result.code === 200) {
+        this.setState({
+          msaState: false,
+          uninstall: false,
+          delLoading: false
         })
       }
     })
@@ -264,7 +275,7 @@ class MsaConfig extends React.Component {
             <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
               footer={[
                 <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
-                <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
+                <Button key="submit" type="primary" loading={this.state.delLoading} onClick={this.handleDel}> 继续卸载 </Button>,
               ]}>
               <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
                 <span>即将在当前项目内卸载 SpringCloud 基础服务卸载后该项目内应用将, 无法继续使用 微服务 部分功能</span>
