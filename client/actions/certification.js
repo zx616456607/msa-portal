@@ -79,6 +79,7 @@ const fetchUaaRefreshToken = body => {
 export const getUaaRefreshToken = body =>
   dispatch => dispatch(fetchUaaRefreshToken(body))
 
+/* <------------------ Clients start--------------------->*/
 export const CLIENT_LIST_REQUEST = 'CLIENT_LIST_REQUEST'
 export const CLIENT_LIST_SUCCESS = 'CLIENT_LIST_SUCCESS'
 export const CLIENT_LIST_FAILURE = 'CLIENT_LIST_FAILURE'
@@ -88,6 +89,7 @@ const fetchClientList = (access_token, query) => {
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
+  // const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ CLIENT_LIST_REQUEST, CLIENT_LIST_SUCCESS, CLIENT_LIST_FAILURE ],
@@ -97,16 +99,19 @@ const fetchClientList = (access_token, query) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
+          Accept: CONTENT_TYPE_JSON,
+          // 'X-Identity-Zone-Id': id,
+          // 'X-Identity-Zone-Subdomain': subdomain,
         },
       },
     },
   }
 }
 
-export function getClientList(query) {
+export function getClientList(query, zoneInfo) {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchClientList(access_token, query))
+    return dispatch(fetchClientList(access_token, query, zoneInfo))
   }
 }
 
@@ -114,7 +119,8 @@ const CREATE_CLIENT_REQUEST = 'CREATE_CLIENT_REQUEST'
 const CREATE_CLIENT_SUCCESS = 'CREATE_CLIENT_SUCCESS'
 const CREATE_CLIENT_FAILURE = 'CREATE_CLIENT_FAILURE'
 
-const fetchCreateClient = (access_token, body, callback) => {
+const fetchCreateClient = (access_token, body) => {
+  // const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ CREATE_CLIENT_REQUEST, CREATE_CLIENT_SUCCESS, CREATE_CLIENT_FAILURE ],
@@ -124,26 +130,27 @@ const fetchCreateClient = (access_token, body, callback) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
+          // 'X-Identity-Zone-Id': id,
+          // 'X-Identity-Zone-Subdomain': subdomain,
         },
         method: 'POST',
         body,
       },
     },
-    callback,
   }
 }
 
-export const createClient = (body, callback) =>
+export const createClient = (body, zoneInfo) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchCreateClient(access_token, body, callback))
+    return dispatch(fetchCreateClient(access_token, body, zoneInfo))
   }
 
 const EDIT_CLIENT_REQUEST = 'EDIT_CLIENT_REQUEST'
 const EDIT_CLIENT_SUCCESS = 'EDIT_CLIENT_SUCCESS'
 const EDIT_CLIENT_FAILURE = 'EDIT_CLIENT_FAILURE'
 
-const fetchEditClient = (access_token, body, callback) => {
+const fetchEditClient = (access_token, body) => {
   return {
     [CALL_API]: {
       types: [ EDIT_CLIENT_REQUEST, EDIT_CLIENT_SUCCESS, EDIT_CLIENT_FAILURE ],
@@ -158,21 +165,20 @@ const fetchEditClient = (access_token, body, callback) => {
         body,
       },
     },
-    callback,
   }
 }
 
-export const editClient = (body, callback) =>
+export const editClient = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchEditClient(access_token, body, callback))
+    return dispatch(fetchEditClient(access_token, body))
   }
 
 const DELETE_CLIENT_REQUEST = 'DELETE_CLIENT_REQUEST'
 const DELETE_CLIENT_SUCCESS = 'DELETE_CLIENT_SUCCESS'
 const DELETE_CLIENT_FAILURE = 'DELETE_CLIENT_FAILURE'
 
-const fetchDeleteClient = (access_token, clientID, callback) => {
+const fetchDeleteClient = (access_token, clientID) => {
   return {
     [CALL_API]: {
       types: [ DELETE_CLIENT_REQUEST, DELETE_CLIENT_SUCCESS, DELETE_CLIENT_FAILURE ],
@@ -186,21 +192,20 @@ const fetchDeleteClient = (access_token, clientID, callback) => {
         method: 'DELETE',
       },
     },
-    callback,
   }
 }
 
-export const deleteClient = (clientID, callback) =>
+export const deleteClient = clientID =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDeleteClient(access_token, clientID, callback))
+    return dispatch(fetchDeleteClient(access_token, clientID))
   }
 
 const CHANGE_CLIENT_SECRET_REQUEST = 'CHANGE_CLIENT_SECRET_REQUEST'
 const CHANGE_CLIENT_SECRET_SUCCESS = 'CHANGE_CLIENT_SECRET_SUCCESS'
 const CHANGE_CLIENT_SECRET_FAILURE = 'CHANGE_CLIENT_SECRET_FAILURE'
 
-const fetchChangeClientSecret = (access_token, body, callback) => {
+const fetchChangeClientSecret = (access_token, body) => {
   return {
     [CALL_API]: {
       types: [
@@ -219,16 +224,18 @@ const fetchChangeClientSecret = (access_token, body, callback) => {
         body,
       },
     },
-    callback,
   }
 }
 
-export const changeClientSecret = (body, callback) =>
+export const changeClientSecret = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchChangeClientSecret(access_token, body, callback))
+    return dispatch(fetchChangeClientSecret(access_token, body))
   }
 
+/* <-------------------------- Clients end -------------------------->*/
+
+/* <-------------------------- Zones start -------------------------->*/
 export const GET_IDENTITY_ZONES_REQUEST = 'GET_IDENTITY_ZONES_REQUEST'
 export const GET_IDENTITY_ZONES_SUCCESS = 'GET_IDENTITY_ZONES_SUCCESS'
 export const GET_IDENTITY_ZONES_FAILURE = 'GET_IDENTITY_ZONES_FAILURE'
@@ -386,3 +393,44 @@ export const deleteIdentityZone = id =>
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     return dispatch(fetchDeleteIdentityZone(id, access_token))
   }
+
+/* <------------------ Zones end ------------------------------>*/
+
+/* <------------------ Users start ---------------------------->*/
+
+export const USERS_LIST_REQUEST = 'USERS_LIST_REQUEST'
+export const USERS_LIST_SUCCESS = 'USERS_LIST_SUCCESS'
+export const USERS_LIST_FAILURE = 'USERS_LIST_FAILURE'
+
+const fetchUserList = (token, query) => {
+  let endpoint = `${CLIENT_API_URL}/Users`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  // const { id, subdomain } = zoneInfo
+  return {
+    [CALL_API]: {
+      types: [
+        USERS_LIST_REQUEST,
+        USERS_LIST_SUCCESS,
+        USERS_LIST_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: Schemas.UAA_ZONE_USER_LIST_DATA,
+      options: {
+        headers: {
+          Accept: CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    },
+  }
+}
+
+export const getUserList = (query, zoneInfo) =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUserList(access_token, query, zoneInfo))
+  }
+/* <------------------ Users end ------------------------------>*/

@@ -16,7 +16,8 @@ import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import { getIdentityZoneDetail } from '../../../../../actions/certification'
 import AUTH_ZONE_ICON from '../../../../../assets/img/msa-manage/auth-zone.png'
-import Client from '../Clients/index'
+import Clients from './Clients'
+import Users from './Users'
 import './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -26,10 +27,11 @@ class AuthZoneDetail extends React.Component {
   componentDidMount() {
     const { uaaAuth, history, getIdentityZoneDetail, match } = this.props
     const { zoneId } = match.params
-    getIdentityZoneDetail(zoneId)
     if (isEmpty(uaaAuth)) {
       history.push('/msa-manage/certification-manage')
+      return
     }
+    getIdentityZoneDetail(zoneId)
   }
 
   state = {
@@ -62,9 +64,9 @@ class AuthZoneDetail extends React.Component {
         </Card>
         <Card key={'auth-zone-detail-body'}>
           <Tabs activeKey={activeKey} onChange={this.handleTabs}>
-            <TabPane tab="用户" key="user">user</TabPane>
+            <TabPane tab="用户" key="user"><Users/></TabPane>
             <TabPane tab="组" key="group">group</TabPane>
-            <TabPane tab="客户端" key="client"><Client/></TabPane>
+            <TabPane tab="客户端" key="client"><Clients/></TabPane>
           </Tabs>
         </Card>
       </QueueAnim>

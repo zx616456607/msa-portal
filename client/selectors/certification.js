@@ -39,3 +39,17 @@ export const identityZoneListSlt = createSelector(
     }
   }
 )
+
+export const zoneUserListSlt = createSelector(
+  [ getCertification, getEntities ],
+  (certification, entities) => {
+    const { zoneUsers } = certification || { zoneUsers: {} }
+    const { data, isFetching: usersFetching } = zoneUsers || { data: {}, isFetching: false }
+    const { resources } = data || { resources: [] }
+    const { uaaZoneUsers } = entities || { uaaZoneUsers: [] }
+    return {
+      zoneUsers: (resources || []).map(item => uaaZoneUsers[item]),
+      usersFetching,
+    }
+  }
+)
