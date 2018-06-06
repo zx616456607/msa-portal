@@ -11,14 +11,15 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
-import { Table, Button, Card, Input, Dropdown, Menu, Pagination, Badge } from 'antd'
+import { Table, Button, Card, Input, Dropdown, Menu, Pagination, Badge, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import classNames from 'classnames'
-import { getUserList } from '../../../../../../actions/certification'
+import { getUserList, deleteZoneUser, patchZoneUser } from '../../../../../../actions/certification'
 import { zoneUserListSlt } from '../../../../../../selectors/certification'
 import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../../../constants/index'
-// import confirm from '../../../../../../components/Modal/confirm'
+import confirm from '../../../../../../components/Modal/confirm'
 import { formatDate } from '../../../../../../common/utils'
+import AddUserModal from './AddUserModal'
 import './style/index.less'
 
 const Search = Input.Search
@@ -60,8 +61,90 @@ class Users extends React.Component {
     }, this.loadUserList)
   }
 
+  toggleVisible = (key, record) => {
+    this.setState(preState => {
+      return {
+        [key]: !preState[key],
+        currentUser: preState[key] ? null : record,
+      }
+    })
+  }
+
+  deleteUser = record => {
+    const { deleteZoneUser } = this.props
+    confirm({
+      modalTitle: '删除',
+      title: `确定删除用户 ${record.userName}?`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        return deleteZoneUser(record.id).then(res => {
+          if (res.error) {
+            notification.warn({
+              message: '删除失败',
+            })
+            return
+          }
+          notification.success({
+            message: '删除成功',
+          })
+          this.loadUserList()
+        }).catch(() => {
+          notification.warn({
+            message: '删除失败',
+          })
+        })
+      },
+    })
+  }
+
+  handleClick = (e, record) => {
+    switch (e.key) {
+      case 'edit':
+        this.toggleVisible('addVisible', record)
+        break
+      case 'delete':
+        this.deleteUser(record)
+        break
+      default:
+        break
+    }
+  }
+
+  toggleActive = record => {
+    const { patchZoneUser } = this.props
+    const text = record.active ? '停用' : '启用'
+    const body = {
+      active: !record.active,
+    }
+    confirm({
+      modalTitle: text,
+      title: `确定${text}用户 ${record.userName}`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        return patchZoneUser(record, body).then(res => {
+          if (res.error) {
+            notification.warn({
+              message: `${text}失败`,
+            })
+            return
+          }
+          notification.success({
+            message: `${text}成功`,
+          })
+          this.loadUserList()
+        }).catch(() => {
+          notification.warn({
+            message: `${text}失败`,
+          })
+        })
+      },
+    })
+  }
+
   render() {
-    const { inputValue, current } = this.state
+    const { inputValue, current, addVisible, currentUser } = this.state
     const { zoneUsers, usersFetching, totalResults } = this.props
     const pagination = {
       simple: true,
@@ -131,16 +214,16 @@ class Users extends React.Component {
       {
         title: '操作',
         width: '15%',
-        render: () => {
+        render: (_, record) => {
           const menu = (
-            <Menu style={{ width: 90 }}>
+            <Menu style={{ width: 90 }} onClick={e => this.handleClick(e, record)}>
               <Menu.Item key="edit">编辑</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
             </Menu>
           )
           return (
-            <Dropdown.Button overlay={menu}>
-              启用
+            <Dropdown.Button overlay={menu} onClick={() => this.toggleActive(record)}>
+              {record.active ? '可用' : '不可用'}
             </Dropdown.Button>
           )
         },
@@ -150,7 +233,7 @@ class Users extends React.Component {
     return (
       <div className="zone-users">
         <div className="layout-content-btns" key="btns">
-          <Button icon="plus" type="primary">
+          <Button icon="plus" type="primary" onClick={() => this.toggleVisible('addVisible')}>
             添加用户
           </Button>
           <Button icon="reload" onClick={this.refreshData}>
@@ -179,6 +262,15 @@ class Users extends React.Component {
             />
           </Card>
         </div>
+        {
+          addVisible &&
+          <AddUserModal
+            visible={addVisible}
+            {...{ currentUser }}
+            closeModal={() => this.toggleVisible('addVisible')}
+            loadData={this.loadUserList}
+          />
+        }
       </div>
     )
   }
@@ -188,7 +280,7 @@ const mapStateToProps = state => {
   const { certification } = state
   const { zoneUsers, identityZoneDetail } = certification
   const { data } = zoneUsers
-  const { totalResults } = data
+  const { totalResults } = data || { totalResults: 0 }
   return {
     ...zoneUserListSlt(state),
     totalResults,
@@ -198,4 +290,6 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   getUserList,
+  deleteZoneUser,
+  patchZoneUser,
 })(Users)

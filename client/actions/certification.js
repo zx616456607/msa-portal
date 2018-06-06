@@ -84,12 +84,12 @@ export const CLIENT_LIST_REQUEST = 'CLIENT_LIST_REQUEST'
 export const CLIENT_LIST_SUCCESS = 'CLIENT_LIST_SUCCESS'
 export const CLIENT_LIST_FAILURE = 'CLIENT_LIST_FAILURE'
 
-const fetchClientList = (access_token, query) => {
+const fetchClientList = (access_token, query, zoneInfo) => {
   let endpoint = `${CLIENT_API_URL}/oauth/clients`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
-  // const { id, subdomain } = zoneInfo
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ CLIENT_LIST_REQUEST, CLIENT_LIST_SUCCESS, CLIENT_LIST_FAILURE ],
@@ -100,8 +100,9 @@ const fetchClientList = (access_token, query) => {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: CONTENT_TYPE_JSON,
-          // 'X-Identity-Zone-Id': id,
-          // 'X-Identity-Zone-Subdomain': subdomain,
+          'Access-Control-Request-Headers': 'X-Identity-Zone-Id,X-Identity-Zone-Subdomain',
+          'X-Identity-Zone-Id': id,
+          'X-Identity-Zone-Subdomain': subdomain,
         },
       },
     },
@@ -433,4 +434,205 @@ export const getUserList = (query, zoneInfo) =>
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     return dispatch(fetchUserList(access_token, query, zoneInfo))
   }
+
+const CREATE_ZONE_USER_REQUEST = 'CREATE_ZONE_USER_REQUEST'
+const CREATE_ZONE_USER_SUCCESS = 'CREATE_ZONE_USER_SUCCESS'
+const CREATE_ZONE_USER_FAILURE = 'CREATE_ZONE_USER_FAILURE'
+
+const fetchCreateZoneUser = (token, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_ZONE_USER_REQUEST,
+        CREATE_ZONE_USER_SUCCESS,
+        CREATE_ZONE_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Users`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const createZoneUser = body => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchCreateZoneUser(access_token, body))
+  }
+}
+
+const UPDATE_ZONE_USER_REQUEST = 'UPDATE_ZONE_USER_REQUEST'
+const UPDATE_ZONE_USER_SUCCESS = 'UPDATE_ZONE_USER_SUCCESS'
+const UPDATE_ZONE_USER_FAILURE = 'UPDATE_ZONE_USER_FAILURE'
+
+const fetchUpdateZoneUser = (token, user, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_ZONE_USER_REQUEST,
+        UPDATE_ZONE_USER_SUCCESS,
+        UPDATE_ZONE_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Users/${user.id}`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'If-Match': user.version,
+        },
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateZoneUser = (user, body) => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUpdateZoneUser(access_token, user, body))
+  }
+}
+
+const PATCH_ZONE_USER_REQUEST = 'PATCH_ZONE_USER_REQUEST'
+const PATCH_ZONE_USER_SUCCESS = 'PATCH_ZONE_USER_SUCCESS'
+const PATCH_ZONE_USER_FAILURE = 'PATCH_ZONE_USER_FAILURE'
+
+const fetchPatchZoneUser = (token, user, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        PATCH_ZONE_USER_REQUEST,
+        PATCH_ZONE_USER_SUCCESS,
+        PATCH_ZONE_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Users/${user.id}`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'if-Match': user.version,
+        },
+        method: 'PATCH',
+        body,
+      },
+    },
+  }
+}
+
+export const patchZoneUser = (user, body) => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchPatchZoneUser(access_token, user, body))
+  }
+}
+
+const DELETE_ZONE_USER_REQUEST = 'DELETE_ZONE_USER_REQUEST'
+const DELETE_ZONE_USER_SUCCESS = 'DELETE_ZONE_USER_SUCCESS'
+const DELETE_ZONE_USER_FAILURE = 'DELETE_ZONE_USER_FAILURE'
+
+const fetchDeleteZoneUser = (token, id) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_ZONE_USER_REQUEST,
+        DELETE_ZONE_USER_SUCCESS,
+        DELETE_ZONE_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Users/${id}`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteZoneUser = id => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDeleteZoneUser(access_token, id))
+  }
+}
+
+const UPDATE_ZONE_USER_PASSWORD_REQUEST = 'UPDATE_ZONE_USER_PASSWORD_REQUEST'
+const UPDATE_ZONE_USER_PASSWORD_SUCCESS = 'UPDATE_ZONE_USER_PASSWORD_SUCCESS'
+const UPDATE_ZONE_USER_PASSWORD_FAILURE = 'UPDATE_ZONE_USER_PASSWORD_FAILURE'
+
+const fetchUpdateUserPassword = (token, userId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_ZONE_USER_PASSWORD_REQUEST,
+        UPDATE_ZONE_USER_PASSWORD_SUCCESS,
+        UPDATE_ZONE_USER_PASSWORD_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Users/${userId}/password`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateZoneUserPassword = (userId, body) => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUpdateUserPassword(access_token, userId, body))
+  }
+}
+
+const ZONE_USER_UNLOCK_REQUEST = 'ZONE_USER_UNLOCK_REQUEST'
+const ZONE_USER_UNLOCK_SUCCESS = 'ZONE_USER_UNLOCK_SUCCESS'
+const ZONE_USER_UNLOCK_FAILURE = 'ZONE_USER_UNLOCK_FAILURE'
+
+const fetchUnlockAccount = (token, userId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        ZONE_USER_UNLOCK_REQUEST,
+        ZONE_USER_UNLOCK_SUCCESS,
+        ZONE_USER_UNLOCK_FAILURE,
+      ],
+      endpoint: `${CLIENT_API_URL}/Users/${userId}/status`,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'PATCH',
+        body,
+      },
+    },
+  }
+}
+
+export const unlockAccount = (userId, body) => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUnlockAccount(access_token, userId, body))
+  }
+}
+
+
 /* <------------------ Users end ------------------------------>*/

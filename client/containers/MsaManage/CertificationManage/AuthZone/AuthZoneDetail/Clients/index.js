@@ -97,7 +97,7 @@ class Clients extends React.Component {
     const { deleteClient } = this.props
     confirm({
       modalTitle: '删除',
-      title: `确定删除客户端 ${record.client_id}`,
+      title: `确定删除客户端 ${record.client_id}?`,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {

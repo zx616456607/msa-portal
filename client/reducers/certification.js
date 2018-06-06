@@ -104,7 +104,7 @@ const certification = (state = {
 }, action) => {
   return {
     clientList: clientList(state.clientList, action),
-    identityZoneList: identityZoneList(state.identityList, action),
+    identityZoneList: identityZoneList(state.identityZoneList, action),
     identityZoneDetail: identityZoneDetail(state.identityZoneDetail, action),
     zoneUsers: zoneUsers(state.zoneUsers, action),
   }
