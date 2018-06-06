@@ -17,10 +17,9 @@ import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col } 
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/AddClientModal.less'
-import { createClient, editClient, getIdentityZones } from '../../../../../actions/certification'
-import { identityZoneListSlt } from '../../../../../selectors/certification'
-import { REDIRECT_URL_REG } from '../../../../../constants'
-import { sleep } from '../../../../../common/utils'
+import { createClient, editClient } from '../../../../../../actions/certification'
+import { REDIRECT_URL_REG } from '../../../../../../constants'
+import { sleep } from '../../../../../../common/utils'
 
 const FormItem = Form.Item
 const CheckboxGroup = Checkbox.Group
@@ -42,8 +41,7 @@ class AddClientModal extends React.Component {
   state = {}
 
   async componentDidMount() {
-    const { form, currentClient, getIdentityZones } = this.props
-    await getIdentityZones()
+    const { form, currentClient } = this.props
     if (isEmpty(currentClient)) {
       return
     }
@@ -105,6 +103,7 @@ class AddClientModal extends React.Component {
   confirmModal = async () => {
     const {
       form, currentClient, loadData, closeModal, createClient, editClient, isView,
+      identityZoneDetail,
     } = this.props
     const { validateFields } = form
     if (isView) {
@@ -137,9 +136,14 @@ class AddClientModal extends React.Component {
         })
         Object.assign(body, { scope, autoapprove })
       }
+
+      const zoneInfo = {
+        id: identityZoneDetail.id,
+        subdomain: identityZoneDetail.subdomain,
+      }
       // 创建
       if (isEmpty(currentClient)) {
-        const result = await createClient(body)
+        const result = await createClient(body, zoneInfo)
         if (result.error) {
           this.setState({
             confirmLoading: false,
@@ -161,7 +165,7 @@ class AddClientModal extends React.Component {
         return
       }
       // 编辑
-      const res = await editClient(body)
+      const res = await editClient(body, zoneInfo)
       if (res.error) {
         this.setState({
           confirmLoading: false,
@@ -261,16 +265,16 @@ class AddClientModal extends React.Component {
   }
 
   renderItem = (key, index) => {
-    const { form, isView, identityZoneList, zonesFetching } = this.props
+    const { form, isView, identityZoneDetail } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 },
     }
-    if (zonesFetching || isEmpty(identityZoneList)) {
+    if (isEmpty(identityZoneDetail)) {
       return
     }
-    const ZONE_ID = identityZoneList[0].id
+    const ZONE_ID = identityZoneDetail.name
     const authScopes = [
       'uaa.user', 'uaa.none', 'uaa.admin', 'scim.write', 'scim.read', 'scim.create', 'scim.userids',
       'scim.invite', 'groups.update', 'password.write', 'openid', 'idps.read', 'idps.write',
@@ -457,13 +461,14 @@ class AddClientModal extends React.Component {
 }
 
 const mapStateToProps = state => {
+  const { certification } = state
+  const { identityZoneDetail } = certification
   return {
-    ...identityZoneListSlt(state),
+    identityZoneDetail,
   }
 }
 
 export default connect(mapStateToProps, {
   createClient,
   editClient,
-  getIdentityZones,
 })(Form.create()(AddClientModal))

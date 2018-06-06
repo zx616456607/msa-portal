@@ -42,7 +42,8 @@ class AuthZoneModal extends React.Component {
         loading: true,
       })
       if (!isEmpty(currentAuthZone)) {
-        const updateRes = await updateIdentityZone(values)
+        const mergeBody = Object.assign({}, values, { id: currentAuthZone.id })
+        const updateRes = await updateIdentityZone(mergeBody)
         if (updateRes.error) {
           notification.warn({
             message: '修改认证域失败',

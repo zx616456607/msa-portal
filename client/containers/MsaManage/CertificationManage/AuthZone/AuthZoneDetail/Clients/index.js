@@ -15,12 +15,12 @@ import { connect } from 'react-redux'
 import { Card, Table, Button, Input, Dropdown, Menu, notification } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
-import { getClientList, deleteClient } from '../../../../../actions/certification'
-import { clientListSlt } from '../../../../../selectors/certification'
-import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../../constants/index'
+import { getClientList, deleteClient } from '../../../../../../actions/certification'
+import { clientListSlt } from '../../../../../../selectors/certification'
+import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../../../constants/index'
 import AddClientModal from './AddClientModal'
 import SecretModal from './SecretModal'
-import confirm from '../../../../../components/Modal/confirm'
+import confirm from '../../../../../../components/Modal/confirm'
 import './style/index.less'
 
 const Search = Input.Search
@@ -32,12 +32,17 @@ class Clients extends React.Component {
   }
 
   componentDidMount() {
-    this.loadClientList({})
+    this.loadClientList()
   }
 
   loadClientList = () => {
-    const { getClientList } = this.props
+    const { getClientList, identityZoneDetail } = this.props
     const { current, inputValue } = this.state
+    const { id, subdomain } = identityZoneDetail
+    const zoneInfo = {
+      id,
+      subdomain,
+    }
     const newQuery = {}
     if (inputValue) {
       Object.assign(newQuery, {
@@ -48,12 +53,12 @@ class Clients extends React.Component {
       startIndex: (current - 1) * DEFAULT_PAGESIZE + 1,
       count: DEFAULT_PAGESIZE,
     })
-    getClientList(newQuery)
+    getClientList(newQuery, zoneInfo)
   }
 
   refreshData = () => {
     this.setState({
-      current: 1,
+      current: DEFAULT_PAGE,
       inputValue: '',
     }, this.loadClientList)
   }
@@ -166,18 +171,6 @@ class Clients extends React.Component {
         width: '20%',
         render: this.renderTableCol,
       },
-      // {
-      //   title: '授权范围',
-      //   dataIndex: 'scope',
-      //   key: 'scope',
-      //   width: '20%'
-      // },
-      // {
-      //   title: 'AutoApprove',
-      //   dataIndex: 'autoapprove',
-      //   key: 'autoapprove',
-      //   width: '10%'
-      // },
       {
         title: '操作',
         dataIndex: 'action',
@@ -217,9 +210,6 @@ class Clients extends React.Component {
           <Button icon="reload" onClick={this.refreshData}>
             刷新
           </Button>
-          {/* <Button icon="delete">*/}
-          {/* 删除*/}
-          {/* </Button>*/}
           <Search
             placeholder="按客户端 ID 搜索"
             style={{ width: 200 }}
@@ -263,12 +253,13 @@ class Clients extends React.Component {
 
 const mapStateToProps = state => {
   const { certification } = state
-  const { clientList } = certification
+  const { clientList, identityZoneDetail } = certification
   const { totalResults, isFetching } = clientList
   return {
     ...clientListSlt(state),
     totalResults,
     isFetching,
+    identityZoneDetail,
   }
 }
 

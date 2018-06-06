@@ -11,7 +11,6 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
@@ -163,31 +162,25 @@ class AuthZone extends React.Component {
 
     const columns = [
       {
-        title: '认证 ID',
-        dataIndex: 'id',
-        width: '20%',
-        render: text => <Link to={`/msa-manage/certification-manage/auth-zone/${text}`}>{text}</Link>,
-      },
-      {
         title: '认证域名称',
         dataIndex: 'name',
-        width: '20%',
+        width: '25%',
       },
       {
         title: 'SubDomain',
         dataIndex: 'subdomain',
-        width: '20%',
+        width: '25%',
         render: text => text || '-',
       },
       {
         title: '更新时间',
         dataIndex: 'last_modified',
-        width: '20%',
+        width: '25%',
         render: text => formatDate(text),
       },
       {
         title: '操作',
-        width: '20%',
+        width: '25%',
         render: (_, record) => (
           <Dropdown.Button
             className="auth-zone-dropdown"
@@ -212,6 +205,7 @@ class AuthZone extends React.Component {
             <AuthZoneModal
               {...{ visible, currentAuthZone }}
               closeModal={this.closeAuthZoneModal}
+              loadDate={this.getZones}
             />
           }
           <Button icon="plus" type="primary" onClick={() => this.setState({ visible: true })}>
