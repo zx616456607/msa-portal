@@ -357,10 +357,10 @@ class ServicesTable extends React.Component {
     if (cascadedType) {
       if (cascadedType.length === 1) {
         if (parseInt(cascadedType[ 0 ]) === 1) {
-          cascadedType = [ 1, 2, 5, 6 ]
+          cascadedType = [ 1, 2, 5, 6, 8 ]
         }
       } else {
-        cascadedType = [ 0, 1, 2, 5, 6 ]
+        cascadedType = [ 0, 1, 2, 5, 6, 8 ]
       }
     }
     loadData(null, {
