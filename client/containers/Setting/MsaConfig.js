@@ -237,10 +237,10 @@ class MsaConfig extends React.Component {
     const {
       msaState, springcloudState, installLoading, gitLab,
     } = this.state
-    const { gitUrl, version } = gitLab
+    const { configDetail, version } = gitLab
     let parseGit = {}
-    if (!isEmpty(gitUrl)) {
-      parseGit = JSON.parse(gitUrl)
+    if (!isEmpty(configDetail)) {
+      parseGit = JSON.parse(configDetail)
     }
     const { form } = this.props
     const { getFieldDecorator } = form
