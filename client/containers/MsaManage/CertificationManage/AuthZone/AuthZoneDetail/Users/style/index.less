@@ -9,3 +9,27 @@
  * @author zhangxuan
  * @date 2018-06-05
  */
+@import '~assets/style/core/index.less';
+.zone-users {
+  .group-list {
+    margin-top: @padding-base;
+  }
+}
+.user-popover {
+  .ant-popover-inner-content {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .zone-user-group-list {
+    margin-top: @padding-base;
+    .anticon-copy {
+      font-size: @font-size-medium;
+      color: @primary-color;
+    }
+    .group-input {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
