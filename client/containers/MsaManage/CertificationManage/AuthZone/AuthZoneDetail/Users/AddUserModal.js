@@ -229,7 +229,9 @@ class AddUserModal extends React.Component {
                     message: '请填写正确的服务地址',
                   },
                 ],
-                initialValue: !isEmpty(currentUser) ? currentUser.phoneNumbers[0].value : '',
+                initialValue:
+                  !isEmpty(currentUser) && !isEmpty(currentUser.phoneNumbers)
+                    ? currentUser.phoneNumbers[0].value : '',
               })(
                 <Input placeholder="用户手机"/>
               )

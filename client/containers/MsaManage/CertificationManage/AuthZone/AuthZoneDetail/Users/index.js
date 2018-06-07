@@ -11,7 +11,10 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
-import { Table, Button, Card, Input, Dropdown, Menu, Pagination, Badge, notification } from 'antd'
+import {
+  Table, Button, Card, Input, Dropdown, Menu, Pagination, Badge,
+  notification, Icon, Popover, Row, Col, Tooltip,
+} from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import classNames from 'classnames'
 import { getUserList, deleteZoneUser, patchZoneUser } from '../../../../../../actions/certification'
@@ -20,6 +23,7 @@ import { DEFAULT_PAGE, DEFAULT_PAGESIZE } from '../../../../../../constants/inde
 import confirm from '../../../../../../components/Modal/confirm'
 import { formatDate } from '../../../../../../common/utils'
 import AddUserModal from './AddUserModal'
+import UserDetailDock from './UserDetail/Dock'
 import './style/index.less'
 
 const Search = Input.Search
@@ -65,7 +69,7 @@ class Users extends React.Component {
     this.setState(preState => {
       return {
         [key]: !preState[key],
-        currentUser: preState[key] ? null : record,
+        currentUser: record ? record : preState.currentUser,
       }
     })
   }
@@ -143,9 +147,59 @@ class Users extends React.Component {
     })
   }
 
+  openUserDetailDock = record => {
+    this.setState({
+      currentUser: record,
+      detailVisible: true,
+    })
+  }
+
+  copyGroupName = cls => {
+    const target = document.getElementsByClassName(cls)[0]
+    target.select()
+    document.execCommand('Copy')
+    this.setState({
+      [cls]: true,
+    })
+  }
+
+  renderGroups = groups => {
+    if (isEmpty(groups)) {
+      return
+    }
+    return groups.map(group => {
+      return (
+        <Row key={group.value} type={'flex'} align={'middle'} gutter={16} className="zone-user-group-list">
+          <Col span={20}>
+            <Tooltip title={group.display} placement="topLeft">
+              <Input
+                className={`txt-of-ellipsis group-input group-${group.value}`}
+                readOnly value={group.display}
+              />
+            </Tooltip>
+          </Col>
+          <Col span={4}>
+            <Tooltip title={this.state[`group-${group.value}`] ? '复制成功' : '点击复制'}>
+              <Icon
+                type="copy"
+                className="pointer"
+                onClick={() => this.copyGroupName(`group-${group.value}`)}
+                onMouseLeave={() => this.setState({ [`group-${group.value}`]: false })}
+              />
+            </Tooltip>
+          </Col>
+        </Row>
+      )
+    })
+  }
+
   render() {
-    const { inputValue, current, addVisible, currentUser } = this.state
+    const { inputValue, current, addVisible, currentUser, detailVisible } = this.state
     const { zoneUsers, usersFetching, totalResults } = this.props
+    const propsFunc = {
+      toggleActive: this.toggleActive,
+      handleClick: this.handleClick,
+    }
     const pagination = {
       simple: true,
       total: totalResults || 0,
@@ -154,8 +208,16 @@ class Users extends React.Component {
       onChange: current => this.setState({ current }, this.loadUserList),
     }
     const columns = [
-      { title: '用户名', dataIndex: 'userName', width: '15%',
-        render: text => <span className="primary-color pointer">{text}</span> },
+      {
+        title: '用户名', dataIndex: 'userName', width: '15%',
+        render: (text, record) =>
+          <span
+            className="primary-color pointer"
+            onClick={() => this.openUserDetailDock(record)}
+          >
+            {text}
+          </span>,
+      },
       {
         title: '状态',
         dataIndex: 'active',
@@ -171,7 +233,23 @@ class Users extends React.Component {
         dataIndex: 'groups',
         key: 'groups',
         width: '10%',
-        render: groups => groups.length,
+        render: (groups, record) => <div className="popover-row">
+          {groups.length}&nbsp;
+          {
+            !isEmpty(groups) &&
+            <Popover
+              onVisibleChange={ visible => this.setState({ [`popover-${record.id}`]: visible })}
+              overlayClassName="user-popover"
+              placement="right" trigger="click" content={this.renderGroups(groups)}
+              getPopupContainer={() => document.getElementsByClassName('popover-row')[0]}
+            >
+              <Icon
+                type={this.state[`popover-${record.id}`] ? 'minus-square-o' : 'plus-square-o'}
+                className="pointer"
+              />
+            </Popover>
+          }
+        </div>,
       },
       {
         title: '授权记录',
@@ -223,7 +301,7 @@ class Users extends React.Component {
           )
           return (
             <Dropdown.Button overlay={menu} onClick={() => this.toggleActive(record)}>
-              {record.active ? '可用' : '不可用'}
+              {record.active ? '停用' : '启用'}
             </Dropdown.Button>
           )
         },
@@ -269,6 +347,15 @@ class Users extends React.Component {
             {...{ currentUser }}
             closeModal={() => this.toggleVisible('addVisible')}
             loadData={this.loadUserList}
+          />
+        }
+        {
+          detailVisible &&
+          <UserDetailDock
+            visible={detailVisible}
+            userId={currentUser && currentUser.id}
+            onVisibleChange={visible => this.setState({ detailVisible: visible })}
+            propsFunc={propsFunc}
           />
         }
       </div>

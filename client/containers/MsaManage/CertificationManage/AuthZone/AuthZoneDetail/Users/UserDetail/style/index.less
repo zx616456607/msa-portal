@@ -1,0 +1,69 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of zone user detail
+ *
+ * @author zhangxuan
+ * @date 2018-06-07
+ */
+@import '~assets/style/core/index.less';
+
+.zone-user-detail {
+  background-color: @backgroud-color-body;
+  height: 100%;
+  &-header {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: @padding-large;
+    &-icon {
+      flex: 0 0 100px;
+      height: 100px;
+    }
+    &-right {
+      flex: 1;
+      .zone-user-info {
+        margin-bottom: @padding-base;
+      }
+    }
+  }
+  &-body {
+    padding: @padding-medium;
+    height: 100%;
+    .ant-tabs {
+      height: 100%;
+      &.ant-tabs-vertical.ant-tabs-left > .ant-tabs-bar {
+        margin-right: @padding-small;
+        border-right: none;
+        .ant-tabs-nav {
+          background-color: #fff;
+          border: 1px @border-style-base @border-color-split;
+          border-radius: @border-radius-base;
+          .ant-tabs-tab {
+            margin-bottom: 0;
+            padding: @padding-base @padding-large;
+            &:not(:last-child) {
+              border-bottom: 1px @border-style-base @border-color-split;
+            }
+          }
+        }
+        .ant-tabs-ink-bar {
+          right: -1px;
+          width: 3px;
+          top: -1px;
+        }
+      }
+      .ant-tabs-content {
+        height: 100%;
+        background-color: #fff;
+        padding-top: @padding-medium;
+        padding-right: @padding-medium;
+        border: 1px @border-style-base @border-color-split;
+        border-radius: @border-radius-base;
+      }
+    }
+  }
+}

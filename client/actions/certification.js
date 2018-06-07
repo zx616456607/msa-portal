@@ -520,7 +520,7 @@ const fetchPatchZoneUser = (token, user, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          'if-Match': user.version,
+          'If-Match': user.version,
         },
         method: 'PATCH',
         body,
@@ -572,7 +572,7 @@ const UPDATE_ZONE_USER_PASSWORD_REQUEST = 'UPDATE_ZONE_USER_PASSWORD_REQUEST'
 const UPDATE_ZONE_USER_PASSWORD_SUCCESS = 'UPDATE_ZONE_USER_PASSWORD_SUCCESS'
 const UPDATE_ZONE_USER_PASSWORD_FAILURE = 'UPDATE_ZONE_USER_PASSWORD_FAILURE'
 
-const fetchUpdateUserPassword = (token, userId, body) => {
+const fetchUpdateUserPassword = (token, userInfo, body) => {
   return {
     [CALL_API]: {
       types: [
@@ -581,11 +581,12 @@ const fetchUpdateUserPassword = (token, userId, body) => {
         UPDATE_ZONE_USER_PASSWORD_FAILURE,
       ],
       isCpi: true,
-      endpoint: `${CLIENT_API_URL}/Users/${userId}/password`,
+      endpoint: `${CLIENT_API_URL}/Users/${userInfo.id}/password`,
       schema: {},
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          'If-Match': userInfo.version,
         },
         method: 'PUT',
         body,
@@ -594,10 +595,10 @@ const fetchUpdateUserPassword = (token, userId, body) => {
   }
 }
 
-export const updateZoneUserPassword = (userId, body) => {
+export const updateZoneUserPassword = (userInfo, body) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUpdateUserPassword(access_token, userId, body))
+    return dispatch(fetchUpdateUserPassword(access_token, userInfo, body))
   }
 }
 
@@ -636,3 +637,36 @@ export const unlockAccount = (userId, body) => {
 
 
 /* <------------------ Users end ------------------------------>*/
+
+/* <---------------------Groups start --------------------------->*/
+const DELETE_GROUP_USER_REQUEST = 'DELETE_GROUP_USER_REQUEST'
+const DELETE_GROUP_USER_SUCCESS = 'DELETE_GROUP_USER_SUCCESS'
+const DELETE_GROUP_USER_FAILURE = 'DELETE_GROUP_USER_FAILURE'
+
+const fetchDeleteGroupUser = (token, groupId, userId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_GROUP_USER_REQUEST,
+        DELETE_GROUP_USER_SUCCESS,
+        DELETE_GROUP_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Groups/${groupId}/members/${userId}`,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteGroupUser = (groupId, userId) => {
+  return (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDeleteGroupUser(access_token, groupId, userId))
+  }
+}
