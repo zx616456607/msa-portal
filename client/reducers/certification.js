@@ -96,17 +96,63 @@ const zoneUsers = (state = {}, action) => {
   }
 }
 
+const zoneGroups = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GROUPS_LIST_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+      })
+    case ActionTypes.GROUPS_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result,
+      })
+    case ActionTypes.GROUPS_LIST_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+      })
+    default:
+      return state
+  }
+}
+
+const zoneGroupsDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GROUPS_DETAIL_LIST_REQUEST :
+      return Object.assign({}, state, {
+        isFetching: true,
+      })
+    case ActionTypes.GROUPS_DETAIL_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result,
+      })
+    case ActionTypes.GROUPS_DETAIL_LIST_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+      })
+    default:
+      return state
+  }
+}
+
 const certification = (state = {
   clientList: {},
   identityZoneList: {},
   identityZoneDetail: {},
   zoneUsers: {},
+  zoneGroups: {},
+  zoneGroupsDetail: {},
 }, action) => {
   return {
     clientList: clientList(state.clientList, action),
     identityZoneList: identityZoneList(state.identityZoneList, action),
     identityZoneDetail: identityZoneDetail(state.identityZoneDetail, action),
     zoneUsers: zoneUsers(state.zoneUsers, action),
+    zoneGroups: zoneGroups(state.zoneGroups, action),
+    zoneGroupsDetail: zoneGroupsDetail(state.zoneGroupsDetail, action),
   }
 }
 
