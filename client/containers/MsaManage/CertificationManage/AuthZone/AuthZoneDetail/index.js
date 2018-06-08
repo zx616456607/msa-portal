@@ -18,6 +18,7 @@ import { getIdentityZoneDetail } from '../../../../../actions/certification'
 import AUTH_ZONE_ICON from '../../../../../assets/img/msa-manage/auth-zone.png'
 import Clients from './Clients'
 import Users from './Users'
+import Groups from './Groups'
 import './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -65,7 +66,7 @@ class AuthZoneDetail extends React.Component {
         <Card key={'auth-zone-detail-body'}>
           <Tabs activeKey={activeKey} onChange={this.handleTabs}>
             <TabPane tab="用户" key="user"><Users/></TabPane>
-            <TabPane tab="组" key="group">group</TabPane>
+            <TabPane tab="组" key="group"><Groups/></TabPane>
             <TabPane tab="客户端" key="client"><Clients/></TabPane>
           </Tabs>
         </Card>

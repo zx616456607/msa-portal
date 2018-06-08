@@ -638,7 +638,144 @@ export const unlockAccount = (userId, body) => {
 
 /* <------------------ Users end ------------------------------>*/
 
-/* <---------------------Groups start --------------------------->*/
+/* <-------------------------- Groups start -------------------------->*/
+
+export const CREATE_GROUPS_REQUEST = 'CREATE_GROUPS_REQUEST'
+export const CREATE_GROUPS_SUCCESS = 'CREATE_GROUPS_SUCCESS'
+export const CREATE_GROUPS_FAILURE = 'CREATE_GROUPS_FAILURE'
+
+const fetchCreateGroups = (token, body) => {
+  const endpoint = `${CLIENT_API_URL}/Groups`
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_GROUPS_REQUEST,
+        CREATE_GROUPS_SUCCESS,
+        CREATE_GROUPS_FAILURE,
+      ],
+      endpoint,
+      isCpi: true,
+      schema: {},
+      options: {
+        headers: {
+          'Content-Type': CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const createGroup = body =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchCreateGroups(access_token, body))
+  }
+
+export const GROUPS_LIST_REQUEST = 'GROUPS_LIST_REQUEST'
+export const GROUPS_LIST_SUCCESS = 'GROUPS_LIST_SUCCESS'
+export const GROUPS_LIST_FAILURE = 'GROUPS_LIST_FAILURE'
+
+const fetchGroupList = (token, query) => {
+  let endpoint = `${CLIENT_API_URL}/Groups`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        GROUPS_LIST_REQUEST,
+        GROUPS_LIST_SUCCESS,
+        GROUPS_LIST_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: {},
+      options: {
+        headers: {
+          Accept: CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    },
+  }
+}
+
+export const getGroupList = query =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchGroupList(access_token, query))
+  }
+
+export const DELETE_GROUPS_REQUEST = 'DELETE_GROUPS_REQUEST'
+export const DELETE_GROUPS_SUCCESS = 'DELETE_GROUPS_SUCCESS'
+export const DELETE_GROUPS_FAILURE = 'DELETE_GROUPS_FAILURE'
+
+const fetchDelGroup = (token, id) => {
+  const endpoint = `${CLIENT_API_URL}/Groups/${id}`
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_GROUPS_REQUEST,
+        DELETE_GROUPS_SUCCESS,
+        DELETE_GROUPS_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: {},
+      options: {
+        headers: {
+          Accept: CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteGroup = id =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDelGroup(access_token, id))
+  }
+
+export const UPDATE_GROUPS_REQUEST = 'UPDATE_GROUPS_REQUEST'
+export const UPDATE_GROUPS_SUCCESS = 'UPDATE_GROUPS_SUCCESS'
+export const UPDATE_GROUPS_FAILURE = 'UPDATE_GROUPS_FAILURE'
+
+const fetchUpdateGroup = (token, query, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_GROUPS_REQUEST,
+        UPDATE_GROUPS_SUCCESS,
+        UPDATE_GROUPS_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Groups/${query.id}`,
+      schema: {},
+      options: {
+        headers: {
+          'Content-Type': CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+          'If-Match': query.match,
+        },
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateGroup = (query, body) =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchUpdateGroup(access_token, query, body))
+  }
+
 const DELETE_GROUP_USER_REQUEST = 'DELETE_GROUP_USER_REQUEST'
 const DELETE_GROUP_USER_SUCCESS = 'DELETE_GROUP_USER_SUCCESS'
 const DELETE_GROUP_USER_FAILURE = 'DELETE_GROUP_USER_FAILURE'
@@ -670,3 +807,71 @@ export const deleteGroupUser = (groupId, userId) => {
     return dispatch(fetchDeleteGroupUser(access_token, groupId, userId))
   }
 }
+
+export const GROUPS_DETAIL_LIST_REQUEST = 'GROUPS_DETAIL_LIST_REQUEST'
+export const GROUPS_DETAIL_LIST_SUCCESS = 'GROUPS_DETAIL_LIST_SUCCESS'
+export const GROUPS_DETAIL_LIST_FAILURE = 'GROUPS_DETAIL_LIST_FAILURE'
+
+const fetchGroupDetailList = (token, id, query) => {
+  let endpoint = `${CLIENT_API_URL}/Groups/${id}/members`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        GROUPS_DETAIL_LIST_REQUEST,
+        GROUPS_DETAIL_LIST_SUCCESS,
+        GROUPS_DETAIL_LIST_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    },
+  }
+}
+
+export const getGroupDetail = (id, query) =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchGroupDetailList(access_token, id, query))
+  }
+
+export const DEL_GROUPS_DETAIL_USER_REQUEST = 'DEL_GROUPS_DETAIL_USER_REQUEST'
+export const DEL_GROUPS_DETAIL_USER_SUCCESS = 'DEL_GROUPS_DETAIL_USER_SUCCESS'
+export const DEL_GROUPS_DETAIL_USER_FAILURE = 'DEL_GROUPS_DETAIL_USER_FAILURE'
+
+const fetchDelGroupDetailUser = (token, query) => {
+  const endpoint = `${CLIENT_API_URL}/Groups/${query.id}/members/${query.userId}`
+  return {
+    [CALL_API]: {
+      types: [
+        DEL_GROUPS_DETAIL_USER_REQUEST,
+        DEL_GROUPS_DETAIL_USER_SUCCESS,
+        DEL_GROUPS_DETAIL_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const DelGroupDetailUser = (id, query) =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDelGroupDetailUser(access_token, query))
+  }
+
+/* <-------------------------- Groups end -------------------------->*/
