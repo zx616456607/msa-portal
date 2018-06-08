@@ -1,0 +1,73 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Style of GroupsDetail
+ *
+ * 2018-06-07
+ * @author zhaoyb
+ */
+
+ @import '~assets/style/core/index.less';
+.groups-detail {
+  background-color: @backgroud-color-body;
+  height: 100%;
+  &-header {
+    height: 160px;
+    background-color: #fff;
+    padding: @padding-large;
+    &-icon {
+      float: left;
+      height: 100px;
+      width: 100px;
+      padding: 10px;
+      border: 1px @border-style-base @border-color-split;
+      border-radius: @border-radius-medium;
+    }
+    &-right {
+      float: left;
+      width: calc(~"100% - 100px - 24px");
+      margin-left: 24px;
+      .desc {
+        padding-top: 10px;
+      }
+    }
+    &-btns {
+      text-align: right;
+    }
+  }
+
+  &-body {
+    padding: @padding-medium;
+    height: 100%;
+    .layout-content-btns {
+      padding-bottom: @padding-medium;
+      & > *:not(:last-child) {
+        margin-right: 10px;
+      }
+      .search-style {
+        width: 180px;
+      }
+      .page-box {
+        float: right;
+        padding-top: 5px;
+        .total {
+          margin-right: 18px;
+          line-height: 24px;
+        }
+        .ant-pagination-simple {
+          float: right;
+        }
+      }
+    }
+    .title {
+      height: 18px;
+      border-left: 7px solid #24a7eb;
+      font-size: 14px;
+      padding-left: 8px;
+      margin-bottom: 20px;
+    }
+  }
+}
