@@ -80,15 +80,61 @@ const msaConfig = (state = {}, action) => {
   }
 }
 
+const serviceDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.SERVICE_DETAIL_REQUEST:
+      return {
+        isFetching: true,
+      }
+    case ActionTypes.SERVICE_DETAIL_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.SERVICE_DETAIL_FAILURE:
+      return {
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+const serviceProxy = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_PROXIES_REQUEST:
+      return {
+        isFetching: true,
+      }
+    case ActionTypes.GET_PROXIES_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.GET_PROXIES_FAILURE:
+      return {
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
   msaEnv: {},
   msaConfig: {},
+  serviceDetail: {},
+  serviceProxy: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
     msaEnv: msaEnv(state.msaEnv, action),
     msaConfig: msaConfig(state.msaConfig, action),
+    serviceDetail: serviceDetail(state.serviceDetail, action),
+    serviceProxy: serviceProxy(state.serviceProxy, action),
   }
 }
 
