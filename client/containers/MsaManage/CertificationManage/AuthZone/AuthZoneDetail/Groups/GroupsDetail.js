@@ -173,7 +173,7 @@ class GroupsDetail extends React.Component {
             dataSource={this.state.mockData}
             showSearch
             listStyle={{ width: 250, height: 300 }}
-            operations={['移除', '添加']}
+            operations={[ '移除', '添加' ]}
             targetKeys={this.state.targetKeys}
             onChange={this.handleChange}
             render={item => `${item.title}-${item.description}`}
