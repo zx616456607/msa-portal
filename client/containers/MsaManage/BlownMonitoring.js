@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import isEmpty from 'lodash/isEmpty.js'
 import QueueAnim from 'rc-queue-anim'
 import { Card, Icon, Spin } from 'antd'
 import './style/BlownMonitoring.less'
@@ -29,7 +30,7 @@ class BlownMonitoring extends React.Component {
       isFetching: proxyFetching,
       data: proxyData,
     } = serviceProxy || { isFetching: true, data: [] }
-    if (detailFetching || proxyFetching) {
+    if (isEmpty(serviceDetail) || isEmpty(serviceProxy) || detailFetching || proxyFetching) {
       return <Spin/>
     }
     const { service } = detailData[DEFAULT_SERVICE]
