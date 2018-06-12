@@ -97,7 +97,7 @@ class Clients extends React.Component {
     const { deleteClient } = this.props
     confirm({
       modalTitle: '删除',
-      title: `确定删除客户端 ${record.client_id}?`,
+      title: `确定删除 OAuth 应用 ${record.client_id}?`,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
@@ -143,7 +143,7 @@ class Clients extends React.Component {
     const { clientList, totalResults, isFetching } = this.props
     const columns = [
       {
-        title: '客户端 ID',
+        title: 'ID',
         dataIndex: 'client_id',
         key: 'client_id',
         width: '20%',
@@ -151,7 +151,7 @@ class Clients extends React.Component {
           <span className="primary-color pointer" onClick={() => this.viewClient(record)}>{text}</span>,
       },
       {
-        title: '客户端名称',
+        title: 'OAuth 应用名称',
         dataIndex: 'name',
         key: 'name',
         width: '20%',
@@ -205,13 +205,13 @@ class Clients extends React.Component {
       <QueueAnim className="certification-clients">
         <div className="layout-content-btns" key="btns">
           <Button icon="plus" type="primary" onClick={() => this.toggleVisible()}>
-            添加客户端
+            添加 OAuth 应用
           </Button>
           <Button icon="reload" onClick={this.refreshData}>
             刷新
           </Button>
           <Search
-            placeholder="按客户端 ID 搜索"
+            placeholder="按 ID 搜索"
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}

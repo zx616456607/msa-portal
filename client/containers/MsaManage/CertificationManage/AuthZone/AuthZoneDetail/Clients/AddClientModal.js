@@ -190,12 +190,12 @@ class AddClientModal extends React.Component {
   renderModalTitle = () => {
     const { currentClient, isView } = this.props
     if (isEmpty(currentClient)) {
-      return '添加认证客户端'
+      return '添加 OAuth 应用'
     }
     if (!isView) {
-      return '编辑认证客户端'
+      return '编辑 OAuth 应用'
     }
-    return '查看认证客户端'
+    return '查看 OAuth 应用'
   }
 
   renderFooter = () => {
@@ -357,7 +357,7 @@ class AddClientModal extends React.Component {
             getFieldDecorator('name', {
               initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.name) ? currentClient.name : '',
             })(
-              <Input disabled={isView} placeholder="请输入客户端名称"/>
+              <Input disabled={isView} placeholder="请输入名称"/>
             )
           }
         </FormItem>
@@ -381,7 +381,7 @@ class AddClientModal extends React.Component {
             )
           }
         </FormItem>
-        <FormItem {...formItemLayout} label="客户端 ID">
+        <FormItem {...formItemLayout} label="Client ID">
           {
             getFieldDecorator('client_id', {
               initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.client_id) ? currentClient.client_id : '',
@@ -398,7 +398,7 @@ class AddClientModal extends React.Component {
         </FormItem>
         {
           isEmpty(currentClient) &&
-          <FormItem {...formItemLayout} label="客户端 Secret">
+          <FormItem {...formItemLayout} label="Client Secret">
             {
               getFieldDecorator('client_secret', {
                 initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.client_secret) ? currentClient.client_secret : '',
