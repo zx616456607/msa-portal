@@ -103,7 +103,6 @@ class AddClientModal extends React.Component {
   confirmModal = async () => {
     const {
       form, currentClient, loadData, closeModal, createClient, editClient, isView,
-      identityZoneDetail,
     } = this.props
     const { validateFields } = form
     if (isView) {
@@ -137,13 +136,9 @@ class AddClientModal extends React.Component {
         Object.assign(body, { scope, autoapprove })
       }
 
-      const zoneInfo = {
-        id: identityZoneDetail.id,
-        subdomain: identityZoneDetail.subdomain,
-      }
       // 创建
       if (isEmpty(currentClient)) {
-        const result = await createClient(body, zoneInfo)
+        const result = await createClient(body)
         if (result.error) {
           this.setState({
             confirmLoading: false,
@@ -165,7 +160,7 @@ class AddClientModal extends React.Component {
         return
       }
       // 编辑
-      const res = await editClient(body, zoneInfo)
+      const res = await editClient(body)
       if (res.error) {
         this.setState({
           confirmLoading: false,

@@ -36,13 +36,8 @@ class Clients extends React.Component {
   }
 
   loadClientList = () => {
-    const { getClientList, identityZoneDetail } = this.props
+    const { getClientList } = this.props
     const { current, inputValue } = this.state
-    const { id, subdomain } = identityZoneDetail
-    const zoneInfo = {
-      id,
-      subdomain,
-    }
     const newQuery = {}
     if (inputValue) {
       Object.assign(newQuery, {
@@ -53,7 +48,7 @@ class Clients extends React.Component {
       startIndex: (current - 1) * DEFAULT_PAGESIZE + 1,
       count: DEFAULT_PAGESIZE,
     })
-    getClientList(newQuery, zoneInfo)
+    getClientList(newQuery)
   }
 
   refreshData = () => {
@@ -253,13 +248,12 @@ class Clients extends React.Component {
 
 const mapStateToProps = state => {
   const { certification } = state
-  const { clientList, identityZoneDetail } = certification
+  const { clientList } = certification
   const { totalResults, isFetching } = clientList
   return {
     ...clientListSlt(state),
     totalResults,
     isFetching,
-    identityZoneDetail,
   }
 }
 

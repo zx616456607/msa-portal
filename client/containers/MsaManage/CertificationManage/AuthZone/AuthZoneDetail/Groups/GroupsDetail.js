@@ -17,7 +17,7 @@ import classNames from 'classnames'
 import './style/groupsDetail.less'
 import QueueAnim from 'rc-queue-anim'
 import groupsIcon from '../../../../../../assets/img/msa-manage/groups.png'
-import { getGroupDetail, DelGroupDetailUser } from '../../../../../../actions/certification'
+import { getGroupDetail } from '../../../../../../actions/certification'
 import { formatDate } from '../../../../../../common/utils'
 
 const Search = Input.Search
@@ -201,6 +201,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   getGroupDetail,
-  DelGroupDetailUser,
 })(GroupsDetail)
 
