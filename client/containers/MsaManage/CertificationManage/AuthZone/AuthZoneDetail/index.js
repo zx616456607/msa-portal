@@ -67,7 +67,7 @@ class AuthZoneDetail extends React.Component {
           <Tabs activeKey={activeKey} onChange={this.handleTabs}>
             <TabPane tab="用户" key="user"><Users/></TabPane>
             <TabPane tab="组" key="group"><Groups/></TabPane>
-            <TabPane tab="客户端" key="client"><Clients/></TabPane>
+            <TabPane tab="OAuth 应用" key="client"><Clients/></TabPane>
           </Tabs>
         </Card>
       </QueueAnim>
