@@ -38,13 +38,8 @@ class Users extends React.Component {
   }
 
   loadUserList = () => {
-    const { getUserList, identityZoneDetail } = this.props
+    const { getUserList } = this.props
     const { current, inputValue } = this.state
-    const { id, subdomain } = identityZoneDetail
-    const zoneInfo = {
-      id,
-      subdomain,
-    }
     const newQuery = {}
     if (inputValue) {
       Object.assign(newQuery, {
@@ -55,7 +50,7 @@ class Users extends React.Component {
       startIndex: (current - 1) * DEFAULT_PAGESIZE + 1,
       count: DEFAULT_PAGESIZE,
     })
-    getUserList(newQuery, zoneInfo)
+    getUserList(newQuery)
   }
 
   refreshData = () => {
@@ -365,13 +360,12 @@ class Users extends React.Component {
 
 const mapStateToProps = state => {
   const { certification } = state
-  const { zoneUsers, identityZoneDetail } = certification
+  const { zoneUsers } = certification
   const { data } = zoneUsers
   const { totalResults } = data || { totalResults: 0 }
   return {
     ...zoneUserListSlt(state),
     totalResults,
-    identityZoneDetail,
   }
 }
 

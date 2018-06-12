@@ -12,7 +12,10 @@
 
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
-import { API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED, UAA_JWT } from '../constants'
+import {
+  API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED, UAA_JWT,
+  ZONE_ID_HEADER, ZONE_SUBDOMAIN_HEADER, IF_MATCH_HEADER,
+} from '../constants'
 import { toQuerystring } from '../common/utils'
 
 const { CLIENT_API_URL } = API_CONFIG
@@ -100,19 +103,19 @@ const fetchClientList = (access_token, query, zoneInfo) => {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: CONTENT_TYPE_JSON,
-          'Access-Control-Request-Headers': 'X-Identity-Zone-Id,X-Identity-Zone-Subdomain',
-          'X-Identity-Zone-Id': id,
-          'X-Identity-Zone-Subdomain': subdomain,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
       },
     },
   }
 }
 
-export function getClientList(query, zoneInfo) {
+export function getClientList(query) {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchClientList(access_token, query, zoneInfo))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchClientList(access_token, query, identityZoneDetail))
   }
 }
 
@@ -120,8 +123,8 @@ const CREATE_CLIENT_REQUEST = 'CREATE_CLIENT_REQUEST'
 const CREATE_CLIENT_SUCCESS = 'CREATE_CLIENT_SUCCESS'
 const CREATE_CLIENT_FAILURE = 'CREATE_CLIENT_FAILURE'
 
-const fetchCreateClient = (access_token, body) => {
-  // const { id, subdomain } = zoneInfo
+const fetchCreateClient = (access_token, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ CREATE_CLIENT_REQUEST, CREATE_CLIENT_SUCCESS, CREATE_CLIENT_FAILURE ],
@@ -131,8 +134,8 @@ const fetchCreateClient = (access_token, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
-          // 'X-Identity-Zone-Id': id,
-          // 'X-Identity-Zone-Subdomain': subdomain,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'POST',
         body,
@@ -141,17 +144,19 @@ const fetchCreateClient = (access_token, body) => {
   }
 }
 
-export const createClient = (body, zoneInfo) =>
+export const createClient = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchCreateClient(access_token, body, zoneInfo))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchCreateClient(access_token, body, identityZoneDetail))
   }
 
 const EDIT_CLIENT_REQUEST = 'EDIT_CLIENT_REQUEST'
 const EDIT_CLIENT_SUCCESS = 'EDIT_CLIENT_SUCCESS'
 const EDIT_CLIENT_FAILURE = 'EDIT_CLIENT_FAILURE'
 
-const fetchEditClient = (access_token, body) => {
+const fetchEditClient = (access_token, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ EDIT_CLIENT_REQUEST, EDIT_CLIENT_SUCCESS, EDIT_CLIENT_FAILURE ],
@@ -161,6 +166,8 @@ const fetchEditClient = (access_token, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PUT',
         body,
@@ -172,14 +179,16 @@ const fetchEditClient = (access_token, body) => {
 export const editClient = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchEditClient(access_token, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchEditClient(access_token, body, identityZoneDetail))
   }
 
 const DELETE_CLIENT_REQUEST = 'DELETE_CLIENT_REQUEST'
 const DELETE_CLIENT_SUCCESS = 'DELETE_CLIENT_SUCCESS'
 const DELETE_CLIENT_FAILURE = 'DELETE_CLIENT_FAILURE'
 
-const fetchDeleteClient = (access_token, clientID) => {
+const fetchDeleteClient = (access_token, clientID, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [ DELETE_CLIENT_REQUEST, DELETE_CLIENT_SUCCESS, DELETE_CLIENT_FAILURE ],
@@ -189,6 +198,8 @@ const fetchDeleteClient = (access_token, clientID) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'DELETE',
       },
@@ -199,14 +210,16 @@ const fetchDeleteClient = (access_token, clientID) => {
 export const deleteClient = clientID =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDeleteClient(access_token, clientID))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchDeleteClient(access_token, clientID, identityZoneDetail))
   }
 
 const CHANGE_CLIENT_SECRET_REQUEST = 'CHANGE_CLIENT_SECRET_REQUEST'
 const CHANGE_CLIENT_SECRET_SUCCESS = 'CHANGE_CLIENT_SECRET_SUCCESS'
 const CHANGE_CLIENT_SECRET_FAILURE = 'CHANGE_CLIENT_SECRET_FAILURE'
 
-const fetchChangeClientSecret = (access_token, body) => {
+const fetchChangeClientSecret = (access_token, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -220,6 +233,8 @@ const fetchChangeClientSecret = (access_token, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PUT',
         body,
@@ -231,7 +246,8 @@ const fetchChangeClientSecret = (access_token, body) => {
 export const changeClientSecret = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchChangeClientSecret(access_token, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchChangeClientSecret(access_token, body, identityZoneDetail))
   }
 
 /* <-------------------------- Clients end -------------------------->*/
@@ -403,12 +419,12 @@ export const USERS_LIST_REQUEST = 'USERS_LIST_REQUEST'
 export const USERS_LIST_SUCCESS = 'USERS_LIST_SUCCESS'
 export const USERS_LIST_FAILURE = 'USERS_LIST_FAILURE'
 
-const fetchUserList = (token, query) => {
+const fetchUserList = (token, query, zoneInfo) => {
   let endpoint = `${CLIENT_API_URL}/Users`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
-  // const { id, subdomain } = zoneInfo
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -423,23 +439,27 @@ const fetchUserList = (token, query) => {
         headers: {
           Accept: CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
       },
     },
   }
 }
 
-export const getUserList = (query, zoneInfo) =>
+export const getUserList = query =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUserList(access_token, query, zoneInfo))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchUserList(access_token, query, identityZoneDetail))
   }
 
 const CREATE_ZONE_USER_REQUEST = 'CREATE_ZONE_USER_REQUEST'
 const CREATE_ZONE_USER_SUCCESS = 'CREATE_ZONE_USER_SUCCESS'
 const CREATE_ZONE_USER_FAILURE = 'CREATE_ZONE_USER_FAILURE'
 
-const fetchCreateZoneUser = (token, body) => {
+const fetchCreateZoneUser = (token, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -453,6 +473,8 @@ const fetchCreateZoneUser = (token, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'POST',
         body,
@@ -464,7 +486,8 @@ const fetchCreateZoneUser = (token, body) => {
 export const createZoneUser = body => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchCreateZoneUser(access_token, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchCreateZoneUser(access_token, body, identityZoneDetail))
   }
 }
 
@@ -472,7 +495,8 @@ const UPDATE_ZONE_USER_REQUEST = 'UPDATE_ZONE_USER_REQUEST'
 const UPDATE_ZONE_USER_SUCCESS = 'UPDATE_ZONE_USER_SUCCESS'
 const UPDATE_ZONE_USER_FAILURE = 'UPDATE_ZONE_USER_FAILURE'
 
-const fetchUpdateZoneUser = (token, user, body) => {
+const fetchUpdateZoneUser = (token, user, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -486,7 +510,9 @@ const fetchUpdateZoneUser = (token, user, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          'If-Match': user.version,
+          [IF_MATCH_HEADER]: user.version,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PUT',
         body,
@@ -498,7 +524,8 @@ const fetchUpdateZoneUser = (token, user, body) => {
 export const updateZoneUser = (user, body) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUpdateZoneUser(access_token, user, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchUpdateZoneUser(access_token, user, body, identityZoneDetail))
   }
 }
 
@@ -506,7 +533,8 @@ const PATCH_ZONE_USER_REQUEST = 'PATCH_ZONE_USER_REQUEST'
 const PATCH_ZONE_USER_SUCCESS = 'PATCH_ZONE_USER_SUCCESS'
 const PATCH_ZONE_USER_FAILURE = 'PATCH_ZONE_USER_FAILURE'
 
-const fetchPatchZoneUser = (token, user, body) => {
+const fetchPatchZoneUser = (token, user, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -520,7 +548,9 @@ const fetchPatchZoneUser = (token, user, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          'If-Match': user.version,
+          [IF_MATCH_HEADER]: user.version,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PATCH',
         body,
@@ -532,7 +562,8 @@ const fetchPatchZoneUser = (token, user, body) => {
 export const patchZoneUser = (user, body) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchPatchZoneUser(access_token, user, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchPatchZoneUser(access_token, user, body, identityZoneDetail))
   }
 }
 
@@ -540,7 +571,8 @@ const DELETE_ZONE_USER_REQUEST = 'DELETE_ZONE_USER_REQUEST'
 const DELETE_ZONE_USER_SUCCESS = 'DELETE_ZONE_USER_SUCCESS'
 const DELETE_ZONE_USER_FAILURE = 'DELETE_ZONE_USER_FAILURE'
 
-const fetchDeleteZoneUser = (token, id) => {
+const fetchDeleteZoneUser = (token, id, zoneInfo) => {
+  const { id: zoneId, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -554,6 +586,8 @@ const fetchDeleteZoneUser = (token, id) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: zoneId,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'DELETE',
       },
@@ -564,7 +598,8 @@ const fetchDeleteZoneUser = (token, id) => {
 export const deleteZoneUser = id => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDeleteZoneUser(access_token, id))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchDeleteZoneUser(access_token, id, identityZoneDetail))
   }
 }
 
@@ -572,7 +607,8 @@ const UPDATE_ZONE_USER_PASSWORD_REQUEST = 'UPDATE_ZONE_USER_PASSWORD_REQUEST'
 const UPDATE_ZONE_USER_PASSWORD_SUCCESS = 'UPDATE_ZONE_USER_PASSWORD_SUCCESS'
 const UPDATE_ZONE_USER_PASSWORD_FAILURE = 'UPDATE_ZONE_USER_PASSWORD_FAILURE'
 
-const fetchUpdateUserPassword = (token, userInfo, body) => {
+const fetchUpdateUserPassword = (token, userInfo, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -586,7 +622,9 @@ const fetchUpdateUserPassword = (token, userInfo, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          'If-Match': userInfo.version,
+          [IF_MATCH_HEADER]: userInfo.version,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PUT',
         body,
@@ -598,7 +636,8 @@ const fetchUpdateUserPassword = (token, userInfo, body) => {
 export const updateZoneUserPassword = (userInfo, body) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUpdateUserPassword(access_token, userInfo, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchUpdateUserPassword(access_token, userInfo, body, identityZoneDetail))
   }
 }
 
@@ -606,7 +645,8 @@ const ZONE_USER_UNLOCK_REQUEST = 'ZONE_USER_UNLOCK_REQUEST'
 const ZONE_USER_UNLOCK_SUCCESS = 'ZONE_USER_UNLOCK_SUCCESS'
 const ZONE_USER_UNLOCK_FAILURE = 'ZONE_USER_UNLOCK_FAILURE'
 
-const fetchUnlockAccount = (token, userId, body) => {
+const fetchUnlockAccount = (token, userId, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -620,6 +660,8 @@ const fetchUnlockAccount = (token, userId, body) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PATCH',
         body,
@@ -631,7 +673,8 @@ const fetchUnlockAccount = (token, userId, body) => {
 export const unlockAccount = (userId, body) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUnlockAccount(access_token, userId, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchUnlockAccount(access_token, userId, body, identityZoneDetail))
   }
 }
 
@@ -644,7 +687,8 @@ export const CREATE_GROUPS_REQUEST = 'CREATE_GROUPS_REQUEST'
 export const CREATE_GROUPS_SUCCESS = 'CREATE_GROUPS_SUCCESS'
 export const CREATE_GROUPS_FAILURE = 'CREATE_GROUPS_FAILURE'
 
-const fetchCreateGroups = (token, body) => {
+const fetchCreateGroups = (token, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   const endpoint = `${CLIENT_API_URL}/Groups`
   return {
     [CALL_API]: {
@@ -660,6 +704,8 @@ const fetchCreateGroups = (token, body) => {
         headers: {
           'Content-Type': CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'POST',
         body,
@@ -671,14 +717,16 @@ const fetchCreateGroups = (token, body) => {
 export const createGroup = body =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchCreateGroups(access_token, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchCreateGroups(access_token, body, identityZoneDetail))
   }
 
 export const GROUPS_LIST_REQUEST = 'GROUPS_LIST_REQUEST'
 export const GROUPS_LIST_SUCCESS = 'GROUPS_LIST_SUCCESS'
 export const GROUPS_LIST_FAILURE = 'GROUPS_LIST_FAILURE'
 
-const fetchGroupList = (token, query) => {
+const fetchGroupList = (token, query, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   let endpoint = `${CLIENT_API_URL}/Groups`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
@@ -697,6 +745,8 @@ const fetchGroupList = (token, query) => {
         headers: {
           Accept: CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
       },
     },
@@ -706,14 +756,16 @@ const fetchGroupList = (token, query) => {
 export const getGroupList = query =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchGroupList(access_token, query))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchGroupList(access_token, query, identityZoneDetail))
   }
 
 export const DELETE_GROUPS_REQUEST = 'DELETE_GROUPS_REQUEST'
 export const DELETE_GROUPS_SUCCESS = 'DELETE_GROUPS_SUCCESS'
 export const DELETE_GROUPS_FAILURE = 'DELETE_GROUPS_FAILURE'
 
-const fetchDelGroup = (token, id) => {
+const fetchDelGroup = (token, id, zoneInfo) => {
+  const { id: zoneId, subdomain } = zoneInfo
   const endpoint = `${CLIENT_API_URL}/Groups/${id}`
   return {
     [CALL_API]: {
@@ -729,6 +781,8 @@ const fetchDelGroup = (token, id) => {
         headers: {
           Accept: CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: zoneId,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'DELETE',
       },
@@ -739,14 +793,16 @@ const fetchDelGroup = (token, id) => {
 export const deleteGroup = id =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDelGroup(access_token, id))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchDelGroup(access_token, id, identityZoneDetail))
   }
 
 export const UPDATE_GROUPS_REQUEST = 'UPDATE_GROUPS_REQUEST'
 export const UPDATE_GROUPS_SUCCESS = 'UPDATE_GROUPS_SUCCESS'
 export const UPDATE_GROUPS_FAILURE = 'UPDATE_GROUPS_FAILURE'
 
-const fetchUpdateGroup = (token, query, body) => {
+const fetchUpdateGroup = (token, query, body, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -761,7 +817,9 @@ const fetchUpdateGroup = (token, query, body) => {
         headers: {
           'Content-Type': CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
-          'If-Match': query.match,
+          [IF_MATCH_HEADER]: query.match,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'PUT',
         body,
@@ -773,14 +831,16 @@ const fetchUpdateGroup = (token, query, body) => {
 export const updateGroup = (query, body) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUpdateGroup(access_token, query, body))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchUpdateGroup(access_token, query, body, identityZoneDetail))
   }
 
 const DELETE_GROUP_USER_REQUEST = 'DELETE_GROUP_USER_REQUEST'
 const DELETE_GROUP_USER_SUCCESS = 'DELETE_GROUP_USER_SUCCESS'
 const DELETE_GROUP_USER_FAILURE = 'DELETE_GROUP_USER_FAILURE'
 
-const fetchDeleteGroupUser = (token, groupId, userId) => {
+const fetchDeleteGroupUser = (token, groupId, userId, zoneInfo) => {
+  const { id, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -794,6 +854,8 @@ const fetchDeleteGroupUser = (token, groupId, userId) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: id,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'DELETE',
       },
@@ -804,7 +866,8 @@ const fetchDeleteGroupUser = (token, groupId, userId) => {
 export const deleteGroupUser = (groupId, userId) => {
   return (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDeleteGroupUser(access_token, groupId, userId))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchDeleteGroupUser(access_token, groupId, userId, identityZoneDetail))
   }
 }
 
@@ -812,7 +875,8 @@ export const GROUPS_DETAIL_LIST_REQUEST = 'GROUPS_DETAIL_LIST_REQUEST'
 export const GROUPS_DETAIL_LIST_SUCCESS = 'GROUPS_DETAIL_LIST_SUCCESS'
 export const GROUPS_DETAIL_LIST_FAILURE = 'GROUPS_DETAIL_LIST_FAILURE'
 
-const fetchGroupDetailList = (token, id, query) => {
+const fetchGroupDetailList = (token, id, query, zoneInfo) => {
+  const { id: zoneId, subdomain } = zoneInfo
   let endpoint = `${CLIENT_API_URL}/Groups/${id}/members`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
@@ -830,6 +894,8 @@ const fetchGroupDetailList = (token, id, query) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: zoneId,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
       },
     },
@@ -839,39 +905,8 @@ const fetchGroupDetailList = (token, id, query) => {
 export const getGroupDetail = (id, query) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchGroupDetailList(access_token, id, query))
-  }
-
-export const DEL_GROUPS_DETAIL_USER_REQUEST = 'DEL_GROUPS_DETAIL_USER_REQUEST'
-export const DEL_GROUPS_DETAIL_USER_SUCCESS = 'DEL_GROUPS_DETAIL_USER_SUCCESS'
-export const DEL_GROUPS_DETAIL_USER_FAILURE = 'DEL_GROUPS_DETAIL_USER_FAILURE'
-
-const fetchDelGroupDetailUser = (token, query) => {
-  const endpoint = `${CLIENT_API_URL}/Groups/${query.id}/members/${query.userId}`
-  return {
-    [CALL_API]: {
-      types: [
-        DEL_GROUPS_DETAIL_USER_REQUEST,
-        DEL_GROUPS_DETAIL_USER_SUCCESS,
-        DEL_GROUPS_DETAIL_USER_FAILURE,
-      ],
-      isCpi: true,
-      endpoint,
-      schema: {},
-      options: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        method: 'DELETE',
-      },
-    },
-  }
-}
-
-export const DelGroupDetailUser = (id, query) =>
-  (dispatch, getState) => {
-    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDelGroupDetailUser(access_token, query))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(fetchGroupDetailList(access_token, id, query, identityZoneDetail))
   }
 
 /* <-------------------------- Groups end -------------------------->*/
