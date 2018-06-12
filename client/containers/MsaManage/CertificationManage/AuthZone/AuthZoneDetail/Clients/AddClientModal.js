@@ -25,7 +25,7 @@ const FormItem = Form.Item
 const CheckboxGroup = Checkbox.Group
 const Option = Select.Option
 
-const authModeOpts = [ 'authorization_code', 'refresh_token', 'password', 'client_credentials' ]
+const authModeOpts = [ 'authorization_code', 'implicit', 'password', 'client_credentials' ]
 
 let uuid = 0
 
