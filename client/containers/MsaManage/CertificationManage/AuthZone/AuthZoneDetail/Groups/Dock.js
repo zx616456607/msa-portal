@@ -15,11 +15,11 @@ import GroupsDetail from './GroupsDetail'
 
 export default class GroupsDetailDock extends React.Component {
   render() {
-    const { groupInfo, ...otherProps } = this.props
+    const { groupInfo, closeModal, loadGroup, ...otherProps } = this.props
     return (
       <DetailPageDock {...otherProps}>
         <GroupsDetail
-          {...{ groupInfo }}
+          {...{ groupInfo, closeModal, loadGroup }}
         />
       </DetailPageDock>
     )
