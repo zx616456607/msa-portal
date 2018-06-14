@@ -909,4 +909,69 @@ export const getGroupDetail = (id, query) =>
     return dispatch(fetchGroupDetailList(access_token, id, query, identityZoneDetail))
   }
 
+export const ADD_GROUPS_DETAIL_USER_REQUEST = 'ADD_GROUPS_DETAIL_USER_REQUEST'
+export const ADD_GROUPS_DETAIL_USER_SUCCESS = 'ADD_GROUPS_DETAIL_USER_SUCCESS'
+export const ADD_GROUPS_DETAIL_USER_FAILURE = 'ADD_GROUPS_DETAIL_USER_FAILURE'
+
+const createGroupUser = (token, id, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        ADD_GROUPS_DETAIL_USER_REQUEST,
+        ADD_GROUPS_DETAIL_USER_SUCCESS,
+        ADD_GROUPS_DETAIL_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint: `${CLIENT_API_URL}/Groups/${id}/members`,
+      schema: {},
+      options: {
+        headers: {
+          'Content-Type': CONTENT_TYPE_JSON,
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const addGroupsUser = (id, body) =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(createGroupUser(access_token, id, body))
+  }
+
+export const DEL_GROUPS_DETAIL_USER_REQUEST = 'DEL_GROUPS_DETAIL_USER_REQUEST'
+export const DEL_GROUPS_DETAIL_USER_SUCCESS = 'DEL_GROUPS_DETAIL_USER_SUCCESS'
+export const DEL_GROUPS_DETAIL_USER_FAILURE = 'DEL_GROUPS_DETAIL_USER_FAILURE'
+
+const fetchDelGroupDetailUser = (token, query) => {
+  const endpoint = `${CLIENT_API_URL}/Groups/${query.id}/members/${query.userId}`
+  return {
+    [CALL_API]: {
+      types: [
+        DEL_GROUPS_DETAIL_USER_REQUEST,
+        DEL_GROUPS_DETAIL_USER_SUCCESS,
+        DEL_GROUPS_DETAIL_USER_FAILURE,
+      ],
+      isCpi: true,
+      endpoint,
+      schema: {},
+      options: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const DelGroupDetailUser = query =>
+  (dispatch, getState) => {
+    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
+    return dispatch(fetchDelGroupDetailUser(access_token, query))
+  }
+
 /* <-------------------------- Groups end -------------------------->*/

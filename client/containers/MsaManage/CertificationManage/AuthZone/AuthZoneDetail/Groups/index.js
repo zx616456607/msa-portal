@@ -12,16 +12,17 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Table, Input, Menu, Dropdown, Modal, Form, notification } from 'antd'
+import { Button, Table, Input, Menu, Dropdown, Form, notification } from 'antd'
 import { DEFAULT_PAGESIZE } from '../../../../../../constants/index'
 import './style/index.less'
 import classNames from 'classnames'
 import { formatDate } from '../../../../../../common/utils'
-import { createGroup, getGroupList, deleteGroup, updateGroup } from '../../../../../../actions/certification'
+import { createGroup, getGroupList,
+  deleteGroup, updateGroup } from '../../../../../../actions/certification'
 import GroupsDetailDock from './Dock'
+import GroupsModal from './GroupsModal'
 
 const Search = Input.Search
-const FormItem = Form.Item
 
 class Groups extends React.Component {
 
@@ -29,7 +30,7 @@ class Groups extends React.Component {
     groupInfo: {},
     editData: {},
     editGroup: false,
-    visible: false,
+    visibleModal: false,
     inputValue: '',
     groupsDetailVisible: false,
   }
@@ -52,7 +53,7 @@ class Groups extends React.Component {
 
   handleAddGroup = () => {
     this.setState({
-      visible: true,
+      visibleModal: true,
       editGroup: false,
     })
   }
@@ -87,53 +88,15 @@ class Groups extends React.Component {
 
   handlEditGroup = record => {
     this.setState({
-      visible: true,
+      visibleModal: true,
       editGroup: true,
       editData: record,
     })
   }
 
-  handleOk = () => {
-    const { editGroup, editData } = this.state
-    const { createGroup, updateGroup, form } = this.props
-    const { validateFields } = form
-    validateFields(async (err, value) => {
-      if (err) {
-        return
-      }
-      const body = {
-        displayName: value.groupName,
-        description: value.desc,
-      }
-      let result
-      if (editGroup) {
-        const query = {
-          id: editData.id,
-          match: editData.meta.version,
-        }
-        result = await updateGroup(query, body)
-      } else {
-        result = await createGroup(body)
-      }
-      if (result.error) {
-        notification.warn({
-          message: editGroup ? `${value.groupName}组更新失败` : `${value.groupName}组添加失败`,
-        })
-        return
-      }
-      this.setState({
-        visible: false,
-      })
-      notification.success({
-        message: editGroup ? `${value.groupName}组更新成功` : `${value.groupName}组添加成功`,
-      })
-      this.loadGroupList()
-    })
-  }
-
   handleCancel = () => {
     this.setState({
-      visible: false,
+      visibleModal: false,
     })
   }
 
@@ -145,8 +108,7 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { dataList, form, isFetching } = this.props
-    const { getFieldDecorator } = form
+    const { dataList, isFetching } = this.props
     const { resources, totalResults } = dataList
     const pagination = {
       simple: true,
@@ -160,6 +122,7 @@ class Groups extends React.Component {
         title: '组名',
         key: 'displayName',
         dataIndex: 'displayName',
+        width: '15%',
         render: (text, record) => <a onClick={() => this.handleDetail(record)}>{text}</a>,
       },
       {
@@ -170,16 +133,10 @@ class Groups extends React.Component {
         render: text => <div>{text.length}</div>,
       },
       {
-        title: '授权范围',
-        dataIndex: 'approvals',
-        key: 'approvals',
-        width: '10%',
-      },
-      {
         title: '描述',
         dataIndex: 'description',
         key: 'description',
-        width: '15%',
+        width: '20%',
       },
       {
         title: '创建时间',
@@ -205,11 +162,8 @@ class Groups extends React.Component {
         },
       },
     ]
-    const formItemLayout = {
-      labelCol: { span: 5 },
-      wrapperCol: { span: 16 },
-    }
-    const { editData, editGroup, groupInfo, groupsDetailVisible } = this.state
+
+    const { editData, editGroup, groupInfo, visibleModal, groupsDetailVisible } = this.state
     return (
       <div className="zone-groups">
         <div className="layout-content-btns" key="btns">
@@ -238,34 +192,20 @@ class Groups extends React.Component {
           <GroupsDetailDock
             groupInfo={groupInfo}
             visible={groupsDetailVisible}
+            closeModal={this.handleCancel}
+            loadGroup={this.loadGroupList}
             onVisibleChange={visible => this.setState({ groupsDetailVisible: visible })}
           />
         }
-        <Modal
-          title={`${editGroup ? '编辑组' : '添加组'}`}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-        >
-          <FormItem {...formItemLayout} label="组名称">
-            {
-              getFieldDecorator('groupName', {
-                initialValue: editGroup ? editData.displayName : '',
-              })(
-                <Input placeholder="请输入组名称" />
-              )
-            }
-          </FormItem>
-          <FormItem {...formItemLayout} label="描述">
-            {
-              getFieldDecorator('desc', {
-                initialValue: editGroup ? editData.description : '',
-              })(
-                <Input placeholder="请输入描述" />
-              )
-            }
-          </FormItem>
-        </Modal>
+        {
+          visibleModal &&
+          <GroupsModal
+            visible={visibleModal}
+            editGroup={editGroup}
+            editData={editData}
+            closeModal={this.handleCancel}
+            loadGroup={this.loadGroupList} />
+        }
       </div>
     )
   }
@@ -274,9 +214,12 @@ class Groups extends React.Component {
 const mapStateToProps = state => {
   const { certification } = state
   const { zoneGroups } = certification
+  const { uaaZoneUsers } = state.entities
   const { data, isFetching } = zoneGroups
+  const UserList = uaaZoneUsers
   const dataList = data || []
   return {
+    UserList,
     dataList,
     isFetching,
   }
