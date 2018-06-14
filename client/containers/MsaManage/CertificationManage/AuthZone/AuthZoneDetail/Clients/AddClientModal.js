@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col, Tooltip } from 'antd'
+import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/AddClientModal.less'
@@ -270,39 +270,14 @@ class AddClientModal extends React.Component {
       return
     }
     const ZONE_ID = identityZoneDetail.name
-    const authScope = [
-      { value: 'uaa.user', text: '用户都拥有的权限' }, { value: 'uaa.none', text: '此 OAuth 应用 将不会代表用户执行操作' },
-      { value: 'uaa.admin', text: '超级用户权限' },
-      { value: 'scim.write', text: '对整个跨域身份管理系统授予添加、更新、删除用户和组的权限' },
-      { value: 'scim.read ', text: '对整个跨域身份管理系统授予读用户和组的权限' },
-      { value: 'scim.create', text: '仅授予添加用户的权限，无删、改、查用户的权限' },
-      { value: 'scim.userids', text: '用于用户名和用户 ID 之间转换' },
-      { value: 'scim.invite', text: '用于 /invite_users 的 endpoint 参加邀请' },
-      { value: 'groups.update', text: '提供更新组的能力，scim.write 也包含该能力' },
-      { value: 'password.write', text: '提供修改用户密码的能力' },
-      { value: 'openid', text: '获取用户信息，适用于 OpenID clients' },
-      { value: 'idps.read', text: '读取、检索 identity providers的能力' },
-      { value: 'idps.write', text: '添加、更新 identity providers 的能力' },
-      { value: 'clients.admin', text: '添加、修改和删除 OAuth 应用的能力' },
-      { value: 'clients.write', text: '添加、修改 OAuth 应用能力' },
-      { value: 'clients.read', text: '获取客户端注册信息的能力' },
-      { value: 'clients.secret', text: '修改自己 OAuth 应用密钥的能力' },
-      { value: 'zones.read', text: '用于获取认证域信息' },
-      { value: 'zones.write', text: '用于添加和修改认证域信息' },
-      { value: 'scim.zones', text: '限制仅能在某个认证域组内添加、删除用户' },
-      { value: 'oauth.approval', text: '默认授权，需要允许或拒绝 OAuth 应用代表用户行事' },
-      { value: 'oauth.login', text: '用于登录应用程序（例如外部登录服务器，可以执行可信操作，或添加的用户未进行身份验证）' },
-      // {value: 'approvals.me', text: '尚未使用'}
-      { value: 'uaa.resource', text: '用于检查 token 的资源服务' },
-      { value: `zones.${ZONE_ID}.admin`, text: '允许在指定认证域内操作' },
-      { value: `zones.${ZONE_ID}.read`, text: '允许获取特定的认证域信息' },
-      { value: `zones.${ZONE_ID}.clients.admin`, text: '切换区域后与 clients.admin 一致' },
-      { value: `zones.${ZONE_ID}.clients.read`, text: '切换区域后与 clients.read 一致' },
-      { value: `zones.${ZONE_ID}.clients.write`, text: '切换区域后与 clients.write 一致' },
-      { value: `zones.${ZONE_ID}.clients.scim.read`, text: '切换区域后与 scim.read 一致' },
-      { value: `zones.${ZONE_ID}.clients.scim.create`, text: '切换区域后与 scim.create 一致' },
-      { value: `zones.${ZONE_ID}.clients.scim.write`, text: '切换区域后与 scim.write 一致' },
-      { value: `zones.${ZONE_ID}.idps.read`, text: '切换区域后与 idps.read 一致' },
+    const authScopes = [
+      'uaa.user', 'uaa.none', 'uaa.admin', 'scim.write', 'scim.read', 'scim.create', 'scim.userids',
+      'scim.invite', 'groups.update', 'password.write', 'openid', 'idps.read', 'idps.write',
+      'clients.admin', 'clients.write', 'clients.read', 'clients.secret', 'zones.read', 'zones.write',
+      'scim.zones', 'oauth.approval', 'oauth.login', 'approvals.me', 'uaa.resource', `zones.${ZONE_ID}.admin`,
+      `zones.${ZONE_ID}.read`, `zones.${ZONE_ID}.clients.admin`, `zones.${ZONE_ID}.clients.read`,
+      `zones.${ZONE_ID}.clients.write`, `zones.${ZONE_ID}.clients.scim.read`, `zones.${ZONE_ID}.clients.scim.create`,
+      `zones.${ZONE_ID}.clients.scim.write`, `zones.${ZONE_ID}.idps.read`,
     ]
     return (
       <Row key={`item-${key}`} className="scope-row">
@@ -326,10 +301,7 @@ class AddClientModal extends React.Component {
                   disabled={isView}
                 >
                   {
-                    authScope.map(scope =>
-                      <Option key={scope.value}>
-                        <Tooltip placement="topLeft" title={scope.text}>{scope.text}</Tooltip>
-                      </Option>)
+                    authScopes.map(scope => <Option key={scope}>{scope}</Option>)
                   }
                 </Select>
               )
