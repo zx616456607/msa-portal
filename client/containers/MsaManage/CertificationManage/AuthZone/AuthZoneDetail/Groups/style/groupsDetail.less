@@ -53,6 +53,7 @@
       .page-box {
         float: right;
         padding-top: 5px;
+        margin-right: 21%;
         .total {
           margin-right: 18px;
           line-height: 24px;
@@ -68,6 +69,54 @@
       font-size: 14px;
       padding-left: 8px;
       margin-bottom: 20px;
+    }
+  }
+}
+.modalTransfer {
+  .prompt {
+    height: 45px;
+    width: 575px;
+    padding: 10px;
+    margin-left: 10px;
+    margin-bottom: 20px;
+  }
+  .listTitle {
+    position: absolute;
+    top: 216px;
+    left: 48px;
+    width: 220px;
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 30px;
+    z-index: 10;
+    background-color: #fff;
+  }
+  .ant-transfer {
+    left: 10px;
+    .ant-transfer-list {
+      .ant-transfer-list-body {
+        ul {
+          padding-top: 30px;
+          overflow-x: hidden;
+          label {
+            position: relative;
+            top: -14px;
+          }
+          li {
+            height: 36px;
+            line-height: 36px;
+            padding: 0 0 0 16px;
+            overflow: visible;
+          }
+          li > span {
+            width: 100%;
+            height: 36px;
+            line-height: 36px;
+            display: inline-block;
+          }
+        }
+      }
     }
   }
 }
