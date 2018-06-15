@@ -12,20 +12,23 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Table, Row, Col, Menu, Dropdown, Card, Transfer, Modal, Popover, Icon, Tooltip, notification } from 'antd'
+import { Button, Table, Row, Col, Menu, Dropdown, Card, notification } from 'antd'
 import classNames from 'classnames'
 import './style/groupsDetail.less'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import groupsIcon from '../../../../../../assets/img/msa-manage/groups.png'
-import { getGroupDetail, DelGroupDetailUser, addGroupsUser } from '../../../../../../actions/certification'
+import { getGroupDetail, deleteGroupUser, addGroupsUser } from '../../../../../../actions/certification'
 import { formatDate } from '../../../../../../common/utils'
 import { zoneUserListSlt } from '../../../../../../selectors/certification'
+import confirm from '../../../../../../components/Modal/confirm'
 import GroupsModal from './GroupsModal'
+import GroupUsersModal from './GroupUsersModal'
+import intersection from 'lodash/intersection'
+import difference from 'lodash/difference'
 
 class GroupsDetail extends React.Component {
   state = {
-    userInfo: [],
     targetKeys: [],
     visibleEdit: false,
     inputValue: '',
@@ -36,31 +39,46 @@ class GroupsDetail extends React.Component {
     this.loadGroupDetailList()
   }
 
-  loadGroupDetailList = () => {
-    const { getGroupDetail, groupInfo } = this.props
+  loadGroupDetailList = async () => {
+    const { getGroupDetail, groupInfo, groupUsers } = this.props
     const query = {
       returnEntities: true,
     }
-    getGroupDetail(groupInfo.id, query)
-
+    await getGroupDetail(groupInfo.id, query)
+    if (isEmpty(groupUsers)) {
+      return
+    }
+    const targetKeys = []
+    groupUsers.forEach(user => {
+      if (user.type === 'USER') {
+        targetKeys.push(user.value)
+      }
+    })
+    this.setState({
+      targetKeys,
+      originKeys: targetKeys,
+    })
   }
 
   handlDeleteUser = record => {
-    const { DelGroupDetailUser, groupInfo } = this.props
-    const query = {
-      id: groupInfo.id,
-      userId: record.value,
-    }
-    DelGroupDetailUser(query).then(res => {
-      if (res.error) {
-        notification.warn({
-          message: `移除 ${record.entity.userName} 失败`,
+    const { deleteGroupUser, groupInfo } = this.props
+    confirm({
+      modalTitle: '删除',
+      title: `确定移除用户 ${record.entity.userName}`,
+      onOk: () => {
+        return deleteGroupUser(groupInfo.id, record.value).then(res => {
+          if (res.error) {
+            notification.warn({
+              message: `移除 ${record.entity.userName} 失败`,
+            })
+            return
+          }
+          notification.success({
+            message: `移除 ${record.entity.userName} 成功`,
+          })
+          this.loadGroupDetailList()
         })
-      }
-      notification.success({
-        message: `移除 ${record.entity.userName} 成功`,
-      })
-      this.loadGroupDetailList()
+      },
     })
   }
 
@@ -71,7 +89,6 @@ class GroupsDetail extends React.Component {
   }
 
   handleMenu = () => {
-    this.filterUserKey()
     this.setState({
       visibleGroupUser: true,
     })
@@ -80,32 +97,6 @@ class GroupsDetail extends React.Component {
   handleCancelModal = () => {
     this.setState({
       visibleEdit: false,
-    })
-  }
-
-  filterUserKey = () => {
-    const { zoneUsers } = this.props
-    zoneUsers.forEach((item, index) => {
-      item.key = index
-    })
-    this.setState({
-      userInfo: zoneUsers,
-    })
-  }
-
-  filterScope = record => {
-    const { UserList } = this.props
-    if (!UserList) return
-    const { approvals } = UserList[record.value] || []
-    if (approvals.length === 0) return <div>--</div>
-    return approvals.map(item => {
-      return (
-        <Row key={item.scope} type={'flex'} align={'middle'} gutter={16} className="group-scope-list">
-          <Tooltip placement="topLeft">
-            <div>{item.scope}</div>
-          </Tooltip>
-        </Row>
-      )
     })
   }
 
@@ -118,30 +109,84 @@ class GroupsDetail extends React.Component {
   }
 
   handleOk = () => {
-    const { targetKeys } = this.state
+    const { targetKeys, originKeys } = this.state
+    const commonKeys = intersection(targetKeys, originKeys)
+    const addKeys = difference(targetKeys, commonKeys)
+    const delKeys = difference(originKeys, commonKeys)
+    if (!isEmpty(addKeys)) {
+      if (addKeys.length > 1) {
+        notification.warn({
+          message: '只支持添加单个用户',
+        })
+        return
+      }
+      this.handleAddGroupUsers(addKeys)
+    }
+    if (!isEmpty(delKeys)) {
+      if (delKeys.length > 1) {
+        notification.warn({
+          message: '只支持删除单个用户',
+        })
+        return
+      }
+      this.handleDelGroupUsers(delKeys)
+    }
+  }
+
+  handleAddGroupUsers = addKeys => {
     const { addGroupsUser, groupInfo, zoneUsers } = this.props
-    if (targetKeys.length > 1) {
-      notification.warn({
-        message: '只支持添加单个用户',
-      })
-      return
-    }
+    const currentUser = zoneUsers.filter(user => user.id === addKeys[0])[0]
     const objKey = {
-      origin: zoneUsers[targetKeys[0]].origin,
+      origin: currentUser.origin,
       type: 'USER',
-      value: zoneUsers[targetKeys[0]].id,
+      value: currentUser.id,
     }
+    this.setState({
+      groupUsersLoading: true,
+    })
     addGroupsUser(groupInfo.id, objKey).then(res => {
       if (res.error) {
         notification.warn({
           message: '添加用户失败',
         })
+        this.setState({
+          groupUsersLoading: false,
+        })
+        return
       }
       notification.success({
         message: '添加用户成功',
       })
       this.setState({
         visibleGroupUser: false,
+        groupUsersLoading: false,
+      })
+      this.loadGroupDetailList()
+    })
+  }
+
+  handleDelGroupUsers = delKeys => {
+    const { deleteGroupUser, groupInfo, zoneUsers } = this.props
+    const currentUser = zoneUsers.filter(user => user.id === delKeys[0])[0]
+    this.setState({
+      groupUsersLoading: true,
+    })
+    deleteGroupUser(groupInfo.id, currentUser.id).then(res => {
+      if (res.error) {
+        notification.warn({
+          message: '移出失败',
+        })
+        this.setState({
+          groupUsersLoading: false,
+        })
+        return
+      }
+      this.setState({
+        visibleGroupUser: false,
+        groupUsersLoading: false,
+      })
+      notification.success({
+        message: '移出成功',
       })
       this.loadGroupDetailList()
     })
@@ -155,7 +200,7 @@ class GroupsDetail extends React.Component {
 
   renderItem = item => {
     return (
-      <Row key={`${item && item.key}`} style={{ display: 'inline-block', width: '100%' }}>
+      <Row key={`${item.id}`} style={{ display: 'inline-block', width: '100%' }}>
         <Col span={9} style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{item.userName}</Col>
         <Col span={12} style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{item.emails[0].value}</Col>
       </Row>
@@ -163,9 +208,10 @@ class GroupsDetail extends React.Component {
   }
 
   render() {
-    const { visibleGroupUser, userInfo, visibleEdit } = this.state
-    const { groupInfo, DataAry, isFetching, loadGroup } = this.props
-    const _DataAry = DataAry.filter(item => item.type !== 'GROUP')
+    const { visibleGroupUser, visibleEdit, groupUsersLoading, targetKeys } = this.state
+    const { groupInfo, groupUsers, isFetching, loadGroup, zoneUsers } = this.props
+
+    const _DataAry = !isEmpty(groupUsers) && groupUsers.filter(item => item.type !== 'GROUP')
     const menu = (
       <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e)}>
         <Menu.Item key="groupName">管理组用户</Menu.Item>
@@ -182,37 +228,17 @@ class GroupsDetail extends React.Component {
         title: '用户名',
         key: 'entity.userName',
         dataIndex: 'entity.userName',
-        width: '14%',
-      },
-      {
-        title: '授权范围',
-        dataIndex: 'approvals',
-        key: 'approvals',
-        width: '10%',
-        render: (text, record) => <div className="popover-row">
-          {
-            !isEmpty(record) &&
-            <Popover
-              onVisibleChange={visible => this.setState({ [`popover-${record.id}`]: visible })}
-              placement="right" trigger="click" content={this.filterScope(record)}
-            >
-              <Icon
-                type={this.state[`popover-${record.id}`] ? 'minus-square-o' : 'plus-square-o'}
-                className="pointer"
-              />
-            </Popover>
-          }
-        </div>,
+        width: '40%',
       },
       {
         title: '用户来源',
         dataIndex: 'entity.origin',
         key: 'entity.origin',
-        width: '15%',
+        width: '40%',
       },
       {
         title: '操作',
-        width: '15%',
+        width: '20%',
         render: record => {
           return (
             <Button onClick={() => this.handlDeleteUser(record)}>移除用户</Button>
@@ -237,11 +263,6 @@ class GroupsDetail extends React.Component {
               <Col span={6}>
                 <div className="txt-of-ellipsis">
                   组名：{groupInfo.displayName}
-                </div>
-              </Col>
-              <Col span={6}>
-                <div className="txt-of-ellipsis">
-                  所属服务组：--
                 </div>
               </Col>
               <Col span={12} className="groups-detail-header-btns">
@@ -287,7 +308,7 @@ class GroupsDetail extends React.Component {
                 loading={isFetching}
                 dataSource={_DataAry}
                 pagination={pagination}
-                rowKey={key => key.id} />
+                rowKey={record => record.value} />
             </div>
           </Card>
         </div>
@@ -300,36 +321,18 @@ class GroupsDetail extends React.Component {
             closeModal={this.handleCancelModal}
             loadGroup={loadGroup} />
         }
-        <Modal
-          title="管理组用户"
-          visible={visibleGroupUser}
-          width={'42%'}
-          className="modalTransfer"
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}>
-          <div className="prompt" style={{ backgroundColor: '#fffaf0', borderRadius: 4, border: '1px dashed #ffc125' }}>
-            <span>用户加入后，即拥有改组的授权范围中的权限，一个组内同一用户不能被重复添加</span>
-          </div>
-          <Row className="listTitle">
-            <Col span={14}>成员名</Col>
-            <Col span={10}>邮箱</Col>
-          </Row>
-          <Row className="listTitle" style={{ left: 380 }}>
-            <Col span={14}>成员名</Col>
-            <Col span={10}>邮箱</Col>
-          </Row>
-          <Transfer
-            dataSource={userInfo}
-            showSearch
-            titles={[ '筛选用户', '已选择用户' ]}
-            listStyle={{ width: 250, height: 300 }}
-            operations={[ '添加', '移除' ]}
-            targetKeys={this.state.targetKeys}
-            onChange={this.handleChange}
-            render={item => this.renderItem(item)}
-            footer={this.renderFooter}
+        {
+          visibleGroupUser &&
+          <GroupUsersModal
+            visible={visibleGroupUser}
+            onCancel={this.handleCancel}
+            onOk={this.handleOk}
+            dataSource={zoneUsers}
+            targetKeys={targetKeys}
+            handleChange={this.handleChange}
+            loading={groupUsersLoading}
           />
-        </Modal>
+        }
       </QueueAnim>
     )
   }
@@ -337,20 +340,10 @@ class GroupsDetail extends React.Component {
 
 const mapStateToProps = state => {
   const { certification } = state
-  const { uaaZoneUsers } = state.entities
   const { zoneGroupsDetail } = certification
-  const { data, isFetching } = zoneGroupsDetail
-  const UserList = uaaZoneUsers
-  const DataAry = []
-  if (data !== undefined) {
-    Object.keys(data).forEach((item, index) => {
-      DataAry.push(data[index])
-    })
-  }
-
+  const { data: groupUsers, isFetching } = zoneGroupsDetail
   return {
-    DataAry,
-    UserList,
+    groupUsers,
     isFetching,
     ...zoneUserListSlt(state),
   }
@@ -359,6 +352,6 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   addGroupsUser,
   getGroupDetail,
-  DelGroupDetailUser,
+  deleteGroupUser,
 })(GroupsDetail)
 

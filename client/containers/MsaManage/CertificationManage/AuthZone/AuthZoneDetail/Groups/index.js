@@ -19,6 +19,7 @@ import classNames from 'classnames'
 import { formatDate } from '../../../../../../common/utils'
 import { createGroup, getGroupList,
   deleteGroup, updateGroup } from '../../../../../../actions/certification'
+import confirm from '../../../../../../components/Modal/confirm'
 import GroupsDetailDock from './Dock'
 import GroupsModal from './GroupsModal'
 
@@ -45,7 +46,7 @@ class Groups extends React.Component {
     const queryInfo = {}
     if (inputValue) {
       Object.assign(queryInfo, {
-        filter: `displayName=\"${inputValue}\"`,
+        filter: `displayName+eq+\"${inputValue}\"`,
       })
     }
     getGroupList(queryInfo)
@@ -63,26 +64,32 @@ class Groups extends React.Component {
       case 'groupName':
         return
       case 'del':
-        this.handleDeleteGroup(record.id)
+        this.handleDeleteGroup(record)
         return
       default:
         break
     }
   }
 
-  handleDeleteGroup = id => {
+  handleDeleteGroup = record => {
     const { deleteGroup } = this.props
-    deleteGroup(id).then(res => {
-      if (res.error) {
-        notification.warn({
-          message: `${id}删除失败`,
+    confirm({
+      modalTitle: '删除',
+      title: `确定删除组 ${record.displayName}`,
+      onOk: () => {
+        return deleteGroup(record.id).then(res => {
+          if (res.error) {
+            notification.warn({
+              message: `${record.displayName}删除失败`,
+            })
+            return
+          }
+          notification.success({
+            message: `${record.displayName}删除成功`,
+          })
+          this.loadGroupList()
         })
-        return
-      }
-      notification.success({
-        message: `${id}删除成功`,
-      })
-      this.loadGroupList()
+      },
     })
   }
 
@@ -122,14 +129,14 @@ class Groups extends React.Component {
         title: '组名',
         key: 'displayName',
         dataIndex: 'displayName',
-        width: '15%',
+        width: '20%',
         render: (text, record) => <a onClick={() => this.handleDetail(record)}>{text}</a>,
       },
       {
         title: '用户（个）',
         dataIndex: 'members',
         key: 'members',
-        width: '10%',
+        width: '20%',
         render: text => <div>{text.length}</div>,
       },
       {
@@ -137,16 +144,18 @@ class Groups extends React.Component {
         dataIndex: 'description',
         key: 'description',
         width: '20%',
+        render: desc => desc || '-',
       },
       {
         title: '创建时间',
         dataIndex: 'meta.created',
         key: 'meta.created',
+        width: '20%',
         render: time => formatDate(time),
       },
       {
         title: '操作',
-        width: '15%',
+        width: '20%',
         render: record => {
           const menu = (
             <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e, record)}>

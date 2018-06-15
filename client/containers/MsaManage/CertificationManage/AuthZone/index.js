@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
@@ -165,6 +166,7 @@ class AuthZone extends React.Component {
         title: '认证域名称',
         dataIndex: 'name',
         width: '25%',
+        render: (name, record) => <Link to={`/msa-manage/certification-manage/auth-zone/${record.id}`}>{name}</Link>,
       },
       {
         title: 'SubDomain',

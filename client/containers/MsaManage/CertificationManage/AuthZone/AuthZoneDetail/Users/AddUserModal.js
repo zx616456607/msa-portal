@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { Modal, Form, Input, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import { EMAIL_REG, PHONE_REG } from '../../../../../../constants'
-import { createZoneUser, updateZoneUser } from '../../../../../../actions/certification'
+import { createZoneUser, fetchPatchZoneUser } from '../../../../../../actions/certification'
 
 const FormItem = Form.Item
 
@@ -32,7 +32,7 @@ class AddUserModal extends React.Component {
   handleConfirm = async () => {
     const {
       form, currentUser, loadData, closeModal,
-      createZoneUser, updateZoneUser,
+      createZoneUser, fetchPatchZoneUser,
     } = this.props
     const { validateFields } = form
     validateFields(async (errors, values) => {
@@ -78,7 +78,7 @@ class AddUserModal extends React.Component {
         return
       }
       // 修改用户
-      const res = await updateZoneUser(currentUser, body)
+      const res = await fetchPatchZoneUser(currentUser, body)
       if (res.error) {
         this.setState({
           loading: false,
@@ -251,5 +251,5 @@ const mapStateToProps = () => {
 
 export default connect(mapStateToProps, {
   createZoneUser,
-  updateZoneUser,
+  fetchPatchZoneUser,
 })(Form.create()(AddUserModal))

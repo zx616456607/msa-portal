@@ -122,7 +122,9 @@ class AddClientModal extends React.Component {
         client_id,
         client_secret,
         authorized_grant_types,
-        redirect_uri: redirect_uri.split(','),
+      }
+      if (!isEmpty(redirect_uri)) {
+        Object.assign(body, { redirect_uri: redirect_uri.split(',') })
       }
       if (!isEmpty(keys)) {
         const scope = []
@@ -430,23 +432,27 @@ class AddClientModal extends React.Component {
         {/* <Option key="test">test</Option>*/}
         {/* </Select>*/}
         {/* </FormItem>*/}
-        <FormItem {...formItemLayout} label="重定向 URL">
-          {
-            getFieldDecorator('redirect_uri', {
-              initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.redirect_uri) ? currentClient.redirect_uri.join(',') : '',
-              rules: [
-                {
-                  whitespace: true,
-                  pattern: REDIRECT_URL_REG,
-                  required: true,
-                  message: '请填写正确的重定向 URL 地址',
-                },
-              ],
-            })(
-              <Input disabled={isView} placeholder="如：http://www.tenxcloud.com" />
-            )
-          }
-        </FormItem>
+        {
+          !isEmpty(authorizedGrantTypes) &&
+          (authorizedGrantTypes.includes('authorization_code') || authorizedGrantTypes.includes('implicit')) &&
+          <FormItem {...formItemLayout} label="重定向 URL">
+            {
+              getFieldDecorator('redirect_uri', {
+                initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.redirect_uri) ? currentClient.redirect_uri.join(',') : '',
+                rules: [
+                  {
+                    whitespace: true,
+                    pattern: REDIRECT_URL_REG,
+                    required: true,
+                    message: '请填写正确的重定向 URL 地址',
+                  },
+                ],
+              })(
+                <Input disabled={isView} placeholder="如：http://www.tenxcloud.com" />
+              )
+            }
+          </FormItem>
+        }
         {keys.map(this.renderItem)}
         <Row style={{ marginTop: 10 }}>
           <Col offset={5}>
