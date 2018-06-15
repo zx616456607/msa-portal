@@ -161,10 +161,12 @@ class MsaComponents extends React.Component {
     }
   }
 
-  handleButtonClick = () => {
+  handleButtonClick = record => {
     this.setState({
-      tipsName: '水平扩展',
-      visible: true,
+      toopVisible: true,
+      tooltipTitle: tooltip[0].title,
+      tooltipContent: tooltip[0].content,
+      componentName: record.component,
     })
   }
 
@@ -185,6 +187,13 @@ class MsaComponents extends React.Component {
     }
   }
   handleMenuClick = (e, value) => {
+    if (e.key === '水平扩展') {
+      this.setState({
+        tipsName: '水平扩展',
+        visible: true,
+      })
+      return
+    }
     const tips = this.tooptic(e.key)
     this.setState({
       toopVisible: true,
@@ -332,13 +341,13 @@ class MsaComponents extends React.Component {
       title: '操作',
       key: 'operation',
       render: (text, record) => <div>
-        <Dropdown.Button onClick={this.handleButtonClick} overlay={
+        <Dropdown.Button onClick={() => this.handleButtonClick(record)} overlay={
           <Menu onClick={e => this.handleMenuClick(e, record)} style={{ width: 100 }}>
-            <Menu.Item key="重启组件">重启组件</Menu.Item>
             <Menu.Item key="停止组件">停止组件</Menu.Item>
             <Menu.Item key="重新部署">重新部署</Menu.Item>
+            <Menu.Item key="水平扩展">水平扩展</Menu.Item>
           </Menu>
-        }>水平扩展</Dropdown.Button>
+        }>重启组件</Dropdown.Button>
       </div>,
     }]
     const scope = this
