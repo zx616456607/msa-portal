@@ -107,11 +107,11 @@ class ConfigCenter extends React.Component {
   }
 
   handleDel = () => {
-    const { configGitUrl, configName, message } = this.state
+    const { configGitUrl, configName, message, value } = this.state
     const { delCenterConfig, clusterID } = this.props
     const query = {
       project_url: configGitUrl,
-      branch_name: 'master',
+      branch_name: value,
       file_path: configName,
       commit_message: message === '' ? '删除一个配置' : message,
     }

@@ -510,7 +510,7 @@ const fetchUpdateZoneUser = (token, user, body, zoneInfo) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          [IF_MATCH_HEADER]: user.version,
+          [IF_MATCH_HEADER]: user.meta.version,
           [ZONE_ID_HEADER]: id,
           [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
@@ -548,7 +548,7 @@ const fetchPatchZoneUser = (token, user, body, zoneInfo) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          [IF_MATCH_HEADER]: user.version,
+          [IF_MATCH_HEADER]: user.meta.version,
           [ZONE_ID_HEADER]: id,
           [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
@@ -622,7 +622,7 @@ const fetchUpdateUserPassword = (token, userInfo, body, zoneInfo) => {
       options: {
         headers: {
           Authorization: `Bearer ${token}`,
-          [IF_MATCH_HEADER]: userInfo.version,
+          [IF_MATCH_HEADER]: userInfo.meta.version,
           [ZONE_ID_HEADER]: id,
           [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
@@ -913,7 +913,8 @@ export const ADD_GROUPS_DETAIL_USER_REQUEST = 'ADD_GROUPS_DETAIL_USER_REQUEST'
 export const ADD_GROUPS_DETAIL_USER_SUCCESS = 'ADD_GROUPS_DETAIL_USER_SUCCESS'
 export const ADD_GROUPS_DETAIL_USER_FAILURE = 'ADD_GROUPS_DETAIL_USER_FAILURE'
 
-const createGroupUser = (token, id, body) => {
+const createGroupUser = (token, id, body, zoneInfo) => {
+  const { id: zoneId, subdomain } = zoneInfo
   return {
     [CALL_API]: {
       types: [
@@ -928,6 +929,8 @@ const createGroupUser = (token, id, body) => {
         headers: {
           'Content-Type': CONTENT_TYPE_JSON,
           Authorization: `Bearer ${token}`,
+          [ZONE_ID_HEADER]: zoneId,
+          [ZONE_SUBDOMAIN_HEADER]: subdomain,
         },
         method: 'POST',
         body,
@@ -939,39 +942,8 @@ const createGroupUser = (token, id, body) => {
 export const addGroupsUser = (id, body) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(createGroupUser(access_token, id, body))
-  }
-
-export const DEL_GROUPS_DETAIL_USER_REQUEST = 'DEL_GROUPS_DETAIL_USER_REQUEST'
-export const DEL_GROUPS_DETAIL_USER_SUCCESS = 'DEL_GROUPS_DETAIL_USER_SUCCESS'
-export const DEL_GROUPS_DETAIL_USER_FAILURE = 'DEL_GROUPS_DETAIL_USER_FAILURE'
-
-const fetchDelGroupDetailUser = (token, query) => {
-  const endpoint = `${CLIENT_API_URL}/Groups/${query.id}/members/${query.userId}`
-  return {
-    [CALL_API]: {
-      types: [
-        DEL_GROUPS_DETAIL_USER_REQUEST,
-        DEL_GROUPS_DETAIL_USER_SUCCESS,
-        DEL_GROUPS_DETAIL_USER_FAILURE,
-      ],
-      isCpi: true,
-      endpoint,
-      schema: {},
-      options: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        method: 'DELETE',
-      },
-    },
-  }
-}
-
-export const DelGroupDetailUser = query =>
-  (dispatch, getState) => {
-    const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchDelGroupDetailUser(access_token, query))
+    const { identityZoneDetail } = getState().certification
+    return dispatch(createGroupUser(access_token, id, body, identityZoneDetail))
   }
 
 /* <-------------------------- Groups end -------------------------->*/

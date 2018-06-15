@@ -117,6 +117,13 @@ const zoneGroups = (state = {}, action) => {
   }
 }
 
+const formatGroupUsers = result => {
+  const data = []
+  for (const value of Object.values(result)) {
+    data.push(value)
+  }
+  return data
+}
 const zoneGroupsDetail = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -127,7 +134,7 @@ const zoneGroupsDetail = (state = {}, action) => {
     case ActionTypes.GROUPS_DETAIL_LIST_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result,
+        data: formatGroupUsers(action.response.result),
       })
     case ActionTypes.GROUPS_DETAIL_LIST_FAILURE:
       return Object.assign({}, state, {

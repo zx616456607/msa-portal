@@ -84,6 +84,9 @@ class Users extends React.Component {
             })
             return
           }
+          this.setState({
+            currentUser: null,
+          })
           notification.success({
             message: '删除成功',
           })
@@ -229,7 +232,7 @@ class Users extends React.Component {
         key: 'groups',
         width: '10%',
         render: (groups, record) => <div className="popover-row">
-          {groups.length}&nbsp;
+          {groups.length}个 &nbsp;
           {
             !isEmpty(groups) &&
             <Popover
