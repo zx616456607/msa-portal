@@ -18,9 +18,15 @@ import './style/groupsDetail.less'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import groupsIcon from '../../../../../../assets/img/msa-manage/groups.png'
-import { getGroupDetail, deleteGroupUser, addGroupsUser } from '../../../../../../actions/certification'
+import {
+  getGroupDetail,
+  deleteGroupUser,
+  addGroupsUser,
+  getGroupList,
+  ADD_GROUPS_DETAIL_USER_FAILURE, DELETE_GROUP_USER_FAILURE,
+} from '../../../../../../actions/certification'
 import { formatDate } from '../../../../../../common/utils'
-import { zoneUserListSlt } from '../../../../../../selectors/certification'
+import { zoneUserListSlt, zoneGroupUserListSlt } from '../../../../../../selectors/certification'
 import confirm from '../../../../../../components/Modal/confirm'
 import GroupsModal from './GroupsModal'
 import GroupUsersModal from './GroupUsersModal'
@@ -40,16 +46,21 @@ class GroupsDetail extends React.Component {
   }
 
   loadGroupDetailList = async () => {
-    const { getGroupDetail, groupInfo, groupUsers } = this.props
+    const { getGroupDetail, groupInfo } = this.props
     const query = {
       returnEntities: true,
     }
     await getGroupDetail(groupInfo.id, query)
-    if (isEmpty(groupUsers)) {
+    const { zoneGroupUsers } = this.props
+    const targetKeys = []
+    if (isEmpty(zoneGroupUsers)) {
+      this.setState({
+        targetKeys: [],
+        originKeys: [],
+      })
       return
     }
-    const targetKeys = []
-    groupUsers.forEach(user => {
+    zoneGroupUsers.forEach(user => {
       if (user.type === 'USER') {
         targetKeys.push(user.value)
       }
@@ -61,7 +72,7 @@ class GroupsDetail extends React.Component {
   }
 
   handlDeleteUser = record => {
-    const { deleteGroupUser, groupInfo } = this.props
+    const { deleteGroupUser, groupInfo, getGroupList } = this.props
     confirm({
       modalTitle: '删除',
       title: `确定移除用户 ${record.entity.userName}`,
@@ -77,6 +88,7 @@ class GroupsDetail extends React.Component {
             message: `移除 ${record.entity.userName} 成功`,
           })
           this.loadGroupDetailList()
+          getGroupList()
         })
       },
     })
@@ -108,88 +120,86 @@ class GroupsDetail extends React.Component {
     return option.description.indexOf(inputValue) > -1
   }
 
-  handleOk = () => {
+  handleOk = async () => {
     const { targetKeys, originKeys } = this.state
+    const { getGroupList } = this.props
     const commonKeys = intersection(targetKeys, originKeys)
     const addKeys = difference(targetKeys, commonKeys)
     const delKeys = difference(originKeys, commonKeys)
+    let addResult
+    let delResult
+    let failedMessage = ''
+    this.setState({
+      groupUsersLoading: true,
+    })
     if (!isEmpty(addKeys)) {
-      if (addKeys.length > 1) {
-        notification.warn({
-          message: '只支持添加单个用户',
-        })
-        return
-      }
-      this.handleAddGroupUsers(addKeys)
+      addResult = await this.handleAddGroupUsers(addKeys)
     }
     if (!isEmpty(delKeys)) {
-      if (delKeys.length > 1) {
-        notification.warn({
-          message: '只支持删除单个用户',
-        })
-        return
-      }
-      this.handleDelGroupUsers(delKeys)
+      delResult = await this.handleDelGroupUsers(delKeys)
     }
+    if (!isEmpty(addResult)) {
+      failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+    }
+    if (!isEmpty(delResult)) {
+      failedMessage += `移除用户 ${delResult.toString()} 失败；\n`
+    }
+    if (failedMessage) {
+      notification.warn({
+        message: failedMessage,
+      })
+    } else {
+      notification.success({
+        message: '操作成功',
+      })
+    }
+    this.loadGroupDetailList()
+    getGroupList()
+    this.setState({
+      groupUsersLoading: false,
+      visibleGroupUser: false,
+    })
   }
 
-  handleAddGroupUsers = addKeys => {
+  handleAddGroupUsers = async addKeys => {
     const { addGroupsUser, groupInfo, zoneUsers } = this.props
-    const currentUser = zoneUsers.filter(user => user.id === addKeys[0])[0]
-    const objKey = {
-      origin: currentUser.origin,
-      type: 'USER',
-      value: currentUser.id,
-    }
-    this.setState({
-      groupUsersLoading: true,
-    })
-    addGroupsUser(groupInfo.id, objKey).then(res => {
-      if (res.error) {
-        notification.warn({
-          message: '添加用户失败',
-        })
-        this.setState({
-          groupUsersLoading: false,
-        })
-        return
+    const currentUsers = zoneUsers.filter(user => addKeys.includes(user.id))
+    const promiseArray = currentUsers.map(user => {
+      const body = {
+        origin: user.origin,
+        type: 'USER',
+        value: user.id,
       }
-      notification.success({
-        message: '添加用户成功',
-      })
-      this.setState({
-        visibleGroupUser: false,
-        groupUsersLoading: false,
-      })
-      this.loadGroupDetailList()
+      return addGroupsUser(groupInfo.id, body)
     })
+    const resultArray = await Promise.all(promiseArray)
+    const failedArray = []
+    resultArray.every(res => {
+      const { type, value } = res.response.result
+      if (type === ADD_GROUPS_DETAIL_USER_FAILURE) {
+        failedArray.push(value)
+      }
+      return true
+    })
+    return failedArray
   }
 
-  handleDelGroupUsers = delKeys => {
+  handleDelGroupUsers = async delKeys => {
     const { deleteGroupUser, groupInfo, zoneUsers } = this.props
-    const currentUser = zoneUsers.filter(user => user.id === delKeys[0])[0]
-    this.setState({
-      groupUsersLoading: true,
+    const currentUsers = zoneUsers.filter(user => delKeys.includes(user.id))
+    const promiseArray = currentUsers.map(user => {
+      return deleteGroupUser(groupInfo.id, user.id)
     })
-    deleteGroupUser(groupInfo.id, currentUser.id).then(res => {
-      if (res.error) {
-        notification.warn({
-          message: '移出失败',
-        })
-        this.setState({
-          groupUsersLoading: false,
-        })
-        return
+    const resultArray = await Promise.all(promiseArray)
+    const failedArray = []
+    resultArray.every(res => {
+      const { type, value } = res.response.result
+      if (type === DELETE_GROUP_USER_FAILURE) {
+        failedArray.push(value)
       }
-      this.setState({
-        visibleGroupUser: false,
-        groupUsersLoading: false,
-      })
-      notification.success({
-        message: '移出成功',
-      })
-      this.loadGroupDetailList()
+      return true
     })
+    return failedArray
   }
 
   handleCancel = () => {
@@ -209,9 +219,8 @@ class GroupsDetail extends React.Component {
 
   render() {
     const { visibleGroupUser, visibleEdit, groupUsersLoading, targetKeys } = this.state
-    const { groupInfo, groupUsers, isFetching, loadGroup, zoneUsers } = this.props
-
-    const _DataAry = !isEmpty(groupUsers) && groupUsers.filter(item => item.type !== 'GROUP')
+    const { groupInfo, zoneGroupUsers, groupUsersFetching, loadGroup, zoneUsers } = this.props
+    const _DataAry = !isEmpty(zoneGroupUsers) ? zoneGroupUsers.filter(item => item.type !== 'GROUP') : []
     const menu = (
       <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e)}>
         <Menu.Item key="groupName">管理组用户</Menu.Item>
@@ -305,7 +314,7 @@ class GroupsDetail extends React.Component {
             <div className="layout-content-body">
               <Table
                 columns={columns}
-                loading={isFetching}
+                loading={groupUsersFetching}
                 dataSource={_DataAry}
                 pagination={pagination}
                 rowKey={record => record.value} />
@@ -339,13 +348,9 @@ class GroupsDetail extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { certification } = state
-  const { zoneGroupsDetail } = certification
-  const { data: groupUsers, isFetching } = zoneGroupsDetail
   return {
-    groupUsers,
-    isFetching,
     ...zoneUserListSlt(state),
+    ...zoneGroupUserListSlt(state),
   }
 }
 
@@ -353,5 +358,6 @@ export default connect(mapStateToProps, {
   addGroupsUser,
   getGroupDetail,
   deleteGroupUser,
+  getGroupList,
 })(GroupsDetail)
 

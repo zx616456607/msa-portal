@@ -837,7 +837,7 @@ export const updateGroup = (query, body) =>
 
 const DELETE_GROUP_USER_REQUEST = 'DELETE_GROUP_USER_REQUEST'
 const DELETE_GROUP_USER_SUCCESS = 'DELETE_GROUP_USER_SUCCESS'
-const DELETE_GROUP_USER_FAILURE = 'DELETE_GROUP_USER_FAILURE'
+export const DELETE_GROUP_USER_FAILURE = 'DELETE_GROUP_USER_FAILURE'
 
 const fetchDeleteGroupUser = (token, groupId, userId, zoneInfo) => {
   const { id, subdomain } = zoneInfo
@@ -890,7 +890,7 @@ const fetchGroupDetailList = (token, id, query, zoneInfo) => {
       ],
       isCpi: true,
       endpoint,
-      schema: {},
+      schema: Schemas.UAA_ZONE_GROUP_USERS_LIST_DATA,
       options: {
         headers: {
           Authorization: `Bearer ${token}`,

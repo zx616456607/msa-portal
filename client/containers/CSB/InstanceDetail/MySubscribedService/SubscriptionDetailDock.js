@@ -101,7 +101,7 @@ export default class SubscriptionDetailDock extends React.Component {
                 </div>
                 <div>
                   <span className="sub-label">服务描述：</span>
-                  -
+                  {currentService.serviceDescription ? currentService.serviceDescription : '-'}
                 </div>
               </div>
             </div>

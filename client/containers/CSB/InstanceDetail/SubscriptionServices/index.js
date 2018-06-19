@@ -148,7 +148,7 @@ class SubscriptionServices extends React.Component {
         <div className="layout-content-btns" key="layout-content-btns">
           <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
           <Search
-            placeholder="按微服务名称搜索"
+            placeholder="按服务名称搜索"
             onChange={e => this.setState({ name: e.target.value })}
             onSearch={() => this.loadData({ name, page: 1 })}
             className="search-style"

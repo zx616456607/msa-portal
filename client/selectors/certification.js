@@ -46,10 +46,25 @@ export const zoneUserListSlt = createSelector(
     const { zoneUsers } = certification || { zoneUsers: {} }
     const { data, isFetching: usersFetching } = zoneUsers || { data: {}, isFetching: false }
     const { resources } = data || { resources: [] }
-    const { uaaZoneUsers } = entities || { uaaZoneUsers: [] }
+    const { uaaZoneUsers } = entities || { uaaZoneUsers: {} }
     return {
       zoneUsers: (resources || []).map(item => uaaZoneUsers[item]),
       usersFetching,
+    }
+  }
+)
+
+export const zoneGroupUserListSlt = createSelector(
+  [ getCertification, getEntities ],
+  (certification, entities) => {
+    const { zoneGroupsDetail } = certification || { zoneGroupsDetail: {} }
+    const {
+      data, isFetching: groupUsersFetching,
+    } = zoneGroupsDetail || { data: [], isFetching: false }
+    const { uaaZoneGroupUsers } = entities || { uaaZoneGroupUsers: {} }
+    return {
+      zoneGroupUsers: (data || []).map(item => uaaZoneGroupUsers[item]),
+      groupUsersFetching,
     }
   }
 )
