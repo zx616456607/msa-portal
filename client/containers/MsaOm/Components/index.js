@@ -37,6 +37,8 @@ const tooltip = [{
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
 
+const SHOW_BTN_COMPONENTS = [ 'spring-cloud-config', 'hystrix-turbine', 'spring-cloud-discovery' ]
+
 class MsaComponents extends React.Component {
   state = {
     metaData: [],
@@ -345,7 +347,10 @@ class MsaComponents extends React.Component {
           <Menu onClick={e => this.handleMenuClick(e, record)} style={{ width: 100 }}>
             <Menu.Item key="停止组件">停止组件</Menu.Item>
             <Menu.Item key="重新部署">重新部署</Menu.Item>
-            <Menu.Item key="水平扩展">水平扩展</Menu.Item>
+            {
+              SHOW_BTN_COMPONENTS.includes(record.component) &&
+              <Menu.Item key="水平扩展">水平扩展</Menu.Item>
+            }
           </Menu>
         }>重启组件</Dropdown.Button>
       </div>,
