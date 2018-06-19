@@ -102,7 +102,7 @@ class PublicServices extends React.Component {
     // let sortObj = { publishTime: false }
     // sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
-      { title: '公开服务名称', dataIndex: 'name', width: '12%' },
+      { title: '服务名称', dataIndex: 'name', width: '12%' },
       {
         title: '服务状态', dataIndex: 'status', width: '11%',
         render: status => renderCSBInstanceServiceStatus(status),
@@ -147,7 +147,7 @@ class PublicServices extends React.Component {
       <div className="layout-content-btns handler-row">
         <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
         <Search
-          placeholder="按公开服务名称搜索"
+          placeholder="按服务名称搜索"
           value={name}
           className="serch-style"
           onChange={e => this.setState({ name: e.target.value })}
