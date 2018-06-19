@@ -16,12 +16,20 @@ import { Button, Table, Input, Menu, Dropdown, Form, notification } from 'antd'
 import { DEFAULT_PAGESIZE } from '../../../../../../constants/index'
 import './style/index.less'
 import classNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
+import intersection from 'lodash/intersection'
+import difference from 'lodash/difference'
 import { formatDate } from '../../../../../../common/utils'
-import { createGroup, getGroupList,
-  deleteGroup, updateGroup } from '../../../../../../actions/certification'
+import {
+  createGroup, getGroupList, deleteGroup, updateGroup,
+  addGroupsUser, deleteGroupUser, ADD_GROUPS_DETAIL_USER_FAILURE,
+  DELETE_GROUP_USER_FAILURE,
+} from '../../../../../../actions/certification'
 import confirm from '../../../../../../components/Modal/confirm'
 import GroupsDetailDock from './Dock'
 import GroupsModal from './GroupsModal'
+import GroupUsersModal from './GroupUsersModal'
+import { zoneUserListSlt } from '../../../../../../selectors/certification'
 
 const Search = Input.Search
 
@@ -59,9 +67,108 @@ class Groups extends React.Component {
     })
   }
 
+  openGroupUsersModal = record => {
+    const targetKeys = []
+    !isEmpty(record.members) && record.members.every(mem => {
+      if (mem.type === 'USER') {
+        targetKeys.push(mem.value)
+      }
+      return true
+    })
+    this.setState({
+      currentGroup: record,
+      targetKeys,
+      originKeys: targetKeys,
+      visibleGroupUser: true,
+    })
+  }
+
+  handleAddGroupUsers = async addKeys => {
+    const { addGroupsUser, zoneUsers } = this.props
+    const { currentGroup } = this.state
+    const currentUsers = zoneUsers.filter(user => addKeys.includes(user.id))
+    const promiseArray = currentUsers.map(user => {
+      const body = {
+        origin: user.origin,
+        type: 'USER',
+        value: user.id,
+      }
+      return addGroupsUser(currentGroup.id, body)
+    })
+    const resultArray = await Promise.all(promiseArray)
+    const failedArray = []
+    resultArray.every(res => {
+      const { type, value } = res.response.result
+      if (type === ADD_GROUPS_DETAIL_USER_FAILURE) {
+        failedArray.push(value)
+      }
+      return true
+    })
+    return failedArray
+  }
+
+  handleDelGroupUsers = async delKeys => {
+    const { deleteGroupUser, zoneUsers } = this.props
+    const { currentGroup } = this.state
+    const currentUsers = zoneUsers.filter(user => delKeys.includes(user.id))
+    const promiseArray = currentUsers.map(user => {
+      return deleteGroupUser(currentGroup.id, user.id)
+    })
+    const resultArray = await Promise.all(promiseArray)
+    const failedArray = []
+    resultArray.every(res => {
+      const { type, value } = res.response.result
+      if (type === DELETE_GROUP_USER_FAILURE) {
+        failedArray.push(value)
+      }
+      return true
+    })
+    return failedArray
+  }
+
+  handleOk = async () => {
+    const { targetKeys, originKeys } = this.state
+    const commonKeys = intersection(targetKeys, originKeys)
+    const addKeys = difference(targetKeys, commonKeys)
+    const delKeys = difference(originKeys, commonKeys)
+    let addResult
+    let delResult
+    let failedMessage = ''
+    this.setState({
+      groupUsersLoading: true,
+    })
+    if (!isEmpty(addKeys)) {
+      addResult = await this.handleAddGroupUsers(addKeys)
+    }
+    if (!isEmpty(delKeys)) {
+      delResult = await this.handleDelGroupUsers(delKeys)
+    }
+    if (!isEmpty(addResult)) {
+      failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+    }
+    if (!isEmpty(delResult)) {
+      failedMessage += `移除用户 ${delResult.toString()} 失败；\n`
+    }
+    if (failedMessage) {
+      notification.warn({
+        message: failedMessage,
+      })
+    } else {
+      notification.success({
+        message: '操作成功',
+      })
+    }
+    this.loadGroupList()
+    this.setState({
+      groupUsersLoading: false,
+      visibleGroupUser: false,
+    })
+  }
+
   handleMenu = (e, record) => {
     switch (e.key) {
       case 'groupName':
+        this.openGroupUsersModal(record)
         return
       case 'del':
         this.handleDeleteGroup(record)
@@ -115,7 +222,7 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { dataList, isFetching } = this.props
+    const { dataList, isFetching, zoneUsers } = this.props
     const { resources, totalResults } = dataList
     const pagination = {
       simple: true,
@@ -172,7 +279,11 @@ class Groups extends React.Component {
       },
     ]
 
-    const { editData, editGroup, groupInfo, visibleModal, groupsDetailVisible } = this.state
+    const {
+      editData, editGroup, groupInfo, visibleModal,
+      groupsDetailVisible, visibleGroupUser, targetKeys,
+      groupUsersLoading,
+    } = this.state
     return (
       <div className="zone-groups">
         <div className="layout-content-btns" key="btns">
@@ -215,6 +326,18 @@ class Groups extends React.Component {
             closeModal={this.handleCancel}
             loadGroup={this.loadGroupList} />
         }
+        {
+          visibleGroupUser &&
+          <GroupUsersModal
+            visible={visibleGroupUser}
+            onCancel={() => this.setState({ visibleGroupUser: false })}
+            onOk={this.handleOk}
+            dataSource={zoneUsers}
+            targetKeys={targetKeys}
+            handleChange={targetKeys => this.setState({ targetKeys })}
+            loading={groupUsersLoading}
+          />
+        }
       </div>
     )
   }
@@ -223,14 +346,12 @@ class Groups extends React.Component {
 const mapStateToProps = state => {
   const { certification } = state
   const { zoneGroups } = certification
-  const { uaaZoneUsers } = state.entities
   const { data, isFetching } = zoneGroups
-  const UserList = uaaZoneUsers
   const dataList = data || []
   return {
-    UserList,
     dataList,
     isFetching,
+    ...zoneUserListSlt(state),
   }
 }
 
@@ -239,5 +360,7 @@ export default connect(mapStateToProps, {
   updateGroup,
   deleteGroup,
   getGroupList,
+  addGroupsUser,
+  deleteGroupUser,
 })(Form.create()(Groups))
 

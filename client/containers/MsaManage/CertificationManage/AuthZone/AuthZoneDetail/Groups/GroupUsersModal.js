@@ -42,6 +42,10 @@ export default class GroupUsersModal extends React.PureComponent {
     )
   }
 
+  filterOption = (inputValue, option) => {
+    return option.userName.includes(inputValue)
+  }
+
   render() {
     const { visible, onCancel, dataSource, targetKeys, handleChange, loading } = this.props
     return (
@@ -68,6 +72,7 @@ export default class GroupUsersModal extends React.PureComponent {
         <Transfer
           dataSource={dataSource}
           showSearch
+          filterOption={this.filterOption}
           titles={[ '筛选用户', '已选择用户' ]}
           listStyle={{ width: 250, height: 300 }}
           operations={[ '添加', '移除' ]}
