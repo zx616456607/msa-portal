@@ -125,7 +125,9 @@ export default class Protocols extends React.Component {
           </Row>
           <Row>
             <Col span={5}>
-              <div className="txt-of-ellipsis">端点</div>
+              <div className="txt-of-ellipsis">
+                {this.renderProtocolType(detail) === 'WebService' ? 'WSDL 地址' : '端点'}
+              </div>
             </Col>
             <Col span={10}>
               <div className="txt-of-ellipsis">
