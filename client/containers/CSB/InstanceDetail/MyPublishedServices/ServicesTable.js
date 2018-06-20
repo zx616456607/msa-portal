@@ -27,6 +27,7 @@ import {
   editPublishedService,
   getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
+import './style/ServiceTable.less'
 import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
 import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
 import serviceOut from '../../../../assets/img/csb/serviceOut.svg'
@@ -400,6 +401,8 @@ class ServicesTable extends React.Component {
         return [ svgArray[ 0 ], svgArray[ 1 ] ]
       case 6:
         return [ ...svgArray ]
+      case 8:
+        return [ svgArray[ 1 ], svgArray[ 2 ] ]
       case 0:
       default:
         return null
@@ -523,6 +526,7 @@ class ServicesTable extends React.Component {
     return [
       <div key="table">
         <Table
+          className="services-table"
           columns={columns}
           dataSource={dataSource}
           pagination={pagination}
