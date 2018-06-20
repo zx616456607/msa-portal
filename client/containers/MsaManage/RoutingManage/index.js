@@ -150,14 +150,21 @@ class RoutingManage extends React.Component {
     }, {
       title: '路由状态',
       dataIndex: 'status',
-      render: (text, record) => (record.status ? '开启' : '关闭'),
+      render: text => <span className={text ? 'success-status' : 'error-status'}>
+        {text ? '开启' : '关闭'}
+      </span>,
     }, {
-      title: '微服务 ID / 路由 URL',
+      title: '目标服务类型',
+      dataIndex: 'serviceID',
+      render: (text, record) => (record.serviceId ? '微服务 ID' : '路由 URL'),
+    }, {
+      title: '目标服务地址',
       dataIndex: 'url',
       render: (text, record) => (record.serviceId || record.url || '-'),
     }, {
-      title: '路由规则描述',
+      title: '描述',
       dataIndex: 'description',
+      render: desc => desc || '-',
     }, {
       title: '去掉路径前缀',
       dataIndex: 'stripPrefix',
