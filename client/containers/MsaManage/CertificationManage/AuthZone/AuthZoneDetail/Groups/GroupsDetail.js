@@ -269,7 +269,7 @@ class GroupsDetail extends React.Component {
               </h2>
             </div>
             <Row>
-              <Col span={6}>
+              <Col span={9}>
                 <div className="txt-of-ellipsis">
                   组名：{groupInfo.displayName}
                 </div>

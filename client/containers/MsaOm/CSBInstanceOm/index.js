@@ -171,9 +171,9 @@ class CSBInstanceOm extends React.Component {
         })
       },
       onCancel: () => {
-        this.setState({
-          currentInstance: null,
-        })
+        // this.setState({
+        //   currentInstance: null,
+        // })
       },
     })
   }
