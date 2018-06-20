@@ -10,16 +10,46 @@
  * @date 2018-06-20
  */
 import React from 'react'
+import { connect } from 'react-redux'
 import { Row, Col, Input, Form } from 'antd'
+import {
+  getMsgConverters,
+  CSB_GET_MESSAGE_CONVERTERS_SUCCESS,
+} from '../../../../../actions/CSB/instanceService'
 import '../Step2/style/ErrorCode.less'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea
 
-export default class ParameterMapping extends React.PureComponent {
+class ParameterMapping extends React.PureComponent {
+  state = {}
+
+  async componentDidMount() {
+    const { getMsgConverters, instanceID, data } = this.props
+    const { requestXsltId, responseXsltId } = JSON.parse(data.transformationDetail)
+    getMsgConverters(instanceID, requestXsltId)
+    getMsgConverters(instanceID, responseXsltId)
+    const actionArray = [
+      getMsgConverters(instanceID, requestXsltId),
+      getMsgConverters(instanceID, responseXsltId),
+    ]
+    const [ reqMsgResult, resMsgResult ] = await Promise.all(actionArray)
+    const msgResultArray = []
+    if (reqMsgResult.type === CSB_GET_MESSAGE_CONVERTERS_SUCCESS) {
+      msgResultArray[0] = reqMsgResult.response.result.body
+    }
+    if (resMsgResult.type === CSB_GET_MESSAGE_CONVERTERS_SUCCESS) {
+      msgResultArray[1] = resMsgResult.response.result.body
+    }
+    this.setState({
+      msgResultArray,
+    })
+  }
   render() {
-    const { form, formItemLayout } = this.props
+    const { msgResultArray } = this.state
+    const { form, formItemLayout, data } = this.props
     const { getFieldDecorator } = form
+    const { exposedRegexPath } = JSON.parse(data.transformationDetail)
     return (
       <div>
         <div className="second-title">参数映射</div>
@@ -33,6 +63,7 @@ export default class ParameterMapping extends React.PureComponent {
                 required: true,
                 message: '请提供请求转换模版!',
               }],
+              initialValue: msgResultArray && msgResultArray[0],
             })(
               <TextArea rows={5} placeholder="请提供请求转换模版" />
             )}
@@ -46,6 +77,7 @@ export default class ParameterMapping extends React.PureComponent {
                 required: true,
                 message: '请提供响应转换模版!',
               }],
+              initialValue: msgResultArray && msgResultArray[1],
             })(
               <TextArea rows={5} placeholder="请提供响应转换模版" />
             )}
@@ -58,7 +90,9 @@ export default class ParameterMapping extends React.PureComponent {
           <FormItem
             wrapperCol={{ offset: 6, span: 14 }}
           >
-            {getFieldDecorator('exposedRegexPath')(
+            {getFieldDecorator('exposedRegexPath', {
+              initialValue: exposedRegexPath || '',
+            })(
               <Input placeholder="如：/bank/.*" />
             )}
           </FormItem>
@@ -67,3 +101,7 @@ export default class ParameterMapping extends React.PureComponent {
     )
   }
 }
+
+export default connect(null, {
+  getMsgConverters,
+})(ParameterMapping)

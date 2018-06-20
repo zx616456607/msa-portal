@@ -193,6 +193,7 @@ class MsaComponents extends React.Component {
       this.setState({
         tipsName: '水平扩展',
         visible: true,
+        currentComponent: value,
       })
       return
     }
@@ -205,11 +206,6 @@ class MsaComponents extends React.Component {
     })
   }
 
-  handleRealNum = value => {
-    this.setState({
-      inputValue: value,
-    })
-  }
 
   handleToopCancel = () => {
     this.setState({
@@ -312,7 +308,8 @@ class MsaComponents extends React.Component {
 
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
-      tipsName, metaData } = this.state
+      tipsName, metaData, currentComponent } = this.state
+    const { clusterId } = this.props
     const pagination = {
       simple: true,
       total: 1,
@@ -355,7 +352,6 @@ class MsaComponents extends React.Component {
         }>重启组件</Dropdown.Button>
       </div>,
     }]
-    const scope = this
 
     return (
       <QueueAnim className="info">
@@ -392,7 +388,17 @@ class MsaComponents extends React.Component {
             </div>
           </div>
         </Modal>
-        <MsaModal visible={visible} tipsType={tipsName} scope={scope} />
+        {
+          visible &&
+          <MsaModal
+            visible={visible}
+            tipsType={tipsName}
+            clusterId={clusterId}
+            currentComponent={currentComponent}
+            closeModal={() => this.setState({ visible: false })}
+            loadData={this.load}
+          />
+        }
       </QueueAnim>
     )
   }

@@ -132,7 +132,6 @@ class PublishService extends React.Component {
                 currentInstance={currentInstance}
                 servicesInbounds={servicesInbounds}
                 serviceGroups={content || []}
-                changeStep={this.changeStep}
                 data={dataList}
                 isEdit={isEdit}
               />
@@ -216,7 +215,7 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.wsdlAddress}
+                            {fields.targetDetail}
                           </div>
                         </Col>
                       </Row>,
@@ -240,7 +239,7 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.methodName}
+                            {fields.operationName}
                           </div>
                         </Col>
                       </Row>,
