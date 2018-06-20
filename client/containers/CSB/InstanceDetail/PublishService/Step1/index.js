@@ -59,6 +59,7 @@ class Step1 extends React.Component {
         {
           getFieldValue('protocol') !== getFieldValue('openProtocol') &&
           <ParameterMapping
+            data={data}
             {...otherProps}
           />
         }

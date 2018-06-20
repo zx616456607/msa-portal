@@ -12,7 +12,7 @@
 
 import { CALL_API } from '../../../middleware/api'
 import { toQuerystring } from '../../../common/utils'
-import { API_CONFIG } from '../../../constants'
+import { API_CONFIG, CONTENT_TYPE_TEXT } from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
 import { Schemas } from '../../../middleware/schemas'
 
@@ -375,6 +375,32 @@ const fetchUploadMsgConverters = (instanceID, body) => {
 
 export const uploadMsgConverters = (instanceID, body) =>
   dispatch => dispatch(fetchUploadMsgConverters(instanceID, body))
+
+export const CSB_GET_MESSAGE_CONVERTERS_REQUEST = 'CSB_GET_MESSAGE_CONVERTERS_REQUEST'
+export const CSB_GET_MESSAGE_CONVERTERS_SUCCESS = 'CSB_GET_MESSAGE_CONVERTERS_SUCCESS'
+export const CSB_GET_MESSAGE_CONVERTERS_FAILURE = 'CSB_GET_MESSAGE_CONVERTERS_FAILURE'
+
+const fetchMsgConverters = (instanceID, id) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CSB_GET_MESSAGE_CONVERTERS_REQUEST,
+        CSB_GET_MESSAGE_CONVERTERS_SUCCESS,
+        CSB_GET_MESSAGE_CONVERTERS_FAILURE,
+      ],
+      endpoint: `${CSB_API_URL}/instances/${instanceID}/message-converters/${id}`,
+      schema: {},
+      options: {
+        headers: {
+          'Content-Type': CONTENT_TYPE_TEXT,
+        },
+      },
+    },
+  }
+}
+
+export const getMsgConverters = (instanceID, id) =>
+  dispatch => dispatch(fetchMsgConverters(instanceID, id))
 
 // cascaded-services/prerequisite
 export const CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST = 'CSB_CASCADED_SERVICES_PREREQUISITE_REQUEST'
