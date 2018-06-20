@@ -10,19 +10,28 @@
  * @author zhaoyb
  */
 import React from 'react'
-import { Row, Col, Slider, InputNumber, Button, Modal } from 'antd'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Row, Col, Slider, InputNumber, Modal, notification } from 'antd'
+import { manualScaleComponent } from '../../../../actions/msaComponent'
 
 const tooltip = [{
   title: '水平扩展',
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
 
-export default class MsaModal extends React.Component {
-  state = {
-    inputValue: 0,
-    tooltipTitle: '',
-    tooltipContent: '',
-    extendVisible: false,
+class MsaModal extends React.Component {
+  static propTypes = {
+    visible: PropTypes.bool.isRequired,
+    closeModal: PropTypes.func.isRequired,
+    currentComponent: PropTypes.object.isRequired,
+    loadData: PropTypes.func,
+  }
+  constructor(props) {
+    super()
+    this.state = {
+      inputValue: props.currentComponent.count,
+    }
   }
 
   fetchtooltips = value => {
@@ -38,30 +47,55 @@ export default class MsaModal extends React.Component {
     }
   }
 
-  handleExtendCancel = () => {
-    const { scope } = this.props
-    scope.setState({
-      visible: false,
-    })
-  }
-
   handleRealNum = value => {
     this.setState({
       inputValue: value,
     })
   }
 
+  handleConfirm = async () => {
+    const { inputValue } = this.state
+    const { manualScaleComponent, clusterId, currentComponent, closeModal, loadData } = this.props
+    this.setState({
+      loading: true,
+    })
+    const body = {
+      number: parseInt(inputValue, 10),
+    }
+    const result = await manualScaleComponent(clusterId, currentComponent.component, body)
+    if (result.error) {
+      this.setState({
+        loading: false,
+      })
+      notification.warn({
+        message: '水平扩展失败',
+      })
+      return
+    }
+    loadData && loadData()
+    closeModal()
+    this.setState({
+      loading: false,
+    })
+    notification.success({
+      message: '水平扩展成功',
+    })
+  }
+
   render() {
-    const { tipsType, visible } = this.props
+    const { loading, inputValue } = this.state
+    const { tipsType, visible, closeModal, currentComponent } = this.props
     const tipsName = tipsType ? this.fetchtooltips(tipsType).title : ''
 
     return (
       <div className="modal">
-        <Modal title={tipsName} visible={visible} onCancel={this.handleExtendCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleExtendCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
-          ]}>
+        <Modal
+          title={tipsName}
+          visible={visible}
+          onCancel={closeModal}
+          onOk={this.handleConfirm}
+          confirmLoading={loading}
+        >
           {
             <div className="extend">
               <div style={{ height: 40, backgroundColor: '#d9edf6', border: '1px dashed #85d7fd', padding: 10, borderRadius: 4, marginBottom: 20 }}>
@@ -69,7 +103,7 @@ export default class MsaModal extends React.Component {
               </div>
               <Row>
                 <Col className="itemTitle" span={4}>组件名称</Col>
-                <Col className="itemBody" span={20}>qwqeqweqwe</Col>
+                <Col className="itemBody" span={20}>{currentComponent && currentComponent.component}</Col>
               </Row>
               <Row>
                 <Col className="itemTitle" span={4} style={{ lineHeight: 2.5 }}>
@@ -80,16 +114,16 @@ export default class MsaModal extends React.Component {
                     <Col span={12}>
                       <Slider
                         min={1}
-                        max={20}
+                        max={10}
                         onChange={this.handleRealNum}
-                        value={this.state.inputValue} />
+                        value={inputValue} />
                     </Col>
                     <Col span={12}>
                       <InputNumber
                         className="inputn"
                         min={1}
-                        max={20}
-                        value={this.state.inputValue}
+                        max={10}
+                        value={inputValue}
                         onChange={this.handleRealNum}
                       /> 个
                     </Col>
@@ -104,3 +138,6 @@ export default class MsaModal extends React.Component {
   }
 }
 
+export default connect(null, {
+  manualScaleComponent,
+})(MsaModal)
