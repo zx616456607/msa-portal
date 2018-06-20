@@ -138,7 +138,7 @@ class MyPublishedServiceGroups extends React.Component {
             notification.success({
               message: `${text}服务组成功`,
             })
-            self.loadData()
+            self.loadGroupServices(record.id, {}, self.loadData)
           })
         })
       },
