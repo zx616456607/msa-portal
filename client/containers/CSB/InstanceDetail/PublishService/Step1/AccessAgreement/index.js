@@ -123,7 +123,7 @@ class AccessAgreement extends React.Component {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form
-    const { transformationDetail, transformationType, type } = dataList
+    const { transformationDetail, transformationType, type, targetDetail } = dataList
     const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
@@ -143,18 +143,30 @@ class AccessAgreement extends React.Component {
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
     let openProtocolType = 'rest'
+    let protocolType
+    let bindingName
+    let operationName
+    let wsdl
     if (!isEmpty(dataList)) {
       if (type === 'rest_ssl' || type === 'rest') {
         openProtocolType = 'rest'
       } else {
         openProtocolType = 'soap'
       }
+      protocolType = transformationType === 'direct'
+        ?
+        type
+        :
+        transformationType.split('_')[0]
+      const {
+        bindingName: copyBindingName,
+        operationName: copyOperationName,
+        wsdl: copyWsdl,
+      } = JSON.parse(transformationDetail)
+      bindingName = copyBindingName
+      operationName = copyOperationName
+      wsdl = copyWsdl
     }
-    const protocolType = transformationType === 'direct'
-      ?
-      type
-      :
-      transformationType.split('_')[0]
     getFieldDecorator('type', {
       initialValue: serviceOpenType,
     })
@@ -163,7 +175,6 @@ class AccessAgreement extends React.Component {
     })
     const isDisabled = isEdit === 'true'
 
-    const { bindingName, operationName, wsdl } = JSON.parse(transformationDetail)
     return (
       <div className={classNames}>
         <div className="second-title">选择协议及接入配置</div>
@@ -326,7 +337,7 @@ class AccessAgreement extends React.Component {
             className="publish-service-body-wsdl-address"
           >
             {getFieldDecorator('targetDetail', {
-              initialValue: wsdl || '',
+              initialValue: wsdl || targetDetail,
               rules: [{
                 required: true,
                 whitespace: true,

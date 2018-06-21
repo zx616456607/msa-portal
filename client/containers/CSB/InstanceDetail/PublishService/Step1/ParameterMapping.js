@@ -12,6 +12,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Row, Col, Input, Form } from 'antd'
+import isEmpty from 'lodash/isEmpty'
 import {
   getMsgConverters,
   CSB_GET_MESSAGE_CONVERTERS_SUCCESS,
@@ -26,6 +27,9 @@ class ParameterMapping extends React.PureComponent {
 
   async componentDidMount() {
     const { getMsgConverters, instanceID, data } = this.props
+    if (isEmpty(data)) {
+      return
+    }
     const { requestXsltId, responseXsltId } = JSON.parse(data.transformationDetail)
     getMsgConverters(instanceID, requestXsltId)
     getMsgConverters(instanceID, responseXsltId)
@@ -49,7 +53,10 @@ class ParameterMapping extends React.PureComponent {
     const { msgResultArray } = this.state
     const { form, formItemLayout, data } = this.props
     const { getFieldDecorator } = form
-    const { exposedRegexPath } = JSON.parse(data.transformationDetail)
+    let exposedRegexPath
+    if (!isEmpty(data)) {
+      exposedRegexPath = JSON.parse(data.transformationDetail).exposedRegexPath
+    }
     return (
       <div>
         <div className="second-title">参数映射</div>
