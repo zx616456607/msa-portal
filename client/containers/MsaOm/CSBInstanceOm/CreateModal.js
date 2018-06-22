@@ -103,7 +103,10 @@ class InstanceModal extends React.Component {
   }
 
   checkName = (rule, value, callback) => {
-    const { clusterID, checkInstanceName } = this.props
+    const { clusterID, checkInstanceName, currentInstance } = this.props
+    if (currentInstance) {
+      return callback()
+    }
     if (!value) {
       return callback('请输入实例名称')
     }

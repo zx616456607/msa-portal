@@ -37,6 +37,8 @@ const tooltip = [{
   content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
 }]
 
+const SHOW_BTN_COMPONENTS = [ 'spring-cloud-config', 'hystrix-turbine', 'spring-cloud-discovery' ]
+
 class MsaComponents extends React.Component {
   state = {
     metaData: [],
@@ -161,10 +163,12 @@ class MsaComponents extends React.Component {
     }
   }
 
-  handleButtonClick = () => {
+  handleButtonClick = record => {
     this.setState({
-      tipsName: '水平扩展',
-      visible: true,
+      toopVisible: true,
+      tooltipTitle: tooltip[0].title,
+      tooltipContent: tooltip[0].content,
+      componentName: record.component,
     })
   }
 
@@ -185,6 +189,14 @@ class MsaComponents extends React.Component {
     }
   }
   handleMenuClick = (e, value) => {
+    if (e.key === '水平扩展') {
+      this.setState({
+        tipsName: '水平扩展',
+        visible: true,
+        currentComponent: value,
+      })
+      return
+    }
     const tips = this.tooptic(e.key)
     this.setState({
       toopVisible: true,
@@ -194,11 +206,6 @@ class MsaComponents extends React.Component {
     })
   }
 
-  handleRealNum = value => {
-    this.setState({
-      inputValue: value,
-    })
-  }
 
   handleToopCancel = () => {
     this.setState({
@@ -301,7 +308,8 @@ class MsaComponents extends React.Component {
 
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
-      tipsName, metaData } = this.state
+      tipsName, metaData, currentComponent } = this.state
+    const { clusterId } = this.props
     const pagination = {
       simple: true,
       total: 1,
@@ -332,16 +340,18 @@ class MsaComponents extends React.Component {
       title: '操作',
       key: 'operation',
       render: (text, record) => <div>
-        <Dropdown.Button onClick={this.handleButtonClick} overlay={
+        <Dropdown.Button onClick={() => this.handleButtonClick(record)} overlay={
           <Menu onClick={e => this.handleMenuClick(e, record)} style={{ width: 100 }}>
-            <Menu.Item key="重启组件">重启组件</Menu.Item>
             <Menu.Item key="停止组件">停止组件</Menu.Item>
             <Menu.Item key="重新部署">重新部署</Menu.Item>
+            {
+              SHOW_BTN_COMPONENTS.includes(record.component) &&
+              <Menu.Item key="水平扩展">水平扩展</Menu.Item>
+            }
           </Menu>
-        }>水平扩展</Dropdown.Button>
+        }>重启组件</Dropdown.Button>
       </div>,
     }]
-    const scope = this
 
     return (
       <QueueAnim className="info">
@@ -378,7 +388,17 @@ class MsaComponents extends React.Component {
             </div>
           </div>
         </Modal>
-        <MsaModal visible={visible} tipsType={tipsName} scope={scope} />
+        {
+          visible &&
+          <MsaModal
+            visible={visible}
+            tipsType={tipsName}
+            clusterId={clusterId}
+            currentComponent={currentComponent}
+            closeModal={() => this.setState({ visible: false })}
+            loadData={this.load}
+          />
+        }
       </QueueAnim>
     )
   }

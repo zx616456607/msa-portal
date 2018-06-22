@@ -263,6 +263,25 @@ class MySubscribedService extends React.Component {
     })
   }
 
+  renderPlaceholder = () => {
+    const { searchType } = this.state
+    let placeholder = ''
+    switch (searchType) {
+      case 'serviceName':
+        placeholder = '按服务名搜索'
+        break
+      case 'evidenceName':
+        placeholder = '按消费凭证名搜索'
+        break
+      case 'groupName':
+        placeholder = '按服务组名搜索'
+        break
+      default:
+        break
+    }
+    return placeholder
+  }
+
   render() {
     const {
       serviceApIDocModal, editBindIpModalVisible, confirmLoading,
@@ -425,7 +444,7 @@ class MySubscribedService extends React.Component {
               <Option value="groupName">所属服务组</Option>
             </Select>
             <Search
-              placeholder="按订阅服务名称搜索"
+              placeholder={this.renderPlaceholder()}
               className="serch-style"
               value={name}
               onChange={e => this.setState({ name: e.target.value })}

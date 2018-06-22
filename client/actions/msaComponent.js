@@ -110,3 +110,27 @@ export const getRedeploy = (clusterID, query) => dispatch => {
   return dispatch(redeployComponent(clusterID, query))
 }
 
+export const MANUALSCALE_COMPONENT_REQUEST = 'MANUALSCALE_COMPONENT_REQUEST'
+export const MANUALSCALE_COMPONENT_SUCCESS = 'MANUALSCALE_COMPONENT_SUCCESS'
+export const MANUALSCALE_COMPONENT_FAILURE = 'MANUALSCALE_COMPONENT_FAILURE'
+
+const fetchManualScaleComponent = (clusterID, name, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        MANUALSCALE_COMPONENT_REQUEST,
+        MANUALSCALE_COMPONENT_SUCCESS,
+        MANUALSCALE_COMPONENT_FAILURE,
+      ],
+      endpoint: `/clusters/${clusterID}/services/${name}/manualscale`,
+      schema: {},
+      options: {
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const manualScaleComponent = (clusterID, name, body) =>
+  dispatch => dispatch(fetchManualScaleComponent(clusterID, name, body))

@@ -17,16 +17,15 @@ import { Modal, Form, Input, Checkbox, Select, notification, Button, Row, Col } 
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/AddClientModal.less'
-import { createClient, editClient, getIdentityZones } from '../../../../../actions/certification'
-import { identityZoneListSlt } from '../../../../../selectors/certification'
-import { REDIRECT_URL_REG } from '../../../../../constants'
-import { sleep } from '../../../../../common/utils'
+import { createClient, editClient } from '../../../../../../actions/certification'
+import { REDIRECT_URL_REG } from '../../../../../../constants'
+import { sleep } from '../../../../../../common/utils'
 
 const FormItem = Form.Item
 const CheckboxGroup = Checkbox.Group
 const Option = Select.Option
 
-const authModeOpts = [ 'authorization_code', 'refresh_token', 'password', 'client_credentials' ]
+const authModeOpts = [ 'authorization_code', 'implicit', 'password', 'client_credentials' ]
 
 let uuid = 0
 
@@ -42,8 +41,7 @@ class AddClientModal extends React.Component {
   state = {}
 
   async componentDidMount() {
-    const { form, currentClient, getIdentityZones } = this.props
-    await getIdentityZones()
+    const { form, currentClient } = this.props
     if (isEmpty(currentClient)) {
       return
     }
@@ -124,7 +122,9 @@ class AddClientModal extends React.Component {
         client_id,
         client_secret,
         authorized_grant_types,
-        redirect_uri: redirect_uri.split(','),
+      }
+      if (!isEmpty(redirect_uri)) {
+        Object.assign(body, { redirect_uri: redirect_uri.split(',') })
       }
       if (!isEmpty(keys)) {
         const scope = []
@@ -137,6 +137,7 @@ class AddClientModal extends React.Component {
         })
         Object.assign(body, { scope, autoapprove })
       }
+
       // 创建
       if (isEmpty(currentClient)) {
         const result = await createClient(body)
@@ -186,12 +187,12 @@ class AddClientModal extends React.Component {
   renderModalTitle = () => {
     const { currentClient, isView } = this.props
     if (isEmpty(currentClient)) {
-      return '添加认证客户端'
+      return '添加 OAuth 应用'
     }
     if (!isView) {
-      return '编辑认证客户端'
+      return '编辑 OAuth 应用'
     }
-    return '查看认证客户端'
+    return '查看 OAuth 应用'
   }
 
   renderFooter = () => {
@@ -261,16 +262,16 @@ class AddClientModal extends React.Component {
   }
 
   renderItem = (key, index) => {
-    const { form, isView, identityZoneList, zonesFetching } = this.props
+    const { form, isView, identityZoneDetail } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 },
     }
-    if (zonesFetching || isEmpty(identityZoneList)) {
+    if (isEmpty(identityZoneDetail)) {
       return
     }
-    const ZONE_ID = identityZoneList[0].id
+    const ZONE_ID = identityZoneDetail.name
     const authScopes = [
       'uaa.user', 'uaa.none', 'uaa.admin', 'scim.write', 'scim.read', 'scim.create', 'scim.userids',
       'scim.invite', 'groups.update', 'password.write', 'openid', 'idps.read', 'idps.write',
@@ -353,31 +354,34 @@ class AddClientModal extends React.Component {
             getFieldDecorator('name', {
               initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.name) ? currentClient.name : '',
             })(
-              <Input disabled={isView} placeholder="请输入客户端名称"/>
+              <Input disabled={isView} placeholder="请输入名称"/>
             )
           }
         </FormItem>
-        <FormItem {...formItemLayout} label="授权方式">
-          {
-            getFieldDecorator('authorized_grant_types', {
-              initialValue: !isEmpty(currentClient) &&
+        {
+          !isView &&
+          <FormItem {...formItemLayout} label="授权方式">
+            {
+              getFieldDecorator('authorized_grant_types', {
+                initialValue: !isEmpty(currentClient) &&
                 !isEmpty(currentClient.authorized_grant_types)
-                ? currentClient.authorized_grant_types : [],
-              rules: [
-                {
-                  required: true,
-                  message: '授权方式不能为空',
-                },
-              ],
-            })(
-              <CheckboxGroup
-                disabled={isView}
-                options={authModeOpts}
-              />
-            )
-          }
-        </FormItem>
-        <FormItem {...formItemLayout} label="客户端 ID">
+                  ? currentClient.authorized_grant_types : [],
+                rules: [
+                  {
+                    required: true,
+                    message: '授权方式不能为空',
+                  },
+                ],
+              })(
+                <CheckboxGroup
+                  disabled={isView}
+                  options={authModeOpts}
+                />
+              )
+            }
+          </FormItem>
+        }
+        <FormItem {...formItemLayout} label="Client ID">
           {
             getFieldDecorator('client_id', {
               initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.client_id) ? currentClient.client_id : '',
@@ -394,7 +398,7 @@ class AddClientModal extends React.Component {
         </FormItem>
         {
           isEmpty(currentClient) &&
-          <FormItem {...formItemLayout} label="客户端 Secret">
+          <FormItem {...formItemLayout} label="Client Secret">
             {
               getFieldDecorator('client_secret', {
                 initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.client_secret) ? currentClient.client_secret : '',
@@ -428,23 +432,27 @@ class AddClientModal extends React.Component {
         {/* <Option key="test">test</Option>*/}
         {/* </Select>*/}
         {/* </FormItem>*/}
-        <FormItem {...formItemLayout} label="重定向 URL">
-          {
-            getFieldDecorator('redirect_uri', {
-              initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.redirect_uri) ? currentClient.redirect_uri.join(',') : '',
-              rules: [
-                {
-                  whitespace: true,
-                  pattern: REDIRECT_URL_REG,
-                  required: true,
-                  message: '请填写正确的重定向 URL 地址',
-                },
-              ],
-            })(
-              <Input disabled={isView} placeholder="如：http://www.tenxcloud.com" />
-            )
-          }
-        </FormItem>
+        {
+          !isEmpty(authorizedGrantTypes) &&
+          (authorizedGrantTypes.includes('authorization_code') || authorizedGrantTypes.includes('implicit')) &&
+          <FormItem {...formItemLayout} label="重定向 URL">
+            {
+              getFieldDecorator('redirect_uri', {
+                initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.redirect_uri) ? currentClient.redirect_uri.join(',') : '',
+                rules: [
+                  {
+                    whitespace: true,
+                    pattern: REDIRECT_URL_REG,
+                    required: true,
+                    message: '请填写正确的重定向 URL 地址',
+                  },
+                ],
+              })(
+                <Input disabled={isView} placeholder="如：http://www.tenxcloud.com" />
+              )
+            }
+          </FormItem>
+        }
         {keys.map(this.renderItem)}
         <Row style={{ marginTop: 10 }}>
           <Col offset={5}>
@@ -457,13 +465,14 @@ class AddClientModal extends React.Component {
 }
 
 const mapStateToProps = state => {
+  const { certification } = state
+  const { identityZoneDetail } = certification
   return {
-    ...identityZoneListSlt(state),
+    identityZoneDetail,
   }
 }
 
 export default connect(mapStateToProps, {
   createClient,
   editClient,
-  getIdentityZones,
 })(Form.create()(AddClientModal))

@@ -179,7 +179,7 @@ class RoutingRuleModal extends React.Component {
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="选择微服务地址"
+          label="目标服务类型"
         >
           {getFieldDecorator('msa-url-type', {
             initialValue: 'id',
@@ -195,7 +195,7 @@ class RoutingRuleModal extends React.Component {
         </FormItem>
         {
           getFieldValue('msa-url-type') === 'id'
-            ? <FormItem {...formItemLayout} label="微服务 ID">
+            ? <FormItem {...formItemLayout} label="目标服务地址">
               {getFieldDecorator('serviceId', {
                 rules: [{
                   required: true,
@@ -209,7 +209,7 @@ class RoutingRuleModal extends React.Component {
                 </Select>
               )}
             </FormItem>
-            : <FormItem {...formItemLayout} label="路由 URL">
+            : <FormItem {...formItemLayout} label="目标服务地址">
               {getFieldDecorator('url', {
                 rules: [{
                   required: true,
@@ -222,7 +222,7 @@ class RoutingRuleModal extends React.Component {
               )}
             </FormItem>
         }
-        <FormItem {...formItemLayout} label="路由规则描述">
+        <FormItem {...formItemLayout} label="描述">
           {getFieldDecorator('description')(
             <Input.TextArea placeholder="请填写路由规则描述" />
           )}

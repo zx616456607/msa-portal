@@ -262,3 +262,51 @@ export function refreshMsaConfig(clusterID, serviceInfo) {
     return dispatch(fetchRefreshMsaConfig(clusterID, serviceInfo))
   }
 }
+
+export const SERVICE_DETAIL_REQUEST = 'SERVICE_DETAIL_REQUEST'
+export const SERVICE_DETAIL_SUCCESS = 'SERVICE_DETAIL_SUCCESS'
+export const SERVICE_DETAIL_FAILURE = 'SERVICE_DETAIL_FAILURE'
+
+const fetchServiceDetail = (clusterID, serviceName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        SERVICE_DETAIL_REQUEST,
+        SERVICE_DETAIL_SUCCESS,
+        SERVICE_DETAIL_FAILURE,
+      ],
+      endpoint: `/clusters/${clusterID}/services/${serviceName}`,
+      schema: {},
+    },
+  }
+}
+
+export function getServiceDetail(clusterID, serviceName) {
+  return dispatch => {
+    return dispatch(fetchServiceDetail(clusterID, serviceName))
+  }
+}
+
+export const GET_PROXIES_REQUEST = 'GET_PROXIES_REQUEST'
+export const GET_PROXIES_SUCCESS = 'GET_PROXIES_SUCCESS'
+export const GET_PROXIES_FAILURE = 'GET_PROXIES_FAILURE'
+
+const fetchClusterProxies = clusterID => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_PROXIES_REQUEST,
+        GET_PROXIES_SUCCESS,
+        GET_PROXIES_FAILURE,
+      ],
+      endpoint: `/clusters/${clusterID}/proxies`,
+      schema: {},
+    },
+  }
+}
+
+export function getClusterProxies(clusterID) {
+  return dispatch => {
+    return dispatch(fetchClusterProxies(clusterID))
+  }
+}

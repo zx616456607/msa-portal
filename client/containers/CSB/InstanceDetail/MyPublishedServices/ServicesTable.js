@@ -27,6 +27,7 @@ import {
   editPublishedService,
   getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
+import './style/ServiceTable.less'
 import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
 import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
 import serviceOut from '../../../../assets/img/csb/serviceOut.svg'
@@ -277,7 +278,7 @@ class ServicesTable extends React.Component {
       async onOk() {
         if (type === 'logout') {
           if (!record.cascadedType) {
-            delInstanceService(instanceID, record.id).then(res => {
+            return delInstanceService(instanceID, record.id).then(res => {
               if (res.error) {
                 notification.error({
                   message: self.serviceMessages(type, true),
@@ -357,10 +358,10 @@ class ServicesTable extends React.Component {
     if (cascadedType) {
       if (cascadedType.length === 1) {
         if (parseInt(cascadedType[ 0 ]) === 1) {
-          cascadedType = [ 1, 2, 5, 6 ]
+          cascadedType = [ 1, 2, 5, 6, 8 ]
         }
       } else {
-        cascadedType = [ 0, 1, 2, 5, 6 ]
+        cascadedType = [ 0, 1, 2, 5, 6, 8 ]
       }
     }
     loadData(null, {
@@ -400,6 +401,8 @@ class ServicesTable extends React.Component {
         return [ svgArray[ 0 ], svgArray[ 1 ] ]
       case 6:
         return [ ...svgArray ]
+      case 8:
+        return [ svgArray[ 1 ], svgArray[ 2 ] ]
       case 0:
       default:
         return null
@@ -523,6 +526,7 @@ class ServicesTable extends React.Component {
     return [
       <div key="table">
         <Table
+          className="services-table"
           columns={columns}
           dataSource={dataSource}
           pagination={pagination}

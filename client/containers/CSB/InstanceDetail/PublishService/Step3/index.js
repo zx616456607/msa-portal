@@ -53,7 +53,7 @@ class Step3 extends React.Component {
     } = this.props
     const { validateFieldsAndScroll, getFieldsValue, getFieldValue, setFields } = form
     const path_id = getFieldValue('pathId')
-    if (path_id !== 'default') {
+    if (!isEdit && path_id !== 'default') {
       let { pathId, version, groupId, name, targetInstancesIDs } = getFieldsValue()
       pathId = parseInt(pathId, 10)
       const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}

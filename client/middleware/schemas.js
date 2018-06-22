@@ -132,6 +132,16 @@ const uaaAuthSchema = new schema.Entity('uaaAuth', {}, {
   idAttribute: () => UAA_JWT,
 })
 
+// UAA Users
+const uaaZoneUsersSchema = new schema.Entity('uaaZoneUsers', {}, {
+  idAttribute: 'id',
+})
+
+// UAA  Group Users
+const uaaZoneGroupUsersSchema = new schema.Entity('uaaZoneGroupUsers', {}, {
+  idAttribute: 'value',
+})
+
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -271,4 +281,8 @@ export const Schemas = {
   },
   MSA_CLIENT_IDENTITY_ZONE_LIST_DATA: [ msaClientIdentityZoneListSchema ],
   UAA_AUTH: uaaAuthSchema,
+  UAA_ZONE_USER_LIST_DATA: {
+    resources: [ uaaZoneUsersSchema ],
+  },
+  UAA_ZONE_GROUP_USERS_LIST_DATA: [ uaaZoneGroupUsersSchema ],
 }

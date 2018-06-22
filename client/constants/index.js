@@ -62,6 +62,9 @@ export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const CONTENT_TYPE_JSON = 'application/json'
 export const CONTENT_TYPE_TEXT = 'text/plain'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
+export const ZONE_ID_HEADER = 'X-Identity-Zone-Id'
+export const ZONE_SUBDOMAIN_HEADER = 'X-Identity-Zone-Subdomain'
+export const IF_MATCH_HEADER = 'If-Match'
 export const PINPOINT_LIMIT = 5000
 export const UAA_TOKEN_EXPIRE = 43199
 export const X_GROUP_UNIT = 284211
@@ -83,6 +86,8 @@ export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const REDIRECT_URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_,\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
+export const EMAIL_REG = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
+export const PHONE_REG = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
 
 export const API_GATEWAY_LIMIT_TYPES = [
   {

@@ -25,68 +25,32 @@
   .conten {
     height: 310px;
     background-color: #fff;
+    .msa {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      margin-right: 10px;
+      & > div:first-child {
+        line-height: 25px;
+        text-align: left;
+      }
+      & > div + div > * {
+        margin-right: 8px;
+      }
+      .btn_edit {
+        position: absolute;
+        left: 105%;
+        top: 0;
+      }
+    }
     .left {
       float: left;
       margin-top: 24px;
       display: inline-block;
-      .msa {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        margin-right: 10px;
-        & > div:first-child {
-          line-height: 25px;
-        }
-        & > div + div > * {
-          margin-right: 8px;
-        }
-        .btn_save {
-          width: 50%;
-          display: inline-block;
-          position: absolute;
-          left: 105%;
-          top: 0;
-          .close {
-            margin-right: 10px;
-          }
-        }
-        .btn_edit {
-          position: absolute;
-          left: 105%;
-          top: 0;
-        }
-        .desc {
-          line-height: 2;
-        }
-        .descs {
-          line-height: 2;
-          color: #ffbf00;
-        }
-        .install {
-          line-height: 2;
-          .ico {
-            color: #5cb85c;
-          }
-          .existence {
-            color: #5cb85c;
-          }
-          .again {
-            cursor: pointer;
-            color: #2db7f5;
-            margin-left: 10px;
-          }
-          .unload {
-            cursor: pointer;
-            color: #f85a5a;
-            margin-left: 10px;
-          }
-          .loding {
-            width: 57%;
-            display: inline-block;
-            margin-left: 5%;
-            span {
-              color: #2db7f5;
-            }
-          }
+      border-right: 1px solid #ccc;
+      .btn_save {
+        display: inline-block;
+        .close {
+          margin-right: 10px;
         }
       }
       .first_row {
@@ -98,7 +62,40 @@
       height: 310px;
       padding: 24px 0 0 24px;
       display: inline-block;
-      border-left: 1px solid #ccc;
+      .desc {
+        line-height: 2;
+      }
+      .descs {
+        line-height: 2;
+        color: #ffbf00;
+      }
+      .install {
+        line-height: 2;
+        .ico {
+          color: #5cb85c;
+        }
+        .existence {
+          color: #5cb85c;
+        }
+        .again {
+          cursor: pointer;
+          color: #2db7f5;
+          margin-left: 10px;
+        }
+        .unload {
+          cursor: pointer;
+          color: #f85a5a;
+          margin-left: 10px;
+        }
+        .loding {
+          width: 57%;
+          display: inline-block;
+          margin-left: 5%;
+          span {
+            color: #2db7f5;
+          }
+        }
+      }
       .select {
         width: 400px;
       }

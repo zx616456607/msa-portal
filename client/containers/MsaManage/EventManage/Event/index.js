@@ -223,7 +223,7 @@ class Event extends React.Component {
         render: this.renderEventType,
       }, {
         title: '事件级别',
-        width: '5%',
+        width: '10%',
         dataIndex: 'eventLevel',
         render: this.renderEventLevel,
       }, {

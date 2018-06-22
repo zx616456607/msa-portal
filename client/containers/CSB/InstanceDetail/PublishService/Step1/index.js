@@ -22,6 +22,7 @@ import {
 import {
   cascadingLinkRuleSlt,
 } from '../../../../../selectors/CSB/cascadingLinkRules'
+import ParameterMapping from './ParameterMapping'
 
 class Step1 extends React.Component {
 
@@ -30,6 +31,7 @@ class Step1 extends React.Component {
       servicesInbounds, serviceGroups,
       currentInstance, data, isEdit, ...otherProps
     } = this.props
+    const { getFieldValue } = this.props.form
     const classNames = ClassNames({
       fields: true,
     })
@@ -54,6 +56,13 @@ class Step1 extends React.Component {
           data={data}
           isEdit={isEdit}
         />
+        {
+          getFieldValue('protocol') !== getFieldValue('openProtocol') &&
+          <ParameterMapping
+            data={data}
+            {...otherProps}
+          />
+        }
       </div>,
     ]
   }

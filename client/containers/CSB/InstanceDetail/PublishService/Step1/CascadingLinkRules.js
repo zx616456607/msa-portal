@@ -101,7 +101,7 @@ class CascadingLinkRules extends React.Component {
           className="path-targets"
         >
           {getFieldDecorator('pathId', {
-            initialValue: isEmpty(data) ? 'default' : data.inboundId,
+            initialValue: isEdit && isEmpty(data.pathId) ? 'default' : data.pathId,
             rules: [{
               required: true,
               message: '请选择链路!',

@@ -105,9 +105,10 @@ export default class Protocols extends React.Component {
   }
   render() {
     const { detail } = this.props
-    const { type, transformationType } = detail
+    const { type, transformationType, transformationDetail } = detail
     const { openProtocolInfo } = this.renderCurrentServiceProtocolsInfo()
     const protocolType = transformationType === 'direct' ? type : transformationType.split('_')[0]
+    const { wsdl, bindingName, operationName } = JSON.parse(transformationDetail)
     return (
       <div className="service-protocols">
         <div className="first-title">接入协议信息</div>
@@ -125,11 +126,13 @@ export default class Protocols extends React.Component {
           </Row>
           <Row>
             <Col span={5}>
-              <div className="txt-of-ellipsis">端点</div>
+              <div className="txt-of-ellipsis">
+                {this.renderProtocolType(detail) === 'WebService' ? 'WSDL 地址' : '端点'}
+              </div>
             </Col>
             <Col span={10}>
               <div className="txt-of-ellipsis">
-                {detail.targetDetail}
+                {protocolType === 'rest' ? detail.targetDetail : wsdl}
               </div>
             </Col>
           </Row>
@@ -147,7 +150,7 @@ export default class Protocols extends React.Component {
             </Row>
           }
           {
-            type === 'soap' && protocolType === 'rest' &&
+            type === 'rest' && protocolType === 'soap' &&
               [
                 <Row key={'binding'}>
                   <Col span={5}>
@@ -155,7 +158,7 @@ export default class Protocols extends React.Component {
                   </Col>
                   <Col span={10}>
                     <div className="txt-of-ellipsis">
-                      {detail.targetDetail}
+                      {bindingName}
                     </div>
                   </Col>
                 </Row>,
@@ -165,7 +168,7 @@ export default class Protocols extends React.Component {
                   </Col>
                   <Col span={10}>
                     <div className="txt-of-ellipsis">
-                      {detail.targetDetail}
+                      {operationName}
                     </div>
                   </Col>
                 </Row>,

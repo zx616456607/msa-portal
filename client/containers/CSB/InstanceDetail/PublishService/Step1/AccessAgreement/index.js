@@ -123,6 +123,7 @@ class AccessAgreement extends React.Component {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form
+    const { transformationDetail, transformationType, type, targetDetail } = dataList
     const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
@@ -141,13 +142,30 @@ class AccessAgreement extends React.Component {
     const ssl = getFieldValue('ssl')
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
-    let protocolType = 'rest'
+    let openProtocolType = 'rest'
+    let protocolType
+    let bindingName
+    let operationName
+    let wsdl
     if (!isEmpty(dataList)) {
-      if (dataList.type === 'rest_ssl' || dataList.type === 'rest') {
-        protocolType = 'rest'
+      if (type === 'rest_ssl' || type === 'rest') {
+        openProtocolType = 'rest'
       } else {
-        protocolType = 'soap'
+        openProtocolType = 'soap'
       }
+      protocolType = transformationType === 'direct'
+        ?
+        type
+        :
+        transformationType.split('_')[0]
+      const {
+        bindingName: copyBindingName,
+        operationName: copyOperationName,
+        wsdl: copyWsdl,
+      } = JSON.parse(transformationDetail)
+      bindingName = copyBindingName
+      operationName = copyOperationName
+      wsdl = copyWsdl
     }
     getFieldDecorator('type', {
       initialValue: serviceOpenType,
@@ -156,6 +174,7 @@ class AccessAgreement extends React.Component {
       initialValue: openUrlBefore,
     })
     const isDisabled = isEdit === 'true'
+
     return (
       <div className={classNames}>
         <div className="second-title">选择协议及接入配置</div>
@@ -210,7 +229,7 @@ class AccessAgreement extends React.Component {
           className="service-protocols"
         >
           {getFieldDecorator('openProtocol', {
-            initialValue: protocolType,
+            initialValue: openProtocolType,
             // rules: [{
             //   required: true,
             //   message: '选择协议类型',
@@ -318,7 +337,7 @@ class AccessAgreement extends React.Component {
             className="publish-service-body-wsdl-address"
           >
             {getFieldDecorator('targetDetail', {
-              initialValue: dataList ? dataList.targetDetail : '',
+              initialValue: wsdl || targetDetail,
               rules: [{
                 required: true,
                 whitespace: true,
@@ -345,7 +364,7 @@ class AccessAgreement extends React.Component {
               key="bindingName"
             >
               {getFieldDecorator('bindingName', {
-                initialValue: dataList ? dataList.bindingName : '',
+                initialValue: bindingName || '',
                 rules: [{
                   required: true,
                   message: 'Please input bindingName',
@@ -360,7 +379,7 @@ class AccessAgreement extends React.Component {
               key="operationName"
             >
               {getFieldDecorator('operationName', {
-                initialValue: dataList ? dataList.operationName : '',
+                initialValue: operationName || '',
                 rules: [{
                   required: true,
                   message: 'Please input operationName',
