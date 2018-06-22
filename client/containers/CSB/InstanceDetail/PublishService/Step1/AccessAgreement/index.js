@@ -143,7 +143,7 @@ class AccessAgreement extends React.Component {
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
     let openProtocolType = 'rest'
-    let protocolType
+    let protocolType = 'rest'
     let bindingName
     let operationName
     let wsdl
