@@ -70,17 +70,17 @@ export default class Control extends React.Component {
     }
   }
 
-  renderLimit = limitDetail => {
+  renderLimit = (limitDetail, type) => {
     if (isEmpty(limitDetail)) {
       return 0
     }
     if (!Array.isArray(limitDetail)) {
-      return limitDetail.limit
+      return limitDetail[type]
     }
     let result = ''
     limitDetail.some(item => {
-      if (item.limit) {
-        result = item.limit
+      if (item[type]) {
+        result = item[type]
         return true
       }
       return false
@@ -95,10 +95,9 @@ export default class Control extends React.Component {
       'service-control': true,
       [className]: !!className,
     })
-    const { authenticationType, limitationDetail, xmlProtectionDetail } = data
+    const { authenticationType, limitationDetail } = data
 
     const limitDetail = limitationDetail && JSON.parse(limitationDetail)
-    const xml = xmlProtectionDetail && JSON.parse(xmlProtectionDetail)
     const oauthObj = Object.keys(data).length > 0 ? JSON.parse(data.authenticationDetail) : ''
     const protocol = getFieldValue('protocol')
     return [
@@ -125,7 +124,7 @@ export default class Control extends React.Component {
               )}
               秒最大调用
               {getFieldDecorator('apiGatewayLimit', {
-                initialValue: this.renderLimit(limitDetail),
+                initialValue: this.renderLimit(limitDetail, 'limit'),
               })(
                 <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
               )}
@@ -146,7 +145,7 @@ export default class Control extends React.Component {
         >
           最长
           {getFieldDecorator('maxElementNameLength', {
-            initialValue: xml !== undefined ? xml.maxElementNameLength : 1000,
+            initialValue: this.renderLimit(limitDetail, 'maxElementNameLength') || 1000,
           })(
             <InputNumber
               style={{ width: 150 }}
@@ -164,7 +163,7 @@ export default class Control extends React.Component {
         >
           最多
           {getFieldDecorator('maxAttibuteCount', {
-            initialValue: xml !== undefined ? xml.maxAttibuteCount : 1000,
+            initialValue: this.renderLimit(limitDetail, 'maxAttibuteCount') || 1000,
           })(
             <InputNumber
               style={{ width: 150 }}
@@ -182,7 +181,7 @@ export default class Control extends React.Component {
         >
           {getFieldDecorator('removeDTD', {
             valuePropName: 'checked',
-            initialValue: xml !== undefined ? xml.removeDTD : true,
+            initialValue: this.renderLimit(limitDetail, 'removeDTD') || true,
           })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
