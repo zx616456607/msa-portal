@@ -201,7 +201,9 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.method}
+                            {
+                              JSON.stringify(fields.method)
+                            }
                           </div>
                         </Col>
                       </Row>,

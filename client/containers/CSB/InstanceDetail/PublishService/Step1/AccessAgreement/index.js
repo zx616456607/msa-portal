@@ -22,6 +22,7 @@ import {
   URL_REG,
 } from '../../../../../../constants'
 import {
+  sleep,
   getCSBServiceOpenType,
 } from '../../../../../../common/utils'
 import {
@@ -37,7 +38,8 @@ const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
 
-const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+const ENDPOINT_METHOD = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE', '所有方法' ]
 // const ENDPOINT_REQUEST_TYPE = [ 'HTTP', 'JSON' ]
 // const ENDPOINT_RESPONSE_TYPE = [
 //   {
@@ -119,6 +121,25 @@ class AccessAgreement extends React.Component {
     const host = currentInstance && currentInstance.instance.host || 'csb-service-host'
     return `${protocol}://${host}:${port}`
   }
+
+  filterMethod = value => {
+    if (!value) return
+    const result = value.split(',').map(item => {
+      return item
+    })
+    return result
+  }
+
+  filterSelect = async value => {
+    const { setFieldsValue } = this.props.form
+    if (value.indexOf('所有方法') !== -1) {
+      await sleep()
+      setFieldsValue({
+        method: ENDPOINT_METHOD,
+      })
+    }
+  }
+
   render() {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
@@ -304,7 +325,7 @@ class AccessAgreement extends React.Component {
                 loading={this.state.pingLoading}
                 onClick={this.ping}
               >
-              测试连接
+                测试连接
               </Button>
             </FormItem>,
             <FormItem
@@ -313,13 +334,16 @@ class AccessAgreement extends React.Component {
               key="method"
             >
               {getFieldDecorator('method', {
-                initialValue: getValueFromLimitDetail(limitationDetail, 'method'),
+                initialValue: this.filterMethod(getValueFromLimitDetail(limitationDetail, 'method')) || ENDPOINT_METHOD,
                 rules: [{
                   required: true,
                   message: '请选择方法',
                 }],
+                onChange: e => {
+                  this.filterSelect(e)
+                },
               })(
-                <Select placeholder="请选择方法">
+                <Select placeholder="请选择方法" mode="multiple">
                   {
                     ENDPOINT_METHODS.map(method => <Option key={method}>{method}</Option>)
                   }
@@ -351,7 +375,7 @@ class AccessAgreement extends React.Component {
               className="right-btn"
               onClick={() => this.setState({ checkWSDLModalVisible: true })}
             >
-            本地 WSDL
+              本地 WSDL
             </Button>
           </FormItem>
         }
@@ -396,7 +420,7 @@ class AccessAgreement extends React.Component {
               <Button
                 onClick={() => this.setState({ securityHeaderModalVisible: true })}
               >
-              点击定制
+                点击定制
               </Button>
             </FormItem>,
           ]

@@ -21,7 +21,7 @@ export default class Step2 extends React.Component {
       className, data, ...otherProps
     } = this.props
     const classNames = ClassNames({
-      fields: true,
+      // fields: true,
       [className]: !!className,
     })
     return [
