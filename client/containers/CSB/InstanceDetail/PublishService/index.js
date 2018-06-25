@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
-  Form, Steps, Row, Col, Tag, Tooltip,
+  Form, Row, Col, Tag, Tooltip, Icon,
 } from 'antd'
 import ClassNames from 'classnames'
 import { parse } from 'query-string'
@@ -37,14 +37,11 @@ import {
 } from '../../../../selectors/CSB/instanceService/group'
 import './style/index.less'
 
-const Step = Steps.Step
-
 class PublishService extends React.Component {
   state = {
     isEdit: '',
     serviceId: '',
     dataList: {},
-    currentStep: 0,
     confirmLoading: false,
   }
 
@@ -81,8 +78,10 @@ class PublishService extends React.Component {
     getInstanceServiceInbounds(instanceID)
   }
 
-  changeStep = currentStep => {
-    this.setState({ currentStep })
+  toggleAdvanced = () => {
+    this.setState({
+      advancedOpen: !this.state.advancedOpen,
+    })
   }
 
   render() {
@@ -91,7 +90,7 @@ class PublishService extends React.Component {
       servicesInbounds, history, currentInstance,
     } = this.props
     const { content } = serviceGroups
-    const { currentStep, dataList, isEdit, serviceId } = this.state
+    const { dataList, isEdit, serviceId, advancedOpen } = this.state
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -114,30 +113,18 @@ class PublishService extends React.Component {
       }
       return true
     })
-    const stepOneClassNames = ClassNames({
-      hide: currentStep !== 0,
-    })
     const stepTwoClassNames = ClassNames({
-      hide: currentStep !== 1,
+      hide: !advancedOpen,
     })
     const stepThreeClassNames = ClassNames({
-      hide: currentStep !== 2,
+      hide: !advancedOpen,
     })
     return (
       <QueueAnim className="publish-service">
         <Row key="publish-service" type="flex">
           <Col span={17} className="publish-service-left">
-            <div className="publish-service-steps">
-              <Steps size="small" current={currentStep}>
-                <Step title="选择协议" />
-                <Step title="参数设定" />
-                <Step title="服务控制" />
-              </Steps>
-            </div>
             <Form className="publish-service-body">
               <Step1
-                className={stepOneClassNames}
-                currentStep={currentStep}
                 history={history}
                 form={form}
                 formItemLayout={formItemLayout}
@@ -145,27 +132,27 @@ class PublishService extends React.Component {
                 currentInstance={currentInstance}
                 servicesInbounds={servicesInbounds}
                 serviceGroups={content || []}
-                changeStep={this.changeStep}
                 data={dataList}
                 isEdit={isEdit}
               />
+              <div className="fields">
+                <div className="advanced-btn pointer" onClick={this.toggleAdvanced}>
+                  <Icon type={!advancedOpen ? 'plus-square-o' : 'minus-square-o'} /> 高级设置
+                </div>
+              </div>
               <Step2
                 className={stepTwoClassNames}
-                currentStep={currentStep}
                 form={form}
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
-                changeStep={this.changeStep}
                 data={dataList}
               />
               <Step3
                 className={stepThreeClassNames}
-                currentStep={currentStep}
                 history={history}
                 form={form}
                 formItemLayout={formItemLayout}
                 instanceID={instanceID}
-                changeStep={this.changeStep}
                 data={dataList}
                 isEdit={isEdit}
                 serviceId={serviceId}
@@ -214,7 +201,9 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.method}
+                            {
+                              JSON.stringify(fields.method)
+                            }
                           </div>
                         </Col>
                       </Row>,
@@ -228,7 +217,7 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.wsdlAddress}
+                            {fields.targetDetail}
                           </div>
                         </Col>
                       </Row>,
@@ -252,7 +241,7 @@ class PublishService extends React.Component {
                         </Col>
                         <Col span={16}>
                           <div className="field-value txt-of-ellipsis">
-                            {fields.methodName}
+                            {fields.operationName}
                           </div>
                         </Col>
                       </Row>,

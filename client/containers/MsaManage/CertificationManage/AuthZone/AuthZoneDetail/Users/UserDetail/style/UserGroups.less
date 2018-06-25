@@ -1,0 +1,35 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of user groups
+ *
+ * @author zhangxuan
+ * @date 2018-06-07
+ */
+@import "~assets/style/core/index.less";
+.user-groups, .user-approvals {
+  .layout-content-btns {
+    padding-bottom: @padding-medium;
+    & > *:not(:last-child) {
+      margin-right: 10px;
+    }
+    .search-style {
+      width: 180px;
+    }
+    .page-box {
+      float: right;
+      padding-top: 5px;
+      .total {
+        margin-right: 18px;
+        line-height: 24px;
+      }
+      .ant-pagination-simple {
+        float: right;
+        position: initial;
+      }
+    }
+  }
+}

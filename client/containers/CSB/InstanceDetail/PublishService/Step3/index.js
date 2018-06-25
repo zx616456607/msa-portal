@@ -20,6 +20,7 @@ import {
 } from 'antd'
 import {
   createService, editService, uploadMsgConverters,
+  getCascadedServicesPrerequisite,
 } from '../../../../../actions/CSB/instanceService'
 import {
   cascadingLinkRuleSlt,
@@ -44,18 +45,70 @@ class Step3 extends React.Component {
     confirmLoading: false,
   }
 
-  validateFieldsAndGoNext = () => {
-    const { changeStep } = this.props
-    changeStep(2)
-  }
-
   submitService = async () => {
     const {
       form, createService, editService, instanceID, history, uploadMsgConverters,
       cascadingLinkRules, cascadedServicesWebsocket, csbInstanceServiceGroups, isEdit,
-      serviceId,
+      serviceId, getCascadedServicesPrerequisite,
     } = this.props
-    const { validateFieldsAndScroll } = form
+    const { validateFieldsAndScroll, getFieldsValue, getFieldValue, setFields } = form
+    const path_id = getFieldValue('pathId')
+    if (!isEdit && path_id !== 'default') {
+      let { pathId, version, groupId, name, targetInstancesIDs } = getFieldsValue()
+      pathId = parseInt(pathId, 10)
+      const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
+      const instances = selectPath && selectPath.instances || []
+      const groupName = csbInstanceServiceGroups
+        && csbInstanceServiceGroups[groupId]
+        && csbInstanceServiceGroups[groupId].name
+      const query = {
+        pathId,
+        groupName,
+        serviceName: name,
+        serviceVersion: version,
+      }
+      const result = await getCascadedServicesPrerequisite(query)
+      if (result.error) {
+        return
+      }
+      const data = result.response.result.data
+      const errors = []
+      if (isEmpty(targetInstancesIDs)) {
+        errors.push(new Error('请选择目标实例!'))
+      } else {
+        Object.keys(data).forEach(key => {
+          Object.keys(data[key]).forEach(itemKey => {
+            const instance = find(instances, { id: itemKey }) || {}
+            if (targetInstancesIDs.indexOf(itemKey) > -1 && data[key][itemKey] === false) {
+              switch (key) {
+                case 'privilege':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上无发布权限`))
+                  break
+                case 'groups':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上无同名服务组 ${groupName}`))
+                  break
+                case 'services':
+                  errors.push(new Error(`用户在实例 ${instance.name} 上有同名及同版本服务`))
+                  break
+                default:
+                  break
+              }
+              const instanceIdIndex = targetInstancesIDs.indexOf(itemKey)
+              if (instanceIdIndex > -1) {
+                targetInstancesIDs.splice(instanceIdIndex, 1)
+              }
+            }
+          })
+        })
+      }
+      setFields({
+        targetInstancesIDs: {
+          value: targetInstancesIDs,
+          errors,
+        },
+      })
+      await sleep(100)
+    }
     validateFieldsAndScroll(async (errors, values) => {
       if (errors) {
         return
@@ -136,7 +189,7 @@ class Step3 extends React.Component {
         limitationType.push('http_method')
         limitationDetailArray.push({
           '@class': `${DEFINITION}.limitation.HttpMethod`,
-          method: values.method,
+          method: JSON.stringify(values.method).replace(/^\[|\"|\"|]/g, ''),
         })
       }
 
@@ -276,7 +329,7 @@ class Step3 extends React.Component {
 
   render() {
     const {
-      className, currentStep, changeStep, data, isEdit, ...otherProps
+      className, data, isEdit, history, ...otherProps
     } = this.props
     const { confirmLoading } = this.state
     const classNames = ClassNames({
@@ -287,13 +340,12 @@ class Step3 extends React.Component {
       <div className={classNames} key="fields">
         <Control data={data} {...otherProps} />
       </div>,
-      currentStep === 2 &&
       <div className="btns" key="btns">
         <Button
           key="previous"
-          onClick={() => changeStep(1)}
+          onClick={() => history.goBack(-1)}
         >
-        上一步
+        取消
         </Button>
         <Button
           type="primary"
@@ -324,4 +376,5 @@ export default connect(mapStateToProps, {
   editService,
   createService,
   uploadMsgConverters,
+  getCascadedServicesPrerequisite,
 })(Step3)

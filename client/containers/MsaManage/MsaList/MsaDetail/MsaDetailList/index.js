@@ -23,7 +23,7 @@ import {
   MSA_TYPES_TEXT,
 } from '../../../../../constants'
 import {
-  toQuerystring,
+  toQuerystring, formatDate,
 } from '../../../../../common/utils'
 import './style/index.less'
 
@@ -92,8 +92,13 @@ class MsaDetailList extends React.Component {
     }, {
       title: '注册类型',
       dataIndex: 'type',
-      width: '15%',
+      width: '10%',
       render: () => MSA_TYPES_TEXT[msaDetail.type],
+    }, {
+      title: '注册时间',
+      dataIndex: 'lastHeartbeatAt',
+      width: '15%',
+      render: time => formatDate(time),
     }, {
       title: '操作',
       width: '15%',

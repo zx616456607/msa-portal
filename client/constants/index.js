@@ -53,6 +53,7 @@ if (isProd) {
 export const API_CONFIG = apiConfig
 
 export const JWT = 'jwt'
+export const UAA_JWT = 'uaa_jwt'
 export const AUTH_URL = 'auth_url'
 export const DEFAULT = 'default'
 export const ROLE_SYS_ADMIN = 2
@@ -61,7 +62,11 @@ export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const CONTENT_TYPE_JSON = 'application/json'
 export const CONTENT_TYPE_TEXT = 'text/plain'
 export const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded'
+export const ZONE_ID_HEADER = 'X-Identity-Zone-Id'
+export const ZONE_SUBDOMAIN_HEADER = 'X-Identity-Zone-Subdomain'
+export const IF_MATCH_HEADER = 'If-Match'
 export const PINPOINT_LIMIT = 5000
+export const UAA_TOKEN_EXPIRE = 43199
 export const X_GROUP_UNIT = 284211
 export const Y_GROUP_UNIT = 57
 export const ALL = 'all'
@@ -81,6 +86,8 @@ export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const REDIRECT_URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_,\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
+export const EMAIL_REG = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
+export const PHONE_REG = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
 
 export const API_GATEWAY_LIMIT_TYPES = [
   {
@@ -133,4 +140,9 @@ export const INSTANCE_SERVICES = [
   'dsb-server-mysql',
   'dsb-server-redis',
 ]
-export const CLIENT_JWT = 'eyJhbGciOiJIUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiIyYTNmYjVhYjIwYzc0ZjU4OThhNDdmMTEyMGJkNGNhMS1yIiwic3ViIjoiZWRkYjk3NzgtMmE0ZS00NTBhLTgwM2ItMDg3NDUwZWNjMjZkIiwic2NvcGUiOlsidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInVhYS51c2VyIl0sImlhdCI6MTUyNjkwMDk2MiwiZXhwIjoxNTI5NDkyOTYyLCJjaWQiOiJhZG1pbiIsImNsaWVudF9pZCI6ImFkbWluIiwiaXNzIjoiaHR0cDovLzE5Mi4xNjguMS4yNTQ6ODA4MC91YWEvb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJ1c2VyX25hbWUiOiJ3ZWl3ZWkiLCJvcmlnaW4iOiJ1YWEiLCJ1c2VyX2lkIjoiZWRkYjk3NzgtMmE0ZS00NTBhLTgwM2ItMDg3NDUwZWNjMjZkIiwicmV2X3NpZyI6IjJjOGUyZWI3IiwiYXVkIjpbImNsaWVudHMiLCJ1YWEiLCJhZG1pbiJdfQ.HZ3XXTihHI43nMG3LwhanklapV5hjWqrkRPtwSuX2nY'
+export const DEFAULT_UAA = {
+  client_id: 'admin',
+  client_secret: 'adminsecret',
+  username: 'weiwei',
+  password: 'weiwei',
+}

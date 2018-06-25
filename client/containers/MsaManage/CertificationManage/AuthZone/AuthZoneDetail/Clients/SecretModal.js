@@ -13,7 +13,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Modal, Form, Input, notification } from 'antd'
-import { changeClientSecret } from '../../.././../actions/certification'
+import { changeClientSecret } from '../../../../../../actions/certification'
 
 const FormItem = Form.Item
 

@@ -27,6 +27,7 @@ import {
   editPublishedService,
   getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
+import './style/ServiceTable.less'
 import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
 import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
 import serviceOut from '../../../../assets/img/csb/serviceOut.svg'
@@ -147,18 +148,26 @@ class ServicesTable extends React.Component {
   }
 
   renderHandleServiceDropdown = record => {
-    const cantUesed = record.status === 4
+    const { cascadedType, status } = record
+    const cantUesed = status === 4
     const menu = <Menu style={{ width: 100 }}
       onClick={this.serviceMenuClick.bind(this, record)}
     >
       <Menu.Item key="edit" disabled={cantUesed}>编辑</Menu.Item>
       {
-        record.status === 2
+        status === 2
           ? <Menu.Item key="start" disabled={cantUesed}>启动</Menu.Item>
           : <Menu.Item key="stop" disabled={cantUesed}>停止</Menu.Item>
       }
       <Menu.Item key="list" disabled={cantUesed}>黑／白名单</Menu.Item>
-      <Menu.Item key="logout" disabled={cantUesed || ![ 5, 6 ].includes(record.cascadedType)}>注销</Menu.Item>
+      <Menu.Item
+        key="logout"
+        disabled={
+          (!cascadedType && cantUesed) || (cascadedType && ![ 5, 6 ].includes(cascadedType))
+        }
+      >
+        注销
+      </Menu.Item>
     </Menu>
     return (
       <Dropdown.Button
@@ -256,6 +265,10 @@ class ServicesTable extends React.Component {
       cascadedServicesWebsocket, getCascadedDetail,
     } = this.props
     const { instanceID } = match.params
+    if (type === 'list') {
+      this.openBlackAndWhiteListModal(record)
+      return
+    }
     const { body, title, content, modalTitle } = this.serviceModals(record, type)
     const self = this
     confirm({
@@ -265,7 +278,7 @@ class ServicesTable extends React.Component {
       async onOk() {
         if (type === 'logout') {
           if (!record.cascadedType) {
-            delInstanceService(instanceID, record.id).then(res => {
+            return delInstanceService(instanceID, record.id).then(res => {
               if (res.error) {
                 notification.error({
                   message: self.serviceMessages(type, true),
@@ -345,10 +358,10 @@ class ServicesTable extends React.Component {
     if (cascadedType) {
       if (cascadedType.length === 1) {
         if (parseInt(cascadedType[ 0 ]) === 1) {
-          cascadedType = [ 1, 2, 5, 6 ]
+          cascadedType = [ 1, 2, 5, 6, 8 ]
         }
       } else {
-        cascadedType = [ 0, 1, 2, 5, 6 ]
+        cascadedType = [ 0, 1, 2, 5, 6, 8 ]
       }
     }
     loadData(null, {
@@ -388,6 +401,8 @@ class ServicesTable extends React.Component {
         return [ svgArray[ 0 ], svgArray[ 1 ] ]
       case 6:
         return [ ...svgArray ]
+      case 8:
+        return [ svgArray[ 1 ], svgArray[ 2 ] ]
       case 0:
       default:
         return null
@@ -511,6 +526,7 @@ class ServicesTable extends React.Component {
     return [
       <div key="table">
         <Table
+          className="services-table"
           columns={columns}
           dataSource={dataSource}
           pagination={pagination}

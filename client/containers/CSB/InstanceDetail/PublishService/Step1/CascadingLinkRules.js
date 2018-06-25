@@ -17,6 +17,7 @@ import {
 } from 'antd'
 import ClassNames from 'classnames'
 import find from 'lodash/find'
+import isEmpty from 'lodash/isEmpty'
 import {
   getCascadingLinkRulesList,
 } from '../../../../../actions/CSB/cascadingLinkRules'
@@ -85,7 +86,7 @@ class CascadingLinkRules extends React.Component {
   }
 
   render() {
-    const { formItemLayout, form, className, cascadingLinkRules } = this.props
+    const { formItemLayout, form, className, cascadingLinkRules, isEdit, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const serviceName = getFieldValue('name') || '-'
     const instancesOptions = this.getInstancesOptions()
@@ -100,7 +101,7 @@ class CascadingLinkRules extends React.Component {
           className="path-targets"
         >
           {getFieldDecorator('pathId', {
-            initialValue: 'default',
+            initialValue: !isEmpty(data) && !isEmpty(data.path) ? data.pathId : 'default',
             rules: [{
               required: true,
               message: '请选择链路!',
@@ -111,6 +112,7 @@ class CascadingLinkRules extends React.Component {
               placeholder="选择级联链路"
               showSearch
               optionFilterProp="children"
+              disabled={isEdit}
             >
               <Option value="default">
               实例 {serviceName}（本实例，非级联发布）
@@ -143,7 +145,7 @@ class CascadingLinkRules extends React.Component {
                 message: '请选择目标实例!',
               }],
             })(
-              <CheckboxGroup options={instancesOptions} />
+              <CheckboxGroup disabled={isEdit} options={instancesOptions} />
             )}
           </FormItem>
         }

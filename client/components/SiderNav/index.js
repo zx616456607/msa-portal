@@ -78,10 +78,9 @@ const menus = [
         defaultOpen: true,
         children: [
           {
-            key: 'k461',
-            to: '/msa-manage/certification-manage/clients',
-            name: '客户端管理',
-            // disabled: true,
+            key: 'auth-zone',
+            to: '/msa-manage/certification-manage/auth-zone',
+            name: '认证域管理',
           }, {
             key: 'k462',
             to: '/msa-manage/certification-manage/auth-mode',
@@ -298,11 +297,16 @@ class SiderNav extends React.Component {
         children.map(item => finderPath(item, list))
         return
       }
-      (to === pathname) && list.push(key)
+      // (to === pathname) && list.push(key)
+      if (pathname.indexOf(to) > -1) {
+        (list.length === 0) && list.push(obj)
+        ;(list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
+      }
       return list
     }
     let s = []
     menus.map(menu => finderPath(menu, s))
+    ;(s.length > 0) && (s = [ s[0].key ])
     if (collapsed) {
       defaultOpenKeys = []
       s = []

@@ -14,6 +14,18 @@
 
 .error-code {
   border-top-style: none !important;
+  margin-top: 20px;
+  & > :nth-child(2) {
+    padding-bottom: @padding-medium;
+    border-bottom: 1px dashed @border-color-split;
+  }
+  & > :nth-child(4) {
+    padding-bottom: @padding-medium;
+    border-bottom: 1px dashed @border-color-split;
+  }
+  .second-title {
+    margin-left: 24px;
+  }
   &-body {
     padding: 0 @padding-medium;
   }

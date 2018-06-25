@@ -11,7 +11,7 @@
  */
 
 import { schema } from 'normalizr'
-import { JWT } from '../constants'
+import { JWT, UAA_JWT } from '../constants'
 
 // We use this Normalizr schemas to transform API responses from a nested form
 // to a flat form where repos and users are placed in `entities`, and nested
@@ -125,6 +125,21 @@ const msaEventListSchema = new schema.Entity('msaEventList', {}, {
 // MSA Client identity zone list
 const msaClientIdentityZoneListSchema = new schema.Entity('msaClientIdentityZoneList', {}, {
   idAttribute: 'id',
+})
+
+// UAA Auth
+const uaaAuthSchema = new schema.Entity('uaaAuth', {}, {
+  idAttribute: () => UAA_JWT,
+})
+
+// UAA Users
+const uaaZoneUsersSchema = new schema.Entity('uaaZoneUsers', {}, {
+  idAttribute: 'id',
+})
+
+// UAA  Group Users
+const uaaZoneGroupUsersSchema = new schema.Entity('uaaZoneGroupUsers', {}, {
+  idAttribute: 'value',
 })
 
 // Schemas for tce API responses.
@@ -265,4 +280,9 @@ export const Schemas = {
     },
   },
   MSA_CLIENT_IDENTITY_ZONE_LIST_DATA: [ msaClientIdentityZoneListSchema ],
+  UAA_AUTH: uaaAuthSchema,
+  UAA_ZONE_USER_LIST_DATA: {
+    resources: [ uaaZoneUsersSchema ],
+  },
+  UAA_ZONE_GROUP_USERS_LIST_DATA: [ uaaZoneGroupUsersSchema ],
 }

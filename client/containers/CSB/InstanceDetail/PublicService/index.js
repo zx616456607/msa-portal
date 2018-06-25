@@ -30,6 +30,7 @@ import { getPublicServiceList } from '../../../../actions/CSB/instanceService/pu
 import { publicServiceSlt } from '../../../../selectors/CSB/instanceService/publicService'
 import { getServiceApiDoc } from '../../../../actions/CSB/instanceService/mySubscribedServices'
 import { renderCSBInstanceServiceStatus } from '../../../../components/utils/index'
+import isEmpty from 'lodash/isEmpty'
 
 const Search = Input.Search
 
@@ -59,12 +60,23 @@ class PublicServices extends React.Component {
     if (query.page && query.page === 1) {
       delete query.page
     }
+    if (!query.authenticationType) {
+      delete query.authenticationType
+    }
     handleHistoryForLoadData(history, query, location, isFirst)
     getPublicServiceList(instanceID, query)
   }
 
   tableChange = (pagination, filters, sorter) => {
-    this.loadData({ sort: parseOrderToQuery(sorter) })
+    const query = {
+      sort: parseOrderToQuery(sorter),
+    }
+    let authenticationType = ''
+    if (!isEmpty(filters.authenticationType) && filters.authenticationType.length === 1) {
+      authenticationType = filters.authenticationType[0]
+    }
+    Object.assign(query, { authenticationType })
+    this.loadData(query)
   }
 
   openServiceApiDoc = record => {
@@ -90,14 +102,26 @@ class PublicServices extends React.Component {
     // let sortObj = { publishTime: false }
     // sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
-      { title: '公开服务名称', dataIndex: 'name', width: '12%' },
+      { title: '服务名称', dataIndex: 'name', width: '12%' },
       {
         title: '服务状态', dataIndex: 'status', width: '11%',
         render: status => renderCSBInstanceServiceStatus(status),
       },
       { title: '服务版本', dataIndex: 'version', width: '11%' },
       { title: '所属服务组', dataIndex: 'groupName', width: '11%' },
-      { title: '订阅状态', dataIndex: 'dingyue', width: '12%', render: () => '无需订阅' },
+      {
+        title: '访问控制',
+        dataIndex: 'authenticationType',
+        width: '12%',
+        filters: [{
+          text: '无需订阅-公开服务',
+          value: 'bypass',
+        }, {
+          text: '无需订阅-OAuth授权',
+          value: 'oauth2',
+        }],
+        render: type => (type === 'bypass' ? '无需订阅-公开服务' : '无需订阅-OAuth授权'),
+      },
       { title: '服务描述', dataIndex: 'description', width: '12%' },
       {
         title: '服务发布时间', dataIndex: 'publishTime', width: '15%', sorter: true,
@@ -123,7 +147,7 @@ class PublicServices extends React.Component {
       <div className="layout-content-btns handler-row">
         <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
         <Search
-          placeholder="按公开服务名称搜索"
+          placeholder="按服务名称搜索"
           value={name}
           className="serch-style"
           onChange={e => this.setState({ name: e.target.value })}

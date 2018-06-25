@@ -29,7 +29,7 @@
     & > .fields {
       padding-bottom: @padding-medium;
       border-bottom: 1px @border-style-base @border-color-split;
-      height: calc(~"100% - 60px");
+      //height: calc(~"100% - 60px");
       & > * {
         padding-top: @padding-medium;
         .second-title {
@@ -38,6 +38,16 @@
       }
       & > *:not(:last-child) {
         border-bottom: 1px dashed @border-color-split;
+      }
+      .advanced-btn {
+        color: @primary-color;
+        border-bottom: none;
+        display: inline-block;
+        font-size: @font-size-medium;
+        margin-left: @padding-medium;
+        &:hover {
+          color: @primary-color;
+        }
       }
     }
     & > .btns {

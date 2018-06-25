@@ -1,0 +1,33 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of auth zone detail
+ *
+ * @author zhangxuan
+ * @date 2018-05-30
+ */
+
+@import "../../../../../../assets/style/core/index";
+.auth-zone-detail {
+  &-header {
+    margin-bottom: @padding-medium !important;
+  }
+  .header-detail-box {
+    display: flex;
+    align-items: center;
+    .auth-zone-icon {
+      flex: 0 0 60px;
+      margin-right: @padding-medium;
+    }
+    .auth-zone-info {
+      flex: 1 1 auto;
+      .auth-zone-name {
+        font-size: @font-size-medium;
+        margin-bottom: @padding-base;
+      }
+    }
+  }
+}

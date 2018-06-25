@@ -14,7 +14,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Layout, Icon, Breadcrumb, notification } from 'antd'
+import { Layout, Icon, Breadcrumb, notification, Tooltip } from 'antd'
 import SockJS from 'sockjs-client'
 import { Stomp } from 'stompjs/lib/stomp'
 import Sider from '../../../components/Sider'
@@ -173,7 +173,7 @@ class CSBInstanceDetail extends React.Component {
           },
           {
             to: `/csb-instances-available/${instanceID}/public-services`,
-            text: '公开服务',
+            text: '无需订阅服务',
           },
           {
             to: `/csb-instances-available/${instanceID}/consumer-vouchers`,
@@ -188,9 +188,13 @@ class CSBInstanceDetail extends React.Component {
           <Breadcrumb.Item>
             <Link to="/csb-instances">CSB 实例列表</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
-            {instanceName || '...'}
-          </Breadcrumb.Item>
+          {
+            <Tooltip title={instanceName}>
+              <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
+                {instanceName || '...'}
+              </Breadcrumb.Item>
+            </Tooltip>
+          }
         </Breadcrumb>
         <Layout>
           <Sider

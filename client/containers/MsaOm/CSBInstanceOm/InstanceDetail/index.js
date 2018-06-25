@@ -11,13 +11,19 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import propTypes from 'prop-types'
 import serviceIcon from '../../../../assets/img/csb/service.png'
 import './style/InstanceDetail.less'
 import { Button, Row, Col, Tabs } from 'antd'
 import Monitor from './Monitor'
 import Log from './Log'
-import { renderCSBInstanceStatus } from '../../../../components/utils'
+import { renderCSBInstanceStatus, HANDlE_INSTANCE_MESSAGE } from '../../../../components/utils'
+import {
+  stopInstance,
+  startInstance,
+  restartInstance,
+} from '../../../../actions/CSB/instance'
 
 const TabPane = Tabs.TabPane
 
@@ -27,8 +33,8 @@ class InstanceDetail extends React.Component {
   }
 
   render() {
-    const { detail } = this.props
-    const { name, clusterId, status } = detail
+    const { detail, callback, stopInstance, startInstance, restartInstance } = this.props
+    const { name, clusterId, status } = detail || {}
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -53,8 +59,27 @@ class InstanceDetail extends React.Component {
                 </div>
               </Col>
               <Col span={12} className="service-detail-header-btns">
-                <Button type="primary" style={{ marginRight: 12 }}>停止 CSB 实例</Button>
-                <Button>重新部署</Button>
+                {
+                  status === 1 || status === 2 ?
+                    <Button
+                      type="primary"
+                      style={{ marginRight: 12 }}
+                      onClick={() => callback(HANDlE_INSTANCE_MESSAGE.stop, stopInstance)}
+                    >
+                      停止 CSB 实例
+                    </Button> :
+                    <Button
+                      type="primary"
+                      style={{ marginRight: 12 }}
+                      onClick={() => callback(HANDlE_INSTANCE_MESSAGE.start, startInstance)}
+                    >
+                      启动 CSB 实例
+                    </Button>
+                }
+
+                <Button onClick={() => callback(HANDlE_INSTANCE_MESSAGE.restart, restartInstance)}>
+                  重新部署
+                </Button>
               </Col>
             </Row>
             <Row>
@@ -77,7 +102,7 @@ class InstanceDetail extends React.Component {
               <Monitor />
             </TabPane>
             <TabPane tab="日志" key="log">
-              <Log clusterID={clusterId} instance={detail}/>
+              <Log clusterID={clusterId} instance={detail} />
             </TabPane>
           </Tabs>
         </div>
@@ -86,4 +111,8 @@ class InstanceDetail extends React.Component {
   }
 }
 
-export default InstanceDetail
+export default connect(null, {
+  stopInstance,
+  startInstance,
+  restartInstance,
+})(InstanceDetail)

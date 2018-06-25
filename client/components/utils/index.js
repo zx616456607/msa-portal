@@ -148,11 +148,11 @@ export function formatWSMessage(message) {
   switch (type) {
     // error
     case 'service_already_exist':
-      msg = '同名同版本号的服务已经存在'
+      msg = '该csb实例中已有相同名称相同版本号的服务发布'
       notifyType = 'warning'
       break
     case 'service_already_exist_in_instance':
-      msg = '同名同版本号的服务已经存在'
+      msg = '该csb实例中已有相同名称相同版本号的服务发布'
       notifyType = 'warning'
       break
     case 'service_group_not_exist_in_instance':
@@ -256,4 +256,23 @@ export function getValueFromLimitDetail(detail, type) {
     return false
   })
   return result
+}
+
+export const HANDlE_INSTANCE_MESSAGE = {
+  stop: {
+    hander: 'stop',
+    modalTitle: '停止',
+    title: '停止后，不能使用实例发布或订阅服务，重新启动后不影响实例中\n' +
+    '已发布或已订阅的服务。',
+  },
+  start: {
+    hander: 'start',
+    modalTitle: '启动',
+    title: '',
+  },
+  restart: {
+    hander: 'restart',
+    modalTitle: '重新部署',
+    title: '',
+  },
 }

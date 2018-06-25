@@ -39,7 +39,7 @@ import {
 } from '../../../selectors/CSB/instance'
 import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG, INSTANCE_SERVICES } from '../../../constants'
 import { formatDate, toQuerystring } from '../../../common/utils'
-import { renderCSBInstanceStatus } from '../../../components/utils'
+import { renderCSBInstanceStatus, HANDlE_INSTANCE_MESSAGE } from '../../../components/utils'
 import InstanceDetailDock from './InstanceDetail/Dock'
 
 // const RadioGroup = Radio.Group
@@ -49,24 +49,6 @@ const Option = Select.Option
 const omInstancesSlt = instancesSltMaker(CSB_OM_INSTANCES_FLAG)
 const { mergeQuery } = getQueryAndFuncs(CSB_OM_INSTANCES_FLAG)
 
-const HANDER_MESSAGE = {
-  stop: {
-    hander: 'stop',
-    modalTitle: '停止',
-    title: '停止后，不能使用实例发布或订阅服务，重新启动后不影响实例中\n' +
-    '已发布或已订阅的服务。',
-  },
-  start: {
-    hander: 'start',
-    modalTitle: '启动',
-    title: '',
-  },
-  restart: {
-    hander: 'restart',
-    modalTitle: '重新部署',
-    title: '',
-  },
-}
 
 class CSBInstanceOm extends React.Component {
   constructor(props) {
@@ -179,11 +161,19 @@ class CSBInstanceOm extends React.Component {
           if (res.error) {
             return
           }
+          this.setState({
+            currentInstance: null,
+          })
           notification.success({
             message: `实例 ${name} ${modalTitle}成功`,
           })
           self.getInstanceList()
         })
+      },
+      onCancel: () => {
+        // this.setState({
+        //   currentInstance: null,
+        // })
       },
     })
   }
@@ -225,13 +215,13 @@ class CSBInstanceOm extends React.Component {
     }, () => {
       switch (e.key) {
         case 'start':
-          this.handerConfirm(HANDER_MESSAGE.start, startInstance)
+          this.handerConfirm(HANDlE_INSTANCE_MESSAGE.start, startInstance)
           break
         case 'stop':
-          this.handerConfirm(HANDER_MESSAGE.stop, stopInstance)
+          this.handerConfirm(HANDlE_INSTANCE_MESSAGE.stop, stopInstance)
           break
         case 'restart':
-          this.handerConfirm(HANDER_MESSAGE.restart, restartInstance)
+          this.handerConfirm(HANDlE_INSTANCE_MESSAGE.restart, restartInstance)
           break
         case 'edit':
           this.setState({
@@ -350,7 +340,7 @@ class CSBInstanceOm extends React.Component {
               <Menu.Item key="instanceDetail">实例详情</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
               <Menu.Item key="start" disabled={parseInt(status) !== 0}>启动</Menu.Item>
-              <Menu.Item key="stop" disabled={parseInt(status) !== 1}>停止</Menu.Item>
+              <Menu.Item key="stop" disabled={parseInt(status) !== 1 && parseInt(status) !== 2}>停止</Menu.Item>
               <Menu.Item key="restart" disabled={parseInt(status) === 0}>重新部署</Menu.Item>
             </Menu>
           )
@@ -419,6 +409,7 @@ class CSBInstanceOm extends React.Component {
         </div>
         {instanceDetailVisible && <InstanceDetailDock
           detail={currentInstance}
+          callback={this.handerConfirm}
           visible={instanceDetailVisible}
           onVisibleChange={visible => this.setState({ instanceDetailVisible: visible })}
         />}

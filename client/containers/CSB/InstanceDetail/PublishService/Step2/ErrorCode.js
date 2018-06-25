@@ -12,11 +12,12 @@
 
 import React from 'react'
 import ClassNames from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 import { Row, Col, Input, Button, Icon, Form } from 'antd'
 import './style/ErrorCode.less'
+import { sleep } from '../../../../../common/utils'
 
 const FormItem = Form.Item
-const TextArea = Input.TextArea
 
 export default class ErrorCode extends React.Component {
   state = {
@@ -24,6 +25,37 @@ export default class ErrorCode extends React.Component {
   }
 
   uuid = 0
+
+  async componentDidMount() {
+    const { data, form } = this.props
+    if (isEmpty(data)) {
+      return
+    }
+    const { errorCode } = data
+    const parseError = JSON.parse(errorCode)
+    if (isEmpty(parseError)) {
+      return
+    }
+    const keys = []
+    const errObj = {}
+    parseError.forEach((err, index) => {
+      this.uuid = index
+      keys.push(index)
+      const { code, advice, description } = err
+      Object.assign(errObj, {
+        [`code-${index}`]: code,
+        [`advice-${index}`]: advice,
+        [`description-${index}`]: description,
+      })
+    })
+    form.setFieldsValue({
+      errCodeKeys: keys,
+    })
+    await sleep()
+    form.setFieldsValue({
+      ...errObj,
+    })
+  }
 
   add = () => {
     this.uuid++
@@ -193,7 +225,7 @@ export default class ErrorCode extends React.Component {
   }
 
   render() {
-    const { className, form, formItemLayout, data } = this.props
+    const { className, form } = this.props
     const { getFieldDecorator, getFieldValue } = form
     getFieldDecorator('errCodeKeys', { initialValue: [] })
     const keys = getFieldValue('errCodeKeys')
@@ -201,55 +233,8 @@ export default class ErrorCode extends React.Component {
       'error-code': true,
       [className]: !!className,
     })
-    const Arykes = Object.keys(data).length > 0 ? JSON.parse(data.errorCode) : ''
     return (
       <div className={classNames}>
-        {
-          getFieldValue('protocol') !== getFieldValue('openProtocol') &&
-          [
-            <div key="title" className="second-title">参数映射</div>,
-            <div key="dody" className="parameter-mapping-body">
-              <FormItem
-                {...formItemLayout}
-                label="请求转换模版"
-              >
-                {getFieldDecorator('requestXslt', {
-                  rules: [{
-                    required: true,
-                    message: '请提供请求转换模版!',
-                  }],
-                })(
-                  <TextArea rows={5} placeholder="请提供请求转换模版" />
-                )}
-              </FormItem>
-              <FormItem
-                {...formItemLayout}
-                label="响应转换模版"
-              >
-                {getFieldDecorator('responseXslt', {
-                  rules: [{
-                    required: true,
-                    message: '请提供响应转换模版!',
-                  }],
-                })(
-                  <TextArea rows={5} placeholder="请提供响应转换模版" />
-                )}
-              </FormItem>
-            </div>,
-            <Row>
-              <Col span={14} offset={6}>
-                如需从 URL 中解析相关参数用于 WebService 调用，请根据需求填写 URL 正则，并在转换模板中匹配使用
-              </Col>
-            </Row>,
-            <FormItem
-              wrapperCol={{ offset: 6, span: 14 }}
-            >
-              {getFieldDecorator('exposedRegexPath')(
-                <Input placeholder="如：/bank/.*" />
-              )}
-            </FormItem>,
-          ]
-        }
         <div className="second-title">编辑错误代码</div>
         <div className="error-code-body">
           <div className="error-code-box">
@@ -260,8 +245,7 @@ export default class ErrorCode extends React.Component {
               <Col span={6}>操作</Col>
             </Row>
             {
-              Arykes ? Arykes.map(this.renderItem) :
-                keys.map(this.renderItem)
+              keys.map(this.renderItem)
             }
             {
               keys.length === 0 &&

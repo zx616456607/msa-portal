@@ -22,6 +22,7 @@ import {
   URL_REG,
 } from '../../../../../../constants'
 import {
+  sleep,
   getCSBServiceOpenType,
 } from '../../../../../../common/utils'
 import {
@@ -37,7 +38,8 @@ const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
 
-const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+const ENDPOINT_METHOD = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE', '所有方法' ]
 // const ENDPOINT_REQUEST_TYPE = [ 'HTTP', 'JSON' ]
 // const ENDPOINT_RESPONSE_TYPE = [
 //   {
@@ -119,10 +121,30 @@ class AccessAgreement extends React.Component {
     const host = currentInstance && currentInstance.instance.host || 'csb-service-host'
     return `${protocol}://${host}:${port}`
   }
+
+  filterMethod = value => {
+    if (!value) return
+    const result = value.split(',').map(item => {
+      return item
+    })
+    return result
+  }
+
+  filterSelect = async value => {
+    const { setFieldsValue } = this.props.form
+    if (value.indexOf('所有方法') !== -1) {
+      await sleep()
+      setFieldsValue({
+        method: ENDPOINT_METHOD,
+      })
+    }
+  }
+
   render() {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
     const { pingSuccess } = this.state
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form
+    const { transformationDetail, transformationType, type, targetDetail } = dataList
     const protocol = getFieldValue('protocol')
     const classNames = ClassNames({
       'access-agreement': true,
@@ -141,13 +163,30 @@ class AccessAgreement extends React.Component {
     const ssl = getFieldValue('ssl')
     const serviceOpenType = getCSBServiceOpenType(openProtocol, ssl)
     const openUrlBefore = this.getOpenUrlBefore(ssl, serviceOpenType)
+    let openProtocolType = 'rest'
     let protocolType = 'rest'
+    let bindingName
+    let operationName
+    let wsdl
     if (!isEmpty(dataList)) {
-      if (dataList.type === 'rest_ssl' || dataList.type === 'rest') {
-        protocolType = 'rest'
+      if (type === 'rest_ssl' || type === 'rest') {
+        openProtocolType = 'rest'
       } else {
-        protocolType = 'soap'
+        openProtocolType = 'soap'
       }
+      protocolType = transformationType === 'direct'
+        ?
+        type
+        :
+        transformationType.split('_')[0]
+      const {
+        bindingName: copyBindingName,
+        operationName: copyOperationName,
+        wsdl: copyWsdl,
+      } = JSON.parse(transformationDetail)
+      bindingName = copyBindingName
+      operationName = copyOperationName
+      wsdl = copyWsdl
     }
     getFieldDecorator('type', {
       initialValue: serviceOpenType,
@@ -156,6 +195,7 @@ class AccessAgreement extends React.Component {
       initialValue: openUrlBefore,
     })
     const isDisabled = isEdit === 'true'
+
     return (
       <div className={classNames}>
         <div className="second-title">选择协议及接入配置</div>
@@ -210,7 +250,7 @@ class AccessAgreement extends React.Component {
           className="service-protocols"
         >
           {getFieldDecorator('openProtocol', {
-            initialValue: protocolType,
+            initialValue: openProtocolType,
             // rules: [{
             //   required: true,
             //   message: '选择协议类型',
@@ -285,7 +325,7 @@ class AccessAgreement extends React.Component {
                 loading={this.state.pingLoading}
                 onClick={this.ping}
               >
-              测试连接
+                测试连接
               </Button>
             </FormItem>,
             <FormItem
@@ -294,13 +334,16 @@ class AccessAgreement extends React.Component {
               key="method"
             >
               {getFieldDecorator('method', {
-                initialValue: getValueFromLimitDetail(limitationDetail, 'method'),
+                initialValue: this.filterMethod(getValueFromLimitDetail(limitationDetail, 'method')) || ENDPOINT_METHOD,
                 rules: [{
                   required: true,
                   message: '请选择方法',
                 }],
+                onChange: e => {
+                  this.filterSelect(e)
+                },
               })(
-                <Select placeholder="请选择方法">
+                <Select placeholder="请选择方法" mode="multiple">
                   {
                     ENDPOINT_METHODS.map(method => <Option key={method}>{method}</Option>)
                   }
@@ -318,7 +361,7 @@ class AccessAgreement extends React.Component {
             className="publish-service-body-wsdl-address"
           >
             {getFieldDecorator('targetDetail', {
-              initialValue: dataList ? dataList.targetDetail : '',
+              initialValue: wsdl || targetDetail,
               rules: [{
                 required: true,
                 whitespace: true,
@@ -332,7 +375,7 @@ class AccessAgreement extends React.Component {
               className="right-btn"
               onClick={() => this.setState({ checkWSDLModalVisible: true })}
             >
-            本地 WSDL
+              本地 WSDL
             </Button>
           </FormItem>
         }
@@ -345,7 +388,7 @@ class AccessAgreement extends React.Component {
               key="bindingName"
             >
               {getFieldDecorator('bindingName', {
-                initialValue: dataList ? dataList.bindingName : '',
+                initialValue: bindingName || '',
                 rules: [{
                   required: true,
                   message: 'Please input bindingName',
@@ -360,7 +403,7 @@ class AccessAgreement extends React.Component {
               key="operationName"
             >
               {getFieldDecorator('operationName', {
-                initialValue: dataList ? dataList.operationName : '',
+                initialValue: operationName || '',
                 rules: [{
                   required: true,
                   message: 'Please input operationName',
@@ -377,7 +420,7 @@ class AccessAgreement extends React.Component {
               <Button
                 onClick={() => this.setState({ securityHeaderModalVisible: true })}
               >
-              点击定制
+                点击定制
               </Button>
             </FormItem>,
           ]
