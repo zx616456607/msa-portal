@@ -132,7 +132,7 @@ class NamespaceSwitch extends React.Component {
           return
         }
         const clustersObj = res.response.entities.clusters
-        const clusters = res.response.result.clusters
+        const clusters = res.response.result.data.clusters
         handleProjectClusters(clusters, clustersObj)
       })
     })
