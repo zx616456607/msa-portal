@@ -189,7 +189,7 @@ class Step3 extends React.Component {
         limitationType.push('http_method')
         limitationDetailArray.push({
           '@class': `${DEFINITION}.limitation.HttpMethod`,
-          method: values.method,
+          method: JSON.stringify(values.method).replace(/^\[|\"|\"|]/g, ''),
         })
       }
 

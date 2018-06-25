@@ -49,10 +49,17 @@ class ServiceApIDoc extends React.Component {
     const basicColumns = [
       { title: '开放协议类型', dataIndex: 'type', key: 'type' },
       { title: '开放地址', dataIndex: 'address', key: 'address' },
+      { title: '方法', dataIndex: 'method', key: 'method' },
     ]
-    const { errorCode, type, exposedPath } = serviceDetial
+    const { errorCode, type, exposedPath, limitationDetail } = serviceDetial
+    let method = ''
+    JSON.parse(limitationDetail).forEach(item => {
+      if (item.method !== undefined) {
+        method = item.method
+      }
+    })
     const basicInfoData = [
-      { type: formatServiceOpenProtocol(type), address: exposedPath },
+      { type: formatServiceOpenProtocol(type), address: exposedPath, method },
     ]
     const errorCodeColumns = [
       { title: '错误代码', dataIndex: 'code', key: 'code' },
