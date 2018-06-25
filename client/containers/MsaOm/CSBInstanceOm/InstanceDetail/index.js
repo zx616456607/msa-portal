@@ -21,6 +21,7 @@ import Log from './Log'
 import { renderCSBInstanceStatus, HANDlE_INSTANCE_MESSAGE } from '../../../../components/utils'
 import {
   stopInstance,
+  startInstance,
   restartInstance,
 } from '../../../../actions/CSB/instance'
 
@@ -32,8 +33,8 @@ class InstanceDetail extends React.Component {
   }
 
   render() {
-    const { detail, callback, stopInstance, restartInstance } = this.props
-    const { name, clusterId, status } = detail
+    const { detail, callback, stopInstance, startInstance, restartInstance } = this.props
+    const { name, clusterId, status } = detail || {}
     return (
       <div className="service-detail">
         <div className="service-detail-header ant-row">
@@ -58,13 +59,24 @@ class InstanceDetail extends React.Component {
                 </div>
               </Col>
               <Col span={12} className="service-detail-header-btns">
-                <Button
-                  type="primary"
-                  style={{ marginRight: 12 }}
-                  onClick={() => callback(HANDlE_INSTANCE_MESSAGE.stop, stopInstance)}
-                >
-                  停止 CSB 实例
-                </Button>
+                {
+                  status === 1 || status === 2 ?
+                    <Button
+                      type="primary"
+                      style={{ marginRight: 12 }}
+                      onClick={() => callback(HANDlE_INSTANCE_MESSAGE.stop, stopInstance)}
+                    >
+                      停止 CSB 实例
+                    </Button> :
+                    <Button
+                      type="primary"
+                      style={{ marginRight: 12 }}
+                      onClick={() => callback(HANDlE_INSTANCE_MESSAGE.start, startInstance)}
+                    >
+                      启动 CSB 实例
+                    </Button>
+                }
+
                 <Button onClick={() => callback(HANDlE_INSTANCE_MESSAGE.restart, restartInstance)}>
                   重新部署
                 </Button>
@@ -90,7 +102,7 @@ class InstanceDetail extends React.Component {
               <Monitor clusterID={clusterId} instance={detail}/>
             </TabPane>
             <TabPane tab="日志" key="log">
-              <Log clusterID={clusterId} instance={detail}/>
+              <Log clusterID={clusterId} instance={detail} />
             </TabPane>
           </Tabs>
         </div>
@@ -101,5 +113,6 @@ class InstanceDetail extends React.Component {
 
 export default connect(null, {
   stopInstance,
+  startInstance,
   restartInstance,
 })(InstanceDetail)
