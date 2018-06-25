@@ -340,7 +340,7 @@ class CSBInstanceOm extends React.Component {
               <Menu.Item key="instanceDetail">实例详情</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
               <Menu.Item key="start" disabled={parseInt(status) !== 0}>启动</Menu.Item>
-              <Menu.Item key="stop" disabled={parseInt(status) !== 1}>停止</Menu.Item>
+              <Menu.Item key="stop" disabled={parseInt(status) !== 1 && parseInt(status) !== 2}>停止</Menu.Item>
               <Menu.Item key="restart" disabled={parseInt(status) === 0}>重新部署</Menu.Item>
             </Menu>
           )

@@ -152,9 +152,12 @@ class AvailableInstances extends React.Component {
         title: '实例名称',
         dataIndex: 'name',
         width: '10%',
-        render: (text, row) => <Link to={`/csb-instances-available/${row.instance.id}`}>
-          {row.instance.name}
-        </Link>,
+        render: (text, row) => {
+          if (row.instance.status !== 1) {
+            return <div>{row.instance.name}</div>
+          }
+          return <Link to={`/csb-instances-available/${row.instance.id}`}>{row.instance.name}</Link>
+        },
       },
       {
         title: '状态',
@@ -218,6 +221,7 @@ class AvailableInstances extends React.Component {
               <Button
                 type="primary"
                 className="detailBtn"
+                disabled={row.instance.status !== 1}
                 onClick={() => history.push(`/csb-instances-available/${row.instance.id}`)}
               >
               查看实例
