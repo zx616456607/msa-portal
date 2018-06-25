@@ -10,8 +10,9 @@
  * @author zhangpc
  */
 
+import isEmpty from 'lodash/isEmpty'
 import * as ActionTypes from '../../actions/CSB/instance'
-import { getQueryKey } from '../../common/utils'
+import { formatDate, getQueryKey } from '../../common/utils'
 
 export const publicInstances = (state = {}, action) => {
   const { query, type } = action
@@ -194,6 +195,52 @@ export const instanceLogs = (state = {}, action) => {
       return {
         ...state,
         [instanceNameSpace]: {
+          isFetching: false,
+          data: [],
+        },
+      }
+    default:
+      return state
+  }
+}
+
+const formatInstanceMonitor = data => {
+  if (isEmpty(data)) {
+    return data
+  }
+  let newData = []
+  data.forEach(item => {
+    const { container_name, metrics } = item
+    metrics.forEach(metric => {
+      metric.container_name = container_name
+      metric.timestamp = formatDate(metric.timestamp, 'MM-DD HH:mm:ss')
+    })
+    newData = newData.concat(metrics)
+  })
+  return data
+}
+export const instanceMonitor = (state = {}, action) => {
+  const { type, metricType } = action
+  switch (type) {
+    case ActionTypes.GET_INSTANCE_MONITOR_REQUEST:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: true,
+        }),
+      }
+    case ActionTypes.GET_INSTANCE_MONITOR_SUCCESS:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: false,
+          data: formatInstanceMonitor(action.response.result.data),
+        }),
+      }
+    case ActionTypes.GET_INSTANCE_MONITOR_FAILURE:
+      return {
+        ...state,
+        [metricType]: {
           isFetching: false,
           data: [],
         },
