@@ -146,3 +146,12 @@ export const DEFAULT_UAA = {
   username: 'weiwei',
   password: 'weiwei',
 }
+export const METRICS_DEFAULT_SOURCE = 'prometheus'
+export const METRICS_CPU = 'cpu/usage_rate'
+export const METRICS_MEMORY = 'memory/usage'
+export const METRICS_NETWORK_RECEIVED = 'network/rx_rate'
+export const METRICS_NETWORK_TRANSMITTED = 'network/tx_rate'
+export const METRICS_DISK_READ = 'disk/readio'
+export const METRICS_DISK_WRITE = 'disk/writeio'
+export const UPDATE_INTERVAL = 1000 * 60
+export const REALTIME_INTERVAL = 1000 * 10 // 实时监控

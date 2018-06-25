@@ -99,7 +99,7 @@ class InstanceDetail extends React.Component {
         <div className="service-detail-body">
           <Tabs tabPosition="left">
             <TabPane tab="监控" key="monitor">
-              <Monitor />
+              <Monitor clusterID={clusterId} instance={detail}/>
             </TabPane>
             <TabPane tab="日志" key="log">
               <Log clusterID={clusterId} instance={detail} />

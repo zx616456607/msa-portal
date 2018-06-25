@@ -19,6 +19,7 @@ import {
   CSB_PUBLIC_INSTANCES_FLAG,
   CSB_AVAILABLE_INSTANCES_FLAG,
   CSB_OM_INSTANCES_FLAG,
+  METRICS_DEFAULT_SOURCE,
 } from '../../constants'
 
 const { CSB_API_URL, PAAS_API_URL } = API_CONFIG
@@ -419,3 +420,67 @@ function fetchRestartInstance(clusterId, instanceNameSpace, body) {
 
 export const restartInstance = (clusterId, instanceNameSpace, body) =>
   dispatch => dispatch(fetchRestartInstance(clusterId, instanceNameSpace, body))
+
+// 实例监控
+export const GET_INSTANCE_MONITOR_REQUEST = 'GET_INSTANCE_MONITOR_REQUEST'
+export const GET_INSTANCE_MONITOR_SUCCESS = 'GET_INSTANCE_MONITOR_SUCCESS'
+export const GET_INSTANCE_MONITOR_FAILURE = 'GET_INSTANCE_MONITOR_FAILURE'
+
+const fetchInstanceMonitor = (clusterID, instance, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { namespace } = instance
+  const { type } = query
+  const name = 'dsb-server'
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_INSTANCE_MONITOR_REQUEST,
+        GET_INSTANCE_MONITOR_SUCCESS,
+        GET_INSTANCE_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterID}/metric/services/${name}/metrics?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers: {
+          project: namespace,
+        },
+      },
+    },
+  }
+}
+
+export const instanceMonitor = (clusterID, instance, query) =>
+  dispatch => dispatch(fetchInstanceMonitor(clusterID, instance, query))
+
+// 实例实时监控
+export const GET_INSTANCE_REALTIME_MONITOR_REQUEST = 'GET_INSTANCE_REALTIME_MONITOR_REQUEST'
+export const GET_INSTANCE_REALTIME_MONITOR_SUCCESS = 'GET_INSTANCE_REALTIME_MONITOR_SUCCESS'
+export const GET_INSTANCE_REALTIME_MONITOR_FAILURE = 'GET_INSTANCE_REALTIME_MONITOR_FAILURE'
+
+const fetchInstanceRealTimeMonitor = (clusterID, instance, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { namespace } = instance
+  const { type } = query
+  const name = 'dsb-server'
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_INSTANCE_REALTIME_MONITOR_REQUEST,
+        GET_INSTANCE_REALTIME_MONITOR_SUCCESS,
+        GET_INSTANCE_REALTIME_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterID}/metric/services/${name}/metrics?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers: {
+          project: namespace,
+        },
+      },
+    },
+  }
+}
+
+export const instanceRealTimeMonitor = (clusterID, instance, query) =>
+  dispatch => dispatch(fetchInstanceRealTimeMonitor(clusterID, instance, query))
