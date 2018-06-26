@@ -210,8 +210,12 @@ const formatInstanceMonitor = data => {
   }
   data.forEach(item => {
     const { container_name, metrics } = item
+    // bizcharts 图例显示有问题，去掉服务名称后的数字（dsb-server-3375465363-1x4v5 => dsb-server-1x4v5）
+    let name = container_name.split('-')
+    name.splice(-2, 1)
+    name = name.join('-')
     metrics.forEach(metric => {
-      metric.container_name = container_name
+      metric.container_name = name
       metric.timestamp = formatDate(metric.timestamp, 'MM-DD HH:mm:ss')
     })
   })
