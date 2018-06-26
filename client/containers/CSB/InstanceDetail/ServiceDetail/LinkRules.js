@@ -70,10 +70,15 @@ class LinkRules extends React.Component {
     this.loadData()
   }
 
-  renderStepIcon = detail => {
-    const { instanceId } = this.props
-    const { status = 3, id } = detail || {}
+  renderStepIcon = item => {
+    const { instanceId, detail, serviceCascadedInfo } = this.props
+    const { status = 3, id } = item || {}
     const intStatus = parseInt(status)
+    const { name } = detail
+    const currentService = serviceCascadedInfo[name]
+    const { result } = currentService
+    const { serviceBehaviourPerInstance } = result
+    const cascadedType = JSON.parse(serviceBehaviourPerInstance)[id]
     let instanceStatus
     switch (intStatus) {
       case 0: instanceStatus = '已停止'; break
@@ -81,6 +86,18 @@ class LinkRules extends React.Component {
       case 2: instanceStatus = '启动中'; break
       case 3: instanceStatus = '已注销'; break
       default: instanceStatus = '未知'; break
+    }
+    let cascadedText
+    switch (cascadedType) {
+      case 1: cascadedText = '接力端'; break
+      case 2: cascadedText = '开放端'; break
+      case 5: cascadedText = '接入/接力端'; break
+      case 6: cascadedText = '接入/接力/开放端'; break
+      case 8: cascadedText = '接力/开放端'; break
+      case 0:
+      default:
+        cascadedText = '未知'
+        break
     }
     const iconClass = classNames({
       'icon-style': true,
@@ -90,7 +107,7 @@ class LinkRules extends React.Component {
     })
     return (
       <div className={iconClass}>
-        <div className="top-style">接入/开放端</div>
+        <div className="top-style">{cascadedText}</div>
         <div className="status-style">({instanceStatus})</div>
       </div>
     )
