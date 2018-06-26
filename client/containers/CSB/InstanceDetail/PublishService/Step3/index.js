@@ -323,7 +323,7 @@ class Step3 extends React.Component {
       this.setState({
         confirmLoading: false,
       })
-      history.push(`/csb-instances-available/${instanceID}/my-published-services`)
+      history.push(`/csb-instances/available/${instanceID}/my-published-services`)
     })
   }
 

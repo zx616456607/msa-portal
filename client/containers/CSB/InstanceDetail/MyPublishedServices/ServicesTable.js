@@ -187,7 +187,7 @@ class ServicesTable extends React.Component {
       return this.openBlackAndWhiteListModal(record)
     }
     if (key === 'edit') {
-      return history.push(`/csb-instances-available/${instanceID}/publish-service?serviceID=${record.id}&isEdit=true`)
+      return history.push(`/csb-instances/available/${instanceID}/publish-service?serviceID=${record.id}&isEdit=true`)
     }
     this.serviceOperation(record, key)
   }

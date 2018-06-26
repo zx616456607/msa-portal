@@ -137,7 +137,7 @@ class CSBInstanceOm extends React.Component {
 
   handleButtonClick = row => {
     // const { history } = this.props
-    // history.push(`/csb-instances-available/${row.id}`)
+    // history.push(`/csb-instances/available/${row.id}`)
     this.setState({
       createModal: true,
       currentInstance: row,

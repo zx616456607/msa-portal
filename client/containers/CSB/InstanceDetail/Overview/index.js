@@ -99,12 +99,12 @@ class InstanceDetailOverview extends React.Component {
 
   goPublishService = () => {
     const { history, instanceID } = this.props
-    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+    history.push(`/csb-instances/available/${instanceID}/publish-service`)
   }
 
   goSubscriptService = () => {
     const { history, instanceID } = this.props
-    history.push(`/csb-instances-available/${instanceID}/subscription-services`)
+    history.push(`/csb-instances/available/${instanceID}/subscription-services`)
   }
 
   filterStatus = key => {
@@ -261,7 +261,7 @@ class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我发布的服务"
-                extra={<Link to={`/csb-instances-available/${instanceID}/my-published-services`}>
+                extra={<Link to={`/csb-instancesavailable/${instanceID}/my-published-services`}>
                   更多>>
                 </Link>
                 }
@@ -285,7 +285,7 @@ class InstanceDetailOverview extends React.Component {
             <Col span={9}>
               <Card
                 title="服务订阅审批"
-                extra={<Link to={`/csb-instances-available/${instanceID}/service-subscription-approval`}>
+                extra={<Link to={`/csb-instances/available/${instanceID}/service-subscription-approval`}>
                   去审批>>
                 </Link>
                 }
@@ -326,7 +326,7 @@ class InstanceDetailOverview extends React.Component {
             <Col span={9} className={`${currentInstance.role === 1 || currentInstance.role === 4 ? 'show' : 'hide'}`}>
               <Card
                 title="我订阅的服务"
-                extra={<Link to={`/csb-instances-available/${instanceID}/my-subscribed-service`}>
+                extra={<Link to={`/csb-instances/available/${instanceID}/my-subscribed-service`}>
                   更多>>
                 </Link>
                 }
@@ -350,7 +350,7 @@ class InstanceDetailOverview extends React.Component {
             <Col span={9} className={`${currentInstance.role === 1 || currentInstance.role === 4 ? 'show' : 'hide'}`}>
               <Card
                 title="可订阅的服务"
-                extra={<Link to={`/csb-instances-available/${instanceID}/subscription-services`}>
+                extra={<Link to={`/csb-instances/available/${instanceID}/subscription-services`}>
                   去订阅>>
                 </Link>
                 }
