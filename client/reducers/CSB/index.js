@@ -12,7 +12,7 @@
 import { myApplication } from './myApplication'
 import {
   publicInstances, availableInstances, omInstances, instanceOverview,
-  servicesInbounds, instanceLogs, instanceMonitor,
+  servicesInbounds, instanceLogs, instanceMonitor, instanceRealTimeMonitor,
 } from './instance'
 import {
   publishedService, serviceCAL, serviceOverview, subscribableServices,
@@ -40,6 +40,7 @@ const CSB = (state = {
   instanceLogs: {},
   cascadedServiceDetail: {},
   instanceMonitor: {},
+  instanceRealTimeMonitor: {},
 }, action) => {
   return {
     myApplication: myApplication(state.myApplication, action),
@@ -76,6 +77,7 @@ const CSB = (state = {
     instanceLogs: instanceLogs(state.instanceLogs, action),
     cascadedServiceDetail: cascadedServiceDetail(state.cascadedServiceDetail, action),
     instanceMonitor: instanceMonitor(state.instanceMonitor, action),
+    instanceRealTimeMonitor: instanceRealTimeMonitor(state.instanceRealTimeMonitor, action),
   }
 }
 

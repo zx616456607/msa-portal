@@ -93,11 +93,17 @@ class Network extends React.PureComponent {
 
   render() {
     const { checked, realTimeLoading } = this.state
-    const { dataSource, freshInterval, loading } = this.props
-    const networkReceived = dataSource[METRICS_NETWORK_RECEIVED] &&
-      dataSource[METRICS_NETWORK_RECEIVED].data || []
-    const networkTransmitted = dataSource[METRICS_NETWORK_TRANSMITTED] &&
-      dataSource[METRICS_NETWORK_TRANSMITTED].data || []
+    const { dataSource, freshInterval, loading, realTimeMonitor } = this.props
+    const networkReceived = checked
+      ? (realTimeMonitor[METRICS_NETWORK_RECEIVED] &&
+        realTimeMonitor[METRICS_NETWORK_RECEIVED].data || [])
+      : (dataSource[METRICS_NETWORK_RECEIVED] &&
+        dataSource[METRICS_NETWORK_RECEIVED].data || [])
+    const networkTransmitted = checked
+      ? (realTimeMonitor[METRICS_NETWORK_TRANSMITTED] &&
+        realTimeMonitor[METRICS_NETWORK_TRANSMITTED].data || [])
+      : (dataSource[METRICS_NETWORK_TRANSMITTED] &&
+        dataSource[METRICS_NETWORK_TRANSMITTED].data || [])
     let mergeData = []
     networkReceived.forEach(item => {
       const data = item.metrics.map(metric => {
@@ -136,8 +142,12 @@ class Network extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  const { CSB } = state
+  const { instanceRealTimeMonitor } = CSB
+  return {
+    realTimeMonitor: instanceRealTimeMonitor,
+  }
 }
 
 export default connect(mapStateToProps, {

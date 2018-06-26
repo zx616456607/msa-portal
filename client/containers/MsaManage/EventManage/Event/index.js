@@ -190,7 +190,7 @@ class Event extends React.Component {
         icon = (<svg className="event-page-slight">
           <use xlinkHref={`${SLIGHT_ICON}`} />
         </svg>)
-        classname = 'success-status'
+        classname = 'primary-color'
         break
       case 'Major':
         displayName = '重要'
@@ -199,8 +199,8 @@ class Event extends React.Component {
         break
       case 'Normal':
         displayName = '正常'
-        icon = <Icon type="exclamation-circle" />
-        classname = 'primary-color'
+        icon = <Icon type="info-circle" />
+        classname = 'success-status'
         break
       default:
         break

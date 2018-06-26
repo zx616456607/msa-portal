@@ -94,11 +94,17 @@ class Disk extends React.PureComponent {
 
   render() {
     const { checked, realTimeLoading } = this.state
-    const { dataSource, freshInterval, loading } = this.props
-    const diskRead = dataSource[METRICS_DISK_READ] &&
-      dataSource[METRICS_DISK_READ].data || []
-    const diskWrite = dataSource[METRICS_DISK_WRITE] &&
-      dataSource[METRICS_DISK_WRITE].data || []
+    const { dataSource, freshInterval, loading, realTimeMonitor } = this.props
+    const diskRead = checked
+      ? (realTimeMonitor[METRICS_DISK_READ] &&
+        realTimeMonitor[METRICS_DISK_READ].data || [])
+      : (dataSource[METRICS_DISK_READ] &&
+        dataSource[METRICS_DISK_READ].data || [])
+    const diskWrite = checked
+      ? (realTimeMonitor[METRICS_DISK_WRITE] &&
+        realTimeMonitor[METRICS_DISK_WRITE].data || [])
+      : (dataSource[METRICS_DISK_WRITE] &&
+        dataSource[METRICS_DISK_WRITE].data || [])
     let mergeData = []
     diskRead.forEach(item => {
       const data = item.metrics.map(metric => {
@@ -137,8 +143,12 @@ class Disk extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  const { CSB } = state
+  const { instanceRealTimeMonitor } = CSB
+  return {
+    realTimeMonitor: instanceRealTimeMonitor,
+  }
 }
 
 export default connect(mapStateToProps, {
