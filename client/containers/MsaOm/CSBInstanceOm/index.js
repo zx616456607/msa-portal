@@ -41,6 +41,7 @@ import { UNUSED_CLUSTER_ID, CSB_OM_INSTANCES_FLAG, INSTANCE_SERVICES } from '../
 import { formatDate, toQuerystring } from '../../../common/utils'
 import { renderCSBInstanceStatus, HANDlE_INSTANCE_MESSAGE } from '../../../components/utils'
 import InstanceDetailDock from './InstanceDetail/Dock'
+import ScaleModal from '../Components/Modal'
 
 // const RadioGroup = Radio.Group
 const SearchInput = Input.Search
@@ -236,6 +237,11 @@ class CSBInstanceOm extends React.Component {
             instanceDetailVisible: true,
           })
           return
+        case 'scale':
+          this.setState({
+            scaleVisible: true,
+          })
+          return
         default:
           break
       }
@@ -255,12 +261,17 @@ class CSBInstanceOm extends React.Component {
     })
   }
 
+  closeScaleModal = () => {
+    this.setState({ scaleVisible: false, currentInstance: null })
+  }
+
   render() {
     let {
       createModal, currentInstance, searchValue,
       currentSearchType, sorterInfo, filterInfo, instanceDetailVisible,
+      scaleVisible,
     } = this.state
-    const { omInstances, namespace, location } = this.props
+    const { omInstances, namespace, location, clusterId } = this.props
     const { totalElements, isFetching, content, size } = omInstances
     const { query } = location
     filterInfo = filterInfo || {}
@@ -338,6 +349,7 @@ class CSBInstanceOm extends React.Component {
             <Menu onClick={e => this.handleMenuClick(e, row)} style={{ width: 110 }}>
               {/* <Menu.Item key="edit">修改实例</Menu.Item> */}
               <Menu.Item key="instanceDetail">实例详情</Menu.Item>
+              <Menu.Item key="scale">水平扩展</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
               <Menu.Item key="start" disabled={parseInt(status) !== 0}>启动</Menu.Item>
               <Menu.Item key="stop" disabled={parseInt(status) !== 1 && parseInt(status) !== 2}>停止</Menu.Item>
@@ -413,6 +425,17 @@ class CSBInstanceOm extends React.Component {
           visible={instanceDetailVisible}
           onVisibleChange={visible => this.setState({ instanceDetailVisible: visible })}
         />}
+        {
+          scaleVisible &&
+          <ScaleModal
+            visible={scaleVisible}
+            tipsType={'水平扩展'}
+            clusterId={clusterId}
+            currentComponent={currentInstance}
+            closeModal={this.closeScaleModal}
+            loadData={this.getInstanceList}
+          />
+        }
       </QueueAnim>
     )
   }
@@ -420,16 +443,18 @@ class CSBInstanceOm extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const { current } = state
-  const { user } = current
+  const { user, config } = current
   const { info } = user
   const { userID, namespace } = info
   const { location } = props
+  const { cluster } = config
   location.query = parseQuerystring(location.search)
   return {
     location,
     namespace,
     userID,
     omInstances: omInstancesSlt(state, props),
+    clusterId: cluster.id,
   }
 }
 

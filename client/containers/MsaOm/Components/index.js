@@ -306,6 +306,10 @@ class MsaComponents extends React.Component {
     })
   }
 
+  closeMsaModal = () => {
+    this.setState({ visible: false, currentComponent: null })
+  }
+
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
       tipsName, metaData, currentComponent } = this.state
@@ -395,7 +399,7 @@ class MsaComponents extends React.Component {
             tipsType={tipsName}
             clusterId={clusterId}
             currentComponent={currentComponent}
-            closeModal={() => this.setState({ visible: false })}
+            closeModal={this.closeMsaModal}
             loadData={this.load}
           />
         }

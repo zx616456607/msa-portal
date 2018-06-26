@@ -62,7 +62,8 @@ class MsaModal extends React.Component {
     const body = {
       number: parseInt(inputValue, 10),
     }
-    const result = await manualScaleComponent(clusterId, currentComponent.component, body)
+    const name = currentComponent.component || currentComponent.name
+    const result = await manualScaleComponent(clusterId, name, body)
     if (result.error) {
       this.setState({
         loading: false,
@@ -73,10 +74,10 @@ class MsaModal extends React.Component {
       return
     }
     loadData && loadData()
-    closeModal()
     this.setState({
       loading: false,
     })
+    closeModal()
     notification.success({
       message: '水平扩展成功',
     })
@@ -103,7 +104,9 @@ class MsaModal extends React.Component {
               </div>
               <Row>
                 <Col className="itemTitle" span={4}>组件名称</Col>
-                <Col className="itemBody" span={20}>{currentComponent && currentComponent.component}</Col>
+                <Col className="itemBody" span={20}>
+                  {currentComponent && (currentComponent.component || currentComponent.name)}
+                </Col>
               </Row>
               <Row>
                 <Col className="itemTitle" span={4} style={{ lineHeight: 2.5 }}>
