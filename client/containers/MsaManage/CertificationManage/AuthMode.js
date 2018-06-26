@@ -42,8 +42,8 @@ export default class AuthMode extends React.Component {
       },
       {
         key: 2,
-        authMode: 'refresh_token',
-        desc: '刷新 accessToken 授权模式',
+        authMode: 'implicit',
+        desc: '标准服务端授权简化模式',
       },
       {
         key: 3,
