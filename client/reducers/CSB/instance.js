@@ -208,14 +208,12 @@ const formatInstanceMonitor = data => {
   if (isEmpty(data)) {
     return data
   }
-  let newData = []
   data.forEach(item => {
     const { container_name, metrics } = item
     metrics.forEach(metric => {
       metric.container_name = container_name
       metric.timestamp = formatDate(metric.timestamp, 'MM-DD HH:mm:ss')
     })
-    newData = newData.concat(metrics)
   })
   return data
 }
@@ -227,6 +225,7 @@ export const instanceMonitor = (state = {}, action) => {
         ...state,
         [metricType]: Object.assign({}, state[metricType], {
           isFetching: true,
+          data: [],
         }),
       }
     case ActionTypes.GET_INSTANCE_MONITOR_SUCCESS:
@@ -238,6 +237,38 @@ export const instanceMonitor = (state = {}, action) => {
         }),
       }
     case ActionTypes.GET_INSTANCE_MONITOR_FAILURE:
+      return {
+        ...state,
+        [metricType]: {
+          isFetching: false,
+          data: [],
+        },
+      }
+    default:
+      return state
+  }
+}
+
+export const instanceRealTimeMonitor = (state = {}, action) => {
+  const { type, metricType } = action
+  switch (type) {
+    case ActionTypes.GET_INSTANCE_REALTIME_MONITOR_REQUEST:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: true,
+          data: [],
+        }),
+      }
+    case ActionTypes.GET_INSTANCE_REALTIME_MONITOR_SUCCESS:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: false,
+          data: formatInstanceMonitor(action.response.result.data),
+        }),
+      }
+    case ActionTypes.GET_INSTANCE_REALTIME_MONITOR_FAILURE:
       return {
         ...state,
         [metricType]: {

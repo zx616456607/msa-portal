@@ -80,8 +80,10 @@ class CPU extends React.PureComponent {
 
   render() {
     const { checked, realTimeLoading } = this.state
-    const { dataSource, freshInterval, loading } = this.props
-    const { data } = dataSource[METRICS_CPU] || { data: [] }
+    const { dataSource, freshInterval, loading, realTimeMonitor } = this.props
+    const { data } = checked
+      ? (realTimeMonitor[METRICS_CPU] || { data: [] })
+      : (dataSource[METRICS_CPU] || { data: [] })
     let mergeData = []
     data && data.forEach(item => {
       mergeData = mergeData.concat(item.metrics)
@@ -111,8 +113,12 @@ class CPU extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  const { CSB } = state
+  const { instanceRealTimeMonitor } = CSB
+  return {
+    realTimeMonitor: instanceRealTimeMonitor,
+  }
 }
 
 export default connect(mapStateToProps, {

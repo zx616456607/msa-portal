@@ -84,9 +84,11 @@ class Memory extends React.PureComponent {
 
   render() {
     const { checked, realTimeLoading } = this.state
-    const { dataSource, freshInterval, loading } = this.props
-    const { data } = dataSource[METRICS_MEMORY] || { data: [] }
+    const { dataSource, freshInterval, loading, realTimeMonitor } = this.props
     let mergeData = []
+    const { data } = checked
+      ? (realTimeMonitor[METRICS_MEMORY] || { data: [] })
+      : (dataSource[METRICS_MEMORY] || { data: [] })
     data && data.forEach(item => {
       mergeData = mergeData.concat(item.metrics)
     })
@@ -115,8 +117,12 @@ class Memory extends React.PureComponent {
   }
 }
 
-const mapStateToProps = () => {
-  return {}
+const mapStateToProps = state => {
+  const { CSB } = state
+  const { instanceRealTimeMonitor } = CSB
+  return {
+    realTimeMonitor: instanceRealTimeMonitor,
+  }
 }
 
 export default connect(mapStateToProps, {
