@@ -79,11 +79,6 @@ export const appChildRoutes = [
     key: 'csb-instances',
   },
   {
-    path: '/csb-instances-available/:instanceID',
-    component: CSBInstanceDetail,
-    key: 'csb-instances',
-  },
-  {
     path: '/apms',
     component: Apm,
     key: 'apms',
@@ -324,6 +319,11 @@ export const csbInstancesChildRoutes = [
     key: 'available',
   },
   {
+    path: '/csb-instances/available/:instanceID',
+    component: CSBInstanceDetail,
+    key: 'csb-instances',
+  },
+  {
     path: '/csb-instances/public',
     component: PublicInstances,
     exact: true,
@@ -339,61 +339,55 @@ export const csbInstancesChildRoutes = [
 
 export const csbInstanceDetailChildRoutes = [
   {
-    path: '/csb-instances-available',
-    exact: true,
-    render: () => <Redirect to="/csb-instances/available" component={AvailableInstances} />,
-    key: 'index',
-  },
-  {
-    path: '/csb-instances-available/:instanceID',
+    path: '/csb-instances/available/:instanceID',
     component: InstanceDetailOverview,
     exact: true,
     key: 'my-published-services',
   },
   {
-    path: '/csb-instances-available/:instanceID/my-published-services',
+    path: '/csb-instances/available/:instanceID/my-published-services',
     component: MyPublishedServices,
     exact: true,
     key: 'my-published-services',
   },
   {
-    path: '/csb-instances-available/:instanceID/my-published-services-groups',
+    path: '/csb-instances/available/:instanceID/my-published-services-groups',
     component: MyPublishedServicesGroups,
     exact: true,
     key: 'my-published-services-groups',
   },
   {
-    path: '/csb-instances-available/:instanceID/service-subscription-approval',
+    path: '/csb-instances/available/:instanceID/service-subscription-approval',
     component: ServiceSubscriptionApproval,
     exact: true,
     key: 'service-subscription-approval',
   },
   {
-    path: '/csb-instances-available/:instanceID/my-subscribed-service',
+    path: '/csb-instances/available/:instanceID/my-subscribed-service',
     component: MySubscribedService,
     exact: true,
     key: 'my-subscribed-service',
   },
   {
-    path: '/csb-instances-available/:instanceID/subscription-services',
+    path: '/csb-instances/available/:instanceID/subscription-services',
     component: SubscriptionServices,
     exact: true,
     key: 'subscription-services',
   },
   {
-    path: '/csb-instances-available/:instanceID/public-services',
+    path: '/csb-instances/available/:instanceID/public-services',
     component: PublicServices,
     exact: true,
     key: 'plubic-services',
   },
   {
-    path: '/csb-instances-available/:instanceID/consumer-vouchers',
+    path: '/csb-instances/available/:instanceID/consumer-vouchers',
     component: ConsumerVouchers,
     exact: true,
     key: 'consumer-vouchers',
   },
   {
-    path: '/csb-instances-available/:instanceID/publish-service',
+    path: '/csb-instances/available/:instanceID/publish-service',
     component: PublishService,
     exact: true,
     key: 'publish-service',

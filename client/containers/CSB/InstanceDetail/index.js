@@ -126,7 +126,7 @@ class CSBInstanceDetail extends React.Component {
       && currentInstance.instance.name
     const menus = [
       {
-        to: `/csb-instances-available/${instanceID}`,
+        to: `/csb-instances/available/${instanceID}`,
         text: '概览',
         icon: <Icon type="dashboard" />,
       },
@@ -138,19 +138,19 @@ class CSBInstanceDetail extends React.Component {
         skiped: currentInstance && currentInstance.role === 1,
         children: [
           {
-            to: `/csb-instances-available/${instanceID}/my-published-services`,
+            to: `/csb-instances/available/${instanceID}/my-published-services`,
             includePaths: [
-              `/csb-instances-available/${instanceID}/my-published-services-groups`,
-              `/csb-instances-available/${instanceID}/publish-service`,
+              `/csb-instances/available/${instanceID}/my-published-services-groups`,
+              `/csb-instances/available/${instanceID}/publish-service`,
             ],
             text: '我发布的服务',
           },
           /* {
-            to: `/csb-instances-available/${instanceID}/my-published-services-groups`,
+            to: `/csb-instances/available/${instanceID}/my-published-services-groups`,
             text: '我的服务组',
           }, */
           {
-            to: `/csb-instances-available/${instanceID}/service-subscription-approval`,
+            to: `/csb-instances/available/${instanceID}/service-subscription-approval`,
             text: '服务订阅审批',
           },
         ],
@@ -162,21 +162,21 @@ class CSBInstanceDetail extends React.Component {
         key: 'service-subscription',
         children: [
           {
-            to: `/csb-instances-available/${instanceID}/my-subscribed-service`,
+            to: `/csb-instances/available/${instanceID}/my-subscribed-service`,
             text: '我订阅的服务',
             skiped: currentInstance && currentInstance.role === 2,
           },
           {
-            to: `/csb-instances-available/${instanceID}/subscription-services`,
+            to: `/csb-instances/available/${instanceID}/subscription-services`,
             text: '可订阅服务',
             skiped: currentInstance && currentInstance.role === 2,
           },
           {
-            to: `/csb-instances-available/${instanceID}/public-services`,
+            to: `/csb-instances/available/${instanceID}/public-services`,
             text: '无需订阅服务',
           },
           {
-            to: `/csb-instances-available/${instanceID}/consumer-vouchers`,
+            to: `/csb-instances/available/${instanceID}/consumer-vouchers`,
             text: '消费凭证',
           },
         ],
@@ -188,13 +188,9 @@ class CSBInstanceDetail extends React.Component {
           <Breadcrumb.Item>
             <Link to="/csb-instances">CSB 实例列表</Link>
           </Breadcrumb.Item>
-          {
-            <Tooltip title={instanceName}>
-              <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
-                {instanceName || '...'}
-              </Breadcrumb.Item>
-            </Tooltip>
-          }
+          <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
+            <Tooltip title={instanceName}>{instanceName || '...'}</Tooltip>
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Layout>
           <Sider

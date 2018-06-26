@@ -96,7 +96,7 @@ class CreateServiceGroupModal extends React.Component {
             width: 520,
             type: 'success',
             onOk() {
-              history.push(`/csb-instances-available/${instanceID}/my-published-services-groups`)
+              history.push(`/csb-instances/available/${instanceID}/my-published-services-groups`)
             },
           })
           return

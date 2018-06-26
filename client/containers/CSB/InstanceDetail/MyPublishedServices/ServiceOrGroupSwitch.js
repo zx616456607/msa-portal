@@ -28,10 +28,10 @@ export default class ServiceOrGroupSwitch extends React.Component {
     const { history, instanceID } = this.props
     switch (e.target.value) {
       case 'all':
-        history.push(`/csb-instances-available/${instanceID}/my-published-services`)
+        history.push(`/csb-instances/available/${instanceID}/my-published-services`)
         break
       case 'group':
-        history.push(`/csb-instances-available/${instanceID}/my-published-services-groups`)
+        history.push(`/csb-instances/available/${instanceID}/my-published-services-groups`)
         break
       default:
         break

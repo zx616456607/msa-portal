@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 import { Layout } from 'antd'
 // import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, withRouter } from 'react-router-dom'
 import { csbInstancesChildRoutes } from '../../../RoutesDom'
 import { getAllClusters } from '../../../actions/current'
 import './style/index.less'
@@ -77,6 +77,7 @@ class CSBInstances extends React.Component {
     //     CSB 实例
     //   </div>
     // )
+    if (this.props.location.pathname.split('instances/available/')[1]) return this.renderChildren()
     return (
       <Layout className="csb-instances">
         {/* <Sider
@@ -101,4 +102,4 @@ const mapStateToProps = () => ({})
 
 export default connect(mapStateToProps, {
   getAllClusters,
-})(CSBInstances)
+})(withRouter(CSBInstances))

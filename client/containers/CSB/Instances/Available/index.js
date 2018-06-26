@@ -156,7 +156,7 @@ class AvailableInstances extends React.Component {
           if (row.instance.status !== 1) {
             return <div>{row.instance.name}</div>
           }
-          return <Link to={`/csb-instances-available/${row.instance.id}`}>{row.instance.name}</Link>
+          return <Link to={`/csb-instances/available/${row.instance.id}`}>{row.instance.name}</Link>
         },
       },
       {
@@ -222,7 +222,7 @@ class AvailableInstances extends React.Component {
                 type="primary"
                 className="detailBtn"
                 disabled={row.instance.status !== 1}
-                onClick={() => history.push(`/csb-instances-available/${row.instance.id}`)}
+                onClick={() => history.push(`/csb-instances/available/${row.instance.id}`)}
               >
               查看实例
               </Button>

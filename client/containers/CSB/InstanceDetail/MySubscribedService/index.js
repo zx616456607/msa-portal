@@ -342,7 +342,7 @@ class MySubscribedService extends React.Component {
         title: '我的消费凭证', dataIndex: 'evidenceName', width: '11%',
         render: (text, record) => (
           <div>
-            <Link to={`/csb-instances-available/${instanceID}/consumer-vouchers?clickedId=${record.evidenceId}`}
+            <Link to={`/csb-instances/available/${instanceID}/consumer-vouchers?clickedId=${record.evidenceId}`}
               className="evidenceId-style"
             >
               {text}

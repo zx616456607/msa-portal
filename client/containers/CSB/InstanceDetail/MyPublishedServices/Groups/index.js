@@ -191,7 +191,7 @@ class MyPublishedServiceGroups extends React.Component {
   // 发布服务
   goPublishService = () => {
     const { history, instanceID } = this.props
-    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+    history.push(`/csb-instances/available/${instanceID}/publish-service`)
   }
 
   closeCreateServiceGroupModal = () => {

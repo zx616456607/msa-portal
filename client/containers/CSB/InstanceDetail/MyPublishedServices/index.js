@@ -124,7 +124,7 @@ class MyPublishedServices extends React.Component {
   goPublishService = () => {
     const { history, match } = this.props
     const { instanceID } = match.params
-    history.push(`/csb-instances-available/${instanceID}/publish-service`)
+    history.push(`/csb-instances/available/${instanceID}/publish-service`)
   }
 
   render() {
