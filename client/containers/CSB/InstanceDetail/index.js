@@ -188,13 +188,9 @@ class CSBInstanceDetail extends React.Component {
           <Breadcrumb.Item>
             <Link to="/csb-instances">CSB 实例列表</Link>
           </Breadcrumb.Item>
-          {
-            <Tooltip title={instanceName}>
-              <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
-                {instanceName || '...'}
-              </Breadcrumb.Item>
-            </Tooltip>
-          }
+          <Breadcrumb.Item className="instance-name-bread" title={instanceName}>
+            <Tooltip title={instanceName}>{instanceName || '...'}</Tooltip>
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Layout>
           <Sider
