@@ -240,7 +240,7 @@ class MsaConfig extends React.Component {
     const { configDetail, version } = gitLab
     let parseGit = {}
     if (!isEmpty(configDetail)) {
-      parseGit = JSON.parse(configDetail)
+      parseGit = configDetail
     }
     const { form } = this.props
     const { getFieldDecorator } = form
