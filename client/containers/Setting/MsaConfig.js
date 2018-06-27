@@ -202,37 +202,19 @@ class MsaConfig extends React.Component {
     })
   }
 
-  gitUrlCheck = (rules, value, callback) => {
-    if (!value) {
-      return callback('Config Server Gitlab信息不可以空')
-    }
-    if (!/^https?/.test(value)) {
-      return callback('请输入 http 协议地址')
-    }
-    callback()
+  handleSave = () => {
+    const { form } = this.props
+    const { validateFields } = form
+    validateFields(errors => {
+      if (errors) return
+      if (!this.state.msaState) {
+        return this.setState({
+          isEdit: false,
+        })
+      }
+      // 等待后端编辑接口
+    })
   }
-
-  gitUserCheck = (rules, value, callback) => {
-    if (!value) {
-      return callback('Gitlab 用户名不能为空')
-    }
-    callback()
-  }
-
-  gitPasswordCheck = (rules, value, callback) => {
-    if (!value) {
-      return callback('Gitlab 密码不能为空')
-    }
-    callback()
-  }
-
-  gitTokenCheck = (rules, value, callback) => {
-    if (!value) {
-      return callback('token 不能为空')
-    }
-    callback()
-  }
-
   render() {
     const {
       msaState, springcloudState, installLoading, gitLab,
@@ -284,11 +266,13 @@ class MsaConfig extends React.Component {
                 >
                   {
                     getFieldDecorator('gitUrl', {
-                      rules: [
-                        {
-                          validator: this.gitUrlCheck,
-                        },
-                      ],
+                      rules: [{
+                        required: true,
+                        message: 'Gitlab 地址不能为空',
+                      }, {
+                        type: 'url',
+                        message: '请输入 http 协议地址',
+                      }],
                       initialValue: !isEmpty(parseGit) ? parseGit.gitUrl : '',
                     })(
                       <Input
@@ -305,11 +289,10 @@ class MsaConfig extends React.Component {
                 >
                   {
                     getFieldDecorator('gitUser', {
-                      rules: [
-                        {
-                          validator: this.gitUserCheck,
-                        },
-                      ],
+                      rules: [{
+                        required: true,
+                        message: 'Gitlab 用户名不能为空',
+                      }],
                       initialValue: !isEmpty(parseGit) ? parseGit.gitUser : '',
                     })(
                       <Input
@@ -326,11 +309,10 @@ class MsaConfig extends React.Component {
                 >
                   {
                     getFieldDecorator('gitPassword', {
-                      rules: [
-                        {
-                          validator: this.gitPasswordCheck,
-                        },
-                      ],
+                      rules: [{
+                        required: true,
+                        message: 'Gitlab 密码不能为空',
+                      }],
                       initialValue: !isEmpty(parseGit) ? parseGit.gitPassword : '',
                     })(
                       <Input
@@ -348,11 +330,10 @@ class MsaConfig extends React.Component {
                 >
                   {
                     getFieldDecorator('gitToken', {
-                      rules: [
-                        {
-                          validator: this.gitTokenCheck,
-                        },
-                      ],
+                      rules: [{
+                        required: true,
+                        message: 'token 不能为空',
+                      }],
                       initialValue: !isEmpty(parseGit) ? parseGit.gitToken : '',
                     })(
                       <Input
@@ -370,7 +351,7 @@ class MsaConfig extends React.Component {
                       this.state.isEdit ?
                         <div className="btn_save">
                           <Button className="close" onClick={this.handleClose}>取消</Button>
-                          <Button className="save" type="primary" onClick={this.handleClose}>保存</Button>
+                          <Button className="save" type="primary" onClick={this.handleSave}>保存</Button>
                         </div> :
                         <Tooltip
                           title={'编辑配置即可安装'} placement={'right'} defaultVisible={true}
@@ -424,7 +405,7 @@ class MsaConfig extends React.Component {
                 <Button key="submit" type="primary" loading={this.state.delLoading} onClick={this.handleDel}> 继续卸载 </Button>,
               ]}>
               <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span>即将在当前项目内卸载 SpringCloud 基础服务卸载后该项目内应用将, 无法继续使用 微服务 部分功能</span>
+                <span>即将在当前项目内卸载 SpringCloud 基础服务, 卸载后该项目内应用将无法继续使用微服务部分功能</span>
               </div>
               <div style={{ marginTop: 10 }}>
                 <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
