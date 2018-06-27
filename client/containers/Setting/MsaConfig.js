@@ -59,7 +59,11 @@ class MsaConfig extends React.Component {
   fetchState = ids => {
     const { getMsaState, cluster, project, namespace } = this.props
     const projectName = project.namespace === 'default' ? namespace : project.namespace
-    if (Object.keys(ids).length === 0) return
+    if (Object.keys(ids).length === 0) {
+      return this.setState({
+        gitLab: {},
+      })
+    }
     ids.forEach(item => {
       if (item.namespace === projectName) {
         this.setState({
@@ -94,7 +98,8 @@ class MsaConfig extends React.Component {
   handleDel = () => {
     const { springcloudID } = this.state
     const { uninstallMsaConfig, cluster, project, namespace } = this.props
-    let filterSpring = springcloudID.filter(item => item.namespace === project.namespace)
+    const projects = project.namespace === 'default' ? namespace : project.namespace
+    let filterSpring = springcloudID.filter(item => item.namespace === projects)
     if (isEmpty(filterSpring)) {
       return
     }
@@ -105,7 +110,6 @@ class MsaConfig extends React.Component {
     const query = {
       id: filterSpring.id,
     }
-    const projects = project.namespace === 'default' ? namespace : project.namespace
     uninstallMsaConfig(cluster.id, projects, query).then(res => {
       if (res.error) {
         this.setState({
@@ -119,6 +123,7 @@ class MsaConfig extends React.Component {
           uninstall: false,
           delLoading: false,
         })
+        this.load()
       }
     })
   }
@@ -222,10 +227,6 @@ class MsaConfig extends React.Component {
       msaState, springcloudState, installLoading, gitLab,
     } = this.state
     const { configDetail, version } = gitLab
-    let parseGit = {}
-    if (!isEmpty(configDetail)) {
-      parseGit = JSON.parse(configDetail)
-    }
     const { form } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
@@ -275,7 +276,7 @@ class MsaConfig extends React.Component {
                         type: 'url',
                         message: '请输入 http 协议地址',
                       }],
-                      initialValue: !isEmpty(parseGit) ? parseGit.gitUrl : '',
+                      initialValue: configDetail && configDetail.gitUrl || '',
                     })(
                       <Input
                         style={{ width: 300 }}
@@ -295,7 +296,7 @@ class MsaConfig extends React.Component {
                         required: true,
                         message: 'Gitlab 用户名不能为空',
                       }],
-                      initialValue: !isEmpty(parseGit) ? parseGit.gitUser : '',
+                      initialValue: configDetail && configDetail.gitUser || '',
                     })(
                       <Input
                         style={{ width: 300 }}
@@ -315,7 +316,7 @@ class MsaConfig extends React.Component {
                         required: true,
                         message: 'Gitlab 密码不能为空',
                       }],
-                      initialValue: !isEmpty(parseGit) ? parseGit.gitPassword : '',
+                      initialValue: configDetail && configDetail.gitPassword || '',
                     })(
                       <Input
                         style={{ width: 300 }}
@@ -336,7 +337,7 @@ class MsaConfig extends React.Component {
                         required: true,
                         message: 'token 不能为空',
                       }],
-                      initialValue: !isEmpty(parseGit) ? parseGit.gitToken : '',
+                      initialValue: configDetail && configDetail.gitToken || '',
                     })(
                       <Input
                         style={{ width: 300 }}
