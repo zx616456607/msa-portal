@@ -197,6 +197,8 @@ class MsaConfig extends React.Component {
   }
 
   handleClose = () => {
+    const { form } = this.props
+    form.resetFields()
     this.setState({
       isEdit: false,
     })
