@@ -358,29 +358,26 @@ class AddClientModal extends React.Component {
             )
           }
         </FormItem>
-        {
-          !isView &&
-          <FormItem {...formItemLayout} label="授权方式">
-            {
-              getFieldDecorator('authorized_grant_types', {
-                initialValue: !isEmpty(currentClient) &&
-                !isEmpty(currentClient.authorized_grant_types)
-                  ? currentClient.authorized_grant_types : [],
-                rules: [
-                  {
-                    required: true,
-                    message: '授权方式不能为空',
-                  },
-                ],
-              })(
-                <CheckboxGroup
-                  disabled={isView}
-                  options={authModeOpts}
-                />
-              )
-            }
-          </FormItem>
-        }
+        <FormItem {...formItemLayout} label="授权方式">
+          {
+            getFieldDecorator('authorized_grant_types', {
+              initialValue: !isEmpty(currentClient) &&
+              !isEmpty(currentClient.authorized_grant_types)
+                ? currentClient.authorized_grant_types : [],
+              rules: [
+                {
+                  required: true,
+                  message: '授权方式不能为空',
+                },
+              ],
+            })(
+              <CheckboxGroup
+                disabled={isView}
+                options={authModeOpts}
+              />
+            )
+          }
+        </FormItem>
         <FormItem {...formItemLayout} label="Client ID">
           {
             getFieldDecorator('client_id', {
