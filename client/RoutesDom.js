@@ -20,7 +20,8 @@ import MsaList from './containers/MsaManage/MsaList/index'
 import MsaDetail from './containers/MsaManage/MsaList/MsaDetail'
 import MsaConfigCenter from './containers/MsaManage/ConfigCenter/ConfigCenter'
 import CreateConfig from './containers/MsaManage/ConfigCenter/CreateConfig'
-import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking'
+import MsaCallLinkTracking from './containers/MsaManage/CallLinkTracking/index'
+import MsaCallLinkTrackingRelation from './containers/MsaManage/CallLinkTracking/RelationShip/index'
 import MsaRoutingManage from './containers/MsaManage/RoutingManage/index'
 import ApiGateway from './containers/MsaManage/ApiGateway'
 import ApiGatewayMonitoring from './containers/MsaManage/ApiGatewayMonitoring'
@@ -137,6 +138,12 @@ export const msaManageChildRoutes = [
     exact: true,
     component: MsaCallLinkTracking,
     key: 'call-link-tracking',
+  },
+  {
+    path: '/msa-manage/call-link-tracking-relation',
+    exact: true,
+    key: 'call-link-tracking-relation',
+    component: MsaCallLinkTrackingRelation,
   },
   {
     path: '/msa-manage/routing-manage',

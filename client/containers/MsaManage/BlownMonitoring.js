@@ -35,6 +35,9 @@ class BlownMonitoring extends React.Component {
     }
     const { service } = detailData[DEFAULT_SERVICE]
     const portName = service.metadata.annotations[TENXCLOUD_SCHEMA_PORT_NAME]
+    if (!portName) {
+      return null
+    }
     const portArr = portName.split(',')
     const [ port1, port2 ] = [ portArr[0].split('/').pop(), portArr[1].split('/').pop() ]
     const { address } = proxyData[0]

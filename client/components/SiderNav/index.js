@@ -55,6 +55,17 @@ const menus = [
         to: '/msa-manage/call-link-tracking',
         icon: 'link',
         name: '服务调用链',
+        children: [
+          {
+            key: 'call-link-tracking',
+            to: '/msa-manage/call-link-tracking',
+            name: '调用链查询',
+          }, {
+            key: 'call-link-tracking-relation',
+            to: '/msa-manage/call-link-tracking-relation',
+            name: '依赖关系',
+          },
+        ],
       }, {
         key: 'k43',
         to: '/msa-manage/routing-manage',

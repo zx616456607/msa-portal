@@ -30,7 +30,9 @@ const CSB_API_PREFIX = '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
 const CLIENT_API = 'http://192.168.1.254:8080'
 const CLIENT_API_PREFIX = '/uaa'
+const ZIPKIN_API_PREFIX = '/zipkin'
 const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
+const ZIPKIN_API_URL = `${MSA_API}${ZIPKIN_API_PREFIX}`
 let apiConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -45,6 +47,7 @@ let apiConfig = {
   CSB_API_PREFIX,
   CSB_API_URL,
   CLIENT_API_URL,
+  ZIPKIN_API_URL,
 }
 // prod api config
 if (isProd) {
