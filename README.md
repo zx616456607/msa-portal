@@ -16,6 +16,8 @@ MSA_API | `'http://192.168.1.58:8000'` | spring cloud api 地址 |
 MSA_API_PREFIX | `'/api/v1'` | spring cloud api 前缀 |
 CSB_API | `'http://192.168.1.58:9090'` | csb api 地址 |
 CSB_API_PREFIX | `'/api/v1'` | csb api 前缀 |
+CLIENT_API | `'http://192.168.1.254:8080'` | uaa api 地址 |
+CLIENT_API_PREFIX | `'/uaa'` | uaa api 前缀 |
 
 ### 项目结构
 ```
