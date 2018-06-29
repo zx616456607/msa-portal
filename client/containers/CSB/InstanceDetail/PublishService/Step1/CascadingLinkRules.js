@@ -17,7 +17,6 @@ import {
 } from 'antd'
 import ClassNames from 'classnames'
 import find from 'lodash/find'
-import isEmpty from 'lodash/isEmpty'
 import {
   getCascadingLinkRulesList,
 } from '../../../../../actions/CSB/cascadingLinkRules'
@@ -44,10 +43,10 @@ class CascadingLinkRules extends React.Component {
   }
 
   getInstancesOptions = () => {
-    const { form, cascadingLinkRules } = this.props
+    const { form, cascadingLinkRules, data } = this.props
     const { getFieldValue } = form
     const pathId = parseInt(getFieldValue('pathId'), 10)
-    const selectPath = find(cascadingLinkRules.content, { id: pathId }) || {}
+    const selectPath = find(cascadingLinkRules.content, { id: data.pathId || pathId }) || {}
     const instances = selectPath && selectPath.instances || []
     const firstDeletedInstanceIndex = instances.indexOf(null)
     return instances.map((instance, index) => {
@@ -85,14 +84,26 @@ class CascadingLinkRules extends React.Component {
     getCascadedServicesPrerequisite({ pathId })
   }
 
+  filterCheck = value => {
+    if (!value) return
+    return value.map(item => {
+      return item.value
+    })
+  }
+
   render() {
-    const { formItemLayout, form, className, cascadingLinkRules, isEdit, data } = this.props
+    const { formItemLayout, form, className, cascadingLinkRules, isEdit, data, csbAvaInstances } =
+      this.props
     const { getFieldDecorator, getFieldValue } = form
-    const serviceName = getFieldValue('name') || '-'
+    // const serviceName = getFieldValue('name') || '-'
     const instancesOptions = this.getInstancesOptions()
     const classNames = ClassNames('cascading-link-rules', {
       [className]: !!className,
     })
+    const instanceID = this.props.history.location.pathname.split('/')[3]
+    const instance = csbAvaInstances[instanceID].instance.name
+    const linkRules = cascadingLinkRules.content.length > 0 ?
+      cascadingLinkRules.content[0].name : ''
     return (
       <div className={classNames}>
         <FormItem
@@ -101,7 +112,7 @@ class CascadingLinkRules extends React.Component {
           className="path-targets"
         >
           {getFieldDecorator('pathId', {
-            initialValue: !isEmpty(data) && !isEmpty(data.path) ? data.pathId : 'default',
+            initialValue: data.pathId ? linkRules : 'default',
             rules: [{
               required: true,
               message: '请选择链路!',
@@ -115,7 +126,7 @@ class CascadingLinkRules extends React.Component {
               disabled={isEdit}
             >
               <Option value="default">
-              实例 {serviceName}（本实例，非级联发布）
+                实例 {instance}（本实例，非级联发布）
               </Option>
               {
                 cascadingLinkRules.content.map(path =>
@@ -127,8 +138,8 @@ class CascadingLinkRules extends React.Component {
           {
             getFieldValue('pathId') !== 'default' &&
             <div className="desc-text">
-            链路中实例按照级联链路方向排列；需预先申请目标实例的发布权限，需预先在目
-            标实例中创建一个与当前发布的服务所选择的服务组名称相同的服务组。
+              链路中实例按照级联链路方向排列；需预先申请目标实例的发布权限，需预先在目
+              标实例中创建一个与当前发布的服务所选择的服务组名称相同的服务组。
             </div>
           }
         </FormItem>
@@ -144,8 +155,10 @@ class CascadingLinkRules extends React.Component {
                 required: true,
                 message: '请选择目标实例!',
               }],
+              valuePropName: 'checked',
             })(
-              <CheckboxGroup disabled={isEdit} options={instancesOptions} />
+              <CheckboxGroup options={instancesOptions}
+                defaultValue={this.filterCheck(instancesOptions)} disabled={isEdit}/>
             )}
           </FormItem>
         }
@@ -156,7 +169,8 @@ class CascadingLinkRules extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const cascadingLinkRules = cascadingLinkRuleSlt(state, ownProps)
-  const { CSB } = state
+  const { CSB, entities } = state
+  const { csbAvaInstances } = entities
   const { cascadedServicePrerequisite = {} } = CSB
   cascadingLinkRules.content.map(clr => {
     const csp = cascadedServicePrerequisite[clr.id]
@@ -173,6 +187,7 @@ const mapStateToProps = (state, ownProps) => {
     return clr
   })
   return {
+    csbAvaInstances,
     cascadingLinkRules,
   }
 }
