@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Card, Table, Button, Input, Dropdown, Menu, notification } from 'antd'
+import { Card, Table, Button, Input, notification } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
 import { getClientList, deleteClient } from '../../../../../../actions/certification'
@@ -171,21 +171,26 @@ class Clients extends React.Component {
         dataIndex: 'action',
         key: 'action',
         width: '20%',
-        render: (_, record) => (
-          <Dropdown.Button
-            className="client-dropdown"
-            onClick={() => this.viewClient(record)}
-            overlay={
-              <Menu style={{ width: 120 }} onClick={e => this.handleClick(e, record)}>
-                <Menu.Item key="edit">编辑</Menu.Item>
-                <Menu.Item key="delete">删除</Menu.Item>
-                <Menu.Item key="secret">修改客户端 Secret</Menu.Item>
-              </Menu>
-            }
-          >
-            查看
-          </Dropdown.Button>
-        ),
+        render: (_, record) => {
+          return (
+            <Button type={'default'} onClick={() => this.viewClient(record)}>查看</Button>
+          )
+          // return ( // 只保留查看, 暂时隐藏
+          //   <Dropdown.Button
+          //     className="client-dropdown"
+          //     onClick={() => this.viewClient(record)}
+          //     overlay={
+          //       <Menu style={{ width: 120 }} onClick={e => this.handleClick(e, record)}>
+          //         <Menu.Item key="edit">编辑</Menu.Item>
+          //         <Menu.Item key="delete">删除</Menu.Item>
+          //         <Menu.Item key="secret">修改客户端 Secret</Menu.Item>
+          //       </Menu>
+          //     }
+          //   >
+          //     查看
+          //   </Dropdown.Button>
+          // )
+        },
       },
     ]
     const pagination = {
@@ -199,9 +204,9 @@ class Clients extends React.Component {
     return (
       <QueueAnim className="certification-clients">
         <div className="layout-content-btns" key="btns">
-          <Button icon="plus" type="primary" onClick={() => this.toggleVisible()}>
+          {/* <Button icon="plus" type="primary" onClick={() => this.toggleVisible()}> // 隐藏添加应用按钮
             添加 OAuth 应用
-          </Button>
+          </Button> */}
           <Button icon="reload" onClick={this.refreshData}>
             刷新
           </Button>
