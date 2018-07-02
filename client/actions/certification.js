@@ -130,7 +130,6 @@ const fetchCreateClient = (access_token, body, zoneInfo) => {
       types: [ CREATE_CLIENT_REQUEST, CREATE_CLIENT_SUCCESS, CREATE_CLIENT_FAILURE ],
       endpoint: `${CLIENT_API_URL}/oauth/clients`,
       schema: {},
-      isCpi: true,
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -162,7 +161,6 @@ const fetchEditClient = (access_token, body, zoneInfo) => {
       types: [ EDIT_CLIENT_REQUEST, EDIT_CLIENT_SUCCESS, EDIT_CLIENT_FAILURE ],
       endpoint: `${CLIENT_API_URL}/oauth/clients/${body.client_id}`,
       schema: {},
-      isCpi: true,
       options: {
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -193,7 +191,6 @@ const fetchDeleteClient = (access_token, clientID, zoneInfo) => {
     [CALL_API]: {
       types: [ DELETE_CLIENT_REQUEST, DELETE_CLIENT_SUCCESS, DELETE_CLIENT_FAILURE ],
       endpoint: `${CLIENT_API_URL}/oauth/clients/${clientID}`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -228,7 +225,6 @@ const fetchChangeClientSecret = (access_token, body, zoneInfo) => {
         CHANGE_CLIENT_SECRET_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/oauth/clients/${body.clientId}/secret`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -266,7 +262,6 @@ const fetchIdentityZones = token => {
         GET_IDENTITY_ZONES_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/identity-zones`,
-      isCpi: true,
       schema: Schemas.MSA_CLIENT_IDENTITY_ZONE_LIST_DATA,
       options: {
         headers: {
@@ -296,7 +291,6 @@ const fetchCreateIdentityZones = (body, token) => {
         CREATE_IDENTITY_ZONES_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/identity-zones`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -329,7 +323,6 @@ const fetchIdentityZoneDetail = (id, token) => {
         IDENTITY_ZONE_DETAIL_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/identity-zones/${id}`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -359,7 +352,6 @@ const fetchUpdateIdentityZone = (body, token) => {
         UPDATE_IDENTITY_ZONE_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/identity-zones/${body.id}`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -392,7 +384,6 @@ const fetchDeleteIdentityZone = (id, token) => {
         DELETE_IDENTITY_ZONE_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/identity-zones/${id}`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -432,7 +423,6 @@ const fetchUserList = (token, query, zoneInfo) => {
         USERS_LIST_SUCCESS,
         USERS_LIST_FAILURE,
       ],
-      isCpi: true,
       endpoint,
       schema: Schemas.UAA_ZONE_USER_LIST_DATA,
       options: {
@@ -467,7 +457,6 @@ const fetchCreateZoneUser = (token, body, zoneInfo) => {
         CREATE_ZONE_USER_SUCCESS,
         CREATE_ZONE_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Users`,
       schema: {},
       options: {
@@ -504,7 +493,6 @@ const fetchUpdateZoneUser = (token, user, body, zoneInfo) => {
         UPDATE_ZONE_USER_SUCCESS,
         UPDATE_ZONE_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Users/${user.id}`,
       schema: {},
       options: {
@@ -542,7 +530,6 @@ const fetchPatchZoneUser = (token, user, body, zoneInfo) => {
         PATCH_ZONE_USER_SUCCESS,
         PATCH_ZONE_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Users/${user.id}`,
       schema: {},
       options: {
@@ -580,7 +567,6 @@ const fetchDeleteZoneUser = (token, id, zoneInfo) => {
         DELETE_ZONE_USER_SUCCESS,
         DELETE_ZONE_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Users/${id}`,
       schema: {},
       options: {
@@ -616,7 +602,6 @@ const fetchUpdateUserPassword = (token, userInfo, body, zoneInfo) => {
         UPDATE_ZONE_USER_PASSWORD_SUCCESS,
         UPDATE_ZONE_USER_PASSWORD_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Users/${userInfo.id}/password`,
       schema: {},
       options: {
@@ -655,7 +640,6 @@ const fetchUnlockAccount = (token, userId, body, zoneInfo) => {
         ZONE_USER_UNLOCK_FAILURE,
       ],
       endpoint: `${CLIENT_API_URL}/Users/${userId}/status`,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -698,7 +682,6 @@ const fetchCreateGroups = (token, body, zoneInfo) => {
         CREATE_GROUPS_FAILURE,
       ],
       endpoint,
-      isCpi: true,
       schema: {},
       options: {
         headers: {
@@ -738,7 +721,6 @@ const fetchGroupList = (token, query, zoneInfo) => {
         GROUPS_LIST_SUCCESS,
         GROUPS_LIST_FAILURE,
       ],
-      isCpi: true,
       endpoint,
       schema: {},
       options: {
@@ -774,7 +756,6 @@ const fetchDelGroup = (token, id, zoneInfo) => {
         DELETE_GROUPS_SUCCESS,
         DELETE_GROUPS_FAILURE,
       ],
-      isCpi: true,
       endpoint,
       schema: {},
       options: {
@@ -810,7 +791,6 @@ const fetchUpdateGroup = (token, query, body, zoneInfo) => {
         UPDATE_GROUPS_SUCCESS,
         UPDATE_GROUPS_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Groups/${query.id}`,
       schema: {},
       options: {
@@ -848,7 +828,6 @@ const fetchDeleteGroupUser = (token, groupId, userId, zoneInfo) => {
         DELETE_GROUP_USER_SUCCESS,
         DELETE_GROUP_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Groups/${groupId}/members/${userId}`,
       schema: {},
       options: {
@@ -888,7 +867,6 @@ const fetchGroupDetailList = (token, id, query, zoneInfo) => {
         GROUPS_DETAIL_LIST_SUCCESS,
         GROUPS_DETAIL_LIST_FAILURE,
       ],
-      isCpi: true,
       endpoint,
       schema: Schemas.UAA_ZONE_GROUP_USERS_LIST_DATA,
       options: {
@@ -922,7 +900,6 @@ const createGroupUser = (token, id, body, zoneInfo) => {
         ADD_GROUPS_DETAIL_USER_SUCCESS,
         ADD_GROUPS_DETAIL_USER_FAILURE,
       ],
-      isCpi: true,
       endpoint: `${CLIENT_API_URL}/Groups/${id}/members`,
       schema: {},
       options: {

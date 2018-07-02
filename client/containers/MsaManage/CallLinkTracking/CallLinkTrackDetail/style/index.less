@@ -1,0 +1,58 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of call link track detail
+ *
+ * @author zhangxuan
+ * @date 2018-07-02
+ */
+@import "../../../../../assets/style/core/index";
+.call-link-track-detail {
+  &-header {
+    margin: @padding-medium 0 !important;
+    .ant-card-body {
+      display: flex;
+      align-items: center;
+      & > img {
+        flex: 0 0;
+        margin-right: @padding-medium;
+      }
+      .call-link-track-detail-header-right {
+        flex: 1;
+        & > *:not(:last-child) {
+          margin-bottom: @padding-base;
+        }
+        .call-link-track-detail-id {
+          font-size: @font-size-large;
+        }
+        .call-link-track-detail-middle {
+          padding: 0;
+          li {
+            list-style: none;
+            display: inline-block;
+            &:not(:last-of-type) {
+              margin-right: @padding-large;
+            }
+          }
+        }
+        .call-link-track-detail-service-count {
+          & > span {
+            &:first-of-type {
+              margin-right: @padding-large;
+            }
+            &:last-of-type {
+              button {
+                &:not(:last-of-type) {
+                  margin-right: @padding-medium;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
