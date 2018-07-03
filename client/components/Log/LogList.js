@@ -50,7 +50,7 @@ class LogList extends React.Component {
     return (
       <div className={logListClass}>
         {
-          !data.length
+          !data || !data.length
             ? <div className="no-log-style">{ isFetching ? '获取中。。。' : '无日志' }</div>
             : <AutoSizer>
               {({ height, width }) => (

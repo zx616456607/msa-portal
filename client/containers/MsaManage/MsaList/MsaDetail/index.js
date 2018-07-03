@@ -58,7 +58,7 @@ class MsaDetail extends React.Component {
             </div>
           </Col>
         </Row>
-        <div className="msa-detail-tabs" key="tabs">
+        <div className="msa-detail-tabs">
           <Tabs
             defaultActiveKey="1"
             onChange={this.callback}
@@ -81,8 +81,13 @@ class MsaDetail extends React.Component {
                 clusterID={clusterID}
               />
             </TabPane>
-            <TabPane tab="日志信息" key="3" disabled><MsaDetailLogs/></TabPane>
-            <TabPane tab="监控" key="4" disabled>
+            <TabPane tab="日志信息" key="3">
+              <MsaDetailLogs
+                msaDetail={msaDetail}
+                clusterID={clusterID}
+              />
+            </TabPane>
+            <TabPane tab="监控" key="4">
               <img alt="monitor" width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
             </TabPane>
             <TabPane tab="配置" key="5">
