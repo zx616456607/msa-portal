@@ -15,7 +15,7 @@ import { Schemas } from '../middleware/schemas'
 import { API_CONFIG, CONTENT_TYPE_TEXT } from '../constants'
 import { toQuerystring } from '../common/utils'
 
-const { MSA_API_URL } = API_CONFIG
+const { MSA_API_URL, PAAS_API_URL } = API_CONFIG
 
 export const MSA_LIST_REQUEST = 'MSA_LIST_REQUEST'
 export const MSA_LIST_SUCCESS = 'MSA_LIST_SUCCESS'
@@ -310,3 +310,29 @@ export function getClusterProxies(clusterID) {
     return dispatch(fetchClusterProxies(clusterID))
   }
 }
+
+// 微服务日志
+export const GET_MSA_LOGS_REQUEST = 'GET_MSA_LOGS_REQUEST'
+export const GET_MSA_LOGS_SUCCESS = 'GET_MSA_LOGS_SUCCESS'
+export const GET_MSA_LOGS_FAILURE = 'GET_MSA_LOGS_FAILURE'
+
+const fetchMsaLogs = (clusterId, serviceName, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_LOGS_REQUEST,
+        GET_MSA_LOGS_SUCCESS,
+        GET_MSA_LOGS_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/logs/services/${serviceName}/logs`,
+      schema: {},
+      options: {
+        method: 'POST',
+        body,
+      },
+    },
+  }
+}
+
+export const getMsaLogs = (clusterId, serviceName, body) =>
+  dispatch => dispatch(fetchMsaLogs(clusterId, serviceName, body))

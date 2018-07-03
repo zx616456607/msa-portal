@@ -122,12 +122,36 @@ const serviceProxy = (state = {}, action) => {
   }
 }
 
+const msaLogs = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_LOGS_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+        data: [],
+      })
+    case ActionTypes.GET_MSA_LOGS_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.GET_MSA_LOGS_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: [],
+      })
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
   msaEnv: {},
   msaConfig: {},
   serviceDetail: {},
   serviceProxy: {},
+  msaLogs: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
@@ -135,6 +159,7 @@ const msa = (state = {
     msaConfig: msaConfig(state.msaConfig, action),
     serviceDetail: serviceDetail(state.serviceDetail, action),
     serviceProxy: serviceProxy(state.serviceProxy, action),
+    msaLogs: msaLogs(state.msaLogs, action),
   }
 }
 
