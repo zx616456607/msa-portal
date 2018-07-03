@@ -328,7 +328,7 @@ class Users extends React.Component {
           </div>
         </div>
         <div className="layout-content-body" key="body">
-          <Card bordered={false}>
+          <Card bordered={false} bodyStyle={{ padding: 0 }}>
             <Table
               columns={columns}
               dataSource={zoneUsers}
