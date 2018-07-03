@@ -57,7 +57,7 @@ class LogList extends React.Component {
                 <List
                   height={height}
                   rowCount={data.length}
-                  rowHeight={50}
+                  rowHeight={40}
                   rowRenderer={this.rowRenderer}
                   // disableWidth={true}
                   width={width}
