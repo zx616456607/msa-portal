@@ -33,7 +33,6 @@ class MsaDetailLogs extends React.Component {
     const { data = [], isFetching } = msaLogs
     return (
       <div>
-        <div style={{ position: 'fixed', top: 0, left: 0, textAlign: 'center' }}>222222</div>
         <LogTemplate
           loadData={this.loadData}
           data={data}
