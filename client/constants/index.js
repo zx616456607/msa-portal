@@ -158,3 +158,20 @@ export const METRICS_DISK_READ = 'disk/readio'
 export const METRICS_DISK_WRITE = 'disk/writeio'
 export const UPDATE_INTERVAL = 1000 * 60
 export const REALTIME_INTERVAL = 1000 * 10 // 实时监控
+export const FRESH_FREQUENCY = {
+  1: {
+    freshInterval: '1分钟',
+  },
+  6: {
+    freshInterval: '5分钟',
+  },
+  24: {
+    freshInterval: '20分钟',
+  },
+  168: {
+    freshInterval: '2小时',
+  },
+  720: {
+    freshInterval: '6小时',
+  },
+}

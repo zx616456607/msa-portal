@@ -12,7 +12,7 @@
 
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
-import { API_CONFIG, CONTENT_TYPE_TEXT } from '../constants'
+import { API_CONFIG, CONTENT_TYPE_TEXT, METRICS_DEFAULT_SOURCE } from '../constants'
 import { toQuerystring } from '../common/utils'
 
 const { MSA_API_URL, PAAS_API_URL } = API_CONFIG
@@ -336,3 +336,53 @@ const fetchMsaLogs = (clusterId, serviceName, body) => {
 
 export const getMsaLogs = (clusterId, serviceName, body) =>
   dispatch => dispatch(fetchMsaLogs(clusterId, serviceName, body))
+
+// 微服务监控
+export const GET_MSA_MONITOR_REQUEST = 'GET_MSA_MONITOR_REQUEST'
+export const GET_MSA_MONITOR_SUCCESS = 'GET_MSA_MONITOR_SUCCESS'
+export const GET_MSA_MONITOR_FAILURE = 'GET_MSA_MONITOR_FAILURE'
+
+const fetchMsaMonitor = (clusterId, serviceName, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_MSA_MONITOR_REQUEST,
+        GET_MSA_MONITOR_SUCCESS,
+        GET_MSA_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaMonitor = (clusterId, serviceName, query) =>
+  dispatch => dispatch(fetchMsaMonitor(clusterId, serviceName, query))
+
+// 微服务实时监控
+export const GET_MSA_REALTIME_MONITOR_REQUEST = 'GET_MSA_REALTIME_MONITOR_REQUEST'
+export const GET_MSA_REALTIME_MONITOR_SUCCESS = 'GET_MSA_REALTIME_MONITOR_SUCCESS'
+export const GET_MSA_REALTIME_MONITOR_FAILURE = 'GET_MSA_REALTIME_MONITOR_FAILURE'
+
+const fetchMsaRealTimeMonitor = (clusterId, serviceName, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_MSA_REALTIME_MONITOR_REQUEST,
+        GET_MSA_REALTIME_MONITOR_SUCCESS,
+        GET_MSA_REALTIME_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaRealTimeMonitor = (clusterId, serviceName, query) =>
+  dispatch => dispatch(fetchMsaRealTimeMonitor(clusterId, serviceName, query))

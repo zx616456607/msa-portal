@@ -22,6 +22,7 @@ import MsaDetailEnv from './MsaDetailEnv'
 import MsaDetailConfig from './MsadetailConfig'
 import MsaDetailLogs from './MsaDetailLogs'
 import './style/index.less'
+import Monitor from './MsaMonitor'
 
 const TabPane = Tabs.TabPane
 
@@ -88,7 +89,9 @@ class MsaDetail extends React.Component {
               />
             </TabPane>
             <TabPane tab="监控" key="4">
-              <img alt="monitor" width="720px" src={require('../../../../assets/img/msa-manage/service_monitor.png')}/>
+              <Monitor
+                {...{ name, clusterID }}
+              />
             </TabPane>
             <TabPane tab="配置" key="5">
               <MsaDetailConfig

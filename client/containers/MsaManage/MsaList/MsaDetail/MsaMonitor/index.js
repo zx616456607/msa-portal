@@ -4,33 +4,32 @@
  */
 
 /**
- * instance detail monitor component
  *
- * 2018-2-01
- * @author zhangcz
+ *
+ * @author zhangxuan
+ * @date 2018-07-04
  */
-
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import cloneDeep from 'lodash/cloneDeep'
-import { instanceMonitor, instanceRealTimeMonitor } from '../../../../actions/CSB/instance'
+import { msaMonitor, msaRealTimeMonitor } from '../../../../../actions/msa'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
   METRICS_NETWORK_TRANSMITTED, METRICS_DISK_READ, METRICS_DISK_WRITE,
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
-} from '../../../../constants'
-import Metric from '../../../../components/Metric'
+} from '../../../../../constants'
+import Metric from '../../../../../components/Metric'
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
   METRICS_NETWORK_RECEIVED, METRICS_DISK_READ, METRICS_DISK_WRITE,
 ]
 
-class Monitor extends React.Component {
+class Monitor extends React.PureComponent {
   static propTypes = {
+    name: PropTypes.string.isRequired,
     clusterID: PropTypes.string.isRequired,
-    instance: PropTypes.object.isRequired,
   }
 
   state = {
@@ -40,7 +39,6 @@ class Monitor extends React.Component {
     realTimeLoading: {},
     realTimeChecked: {},
   }
-
   componentDidMount() {
     this.intervalLoadMetrics()
   }
@@ -72,14 +70,14 @@ class Monitor extends React.Component {
   }
 
   getInstanceMetricsByType = type => {
-    const { instanceMonitor, clusterID, instance } = this.props
+    const { msaMonitor, clusterID, name } = this.props
     const { currentValue } = this.state
     const query = {
       type,
       start: this.changeTime(currentValue),
       end: new Date().toISOString(),
     }
-    return instanceMonitor(clusterID, instance, query)
+    return msaMonitor(clusterID, name, query)
   }
 
   changeTime = hours => {
@@ -100,7 +98,7 @@ class Monitor extends React.Component {
   }
 
   getNetworkMonitor = async () => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { msaRealTimeMonitor, clusterID, name } = this.props
     const now = new Date()
     const receivedQuery = {
       type: METRICS_NETWORK_RECEIVED,
@@ -113,14 +111,14 @@ class Monitor extends React.Component {
       end: new Date().toISOString(),
     }
     const networkPromiseArray = [
-      instanceRealTimeMonitor(clusterID, instance, receivedQuery),
-      instanceRealTimeMonitor(clusterID, instance, metricsQuery),
+      msaRealTimeMonitor(clusterID, name, receivedQuery),
+      msaRealTimeMonitor(clusterID, name, metricsQuery),
     ]
     await Promise.all(networkPromiseArray)
   }
 
   getDiskMonitor = async () => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { msaRealTimeMonitor, clusterID, name } = this.props
     const now = new Date()
     const readQuery = {
       type: METRICS_DISK_READ,
@@ -133,26 +131,26 @@ class Monitor extends React.Component {
       end: new Date().toISOString(),
     }
     const diskPromiseArray = [
-      instanceRealTimeMonitor(clusterID, instance, readQuery),
-      instanceRealTimeMonitor(clusterID, instance, writeQuery),
+      msaRealTimeMonitor(clusterID, name, readQuery),
+      msaRealTimeMonitor(clusterID, name, writeQuery),
     ]
     await Promise.all(diskPromiseArray)
   }
 
   getMonitor = async type => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { msaRealTimeMonitor, clusterID, name } = this.props
     const now = new Date()
     now.setHours(now.getHours() - 1)
     switch (type) {
       case 'cpu':
-        await instanceRealTimeMonitor(clusterID, instance, {
+        await msaRealTimeMonitor(clusterID, name, {
           type: METRICS_CPU,
           start: now.toISOString(),
           end: new Date().toISOString(),
         })
         break
       case 'memory':
-        await instanceRealTimeMonitor(clusterID, instance, {
+        await msaRealTimeMonitor(clusterID, name, {
           type: METRICS_MEMORY,
           start: now.toISOString(),
           end: new Date().toISOString(),
@@ -198,31 +196,28 @@ class Monitor extends React.Component {
 
   render() {
     const { loading, currentValue, freshInterval, realTimeChecked, realTimeLoading } = this.state
-    const { instanceMetrics, realTimeMonitor } = this.props
+    const { msaMetrics, msaRealTimeMetrics } = this.props
     return (
-      <div id="instance-detail-monitor">
-        <Metric
-          value={currentValue}
-          onChange={this.handleTimeChange}
-          dataSource={instanceMetrics}
-          realTimeDataSource={realTimeMonitor}
-          handleSwitch={this.handleSwitch}
-          {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
-        />
-      </div>
+      <Metric
+        value={currentValue}
+        onChange={this.handleTimeChange}
+        dataSource={msaMetrics}
+        realTimeDataSource={msaRealTimeMetrics}
+        handleSwitch={this.handleSwitch}
+        {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
+      />
     )
   }
 }
 
 const mapStateToProps = state => {
-  const { instanceMonitor: instanceMetrics, instanceRealTimeMonitor } = state.CSB
+  const { msaMonitor, msaRealTimeMonitor } = state.msa
   return {
-    instanceMetrics,
-    realTimeMonitor: instanceRealTimeMonitor,
+    msaMetrics: msaMonitor,
+    msaRealTimeMetrics: msaRealTimeMonitor,
   }
 }
-
 export default connect(mapStateToProps, {
-  instanceMonitor,
-  instanceRealTimeMonitor,
+  msaMonitor,
+  msaRealTimeMonitor,
 })(Monitor)
