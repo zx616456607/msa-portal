@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import {
   Button, Icon, Input, Table, Card, notification, Tooltip,
-  Dropdown, Menu, Badge,
+  Dropdown, Menu, Badge, Tabs, Radio,
 } from 'antd'
 import {
   getMsaList,
@@ -38,6 +38,9 @@ import './style/msaList.less'
 const Search = Input.Search
 const DropdownButton = Dropdown.Button
 const MenuItem = Menu.Item
+const TabPane = Tabs.TabPane
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 class MsaList extends React.Component {
   state = {
@@ -147,96 +150,125 @@ class MsaList extends React.Component {
     }
   }
 
+  // rpc related
+  classify = () => {
+  }
+  rpcSearch = () => {
+  }
+
   render() {
     const { msaList, msaListLoading } = this.props
     const { keyword } = this.state
     const msaData = msaList.filter(msa => msa.appName.indexOf(keyword) > -1)
-    const columns = [{
-      title: '微服务名称',
-      dataIndex: 'appName',
-      width: '20%',
-      render: (text, record) => {
-        if (record.discoverable) {
-          return <Link to={`/msa-manage/detail/${text}`}>{text}</Link>
-        }
-        return (
-          <Tooltip title="不可被发现">
-            <span>{text}</span>
-          </Tooltip>
-        )
-      },
-    }, {
-      title: '服务状态',
-      dataIndex: 'upSum',
-      width: '20%',
-      render: (text, record) => `${text}/${record.instances.length}`,
-    }, {
-      title: '注册类型',
-      dataIndex: 'type',
-      width: '20%',
-      render: text => MSA_TYPES_TEXT[text],
-    }, {
-      title: '状态',
-      dataIndex: 'discoverable',
-      width: '20%',
-      render: text =>
-        <span>
-          <Badge
-            status={text ? 'success' : 'default'}
-            text={text ? '可被发现' : '不可被发现'}
-          />
-        </span>,
-    }, {
-      title: '操作',
-      width: '20%',
-      render: record => {
-        const isMsaAutomatic = record.type === MSA_TYPE_AUTO
-        const isShow = !record.id || (record.id && record.deletedAt)
-        const isHide = record.id && !record.deletedAt
-        const menu = (
-          <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 103 }}>
-            <MenuItem key="add" disabled={isMsaAutomatic}>
-              <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
-                添加实例
-              </Tooltip>
-            </MenuItem>
-          </Menu>
-        )
-        return (
-          <div>
-            {
-              isMsaAutomatic && isShow && (
+    const restColumns = [
+      {
+        title: '微服务名称',
+        dataIndex: 'appName',
+        width: '20%',
+        render: (text, record) => {
+          if (record.discoverable) {
+            return <Link to={`/msa-manage/detail/${text}`}>{text}</Link>
+          }
+          return (
+            <Tooltip title="不可被发现">
+              <span>{text}</span>
+            </Tooltip>
+          )
+        },
+      }, {
+        title: '服务状态',
+        dataIndex: 'upSum',
+        width: '20%',
+        render: (text, record) => `${text}/${record.instances.length}`,
+      }, {
+        title: '注册类型',
+        dataIndex: 'type',
+        width: '20%',
+        render: text => MSA_TYPES_TEXT[text],
+      }, {
+        title: '状态',
+        dataIndex: 'discoverable',
+        width: '20%',
+        render: text =>
+          <span>
+            <Badge
+              status={text ? 'success' : 'default'}
+              text={text ? '可被发现' : '不可被发现'}
+            />
+          </span>,
+      }, {
+        title: '操作',
+        width: '20%',
+        render: record => {
+          const isMsaAutomatic = record.type === MSA_TYPE_AUTO
+          const isShow = !record.id || (record.id && record.deletedAt)
+          const isHide = record.id && !record.deletedAt
+          const menu = (
+            <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 103 }}>
+              <MenuItem key="add" disabled={isMsaAutomatic}>
+                <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
+                  添加实例
+                </Tooltip>
+              </MenuItem>
+            </Menu>
+          )
+          return (
+            <div>
+              {
+                isMsaAutomatic && isShow && (
+                  <DropdownButton
+                    overlay={menu}
+                    onClick={this.hideService.bind(this, record)}
+                  >
+                  隐藏服务
+                  </DropdownButton>
+                )
+              }
+              {
+                isMsaAutomatic && isHide && (
+                  <DropdownButton
+                    overlay={menu}
+                    onClick={this.cancelHideService.bind(this, record)}
+                  >
+                  取消隐藏
+                  </DropdownButton>
+                )
+              }
+              {
+                record.type === MSA_TYPE_MAN &&
                 <DropdownButton
                   overlay={menu}
-                  onClick={this.hideService.bind(this, record)}
+                  onClick={this.removeRegister.bind(this, record)}
                 >
-                隐藏服务
+                移除注册
                 </DropdownButton>
-              )
-            }
-            {
-              isMsaAutomatic && isHide && (
-                <DropdownButton
-                  overlay={menu}
-                  onClick={this.cancelHideService.bind(this, record)}
-                >
-                取消隐藏
-                </DropdownButton>
-              )
-            }
-            {
-              record.type === MSA_TYPE_MAN &&
-              <DropdownButton
-                overlay={menu}
-                onClick={this.removeRegister.bind(this, record)}
-              >
-              移除注册
-              </DropdownButton>
-            }
-          </div>
-        )
+              }
+            </div>
+          )
+        },
       },
-    }]
+    ]
+    const rpcColumns = [
+      {
+        title: '服务名称',
+        dataIndex: 'appName',
+      }, {
+        title: '服务版本',
+        dataIndex: 'upSum',
+      }, {
+        title: '所属应用',
+        dataIndex: 'type',
+      }, {
+        title: '服务分组',
+        dataIndex: 'discoverable',
+      }, {
+        title: '服务IP',
+        dataIndex: 'serviceIp',
+      }, {
+        title: '注册时间',
+        dataIndex: 'creationTime',
+      },
+    ]
     /* const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
@@ -250,30 +282,58 @@ class MsaList extends React.Component {
     }
     return (
       <QueueAnim className="msa">
-        <div className="msa-btn-box layout-content-btns" key="btns">
-          <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
-          {/* <Button icon="poweroff">注销微服务</Button> */}
-          <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
-          <Search
-            className="msa-search"
-            placeholder="按微服务名称搜索"
-            onSearch={keyword => this.setState({ keyword })}
-          />
-          <span className="float-right msa-btn-box-total">共计 {msaData.length} 条</span>
-        </div>
-        <div className="layout-content-body" key="body">
-          <Card>
-            <Table
-              className="msa-table"
-              pagination={pagination}
-              // rowSelection={rowSelection}
-              columns={columns}
-              dataSource={msaData}
-              loading={msaListLoading}
-              rowKey={row => row.appName}
-            />
-          </Card>
-        </div>
+        <Tabs type="card" animated>
+          <TabPane tab="REST服务" key="REST">
+            <div className="msa-btn-box layout-content-btns" key="btns">
+              <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
+              {/* <Button icon="poweroff">注销微服务</Button> */}
+              <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
+              <Search
+                className="msa-search"
+                placeholder="按微服务名称搜索"
+                onSearch={keyword => this.setState({ keyword })}
+              />
+              <span className="float-right msa-btn-box-total">共计 {msaData.length} 条</span>
+            </div>
+            <div className="layout-content-body" key="body">
+              <Card>
+                <Table
+                  className="msa-table"
+                  pagination={pagination}
+                  // rowSelection={rowSelection}
+                  columns={restColumns}
+                  dataSource={msaData}
+                  loading={msaListLoading}
+                  rowKey={row => row.appName}
+                />
+              </Card>
+            </div>
+
+          </TabPane>
+          <TabPane tab="RPC服务" key="RPC">
+            <div>
+              <div className="msa-classify">
+                <div className="title">分类</div>
+                <RadioGroup onChange={this.classify} defaultValue="supplier">
+                  <RadioButton value="supplier">提供者</RadioButton>
+                  <RadioButton value="consumer">消费者</RadioButton>
+                </RadioGroup>
+              </div>
+            </div>
+            <Card>
+              <div className="msa-rpc-table-filter">
+                <Button type="primary">刷新</Button>
+                <Input.Search
+                  placeholder="按服务名称、IP搜索"
+                  onSearch={this.rpcSearch}
+                />
+              </div>
+              <Table
+                columns={rpcColumns}
+              />
+            </Card>
+          </TabPane>
+        </Tabs>
       </QueueAnim>
     )
   }
