@@ -42,6 +42,31 @@ export function getMsaList(clusterID, query) {
   }
 }
 
+export const RPC_LIST_REQUEST = 'RPC_LIST_REQUEST'
+export const RPC_LIST_SUCCESS = 'RPC_LIST_SUCCESS'
+export const RPC_LIST_FAILURE = 'RPC_LIST_FAILURE'
+
+// Fetches a page of msa.
+const fetchRpcList = (clusterID, query) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/discovery/services`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [ RPC_LIST_REQUEST, RPC_LIST_SUCCESS, RPC_LIST_FAILURE ],
+      endpoint,
+      schema: Schemas.MSALIST_ARRAY_DATA,
+    },
+  }
+}
+
+export function getRpcList(clusterID, query) {
+  return dispatch => {
+    return dispatch(fetchRpcList(clusterID, query))
+  }
+}
+
 export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
 export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
 export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'

@@ -19,6 +19,7 @@ import {
 } from 'antd'
 import {
   getMsaList,
+  getRpcList,
   delManualrules,
   addExpulsionsManualrules,
   delExpulsionsManualrules,
@@ -45,6 +46,7 @@ const RadioGroup = Radio.Group
 class MsaList extends React.Component {
   state = {
     keyword: '',
+    classify: 'supplier',
   }
 
   componentWillMount() {
@@ -151,13 +153,30 @@ class MsaList extends React.Component {
   }
 
   // rpc related
-  classify = () => {
+  classify = e => {
+    this.setState({
+      classify: e.target.value,
+    }, () => {
+      // const { getRpcList, clusterID } = this.props
+      // getRpcList({ clusterID, classify: this.state.classify })
+    })
+  }
+  toggleTab = key => {
+    if (key === 'RPC') {
+      // const { getRpcList, clusterID } = this.props
+      // const { classify } = this.state
+      // getRpcList({ clusterID, classify })
+    }
   }
   rpcSearch = () => {
   }
-
+  rpcReload = () => {
+    // const { getRpcList, clusterID } = this.props
+    // const { classify } = this.state
+    // getRpcList({ clusterID, classify })
+  }
   render() {
-    const { msaList, msaListLoading } = this.props
+    const { msaList, msaListLoading, rpcList, rpcListLoading } = this.props
     const { keyword } = this.state
     const msaData = msaList.filter(msa => msa.appName.indexOf(keyword) > -1)
     const restColumns = [
@@ -282,7 +301,7 @@ class MsaList extends React.Component {
     }
     return (
       <QueueAnim className="msa">
-        <Tabs type="card" animated>
+        <Tabs type="card" animated onChange={this.toggleTab}>
           <TabPane tab="REST服务" key="REST">
             <div className="msa-btn-box layout-content-btns" key="btns">
               <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
@@ -322,7 +341,7 @@ class MsaList extends React.Component {
             </div>
             <Card>
               <div className="msa-rpc-table-filter">
-                <Button type="primary">刷新</Button>
+                <Button type="primary" onClick={this.rpcReload}>刷新</Button>
                 <Input.Search
                   placeholder="按服务名称、IP搜索"
                   onSearch={this.rpcSearch}
@@ -330,6 +349,8 @@ class MsaList extends React.Component {
               </div>
               <Table
                 columns={rpcColumns}
+                loading={rpcListLoading}
+                dataSource={rpcList}
               />
             </Card>
           </TabPane>
@@ -340,16 +361,20 @@ class MsaList extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, msa } = state
   const { id } = current.config.cluster
+  const { rpcList } = msa
   return {
     clusterID: id,
     ...msaListSlt(state),
+    rpcList: rpcList.data || [],
+    rpcLoading: rpcList.isFetching || false,
   }
 }
 
 export default connect(mapStateToProps, {
   getMsaList,
+  getRpcList,
   delManualrules,
   addExpulsionsManualrules,
   delExpulsionsManualrules,

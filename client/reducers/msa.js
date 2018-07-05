@@ -38,6 +38,30 @@ const msaNameList = (state = {}, action) => {
   }
 }
 
+const rpcList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.RPC_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.RPC_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ...action.response.result,
+      }
+    case ActionTypes.RPC_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const msaEnv = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -231,6 +255,7 @@ const msaRealTimeMonitor = (state = {}, action) => {
 
 const msa = (state = {
   msaNameList: {},
+  rpcList: {},
   msaEnv: {},
   msaConfig: {},
   serviceDetail: {},
@@ -241,6 +266,7 @@ const msa = (state = {
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
+    rpcList: rpcList(state.rpcList, action),
     msaEnv: msaEnv(state.msaEnv, action),
     msaConfig: msaConfig(state.msaConfig, action),
     serviceDetail: serviceDetail(state.serviceDetail, action),
