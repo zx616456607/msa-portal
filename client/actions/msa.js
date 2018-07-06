@@ -48,7 +48,8 @@ export const RPC_LIST_FAILURE = 'RPC_LIST_FAILURE'
 
 // Fetches a page of msa.
 const fetchRpcList = (clusterID, query) => {
-  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/discovery/services`
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/zookeeper/dubbo/servers`
+
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
@@ -67,6 +68,19 @@ export function getRpcList(clusterID, query) {
   }
 }
 
+export const RPC_SEARCH = 'RPC_SEARCH'
+export function searchRpcList(condition, currentClassify) {
+  return dispatch => {
+    dispatch({
+      type: RPC_SEARCH,
+      payload: {
+        condition,
+        currentClassify,
+      },
+    })
+
+  }
+}
 export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
 export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
 export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'

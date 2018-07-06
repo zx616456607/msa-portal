@@ -20,6 +20,7 @@ import {
 import {
   getMsaList,
   getRpcList,
+  searchRpcList,
   delManualrules,
   addExpulsionsManualrules,
   delExpulsionsManualrules,
@@ -33,7 +34,7 @@ import {
   MSA_TYPES_TEXT,
 } from '../../../constants'
 import confirm from '../../../components/Modal/confirm'
-import { toQuerystring } from '../../../common/utils'
+import { toQuerystring, formatDate } from '../../../common/utils'
 import './style/msaList.less'
 
 const Search = Input.Search
@@ -46,7 +47,7 @@ const RadioGroup = Radio.Group
 class MsaList extends React.Component {
   state = {
     keyword: '',
-    classify: 'supplier',
+    classify: 'providersSet',
   }
 
   componentWillMount() {
@@ -156,19 +157,22 @@ class MsaList extends React.Component {
   classify = e => {
     this.setState({
       classify: e.target.value,
-    }, () => {
-      // const { getRpcList, clusterID } = this.props
-      // getRpcList({ clusterID, classify: this.state.classify })
     })
   }
   toggleTab = key => {
     if (key === 'RPC') {
-      // const { getRpcList, clusterID } = this.props
-      // const { classify } = this.state
-      // getRpcList({ clusterID, classify })
+      const { getRpcList, clusterID } = this.props
+      getRpcList(clusterID, { side: 'provider' })// 参数side传什么，后台都会全部返回
     }
   }
-  rpcSearch = () => {
+  rpcSearch = val => {
+    const testIpAndPort = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\:([0-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-5]{2}[0-3][0-5])$/
+    const testIp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])/
+    let searchVal = 'serviceName'
+    if (testIp.test(val) || testIpAndPort.test(val)) {
+      searchVal = 'ip'
+    }
+    this.props.searchRpcList({ [searchVal]: val }, this.state.classify)
   }
   rpcReload = () => {
     // const { getRpcList, clusterID } = this.props
@@ -270,22 +274,23 @@ class MsaList extends React.Component {
     const rpcColumns = [
       {
         title: '服务名称',
-        dataIndex: 'appName',
+        dataIndex: 'serviceName',
       }, {
         title: '服务版本',
-        dataIndex: 'upSum',
+        dataIndex: 'version',
       }, {
         title: '所属应用',
-        dataIndex: 'type',
+        dataIndex: 'side',
       }, {
         title: '服务分组',
-        dataIndex: 'discoverable',
+        dataIndex: 'group',
       }, {
         title: '服务IP',
-        dataIndex: 'serviceIp',
+        dataIndex: 'ip',
       }, {
         title: '注册时间',
         dataIndex: 'creationTime',
+        render: time => formatDate(time),
       },
     ]
     /* const rowSelection = {
@@ -333,9 +338,9 @@ class MsaList extends React.Component {
             <div>
               <div className="msa-classify">
                 <div className="title">分类</div>
-                <RadioGroup onChange={this.classify} defaultValue="supplier">
-                  <RadioButton value="supplier">提供者</RadioButton>
-                  <RadioButton value="consumer">消费者</RadioButton>
+                <RadioGroup onChange={this.classify} defaultValue="providersSet">
+                  <RadioButton value="providersSet">提供者</RadioButton>
+                  <RadioButton value="consumersSet">消费者</RadioButton>
                 </RadioGroup>
               </div>
             </div>
@@ -350,7 +355,8 @@ class MsaList extends React.Component {
               <Table
                 columns={rpcColumns}
                 loading={rpcListLoading}
-                dataSource={rpcList}
+                dataSource={rpcList[this.state.classify]}
+                pagination={false}
               />
             </Card>
           </TabPane>
@@ -364,10 +370,11 @@ const mapStateToProps = state => {
   const { current, msa } = state
   const { id } = current.config.cluster
   const { rpcList } = msa
+
   return {
     clusterID: id,
     ...msaListSlt(state),
-    rpcList: rpcList.data || [],
+    rpcList: rpcList || {},
     rpcLoading: rpcList.isFetching || false,
   }
 }
@@ -375,6 +382,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   getMsaList,
   getRpcList,
+  searchRpcList,
   delManualrules,
   addExpulsionsManualrules,
   delExpulsionsManualrules,
