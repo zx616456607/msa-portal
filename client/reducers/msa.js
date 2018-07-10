@@ -40,92 +40,7 @@ const msaNameList = (state = {}, action) => {
 
 const rpcList = (state = {}, action) => {
   const { type } = action
-  const data = {
-    status: 'success',
-    code: 200,
-    data: {
-      providersSet: [
-        {
-          ip: '10.0.75.1:20880',
-          version: null,
-          side: 'provider',
-          serviceName: 'com.tenxcloud.example.dubbos.CityService',
-          application: 'zk-dubbo-provider',
-          group: 'a',
-          timestamp: 1530771249531,
-          pid: 0,
-          detail: null,
-        },
-        {
-          ip: '192.168.1.220:20880',
-          version: null,
-          side: 'provider',
-          serviceName: 'com.tenxcloud.example.dubbos.CityService',
-          application: 'zk-dubbo-provider',
-          group: null,
-          timestamp: 1530531827620,
-          pid: 0,
-          detail: null,
-        },
-        {
-          ip: '10.0.75.1:53637',
-          version: '3.0',
-          side: 'provider',
-          serviceName: 'com.tenxcloud.example.dubbos.ConService',
-          application: 'zk-dubbo-consumer',
-          group: null,
-          timestamp: 1530775275706,
-          pid: 0,
-          detail: null,
-        },
-        {
-          ip: '10.0.75.1:20880',
-          version: null,
-          side: 'provider',
-          serviceName: 'com.tenxcloud.example.dubbos.CityService',
-          application: 'zk-dubbo-provider',
-          group: null,
-          timestamp: 1530771239220,
-          pid: 0,
-          detail: null,
-        },
-        {
-          ip: '10.0.75.1:53637',
-          version: '2.0',
-          side: 'provider',
-          serviceName: 'com.tenxcloud.example.dubbos.ConService',
-          application: 'zk-dubbo-consumer',
-          group: null,
-          timestamp: 1530775274927,
-          pid: 0,
-          detail: null,
-        },
-      ],
-      consumersSet: [
-        {
-          ip: '10.0.75.1',
-          version: null,
-          side: 'consumer',
-          serviceName: 'com.tenxcloud.example.dubbos.CityService',
-          application: 'zk-dubbo-consumer',
-          group: null,
-          timestamp: 1530775254683,
-          pid: 0,
-          detail: null,
-        },
-      ],
-      services: [
-        'com.tenxcloud.example.dubbos.CityService',
-        'com.tenxcloud.example.dubbos.ConService',
-      ],
-      ips: [
-        '10.0.75.1',
-        '10.0.75.1:20880',
-        '192.168.1.220:20880',
-        '10.0.75.1:53637',
-      ],
-    },
-  }
+
   switch (type) {
     case ActionTypes.RPC_LIST_REQUEST:
       return {
@@ -136,13 +51,12 @@ const rpcList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        ...action.response.data,
+        ...action.response.result.data,
       }
     case ActionTypes.RPC_LIST_FAILURE:
       return {
         ...state,
         isFetching: false,
-        ...data.data,
       }
     case ActionTypes.RPC_SEARCH: {
       const { condition } = action.payload

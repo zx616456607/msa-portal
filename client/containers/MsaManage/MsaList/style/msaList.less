@@ -39,6 +39,14 @@
       top: -90px;
     }
   }
+  &-option {
+    position: relative;
+    .float-right {
+      position: absolute;
+      top: 2px;
+      right: @padding-small;
+    }
+  }
   &-classify {
     display: flex;
     justify-content: flex-start;
@@ -71,6 +79,13 @@
     .ant-input-search {
       width: 200px;
       margin-left: @padding-small;
+    }
+  }
+  &-rpc-table {
+    .ant-pagination-simple {
+      position: absolute;
+      right: -25px;
+      top: -112px;
     }
   }
 }

@@ -57,7 +57,7 @@ const fetchRpcList = (clusterID, query) => {
     [CALL_API]: {
       types: [ RPC_LIST_REQUEST, RPC_LIST_SUCCESS, RPC_LIST_FAILURE ],
       endpoint,
-      schema: Schemas.MSALIST_ARRAY_DATA,
+      schema: {},
     },
   }
 }

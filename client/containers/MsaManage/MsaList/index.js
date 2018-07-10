@@ -25,6 +25,7 @@ import {
   addExpulsionsManualrules,
   delExpulsionsManualrules,
 } from '../../../actions/msa'
+import { getZkhost } from '../../../actions/globalConfig'
 import {
   msaListSlt,
 } from '../../../selectors/msa'
@@ -48,6 +49,7 @@ class MsaList extends React.Component {
   state = {
     keyword: '',
     classify: 'providersSet',
+    hasZkhost: false,
   }
 
   componentWillMount() {
@@ -161,8 +163,15 @@ class MsaList extends React.Component {
   }
   toggleTab = key => {
     if (key === 'RPC') {
-      const { getRpcList, clusterID } = this.props
-      getRpcList(clusterID, { side: 'provider' })// 参数side传什么，后台都会全部返回
+      const { getRpcList, getZkhost, clusterID } = this.props
+      getZkhost(clusterID).then(res => {
+        if (res.response.result.code === 200) {
+          this.setState({
+            hasZkhost: true,
+          })
+          getRpcList(clusterID, { side: 'provider' })// 参数side传什么，后台都会全部返回
+        }
+      })
     }
   }
   rpcSearch = val => {
@@ -175,12 +184,13 @@ class MsaList extends React.Component {
     this.props.searchRpcList({ [searchVal]: val }, this.state.classify)
   }
   rpcReload = () => {
-    // const { getRpcList, clusterID } = this.props
-    // const { classify } = this.state
-    // getRpcList({ clusterID, classify })
+    if (this.state.hasZkhost) {
+      const { getRpcList, clusterID } = this.props
+      getRpcList(clusterID, { side: 'provider' })
+    }
   }
   render() {
-    const { msaList, msaListLoading, rpcList, rpcListLoading } = this.props
+    const { msaList, msaListLoading, rpcList, rpcLoading } = this.props
     const { keyword } = this.state
     const msaData = msaList.filter(msa => msa.appName.indexOf(keyword) > -1)
     const restColumns = [
@@ -335,7 +345,7 @@ class MsaList extends React.Component {
 
           </TabPane>
           <TabPane tab="RPC服务" key="RPC">
-            <div>
+            <div className="msa-option">
               <div className="msa-classify">
                 <div className="title">分类</div>
                 <RadioGroup onChange={this.classify} defaultValue="providersSet">
@@ -343,6 +353,7 @@ class MsaList extends React.Component {
                   <RadioButton value="consumersSet">消费者</RadioButton>
                 </RadioGroup>
               </div>
+              <span className="float-right msa-btn-box-total">共计 {rpcList[this.state.classify] ? rpcList[this.state.classify].length : 0} 条</span>
             </div>
             <Card>
               <div className="msa-rpc-table-filter">
@@ -353,10 +364,14 @@ class MsaList extends React.Component {
                 />
               </div>
               <Table
+                className="msa-rpc-table"
                 columns={rpcColumns}
-                loading={rpcListLoading}
+                loading={rpcLoading}
                 dataSource={rpcList[this.state.classify]}
-                pagination={false}
+                rowKey={row => row.timestamp}
+                pagination={{
+                  simple: true,
+                }}
               />
             </Card>
           </TabPane>
@@ -369,6 +384,7 @@ class MsaList extends React.Component {
 const mapStateToProps = state => {
   const { current, msa } = state
   const { id } = current.config.cluster
+
   const { rpcList } = msa
 
   return {
@@ -382,6 +398,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   getMsaList,
   getRpcList,
+  getZkhost,
   searchRpcList,
   delManualrules,
   addExpulsionsManualrules,
