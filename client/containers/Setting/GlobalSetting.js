@@ -197,7 +197,7 @@ const mapStateToProps = state => {
     host = state.globalConfig.data.host
     isFetching = state.globalConfig.isFetching
   }
-  const clusterId = Object.keys(clusters)[0]
+  const clusterId = clusters ? Object.keys(clusters)[0] : ''
   return { clusterId, host, isFetching }
 }
 

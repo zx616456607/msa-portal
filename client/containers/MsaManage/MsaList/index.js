@@ -162,16 +162,20 @@ class MsaList extends React.Component {
     })
   }
   toggleTab = key => {
+
     if (key === 'RPC') {
-      const { getRpcList, getZkhost, clusterID } = this.props
-      getZkhost(clusterID).then(res => {
-        if (res.response.result.code === 200) {
-          this.setState({
-            hasZkhost: true,
-          })
-          getRpcList(clusterID, { side: 'provider' })// 参数side传什么，后台都会全部返回
-        }
-      })
+      const { getRpcList, getZkhost, clusterID, rpcList } = this.props
+      if (!rpcList.providersSet) {
+        getZkhost(clusterID).then(res => {
+          if (res.response.result.code === 200) {
+            this.setState({
+              hasZkhost: true,
+            })
+            getRpcList(clusterID, { side: 'provider' })// 参数side传什么，后台都会全部返回
+          }
+        })
+      }
+
     }
   }
   rpcSearch = val => {
@@ -347,7 +351,7 @@ class MsaList extends React.Component {
           <TabPane tab="RPC服务" key="RPC">
             <div className="msa-option">
               <div className="msa-classify">
-                <div className="title">分类</div>
+                <div className="title">分类 :</div>
                 <RadioGroup onChange={this.classify} defaultValue="providersSet">
                   <RadioButton value="providersSet">提供者</RadioButton>
                   <RadioButton value="consumersSet">消费者</RadioButton>
