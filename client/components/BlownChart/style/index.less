@@ -1,0 +1,72 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of blown monitor chart
+ *
+ * @author zhangxuan
+ * @date 2018-07-11
+ */
+
+@import '../../../assets/style/core/index.less';
+.thread-monitor, .blown-monitor {
+  border-radius: @border-radius-base;
+  .monitor-content {
+    background-color: white;
+    padding: @padding-medium;
+    display: flex;
+    justify-content: space-around;
+    .blown-chart, .thread-chart {
+      height: 150px;
+      flex: 0 1 156px;
+    }
+    .blown-chart {
+      border: @border-width-base dashed @border-color-base;
+    }
+    .blow-chart-right {
+      flex: 0 1 91px;
+      .service-name, .thread-name {
+        font-size: @font-size-medium;
+        margin-bottom: @padding-base;
+        .unit {
+          font-size: @font-size-base;
+          color: @font-color-4;
+        }
+      }
+      .thread-name {
+        margin-top: @padding-large;
+      }
+      .request-frequency {
+        color: @font-color-4;
+        margin-top: @padding-medium;
+      }
+      .request-detail {
+        padding: 0;
+        display: flex;
+        li {
+          list-style: none;
+          display: inline-block;
+          flex: 33px;
+          text-align: right;
+          &:not(:last-of-type) {
+            border-right: @border-width-base @border-style-base @border-color-base;
+            padding-right: @padding-base;
+          }
+        }
+      }
+      .handle-capacity {
+        margin-bottom: @padding-base;
+      }
+      .handle-capacity, .blown-status {
+        color: @font-color-4;
+      }
+    }
+  }
+  .monitor-footer {
+    background-color: #f6f7fb;
+    padding: @padding-base @padding-medium;
+    color: @font-color-4;
+  }
+}

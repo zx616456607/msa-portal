@@ -1,75 +1,52 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import isEmpty from 'lodash/isEmpty.js'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Icon, Spin } from 'antd'
+import { Icon, Select } from 'antd'
 import './style/BlownMonitoring.less'
-import { getServiceDetail, getClusterProxies } from '../../actions/msa'
+import BlownChart from '../../components/BlownChart'
+import ThreadChart from '../../components/BlownChart/ThreadChart'
 
-const DEFAULT_SERVICE = 'spring-cloud-hystrix-turbine'
-const TENXCLOUD_SCHEMA_PORT_NAME = 'tenxcloud.com/schemaPortname'
+const Option = Select.Option
+
 
 class BlownMonitoring extends React.Component {
-  componentDidMount() {
-    const { getServiceDetail, currentCluster, getClusterProxies } = this.props
-    const { clusterID } = currentCluster
-    getServiceDetail(clusterID, DEFAULT_SERVICE)
-    getClusterProxies(clusterID)
-  }
 
   render() {
-    // const { currentCluster } = this.props
-    // const { apiHost } = currentCluster
-    // const blownUrl = `http://${apiHost.split(':')[0]}`
-    // const iframeSrc = `${blownUrl}:9901/hystrix/monitor?stream=${blownUrl}:9902/trubine.stream`
-    const { serviceDetail, serviceProxy } = this.props
-    const {
-      isFetching: detailFetching, data: detailData,
-    } = serviceDetail || { isFetching: true, data: {} }
-    const {
-      isFetching: proxyFetching,
-      data: proxyData,
-    } = serviceProxy || { isFetching: true, data: [] }
-    if (isEmpty(serviceDetail) || isEmpty(serviceProxy) || detailFetching || proxyFetching) {
-      return <Spin/>
-    }
-    const { service } = detailData[DEFAULT_SERVICE]
-    const portName = service.metadata.annotations[TENXCLOUD_SCHEMA_PORT_NAME]
-    if (!portName) {
-      return null
-    }
-    const portArr = portName.split(',')
-    const [ port1, port2 ] = [ portArr[0].split('/').pop(), portArr[1].split('/').pop() ]
-    const { address } = proxyData[0]
-    const iframeSrc =
-      `http://${address}:${port1}/hystrix/monitor?stream=http://${address}:${port2}/trubine.stream`
-    const extra = <a target="_blank" href={iframeSrc}>
-      <Icon type="export" /> 新页签打开
-    </a>
     return (
       <QueueAnim className="blown-monitoring">
+        <div className="layout-content-btns" key={'btns'}>
+          <Select
+            placeholder={'服务监控组（默认）'}
+            style={{ width: 200 }}>
+            <Option key={'default'}>default</Option>
+          </Select>
+          <span className={'primary-color pointer'}><Icon type="picture" /> 查看示例图</span>
+        </div>
         <div className="layout-content-body" key="body">
-          <Card extra={extra}>
-            <iframe title="blown monitoring" src={iframeSrc} />
-          </Card>
+          <div className="first-title">断路器</div>
+          <div className="monitor-wrapper">
+            <div className="monitor-list">
+              <BlownChart/>
+            </div>
+          </div>
+          <div className="first-title">线程池</div>
+          <div className="monitor-wrapper">
+            <div className="monitor-list">
+              <ThreadChart/>
+            </div>
+          </div>
         </div>
       </QueueAnim>
     )
   }
 }
 
-const mapStateToProps = state => {
-  const { current, entities, msa } = state
-  const currentCluster = entities.clusters[current.config.cluster.id]
-  const { serviceDetail, serviceProxy } = msa
+const mapStateToProps = () => {
   return {
-    currentCluster,
-    serviceDetail,
-    serviceProxy,
+
   }
 }
 
 export default connect(mapStateToProps, {
-  getServiceDetail,
-  getClusterProxies,
+
 })(BlownMonitoring)
