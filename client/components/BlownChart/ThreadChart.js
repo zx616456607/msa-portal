@@ -30,9 +30,17 @@ export default class ThreadChart extends React.PureComponent {
     return (
       <div className="thread-monitor">
         <div className="monitor-content">
-          <Chart className="thread-chart" height={150} width={'100%'} padding={10} data={threadData} scale={threadCols} forceFit>
+          <Chart className="thread-chart" height={150} width={156} padding={10} data={threadData} scale={threadCols} forceFit>
             <Tooltip crosshairs={{ type: 'y' }}/>
-            <Geom type="point" position="x*y" active={false} size={[ 'value', [ 4, 60 ]]} shape={'circle'} style={{ stroke: '#fff', lineWidth: 1 }} />
+            <Geom
+              type="point"
+              position="x*y"
+              active={false}
+              size={[ 'value', [ 4, 60 ]]}
+              shape={'circle'}
+              style={{ stroke: '#fff', lineWidth: 1 }}
+              opacity={0.5}
+            />
           </Chart>
           <div className="blow-chart-right">
             <div className="thread-name">xxx线程池</div>

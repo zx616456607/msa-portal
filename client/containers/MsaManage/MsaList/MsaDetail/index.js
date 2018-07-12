@@ -23,6 +23,7 @@ import MsaDetailConfig from './MsadetailConfig'
 import MsaDetailLogs from './MsaDetailLogs'
 import './style/index.less'
 import Monitor from './MsaMonitor'
+import BlownMonitor from './MsaBlownMonitor'
 
 const TabPane = Tabs.TabPane
 
@@ -99,6 +100,9 @@ class MsaDetail extends React.Component {
                 instances={instances}
                 clusterID={clusterID}
               />
+            </TabPane>
+            <TabPane tab="熔断监控" key="6">
+              <BlownMonitor/>
             </TabPane>
           </Tabs>
         </div>

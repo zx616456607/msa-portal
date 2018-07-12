@@ -18,7 +18,7 @@ import './style/index.less'
 
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
-let Chart4 = createG6Flow(chart => {
+const Chart4 = createG6Flow(chart => {
   chart.render()
   chart.edge()
     .shape('smooth')

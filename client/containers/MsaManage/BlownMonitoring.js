@@ -5,13 +5,25 @@ import { Icon, Select } from 'antd'
 import './style/BlownMonitoring.less'
 import BlownChart from '../../components/BlownChart'
 import ThreadChart from '../../components/BlownChart/ThreadChart'
+import BlownDemoModal from '../../components/BlownChart/BlownDemo'
 
 const Option = Select.Option
 
 
 class BlownMonitoring extends React.Component {
 
+  state = {}
+
+  toggleVisible = () => {
+    this.setState(({ visible }) => {
+      return {
+        visible: !visible,
+      }
+    })
+  }
+
   render() {
+    const { visible } = this.state
     return (
       <QueueAnim className="blown-monitoring">
         <div className="layout-content-btns" key={'btns'}>
@@ -20,7 +32,12 @@ class BlownMonitoring extends React.Component {
             style={{ width: 200 }}>
             <Option key={'default'}>default</Option>
           </Select>
-          <span className={'primary-color pointer'}><Icon type="picture" /> 查看示例图</span>
+          <span
+            className={'primary-color pointer'}
+            onClick={this.toggleVisible}
+          >
+            <Icon type="picture" /> 查看示例图
+          </span>
         </div>
         <div className="layout-content-body" key="body">
           <div className="first-title">断路器</div>
@@ -36,6 +53,11 @@ class BlownMonitoring extends React.Component {
             </div>
           </div>
         </div>
+        <BlownDemoModal
+          visible={visible}
+          onOk={this.toggleVisible}
+          onCancel={this.toggleVisible}
+        />
       </QueueAnim>
     )
   }

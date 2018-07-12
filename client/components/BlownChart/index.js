@@ -38,7 +38,7 @@ export default class BlownChart extends React.PureComponent {
     return (
       <div className="blown-monitor">
         <div className="monitor-content">
-          <Chart className="blown-chart" height={150} width={'100%'} padding={10} data={data} scale={cols} forceFit>
+          <Chart className="blown-chart" height={150} width={156} padding={10} data={data} scale={cols} forceFit>
             <Tooltip crosshairs={{ type: 'y' }}/>
             <Geom
               type="point"
@@ -48,6 +48,7 @@ export default class BlownChart extends React.PureComponent {
               size={[ 'scale', [ 4, 60 ]]}
               shape={'circle'}
               style={{ stroke: '#fff', lineWidth: 1 }}
+              opacity={0.5}
             />
             <Geom type="line" position="year*value" size={2} />
           </Chart>
