@@ -22,7 +22,7 @@ import { getZipkinTrace } from '../../../../actions/callLinkTrack'
 class CallLinkTrackDetail extends React.PureComponent {
 
   state = {
-    visible: false
+    visible: false,
   }
 
   componentDidMount() {
@@ -37,18 +37,18 @@ class CallLinkTrackDetail extends React.PureComponent {
 
   handleDetail = () => {
     this.setState({
-      visible: true
+      visible: true,
     })
   }
 
   handleClose = () => {
     this.setState({
-      visible: false
+      visible: false,
     })
   }
 
   render() {
-    const { data, isFetching } = this.props
+    const { isFetching } = this.props
     const columns = [{
       id: 'id',
       title: '微服务名称',
@@ -219,7 +219,7 @@ class CallLinkTrackDetail extends React.PureComponent {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const { current, zipkin } = state
   const { cluster } = current.config
   const clusterID = cluster.id
@@ -227,10 +227,10 @@ const mapStateToProps = (state) => {
   return {
     data,
     clusterID,
-    isFetching
+    isFetching,
   }
 }
 
 export default connect(mapStateToProps, {
-  getZipkinTrace
+  getZipkinTrace,
 })(CallLinkTrackDetail)

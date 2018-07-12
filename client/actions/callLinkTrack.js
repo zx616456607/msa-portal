@@ -10,7 +10,6 @@
  * @date 2018-06-29
  */
 import { CALL_API } from '../middleware/api'
-import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
 import {
   API_CONFIG,
@@ -21,7 +20,7 @@ export const GET_ZIPKIN_SERVICES_REQUEST = 'GET_ZIPKIN_SERVICES_REQUEST'
 export const GET_ZIPKIN_SERVICES_SUCCESS = 'GET_ZIPKIN_SERVICES_SUCCESS'
 export const GET_ZIPKIN_SERVICES_FAILURE = 'GET_ZIPKIN_SERVICES_FAILURE'
 
-const fetchZipkinServices = (clusterId) => {
+const fetchZipkinServices = clusterId => {
   const endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/services`
   return {
     [CALL_API]: {
@@ -36,7 +35,7 @@ const fetchZipkinServices = (clusterId) => {
   }
 }
 
-export const getZipkinServices = (clusterId) =>
+export const getZipkinServices = clusterId =>
   dispatch => dispatch(fetchZipkinServices(clusterId))
 
 export const GET_ZIPKIN_SPANS_REQUEST = 'GET_ZIPKIN_SPANS_REQUEST'
@@ -45,7 +44,7 @@ export const GET_ZIPKIN_SPANS_FAILURE = 'GET_ZIPKIN_SPANS_FAILURE'
 
 const fetchZipkinSpans = (clusterId, query) => {
   let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/spans`
-  if(query) {
+  if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
@@ -116,8 +115,8 @@ export const GET_ZIPKIN_DEPENDENCIES_SUCCESS = 'GET_ZIPKIN_DEPENDENCIES_SUCCESS'
 export const GET_ZIPKIN_DEPENDENCIES_FAILURE = 'GET_ZIPKIN_DEPENDENCIES_FAILURE'
 
 const fetchZipkinDependencies = (clusterId, query) => {
-  const endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/dependencies`
-  if(query) {
+  let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/dependencies`
+  if (query) {
     endpoint += `?${query}`
   }
   return {
@@ -135,5 +134,4 @@ const fetchZipkinDependencies = (clusterId, query) => {
 
 export const getZipkinDependencies = (clusterId, query) =>
   dispatch => dispatch(fetchZipkinDependencies(clusterId, query))
-
 

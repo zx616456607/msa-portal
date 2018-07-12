@@ -15,10 +15,10 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
   Checkbox, Icon, Select, DatePicker, Input, Button,
-  Card, Table, Form, Col, Row, Badge, Tooltip
+  Card, Table, Form, Col, Row, Badge, Tooltip,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import { DEFAULT, DEFAULT_PAGESIZE, DEFAULT_PAGE } from '../../../constants/index'
+import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
 import { formatFromnow, formatDate } from '../../../common/utils'
@@ -29,8 +29,8 @@ const FormItem = Form.Item
 const { RangePicker } = DatePicker
 const Option = Select.Option
 const colorMap = {
-  'success': G2.Global.colors[0],
-  'error': G2.Global.colors[7],
+  success: G2.Global.colors[0],
+  error: G2.Global.colors[7],
 };
 
 class CallLinkTracking extends React.Component {
@@ -55,7 +55,7 @@ class CallLinkTracking extends React.Component {
       let query
       if (value.traceId) {
         query = {
-          traceId: value.traceId
+          traceId: value.traceId,
         }
       } else {
         query = {
@@ -71,32 +71,32 @@ class CallLinkTracking extends React.Component {
     })
   }
 
-  handleServer = (value) => {
+  handleServer = value => {
     const { getZipkinSpans, clusterID } = this.props
     const query = {
-      serviceName: value
+      serviceName: value,
     }
     getZipkinSpans(clusterID, query).then((res, error) => {
       if (error) return
       this.setState({
-        spanList: res.response.result.data
+        spanList: res.response.result.data,
       })
     })
   }
 
-  fliterChartData = (data) => {
-    if (data.length <= 0) return
-    let dataAry = []
+  fliterChartData = data => {
+    if (!data) return
+    const dataAry = []
     data.forEach(item => {
-      let columns = {
-        gender: "female",
+      const columns = {
+        gender: 'female',
         continent: item.success ? 'success' : 'error',
         traceId: item.traceId,
         success: item.success,
         serviceName: item.serviceName,
         duration: item.duration,
         startTime: formatDate(item.startTime, 'YY-MM-DD hh'),
-        spanCount: item.spanCount
+        spanCount: item.spanCount,
       }
       dataAry.push(columns)
     })
@@ -111,8 +111,8 @@ class CallLinkTracking extends React.Component {
     const { spanList, checked } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
-    if(checked) {
-      dataList = dataList.filter(val => val.success !== true)
+    if (checked) {
+      // dataList = dataList.filter(val => val.success !== true)
     }
     // const pagination = {
     //   simple: true,
@@ -123,20 +123,20 @@ class CallLinkTracking extends React.Component {
     // }
     const cols = {
       traceId: {
-        alias: 'TraceID'
+        alias: 'TraceID',
       },
       serviceName: {
-        alias: '微服务名称'
+        alias: '微服务名称',
       },
       success: {
-        alias: '状态'
+        alias: '状态',
       },
       duration: {
-        alias: '总调用耗时'
+        alias: '总调用耗时',
       },
       startTime: {
-        alias: '产生时间'
-      }
+        alias: '产生时间',
+      },
     }
     const columns = [{
       title: 'Trace ID',
@@ -171,7 +171,7 @@ class CallLinkTracking extends React.Component {
     }, {
       title: '操作',
       width: '10%',
-      render: (record) => <Button
+      render: record => <Button
         type={'primary'}
         onClick={() => history.push(`/msa-manage/call-link-tracking/${record.traceId}`)}
       >
@@ -187,7 +187,7 @@ class CallLinkTracking extends React.Component {
               <FormItem>
                 {getFieldDecorator('serviceName', {
                   initialValue: servicesList && servicesList[0],
-                  onChange: (e) => this.handleServer(e),
+                  onChange: e => this.handleServer(e),
                 })(
                   <Select
                     style={{ width: 200 }}
@@ -224,7 +224,7 @@ class CallLinkTracking extends React.Component {
                     style={{ width: 400 }}
                     showTime={{ format: 'HH:mm' }}
                     format="YYYY-MM-DD HH:mm"
-                    placeholder={['开始时间', '结束时间']}
+                    placeholder={[ '开始时间', '结束时间' ]}
                   />
                 )}
               </FormItem>
@@ -279,15 +279,15 @@ class CallLinkTracking extends React.Component {
         <div className="chart" key="chart">
           <Chart height="200" data={this.fliterChartData(dataList)} scale={cols} forceFit={true}>
             <Tooltip showTitle={false} crosshairs={{ type: 'cross' }} />
-            <Axis name='startTime' />
-            <Axis name='spanCount' />
-            <Geom active={true} type='point' position="startTime*spanCount" opacity={0.65} shape="circle"
-              size={['spanCount', [4, 20]]} tooltip='traceId*serviceName*success*duration*startTime'
-              color={['continent', val => { return colorMap[val] }]} style={['continent', {
+            <Axis name="startTime" />
+            <Axis name="spanCount" />
+            <Geom active={true} type="point" position="startTime*spanCount" opacity={0.65} shape="circle"
+              size={[ 'spanCount', [ 4, 20 ]]} tooltip="traceId*serviceName*success*duration*startTime"
+              color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
                 lineWidth: 1,
                 stroke: val => {
                   return colorMap[val];
-                }
+                },
               }]} />
           </Chart>
         </div>

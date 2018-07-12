@@ -49,61 +49,61 @@ class RelationShip extends React.Component {
   render() {
     const { isTimerShow, timer } = this.state
     const data = {
-      "nodes": [
+      nodes: [
         {
-          "shape": "rect",
-          "label": "Service",
-          "id": "add1174b"
+          shape: 'rect',
+          label: 'Service',
+          id: 'add1174b',
         },
         {
-          "shape": "rect",
-          "label": "Service1",
-          "id": "fbc69eaa"
+          shape: 'rect',
+          label: 'Service1',
+          id: 'fbc69eaa',
         },
         {
-          "shape": "rect",
-          "label": "Service1-1",
-          "id": "0ce831a6"
+          shape: 'rect',
+          label: 'Service1-1',
+          id: '0ce831a6',
         },
         {
-          "shape": "rect",
-          "label": "Service1-2",
-          "id": "46c87dc5"
+          shape: 'rect',
+          label: 'Service1-2',
+          id: '46c87dc5',
         },
         {
-          "shape": "rect",
-          "label": "Service2",
-          "id": "a7ae06e1"
+          shape: 'rect',
+          label: 'Service2',
+          id: 'a7ae06e1',
         },
       ],
-      "edges": [
+      edges: [
         {
-          "source": "add1174b",
-          "target": "fbc69eaa",
-          "color": '#5ab46d',
-          "label": '0/1 calss (错误/总)',
-          "id": "ae85ce02"
+          source: 'add1174b',
+          target: 'fbc69eaa',
+          color: '#5ab46d',
+          label: '0/1 calss (错误/总)',
+          id: 'ae85ce02',
         },
         {
-          "source": "fbc69eaa",
-          "target": "0ce831a6",
-          "color": 'red',
-          "label": '1/2 calss (错误/总)',
-          "id": "ebb1bb90"
+          source: 'fbc69eaa',
+          target: '0ce831a6',
+          color: 'red',
+          label: '1/2 calss (错误/总)',
+          id: 'ebb1bb90',
         },
         {
-          "source": "fbc69eaa",
-          "target": "46c87dc5",
-          "color": "#5ab46d",
-          "id": "de5483e7"
+          source: 'fbc69eaa',
+          target: '46c87dc5',
+          color: '#5ab46d',
+          id: 'de5483e7',
         },
         {
-          "source": "fbc69eaa",
-          "target": "a7ae06e1",
-          "color": "#5ab46d",
-          "id": "a0318c7b"
-        }
-      ]
+          source: 'fbc69eaa',
+          target: 'a7ae06e1',
+          color: '#5ab46d',
+          id: 'a0318c7b',
+        },
+      ],
     }
     return (
       <QueueAnim className="relation-ship">
