@@ -12,30 +12,27 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Card, Button, DatePicker } from 'antd'
+import isEmpty from 'lodash/isEmpty'
 import createG6Flow from '../../../../components/CreateG6/flowChart'
 import './style/index.less'
 
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
-let Chart4
+const Chart4 = createG6Flow(chart => {
+  chart.render()
+  chart.edge()
+    .shape('smooth')
+    .style({
+      arrow: true,
+    })
+    .size(2)
+})
 
 class RelationShip extends React.Component {
 
   state = {
     timer: '',
     isTimerShow: true,
-  }
-
-  componentDidMount() {
-    Chart4 = createG6Flow(chart => {
-      chart.render()
-      chart.edge()
-        .shape('smooth')
-        .style({
-          arrow: true,
-        })
-        .size(2)
-    })
   }
 
   handleTimer = () => {
@@ -133,8 +130,12 @@ class RelationShip extends React.Component {
         </div>
         <div className="body" key="body">
           <Card>
-            <Chart4
-              data={data} />
+            {
+              !isEmpty(data) &&
+              <Chart4
+                data={data}
+              />
+            }
           </Card>
         </div>
       </QueueAnim>
