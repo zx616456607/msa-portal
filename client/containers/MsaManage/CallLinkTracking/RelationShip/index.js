@@ -10,11 +10,13 @@
  * @date 2018-06-28
  */
 import React from 'react'
+import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Card, Button, DatePicker } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import createG6Flow from '../../../../components/CreateG6/flowChart'
 import './style/index.less'
+import { getZipkinDependencies } from '../../../../actions/callLinkTrack'
 
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
@@ -35,73 +37,72 @@ class RelationShip extends React.Component {
     isTimerShow: true,
   }
 
-  handleTimer = () => {
-    this.setState({
-      isTimerShow: false,
-    })
+  componentDidMount() {
+    const { clusterID, getZipkinDependencies } = this.props
+    const query = {
+      endTs: Date.parse(new Date(new Date() - 300 * 1000)),
+    }
+    getZipkinDependencies(clusterID, query)
   }
 
-  handleLatelyTimer = () => { }
+  handleTimer = () => {
+    const { isTimerShow } = this.state
+    if (isTimerShow) {
+      this.setState({
+        isTimerShow: false,
+      })
+    } else {
+      this.setState({
+        isTimerShow: true,
+      })
+    }
+  }
+
+  handleLatelyTimer = key => {
+    const { clusterID, getZipkinDependencies } = this.props
+    let query
+    switch (key) {
+      case 'five':
+        query = {
+          endTs: Date.parse(new Date(new Date() - 300 * 1000)),
+        }
+        break
+      case 'halFhour':
+        query = {
+          endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
+        }
+        break
+      case 'anHour':
+        query = {
+          endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
+        }
+        break
+      default:
+        break
+    }
+    getZipkinDependencies(clusterID, query)
+  }
 
   render() {
     const { isTimerShow, timer } = this.state
-    const data = {
-      nodes: [
-        {
-          shape: 'rect',
-          label: 'Service',
-          id: 'add1174b',
-        },
-        {
-          shape: 'rect',
-          label: 'Service1',
-          id: 'fbc69eaa',
-        },
-        {
-          shape: 'rect',
-          label: 'Service1-1',
-          id: '0ce831a6',
-        },
-        {
-          shape: 'rect',
-          label: 'Service1-2',
-          id: '46c87dc5',
-        },
-        {
-          shape: 'rect',
-          label: 'Service2',
-          id: 'a7ae06e1',
-        },
-      ],
-      edges: [
-        {
-          source: 'add1174b',
-          target: 'fbc69eaa',
-          color: '#5ab46d',
-          label: '0/1 calss (错误/总)',
-          id: 'ae85ce02',
-        },
-        {
-          source: 'fbc69eaa',
-          target: '0ce831a6',
-          color: 'red',
-          label: '1/2 calss (错误/总)',
-          id: 'ebb1bb90',
-        },
-        {
-          source: 'fbc69eaa',
-          target: '46c87dc5',
-          color: '#5ab46d',
-          id: 'de5483e7',
-        },
-        {
-          source: 'fbc69eaa',
-          target: 'a7ae06e1',
-          color: '#5ab46d',
-          id: 'a0318c7b',
-        },
-      ],
+    const { data } = this.props
+    if (!isEmpty(data)) {
+      if(data.edges.length > 0) {
+        data.edges.forEach(item => {
+          if (item.errorCount > 0 && item.errorCount < item.callCount) {
+            item.color = '#5ab46d'
+            item.errPart = true
+          } else {
+            item.color = '#5ab46d'
+            item.errPart = false
+          }
+          if (item.errorCount === item.callCount) {
+            item.color = 'red'
+          }
+        })
+      }
     }
+
     return (
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
@@ -113,8 +114,8 @@ class RelationShip extends React.Component {
               isTimerShow ?
                 <Row>
                   <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('three')}>最近30分钟</Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('today')}>最近1小时</Button>
+                  <Button className="btn" onClick={() => this.handleLatelyTimer('halFhour')}>最近30分钟</Button>
+                  <Button className="btn" onClick={() => this.handleLatelyTimer('anHour')}>最近1小时</Button>
                 </Row> :
                 <Row>
                   <RangePicker
@@ -123,7 +124,6 @@ class RelationShip extends React.Component {
                     value={timer}
                     onChange={timer => this.setState({ timer })}
                   />
-                  {/* <Button icon="search" onClick={() => this.handleCustomTimer()} /> */}
                 </Row>
             }
           </ButtonGroup>
@@ -143,4 +143,17 @@ class RelationShip extends React.Component {
   }
 }
 
-export default RelationShip
+const mapStateToProps = state => {
+  const { current, zipkin } = state
+  const { cluster } = current.config
+  const clusterID = cluster.id
+  const { relationShipList } = zipkin
+  const { data } = relationShipList
+  return {
+    data,
+    clusterID,
+  }
+}
+export default connect(mapStateToProps, {
+  getZipkinDependencies,
+})(RelationShip)

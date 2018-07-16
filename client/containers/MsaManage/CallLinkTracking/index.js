@@ -14,15 +14,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  Checkbox, Icon, Select, DatePicker, Input, Button,
-  Card, Table, Form, Col, Row, Badge, Tooltip,
+  Checkbox, Select, DatePicker, Input, Button,
+  Card, Table, Form, Col, Row, Badge,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
 import { formatFromnow, formatDate } from '../../../common/utils'
-import { Chart, Geom, Axis, G2 } from 'bizcharts'
+import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import { getZipkinTracesList, getZipkinServices, getZipkinSpans } from '../../../actions/callLinkTrack'
 
 const FormItem = Form.Item
@@ -61,10 +61,10 @@ class CallLinkTracking extends React.Component {
         query = {
           serviceName: value.serviceName,
           spanName: value.spanName,
-          endTs: value.endTs,
+          endTs: value.endTs[1].valueOf(),
           minDuration: value.minDuration,
           limit: value.limit,
-          lookback: '',
+          lookback: value.endTs[1] - value.endTs[0],
         }
       }
       getZipkinTracesList(clusterID, query)
@@ -111,9 +111,7 @@ class CallLinkTracking extends React.Component {
     const { spanList, checked } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
-    if (checked) {
-      // dataList = dataList.filter(val => val.success !== true)
-    }
+    let errorList
     // const pagination = {
     //   simple: true,
     //   total: 10 || 0,
@@ -163,6 +161,7 @@ class CallLinkTracking extends React.Component {
       title: '总耗时数（ms）',
       width: '10%',
       dataIndex: 'duration',
+      render: text => <div>{text / 1000}</div>,
     }, {
       title: '开始时间',
       width: '10%',
@@ -179,6 +178,9 @@ class CallLinkTracking extends React.Component {
       </Button>,
     }]
 
+    if (checked) {
+      errorList = dataList.filter(val => val.success !== true)
+    }
     return (
       <QueueAnim className="msa-call-link-tracking">
         <div className="layout-content-btns" key="btns">
@@ -190,8 +192,8 @@ class CallLinkTracking extends React.Component {
                   onChange: e => this.handleServer(e),
                 })(
                   <Select
-                    style={{ width: 200 }}
                     placeholder="选择微服务"
+                    className="select-style"
                   >
                     {
                       servicesList && servicesList.map(item => {
@@ -207,7 +209,8 @@ class CallLinkTracking extends React.Component {
                 {getFieldDecorator('spanName', {
                   ininialValue: spanList.length > 1 && spanList[0],
                 })(
-                  <Select style={{ width: 200 }} placeholder="选择span">
+                  <Select placeholder="选择span"
+                    className="select-style">
                     {
                       spanList.length > 1 && spanList.map(item => {
                         return <Option key={item}>{item}</Option>
@@ -217,29 +220,29 @@ class CallLinkTracking extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={8}>
+            <Col span={7}>
               <FormItem>
                 {getFieldDecorator('endTs', {})(
                   <RangePicker
-                    style={{ width: 400 }}
                     showTime={{ format: 'HH:mm' }}
                     format="YYYY-MM-DD HH:mm"
+                    className="endTs"
                     placeholder={[ '开始时间', '结束时间' ]}
                   />
                 )}
               </FormItem>
             </Col>
-            <Col span={4}>
+            <Col span={5}>
               <FormItem>
                 {getFieldDecorator('minDuration', {})(
-                  <Input placeholder="耗时（ms）>=" style={{ width: 200 }} />
+                  <Input placeholder="耗时（ms）>=" className="input-style" />
                 )}
               </FormItem>
             </Col>
             <Col span={4}>
               <FormItem>
                 {getFieldDecorator('limit', {})(
-                  <Input placeholder="返回条数" style={{ width: 250 }} />
+                  <Input placeholder="返回条数" className="input-style" />
                 )}
               </FormItem>
             </Col>
@@ -249,10 +252,7 @@ class CallLinkTracking extends React.Component {
               <FormItem>
                 {getFieldDecorator('traceId', {})(
                   <div>
-                    <Input placeholder="Trace ID" style={{ width: 200, marginRight: 10 }} />
-                    <Tooltip title="在使用TraceID搜索时，其他条件设置无效。">
-                      <Icon type="question-circle-o" />
-                    </Tooltip>
+                    <Input placeholder="Trace ID，其他条件设置无效" className="trace" />
                   </div>
                 )}
               </FormItem>
@@ -264,7 +264,7 @@ class CallLinkTracking extends React.Component {
               >
                 只查失败
               </Checkbox>
-              <Button type={'primary'} icon={'search'} style={{ marginRight: 10 }}
+              <Button type={'primary'} icon={'search'} className="search"
                 onClick={() => this.handleSearch()}>搜索</Button>
               <Button type={'primary'} icon={'rollback'}
                 onClick={() => this.handleReset()}>重置</Button>
@@ -296,7 +296,7 @@ class CallLinkTracking extends React.Component {
             <Table
               pagination={false}
               loading={isFetching}
-              dataSource={dataList}
+              dataSource={checked ? errorList : dataList}// {checked ? errorList : dataList}
               columns={columns}
               rowKey={row => row.traceId}
             />

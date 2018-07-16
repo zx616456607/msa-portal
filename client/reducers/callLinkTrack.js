@@ -84,15 +84,41 @@ const traceList = (state = {}, action) => {
   }
 }
 
+const relationShipList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_ZIPKIN_DEPENDENCIES_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_ZIPKIN_DEPENDENCIES_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: action.response.result.data,
+      }
+    case ActionTypes.GET_ZIPKIN_DEPENDENCIES_FAILURE:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    default:
+      return state
+  }
+}
+
 const zipkin = (state = {
   traceList: {},
   tracesList: {},
   servicesList: {},
+  relationShipList: {},
 }, action) => {
   return {
     traceList: traceList(state.traceList, action),
     tracesList: tracesList(state.tracesList, action),
     servicesList: servicesList(state.servicesList, action),
+    relationShipList: relationShipList(state.relationShipList, action),
   }
 }
 
