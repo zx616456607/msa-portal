@@ -6,7 +6,7 @@
 /**
  * Call link track detail
  *
- * @author zhangxuan
+ * @author zhaoyb
  * @date 2018-07-02
  */
 import React from 'react'
@@ -27,6 +27,7 @@ class CallLinkTrackDetail extends React.PureComponent {
     detailData: [],
     serviceList: [],
     serverDetail: [],
+    detailTimestamp: '',
   }
 
   componentDidMount() {
@@ -43,7 +44,8 @@ class CallLinkTrackDetail extends React.PureComponent {
   handleDetail = record => {
     this.setState({
       visible: true,
-      serviceList: record.annotations,
+      detailTimestamp: record.timestamp,
+      serviceList: record.annotations || [],
       serverDetail: record.binaryAnnotations,
     })
   }
@@ -56,25 +58,27 @@ class CallLinkTrackDetail extends React.PureComponent {
 
   filterProgress = (text, success, duration) => {
     const { detailData } = this.props
-    if (text.length === 2) {
-      return <Progress
-        status={success ? 'success' : 'exception'}
-        showInfo={false}
-        percent={100}
-      />
-    }
-    if (text.length === 4) {
-      const countMS = Math.ceil((duration / detailData[0].duration) * 100)
-      return <Progress
-        status={success ? 'success' : 'exception'}
-        showInfo={false}
-        percent={countMS}
-      />
+    if (text) {
+      if (text.length === 2) {
+        return <Progress
+          status={success ? 'success' : 'exception'}
+          showInfo={false}
+          percent={100}
+        />
+      }
+      if (text.length === 4) {
+        const countMS = Math.ceil((duration / detailData[0].duration) * 100)
+        return <Progress
+          status={success ? 'success' : 'exception'}
+          showInfo={false}
+          percent={countMS}
+        />
+      }
     }
   }
 
   render() {
-    const { serverDetail, serviceList } = this.state
+    const { serverDetail, serviceList, detailTimestamp } = this.state
     const { isFetching, detailData } = this.props
     const columns = [{
       id: 'id',
@@ -99,14 +103,15 @@ class CallLinkTrackDetail extends React.PureComponent {
       width: '10%',
       render: text => text / 1000,
     }, {
-      title: `时间线 0 ms - ${detailData && detailData[0].duration / 1000} ms`,
+      title: `时间线 0 ms - ${detailData.length > 0 && detailData[0].duration / 1000} ms`,
       dataIndex: 'annotations',
       width: '20%',
-      render: (text, record) => this.filterProgress(text, record.success, record.duration), // <Progress percent={60} showInfo={false} />,
+      render: (text, record) => this.filterProgress(text, record.success, record.duration, record),
     }, {
       title: '操作',
       width: '15%',
-      render: text => <Button type="primary" onClick={() => this.handleDetail(text)}>查看详情</Button>,
+      render: text => <Button type="primary"
+        onClick={() => this.handleDetail(text)}>查看详情</Button>,
     }]
     const modalColums = [{
       key: 'id',
@@ -134,7 +139,7 @@ class CallLinkTrackDetail extends React.PureComponent {
               <li>开始时间：
                 {detailData.length > 0 && formatFromnow(detailData[0].timestamp / 1000)}
               </li>
-              <li>调用深度：3</li>
+              <li>调用深度：{detailData.length > 0 && detailData[0].spanCount}</li>
               <li>调用耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</li>
               <li>总span数：{detailData.length > 0 && detailData[0].spanCount}</li>
             </ul>
@@ -169,53 +174,77 @@ class CallLinkTrackDetail extends React.PureComponent {
           onCancel={this.handleClose}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleClose}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleOk}>确 定</Button>,
+            <Button key="submit" type="primary" onClick={this.handleClose}>确 定</Button>,
           ]}>
           {
             <div className="modal-server">
               <div className="top">
-                <div>请求相对开始时间：10.00 ms</div>
+                <div>请求相对开始时间：{detailTimestamp - detailData[0].timestamp} ms</div>
                 <div>span 总耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</div>
               </div>
-              <div className="flow-chart">
-                <Row gutter={16}>
-                  <Col span={6}>
-                    <div className="server">
-                      {serviceList.length > 0 && serviceList[0].endpoint.serviceName}
-                    </div>
-                  </Col>
-                  <Col span={6}>
-                    <div className="send">发送请求耗时：
-                      {
-                        serviceList.length > 0 &&
+              {
+                serviceList.length === 4 &&
+                <div className="flow-chart">
+                  <Row gutter={16}>
+                    <Col span={6}>
+                      <div className="server">
+                        {serviceList.length > 0 && serviceList[0].endpoint.serviceName}
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="send">发送请求耗时：
+                        {
+                          serviceList.length > 0 &&
+                          (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
+                        } ms
+                      </div>
+                      <div className="arrow-left sx-arrow-left"></div>
+                      <div className="end">收到响应耗时：
+                        {
+                          serviceList.length > 0 &&
+                          (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
+                        } ms
+                      </div>
+                      <div className="arrow-rigth sx-arrow-rigth"></div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="server end-server">
+                        {serviceList.length > 0 && serviceList[1].endpoint.serviceName}
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="server-time">服务端处理请求耗时：
+                        {
+                          serviceList.length > 0 &&
+                          (serviceList[2].timestamp - serviceList[1].timestamp) / 1000
+                        } ms
+                      </div>
+                      <div className="arrow-time"></div>
+                    </Col>
+                  </Row>
+                </div>
+              }
+              {
+                serviceList.length === 2 &&
+                <div className="flow-chart">
+                  <Row gutter={16}>
+                    <Col span={6}>
+                      <div className="server end-server">
+                        {serviceList.length > 0 && serviceList[0].endpoint.serviceName}
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="server-time">服务端处理请求耗时：
+                        {
+                          serviceList.length > 0 &&
                         (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
-                      } ms
-                    </div>
-                    <div className="arrow-left sx-arrow-left"></div>
-                    <div className="end">收到响应耗时：
-                      {
-                        serviceList.length > 0 &&
-                        (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
-                      } ms
-                    </div>
-                    <div className="arrow-rigth sx-arrow-rigth"></div>
-                  </Col>
-                  <Col span={6}>
-                    <div className="server end-server">
-                      {serviceList.length > 0 && serviceList[1].endpoint.serviceName}
-                    </div>
-                  </Col>
-                  <Col span={6}>
-                    <div className="server-time">服务端处理请求耗时：
-                      {
-                        serviceList.length > 0 &&
-                        (serviceList[2].timestamp - serviceList[1].timestamp) / 1000
-                      } ms
-                    </div>
-                    <div className="arrow-time"></div>
-                  </Col>
-                </Row>
-              </div>
+                        } ms
+                      </div>
+                      <div className="arrow-time"></div>
+                    </Col>
+                  </Row>
+                </div>
+              }
               <div className="body">
                 <Table
                   pagination={false}

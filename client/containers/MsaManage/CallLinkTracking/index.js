@@ -271,32 +271,36 @@ class CallLinkTracking extends React.Component {
             </Col>
           </Row>
           <div className="page-box">
-            <span className="total">共 {dataList &&
-              dataList.length} 条</span>
+            {
+              dataList && <span className="total">共 {dataList.length} 条</span>
+            }
             {/* <Pagination {...pagination} /> */}
           </div>
         </div>
-        <div className="chart" key="chart">
-          <Chart height="200" data={this.fliterChartData(dataList)} scale={cols} forceFit={true}>
-            <Tooltip showTitle={false} crosshairs={{ type: 'cross' }} />
-            <Axis name="startTime" />
-            <Axis name="spanCount" />
-            <Geom active={true} type="point" position="startTime*spanCount" opacity={0.65} shape="circle"
-              size={[ 'spanCount', [ 4, 20 ]]} tooltip="traceId*serviceName*success*duration*startTime"
-              color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
-                lineWidth: 1,
-                stroke: val => {
-                  return colorMap[val];
-                },
-              }]} />
-          </Chart>
-        </div>
+        {
+          dataList &&
+          <div className="chart" key="chart">
+            <Chart height="200" data={this.fliterChartData(dataList)} scale={cols} forceFit={true}>
+              <Tooltip showTitle={false} crosshairs={{ type: 'cross' }} />
+              <Axis name="startTime" />
+              <Axis name="spanCount" />
+              <Geom active={true} type="point" position="startTime*spanCount" opacity={0.65} shape="circle"
+                size={[ 'spanCount', [ 4, 20 ]]} tooltip="traceId*serviceName*success*duration*startTime"
+                color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
+                  lineWidth: 1,
+                  stroke: val => {
+                    return colorMap[val]
+                  },
+                }]} />
+            </Chart>
+          </div>
+        }
         <div className="layout-content-body" key="body">
           <Card>
             <Table
               pagination={false}
               loading={isFetching}
-              dataSource={checked ? errorList : dataList}// {checked ? errorList : dataList}
+              dataSource={checked ? errorList : dataList}
               columns={columns}
               rowKey={row => row.traceId}
             />

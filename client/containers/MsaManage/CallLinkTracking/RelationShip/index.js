@@ -87,7 +87,7 @@ class RelationShip extends React.Component {
     const { isTimerShow, timer } = this.state
     const { data } = this.props
     if (!isEmpty(data)) {
-      if(data.edges.length > 0) {
+      if (data.edges.length > 0) {
         data.edges.forEach(item => {
           if (item.errorCount > 0 && item.errorCount < item.callCount) {
             item.color = '#5ab46d'
