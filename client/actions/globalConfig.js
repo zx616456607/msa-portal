@@ -10,6 +10,8 @@
  * @author ZhouHai tao
  */
 
+// @todo
+// 由于dev-branch暂时不需要RPC相关功能，此文件暂时没用
 import { API_CONFIG } from '../constants'
 import { CALL_API } from '../middleware/api'
 import { toQuerystring } from '../common/utils'
