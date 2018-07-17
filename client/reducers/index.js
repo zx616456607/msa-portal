@@ -24,7 +24,6 @@ import * as sringcloudComponent from './springcloud'
 import CSB from './CSB'
 import certification from './certification'
 import eventManage from './eventManage'
-import globalConfig from './globalConfig'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -65,7 +64,6 @@ const rootReducer = combineReducers({
   entities,
   errorObject,
   config,
-  globalConfig,
   routing,
   current,
   ...apm,
