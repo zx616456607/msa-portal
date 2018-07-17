@@ -359,6 +359,7 @@ class SiderNav extends React.Component {
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
+        className="sider-wrapper"
         collapsible
         collapsed={collapsed}
         onCollapse={this.onCollapse}
