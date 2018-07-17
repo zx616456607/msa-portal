@@ -24,6 +24,7 @@ import * as sringcloudComponent from './springcloud'
 import CSB from './CSB'
 import certification from './certification'
 import eventManage from './eventManage'
+import zipkin from './callLinkTrack'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -75,6 +76,7 @@ const rootReducer = combineReducers({
   CSB,
   certification,
   eventManage,
+  zipkin,
 })
 
 export default rootReducer
