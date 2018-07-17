@@ -26,6 +26,7 @@ import {
 } from 'antd'
 import {
   APP_NAME_REG,
+  APP_NAME_REG_NOTICE,
   HOST_REG,
   URL_REG,
 } from '../../../../constants'
@@ -331,7 +332,7 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: APP_NAME_REG,
-                message: '请填写正确的微服务名称，例如：msa-service-1',
+                message: '微服务名称' + APP_NAME_REG_NOTICE,
               }],
             })(
               <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>
