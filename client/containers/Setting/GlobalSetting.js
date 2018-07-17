@@ -136,48 +136,55 @@ class GlobalSetting extends Component {
                       <Input placeholder="请填写集成部署API" disabled/>
                     )}
                   </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Dubbo 注册中心"
-                    hasFeedBack
-                    key="dubbo"
-                  >
-                    {getFieldDecorator('dubbo', {
-                      initialValue: `${this.state.dubbo}`,
-                      rules: [
-                        {
-                          required: true,
-                          message: '请输入zookeeper地址 不能为空',
-                        },
-                        {
-                          validator: this.testIp,
-                          trigger: [ 'onBlur', 'onChange' ],
-                        },
-                      ],
-                      onChange: e => {
-                        this.setState({
-                          dubbo: e.target.value,
-                        })
-                      },
-                    })(
-                      <Input placeholder="请输入zookeeper地址" disabled = {!isEdit}/>
-                    )}
-                  </FormItem>
-                  <div className="button_group">
-                    {
-                      !isEdit ?
-                        <Button type="primary" onClick={() => {
+                  {
+                    // 由于dev-branch暂时不需要RPC相关功能,暂时隐藏
+                    false && <FormItem
+                      {...formItemLayout}
+                      label="Dubbo 注册中心"
+                      hasFeedBack
+                      key="dubbo"
+                    >
+                      {getFieldDecorator('dubbo', {
+                        initialValue: `${this.state.dubbo}`,
+                        rules: [
+                          {
+                            required: true,
+                            message: '请输入zookeeper地址 不能为空',
+                          },
+                          {
+                            validator: this.testIp,
+                            trigger: [ 'onBlur', 'onChange' ],
+                          },
+                        ],
+                        onChange: e => {
                           this.setState({
-                            isEdit: true,
+                            dubbo: e.target.value,
                           })
-                        }}>修改</Button>
-                        :
-                        <div>
-                          <Button type="default" className="cancel" onClick={this.cancelDubbo}>取消</Button>
-                          <Button type="primary" loading={isFetching} disabled={this.hasErrors(form.getFieldsError()) || this.state.dubbo === host} onClick={this.submitDubbo}>确认</Button>
-                        </div>
-                    }
-                  </div>
+                        },
+                      })(
+                        <Input placeholder="请输入zookeeper地址" disabled = {!isEdit}/>
+                      )}
+                    </FormItem>
+                  }
+                  {
+                    // 由于dev-branch暂时不需要RPC相关功能,暂时隐藏
+                    false && <div className="button_group">
+                      {
+                        !isEdit ?
+                          <Button type="primary" onClick={() => {
+                            this.setState({
+                              isEdit: true,
+                            })
+                          }}>修改</Button>
+                          :
+                          <div>
+                            <Button type="default" className="cancel" onClick={this.cancelDubbo}>取消</Button>
+                            <Button type="primary" loading={isFetching} disabled={this.hasErrors(form.getFieldsError()) || this.state.dubbo === host} onClick={this.submitDubbo}>确认</Button>
+                          </div>
+                      }
+                    </div>
+                  }
+
 
                 </Form>
               </Col>

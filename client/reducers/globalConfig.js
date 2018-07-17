@@ -9,7 +9,8 @@
  * 2018-07-10
  * @author ZhouHai tao
  */
-
+// @todo
+// 由于dev-branch暂时不需要RPC相关功能，此文件暂时没用
 import * as ActionTypes from '../actions/globalConfig'
 
 const globalConfig = (state = {}, action) => {
