@@ -56,7 +56,7 @@ export default function createG6Flow(__operation) {
       })
       // 第三步：进行布局
       const margin = 60
-      const height = 900
+      const height = 1600
       const width = 500
       let nodes = data.nodes
       const edges = data.edges
@@ -74,13 +74,21 @@ export default function createG6Flow(__operation) {
       // 第四步：初始化图
       const net = new G6.Net({
         id: this.graphId,
-        height: 450,
+        height: 650,
         fitView: 'autoZoom',
       })
       net.edge()
         .shape('smooth')
-        .style({
-          arrow: true,
+        .style(function(obj) {
+          if (obj.errPart === true) {
+            return {
+              arrow: true,
+              lineDash: [ 5, 5 ],
+            }
+          }
+          return {
+            arrow: true,
+          }
         })
         .size(2)
       // 第五步：载入数据

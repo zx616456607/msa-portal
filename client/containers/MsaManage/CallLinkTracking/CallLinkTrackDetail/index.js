@@ -18,16 +18,21 @@ import './style/index.less'
 import { Card, Table, Button, Badge, Progress, Modal, Row, Col } from 'antd'
 import CallLinkTrackIcon from '../../../../assets/img/msa-manage/call-link-track.png'
 import { getZipkinTrace } from '../../../../actions/callLinkTrack'
+import { formatFromnow } from '../../../../common/utils'
 
 class CallLinkTrackDetail extends React.PureComponent {
 
   state = {
     visible: false,
+    detailData: [],
+    serviceList: [],
+    serverDetail: [],
   }
 
   componentDidMount() {
     const { clusterID, getZipkinTrace } = this.props
-    getZipkinTrace(clusterID, '6d4bf6fc3f03260b')
+    const traceId = this.props.location.pathname.split('/')[3]
+    getZipkinTrace(clusterID, traceId)
   }
 
   backToList = () => {
@@ -35,9 +40,11 @@ class CallLinkTrackDetail extends React.PureComponent {
     history.push('/msa-manage/call-link-tracking')
   }
 
-  handleDetail = () => {
+  handleDetail = record => {
     this.setState({
       visible: true,
+      serviceList: record.annotations,
+      serverDetail: record.binaryAnnotations,
     })
   }
 
@@ -47,87 +54,71 @@ class CallLinkTrackDetail extends React.PureComponent {
     })
   }
 
+  filterProgress = (text, success, duration) => {
+    const { detailData } = this.props
+    if (text.length === 2) {
+      return <Progress
+        status={success ? 'success' : 'exception'}
+        showInfo={false}
+        percent={100}
+      />
+    }
+    if (text.length === 4) {
+      const countMS = Math.ceil((duration / detailData[0].duration) * 100)
+      return <Progress
+        status={success ? 'success' : 'exception'}
+        showInfo={false}
+        percent={countMS}
+      />
+    }
+  }
+
   render() {
-    const { isFetching } = this.props
+    const { serverDetail, serviceList } = this.state
+    const { isFetching, detailData } = this.props
     const columns = [{
       id: 'id',
       title: '微服务名称',
-      dataIndex: 'serviceName',
+      dataIndex: 'serverName',
       width: '15%',
     }, {
       title: '方法名',
-      dataIndex: 'method',
+      dataIndex: 'name',
       width: '15%',
     }, {
       title: '状态',
-      dataIndex: 'status',
+      dataIndex: 'success',
       width: '10%',
       render: status => <div className={status ? 'success-status' : 'error-status'}>
         <Badge status={status ? 'success' : 'error'} />
         {status ? '成功' : '失败'}
       </div>,
     }, {
-      title: '耗时',
+      title: '耗时(ms)',
       dataIndex: 'duration',
       width: '10%',
-      render: text => text + ' ms',
+      render: text => text / 1000,
     }, {
-      title: '时间线 0 ms - 38.29 ms',
-      dataIndex: 'progress',
+      title: `时间线 0 ms - ${detailData && detailData[0].duration / 1000} ms`,
+      dataIndex: 'annotations',
       width: '20%',
-      render: progress => <Progress
-        status={progress < 50 ? 'exception' : 'success'}
-        showInfo={false}
-        percent={progress}
-      />,
+      render: (text, record) => this.filterProgress(text, record.success, record.duration), // <Progress percent={60} showInfo={false} />,
     }, {
       title: '操作',
       width: '15%',
-      render: () => <Button type="primary" onClick={this.handleDetail}>查看详情</Button>,
+      render: text => <Button type="primary" onClick={() => this.handleDetail(text)}>查看详情</Button>,
     }]
     const modalColums = [{
       key: 'id',
       title: 'key',
-      dataIndex: 'name',
+      dataIndex: 'key',
+      width: '30% ',
     }, {
       key: 'value',
       title: 'value',
       dataIndex: 'value',
     }]
-    const modalData = [{
-      key: 1,
-      name: 'http.host',
-      value: 'localhost',
-    }, {
-      key: 2,
-      name: 'http.mothod',
-      value: 'GET',
-    }]
-    const datas = [{
-      id: '1',
-      key: 1,
-      serviceName: 'service1',
-      method: 'poll',
-      status: true,
-      duration: '70',
-      progress: 20,
-      children: [{
-        key: 2,
-        serviceName: 'service2',
-        method: 'post',
-        status: false,
-        duration: '79',
-        progress: 50,
-        children: [{
-          key: 3,
-          serviceName: 'service3',
-          method: 'get',
-          status: true,
-          duration: 80,
-          progress: 100,
-        }],
-      }],
-    }]
+
     return (
       <QueueAnim className="call-link-track-detail">
         <ReturnButton onClick={this.backToList}>返回</ReturnButton>
@@ -140,18 +131,24 @@ class CallLinkTrackDetail extends React.PureComponent {
           <div className="call-link-track-detail-header-right">
             <div className="call-link-track-detail-id"></div>
             <ul className="call-link-track-detail-middle">
-              <li>开始时间：22分钟前</li>
+              <li>开始时间：
+                {detailData.length > 0 && formatFromnow(detailData[0].timestamp / 1000)}
+              </li>
               <li>调用深度：3</li>
-              <li>调用耗时：38.29 ms</li>
-              <li>总span数：4</li>
+              <li>调用耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</li>
+              <li>总span数：{detailData.length > 0 && detailData[0].spanCount}</li>
             </ul>
             <div className="call-link-track-detail-service-count">
-              <span>服务数：2</span>
+              <span>服务数：
+                {detailData.length > 0 && Object.keys(detailData[0].services).length}
+              </span>
               <span>
-                <Button type="primary" size="small">service1 x 2</Button>
-                <Button type="primary" size="small">service1 x 2</Button>
-                <Button type="primary" size="small">service1 x 2</Button>
-                <Button type="primary" size="small">service1 x 2</Button>
+                {
+                  detailData.length > 0 && Object.keys(detailData[0].services).map(item => {
+                    return <Button type="primary" size="small">
+                      {`${item} x ${detailData[0].services[item]}`}</Button>
+                  })
+                }
               </span>
             </div>
           </div>
@@ -160,7 +157,7 @@ class CallLinkTrackDetail extends React.PureComponent {
           <Card>
             <Table
               pagination={false}
-              dataSource={datas}
+              dataSource={detailData}
               columns={columns}
               rowKey={key => key.id}
             />
@@ -178,26 +175,43 @@ class CallLinkTrackDetail extends React.PureComponent {
             <div className="modal-server">
               <div className="top">
                 <div>请求相对开始时间：10.00 ms</div>
-                <div>span 总耗时： 1.2 ms</div>
+                <div>span 总耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</div>
               </div>
               <div className="flow-chart">
                 <Row gutter={16}>
                   <Col span={6}>
                     <div className="server">
-                      service1
+                      {serviceList.length > 0 && serviceList[0].endpoint.serviceName}
                     </div>
                   </Col>
                   <Col span={6}>
-                    <div className="send">发送请求耗时：1S</div>
+                    <div className="send">发送请求耗时：
+                      {
+                        serviceList.length > 0 &&
+                        (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
+                      } ms
+                    </div>
                     <div className="arrow-left sx-arrow-left"></div>
-                    <div className="end">收到响应耗时：1S</div>
+                    <div className="end">收到响应耗时：
+                      {
+                        serviceList.length > 0 &&
+                        (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
+                      } ms
+                    </div>
                     <div className="arrow-rigth sx-arrow-rigth"></div>
                   </Col>
                   <Col span={6}>
-                    <div className="server end-server">server2</div>
+                    <div className="server end-server">
+                      {serviceList.length > 0 && serviceList[1].endpoint.serviceName}
+                    </div>
                   </Col>
                   <Col span={6}>
-                    <div className="server-time">服务端处理请求耗时：1.00 ms</div>
+                    <div className="server-time">服务端处理请求耗时：
+                      {
+                        serviceList.length > 0 &&
+                        (serviceList[2].timestamp - serviceList[1].timestamp) / 1000
+                      } ms
+                    </div>
                     <div className="arrow-time"></div>
                   </Col>
                 </Row>
@@ -206,9 +220,9 @@ class CallLinkTrackDetail extends React.PureComponent {
                 <Table
                   pagination={false}
                   loading={isFetching}
-                  dataSource={modalData}
+                  dataSource={serverDetail}
                   columns={modalColums}
-                  rowKey="uid"
+                  rowKey={key => key.id}
                 />
               </div>
             </div>
@@ -223,9 +237,15 @@ const mapStateToProps = state => {
   const { current, zipkin } = state
   const { cluster } = current.config
   const clusterID = cluster.id
-  const { data, isFetching } = zipkin.traceList
+  const { traceList, tracesList } = zipkin
+  const { data, isFetching } = traceList
+  const detailData = []
+  if (data) {
+    detailData.push(data)
+  }
   return {
-    data,
+    tracesList,
+    detailData,
     clusterID,
     isFetching,
   }
