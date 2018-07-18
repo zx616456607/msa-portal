@@ -31,7 +31,7 @@ const Option = Select.Option
 const colorMap = {
   success: G2.Global.colors[0],
   error: G2.Global.colors[7],
-};
+}
 
 class CallLinkTracking extends React.Component {
 

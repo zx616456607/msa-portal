@@ -16,7 +16,7 @@ import './style/index.less'
 
 const threadData = [
   { x: 0.5, y: 0.5, value: 60 },
-];
+]
 
 
 const threadCols = {
