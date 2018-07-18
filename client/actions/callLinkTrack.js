@@ -6,7 +6,7 @@
 /**
  * call link track action
  *
- * @author zhangxuan
+ * @author zhaoyb
  * @date 2018-06-29
  */
 import { CALL_API } from '../middleware/api'
@@ -117,14 +117,14 @@ export const GET_ZIPKIN_DEPENDENCIES_FAILURE = 'GET_ZIPKIN_DEPENDENCIES_FAILURE'
 const fetchZipkinDependencies = (clusterId, query) => {
   let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/dependencies`
   if (query) {
-    endpoint += `?${query}`
+    endpoint += `?${toQuerystring(query)}`
   }
   return {
     [CALL_API]: {
       types: [
-        GET_ZIPKIN_TRACE_REQUEST,
-        GET_ZIPKIN_TRACE_SUCCESS,
-        GET_ZIPKIN_TRACE_FAILURE,
+        GET_ZIPKIN_DEPENDENCIES_REQUEST,
+        GET_ZIPKIN_DEPENDENCIES_SUCCESS,
+        GET_ZIPKIN_DEPENDENCIES_FAILURE,
       ],
       endpoint,
       schema: {},

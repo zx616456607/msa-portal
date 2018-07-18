@@ -14,7 +14,6 @@ import PropTypes from 'prop-types'
 import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom } from 'bizcharts'
 import './style/index.less'
-
 const threadCols = {
   x: { min: 0, max: 1 },
   y: { min: 0, max: 1 },

@@ -38,6 +38,9 @@ const msaNameList = (state = {}, action) => {
   }
 }
 
+// @todo
+// 由于dev-branch暂时不需要RPC相关功能，rpcList暂时不需要
+
 const rpcList = (state = {}, action) => {
   const { type } = action
 

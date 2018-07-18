@@ -42,6 +42,7 @@ export function getMsaList(clusterID, query) {
   }
 }
 
+// 由于dev-branch暂时不需要RPC相关功能, rpc相关action暂时没用
 export const RPC_LIST_REQUEST = 'RPC_LIST_REQUEST'
 export const RPC_LIST_SUCCESS = 'RPC_LIST_SUCCESS'
 export const RPC_LIST_FAILURE = 'RPC_LIST_FAILURE'
