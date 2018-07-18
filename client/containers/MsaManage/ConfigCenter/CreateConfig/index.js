@@ -15,9 +15,10 @@ import { connect } from 'react-redux'
 import './style/index.less'
 import { parse } from 'query-string'
 import QueueAnim from 'rc-queue-anim'
-import { putCenterConfig, getCenterConfig, getService, getBranchList, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
+import { putCenterConfig, getCenterConfig, getService, getBranchList, getCenterEvn, releaseConfigService, addCenterConfig } from '../../../../actions/configCenter'
 import YamlEditor from '../../../../components/Editor/Yaml'
 import { Row, Button, Select, Input, notification, Card, Form } from 'antd'
+import { REPOSITORY_REGEXP } from '../../../../constants'
 const Option = Select.Option
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -76,7 +77,7 @@ class CreateConfig extends React.Component {
   }
 
   fetchYaml = (branch, url) => {
-    const { getCenterConfig, clusterID, location } = this.props
+    const { getCenterConfig, clusterID, location, form } = this.props
     const { id } = parse(location.search)
     const query = {
       file_path: location.pathname.split('/')[3],
@@ -86,8 +87,10 @@ class CreateConfig extends React.Component {
     getCenterConfig(clusterID, id, query).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
+        const content = res.response.result.data.content
+        form.setFieldsValue({ info: content })
         this.setState({
-          yaml: res.response.result.data.content,
+          yaml: content,
         })
       }
     })
@@ -144,6 +147,13 @@ class CreateConfig extends React.Component {
   }
 
   handlechage = value => {
+    const { getCenterEvn, clusterID } = this.props
+    const { configGitUrl } = this.state
+    const evnQuery = {
+      project_url: configGitUrl,
+      branch_name: value,
+    }
+    getCenterEvn(clusterID, evnQuery)
     this.setState({
       branchName: value,
     })
@@ -187,7 +197,21 @@ class CreateConfig extends React.Component {
 
   handleAdd = () => {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
-    const { addCenterConfig, clusterID, history } = this.props
+    const { addCenterConfig, clusterID, history, data } = this.props
+    let hasConfigName
+    data.every(item => {
+      if (item.name === inputValue) {
+        hasConfigName = true
+        return false
+      }
+      return true
+    })
+    if (hasConfigName) {
+      notification.info({
+        message: '配置名称已存在',
+      })
+      return
+    }
     this.props.form.validateFields(err => {
       if (err) return
       if (currentYaml === '') {
@@ -245,7 +269,7 @@ class CreateConfig extends React.Component {
             <FormItem {...fromLayout} label="配置名称">
               {getFieldDecorator('configName', {
                 initialValue: detail !== 'false' ? projectName : undefined,
-                rules: [{ required: true, whitespace: true, message: '请填写配置名称' }],
+                rules: [{ required: true, pattern: REPOSITORY_REGEXP, whitespace: true, message: '配置名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头' }],
               })(
                 <Input className="selects" placeholder="请输入配置名称" disabled={ detail === 'true' } onChange={this.handleInput} />
               )}
@@ -272,7 +296,7 @@ class CreateConfig extends React.Component {
             <FormItem {...fromLayout} label="配置内容">
               {getFieldDecorator('info', {
                 initialValue: currentYaml === '' ? yaml : currentYaml,
-                // rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
+                rules: [{ required: true, whitespace: true, message: '请填写配置内容' }],
               })(
                 <YamlEditor options={readOnly} style={{ width: '60%' }} onChange={this.handleYamlEditor} />
               )}
@@ -325,10 +349,12 @@ class CreateConfig extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, configCenter } = state
+  const { data } = configCenter
   const { cluster } = current.config
   const clusterID = cluster.id
   return {
+    data: data || [],
     clusterID,
   }
 }
@@ -336,6 +362,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   getService,
   getBranchList,
+  getCenterEvn,
   addCenterConfig,
   putCenterConfig,
   getCenterConfig,
