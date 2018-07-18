@@ -425,3 +425,67 @@ const fetchMsaRealTimeMonitor = (clusterId, serviceName, query) => {
 
 export const msaRealTimeMonitor = (clusterId, serviceName, query) =>
   dispatch => dispatch(fetchMsaRealTimeMonitor(clusterId, serviceName, query))
+
+// 微服务熔断监控集群列表
+
+export const GET_MSA_BLOWN_CLUSTERS_REQUEST = 'GET_MSA_BLOWN_CLUSTERS_REQUEST'
+export const GET_MSA_BLOWN_CLUSTERS_SUCCESS = 'GET_MSA_BLOWN_CLUSTERS_SUCCESS'
+export const GET_MSA_BLOWN_CLUSTERS_FAILURE = 'GET_MSA_BLOWN_CLUSTERS_FAILURE'
+
+const fetchMsaBlownClusters = clusterId => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_CLUSTERS_REQUEST,
+        GET_MSA_BLOWN_CLUSTERS_SUCCESS,
+        GET_MSA_BLOWN_CLUSTERS_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/hystrix/clusters`,
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownClusters = clusterId =>
+  dispatch => dispatch(fetchMsaBlownClusters(clusterId))
+
+// 微服务熔断监控
+export const GET_MSA_BLOWN_MONITOR_REQUEST = 'GET_MSA_BLOWN_MONITOR_REQUEST'
+export const GET_MSA_BLOWN_MONITOR_SUCCESS = 'GET_MSA_BLOWN_MONITOR_SUCCESS'
+export const GET_MSA_BLOWN_MONITOR_FAILURE = 'GET_MSA_BLOWN_MONITOR_FAILURE'
+
+const fetchMsaBlownMonitor = (clusterId, clusterName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_MONITOR_REQUEST,
+        GET_MSA_BLOWN_MONITOR_SUCCESS,
+        GET_MSA_BLOWN_MONITOR_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/hystrix/query/${clusterName}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownMonitor = (clusterID, clusterName) =>
+  dispatch => dispatch(fetchMsaBlownMonitor(clusterID, clusterName))
+
+// 将熔断监控数据放入store
+export const SET_BLOWN_MONITOR = 'SET_BLOWN_MONITOR'
+
+export const setBlownMonitor = data => {
+  return {
+    type: SET_BLOWN_MONITOR,
+    data,
+  }
+}
+
+// 清空熔断监控数据
+export const CLEAR_BLOWN_MONITOR = 'CLEAR_BLOWN_MONITOR'
+
+export const clearBlownMonitor = () => {
+  return {
+    type: CLEAR_BLOWN_MONITOR,
+  }
+}

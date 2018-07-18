@@ -268,6 +268,61 @@ const msaRealTimeMonitor = (state = {}, action) => {
   }
 }
 
+const msaBlownClusters = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_BLOWN_CLUSTERS_REQUEST:
+      return {
+        isFetching: true,
+        data: [],
+      }
+    case ActionTypes.GET_MSA_BLOWN_CLUSTERS_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.GET_MSA_BLOWN_CLUSTERS_FAILURE:
+      return {
+        isFetching: false,
+        data: [],
+      }
+    default:
+      return state
+  }
+}
+
+const msaBlownMonitor = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_BLOWN_MONITOR_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        data: {},
+      }
+    case ActionTypes.GET_MSA_BLOWN_MONITOR_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result,
+      })
+    case ActionTypes.GET_MSA_BLOWN_MONITOR_FAILURE:
+      return {
+        isFetching: false,
+        data: {},
+      }
+    case ActionTypes.SET_BLOWN_MONITOR:
+      return {
+        data: JSON.parse(action.data),
+      }
+    case ActionTypes.CLEAR_BLOWN_MONITOR:
+      return {
+        data: {},
+      }
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
   rpcList: {},
@@ -278,6 +333,8 @@ const msa = (state = {
   msaLogs: {},
   msaMonitor: {},
   msaRealTimeMonitor: {},
+  msaBlownClusters: {},
+  msaBlownMonitor: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
@@ -289,6 +346,8 @@ const msa = (state = {
     msaLogs: msaLogs(state.msaLogs, action),
     msaMonitor: msaMonitor(state.msaMonitor, action),
     msaRealTimeMonitor: msaRealTimeMonitor(state.msaRealTimeMonitor, action),
+    msaBlownClusters: msaBlownClusters(state.msaBlownClusters, action),
+    msaBlownMonitor: msaBlownMonitor(state.msaBlownMonitor, action),
   }
 }
 
