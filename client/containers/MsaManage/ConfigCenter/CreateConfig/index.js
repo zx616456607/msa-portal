@@ -29,6 +29,7 @@ class CreateConfig extends React.Component {
     inputValue: '',
     textAreaValue: '',
     btnVasible: true,
+    releaseVasible: false,
     detal: '',
     branchData: [],
     configGitUrl: '',
@@ -125,6 +126,7 @@ class CreateConfig extends React.Component {
           })
           this.setState({
             btnVasible: false,
+            releaseVasible: true,
           })
         }
       })
@@ -214,7 +216,7 @@ class CreateConfig extends React.Component {
   }
 
   render() {
-    const { detal, yaml, branchData, btnVasible, currentYaml,
+    const { detal, yaml, branchData, btnVasible, currentYaml, releaseVasible,
       branchName, addLoading, editLoading, releaseLoading } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
@@ -282,7 +284,11 @@ class CreateConfig extends React.Component {
                       <Button className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> :
                       <Button className="close" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button>
                   }
-                  <Button className="ok" type="primary" loading={releaseLoading} disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
+                  {
+                    releaseVasible ?
+                      <Button className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>发布</Button> : <div></div>
+                  }
+
                 </div> :
                 <div>
                   <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
