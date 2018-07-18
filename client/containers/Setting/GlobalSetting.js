@@ -35,8 +35,9 @@ class GlobalSetting extends Component {
   }
 
   componentDidMount() {
-    const { clusterId, getZkhost } = this.props
-    getZkhost(clusterId)
+    // 获取zkhost
+    // const { clusterId, getZkhost } = this.props
+    // getZkhost(clusterId)
   }
   componentWillReceiveProps(nextProps) {
     if (this.props.host !== nextProps.host) {
