@@ -86,7 +86,7 @@ const menus = [
         to: '/msa-manage/certification-manage',
         icon: certificationManageIcon,
         name: '认证管理',
-        defaultOpen: true,
+        defaultopen: 'true',
         children: [
           {
             key: 'auth-zone',
@@ -107,7 +107,7 @@ const menus = [
         to: '/msa-manage/event-manage',
         icon: eventManageIcon,
         name: '事件管理',
-        defaultOpen: true,
+        defaultopen: 'true',
         children: [
           {
             key: 'event',
@@ -127,7 +127,7 @@ const menus = [
         key: 'mine-csb-instances',
         icon: 'user',
         name: '我的实例',
-        defaultOpen: true,
+        defaultopen: 'true',
         children: [
           {
             key: 'k300',
@@ -143,7 +143,7 @@ const menus = [
         key: 'k31',
         icon: 'unlock',
         name: '可申请实例',
-        defaultOpen: true,
+        defaultopen: 'true',
         children: [
           {
             key: 'k310',
@@ -192,7 +192,7 @@ const menus = [
         to: '/cluster',
         name: 'CSB 运维',
         icon: csbInstancesOm,
-        defaultOpen: true,
+        defaultopen: 'true',
         children: [
           {
             key: 'k010',
@@ -359,6 +359,7 @@ class SiderNav extends React.Component {
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
+        className="sider-wrapper"
         collapsible
         collapsed={collapsed}
         onCollapse={this.onCollapse}

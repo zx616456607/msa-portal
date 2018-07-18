@@ -423,6 +423,7 @@ class CSBInstanceOm extends React.Component {
           detail={currentInstance}
           callback={this.handerConfirm}
           visible={instanceDetailVisible}
+          clusterId={clusterId}
           onVisibleChange={visible => this.setState({ instanceDetailVisible: visible })}
         />}
         {

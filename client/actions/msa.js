@@ -12,7 +12,7 @@
 
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
-import { API_CONFIG, CONTENT_TYPE_TEXT } from '../constants'
+import { API_CONFIG, CONTENT_TYPE_TEXT, METRICS_DEFAULT_SOURCE } from '../constants'
 import { toQuerystring } from '../common/utils'
 
 const { MSA_API_URL, PAAS_API_URL } = API_CONFIG
@@ -42,6 +42,46 @@ export function getMsaList(clusterID, query) {
   }
 }
 
+// 由于dev-branch暂时不需要RPC相关功能, rpc相关action暂时没用
+export const RPC_LIST_REQUEST = 'RPC_LIST_REQUEST'
+export const RPC_LIST_SUCCESS = 'RPC_LIST_SUCCESS'
+export const RPC_LIST_FAILURE = 'RPC_LIST_FAILURE'
+
+// Fetches a page of msa.
+const fetchRpcList = (clusterID, query) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/zookeeper/dubbo/servers`
+
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [ RPC_LIST_REQUEST, RPC_LIST_SUCCESS, RPC_LIST_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+
+export function getRpcList(clusterID, query) {
+  return dispatch => {
+    return dispatch(fetchRpcList(clusterID, query))
+  }
+}
+
+export const RPC_SEARCH = 'RPC_SEARCH'
+export function searchRpcList(condition, currentClassify) {
+  return dispatch => {
+    dispatch({
+      type: RPC_SEARCH,
+      payload: {
+        condition,
+        currentClassify,
+      },
+    })
+
+  }
+}
 export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
 export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
 export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'
@@ -336,3 +376,53 @@ const fetchMsaLogs = (clusterId, serviceName, body) => {
 
 export const getMsaLogs = (clusterId, serviceName, body) =>
   dispatch => dispatch(fetchMsaLogs(clusterId, serviceName, body))
+
+// 微服务监控
+export const GET_MSA_MONITOR_REQUEST = 'GET_MSA_MONITOR_REQUEST'
+export const GET_MSA_MONITOR_SUCCESS = 'GET_MSA_MONITOR_SUCCESS'
+export const GET_MSA_MONITOR_FAILURE = 'GET_MSA_MONITOR_FAILURE'
+
+const fetchMsaMonitor = (clusterId, serviceName, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_MSA_MONITOR_REQUEST,
+        GET_MSA_MONITOR_SUCCESS,
+        GET_MSA_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaMonitor = (clusterId, serviceName, query) =>
+  dispatch => dispatch(fetchMsaMonitor(clusterId, serviceName, query))
+
+// 微服务实时监控
+export const GET_MSA_REALTIME_MONITOR_REQUEST = 'GET_MSA_REALTIME_MONITOR_REQUEST'
+export const GET_MSA_REALTIME_MONITOR_SUCCESS = 'GET_MSA_REALTIME_MONITOR_SUCCESS'
+export const GET_MSA_REALTIME_MONITOR_FAILURE = 'GET_MSA_REALTIME_MONITOR_FAILURE'
+
+const fetchMsaRealTimeMonitor = (clusterId, serviceName, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_MSA_REALTIME_MONITOR_REQUEST,
+        GET_MSA_REALTIME_MONITOR_SUCCESS,
+        GET_MSA_REALTIME_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaRealTimeMonitor = (clusterId, serviceName, query) =>
+  dispatch => dispatch(fetchMsaRealTimeMonitor(clusterId, serviceName, query))

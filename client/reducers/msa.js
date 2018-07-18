@@ -11,6 +11,8 @@
  */
 
 import * as ActionTypes from '../actions/msa'
+import isEmpty from 'lodash/isEmpty'
+import { formatDate } from '../common/utils'
 
 const msaNameList = (state = {}, action) => {
   const { type } = action
@@ -31,6 +33,48 @@ const msaNameList = (state = {}, action) => {
         ...state,
         isFetching: false,
       }
+    default:
+      return state
+  }
+}
+
+// @todo
+// 由于dev-branch暂时不需要RPC相关功能，rpcList暂时不需要
+
+const rpcList = (state = {}, action) => {
+  const { type } = action
+
+  switch (type) {
+    case ActionTypes.RPC_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.RPC_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ...action.response.result.data,
+      }
+    case ActionTypes.RPC_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    case ActionTypes.RPC_SEARCH: {
+      const { condition } = action.payload
+      const key = Object.keys(condition)[0]
+      const tempState = state
+      if (condition[key] !== '') {
+        const newData = tempState[action.payload.currentClassify].filter(
+          v => v[key] === condition[key])
+        tempState[action.payload.currentClassify] = newData
+      }
+      return {
+        ...state,
+        ...tempState,
+      }
+    }
     default:
       return state
   }
@@ -145,21 +189,109 @@ const msaLogs = (state = {}, action) => {
   }
 }
 
+const formatInstanceMonitor = data => {
+  if (isEmpty(data)) {
+    return data
+  }
+  data.forEach(item => {
+    const { container_name, metrics } = item
+    // bizcharts 图例显示有问题，去掉服务名称后的数字（dsb-server-3375465363-1x4v5 => dsb-server-1x4v5）
+    let name = container_name.split('-')
+    name.splice(-2, 1)
+    name = name.join('-')
+    metrics.forEach(metric => {
+      metric.container_name = name
+      metric.timestamp = formatDate(metric.timestamp, 'MM-DD HH:mm:ss')
+    })
+  })
+  return data
+}
+
+const msaMonitor = (state = {}, action) => {
+  const { type, metricType } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_MONITOR_REQUEST:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: true,
+          data: [],
+        }),
+      }
+    case ActionTypes.GET_MSA_MONITOR_SUCCESS:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: false,
+          data: formatInstanceMonitor(action.response.result.data),
+        }),
+      }
+    case ActionTypes.GET_MSA_MONITOR_FAILURE:
+      return {
+        ...state,
+        [metricType]: {
+          isFetching: false,
+          data: [],
+        },
+      }
+    default:
+      return state
+  }
+}
+
+const msaRealTimeMonitor = (state = {}, action) => {
+  const { type, metricType } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_REALTIME_MONITOR_REQUEST:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: true,
+          data: [],
+        }),
+      }
+    case ActionTypes.GET_MSA_REALTIME_MONITOR_SUCCESS:
+      return {
+        ...state,
+        [metricType]: Object.assign({}, state[metricType], {
+          isFetching: true,
+          data: formatInstanceMonitor(action.response.result.data),
+        }),
+      }
+    case ActionTypes.GET_MSA_REALTIME_MONITOR_FAILURE:
+      return {
+        ...state,
+        [metricType]: {
+          isFetching: false,
+          data: [],
+        },
+      }
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
+  rpcList: {},
   msaEnv: {},
   msaConfig: {},
   serviceDetail: {},
   serviceProxy: {},
   msaLogs: {},
+  msaMonitor: {},
+  msaRealTimeMonitor: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
+    rpcList: rpcList(state.rpcList, action),
     msaEnv: msaEnv(state.msaEnv, action),
     msaConfig: msaConfig(state.msaConfig, action),
     serviceDetail: serviceDetail(state.serviceDetail, action),
     serviceProxy: serviceProxy(state.serviceProxy, action),
     msaLogs: msaLogs(state.msaLogs, action),
+    msaMonitor: msaMonitor(state.msaMonitor, action),
+    msaRealTimeMonitor: msaRealTimeMonitor(state.msaRealTimeMonitor, action),
   }
 }
 

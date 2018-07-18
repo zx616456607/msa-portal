@@ -30,7 +30,7 @@ const CSB_API_PREFIX = '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
 const CLIENT_API = 'http://192.168.1.254:8080'
 const CLIENT_API_PREFIX = '/uaa'
-const ZIPKIN_API_PREFIX = '/zipkin/api/v1'
+const ZIPKIN_API_PREFIX = '/api/v1'
 const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
 const ZIPKIN_API_URL = `${MSA_API}${ZIPKIN_API_PREFIX}`
 let apiConfig = {
@@ -86,6 +86,7 @@ export const MSA_TYPES_TEXT = {
 }
 // RegExp
 export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
+export const APP_NAME_REG_NOTICE = '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const REDIRECT_URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_,\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
@@ -158,3 +159,20 @@ export const METRICS_DISK_READ = 'disk/readio'
 export const METRICS_DISK_WRITE = 'disk/writeio'
 export const UPDATE_INTERVAL = 1000 * 60
 export const REALTIME_INTERVAL = 1000 * 10 // 实时监控
+export const FRESH_FREQUENCY = {
+  1: {
+    freshInterval: '1分钟',
+  },
+  6: {
+    freshInterval: '5分钟',
+  },
+  24: {
+    freshInterval: '20分钟',
+  },
+  168: {
+    freshInterval: '2小时',
+  },
+  720: {
+    freshInterval: '6小时',
+  },
+}
