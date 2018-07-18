@@ -29,7 +29,7 @@ class CreateConfig extends React.Component {
     inputValue: '',
     textAreaValue: '',
     btnVasible: true,
-    detal: '',
+    detail: 'false',
     branchData: [],
     configGitUrl: '',
     currentYaml: '',
@@ -39,16 +39,16 @@ class CreateConfig extends React.Component {
   }
   componentWillMount() {
     const { location } = this.props
-    const { detal } = parse(location.search)
+    const { detail } = parse(location.search)
     this.setState({
-      detal,
+      detail,
     })
     this.version()
   }
 
   version = () => {
     const { getService, getBranchList, clusterID, location } = this.props
-    const { branch, detal } = parse(location.search)
+    const { branch, detail } = parse(location.search)
     getService(clusterID).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
@@ -57,7 +57,7 @@ class CreateConfig extends React.Component {
           branchName: branch,
           configGitUrl: url,
         })
-        if (detal === 'true') {
+        if (detail === 'true' || detail === 'update') {
           this.fetchYaml(branch, url)
         }
         const branchQuery = {
@@ -104,6 +104,12 @@ class CreateConfig extends React.Component {
       project_url: configGitUrl,
     }
     const yamls = currentYaml === '' ? yaml : currentYaml
+    if (yaml && currentYaml === '') {
+      notification.info({
+        message: '请填写配置内容',
+      })
+      return
+    }
     this.props.form.validateFields(err => {
       if (err) return
       this.setState({
@@ -184,6 +190,12 @@ class CreateConfig extends React.Component {
     const { addCenterConfig, clusterID, history } = this.props
     this.props.form.validateFields(err => {
       if (err) return
+      if (currentYaml === '') {
+        notification.info({
+          message: '请填写配置内容',
+        })
+        return
+      }
       this.setState({
         addLoading: true,
       })
@@ -214,7 +226,7 @@ class CreateConfig extends React.Component {
   }
 
   render() {
-    const { detal, yaml, branchData, btnVasible, currentYaml,
+    const { detail, yaml, branchData, btnVasible, currentYaml,
       branchName, addLoading, editLoading, releaseLoading } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
     const projectName = this.props.location.pathname.split('/')[3]
@@ -223,27 +235,29 @@ class CreateConfig extends React.Component {
       labelCol: { span: 4 },
       wrapperCol: { span: 20 },
     }
-
+    const readOnly = {
+      readOnly: detail === 'true',
+    }
     return (
       <QueueAnim className="create">
         <Card className="info" key="body">
           <Row className="connent">
             <FormItem {...fromLayout} label="配置名称">
               {getFieldDecorator('configName', {
-                initialValue: detal === 'true' ? projectName : undefined,
+                initialValue: detail !== 'false' ? projectName : undefined,
                 rules: [{ required: true, whitespace: true, message: '请填写配置名称' }],
               })(
-                <Input className="selects" onChange={this.handleInput} />
+                <Input className="selects" placeholder="请输入配置名称" disabled={ detail === 'true' } onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
           <Row className="connent">
             <FormItem {...fromLayout} label="配置版本">
               {getFieldDecorator('edition', {
-                initialValue: branchName,
+                initialValue: detail !== 'false' ? branchName : undefined,
                 rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
               })(
-                <Select className="selects" onChange={this.handlechage}>
+                <Select className="selects" placeholder="请选择配置版本" disabled={ detail === 'true' } onChange={this.handlechage}>
                   {
                     branchData ?
                       branchData.map((item, index) => (
@@ -260,30 +274,44 @@ class CreateConfig extends React.Component {
                 initialValue: currentYaml === '' ? yaml : currentYaml,
                 // rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
               })(
-                <YamlEditor style={{ width: '60%' }} onChange={this.handleYamlEditor} />
+                <YamlEditor options={readOnly} style={{ width: '60%' }} onChange={this.handleYamlEditor} />
               )}
             </FormItem>
           </Row>
-          <Row className="connents">
-            <FormItem {...fromLayout} label="添加备注">
-              {getFieldDecorator('configArea', {
-                rules: [{ required: true, whitespace: true, message: '请填写备注信息' }],
-              })(
-                <TextArea className="textArea" placeholder="添加备注信息" autosize={{ minRows: 1.5, maxRows: 6 }} onChange={this.handleTextArea} />
-              )}
-            </FormItem>
-          </Row>
+          {
+            detail !== 'true' ?
+              <Row className="connents">
+                <FormItem {...fromLayout} label="Commit">
+                  {getFieldDecorator('configArea', {
+                    rules: [{ required: true, whitespace: true, message: '请填写Commit' }],
+                  })(
+                    <TextArea className="textArea" placeholder="输入Commit" autosize={{ minRows: 1.5, maxRows: 6 }} onChange={this.handleTextArea} />
+                  )}
+                </FormItem>
+              </Row>
+              : null
+          }
           <div className="operation" >
             {
-              detal === 'true' ?
+              detail === 'update' &&
+              <div>
+                {
+                  btnVasible ?
+                    [ <Button key="close" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>,
+                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> ]
+                    :
+                    <Button className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>发布</Button>
+                }
+              </div>
+            }
+            {
+              detail === 'true' &&
                 <div>
-                  {
-                    btnVasible ?
-                      <Button className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> :
-                      <Button className="close" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button>
-                  }
-                  <Button className="ok" type="primary" loading={releaseLoading} disabled={btnVasible} onClick={this.handleRelease}>发布</Button>
-                </div> :
+                  <Button type="primary" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>确定</Button>
+                </div>
+            }
+            {
+              detail === 'false' &&
                 <div>
                   <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
                   <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确定</Button>

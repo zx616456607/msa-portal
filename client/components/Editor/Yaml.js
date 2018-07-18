@@ -12,13 +12,14 @@
 
 import React from 'react'
 import Editor from './'
-import 'codemirror/mode/yaml/yaml'
 
 export default class YamlEditor extends React.Component {
   render() {
-    const options = {
+    const defaultOptions = {
       mode: 'yaml',
+      readOnly: false,
     }
+    const options = Object.assign({}, defaultOptions, this.props.options)
     const { title, ...otherProps } = this.props
     return <Editor title={ title || 'Yaml' } {...otherProps} options={options} />
   }
