@@ -24,13 +24,13 @@ const data = [
   { year: '1997', value: 7 },
   { year: '1998', value: 9 },
   { year: '1999', value: 13 },
-];
+]
 
 const cols = {
   value: { min: 0 },
   year: { range: [ 0, 1 ] },
   height: { min: 0, max: 13 },
-};
+}
 
 export default class BlownChart extends React.PureComponent {
 

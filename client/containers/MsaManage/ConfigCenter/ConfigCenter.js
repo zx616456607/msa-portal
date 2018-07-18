@@ -32,22 +32,12 @@ class ConfigCenter extends React.Component {
     configGitUrl: '',
     deleteVisible: false,
     branchData: [],
-    envData: [],
     configData: [],
     productionData: [],
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.data !== undefined) {
-      this.setState({
-        loading: false,
-        envData: nextProps.data,
-      })
-    }
   }
 
   loadData = () => {
@@ -92,10 +82,10 @@ class ConfigCenter extends React.Component {
     })
   }
 
-  handleChang = value => {
-    this.fetchList(value)
+  handleChang = e => {
+    this.fetchList(e)
     this.setState({
-      branchName: value,
+      branchName: e,
     })
   }
 
@@ -107,11 +97,11 @@ class ConfigCenter extends React.Component {
   }
 
   handleDel = () => {
-    const { configGitUrl, configName, message, value } = this.state
+    const { configGitUrl, configName, message, branchName, value } = this.state
     const { delCenterConfig, clusterID } = this.props
     const query = {
       project_url: configGitUrl,
-      branch_name: value,
+      branch_name: branchName || value,
       file_path: configName,
       commit_message: message === '' ? '删除一个配置' : message,
     }
@@ -122,14 +112,14 @@ class ConfigCenter extends React.Component {
         })
       }
       if (res.response.result.code === 200) {
-        this.loadData()
         notification.success({
           message: `删除成功 ${configName}`,
         })
       }
-    })
-    this.setState({
-      deleteVisible: false,
+      this.loadData()
+      this.setState({
+        deleteVisible: false,
+      })
     })
   }
 
@@ -153,7 +143,8 @@ class ConfigCenter extends React.Component {
   }
 
   render() {
-    const { envData, branchData, loading, branchName } = this.state
+    const { envData, isFetching } = this.props
+    const { branchData, branchName } = this.state
     let branch = ''
     if (branchName) {
       branch = branchName
@@ -188,7 +179,6 @@ class ConfigCenter extends React.Component {
       defaultCurrent: 1,
     }
     const data = branchData ? branchData.map((item, index) => (<Option key={index} value={item.name}>{item.name}</Option>)) : ''
-
     return (
       <QueueAnim className="center" >
         <div key="body">
@@ -217,7 +207,7 @@ class ConfigCenter extends React.Component {
                 columns={columns}
                 dataSource={envData}
                 pagination={false}
-                loading={loading}
+                loading={isFetching}
                 rowKey={row => row.name} />
               {/* <TabPane tab="测试环境" key="2">
                 <div className="exploit">
@@ -289,12 +279,14 @@ class ConfigCenter extends React.Component {
 
 const mapStateToProps = state => {
   const { current, configCenter } = state
-  const { data } = configCenter
+  const { data, isFetching } = configCenter
   const { cluster } = current.config
   const clusterID = cluster.id
+  const envData = data || []
   return {
-    data,
+    envData,
     clusterID,
+    isFetching,
   }
 }
 

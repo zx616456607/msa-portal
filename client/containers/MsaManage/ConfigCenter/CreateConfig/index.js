@@ -31,6 +31,7 @@ class CreateConfig extends React.Component {
     textAreaValue: '',
     btnVasible: true,
     detail: 'false',
+    releaseVasible: false,
     branchData: [],
     configGitUrl: '',
     currentYaml: '',
@@ -134,6 +135,7 @@ class CreateConfig extends React.Component {
           })
           this.setState({
             btnVasible: false,
+            releaseVasible: true,
           })
         }
       })
