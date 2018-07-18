@@ -139,7 +139,7 @@ class ConfigCenter extends React.Component {
   }
 
   handleButtonClick = record => {
-    this.props.history(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}`)
+    this.props.history(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}`)
   }
 
   render() {
@@ -157,18 +157,19 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '80%',
+      width: '60%',
       render: (text, record) =>
-        <Link to={`/msa-manage/config-center/${text}?detal=true&id=${record.id}&branch=${branch}`}>
+        <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch}`}>
           {text}
         </Link>,
     }, {
       id: 'id',
       title: '操作',
       dataIndex: 'operation',
-      width: '20%',
+      width: '40%',
       render: (text, record) => <div>
-        <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detal=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
+        <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
+        <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch}`)}>更新</Button>
         <Button onClick={() => this.handleDelVisible(record.name)}>删除</Button>
       </div>,
     }]
@@ -191,7 +192,7 @@ class ConfigCenter extends React.Component {
             <div>
               <div className="exploit layout-content-btns">
                 <div className="headers">
-                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detal=false&branch=${branchName}`)}>
+                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branchName}`)}>
                     <Icon type="plus" style={{ color: '#fff' }} />
                     <span className="font">添加配置</span>
                   </Button>

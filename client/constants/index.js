@@ -93,6 +93,8 @@ export const REDIRECT_URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_,\-\.]*
 export const EMAIL_REG = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
 export const PHONE_REG = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
 
+export const REPOSITORY_REGEXP = /^[a-zA-Z0-9]+[a-zA-Z0-9_\-\.]{1,49}$/
+
 export const API_GATEWAY_LIMIT_TYPES = [
   {
     key: 'second',
