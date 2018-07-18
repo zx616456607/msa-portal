@@ -155,7 +155,7 @@ class RegisterMsa extends React.Component {
       notification.success({
         message: '添加实例成功',
       })
-      history.push('/msa-manage')
+      history.push(`/msa-manage/detail/${appName}`)
     })
   }
 
@@ -287,7 +287,7 @@ class RegisterMsa extends React.Component {
                 message: '请填写端口',
               }],
             })(
-              <InputNumber placeholder="如 8080" min={1} max={65535} style={{ width: '30%' }} />
+              <InputNumber placeholder="如 8080, 输入范围 0~65535" min={1} max={65535} style={{ width: '30%' }} />
             )}
           </FormItem>
           <FormItem {...formItemLayoutLast} label="健康检查地址">

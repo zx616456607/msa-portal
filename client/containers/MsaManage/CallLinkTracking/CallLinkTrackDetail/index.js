@@ -179,7 +179,10 @@ class CallLinkTrackDetail extends React.PureComponent {
           {
             <div className="modal-server">
               <div className="top">
-                <div>请求相对开始时间：{detailTimestamp - detailData[0].timestamp} ms</div>
+                <div>请求相对开始时间：
+                  {
+                    detailData.length > 0 && detailTimestamp - detailData[0].timestamp
+                  } ms</div>
                 <div>span 总耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</div>
               </div>
               {
@@ -237,7 +240,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       <div className="server-time">服务端处理请求耗时：
                         {
                           serviceList.length > 0 &&
-                        (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
+                          (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-time"></div>
