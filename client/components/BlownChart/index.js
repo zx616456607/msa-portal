@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Row, Col } from 'antd'
+import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom, Tooltip } from 'bizcharts'
 import { formatDate } from '../../common/utils';
 import './style/index.less'
@@ -36,47 +36,41 @@ export default class BlownChart extends React.PureComponent {
     const parseFailure = parseInt(rollingCountFailure, 10)
     const parseTimeout = parseInt(rollingCountTimeout, 10)
     const parseRejected = parseInt(rollingCountThreadPoolRejected, 10)
-    const parseRequest = parseInt(requestCount, 10)
-    const failureRate = (parseFailure + parseTimeout + parseRejected) / parseRequest
+    const failureRate = (parseFailure + parseTimeout + parseRejected) / requestCount
     if (isNaN(failureRate)) {
-      return failureRate.toString()
+      return '0.0%'
     }
-    return failureRate / 100 + '%'
+    return (failureRate * 100).toFixed(0) + '%'
   }
 
   renderAmount = () => {
     const {
       rollingCountThreadsExecuted, reportingHosts,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
     } = this.props.dataSource
-    const parseExecuted = parseInt(rollingCountThreadsExecuted, 10)
-    const parseHosts = parseInt(reportingHosts, 10)
-    const parseValue = parseInt(propertyValue_metricsRollingStatisticalWindowInMilliseconds, 10)
-    return ((parseExecuted / (parseValue / 1000)) / parseHosts).toFixed(1) + '/s'
+    return ((rollingCountThreadsExecuted / (parseValue / 1000)) / reportingHosts).toFixed(1) + '/s'
   }
 
   formatLatency = value => {
     const { reportingHosts } = this.props.dataSource
-    const parseHosts = parseInt(reportingHosts, 10)
-    value = parseInt(value, 10)
-    return Math.floor(value / parseHosts)
+    return Math.floor(value / reportingHosts)
   }
 
   formatMonitor = () => {
     const {
       allPoint, reportingHosts, requestCount,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
     } = this.props.dataSource
-    const parseHosts = parseInt(reportingHosts, 10)
-    const parseRequests = parseInt(requestCount, 10)
-    const parseProperty =
-      parseInt(propertyValue_metricsRollingStatisticalWindowInMilliseconds, 10) / 1000
-    const ratePerSecondPerHost = (parseRequests / parseProperty / parseHosts).toFixed(1) // 圆半径
+    const ratePerSecondPerHost = (requestCount / (parseValue / 1000) / reportingHosts).toFixed(1) // 圆半径
     // 找出 y 轴最大值，用于定位圆的 y 轴位置
     let maxValue = 0
+    let minValue = parseInt(allPoint[0].count, 10)
     allPoint.every(item => {
       if (parseInt(item.count) > maxValue) {
         maxValue = parseInt(item.count)
+      }
+      if (parseInt(item.count) < minValue) {
+        minValue = parseInt(item.count)
       }
       return true
     })
@@ -89,7 +83,7 @@ export default class BlownChart extends React.PureComponent {
     })
     const circleInfo = {
       radius: Number(ratePerSecondPerHost),
-      vertical: maxValue > 0 ? maxValue / 2 : 0.5, // 圆的 y 轴坐标
+      vertical: maxValue > 0 ? (maxValue) / 2 : 0.5, // 圆的 y 轴坐标
     }
     // 圆的位置在数据中间位置的前一个
     Object.assign(finalData[Math.floor(finalData.length / 2)], circleInfo)
@@ -106,7 +100,6 @@ export default class BlownChart extends React.PureComponent {
       return '#FF9900'
     }
     return 'red'
-
   }
 
   render() {
@@ -126,7 +119,7 @@ export default class BlownChart extends React.PureComponent {
               tooltip={false}
               active={false}
               position="time*vertical"
-              size={[ 'radius', [ 4, 40 ]]}
+              size={[ 'radius', radius => Number(radius) * 10 || 4 ]}
               shape={'circle'}
               style={{ stroke: '#fff', lineWidth: 1 }}
               color={this.renderColor()}
@@ -135,7 +128,9 @@ export default class BlownChart extends React.PureComponent {
             <Geom type="line" position="time*count" size={2} />
           </Chart>
           <div className="blow-chart-right">
-            <div className="service-name">{circuitBreakerName}</div>
+            <AntTooltip title={circuitBreakerName}>
+              <div className="service-name txt-of-ellipsis">{circuitBreakerName}</div>
+            </AntTooltip>
             <ul className="request-detail">
               <li>
                 <div className="success-status">{requestCount}</div>

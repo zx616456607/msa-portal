@@ -28,22 +28,18 @@ export default class ThreadChart extends React.PureComponent {
   renderRequestFrequency = () => {
     const {
       rollingCountThreadsExecuted,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseProperty,
     } = this.props.dataSource
-    const parseExecuted = parseInt(rollingCountThreadsExecuted, 10)
-    const parseValue = parseInt(propertyValue_metricsRollingStatisticalWindowInMilliseconds, 10)
-    return (parseExecuted / (parseValue / 1000)).toFixed(1) + '/s'
+    return (rollingCountThreadsExecuted / (parseProperty / 1000)).toFixed(1) + '/s'
   }
 
   formatPoolCircleData = () => {
     const {
       rollingCountThreadsExecuted, reportingHosts,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseProperty,
     } = this.props.dataSource
-    const parseThreads = parseInt(rollingCountThreadsExecuted, 10)
-    const parseHosts = parseInt(reportingHosts, 10)
-    const parseProperty = parseInt(propertyValue_metricsRollingStatisticalWindowInMilliseconds, 10)
-    const ratePerSecondPerHost = (parseThreads / parseProperty / parseHosts).toFixed(1)
+    const ratePerSecondPerHost
+      = rollingCountThreadsExecuted / (parseProperty / 1000) / reportingHosts
     return [{
       x: 0.5,
       y: 0.5,
@@ -62,7 +58,6 @@ export default class ThreadChart extends React.PureComponent {
       return '#FF9900'
     }
     return 'red'
-
   }
 
   render() {
@@ -81,7 +76,7 @@ export default class ThreadChart extends React.PureComponent {
               type="point"
               position="x*y"
               active={false}
-              size={[ 'radius', [ 4, 40 ]]}
+              size={[ 'radius', radius => Number(radius) * 10 || 4 ]}
               shape={'circle'}
               style={{ stroke: '#fff', lineWidth: 1 }}
               color={this.renderColor()}

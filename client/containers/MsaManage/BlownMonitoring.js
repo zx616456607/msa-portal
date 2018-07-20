@@ -10,6 +10,8 @@ import ThreadChart from '../../components/BlownChart/ThreadChart'
 import BlownDemoModal from '../../components/BlownChart/BlownDemo'
 import * as msaActions from '../../actions/msa'
 import { sleep } from '../../common/utils';
+import { API_CONFIG } from '../../constants'
+const { MSA_API } = API_CONFIG
 
 const Option = Select.Option
 
@@ -46,20 +48,16 @@ class BlownMonitoring extends React.Component {
     })
   }
 
-  selectBlownCluster = clusterName => {
+  selectBlownCluster = async clusterName => {
     this.setState({
       blownCluster: clusterName,
     })
-    this.toggleWebsocket()
-  }
-
-  toggleWebsocket = async () => {
     this.setState({
-      wsFlag: false,
+      wsFetching: true,
     })
-    await sleep()
+    await sleep(200)
     this.setState({
-      wsFlag: true,
+      wsFetching: false,
     })
   }
 
@@ -91,26 +89,36 @@ class BlownMonitoring extends React.Component {
   }
 
   wsOnSetup = socket => {
-    const { setBlownMonitor } = this.props
+    const { blownCluster } = this.state
+    const { setBlownMonitor, namespace, userInfo, clusterId } = this.props
+    const { namespace: userNamespace } = userInfo
+    const finalNamespace = namespace === 'default' ? userNamespace : namespace
+    const body = {
+      clusterId,
+      namespace: finalNamespace,
+      clusterName: blownCluster,
+    }
+    socket.send(JSON.stringify(body))
     socket.onmessage = data => {
       setBlownMonitor(data.data)
     }
   }
 
   render() {
-    const { visible, blownCluster, wsFlag } = this.state
-    const { clusterFetching, clusterId } = this.props
-    if (clusterFetching || !blownCluster) {
+    const { visible, blownCluster, wsFetching } = this.state
+    const { clusterFetching } = this.props
+    if (clusterFetching || !blownCluster || wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
       </div>
     }
+    const host = MSA_API.replace('http', 'ws')
     return (
       <QueueAnim className="blown-monitoring">
         {
-          wsFlag &&
+          !wsFetching &&
           <WebSocket
-            url={`ws://192.168.4.236:8080/api/v1/clusters/${clusterId}/hystrix/socket/${blownCluster}`}
+            url={`${host}/api/v1/clusters/hystrix/ws`}
             onSetup={this.wsOnSetup}
           />
         }
@@ -152,16 +160,20 @@ class BlownMonitoring extends React.Component {
 
 const mapStateToProps = state => {
   const { current, msa } = state
-  const { id: clusterId } = current.config.cluster
+  const { config, user } = current
+  const { cluster, project } = config
+  const { namespace } = project
+  const { id: clusterId } = cluster
   const { msaBlownClusters, msaBlownMonitor } = msa
   const { data: blownClusters, isFetching: clusterFetching } = msaBlownClusters
-  const { data: blownMonitor, isFetching: monitorFetching } = msaBlownMonitor
+  const { data: blownMonitor } = msaBlownMonitor
   return {
     clusterId,
+    namespace,
+    userInfo: user.info,
     blownClusters,
     blownMonitor,
     clusterFetching,
-    monitorFetching,
   }
 }
 
