@@ -102,7 +102,9 @@ class MsaDetail extends React.Component {
               />
             </TabPane>
             <TabPane tab="熔断监控" key="6">
-              <BlownMonitor/>
+              <BlownMonitor
+                {...{ name, clusterID }}
+              />
             </TabPane>
           </Tabs>
         </div>

@@ -450,7 +450,7 @@ const fetchMsaBlownClusters = clusterId => {
 export const msaBlownClusters = clusterId =>
   dispatch => dispatch(fetchMsaBlownClusters(clusterId))
 
-// 微服务熔断监控
+// 微服务熔断监控（目前未使用，这部分数据通过websocket方式获取）
 export const GET_MSA_BLOWN_MONITOR_REQUEST = 'GET_MSA_BLOWN_MONITOR_REQUEST'
 export const GET_MSA_BLOWN_MONITOR_SUCCESS = 'GET_MSA_BLOWN_MONITOR_SUCCESS'
 export const GET_MSA_BLOWN_MONITOR_FAILURE = 'GET_MSA_BLOWN_MONITOR_FAILURE'
