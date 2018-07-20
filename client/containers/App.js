@@ -277,7 +277,7 @@ class App extends React.Component {
 
           { this.renderChildren() }
           <Footer style={{ textAlign: 'center' }} id="footer">
-            © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
+            © 2018 微服务治理平台 v1.2
           </Footer>
         </Layout>
       </Layout>
