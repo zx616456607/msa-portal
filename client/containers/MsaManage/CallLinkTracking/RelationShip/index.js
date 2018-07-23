@@ -58,27 +58,38 @@ class RelationShip extends React.Component {
     }
   }
 
-  handleLatelyTimer = key => {
+  handleLatelyTimer = () => {
     const { clusterID, getZipkinDependencies } = this.props
-    let query
-    switch (key) {
-      case 'five':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 300 * 1000)),
-        }
-        break
-      case 'halFhour':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
-        }
-        break
-      case 'anHour':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
-        }
-        break
-      default:
-        break
+    const query = {
+      endTs: Date.parse(new Date()),
+    }
+    // switch (key) {
+    //   case 'five':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 300 * 1000)),
+    //     }
+    //     break
+    //   case 'halFhour':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
+    //     }
+    //     break
+    //   case 'anHour':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
+    //     }
+    //     break
+    //   default:
+    //     break
+    // }
+    getZipkinDependencies(clusterID, query)
+  }
+
+  onOk = value => {
+    const { clusterID, getZipkinDependencies } = this.props
+    const query = {
+      endTs: Date.parse(value[1]),
+      lookback: (Date.parse(value[1]) - Date.parse(value[0])) * 1000,
     }
     getZipkinDependencies(clusterID, query)
   }
@@ -135,6 +146,7 @@ class RelationShip extends React.Component {
                     showTime={{ format: 'HH:mm' }}
                     format="YYYY-MM-DD HH:mm"
                     value={timer}
+                    onOk={this.onOk}
                     onChange={timer => this.setState({ timer })}
                   />
                 </Row>
