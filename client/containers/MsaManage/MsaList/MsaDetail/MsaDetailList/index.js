@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { Button, Input, Table, notification, Tooltip } from 'antd'
 import confirm from '../../../../../components/Modal/confirm'
 import {
-  delManualrules,
+  delInstanceManualRules,
 } from '../../../../../actions/msa'
 import {
   MSA_TYPE_MAN,
@@ -35,13 +35,13 @@ class MsaDetailList extends React.Component {
   }
 
   removeRegister = record => {
-    const { delManualrules, clusterID, loadMsaDetail } = this.props
+    const { delInstanceManualRules, clusterID, loadMsaDetail } = this.props
     confirm({
       title: `确认将实例 ${record.instanceId} 移除注册吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
-          delManualrules(clusterID, record.id).then(res => {
+          delInstanceManualRules(clusterID, record.id).then(res => {
             if (res.error) {
               return reject()
             }
@@ -158,5 +158,5 @@ const mapStateToProps = () => {
 }
 
 export default connect(mapStateToProps, {
-  delManualrules,
+  delInstanceManualRules,
 })(MsaDetailList)
