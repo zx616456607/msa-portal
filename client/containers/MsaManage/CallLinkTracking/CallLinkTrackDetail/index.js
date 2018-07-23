@@ -209,7 +209,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       <div className="end">收到响应耗时：
                         {
                           serviceList.length > 0 &&
-                          (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
+                          (serviceList[3].timestamp - serviceList[2].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-rigth sx-arrow-rigth"></div>

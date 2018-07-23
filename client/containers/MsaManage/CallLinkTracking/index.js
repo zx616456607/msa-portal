@@ -21,6 +21,7 @@ import QueueAnim from 'rc-queue-anim'
 import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
+import isEmpty from 'lodash/isEmpty'
 import { formatFromnow, formatDate } from '../../../common/utils'
 import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import { getZipkinTracesList, getZipkinServices, getZipkinSpans } from '../../../actions/callLinkTrack'
@@ -40,6 +41,7 @@ class CallLinkTracking extends React.Component {
     endTs: '',
     isFliter: false,
     spanList: [],
+    filterList: [],
     isTimerShow: true,
     filterSuccess: '',
     current: DEFAULT_PAGE,
@@ -67,7 +69,7 @@ class CallLinkTracking extends React.Component {
           serviceName: value.serviceName,
           spanName: value.spanName,
           endTs: endTs ? endTs : value.endTs && value.endTs[1].valueOf(),
-          minDuration: value.minDuration,
+          minDuration: value.minDuration * 1000,
           limit: value.limit,
           lookback: value.endTs && value.endTs[1] - value.endTs[0],
         }
@@ -91,7 +93,7 @@ class CallLinkTracking extends React.Component {
 
   fliterChartData = data => {
     if (!data) return
-    const dataAry = []
+    let dataAry = []
     data.forEach(item => {
       const columns = {
         gender: 'female',
@@ -99,12 +101,13 @@ class CallLinkTracking extends React.Component {
         traceId: item.traceId,
         success: item.success ? '成功' : '失败',
         serviceName: item.serviceName,
-        duration: `${item.duration} ms`,
+        duration: `${item.duration / 1000} ms`,
         startTime: `${formatDate(item.startTime, 'hh:mm:ss')} pm`,
         spanCount: item.spanCount,
       }
       dataAry.push(columns)
     })
+    dataAry = dataAry.sort()
     return dataAry
   }
 
@@ -148,28 +151,34 @@ class CallLinkTracking extends React.Component {
   }
 
   tableChange = (pagination, filters) => {
-    this.setState({
-      isFliter: true,
-      filterSuccess: filters.success[0].indexOf('false') === 0,
-    })
+    const { dataList } = this.props
+    if (!isEmpty(filters)) {
+      if (filters.success.length > 0) {
+        const status = filters.success[0].indexOf('false') === 0
+        this.setState({
+          isFliter: true,
+          filterList: dataList.filter(item => item.success !== status),
+          filterSuccess: filters.success[0],
+        })
+      }
+    }
   }
 
   filterSpans = list => {
     if (!list) return
     return Object.keys(list).map(item => {
       return <div className="serviceName">
-        <span>
-          <Button type="primary" size="small">{`${item} (${list[item]})`}</Button>
+        <span className="names">
+          {`${item} (${list[item]})`}
         </span>
       </div>
     })
   }
 
   render() {
-    const { spanList, filterSuccess, isTimerShow, isFliter } = this.state
+    const { spanList, isTimerShow, isFliter, filterList } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
-    let errorList
     // const pagination = {
     //   simple: true,
     //   total: 10 || 0,
@@ -245,9 +254,6 @@ class CallLinkTracking extends React.Component {
         查看详情
       </Button>,
     }]
-    if (isFliter) {
-      errorList = dataList.filter(item => item.success !== filterSuccess)
-    }
 
     return (
       <QueueAnim className="msa-call-link-tracking">
@@ -262,7 +268,9 @@ class CallLinkTracking extends React.Component {
                   <Select
                     placeholder="选择微服务"
                     className="select-style"
+                    showSearch={true}
                   >
+                    <Option key="all">所有服务</Option>
                     {
                       servicesList && servicesList.map(item => {
                         return <Option key={item}>{item}</Option>
@@ -278,7 +286,8 @@ class CallLinkTracking extends React.Component {
                   ininialValue: spanList.length > 1 && spanList[0],
                 })(
                   <Select placeholder="选择span"
-                    className="select-style">
+                    className="select-style"
+                    showSearch={true}>
                     {
                       spanList.length > 1 && spanList.map(item => {
                         return <Option key={item}>{item}</Option>
@@ -345,7 +354,8 @@ class CallLinkTracking extends React.Component {
               <Button type={'primary'} icon={'rollback'}
                 onClick={() => this.handleReset()}>重置</Button>
               {
-                dataList && <span className="total">共 {dataList.length} 条</span>
+                dataList && <span className="total">共 {
+                  isFliter ? filterList.length : dataList.length} 条</span>
               }
             </Col>
           </Row>
@@ -357,9 +367,9 @@ class CallLinkTracking extends React.Component {
               data={this.fliterChartData(dataList)} scale={cols} forceFit={true}>
               <Tooltip showTitle={false} crosshairs={{ type: 'cross' }} />
               <Axis name="startTime" />
-              <Axis name="spanCount" />
-              <Geom active={true} type="point" position="startTime*spanCount" opacity={0.65} shape="circle"
-                size={[ 'spanCount', [ 4, 20 ]]} tooltip="traceId*serviceName*success*duration*startTime"
+              <Axis name="duration" />
+              <Geom active={true} type="point" position="startTime*duration" opacity={0.65} shape="circle"
+                size={[ 'spanCount', [ 4, 10 ]]} tooltip="traceId*serviceName*success*duration*startTime"
                 color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
                   lineWidth: 1,
                   stroke: val => {
@@ -374,7 +384,7 @@ class CallLinkTracking extends React.Component {
             <Table
               pagination={false}
               loading={isFetching}
-              dataSource={isFliter ? errorList : dataList}
+              dataSource={isFliter ? filterList : dataList}
               columns={columns}
               onChange={this.tableChange}
               rowKey={row => row.traceId}
@@ -397,9 +407,6 @@ const mapStateToProps = state => {
   if (currentConfig.project.namespace === DEFAULT) {
     currentConfig.project.namespace = currentUser.namespace
   }
-  data && data.forEach(item => {
-    item.spans = { name: 1, service: 2 }
-  })
   return {
     currentConfig,
     currentUser,
