@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Input, Table, notification, Tooltip } from 'antd'
+import { Button, Input, Table, notification, Tooltip, Icon } from 'antd'
 import confirm from '../../../../../components/Modal/confirm'
 import {
   delManualrules,
@@ -35,10 +35,11 @@ class MsaDetailList extends React.Component {
   }
 
   removeRegister = record => {
-    const { delManualrules, clusterID, loadMsaDetail } = this.props
+    const { delManualrules, clusterID, loadMsaDetail, instances } = this.props
     confirm({
+      modalTitle: '移除注册操作',
       title: `确认将实例 ${record.instanceId} 移除注册吗？`,
-      content: '',
+      content: instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
         return new Promise((resolve, reject) => {
           delManualrules(clusterID, record.id).then(res => {
