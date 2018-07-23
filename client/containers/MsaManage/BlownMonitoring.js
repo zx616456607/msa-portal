@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Icon, Select, Spin } from 'antd'
+import { Icon, Select, Spin, notification } from 'antd'
 import WebSocket from '@tenx-ui/webSocket/lib/websocket'
 import isEmpty from 'lodash/isEmpty'
 import './style/BlownMonitoring.less'
@@ -21,7 +21,13 @@ class BlownMonitoring extends React.Component {
 
   async componentDidMount() {
     const { msaBlownClusters, clusterId } = this.props
-    await msaBlownClusters(clusterId)
+    const result = await msaBlownClusters(clusterId)
+    if (result.error) {
+      notification.warn({
+        message: '请求熔断集群失败',
+      })
+      return
+    }
     const { blownClusters } = this.props
     if (!isEmpty(blownClusters)) {
       this.selectBlownCluster(blownClusters[0])
@@ -106,8 +112,9 @@ class BlownMonitoring extends React.Component {
 
   render() {
     const { visible, blownCluster, wsFetching } = this.state
-    const { clusterFetching } = this.props
-    if (clusterFetching || !blownCluster || wsFetching) {
+    const { clusterFetching, blownClusters, blownMonitor } = this.props
+    const emptyElement = <div style={{ textAlign: 'center' }} className="empty-text">暂无数据</div>
+    if (clusterFetching || wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
       </div>
@@ -140,13 +147,25 @@ class BlownMonitoring extends React.Component {
         </div>
         <div className="layout-content-body" key="body">
           <div className="first-title">断路器</div>
-          <div className="monitor-wrapper">
-            {this.renderBlownCharts()}
-          </div>
+          {
+            (isEmpty(blownClusters) || isEmpty(blownMonitor))
+              ?
+              emptyElement
+              :
+              <div className="monitor-wrapper">
+                {this.renderBlownCharts()}
+              </div>
+          }
           <div className="first-title">线程池</div>
-          <div className="monitor-wrapper">
-            {this.renderPools()}
-          </div>
+          {
+            (isEmpty(blownClusters) || isEmpty(blownMonitor))
+              ?
+              emptyElement
+              :
+              <div className="monitor-wrapper">
+                {this.renderPools()}
+              </div>
+          }
         </div>
         <BlownDemoModal
           visible={visible}
