@@ -192,7 +192,7 @@ const fetchDelManualrules = (clusterID, ruleIDs) => ({
       MSA_DELETE_MANUALRULES_SUCCESS,
       MSA_DELETE_MANUALRULES_FAILURE,
     ],
-    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/instances/${ruleIDs}`,
+    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/${ruleIDs}`,
     options: {
       method: 'DELETE',
     },
@@ -205,6 +205,28 @@ export function delManualrules(clusterID, ruleIDs) {
     return dispatch(fetchDelManualrules(clusterID, ruleIDs))
   }
 }
+
+export const MSA_DELETE_INSTANCE_MANUALRULES_REQUEST = 'MSA_DELETE_INSTANCE_MANUALRULES_REQUEST'
+export const MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS = 'MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS'
+export const MSA_DELETE_INSTANCE_MANUALRULES_FAILURE = 'MSA_DELETE_INSTANCE_MANUALRULES_FAILURE'
+
+const fetchDelInstanceManualrules = (clusterID, ruleIDs) => ({
+  [CALL_API]: {
+    types: [
+      MSA_DELETE_INSTANCE_MANUALRULES_REQUEST,
+      MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS,
+      MSA_DELETE_INSTANCE_MANUALRULES_FAILURE,
+    ],
+    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/instances/${ruleIDs}`,
+    options: {
+      method: 'DELETE',
+    },
+    schema: {},
+  },
+})
+
+export const delInstanceManualRules = (clusterID, ruleIDs) =>
+  dispatch => dispatch(fetchDelInstanceManualrules(clusterID, ruleIDs))
 
 export const MSA_DELETE_EXPULSSIONS_MANUALRULES_REQUEST = 'MSA_DELETE_EXPULSSIONS_MANUALRULES_REQUEST'
 export const MSA_DELETE_EXPULSSIONS_MANUALRULES_SUCCESS = 'MSA_DELETE_EXPULSSIONS_MANUALRULES_SUCCESS'

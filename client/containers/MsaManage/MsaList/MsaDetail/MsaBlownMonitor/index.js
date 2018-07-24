@@ -87,12 +87,14 @@ class MsaBlownMonitor extends React.PureComponent {
 
   render() {
     const { visible, wsFetching } = this.state
+    const { blownMonitor } = this.props
     const host = MSA_API.replace('http', 'ws')
     if (wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
       </div>
     }
+    const emptyElement = <div style={{ textAlign: 'center' }} className="empty-text">暂无数据</div>
     return (
       <div className="msa-blown-monitor">
         <WebSocket
@@ -104,13 +106,25 @@ class MsaBlownMonitor extends React.PureComponent {
         </span>
         <div className="layout-content-body blown-monitor-body">
           <div className="first-title">断路器</div>
-          <div className="monitor-wrapper">
-            {this.renderBlownCharts()}
-          </div>
+          {
+            isEmpty(blownMonitor)
+              ?
+              emptyElement
+              :
+              <div className="monitor-wrapper">
+                {this.renderBlownCharts()}
+              </div>
+          }
           <div className="first-title">线程池</div>
-          <div className="monitor-wrapper">
-            {this.renderPools()}
-          </div>
+          {
+            isEmpty(blownMonitor)
+              ?
+              emptyElement
+              :
+              <div className="monitor-wrapper">
+                {this.renderPools()}
+              </div>
+          }
         </div>
         <BlownDemoModal
           visible={visible}
