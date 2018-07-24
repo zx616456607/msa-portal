@@ -96,7 +96,7 @@ class MsaDetailList extends React.Component {
       width: '10%',
       render: () => MSA_TYPES_TEXT[msaDetail.type],
     }, {
-      title: '注册时间',
+      title: '心跳时间',
       dataIndex: 'lastHeartbeatAt',
       width: '15%',
       render: time => formatDate(time),
