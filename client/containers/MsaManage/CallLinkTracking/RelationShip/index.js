@@ -12,7 +12,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Row, Card, Button, DatePicker } from 'antd'
+import { Row, Card, Button, DatePicker, Tooltip, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import createG6Flow from '../../../../components/CreateG6/flowChart'
 import './style/index.less'
@@ -58,27 +58,38 @@ class RelationShip extends React.Component {
     }
   }
 
-  handleLatelyTimer = key => {
+  handleLatelyTimer = () => {
     const { clusterID, getZipkinDependencies } = this.props
-    let query
-    switch (key) {
-      case 'five':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 300 * 1000)),
-        }
-        break
-      case 'halFhour':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
-        }
-        break
-      case 'anHour':
-        query = {
-          endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
-        }
-        break
-      default:
-        break
+    const query = {
+      endTs: Date.parse(new Date()),
+    }
+    // switch (key) {
+    //   case 'five':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 300 * 1000)),
+    //     }
+    //     break
+    //   case 'halFhour':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
+    //     }
+    //     break
+    //   case 'anHour':
+    //     query = {
+    //       endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
+    //     }
+    //     break
+    //   default:
+    //     break
+    // }
+    getZipkinDependencies(clusterID, query)
+  }
+
+  onOk = value => {
+    const { clusterID, getZipkinDependencies } = this.props
+    const query = {
+      endTs: Date.parse(value[1]),
+      lookback: (Date.parse(value[1]) - Date.parse(value[0])) * 1000,
     }
     getZipkinDependencies(clusterID, query)
   }
@@ -103,6 +114,19 @@ class RelationShip extends React.Component {
       }
     }
 
+    const tipText = (<div>
+      <span></span>
+      <div className="content">发出的调用全部成功</div>
+      <div className="line allLine"></div>
+      <div className="arrow allArrow"></div>
+      <div className="content">发出的调用部分成功/失败</div>
+      <div className="line partLine"></div>
+      <div className="arrow partArrow"></div>
+      <div className="content">发出的调用全部失败</div>
+      <div className="line errorLine"></div>
+      <div className="arrow errorArrow"></div>
+    </div>)
+
     return (
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
@@ -122,10 +146,16 @@ class RelationShip extends React.Component {
                     showTime={{ format: 'HH:mm' }}
                     format="YYYY-MM-DD HH:mm"
                     value={timer}
+                    onOk={this.onOk}
                     onChange={timer => this.setState({ timer })}
                   />
                 </Row>
             }
+            <div className="tip">
+              <Tooltip placement="bottom" title={tipText}>
+                <Icon type="question-circle-o" />
+              </Tooltip>
+            </div>
           </ButtonGroup>
         </div>
         <div className="body" key="body">

@@ -25,6 +25,8 @@ class CallLinkTrackDetail extends React.PureComponent {
   state = {
     visible: false,
     detailData: [],
+    serverUrl: '',
+    serverName: '',
     serviceList: [],
     serverDetail: [],
     detailTimestamp: '',
@@ -44,6 +46,8 @@ class CallLinkTrackDetail extends React.PureComponent {
   handleDetail = record => {
     this.setState({
       visible: true,
+      serverUrl: record.name,
+      serverName: record.serverName,
       detailTimestamp: record.timestamp,
       serviceList: record.annotations || [],
       serverDetail: record.binaryAnnotations,
@@ -78,7 +82,7 @@ class CallLinkTrackDetail extends React.PureComponent {
   }
 
   render() {
-    const { serverDetail, serviceList, detailTimestamp } = this.state
+    const { serverDetail, serviceList, detailTimestamp, serverUrl, serverName } = this.state
     const { isFetching, detailData } = this.props
     const columns = [{
       id: 'id',
@@ -168,7 +172,7 @@ class CallLinkTrackDetail extends React.PureComponent {
             />
           </Card>
         </div>
-        <Modal title="服务详情"
+        <Modal title={`${serverName} (${serverUrl})`}
           visible={this.state.visible}
           width={'40%'}
           onCancel={this.handleClose}
@@ -205,7 +209,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       <div className="end">收到响应耗时：
                         {
                           serviceList.length > 0 &&
-                          (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
+                          (serviceList[3].timestamp - serviceList[2].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-rigth sx-arrow-rigth"></div>
