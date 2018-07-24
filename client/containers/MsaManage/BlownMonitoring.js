@@ -71,7 +71,7 @@ class BlownMonitoring extends React.Component {
     const { blownMonitor } = this.props
     const { circuitBreakerData, poolData } = blownMonitor || { circuitBreakerData: [] }
     return (circuitBreakerData || []).map(monitor => {
-      const matchPool = poolData.filter(pool => pool.poolName === monitor.pool_name)
+      const matchPool = poolData.filter(pool => pool.poolName === monitor.poolName)
       let finalMonitor = monitor
       if (!isEmpty(matchPool)) {
         finalMonitor = Object.assign({}, monitor, {
@@ -113,7 +113,12 @@ class BlownMonitoring extends React.Component {
   render() {
     const { visible, blownCluster, wsFetching } = this.state
     const { clusterFetching, blownClusters, blownMonitor } = this.props
-    const emptyElement = <div style={{ textAlign: 'center' }} className="empty-text">暂无数据</div>
+    const emptyElement = <div className="empty-text empty-blown-monitor">
+      <span>
+        <Icon type="frown-o" />
+        <div>暂无数据</div>
+      </span>
+    </div>
     if (clusterFetching || wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
@@ -148,7 +153,8 @@ class BlownMonitoring extends React.Component {
         <div className="layout-content-body" key="body">
           <div className="first-title">断路器</div>
           {
-            (isEmpty(blownClusters) || isEmpty(blownMonitor))
+            (isEmpty(blownClusters) || isEmpty(blownMonitor
+              || isEmpty(blownMonitor.circuitBreakerData)))
               ?
               emptyElement
               :
@@ -158,7 +164,7 @@ class BlownMonitoring extends React.Component {
           }
           <div className="first-title">线程池</div>
           {
-            (isEmpty(blownClusters) || isEmpty(blownMonitor))
+            (isEmpty(blownClusters) || isEmpty(blownMonitor || isEmpty(blownMonitor.poolData)))
               ?
               emptyElement
               :

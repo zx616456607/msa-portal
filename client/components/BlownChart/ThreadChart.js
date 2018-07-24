@@ -51,13 +51,13 @@ export default class ThreadChart extends React.PureComponent {
     const { currentQueueSize, reportingHosts } = this.props.dataSource
     const errorPercentage = currentQueueSize / reportingHosts
     if (errorPercentage <= 25) {
-      return 'green'
+      return '#85ca87'
     } else if (errorPercentage <= 40) {
-      return '#FFCC00'
+      return '#fdd552'
     } else if (errorPercentage <= 50) {
-      return '#FF9900'
+      return '#ffa15b'
     }
-    return 'red'
+    return '#fd726f'
   }
 
   render() {

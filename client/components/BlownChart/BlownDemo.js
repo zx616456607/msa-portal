@@ -26,7 +26,8 @@ export default class BlownDemoModal extends React.PureComponent {
   }
 
   renderFooter = () => {
-    return <Button type={'primary'} onClick={this.toggleVisible}>知道了</Button>
+    const { onOk } = this.props
+    return <Button type={'primary'} onClick={onOk}>知道了</Button>
   }
 
   render() {
