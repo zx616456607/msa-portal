@@ -36,6 +36,12 @@ class MsaBlownMonitor extends React.PureComponent {
       wsFetching: false,
     })
   }
+
+  componentWillUnmount() {
+    const { clearBlownMonitor } = this.props
+    clearBlownMonitor()
+  }
+
   toggleVisible = () => {
     this.setState(({ visible }) => {
       return {
