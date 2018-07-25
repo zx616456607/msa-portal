@@ -19,6 +19,7 @@ import * as msaActions from '../../../../../actions/msa'
 import { API_CONFIG } from '../../../../../constants';
 import './style/index.less'
 import BlownDemoModal from '../../../../../components/BlownChart/BlownDemo'
+import EmptyBlown from '../../../../../components/BlownChart/EmptyBlown'
 import isEmpty from 'lodash/isEmpty';
 import { sleep } from '../../../../../common/utils'
 const { MSA_API } = API_CONFIG
@@ -94,12 +95,6 @@ class MsaBlownMonitor extends React.PureComponent {
         <Spin size={'large'}/>
       </div>
     }
-    const emptyElement = <div className="empty-text empty-blown-monitor">
-      <span>
-        <Icon type="frown-o" />
-        <div>暂无数据</div>
-      </span>
-    </div>
     return (
       <div className="msa-blown-monitor">
         <WebSocket
@@ -114,7 +109,9 @@ class MsaBlownMonitor extends React.PureComponent {
           {
             isEmpty(blownMonitor) || isEmpty(blownMonitor.circuitBreakerData)
               ?
-              emptyElement
+              <EmptyBlown
+                loading={isEmpty(blownMonitor)}
+              />
               :
               <div className="monitor-wrapper">
                 {this.renderBlownCharts()}
@@ -124,7 +121,9 @@ class MsaBlownMonitor extends React.PureComponent {
           {
             isEmpty(blownMonitor) || isEmpty(blownMonitor.poolData)
               ?
-              emptyElement
+              <EmptyBlown
+                loading={isEmpty(blownMonitor)}
+              />
               :
               <div className="monitor-wrapper">
                 {this.renderPools()}
