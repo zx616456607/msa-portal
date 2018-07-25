@@ -94,7 +94,12 @@ class MsaBlownMonitor extends React.PureComponent {
         <Spin size={'large'}/>
       </div>
     }
-    const emptyElement = <div style={{ textAlign: 'center' }} className="empty-text">暂无数据</div>
+    const emptyElement = <div className="empty-text empty-blown-monitor">
+      <span>
+        <Icon type="frown-o" />
+        <div>暂无数据</div>
+      </span>
+    </div>
     return (
       <div className="msa-blown-monitor">
         <WebSocket
@@ -107,7 +112,7 @@ class MsaBlownMonitor extends React.PureComponent {
         <div className="layout-content-body blown-monitor-body">
           <div className="first-title">断路器</div>
           {
-            isEmpty(blownMonitor)
+            isEmpty(blownMonitor) || isEmpty(blownMonitor.circuitBreakerData)
               ?
               emptyElement
               :
@@ -117,7 +122,7 @@ class MsaBlownMonitor extends React.PureComponent {
           }
           <div className="first-title">线程池</div>
           {
-            isEmpty(blownMonitor)
+            isEmpty(blownMonitor) || isEmpty(blownMonitor.poolData)
               ?
               emptyElement
               :

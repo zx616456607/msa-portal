@@ -93,13 +93,13 @@ export default class BlownChart extends React.PureComponent {
   renderColor = () => {
     const { errorPercentage } = this.props.dataSource
     if (errorPercentage <= 25) {
-      return 'green'
+      return '#85ca87'
     } else if (errorPercentage <= 40) {
-      return '#FFCC00'
+      return '#fdd552'
     } else if (errorPercentage <= 50) {
-      return '#FF9900'
+      return '#ffa15b'
     }
-    return 'red'
+    return '#fd726f'
   }
 
   render() {
@@ -125,7 +125,7 @@ export default class BlownChart extends React.PureComponent {
               color={this.renderColor()}
               opacity={0.5}
             />
-            <Geom type="line" position="time*count" size={2} />
+            <Geom type="line" position="time*count" size={2} color={this.renderColor()}/>
           </Chart>
           <div className="blow-chart-right">
             <AntTooltip title={circuitBreakerName}>
