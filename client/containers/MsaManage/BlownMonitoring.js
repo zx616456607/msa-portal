@@ -8,6 +8,7 @@ import './style/BlownMonitoring.less'
 import BlownChart from '../../components/BlownChart'
 import ThreadChart from '../../components/BlownChart/ThreadChart'
 import BlownDemoModal from '../../components/BlownChart/BlownDemo'
+import EmptyBlown from '../../components/BlownChart/EmptyBlown'
 import * as msaActions from '../../actions/msa'
 import { sleep } from '../../common/utils';
 import { API_CONFIG } from '../../constants'
@@ -55,6 +56,9 @@ class BlownMonitoring extends React.Component {
   }
 
   selectBlownCluster = async clusterName => {
+    if (clusterName === this.state.blownCluster) {
+      return
+    }
     this.setState({
       blownCluster: clusterName,
     })
@@ -113,12 +117,6 @@ class BlownMonitoring extends React.Component {
   render() {
     const { visible, blownCluster, wsFetching } = this.state
     const { clusterFetching, blownClusters, blownMonitor } = this.props
-    const emptyElement = <div className="empty-text empty-blown-monitor">
-      <span>
-        <Icon type="frown-o" />
-        <div>暂无数据</div>
-      </span>
-    </div>
     if (clusterFetching || wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
@@ -153,10 +151,12 @@ class BlownMonitoring extends React.Component {
         <div className="layout-content-body" key="body">
           <div className="first-title">断路器</div>
           {
-            (isEmpty(blownClusters) || isEmpty(blownMonitor
-              || isEmpty(blownMonitor.circuitBreakerData)))
+            (isEmpty(blownClusters) || isEmpty(blownMonitor)
+              || isEmpty(blownMonitor.circuitBreakerData))
               ?
-              emptyElement
+              <EmptyBlown
+                loading={isEmpty(blownMonitor)}
+              />
               :
               <div className="monitor-wrapper">
                 {this.renderBlownCharts()}
@@ -164,9 +164,12 @@ class BlownMonitoring extends React.Component {
           }
           <div className="first-title">线程池</div>
           {
-            (isEmpty(blownClusters) || isEmpty(blownMonitor || isEmpty(blownMonitor.poolData)))
+            (isEmpty(blownClusters) || isEmpty(blownMonitor)
+              || isEmpty(blownMonitor.poolData))
               ?
-              emptyElement
+              <EmptyBlown
+                loading={isEmpty(blownMonitor)}
+              />
               :
               <div className="monitor-wrapper">
                 {this.renderPools()}

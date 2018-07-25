@@ -1,0 +1,28 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * style of empty blown
+ *
+ * @author zhangxuan
+ * @date 2018-07-25
+ */
+@import '~assets/style/core/index.less';
+.empty-loading {
+  display: inline-block;
+  .empty-blown-monitor {
+    width: 395px;
+    height: 268px;
+    border: @border-width-base dashed @border-color-base;
+    border-radius: @border-radius-base;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: @padding-medium;
+    & > span {
+      text-align: center;
+    }
+  }
+}
