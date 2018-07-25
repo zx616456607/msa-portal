@@ -48,7 +48,7 @@ class MsaBlownMonitor extends React.PureComponent {
     const { blownMonitor } = this.props
     const { circuitBreakerData, poolData } = blownMonitor || { circuitBreakerData: [] }
     return (circuitBreakerData || []).map(monitor => {
-      const matchPool = poolData.filter(pool => pool.poolName === monitor.pool_name)
+      const matchPool = poolData.filter(pool => pool.poolName === monitor.poolName)
       let finalMonitor = monitor
       if (!isEmpty(matchPool)) {
         finalMonitor = Object.assign({}, monitor, {
