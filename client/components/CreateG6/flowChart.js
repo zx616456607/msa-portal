@@ -30,7 +30,7 @@ export default function createG6Flow(__operation) {
     }
 
     componentWillUnmount() {
-      this.net.destroy()
+      // this.net.destroy()
       this.net = null
       this.graphId = null
     }
@@ -78,7 +78,7 @@ export default function createG6Flow(__operation) {
         fitView: 'autoZoom',
       })
       net.edge()
-        .shape('smooth')
+        .shape('rect')
         .style(function(obj) {
           if (obj.errPart === true) {
             return {
