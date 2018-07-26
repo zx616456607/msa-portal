@@ -34,6 +34,8 @@ class RelationShip extends React.Component {
 
   state = {
     timer: '',
+    timers: '',
+    latelyKey: '',
     isTimerShow: true,
   }
 
@@ -58,35 +60,22 @@ class RelationShip extends React.Component {
     }
   }
 
-  handleLatelyTimer = () => {
+  handleLatelyTimer = key => {
     const { clusterID, getZipkinDependencies } = this.props
     const query = {
       endTs: Date.parse(new Date()),
     }
-    // switch (key) {
-    //   case 'five':
-    //     query = {
-    //       endTs: Date.parse(new Date(new Date() - 300 * 1000)),
-    //     }
-    //     break
-    //   case 'halFhour':
-    //     query = {
-    //       endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
-    //     }
-    //     break
-    //   case 'anHour':
-    //     query = {
-    //       endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
-    //     }
-    //     break
-    //   default:
-    //     break
-    // }
+    this.setState({
+      latelyKey: key,
+    })
     getZipkinDependencies(clusterID, query)
   }
 
   onOk = value => {
     const { clusterID, getZipkinDependencies } = this.props
+    this.setState({
+      timers: (Date.parse(value[1]) - Date.parse(value[0])),
+    })
     const query = {
       endTs: Date.parse(value[1]),
       lookback: (Date.parse(value[1]) - Date.parse(value[0])) * 1000,
@@ -94,18 +83,69 @@ class RelationShip extends React.Component {
     getZipkinDependencies(clusterID, query)
   }
 
+  filterNodes = edges => {
+    const newArry = []
+    edges.forEach(item => {
+      if (newArry[item.target]) {
+        newArry[item.target].callCount = newArry[item.target].callCount + item.callCount
+      }
+      const objAry = {
+        callCount: item.callCount,
+      }
+      newArry[item.target] = objAry
+    })
+    return newArry
+  }
+
+  fliterAvg = value => {
+    const { timers, latelyKey } = this.state
+    const { data } = this.props
+    let avgTimer
+    const avgAry = this.filterNodes(data.edges)
+    // if(avgAry.length === 0) return 0
+    let time = 5
+    switch (latelyKey) {
+      case 'five':
+        time = 5
+        break
+      case 'halFhour':
+        time = 30
+        break
+      case 'anHour':
+        time = 60
+        break
+      default:
+        break
+    }
+    if (avgAry[value]) {
+      avgTimer = timers ? (timers / 1000) / 1000 / 60 : avgAry[value].callCount / time
+    } else {
+      avgTimer = 0.00
+    }
+    return avgTimer.toFixed(2)
+  }
+
   render() {
     const { isTimerShow, timer } = this.state
     const { data } = this.props
     if (!isEmpty(data)) {
+      if (data.nodes.length > 0) {
+        data.nodes.forEach(item => {
+          item.label = `${item.label}\n ${this.fliterAvg(item.id)}次/min`
+        })
+      }
       if (data.edges.length > 0) {
         data.edges.forEach(item => {
           if (item.errorCount > 0 && item.errorCount < item.callCount) {
+            item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
             item.color = '#5ab46d'
             item.errPart = true
+            item.shape = 'polyLineFlow'
           } else {
+            item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
             item.color = '#5ab46d'
             item.errPart = false
+            item.shape = 'polyLineFlow'
           }
           if (item.errorCount === item.callCount) {
             item.color = 'red'
@@ -137,9 +177,15 @@ class RelationShip extends React.Component {
             {
               isTimerShow ?
                 <Row>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('halFhour')}>最近30分钟</Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('anHour')}>最近1小时</Button>
+                  <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >
+                    最近5分钟
+                  </Button>
+                  <Button className="btn" onClick={() => this.handleLatelyTimer('halFhour')}>
+                    最近30分钟
+                  </Button>
+                  <Button className="btn" onClick={() => this.handleLatelyTimer('anHour')}>
+                    最近1小时
+                  </Button>
                 </Row> :
                 <Row>
                   <RangePicker
@@ -161,7 +207,7 @@ class RelationShip extends React.Component {
         <div className="body" key="body">
           <Card>
             {
-              !isEmpty(data) &&
+              data && data.nodes.length > 0 &&
               <Chart4
                 data={data}
               />

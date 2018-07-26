@@ -22,8 +22,8 @@ import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
 import isEmpty from 'lodash/isEmpty'
-import { formatFromnow, formatDate } from '../../../common/utils'
-import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
+import { formatFromnow } from '../../../common/utils'
+import { Chart, Geom, Axis, G2, Tooltip, View } from 'bizcharts'
 import { getZipkinTracesList, getZipkinServices, getZipkinSpans } from '../../../actions/callLinkTrack'
 
 const FormItem = Form.Item
@@ -102,7 +102,7 @@ class CallLinkTracking extends React.Component {
         success: item.success ? '成功' : '失败',
         serviceName: item.serviceName,
         duration: `${item.duration / 1000} ms`,
-        startTime: `${formatDate(item.startTime, 'hh:mm:ss')} pm`,
+        startTime: item.startTime, // `${formatDate(item.startTime, 'hh:mm:ss')} pm`,
         spanCount: item.spanCount,
       }
       dataAry.push(columns)
@@ -186,7 +186,6 @@ class CallLinkTracking extends React.Component {
     //   current,
     //   // onChange: current => this.setState({ current }),
     // }
-
     const cols = {
       traceId: {
         alias: 'TraceID',
@@ -199,9 +198,15 @@ class CallLinkTracking extends React.Component {
       },
       duration: {
         alias: '总调用耗时',
+        sync: true,
+        tickCount: 3,
       },
       startTime: {
         alias: '开始时间',
+        type: 'timeCat',
+        // sync: true,
+        mask: 'hh:mm:ss',
+        tickCount: 5,
       },
     }
     const columns = [{
@@ -259,10 +264,9 @@ class CallLinkTracking extends React.Component {
       <QueueAnim className="msa-call-link-tracking">
         <div className="layout-content-btns" key="btns">
           <Row>
-            <Col span={4}>
+            <Col span={5}>
               <FormItem>
                 {getFieldDecorator('serviceName', {
-                  initialValue: servicesList && servicesList[0],
                   onChange: e => this.handleServer(e),
                 })(
                   <Select
@@ -280,7 +284,7 @@ class CallLinkTracking extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={4}>
+            <Col span={5}>
               <FormItem>
                 {getFieldDecorator('spanName', {
                   ininialValue: spanList.length > 1 && spanList[0],
@@ -297,7 +301,32 @@ class CallLinkTracking extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={7}>
+            <Col span={5}>
+              <FormItem>
+                {getFieldDecorator('traceId', {})(
+                  <div>
+                    <Input placeholder="Trace ID，其他条件设置无效" className="trace" />
+                  </div>
+                )}
+              </FormItem>
+            </Col>
+            <Col span={5}>
+              <FormItem>
+                {getFieldDecorator('minDuration', {})(
+                  <Input placeholder="耗时（ms）>=" className="input-style" />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={4}>
+              <FormItem>
+                {getFieldDecorator('limit', {})(
+                  <Input placeholder="返回条数" className="resCount" />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={8}>
               <ButtonGroup className="timer">
                 <Button icon="calendar" onClick={() => this.handleTimer()}>
                   自定义日期
@@ -323,31 +352,6 @@ class CallLinkTracking extends React.Component {
                 }
               </ButtonGroup>
             </Col>
-            <Col span={5}>
-              <FormItem>
-                {getFieldDecorator('minDuration', {})(
-                  <Input placeholder="耗时（ms）>=" className="input-style" />
-                )}
-              </FormItem>
-            </Col>
-            <Col span={4}>
-              <FormItem>
-                {getFieldDecorator('limit', {})(
-                  <Input placeholder="返回条数" className="input-style" />
-                )}
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={4}>
-              <FormItem>
-                {getFieldDecorator('traceId', {})(
-                  <div>
-                    <Input placeholder="Trace ID，其他条件设置无效" className="trace" />
-                  </div>
-                )}
-              </FormItem>
-            </Col>
             <Col span={6}>
               <Button type={'primary'} icon={'search'} className="search"
                 onClick={() => this.handleSearch()}>搜索</Button>
@@ -363,20 +367,24 @@ class CallLinkTracking extends React.Component {
         {
           dataList &&
           <div className="chart" key="chart">
-            <Chart height="225" padding={{ top: 40, right: 40, bottom: '25%', left: '5%' }}
-              data={this.fliterChartData(dataList)} scale={cols} forceFit={true}>
-              <Tooltip showTitle={false} crosshairs={{ type: 'cross' }} />
-              <Axis name="startTime" />
-              <Axis name="duration" />
-              <Geom active={true} type="point" position="startTime*duration" opacity={0.65} shape="circle"
-                size={[ 'spanCount', [ 4, 10 ]]} tooltip="traceId*serviceName*success*duration*startTime"
-                color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
-                  lineWidth: 1,
-                  stroke: val => {
-                    return colorMap[val]
-                  },
-                }]} />
+            <Chart height="225" placeholder padding={{ top: 40, right: '4%', bottom: '25%', left: '6%' }}
+              scale={cols} forceFit>
+              <Tooltip crosshairs={{ type: 'cross' }} />
+              <View data={isFliter ? filterList : this.fliterChartData(dataList)} >
+                <Axis name="startTime" />
+                <Axis name="duration" />
+                <Geom active={true} type="point" position="startTime*duration" opacity={0.65} shape="circle"
+                  size={[ 'spanCount', [ 4, 10 ]]} tooltip="traceId*serviceName*success*duration*startTime"
+                  color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
+                    lineWidth: 1,
+                    stroke: val => {
+                      return colorMap[val]
+                    },
+                  }]} />
+              </View>
             </Chart>
+            <div className="kaing">耗时</div>
+            <div className="sTime">产生时间</div>
           </div>
         }
         <div className="layout-content-body" key="body">
