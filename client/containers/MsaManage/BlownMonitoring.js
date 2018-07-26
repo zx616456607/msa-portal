@@ -80,6 +80,9 @@ class BlownMonitoring extends React.Component {
       if (!isEmpty(matchPool)) {
         finalMonitor = Object.assign({}, monitor, {
           rollingCountThreadsExecuted: matchPool[0].rollingCountThreadsExecuted,
+          reportingHosts: matchPool[0].reportingHosts,
+          propertyValue_metricsRollingStatisticalWindowInMilliseconds:
+          matchPool[0].propertyValue_metricsRollingStatisticalWindowInMilliseconds,
         })
       }
       return <div className="monitor-list" key={finalMonitor.circuitBreakerName}>
