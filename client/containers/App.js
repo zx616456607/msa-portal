@@ -14,7 +14,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ClassNames from 'classnames'
-import { Layout, Modal, notification } from 'antd'
+import { Layout, Modal, notification, message as messageTip } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
 import NamespaceSwitch from './NamespaceSwitch'
@@ -138,6 +138,11 @@ class App extends React.Component {
       return null
     }
     const { message, status } = errorObject
+    if (message === 'Failed to fetch') {
+      messageTip.warn('网络或服务暂时不可用，请稍后重试')
+      resetErrorMessage()
+      return
+    }
     if (!errorMessageCloseObj[errorMessageBeforeDateTime]
       && errorMessageBefore === message
       && (Date.now() - errorMessageBeforeDateTime) < 4500
