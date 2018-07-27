@@ -17,9 +17,8 @@ import { formatDate } from '../../common/utils';
 import './style/index.less'
 
 const cols = {
-  count: { min: 0 },
-  time: { range: [ 0, 1 ] },
-  vertical: { min: 0 },
+  count: { min: -10, max: 100 },
+  vertical: { min: 0, max: 100 },
 };
 
 export default class BlownChart extends React.PureComponent {
@@ -62,28 +61,16 @@ export default class BlownChart extends React.PureComponent {
       propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
     } = this.props.dataSource
     const ratePerSecondPerHost = (requestCount / (parseValue / 1000) / reportingHosts).toFixed(1) // 圆半径
-    // 找出 y 轴最大值，用于定位圆的 y 轴位置
-    let maxValue = 0
-    let minValue = parseInt(allPoint[0].count, 10)
-    allPoint.every(item => {
-      if (parseInt(item.count) > maxValue) {
-        maxValue = parseInt(item.count)
-      }
-      if (parseInt(item.count) < minValue) {
-        minValue = parseInt(item.count)
-      }
-      return true
-    })
-    cols.vertical.max = maxValue || 1
+
     const finalData = allPoint.map(item => {
       return {
-        count: item.count,
-        time: formatDate(item.time * 1000, 'mm:ss'),
+        count: Number(item.count),
+        time: formatDate(Number(item.time) * 1000, 'mm:ss'),
       }
     })
     const circleInfo = {
-      radius: Number(ratePerSecondPerHost),
-      vertical: maxValue > 0 ? (maxValue) / 2 : 0.5, // 圆的 y 轴坐标
+      radius: Number(ratePerSecondPerHost), // 圆的半径
+      vertical: 50, // 圆的y轴坐标
     }
     // 圆的位置在数据中间位置的前一个
     Object.assign(finalData[Math.floor(finalData.length / 2)], circleInfo)
