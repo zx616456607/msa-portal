@@ -27,6 +27,7 @@ class CallLinkTrackDetail extends React.PureComponent {
     detailData: [],
     serverUrl: '',
     serverName: '',
+    serverDuration: '',
     serviceList: [],
     serverDetail: [],
     detailTimestamp: '',
@@ -49,6 +50,7 @@ class CallLinkTrackDetail extends React.PureComponent {
       serverUrl: record.name,
       serverName: record.serverName,
       detailTimestamp: record.timestamp,
+      serverDuration: record.duration,
       serviceList: record.annotations || [],
       serverDetail: record.binaryAnnotations,
     })
@@ -82,7 +84,8 @@ class CallLinkTrackDetail extends React.PureComponent {
   }
 
   render() {
-    const { serverDetail, serviceList, detailTimestamp, serverUrl, serverName } = this.state
+    const { serverDetail, serviceList, detailTimestamp, serverUrl, serverName, serverDuration } =
+      this.state
     const { isFetching, detailData } = this.props
     const columns = [{
       id: 'id',
@@ -131,6 +134,7 @@ class CallLinkTrackDetail extends React.PureComponent {
     return (
       <QueueAnim className="call-link-track-detail">
         <ReturnButton onClick={this.backToList}>返回</ReturnButton>
+        <span className="title">{`${detailData.length > 0 && detailData[0].traceId}`} 调用关系</span>
         <Card
           className="call-link-track-detail-header"
           key="call-link-track-detail-header"
@@ -174,7 +178,7 @@ class CallLinkTrackDetail extends React.PureComponent {
         </div>
         <Modal title={`${serverName} (${serverUrl})`}
           visible={this.state.visible}
-          width={'40%'}
+          width={'50%'}
           onCancel={this.handleClose}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleClose}>取 消</Button>,
@@ -185,9 +189,9 @@ class CallLinkTrackDetail extends React.PureComponent {
               <div className="top">
                 <div>请求相对开始时间：
                   {
-                    detailData.length > 0 && detailTimestamp - detailData[0].timestamp
+                    detailData.length > 0 && (detailTimestamp - detailData[0].timestamp) / 1000
                   } ms</div>
-                <div>span 总耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</div>
+                <div>span 总耗时：{serverDuration && serverDuration / 1000} ms</div>
               </div>
               {
                 serviceList.length === 4 &&
