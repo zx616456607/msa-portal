@@ -12,6 +12,7 @@
 
 import G6 from '@antv/g6'
 import React from 'react'
+import isEqual from 'lodash/isEqual'
 
 // 关闭 G6 的体验改进计划打点请求
 G6.track(false)
@@ -39,6 +40,26 @@ export default function createG6Flow(__operation) {
       this.initGraph(this.props)
     }
 
+    componentWillReceiveProps(newProps) {
+      const { data } = newProps
+      if (!isEqual(data) && data.nodes.length > 0) {
+        let nodes = data.nodes
+        const edges = data.edges
+        const layout = new G6.Layout.Flow({
+          nodes,
+          edges,
+        })
+        nodes = layout.getNodes()
+        nodes.forEach(node => {
+          const x = node.x * 500 - 2 * 60 + 60
+          const y = node.y * 800 - 2 * 60 + 60
+          node.x = y
+          node.y = x
+        })
+        this.net.changeData(nodes, edges)
+      }
+    }
+
     shouldComponentUpdate() {
       return false
     }
@@ -55,22 +76,26 @@ export default function createG6Flow(__operation) {
         },
       })
       // 第三步：进行布局
+      // const Layout = G6.Layout;
       const margin = 60
-      const height = 1600
-      const width = 500
+      const height = 800 - 2 * margin;
+      const width = 500 - 2 * margin;
       let nodes = data.nodes
       const edges = data.edges
-      const layout = new G6.Layout.Flow({
-        nodes,
-        edges,
-      })
-      nodes = layout.getNodes()
-      nodes.forEach(node => {
-        const x = node.x * width + margin
-        const y = node.y * height + margin
-        node.x = y
-        node.y = x
-      })
+      if (nodes.length > 0) {
+        const layout = new G6.Layout.Flow({
+          nodes,
+          edges,
+        })
+        nodes = layout.getNodes()
+        nodes.forEach(node => {
+          const x = node.x * width + margin
+          const y = node.y * height + margin
+          node.x = y
+          node.y = x
+        })
+      }
+
       // 第四步：初始化图
       const net = new G6.Net({
         id: this.graphId,
@@ -97,7 +122,7 @@ export default function createG6Flow(__operation) {
       this.net = net
     }
     render() {
-      return (<div id={this.graphId}/>)
+      return (<div id={this.graphId} />)
     }
   }
   return Component
