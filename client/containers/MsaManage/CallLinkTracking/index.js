@@ -25,7 +25,8 @@ import isEmpty from 'lodash/isEmpty'
 import { formatFromnow, formatDate } from '../../../common/utils'
 import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import {
-  getZipkinTracesList, getZipkinServices, getZipkinSpans } from '../../../actions/callLinkTrack'
+  getZipkinTracesList, getZipkinServices, getZipkinSpans
+} from '../../../actions/callLinkTrack'
 
 const FormItem = Form.Item
 const { RangePicker } = DatePicker
@@ -59,7 +60,7 @@ class CallLinkTracking extends React.Component {
 
   load = () => {
     const { clusterID, getZipkinTracesList } = this.props
-    const time = new Date().getTime() - 5 * 1000 * 60
+    const time = new Date().getTime()
     const query = {
       endTs: time,
       lookback: new Date().getTime() - time,
@@ -374,9 +375,12 @@ class CallLinkTracking extends React.Component {
                 {
                   isTimerShow ?
                     <Row>
-                      <Button className="btn" type={btnFive} onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                      <Button className="btn" type={btnHalFhour} onClick={() => this.handleLatelyTimer('halFhour')}>最近30分钟</Button>
-                      <Button className="btn" type={btnAnHour} onClick={() => this.handleLatelyTimer('anHour')}>最近1小时</Button>
+                      <Button className="btn" type={btnFive}
+                        onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
+                      <Button className="btn" type={btnHalFhour}
+                        onClick={() => this.handleLatelyTimer('halFhour')}>最近30分钟</Button>
+                      <Button className="btn" type={btnAnHour}
+                        onClick={() => this.handleLatelyTimer('anHour')}>最近1小时</Button>
                     </Row> :
                     <FormItem>
                       {getFieldDecorator('endTs', {})(
@@ -385,7 +389,7 @@ class CallLinkTracking extends React.Component {
                           showTime={{ format: 'HH:mm' }}
                           format="YYYY-MM-DD HH:mm"
                           className="endTs"
-                          placeholder={[ '开始时间', '结束时间' ]}
+                          placeholder={['开始时间', '结束时间']}
                         />
                       )}
                     </FormItem>
@@ -412,9 +416,9 @@ class CallLinkTracking extends React.Component {
             <Axis name="startTime" />
             <Axis name="duration" />
             <Geom type="point" position="startTime*duration" opacity={0.65}
-              shape="circle" size={[ 'spanCount', [ 4, 10 ]]}
+              shape="circle" size={['spanCount', [4, 10]]}
               tooltip="traceId*serviceName*success*duration*startTime"
-              color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
+              color={['continent', val => { return colorMap[val] }]} style={['continent', {
                 lineWidth: 1,
                 stroke: val => {
                   return colorMap[val]
