@@ -78,8 +78,8 @@ export default function createG6Flow(__operation) {
       // 第三步：进行布局
       // const Layout = G6.Layout;
       const margin = 60
-      const height = 800 - 2 * margin;
-      const width = 500 - 2 * margin;
+      const height = 800 - 2 * margin
+      const width = 500 - 2 * margin
       let nodes = data.nodes
       const edges = data.edges
       if (nodes.length > 0) {
