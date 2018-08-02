@@ -25,7 +25,7 @@ import isEmpty from 'lodash/isEmpty'
 import { formatFromnow, formatDate } from '../../../common/utils'
 import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import {
-  getZipkinTracesList, getZipkinServices, getZipkinSpans
+  getZipkinTracesList, getZipkinServices, getZipkinSpans,
 } from '../../../actions/callLinkTrack'
 
 const FormItem = Form.Item
@@ -389,7 +389,7 @@ class CallLinkTracking extends React.Component {
                           showTime={{ format: 'HH:mm' }}
                           format="YYYY-MM-DD HH:mm"
                           className="endTs"
-                          placeholder={['开始时间', '结束时间']}
+                          placeholder={[ '开始时间', '结束时间' ]}
                         />
                       )}
                     </FormItem>
@@ -416,9 +416,9 @@ class CallLinkTracking extends React.Component {
             <Axis name="startTime" />
             <Axis name="duration" />
             <Geom type="point" position="startTime*duration" opacity={0.65}
-              shape="circle" size={['spanCount', [4, 10]]}
+              shape="circle" size={[ 'spanCount', [ 4, 10 ]]}
               tooltip="traceId*serviceName*success*duration*startTime"
-              color={['continent', val => { return colorMap[val] }]} style={['continent', {
+              color={[ 'continent', val => { return colorMap[val] } ]} style={[ 'continent', {
                 lineWidth: 1,
                 stroke: val => {
                   return colorMap[val]
