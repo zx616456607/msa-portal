@@ -13,13 +13,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom, Tooltip } from 'bizcharts'
-import { formatDate } from '../../common/utils';
+import { formatDate } from '../../common/utils'
 import './style/index.less'
 
 const cols = {
   count: { min: -10, max: 100 },
   vertical: { min: 0, max: 100 },
-};
+}
 
 export default class BlownChart extends React.PureComponent {
 
