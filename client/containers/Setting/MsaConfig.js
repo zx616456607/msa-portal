@@ -181,6 +181,7 @@ class MsaConfig extends React.Component {
     this.setState({
       uninstall: false,
     })
+    this.props.form.resetFields()
   }
 
   play() {
@@ -221,6 +222,12 @@ class MsaConfig extends React.Component {
       }
       // 等待后端编辑接口
     })
+  }
+  disabledInstall = () => {
+    const values = this.props.form.getFieldsValue()
+    let disabledInstall = false
+    Object.keys(values).map(key => !values[key] && (disabledInstall = true))
+    return disabledInstall
   }
   render() {
     const {
@@ -379,7 +386,7 @@ class MsaConfig extends React.Component {
                         </Row> :
                         <Button
                           type="primary"
-                          disabled={this.state.isEdit}
+                          disabled={this.state.isEdit || this.disabledInstall()}
                           onClick={this.handleInstall}
                           loading={installLoading}
                         >
