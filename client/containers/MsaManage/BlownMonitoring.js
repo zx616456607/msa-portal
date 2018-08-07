@@ -10,7 +10,7 @@ import ThreadChart from '../../components/BlownChart/ThreadChart'
 import BlownDemoModal from '../../components/BlownChart/BlownDemo'
 import EmptyBlown from '../../components/BlownChart/EmptyBlown'
 import * as msaActions from '../../actions/msa'
-import { sleep } from '../../common/utils';
+import { sleep } from '../../common/utils'
 import { API_CONFIG } from '../../constants'
 const { MSA_API } = API_CONFIG
 

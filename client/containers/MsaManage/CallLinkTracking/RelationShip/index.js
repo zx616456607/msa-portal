@@ -37,6 +37,9 @@ class RelationShip extends React.Component {
     timers: '',
     latelyKey: '',
     isTimerShow: true,
+    btnFive: 'primary',
+    btnAnHour: 'default',
+    btnHalFhour: 'default',
   }
 
   componentDidMount() {
@@ -65,6 +68,31 @@ class RelationShip extends React.Component {
     const query = {
       endTs: Date.parse(new Date()),
     }
+    switch (key) {
+      case 'five':
+        this.setState({
+          btnFive: 'primary',
+          btnAnHour: 'default',
+          btnHalFhour: 'default',
+        })
+        break
+      case 'halFhour':
+        this.setState({
+          btnFive: 'default',
+          btnAnHour: 'default',
+          btnHalFhour: 'primary',
+        })
+        break
+      case 'anHour':
+        this.setState({
+          btnFive: 'default',
+          btnAnHour: 'primary',
+          btnHalFhour: 'default',
+        })
+        break
+      default:
+        break
+    }
     this.setState({
       latelyKey: key,
     })
@@ -78,7 +106,7 @@ class RelationShip extends React.Component {
     })
     const query = {
       endTs: Date.parse(value[1]),
-      lookback: (Date.parse(value[1]) - Date.parse(value[0])) * 1000,
+      lookback: (Date.parse(value[1]) - Date.parse(value[0])),
     }
     getZipkinDependencies(clusterID, query)
   }
@@ -126,7 +154,7 @@ class RelationShip extends React.Component {
   }
 
   render() {
-    const { isTimerShow, timer } = this.state
+    const { isTimerShow, timer, btnFive, btnAnHour, btnHalFhour } = this.state
     const { data } = this.props
     if (!isEmpty(data)) {
       if (data.nodes.length > 0) {
@@ -140,12 +168,12 @@ class RelationShip extends React.Component {
             item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
             item.color = '#5ab46d'
             item.errPart = true
-            item.shape = 'polyLineFlow'
+            item.shape = 'rect'
           } else {
             item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
             item.color = '#5ab46d'
             item.errPart = false
-            item.shape = 'polyLineFlow'
+            item.shape = 'rect'
           }
           if (item.errorCount === item.callCount) {
             item.color = 'red'
@@ -177,13 +205,13 @@ class RelationShip extends React.Component {
             {
               isTimerShow ?
                 <Row>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >
+                  <Button className="btn" type={btnFive} onClick={() => this.handleLatelyTimer('five')} >
                     最近5分钟
                   </Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('halFhour')}>
+                  <Button className="btn" type={btnHalFhour} onClick={() => this.handleLatelyTimer('halFhour')}>
                     最近30分钟
                   </Button>
-                  <Button className="btn" onClick={() => this.handleLatelyTimer('anHour')}>
+                  <Button className="btn" type={btnAnHour} onClick={() => this.handleLatelyTimer('anHour')}>
                     最近1小时
                   </Button>
                 </Row> :
@@ -207,7 +235,7 @@ class RelationShip extends React.Component {
         <div className="body" key="body">
           <Card>
             {
-              data && data.nodes.length > 0 &&
+              data &&
               <Chart4
                 data={data}
               />
