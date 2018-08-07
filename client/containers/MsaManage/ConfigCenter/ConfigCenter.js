@@ -34,6 +34,8 @@ class ConfigCenter extends React.Component {
     branchData: [],
     configData: [],
     productionData: [],
+    isDelFetching: false,
+    delIndex: '',
   }
 
   componentDidMount() {
@@ -105,6 +107,9 @@ class ConfigCenter extends React.Component {
       file_path: configName,
       commit_message: message === '' ? '删除一个配置' : message,
     }
+    this.setState({
+      isDelFetching: true,
+    })
     delCenterConfig(clusterID, query).then(res => {
       if (res.error) {
         notification.error({
@@ -112,6 +117,7 @@ class ConfigCenter extends React.Component {
         })
       }
       if (res.response.result.code === 200) {
+        this.loadData()
         notification.success({
           message: `删除成功 ${configName}`,
         })
@@ -119,6 +125,7 @@ class ConfigCenter extends React.Component {
       this.loadData()
       this.setState({
         deleteVisible: false,
+        isDelFetching: false,
       })
     })
   }
@@ -170,7 +177,9 @@ class ConfigCenter extends React.Component {
       render: (text, record) => <div>
         <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
         <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch}`)}>更新</Button>
-        <Button onClick={() => this.handleDelVisible(record.name)}>删除</Button>
+        <Button
+          onClick={() => this.handleDelVisible(record.name)}
+          disabled={this.state.isDelFetching && this.state.configName === record.name}>删除</Button>
       </div>,
     }]
     const pagination = {
@@ -257,7 +266,7 @@ class ConfigCenter extends React.Component {
             <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
               footer={[
                 <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-                <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
+                <Button key="submit" type="primary" onClick={this.handleDel} loading={this.state.isDelFetching}>确 定</Button>,
               ]}>
               <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
                 <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
