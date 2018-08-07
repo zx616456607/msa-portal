@@ -26,6 +26,7 @@ import {
 } from 'antd'
 import {
   APP_NAME_REG,
+  APP_NAME_REG_NOTICE,
   HOST_REG,
   URL_REG,
 } from '../../../../constants'
@@ -108,11 +109,20 @@ class RegisterMsa extends React.Component {
         instances,
       },
     ]
-    addManualrules(clusterID, body).then(res => {
+    addManualrules(clusterID, body, { isHandleError: true }).then(res => {
       this.setState({
         submitLoading: false,
       })
       if (res.error) {
+        let description = ''
+        if (res.status === 500 &&
+          res.error === 'service name cannot be same with other service\'s name') {
+          description = '微服务名称重复'
+        }
+        notification.warn({
+          message: '注册失败',
+          description,
+        })
         return
       }
       notification.success({
@@ -154,7 +164,7 @@ class RegisterMsa extends React.Component {
       notification.success({
         message: '添加实例成功',
       })
-      history.push('/msa-manage')
+      history.push(`/msa-manage/detail/${appName}`)
     })
   }
 
@@ -286,7 +296,7 @@ class RegisterMsa extends React.Component {
                 message: '请填写端口',
               }],
             })(
-              <InputNumber placeholder="如 8080" min={1} max={65535} style={{ width: '30%' }} />
+              <InputNumber placeholder="如 8080, 输入范围 0~65535" min={1} max={65535} style={{ width: '30%' }} />
             )}
           </FormItem>
           <FormItem {...formItemLayoutLast} label="健康检查地址">
@@ -331,7 +341,7 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: APP_NAME_REG,
-                message: '请填写正确的微服务名称，例如：msa-service-1',
+                message: '微服务名称' + APP_NAME_REG_NOTICE,
               }],
             })(
               <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>

@@ -25,6 +25,9 @@ class CallLinkTrackDetail extends React.PureComponent {
   state = {
     visible: false,
     detailData: [],
+    serverUrl: '',
+    serverName: '',
+    serverDuration: '',
     serviceList: [],
     serverDetail: [],
     detailTimestamp: '',
@@ -44,7 +47,10 @@ class CallLinkTrackDetail extends React.PureComponent {
   handleDetail = record => {
     this.setState({
       visible: true,
+      serverUrl: record.name,
+      serverName: record.serverName,
       detailTimestamp: record.timestamp,
+      serverDuration: record.duration,
       serviceList: record.annotations || [],
       serverDetail: record.binaryAnnotations,
     })
@@ -78,7 +84,8 @@ class CallLinkTrackDetail extends React.PureComponent {
   }
 
   render() {
-    const { serverDetail, serviceList, detailTimestamp } = this.state
+    const { serverDetail, serviceList, detailTimestamp, serverUrl, serverName, serverDuration } =
+      this.state
     const { isFetching, detailData } = this.props
     const columns = [{
       id: 'id',
@@ -127,6 +134,7 @@ class CallLinkTrackDetail extends React.PureComponent {
     return (
       <QueueAnim className="call-link-track-detail">
         <ReturnButton onClick={this.backToList}>返回</ReturnButton>
+        <span className="title">{`${detailData.length > 0 && detailData[0].traceId}`} 调用关系</span>
         <Card
           className="call-link-track-detail-header"
           key="call-link-track-detail-header"
@@ -168,9 +176,9 @@ class CallLinkTrackDetail extends React.PureComponent {
             />
           </Card>
         </div>
-        <Modal title="服务详情"
+        <Modal title={`${serverName} (${serverUrl})`}
           visible={this.state.visible}
-          width={'40%'}
+          width={'50%'}
           onCancel={this.handleClose}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleClose}>取 消</Button>,
@@ -179,8 +187,11 @@ class CallLinkTrackDetail extends React.PureComponent {
           {
             <div className="modal-server">
               <div className="top">
-                <div>请求相对开始时间：{detailTimestamp - detailData[0].timestamp} ms</div>
-                <div>span 总耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</div>
+                <div>请求相对开始时间：
+                  {
+                    detailData.length > 0 && (detailTimestamp - detailData[0].timestamp) / 1000
+                  } ms</div>
+                <div>span 总耗时：{serverDuration && serverDuration / 1000} ms</div>
               </div>
               {
                 serviceList.length === 4 &&
@@ -202,7 +213,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       <div className="end">收到响应耗时：
                         {
                           serviceList.length > 0 &&
-                          (serviceList[3].timestamp - serviceList[0].timestamp) / 1000
+                          (serviceList[3].timestamp - serviceList[2].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-rigth sx-arrow-rigth"></div>
@@ -237,7 +248,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       <div className="server-time">服务端处理请求耗时：
                         {
                           serviceList.length > 0 &&
-                        (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
+                          (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-time"></div>

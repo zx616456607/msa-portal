@@ -19,7 +19,6 @@ import './style/index.less'
 
 const defaultOpts = {
   lineNumbers: true,
-  readOnly: false,
   styleActiveLine: true,
   lineWrapping: true,
   tabSize: 2,

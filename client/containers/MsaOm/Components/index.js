@@ -20,8 +20,7 @@ import { fetchSpingCloud } from '../../../actions/msaConfig'
 import { formatFromnow } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
-import { Card, Button, Input, Table, Pagination, Dropdown, Menu, Modal, Icon, notification } from 'antd'
-const Search = Input.Search
+import { Card, Button, Table, Dropdown, Menu, Modal, Icon, notification } from 'antd'
 
 const tooltip = [{
   title: '重启组件',
@@ -314,11 +313,6 @@ class MsaComponents extends React.Component {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
       tipsName, metaData, currentComponent } = this.state
     const { clusterId } = this.props
-    const pagination = {
-      simple: true,
-      total: 1,
-      defaultCurrent: 1,
-    }
     const columns = [{
       key: 'component',
       title: '组件',
@@ -361,10 +355,8 @@ class MsaComponents extends React.Component {
       <QueueAnim className="info">
         <div className="nav" key="nav">
           <Button type="primary" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
-          <Search className="input" placeholder="按微服务名称搜索" />
           <div className="pages">
             <span className="total">共计 {metaData.length} 条&nbsp;&nbsp;</span>
-            <Pagination {...pagination} />
           </div>
         </div>
         <Card key="body">

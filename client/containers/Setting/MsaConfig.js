@@ -62,6 +62,7 @@ class MsaConfig extends React.Component {
     if (Object.keys(ids).length === 0) {
       return this.setState({
         gitLab: {},
+        springcloudState: '',
       })
     }
     ids.forEach(item => {
@@ -73,13 +74,9 @@ class MsaConfig extends React.Component {
         getMsaState(cluster.id, item.id).then(res => {
           if (res.error) return
           if (res.response.result.code === 200) {
-            let isHealthy = ''
-            // TODO: use the status code to show the actual status
-            if (res.response.result.data.status === 1) {
-              isHealthy = 'true'
-            }
+            const { status } = res.response.result.data
             this.setState({
-              springcloudState: isHealthy,
+              springcloudState: status,
             })
           }
         })
@@ -181,6 +178,7 @@ class MsaConfig extends React.Component {
     this.setState({
       uninstall: false,
     })
+    this.props.form.resetFields()
   }
 
   play() {
@@ -222,6 +220,12 @@ class MsaConfig extends React.Component {
       // 等待后端编辑接口
     })
   }
+  disabledInstall = () => {
+    const values = this.props.form.getFieldsValue()
+    let disabledInstall = false
+    Object.keys(values).map(key => !values[key] && (disabledInstall = true))
+    return disabledInstall
+  }
   render() {
     const {
       msaState, springcloudState, installLoading, gitLab,
@@ -235,8 +239,10 @@ class MsaConfig extends React.Component {
     }
     let healthy = null
     if (springcloudState !== '') {
-      healthy = springcloudState ? <span className="desc"><font color="#5cb85c">健康</font></span> :
-        <span className="descs">不健康</span>
+      if (springcloudState === 0) healthy = <span className="descs">不健康</span>
+      if (springcloudState === 1) healthy = <span className="desc"><font color="#5cb85c">健康</font></span>
+      if (springcloudState === 2) healthy = <span className="descs">启动中</span>
+      if (springcloudState === 3) healthy = <span className="descs">停止中</span>
     } else {
       healthy = <span className="descs">未安装</span>
     }
@@ -379,7 +385,7 @@ class MsaConfig extends React.Component {
                         </Row> :
                         <Button
                           type="primary"
-                          disabled={this.state.isEdit}
+                          disabled={this.state.isEdit || this.disabledInstall()}
                           onClick={this.handleInstall}
                           loading={installLoading}
                         >

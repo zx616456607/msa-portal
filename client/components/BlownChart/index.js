@@ -10,88 +10,152 @@
  * @date 2018-07-11
  */
 import React from 'react'
-import { Row, Col } from 'antd'
+import PropTypes from 'prop-types'
+import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom, Tooltip } from 'bizcharts'
+import { formatDate } from '../../common/utils'
 import './style/index.less'
 
-const data = [
-  { year: '1991', value: 3 },
-  { year: '1992', value: 4 },
-  { year: '1993', value: 3.5 },
-  { year: '1994', value: 5 },
-  { year: '1995', value: 4.9, scale: 20, height: 8 },
-  { year: '1996', value: 6 },
-  { year: '1997', value: 7 },
-  { year: '1998', value: 9 },
-  { year: '1999', value: 13 },
-];
-
 const cols = {
-  value: { min: 0 },
-  year: { range: [ 0, 1 ] },
-  height: { min: 0, max: 13 },
-};
+  count: { min: -10, max: 100 },
+  vertical: { min: 0, max: 100 },
+}
 
 export default class BlownChart extends React.PureComponent {
 
+  static propTypes = {
+    dataSource: PropTypes.object.isRequired,
+  }
+
+  renderFailureRage = () => {
+    const {
+      requestCount, rollingCountFailure, rollingCountTimeout,
+      rollingCountThreadPoolRejected,
+    } = this.props.dataSource
+    const parseFailure = parseInt(rollingCountFailure, 10)
+    const parseTimeout = parseInt(rollingCountTimeout, 10)
+    const parseRejected = parseInt(rollingCountThreadPoolRejected, 10)
+    const failureRate = (parseFailure + parseTimeout + parseRejected) / requestCount
+    if (isNaN(failureRate)) {
+      return '0.0%'
+    }
+    return (failureRate * 100).toFixed(0) + '%'
+  }
+
+  renderAmount = () => {
+    const {
+      rollingCountThreadsExecuted, reportingHosts,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
+    } = this.props.dataSource
+    return ((rollingCountThreadsExecuted / (parseValue / 1000)) / reportingHosts).toFixed(1) + '/s'
+  }
+
+  formatLatency = value => {
+    const { reportingHosts } = this.props.dataSource
+    return Math.floor(value / reportingHosts)
+  }
+
+  formatMonitor = () => {
+    const {
+      allPoint, reportingHosts, requestCount,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
+    } = this.props.dataSource
+    const ratePerSecondPerHost = (requestCount / (parseValue / 1000) / reportingHosts).toFixed(1) // 圆半径
+
+    const finalData = allPoint.map(item => {
+      return {
+        count: Number(item.count),
+        time: formatDate(Number(item.time) * 1000, 'mm:ss'),
+      }
+    })
+    const circleInfo = {
+      radius: Number(ratePerSecondPerHost), // 圆的半径
+      vertical: 50, // 圆的y轴坐标
+    }
+    // 圆的位置在数据中间位置的前一个
+    Object.assign(finalData[Math.floor(finalData.length / 2)], circleInfo)
+    return finalData
+  }
+
+  renderColor = () => {
+    const { errorPercentage } = this.props.dataSource
+    if (errorPercentage <= 25) {
+      return '#85ca87'
+    } else if (errorPercentage <= 40) {
+      return '#fdd552'
+    } else if (errorPercentage <= 50) {
+      return '#ffa15b'
+    }
+    return '#fd726f'
+  }
+
   render() {
+    const { dataSource } = this.props
+    const {
+      circuitBreakerName, requestCount, rollingCountShortCircuited,
+      rollingCountTimeout, rollingCountThreadPoolRejected, rollingCountFailure,
+      reportingHosts, isCircuitBreakerOpen, latencyExecute, latencyExecute_mean,
+    } = dataSource
     return (
       <div className="blown-monitor">
         <div className="monitor-content">
-          <Chart className="blown-chart" height={150} width={156} padding={10} data={data} scale={cols} forceFit>
+          <Chart className="blown-chart" height={150} width={156} padding={10} data={this.formatMonitor()} scale={cols} forceFit>
             <Tooltip crosshairs={{ type: 'y' }}/>
             <Geom
               type="point"
               tooltip={false}
               active={false}
-              position="year*height"
-              size={[ 'scale', [ 4, 60 ]]}
+              position="time*vertical"
+              size={[ 'radius', radius => Number(radius) * 10 || 4 ]}
               shape={'circle'}
               style={{ stroke: '#fff', lineWidth: 1 }}
+              color={this.renderColor()}
               opacity={0.5}
             />
-            <Geom type="line" position="year*value" size={2} />
+            <Geom type="line" position="time*count" size={2} color={this.renderColor()}/>
           </Chart>
           <div className="blow-chart-right">
-            <div className="service-name">test#1.0.0 <span className="unit">hhh</span></div>
+            <AntTooltip title={circuitBreakerName}>
+              <div className="service-name txt-of-ellipsis">{circuitBreakerName}</div>
+            </AntTooltip>
             <ul className="request-detail">
               <li>
-                <div className="success-status">120</div>
-                <div className="warning-status">0</div>
+                <div className="success-status">{requestCount}</div>
+                <div className="warning-status">{rollingCountShortCircuited}</div>
               </li>
               <li>
-                <div className="timeout-status">0</div>
-                <div className="warning-status">0</div>
-                <div className="error-status">0</div>
+                <div className="timeout-status">{rollingCountTimeout}</div>
+                <div className="warning-status">{rollingCountThreadPoolRejected}</div>
+                <div className="error-status">{rollingCountFailure}</div>
               </li>
-              <li>1%</li>
+              <li>{this.renderFailureRage()}</li>
             </ul>
             <div className="handle-capacity">
-              吞吐量： 0.1/s
+              吞吐量： {this.renderAmount()}
             </div>
             <div className="blown-status">
-              熔断状态：关闭
+              熔断状态：{parseInt(isCircuitBreakerOpen, 10) ? '开启' : '关闭'}
             </div>
           </div>
         </div>
         <div className="monitor-footer">
           <Row type={'flex'} align={'middle'} justify={'center'} gutter={16}>
             <Col span={7} offset={1}>实例数</Col>
-            <Col span={4}>0</Col>
+            <Col span={4}>{reportingHosts}</Col>
             <Col span={6}>90 th</Col>
-            <Col span={6}>NaN</Col>
+            <Col span={6}>{this.formatLatency(latencyExecute['90']) + ' ms'}</Col>
           </Row>
           <Row type={'flex'} align={'middle'} justify={'center'} gutter={16}>
             <Col span={7} offset={1}>中位数时延</Col>
-            <Col span={4}>NAN</Col>
+            <Col span={4}>{this.formatLatency(latencyExecute['50']) + ' ms'}</Col>
             <Col span={6}>99 th</Col>
-            <Col span={6}>NaN</Col>
+            <Col span={6}>{this.formatLatency(latencyExecute['99']) + ' ms'}</Col>
           </Row>
           <Row type={'flex'} align={'middle'} justify={'center'} gutter={16}>
             <Col span={7} offset={1}>平均时延</Col>
-            <Col span={4}>NAN</Col>
+            <Col span={4}>{parseInt(latencyExecute_mean, 10) + ' ms'}</Col>
             <Col span={6}>99.5 th</Col>
-            <Col span={6}>NaN</Col>
+            <Col span={6}>{this.formatLatency(latencyExecute['99.5']) + ' ms'}</Col>
           </Row>
         </div>
       </div>

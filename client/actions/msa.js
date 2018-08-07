@@ -86,7 +86,8 @@ export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
 export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
 export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'
 
-const fetchAddManualrules = (clusterID, body) => ({
+const fetchAddManualrules = (clusterID, body, options) => ({
+  options,
   [CALL_API]: {
     types: [ MSA_ADD_MANUALRULE_REQUEST, MSA_ADD_MANUALRULE_SUCCESS, MSA_ADD_MANUALRULE_FAILURE ],
     endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions`,
@@ -98,9 +99,9 @@ const fetchAddManualrules = (clusterID, body) => ({
   },
 })
 
-export function addManualrules(clusterID, body) {
+export function addManualrules(clusterID, body, options) {
   return dispatch => {
-    return dispatch(fetchAddManualrules(clusterID, body))
+    return dispatch(fetchAddManualrules(clusterID, body, options))
   }
 }
 
@@ -192,7 +193,7 @@ const fetchDelManualrules = (clusterID, ruleIDs) => ({
       MSA_DELETE_MANUALRULES_SUCCESS,
       MSA_DELETE_MANUALRULES_FAILURE,
     ],
-    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/instances/${ruleIDs}`,
+    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/${ruleIDs}`,
     options: {
       method: 'DELETE',
     },
@@ -205,6 +206,28 @@ export function delManualrules(clusterID, ruleIDs) {
     return dispatch(fetchDelManualrules(clusterID, ruleIDs))
   }
 }
+
+export const MSA_DELETE_INSTANCE_MANUALRULES_REQUEST = 'MSA_DELETE_INSTANCE_MANUALRULES_REQUEST'
+export const MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS = 'MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS'
+export const MSA_DELETE_INSTANCE_MANUALRULES_FAILURE = 'MSA_DELETE_INSTANCE_MANUALRULES_FAILURE'
+
+const fetchDelInstanceManualrules = (clusterID, ruleIDs) => ({
+  [CALL_API]: {
+    types: [
+      MSA_DELETE_INSTANCE_MANUALRULES_REQUEST,
+      MSA_DELETE_INSTANCE_MANUALRULES_SUCCESS,
+      MSA_DELETE_INSTANCE_MANUALRULES_FAILURE,
+    ],
+    endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions/instances/${ruleIDs}`,
+    options: {
+      method: 'DELETE',
+    },
+    schema: {},
+  },
+})
+
+export const delInstanceManualRules = (clusterID, ruleIDs) =>
+  dispatch => dispatch(fetchDelInstanceManualrules(clusterID, ruleIDs))
 
 export const MSA_DELETE_EXPULSSIONS_MANUALRULES_REQUEST = 'MSA_DELETE_EXPULSSIONS_MANUALRULES_REQUEST'
 export const MSA_DELETE_EXPULSSIONS_MANUALRULES_SUCCESS = 'MSA_DELETE_EXPULSSIONS_MANUALRULES_SUCCESS'
@@ -426,3 +449,67 @@ const fetchMsaRealTimeMonitor = (clusterId, serviceName, query) => {
 
 export const msaRealTimeMonitor = (clusterId, serviceName, query) =>
   dispatch => dispatch(fetchMsaRealTimeMonitor(clusterId, serviceName, query))
+
+// 微服务熔断监控集群列表
+
+export const GET_MSA_BLOWN_CLUSTERS_REQUEST = 'GET_MSA_BLOWN_CLUSTERS_REQUEST'
+export const GET_MSA_BLOWN_CLUSTERS_SUCCESS = 'GET_MSA_BLOWN_CLUSTERS_SUCCESS'
+export const GET_MSA_BLOWN_CLUSTERS_FAILURE = 'GET_MSA_BLOWN_CLUSTERS_FAILURE'
+
+const fetchMsaBlownClusters = clusterId => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_CLUSTERS_REQUEST,
+        GET_MSA_BLOWN_CLUSTERS_SUCCESS,
+        GET_MSA_BLOWN_CLUSTERS_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/hystrix/clusters`,
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownClusters = clusterId =>
+  dispatch => dispatch(fetchMsaBlownClusters(clusterId))
+
+// 微服务熔断监控（目前未使用，这部分数据通过websocket方式获取）
+export const GET_MSA_BLOWN_MONITOR_REQUEST = 'GET_MSA_BLOWN_MONITOR_REQUEST'
+export const GET_MSA_BLOWN_MONITOR_SUCCESS = 'GET_MSA_BLOWN_MONITOR_SUCCESS'
+export const GET_MSA_BLOWN_MONITOR_FAILURE = 'GET_MSA_BLOWN_MONITOR_FAILURE'
+
+const fetchMsaBlownMonitor = (clusterId, clusterName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_MONITOR_REQUEST,
+        GET_MSA_BLOWN_MONITOR_SUCCESS,
+        GET_MSA_BLOWN_MONITOR_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/hystrix/query/${clusterName}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownMonitor = (clusterID, clusterName) =>
+  dispatch => dispatch(fetchMsaBlownMonitor(clusterID, clusterName))
+
+// 将熔断监控数据放入store
+export const SET_BLOWN_MONITOR = 'SET_BLOWN_MONITOR'
+
+export const setBlownMonitor = data => {
+  return {
+    type: SET_BLOWN_MONITOR,
+    data,
+  }
+}
+
+// 清空熔断监控数据
+export const CLEAR_BLOWN_MONITOR = 'CLEAR_BLOWN_MONITOR'
+
+export const clearBlownMonitor = () => {
+  return {
+    type: CLEAR_BLOWN_MONITOR,
+  }
+}
