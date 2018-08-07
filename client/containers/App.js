@@ -18,10 +18,8 @@ import { Layout, Modal, notification } from 'antd'
 import { parse } from 'query-string'
 import Header from '../components/Header'
 import NamespaceSwitch from './NamespaceSwitch'
-import { resetErrorMessage, getAuth, AUTH_FAILURE } from '../actions'
-import {
-  getCurrentUser, toggleCollapsed,
-} from '../actions/current'
+import * as indexActions from '../actions'
+import * as currentActions from '../actions/current'
 import { scrollToTop, toQuerystring } from '../common/utils'
 import { renderLoading } from '../components/utils'
 import { JWT, AUTH_URL } from '../constants'
@@ -55,7 +53,7 @@ class App extends React.Component {
     toggleCollapsed: PropTypes.func.isRequired,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const {
       getAuth,
       getCurrentUser,
@@ -66,7 +64,7 @@ class App extends React.Component {
     const query = parse(search)
     const { username, token, jwt, authUrl, ...otherQuery } = query
     getAuth({ username, token, jwt }).then(res => {
-      if (res.type === AUTH_FAILURE) {
+      if (res.type === indexActions.AUTH_FAILURE) {
         Modal.error({
           title: '认证失败',
           content: '请您刷新页面重试或点击确定返回',
@@ -75,13 +73,13 @@ class App extends React.Component {
         })
         return
       }
-      const jwt = res.response.entities.auth[JWT]
+      const resJWT = res.response.entities.auth[JWT]
       // Save jwt token to localStorage
       if (localStorage) {
-        localStorage.setItem(JWT, jwt.token)
+        localStorage.setItem(JWT, resJWT.token)
         authUrl && localStorage.setItem(AUTH_URL, authUrl)
       }
-      const { userID } = jwt
+      const { userID } = resJWT
       // replace history
       history.replace(`${pathname}?${toQuerystring(otherQuery)}${hash}`)
       // Get user detail info
@@ -89,15 +87,15 @@ class App extends React.Component {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     const {
       location: newLocation,
       currentConfig: newCurrentConfig,
-    } = nextProps
+    } = this.props
     const {
       location: oldLocation,
       currentConfig: oldCurrentConfig,
-    } = this.props
+    } = prevProps
     // Scroll to top when pathname change
     if (newLocation.pathname !== oldLocation.pathname) {
       document.body.scrollTop = 0
@@ -277,7 +275,7 @@ class App extends React.Component {
 
           { this.renderChildren() }
           <Footer style={{ textAlign: 'center' }} id="footer">
-            © 2017 北京云思畅想科技有限公司 | 时速云微服务治理平台 v1.0
+            © 2018 微服务治理平台 v1.2
           </Footer>
         </Layout>
       </Layout>
@@ -298,8 +296,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  resetErrorMessage,
-  getAuth,
-  getCurrentUser,
-  toggleCollapsed,
+  resetErrorMessage: indexActions.resetErrorMessage,
+  getAuth: indexActions.getAuth,
+  getCurrentUser: currentActions.getCurrentUser,
+  toggleCollapsed: currentActions.toggleCollapsed,
 })(App)

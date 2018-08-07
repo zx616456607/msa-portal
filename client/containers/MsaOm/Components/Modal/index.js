@@ -30,7 +30,7 @@ class MsaModal extends React.Component {
   constructor(props) {
     super()
     this.state = {
-      inputValue: props.currentComponent.count,
+      inputValue: props.currentComponent.count || props.currentComponent.replicas,
     }
   }
 
@@ -62,8 +62,12 @@ class MsaModal extends React.Component {
     const body = {
       number: parseInt(inputValue, 10),
     }
-    const name = currentComponent.component || currentComponent.name
-    const result = await manualScaleComponent(clusterId, name, body)
+    const finalClusterId = currentComponent.clusterId || clusterId
+    const name = currentComponent.component || 'dsb-server'
+    if (name === 'dsb-server') {
+      Object.assign(body, { namespace: currentComponent.namespace })
+    }
+    const result = await manualScaleComponent(finalClusterId, name, body)
     if (result.error) {
       this.setState({
         loading: false,

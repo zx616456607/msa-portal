@@ -17,6 +17,7 @@ import isEmpty from 'lodash/isEmpty'
 import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
 import {
   getUaaAuth, getIdentityZones, getUaaRefreshToken, UAA_AUTH_FAILURE, deleteIdentityZone,
+  UAA_REFRESH_TOKEN_FAILURE,
 } from '../../../../actions/certification'
 import { identityZoneListSlt } from '../../../../selectors/certification'
 import './style/index.less'
@@ -39,14 +40,23 @@ class AuthZone extends React.Component {
       const timeLength = Math.ceil((Date.now() - from) / 1000)
       if (timeLength >= UAA_TOKEN_EXPIRE) {
         // 超过过期时间重新获取 access_token
-        await this.getUaaAuthToken()
+        const res = await this.getUaaAuthToken()
+        if (res && res.error) {
+          return
+        }
       } else {
         // 获取refresh token
-        await this.getUaaRefreshToken(refresh_token)
+        const res = await this.getUaaRefreshToken(refresh_token)
+        if (res && res.error) {
+          return
+        }
       }
     } else {
       // 本地存储中没有uaa token
-      await this.getUaaAuthToken()
+      const res = await this.getUaaAuthToken()
+      if (res && res.error) {
+        return
+      }
     }
     this.getZones()
   }
@@ -74,7 +84,7 @@ class AuthZone extends React.Component {
         closable: false,
         onOk: () => history.go(0),
       })
-      return
+      return Promise.reject({ error: 'failure' })
     }
     const uaaToken = accessRes.response.entities.uaaAuth[UAA_JWT]
     Object.assign(uaaToken, {
@@ -96,6 +106,9 @@ class AuthZone extends React.Component {
       grant_type: 'refresh_token',
     }
     const refreshRes = await getUaaRefreshToken(body)
+    if (refreshRes.type === UAA_REFRESH_TOKEN_FAILURE) {
+      return Promise.reject({ error: 'failure' })
+    }
     const uaaToken = refreshRes.response.entities.uaaAuth[UAA_JWT]
     Object.assign(uaaToken, {
       from: Date.now(),

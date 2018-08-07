@@ -145,7 +145,14 @@ class InstanceModal extends React.Component {
     }
     callback()
   }
-
+  ipOrDomainValidator = (rule, value, cb) => {
+    if (!value) return cb()
+    const domain = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+    const ip = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+    const ipWithPort = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):(\d{1,5})$/
+    if (!domain.test(value) && !ip.test(value) && !ipWithPort.test(value)) cb('请输入ip或域名, 域名不含 http(s)')
+    cb()
+  }
   render() {
     const { confirmLoading } = this.state
     const { form, currentInstance, clusterList, visible } = this.props
@@ -223,6 +230,8 @@ class InstanceModal extends React.Component {
                   whitespace: true,
                   pattern: HOST_REG,
                   message: '请输入实例出口地址',
+                }, {
+                  validator: this.ipOrDomainValidator,
                 },
               ],
               initialValue: currentInstance ? currentInstance.host : '',

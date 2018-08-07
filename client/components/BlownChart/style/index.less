@@ -13,6 +13,8 @@
 @import '../../../assets/style/core/index.less';
 .thread-monitor, .blown-monitor {
   border-radius: @border-radius-base;
+  border: @border-width-base @border-style-base @border-color-base;
+  overflow: hidden;
   .monitor-content {
     background-color: white;
     padding: @padding-medium;
@@ -28,15 +30,15 @@
     .blow-chart-right {
       flex: 0 1 91px;
       .service-name, .thread-name {
+        width: 90px;
         font-size: @font-size-medium;
         margin-bottom: @padding-base;
-        .unit {
-          font-size: @font-size-base;
-          color: @font-color-4;
-        }
       }
       .thread-name {
         margin-top: @padding-large;
+        .pool-name {
+          width: 90px;
+        }
       }
       .request-frequency {
         color: @font-color-4;

@@ -114,11 +114,12 @@ class MsaList extends React.Component {
 
   removeRegister = record => {
     const { delManualrules, clusterID } = this.props
-    const ruleIds = record.instances.map(instance => instance.id)
+    const ruleIds = record.id
     const self = this
     confirm({
+      modalTitle: '移除注册操作',
       title: `确认将服务 ${record.appName} 移除注册吗？`,
-      content: '',
+      content: record.instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
         return new Promise((resolve, reject) => {
           delManualrules(clusterID, ruleIds).then(res => {
