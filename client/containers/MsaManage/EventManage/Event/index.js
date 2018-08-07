@@ -34,7 +34,7 @@ const EVENT_TYPES = [
     text: '服务下线事件',
   }, {
     type: 'InstanceUp',
-    text: '服务注册事件',
+    text: '服务注册',
   }, {
     type: 'InstanceRenewed',
     text: '服务续约事件',
@@ -161,7 +161,7 @@ class Event extends React.Component {
       case 'InstanceDown':
         return 'InstanceDown'
       case 'InstanceUp':
-        return '服务上线'
+        return '服务注册'
       case 'InstanceRenewed':
         return '服务续约'
       case 'EurekaServerStart':
