@@ -122,7 +122,6 @@ class ConfigCenter extends React.Component {
           message: `删除成功 ${configName}`,
         })
       }
-      this.loadData()
       this.setState({
         deleteVisible: false,
         isDelFetching: false,
