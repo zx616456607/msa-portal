@@ -48,12 +48,12 @@ const entities = (state = {
 
 // Updates error message to notify about the failed fetches.
 const errorObject = (state = null, action) => {
-  const { type, error, status } = action
+  const { type, error, status, options } = action
 
   if (type === ActionTypes.RESET_ERROR_MESSAGE) {
     return null
   } else if (error) {
-    return { message: error, status }
+    return { message: error, status, options }
   }
 
   return state

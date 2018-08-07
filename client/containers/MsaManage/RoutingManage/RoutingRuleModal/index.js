@@ -16,6 +16,7 @@ import {
   APP_NAME_REG,
   APP_NAME_REG_NOTICE,
   URL_REG,
+  ROUTE_REG,
 } from '../../../../constants'
 import {
   getMsaList,
@@ -172,7 +173,8 @@ class RoutingRuleModal extends React.Component {
           {getFieldDecorator('path', {
             rules: [{
               required: true,
-              message: '请填写路由路径',
+              pattern: ROUTE_REG,
+              message: '以/开头，由数字、字母、中划线、下划线组成',
             }],
           })(
             <Input placeholder="/service/demo/**" />
