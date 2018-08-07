@@ -131,7 +131,7 @@ class App extends React.Component {
     }
   }
 
-  renderErrorMessage = () => {debugger
+  renderErrorMessage = () => {
     const { errorObject, resetErrorMessage, location } = this.props
     const { pathname } = location
     if (!errorObject) {
