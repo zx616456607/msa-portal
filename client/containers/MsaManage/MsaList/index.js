@@ -127,7 +127,8 @@ class MsaList extends React.Component {
     confirm({
       modalTitle: '移除注册操作',
       title: `确认将服务 ${record.appName} 移除注册吗？`,
-      content: record.instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
+      className: 'removeRegisterConfirm',
+      content: record.instances.length > 1 ? '' : <div className="hint"> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
         return new Promise((resolve, reject) => {
           delManualrules(clusterID, ruleIds).then(res => {
