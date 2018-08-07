@@ -137,7 +137,7 @@ class App extends React.Component {
     if (!errorObject) {
       return null
     }
-    const { message, status } = errorObject
+    const { message, status, options } = errorObject
     if (message === 'Failed to fetch') {
       messageTip.warn('网络或服务暂时不可用，请稍后重试')
       resetErrorMessage()
@@ -193,6 +193,9 @@ class App extends React.Component {
     errorMessageBefore = message
     errorMessageBeforeDateTime = Date.now()
     setTimeout(() => {
+      if (options && options.isHandleError) {
+        return resetErrorMessage()
+      }
       notification.warn({
         message,
         onClose: () => {
