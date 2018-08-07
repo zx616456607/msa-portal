@@ -131,7 +131,7 @@ class App extends React.Component {
     }
   }
 
-  renderErrorMessage = () => {
+  renderErrorMessage = () => {debugger
     const { errorObject, resetErrorMessage, location } = this.props
     const { pathname } = location
     if (!errorObject) {
@@ -188,7 +188,7 @@ class App extends React.Component {
     errorMessageBefore = message
     errorMessageBeforeDateTime = Date.now()
     setTimeout(() => {
-      notification.error({
+      notification.warn({
         message,
         onClose: () => {
           resetErrorMessage()
