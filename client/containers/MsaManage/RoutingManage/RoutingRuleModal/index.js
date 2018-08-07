@@ -84,7 +84,13 @@ class RoutingRuleModal extends React.Component {
       if (err) {
         return
       }
-      delete values['msa-url-type']
+      const body = Object.assign({}, values)
+      delete body['msa-url-type']
+      if (values['msa-url-type'] === 'id') {
+        delete body.url
+      } else {
+        delete body.serviceId
+      }
       this.setState({
         confirmLoading: true,
       })
@@ -104,12 +110,6 @@ class RoutingRuleModal extends React.Component {
         })
         return
       }
-      const body = {}
-      Object.keys(values).forEach(key => {
-        if (values[key] !== currentRoute[key]) {
-          body[key] = values[key]
-        }
-      })
       updateGatewayRoute(clusterID, currentRoute.id, body).then(res => {
         this.setState({
           confirmLoading: false,
