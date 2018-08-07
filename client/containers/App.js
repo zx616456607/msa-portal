@@ -193,7 +193,7 @@ class App extends React.Component {
     errorMessageBefore = message
     errorMessageBeforeDateTime = Date.now()
     setTimeout(() => {
-      notification.error({
+      notification.warn({
         message,
         onClose: () => {
           resetErrorMessage()
