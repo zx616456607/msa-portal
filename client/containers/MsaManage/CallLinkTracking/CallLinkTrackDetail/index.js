@@ -257,6 +257,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                 </div>
               }
               <div className="body">
+                <div className="title">Annotations</div>
                 <Table
                   pagination={false}
                   loading={isFetching}

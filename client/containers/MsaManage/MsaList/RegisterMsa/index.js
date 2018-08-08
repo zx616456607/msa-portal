@@ -23,6 +23,7 @@ import {
   Button,
   InputNumber,
   notification,
+  Tooltip,
 } from 'antd'
 import {
   APP_NAME_REG,
@@ -299,7 +300,16 @@ class RegisterMsa extends React.Component {
               <InputNumber placeholder="如 8080, 输入范围 0~65535" min={1} max={65535} style={{ width: '30%' }} />
             )}
           </FormItem>
-          <FormItem {...formItemLayoutLast} label="健康检查地址">
+          <FormItem {...formItemLayoutLast} label={
+            <span>
+              健康检查地址
+              <Tooltip
+                title="手动注册的服务，通过健康检查地址（该服务本身的健康检查端点）检测服务的状态"
+              ><Icon type="question-circle-o" className="msa-register-tip"/>
+              </Tooltip>
+            </span>
+          }
+          >
             {getFieldDecorator(`healthProbe-${k}`, {
               rules: [{
                 required: true,
@@ -311,7 +321,7 @@ class RegisterMsa extends React.Component {
               <Row gutter={16}>
                 <Col span={19}>
                   <Input
-                    placeholder="如 http://192.168.0.1:8080/healthcheck.html"
+                    placeholder="该服务健康检查地址或外部主要依赖服务地址，如：http://192.168.1.1:8080/healthcheck.html"
                     disabled={ping[k] && ping[k].loading}
                   />
                 </Col>
