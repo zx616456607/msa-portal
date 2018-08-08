@@ -116,9 +116,13 @@ class RegisterMsa extends React.Component {
       })
       if (res.error) {
         let description = ''
-        if (res.status === 500 &&
-          res.error === 'service name cannot be same with other service\'s name') {
-          description = '微服务名称重复'
+        if (res.status === 500) {
+          if (res.error === 'service name cannot be same with other service\'s name') {
+            description = '微服务名称重复'
+          }
+          if (res.error === 'host:port cannot be same with other instances') {
+            description = 'host:port重复'
+          }
         }
         notification.warn({
           message: '注册失败',
