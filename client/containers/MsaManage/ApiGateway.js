@@ -21,6 +21,7 @@ import {
   Switch, InputNumber,
   Form, Spin, Card,
   notification, Badge,
+  Row, Col,
 } from 'antd'
 import {
   gatewayPagePoliciesList,
@@ -491,6 +492,11 @@ class ApiGateway extends React.Component {
                 )
               }
             </FormItem>
+            <Row>
+              <Col offset={7} className="desc-text">
+                <Icon type="info-circle-o" /> 所选服务被移除后，该限流规则同时被移除
+              </Col>
+            </Row>
             <FormItem
               label="限流类型"
               key="gatewayType"

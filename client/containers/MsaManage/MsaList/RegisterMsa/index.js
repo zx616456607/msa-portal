@@ -109,7 +109,7 @@ class RegisterMsa extends React.Component {
         instances,
       },
     ]
-    addManualrules(clusterID, body).then(res => {
+    addManualrules(clusterID, body, { isHandleError: true }).then(res => {
       this.setState({
         submitLoading: false,
       })

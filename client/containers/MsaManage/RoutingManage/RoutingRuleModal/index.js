@@ -16,6 +16,7 @@ import {
   APP_NAME_REG,
   APP_NAME_REG_NOTICE,
   URL_REG,
+  ROUTE_REG,
 } from '../../../../constants'
 import {
   getMsaList,
@@ -83,7 +84,13 @@ class RoutingRuleModal extends React.Component {
       if (err) {
         return
       }
-      delete values['msa-url-type']
+      const body = Object.assign({}, values)
+      delete body['msa-url-type']
+      if (values['msa-url-type'] === 'id') {
+        delete body.url
+      } else {
+        delete body.serviceId
+      }
       this.setState({
         confirmLoading: true,
       })
@@ -103,12 +110,6 @@ class RoutingRuleModal extends React.Component {
         })
         return
       }
-      const body = {}
-      Object.keys(values).forEach(key => {
-        if (values[key] !== currentRoute[key]) {
-          body[key] = values[key]
-        }
-      })
       updateGatewayRoute(clusterID, currentRoute.id, body).then(res => {
         this.setState({
           confirmLoading: false,
@@ -172,7 +173,8 @@ class RoutingRuleModal extends React.Component {
           {getFieldDecorator('path', {
             rules: [{
               required: true,
-              message: '请填写路由路径',
+              pattern: ROUTE_REG,
+              message: '以/开头，由数字、字母、中划线、下划线组成',
             }],
           })(
             <Input placeholder="/service/demo/**" />

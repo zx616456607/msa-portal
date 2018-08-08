@@ -46,6 +46,7 @@ class GlobalSetting extends Component {
       })
     }
   }
+
   // 配置zkhost相关
   submitDubbo = () => {
     if (this.state.dubbo === '') {
