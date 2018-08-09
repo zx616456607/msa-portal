@@ -135,9 +135,9 @@ class Event extends React.Component {
 
   resetConfig = () => {
     this.setState({
-      eventType: '',
-      eventLevel: '',
-      rootPlace: '',
+      eventType: undefined,
+      eventLevel: undefined,
+      rootPlace: undefined,
       appName: '',
       keyword: '',
       rangeDate: [],
@@ -265,9 +265,11 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件类型"
-            onSelect={eventType => this.setState({ eventType })}
+            onChange={eventType => this.setState({ eventType })}
             value={this.state.eventType}
+            allowClear={true}
           >
+            <Option key="all" value="">所有事件</Option>
             {
               EVENT_TYPES.map(item => <Option key={item.type}>{item.text}</Option>)
             }
@@ -275,8 +277,9 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件级别"
-            onSelect={eventLevel => this.setState({ eventLevel })}
+            onChange={eventLevel => this.setState({ eventLevel })}
             value={this.state.eventLevel}
+            allowClear={true}
           >
             {
               EVENT_LEVELS.map(item => <Option key={item.level}>{item.text}</Option>)
@@ -285,8 +288,9 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件源"
-            onSelect={rootPlace => this.setState({ rootPlace })}
+            onChange={rootPlace => this.setState({ rootPlace })}
             value={this.state.rootPlace}
+            allowClear={true}
           >
             {
               ROOT_PLACES.map(item => <Option key={item.root}>{item.text}</Option>)
