@@ -214,7 +214,7 @@ class RelationShip extends React.Component {
     return (
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
-          <Button style={{ marginRight: 5 }} icon="calendar" onClick={() => {
+          <Button style={{ marginRight: 5 }} icon="reload" onClick={() => {
             isTimerShow ?
               this.handleLatelyTimer(latelyKey)
               :
