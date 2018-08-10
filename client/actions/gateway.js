@@ -247,3 +247,24 @@ export function updateGatewayRoute(clusterID, routeID, body) {
     return dispatch(fetchUpdateGatewayRoute(clusterID, routeID, body))
   }
 }
+
+export const CHECK_ROUTE_NAME_EXISTENCE_REQUEST = 'CHECK_ROUTE_NAME_EXISTENCE_REQUEST'
+export const CHECK_ROUTE_NAME_EXISTENCE_SUCCESS = 'CHECK_ROUTE_NAME_EXISTENCE_SUCCESS'
+export const CHECK_ROUTE_NAME_EXISTENCE_FAILURE = 'CHECK_ROUTE_NAME_EXISTENCE_FAILURE'
+
+const fetchRouteNameExitence = (clusterID, name) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_ROUTE_NAME_EXISTENCE_REQUEST,
+        CHECK_ROUTE_NAME_EXISTENCE_SUCCESS,
+        CHECK_ROUTE_NAME_EXISTENCE_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/route/has/${name}`,
+      schema: {},
+    },
+  }
+}
+
+export const checkRouteName = (clusterID, name) =>
+  dispatch => dispatch(fetchRouteNameExitence(clusterID, name))

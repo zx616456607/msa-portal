@@ -17,14 +17,10 @@ import {
   APP_NAME_REG_NOTICE,
   URL_REG,
   ROUTE_REG,
+  ASYNC_VALIDATOR_TIMEOUT,
 } from '../../../../constants'
-import {
-  getMsaList,
-} from '../../../../actions/msa'
-import {
-  addGatewayRoute,
-  updateGatewayRoute,
-} from '../../../../actions/gateway'
+import * as msaAction from '../../../../actions/msa'
+import * as gateWayAction from '../../../../actions/gateway'
 import {
   msaListSlt,
 } from '../../../../selectors/msa'
@@ -140,6 +136,25 @@ class RoutingRuleModal extends React.Component {
     })
   } */
 
+  routeNameCheck = (rules, value, callback) => {
+    const { checkRouteName, clusterID, currentRoute } = this.props
+    clearTimeout(this.routeNameTimeout)
+    if (currentRoute && (currentRoute.routeId === value)) {
+      return callback()
+    }
+    this.routeNameTimeout = setTimeout(() => {
+      checkRouteName(clusterID, value).then(res => {
+        if (res.response.result.data.has) {
+          callback('路由名称已经存在')
+        } else {
+          callback()
+        }
+      }).catch(() => {
+        callback('请求出错')
+      })
+    }, ASYNC_VALIDATOR_TIMEOUT)
+  }
+
   render() {
     const { form, msaList, visible, onCancel, currentRoute } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -164,6 +179,8 @@ class RoutingRuleModal extends React.Component {
               whitespace: true,
               pattern: APP_NAME_REG,
               message: '路由名称' + APP_NAME_REG_NOTICE,
+            }, {
+              validator: this.routeNameCheck,
             }],
           })(
             <Input placeholder="请填写路由名称" />
@@ -275,7 +292,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  getMsaList,
-  addGatewayRoute,
-  updateGatewayRoute,
+  getMsaList: msaAction.getMsaList,
+  addGatewayRoute: gateWayAction.addGatewayRoute,
+  updateGatewayRoute: gateWayAction.updateGatewayRoute,
+  checkRouteName: gateWayAction.checkRouteName,
 })(Form.create()(RoutingRuleModal))
