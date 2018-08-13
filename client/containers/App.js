@@ -34,8 +34,9 @@ let errorMessageBeforeDateTime
 const errorMessageCloseObj = {}
 
 // the routes need hide namespace switch
-const HIDE_NAMESPACE_SWITCH_ROUTES = [
+const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
+  // /^\/service-mesh/,
 ]
 
 class App extends React.Component {

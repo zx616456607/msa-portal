@@ -37,7 +37,7 @@ const menus = [
   {
     to: '/msa-manage',
     key: 'msa-manage',
-    name: '微服务治理',
+    name: '治理-SpringCloud',
     icon: 'api',
     children: [
       {
@@ -115,6 +115,19 @@ const menus = [
             name: '事件',
           },
         ],
+      },
+    ],
+  }, {
+    key: 'service-mesh',
+    to: '/service-mesh',
+    icon: 'share-alt',
+    name: '治理-服务网格',
+    children: [
+      {
+        key: 'k1',
+        to: '/service-mesh',
+        icon: 'question',
+        name: '微服务拓扑',
       },
     ],
   }, {
