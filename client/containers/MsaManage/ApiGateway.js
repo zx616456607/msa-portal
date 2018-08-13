@@ -19,7 +19,7 @@ import {
   Pagination, Modal, Dropdown,
   Input, Menu, Select,
   Switch, InputNumber,
-  Form, Spin, Card,
+  Form, Spin, Card, Checkbox,
   notification, Badge,
   Row, Col,
 } from 'antd'
@@ -53,6 +53,10 @@ class ApiGateway extends React.Component {
     currentRecord: undefined,
     currentHandle: undefined,
     currentPage: 1,
+    stopOrStartVisible: false,
+    stopOrStartItem: {},
+    iHasKnowCheckbox: false,
+    isLoadingStopOrStart: false,
   }
 
   componentWillMount() {
@@ -136,38 +140,17 @@ class ApiGateway extends React.Component {
   }
 
   disableGateway = item => {
-    const { editGatewayPolicy, clusterID } = this.props
-    const {
-      id: policyID, type, service_id,
-      limits, refresh_interval, status,
-    } = item
-    const self = this
-    const body = {
-      type,
-      service_id,
-      limits,
-      refresh_interval,
-      status: !status,
+    const query = {
+      page: 0,
+      size: 99,
+      service_id: item.service_id,
     }
-    const handlerName = status ? '停用' : '启用'
-    confirm({
-      modalTitle: `${handlerName}操作`,
-      title: `确认将微服务 ${item.service_id} 的限流规则${handlerName}吗？`,
-      content: '',
-      onOk() {
-        return new Promise((resolve, reject) => {
-          editGatewayPolicy(clusterID, policyID, body).then(res => {
-            if (res.error) {
-              return reject()
-            }
-            resolve()
-            notification.success({
-              message: `${handlerName}微服务限流规则成功`,
-            })
-            self.reloadGatewayPolicyList()
-          })
-        })
-      },
+    this.loadGatewayHasOpenPolicy(query)
+    this.setState({
+      stopOrStartVisible: true,
+      stopOrStartItem: item,
+      selectedServiceId: item.service_id,
+      isLoadingStopOrStart: false,
     })
   }
 
@@ -371,7 +354,83 @@ class ApiGateway extends React.Component {
       searchValue,
     })
   }
-
+  handleStopOrStartCancel = () => {
+    this.setState({
+      stopOrStartVisible: false,
+      stopOrStartItem: {},
+      iHasKnowCheckbox: false,
+      isLoadingStopOrStart: false,
+    })
+  }
+  handleStopOrStartOk = async () => {
+    this.setState({
+      isLoadingStopOrStart: true,
+    })
+    const { stopOrStartItem } = this.state
+    const { editGatewayPolicy, clusterID } = this.props
+    const {
+      id: policyID, type, service_id,
+      limits, refresh_interval, status,
+    } = stopOrStartItem
+    const self = this
+    const body = { type, service_id, limits, refresh_interval, status: !status }
+    await editGatewayPolicy(clusterID, policyID, body)
+    notification.success({
+      message: `${status ? '停用' : '启用'}微服务限流规则成功`,
+    })
+    self.reloadGatewayPolicyList()
+    self.setState({
+      stopOrStartVisible: false,
+      stopOrStartItem: {},
+      iHasKnowCheckbox: false,
+      isLoadingStopOrStart: false,
+    })
+  }
+  renderStopOrStartModal = () => {
+    const {
+      stopOrStartVisible, stopOrStartItem, iHasKnowCheckbox, isLoadingStopOrStart } = this.state
+    if (!stopOrStartItem || !stopOrStartItem.service_id) return null
+    const {
+      id: service_id, status,
+    } = stopOrStartItem
+    const handlerName = status ? '停用' : '启用'
+    const footer = [
+      <Button
+        key="back"
+        onClick={this.handleStopOrStartCancel}>取消</Button>,
+      <Button
+        key="submit"
+        type="primary"
+        loading={isLoadingStopOrStart}
+        disabled={!status && this.hasOpenPolicy() && !iHasKnowCheckbox}
+        onClick={this.handleStopOrStartOk}>
+        确定
+      </Button>,
+    ]
+    return (
+      <Modal
+        title={`${handlerName}操作`}
+        visible={stopOrStartVisible}
+        onCancel={this.handleStopOrStartCancel}
+        footer={footer}
+        className={'api-gateway-stop-modal'}
+      >
+        <div className={'title'}>
+          <Icon className={'icon'} type="question-circle" />
+          {`确认将微服务 ${service_id} 的限流规则${handlerName}吗？`}
+        </div>
+        {
+          !status && this.hasOpenPolicy() &&
+          <Checkbox
+            value={iHasKnowCheckbox}
+            onChange={e => this.setState({ iHasKnowCheckbox: e.target.checked })}
+            className={'checkbox'}>
+            启用此规则的同时, 将停用微服务 {service_id} 的其他限流规则
+          </Checkbox>
+        }
+      </Modal>
+    )
+  }
   render() {
     const {
       form, policesList, isFetching,
@@ -630,6 +689,9 @@ class ApiGateway extends React.Component {
             </FormItem> }
           </Form>
         </Modal>}
+        {
+          this.renderStopOrStartModal()
+        }
       </QueueAnim>
     )
   }
