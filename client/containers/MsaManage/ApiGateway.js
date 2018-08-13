@@ -145,7 +145,7 @@ class ApiGateway extends React.Component {
       size: 99,
       service_id: item.service_id,
     }
-    this.loadGatewayHasOpenPolicy(query)
+    !item.status && this.loadGatewayHasOpenPolicy(query)
     this.setState({
       stopOrStartVisible: true,
       stopOrStartItem: item,
@@ -391,7 +391,7 @@ class ApiGateway extends React.Component {
       stopOrStartVisible, stopOrStartItem, iHasKnowCheckbox, isLoadingStopOrStart } = this.state
     if (!stopOrStartItem || !stopOrStartItem.service_id) return null
     const {
-      id: service_id, status,
+      service_id, status,
     } = stopOrStartItem
     const handlerName = status ? '停用' : '启用'
     const footer = [
