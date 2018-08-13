@@ -28,10 +28,11 @@ import {
   createGatewayPolicy,
   deleteGatewayPolicy,
   editGatewayPolicy,
+  gatewayHasOpenPolicy,
 } from '../../actions/gateway'
 import { getMsaList } from '../../actions/msa'
 import { msaListSlt } from '../../selectors/msa'
-import { gatewayPolicesListSlt } from '../../selectors/gateway'
+import { gatewayPolicesListSlt, gatewayHasOpenPolicySlt } from '../../selectors/gateway'
 import confirm from '../../components/Modal/confirm'
 
 const Search = Input.Search
@@ -262,6 +263,32 @@ class ApiGateway extends React.Component {
     gatewayPagePoliciesList(clusterID, query)
   }
 
+  loadGatewayHasOpenPolicy = (newQuery = {}) => {
+    const query = Object.assign({}, DEFAULT_QUERY, newQuery)
+    const { gatewayHasOpenPolicy, clusterID } = this.props
+    gatewayHasOpenPolicy(clusterID, query)
+  }
+
+  hasOpenPolicy = () => {
+    const { gatewayHasOpenPolicyList } = this.props
+    const { selectedServiceId } = this.state
+    if (!selectedServiceId) return false
+    let flag = false
+    gatewayHasOpenPolicyList.map(policy =>
+      policy.service_id === selectedServiceId && policy.status && (flag = true))
+    return flag
+  }
+  onSelectServiceChange = v => {
+    const query = {
+      page: 0,
+      size: 99,
+      service_id: v,
+    }
+    this.loadGatewayHasOpenPolicy(query)
+    this.setState({
+      selectedServiceId: v,
+    })
+  }
   menuClick = (item, e) => {
     const { key } = e
     switch (key) {
@@ -486,6 +513,7 @@ class ApiGateway extends React.Component {
                   <Select
                     placeholder="请选择微服务"
                     disabled={currentHandle === 'edit'}
+                    onChange={this.onSelectServiceChange}
                   >
                     { this.renderMsaOption() }
                   </Select>
@@ -593,6 +621,12 @@ class ApiGateway extends React.Component {
                   />
                 )
               }
+              {
+                this.hasOpenPolicy() &&
+                <span className={'api-gateway-has-open-policy desc-text'}>
+                  <Icon type="info-circle-o" /> 该服务已存在启用状态的限流规则
+                </span>
+              }
             </FormItem> }
           </Form>
         </Modal>}
@@ -606,6 +640,7 @@ const mapStateToProps = state => {
   const { id } = current.config.cluster
   const { msaList, msaListLoading } = msaListSlt(state)
   const { policesList, isFetching, totalElements } = gatewayPolicesListSlt(state)
+  const { gatewayHasOpenPolicy } = gatewayHasOpenPolicySlt(state)
   return {
     clusterID: id,
     msaList,
@@ -613,6 +648,7 @@ const mapStateToProps = state => {
     policesList,
     isFetching,
     totalElements,
+    gatewayHasOpenPolicyList: gatewayHasOpenPolicy,
   }
 }
 
@@ -622,4 +658,5 @@ export default connect(mapStateToProps, {
   createGatewayPolicy,
   deleteGatewayPolicy,
   editGatewayPolicy,
+  gatewayHasOpenPolicy,
 })(Form.create()(ApiGateway))
