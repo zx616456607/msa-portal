@@ -22,7 +22,7 @@ console.warn('Use development webpack config ...')
 
 module.exports = {
   devtool: '#cheap-module-eval-source-map',
-
+  mode: 'development',
   entry: {
     main: [
       hotMiddleWareConfig,
@@ -125,18 +125,18 @@ module.exports = {
       context: __dirname,
       manifest: require('../manifest.json'),
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.js',
-      // (Give the chunk a different name)
-      minChunks: Infinity,
-      // (with more entries, this ensures that no other module
-      //  goes into the vendor chunk)
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.js',
-    }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'vendor',
+    //   filename: 'vendor.js',
+    //   // (Give the chunk a different name)
+    //   minChunks: Infinity,
+    //   // (with more entries, this ensures that no other module
+    //   //  goes into the vendor chunk)
+    // }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'commons',
+    //   filename: 'commons.js',
+    // }),
     new SpriteLoaderPlugin(),
     // new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),

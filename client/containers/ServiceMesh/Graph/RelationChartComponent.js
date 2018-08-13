@@ -69,7 +69,7 @@ export default class RelationChartComponent extends React.Component {
     const { visible, currentService, nodes, edges } = this.state
     // console.log('nodes', nodes)
     return (
-      <div style={{ border: '1px solid red' }} className="wrap">
+      <div className="wrap">
         <RelationChart
           graphConfigs={config}
           nodes={nodes}

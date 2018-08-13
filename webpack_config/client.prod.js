@@ -27,7 +27,7 @@ const svgHash = +new Date()
 
 module.exports = {
   devtool: '#cheap-source-map',
-
+  mode: 'production',
   entry: {
     main: [
       './client/entry/index.js',
@@ -171,18 +171,18 @@ module.exports = {
       threshold: 10240,
       minRatio: 0.8,
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.[chunkhash:8].js',
-      // (Give the chunk a different name)
-      minChunks: Infinity,
-      // (with more entries, this ensures that no other module
-      //  goes into the vendor chunk)
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.[hash:8].js',
-    }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'vendor',
+    //   filename: 'vendor.[chunkhash:8].js',
+    //   // (Give the chunk a different name)
+    //   minChunks: Infinity,
+    //   // (with more entries, this ensures that no other module
+    //   //  goes into the vendor chunk)
+    // }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'commons',
+    //   filename: 'commons.[hash:8].js',
+    // }),
     new webpack.NoEmitOnErrorsPlugin(),
   ],
 }
