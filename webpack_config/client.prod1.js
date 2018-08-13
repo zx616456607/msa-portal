@@ -1,39 +1,69 @@
-/*
+/**
  * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2018 TenxCloud. All Rights Reserved.
- * ----
- * client.prod.js page
- *
- * @author zhangtao
- * @date Monday August 13th 2018
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
  */
-const merge = require('webpack-merge');
-const common = require('./client.base.js')
+
+/**
+ * App webpack dev config
+ *
+ * https://webpack.js.org/guides/migrating/
+ * v0.1 - 2017-08-15
+ * @author Zhangpc
+ */
+
 const path = require('path')
+const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const postcssConfig = require('./postcss')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpack = require('webpack')
+// const WebpackMd5Hash = require('webpack-md5-hash')
+const postcssConfig = require('./postcss')
+const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 
-const svgHash = +new Date()
 const publicPath = '/public/'
+const svgHash = +new Date()
 
-module.exports = merge(common, {
+module.exports = {
   devtool: '#cheap-source-map',
   mode: 'production',
   entry: {
     main: [
       './client/entry/index.js',
     ],
+    vendor: [
+      '@babel/polyfill',
+      'g2',
+      '@antv/g6',
+      'moment',
+      'codemirror',
+    ],
   },
+
+  resolve: {
+    modules: [
+      path.join(__dirname, '../client'),
+      'node_modules',
+    ],
+    alias: {
+      '@': path.join(__dirname, '..', 'client'),
+    },
+  },
+
   output: {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].[chunkhash:8].js',
     chunkFilename: '[id].chunk.[chunkhash:8].js',
+    publicPath,
   },
+
+  // https://webpack.js.org/plugins/uglifyjs-webpack-plugin/
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.svg$/,
         use: [
@@ -56,6 +86,14 @@ module.exports = merge(common, {
             },
           },
         ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 5192, // 5KB 以下图片自动转成 base64 码
+          name: 'img/[name].[hash:8].[ext]',
+        },
       },
       {
         test: /\.css$/,
@@ -96,10 +134,11 @@ module.exports = merge(common, {
       },
     ],
   },
+
   plugins: [
     // new WebpackMd5Hash(),
     new ExtractTextPlugin({
-      filename: 'styles.[chunkhash:8].css',
+      filename: 'styles.[contenthash:8].css',
       allChunks: true,
     }),
     new HtmlWebpackPlugin({
@@ -115,13 +154,14 @@ module.exports = merge(common, {
       svgHash,
       publicPath,
     }),
+    new SpriteLoaderPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   sourceMap: true,
-    //   comments: false,
-    //   unused: true,
-    //   dead_code: true,
-    // }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      comments: false,
+      unused: true,
+      dead_code: true,
+    }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
@@ -129,8 +169,18 @@ module.exports = merge(common, {
       threshold: 10240,
       minRatio: 0.8,
     }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'vendor',
+    //   filename: 'vendor.[chunkhash:8].js',
+    //   // (Give the chunk a different name)
+    //   minChunks: Infinity,
+    //   // (with more entries, this ensures that no other module
+    //   //  goes into the vendor chunk)
+    // }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'commons',
+    //   filename: 'commons.[hash:8].js',
+    // }),
+    new webpack.NoEmitOnErrorsPlugin(),
   ],
-  optimization: {
-    minimize: true,
-  },
-})
+}
