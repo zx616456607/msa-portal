@@ -31,16 +31,16 @@ const Option = Select.Option
 const EVENT_TYPES = [
   {
     type: 'InstanceDown',
-    text: '服务下线事件',
+    text: '服务下线',
   }, {
     type: 'InstanceUp',
     text: '服务注册',
   }, {
     type: 'InstanceRenewed',
-    text: '服务续约事件',
+    text: '服务续约',
   }, {
     type: 'EurekaServerStart',
-    text: '注册服务启动',
+    text: 'Eureka server 启动',
   }, {
     type: 'EurekaREgistryStart',
     text: '注册中心启动',
@@ -159,13 +159,13 @@ class Event extends React.Component {
   renderEventType = text => {
     switch (text) {
       case 'InstanceDown':
-        return 'InstanceDown'
+        return '服务下线'
       case 'InstanceUp':
         return '服务注册'
       case 'InstanceRenewed':
         return '服务续约'
       case 'EurekaServerStart':
-        return '注册服务启动'
+        return 'Eureka server 启动'
       case 'EurekaREgistryStart':
         return '注册中心启动'
       default:
