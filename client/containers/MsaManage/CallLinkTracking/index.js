@@ -345,7 +345,7 @@ class CallLinkTracking extends React.Component {
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('limit', {})(
-                  <Input placeholder="返回条数" className="resCount" />
+                  <Input placeholder="返回条数，默认10条" className="resCount" />
                 )}
               </FormItem>
             </Col>

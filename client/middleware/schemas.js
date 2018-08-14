@@ -56,6 +56,11 @@ const gatewayPolicies = new schema.Entity('gatewayPolicies', {}, {
   idAttribute: 'id',
 })
 
+// gatewayHasOpenPolicy
+const gatewayHasOpenPolicy = new schema.Entity('gatewayHasOpenPolicy', {}, {
+  idAttribute: 'id',
+})
+
 // GatewayRoutes
 const gatewayRoutesSchema = new schema.Entity('gatewayRoutes', {}, {
   idAttribute: 'id',
@@ -187,6 +192,11 @@ export const Schemas = {
   GATEWAY_POLICIES_LIST_DATA: {
     data: {
       content: [ gatewayPolicies ],
+    },
+  },
+  GATEWAY_HAS_OPEN_POLICY_DATA: {
+    data: {
+      content: [ gatewayHasOpenPolicy ],
     },
   },
   GATEWAY_ROUTES_LIST_DATA: {

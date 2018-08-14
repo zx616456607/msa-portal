@@ -16,14 +16,11 @@ import {
   APP_NAME_REG,
   APP_NAME_REG_NOTICE,
   URL_REG,
+  ROUTE_REG,
+  ASYNC_VALIDATOR_TIMEOUT,
 } from '../../../../constants'
-import {
-  getMsaList,
-} from '../../../../actions/msa'
-import {
-  addGatewayRoute,
-  updateGatewayRoute,
-} from '../../../../actions/gateway'
+import * as msaAction from '../../../../actions/msa'
+import * as gateWayAction from '../../../../actions/gateway'
 import {
   msaListSlt,
 } from '../../../../selectors/msa'
@@ -83,7 +80,13 @@ class RoutingRuleModal extends React.Component {
       if (err) {
         return
       }
-      delete values['msa-url-type']
+      const body = Object.assign({}, values)
+      delete body['msa-url-type']
+      if (values['msa-url-type'] === 'id') {
+        delete body.url
+      } else {
+        delete body.serviceId
+      }
       this.setState({
         confirmLoading: true,
       })
@@ -103,12 +106,6 @@ class RoutingRuleModal extends React.Component {
         })
         return
       }
-      const body = {}
-      Object.keys(values).forEach(key => {
-        if (values[key] !== currentRoute[key]) {
-          body[key] = values[key]
-        }
-      })
       updateGatewayRoute(clusterID, currentRoute.id, body).then(res => {
         this.setState({
           confirmLoading: false,
@@ -139,6 +136,25 @@ class RoutingRuleModal extends React.Component {
     })
   } */
 
+  routeNameCheck = (rules, value, callback) => {
+    const { checkRouteName, clusterID, currentRoute } = this.props
+    clearTimeout(this.routeNameTimeout)
+    if (currentRoute && (currentRoute.routeId === value)) {
+      return callback()
+    }
+    this.routeNameTimeout = setTimeout(() => {
+      checkRouteName(clusterID, value).then(res => {
+        if (res.response.result.data.has) {
+          callback('路由名称已经存在')
+        } else {
+          callback()
+        }
+      }).catch(() => {
+        callback('请求出错')
+      })
+    }, ASYNC_VALIDATOR_TIMEOUT)
+  }
+
   render() {
     const { form, msaList, visible, onCancel, currentRoute } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -163,6 +179,8 @@ class RoutingRuleModal extends React.Component {
               whitespace: true,
               pattern: APP_NAME_REG,
               message: '路由名称' + APP_NAME_REG_NOTICE,
+            }, {
+              validator: this.routeNameCheck,
             }],
           })(
             <Input placeholder="请填写路由名称" />
@@ -172,7 +190,8 @@ class RoutingRuleModal extends React.Component {
           {getFieldDecorator('path', {
             rules: [{
               required: true,
-              message: '请填写路由路径',
+              pattern: ROUTE_REG,
+              message: '以/开头，由数字、字母、中划线、下划线组成',
             }],
           })(
             <Input placeholder="/service/demo/**" />
@@ -273,7 +292,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  getMsaList,
-  addGatewayRoute,
-  updateGatewayRoute,
+  getMsaList: msaAction.getMsaList,
+  addGatewayRoute: gateWayAction.addGatewayRoute,
+  updateGatewayRoute: gateWayAction.updateGatewayRoute,
+  checkRouteName: gateWayAction.checkRouteName,
 })(Form.create()(RoutingRuleModal))

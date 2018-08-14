@@ -16,11 +16,11 @@ import WebSocket from '@tenx-ui/webSocket/lib/websocket'
 import BlownChart from '../../../../../components/BlownChart'
 import ThreadChart from '../../../../../components/BlownChart/ThreadChart'
 import * as msaActions from '../../../../../actions/msa'
-import { API_CONFIG } from '../../../../../constants';
+import { API_CONFIG } from '../../../../../constants'
 import './style/index.less'
 import BlownDemoModal from '../../../../../components/BlownChart/BlownDemo'
 import EmptyBlown from '../../../../../components/BlownChart/EmptyBlown'
-import isEmpty from 'lodash/isEmpty';
+import isEmpty from 'lodash/isEmpty'
 import { sleep } from '../../../../../common/utils'
 const { MSA_API } = API_CONFIG
 
@@ -59,6 +59,9 @@ class MsaBlownMonitor extends React.PureComponent {
       if (!isEmpty(matchPool)) {
         finalMonitor = Object.assign({}, monitor, {
           rollingCountThreadsExecuted: matchPool[0].rollingCountThreadsExecuted,
+          reportingHosts: matchPool[0].reportingHosts,
+          propertyValue_metricsRollingStatisticalWindowInMilliseconds:
+          matchPool[0].propertyValue_metricsRollingStatisticalWindowInMilliseconds,
         })
       }
       return <div className="monitor-list" key={finalMonitor.circuitBreakerName}>

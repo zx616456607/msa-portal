@@ -79,7 +79,7 @@ const zoneUsers = (state = {}, action) => {
   const { type } = action
   switch (type) {
     case ActionTypes.USERS_LIST_REQUEST:
-      return Object.assign({}, state, {
+      return Object.assign({}, {
         isFetching: true,
       })
     case ActionTypes.USERS_LIST_SUCCESS:

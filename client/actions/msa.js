@@ -86,7 +86,8 @@ export const MSA_ADD_MANUALRULE_REQUEST = 'MSA_ADD_MANUALRULE_REQUEST'
 export const MSA_ADD_MANUALRULE_SUCCESS = 'MSA_ADD_MANUALRULE_SUCCESS'
 export const MSA_ADD_MANUALRULE_FAILURE = 'MSA_ADD_MANUALRULE_FAILURE'
 
-const fetchAddManualrules = (clusterID, body) => ({
+const fetchAddManualrules = (clusterID, body, options) => ({
+  options,
   [CALL_API]: {
     types: [ MSA_ADD_MANUALRULE_REQUEST, MSA_ADD_MANUALRULE_SUCCESS, MSA_ADD_MANUALRULE_FAILURE ],
     endpoint: `${MSA_API_URL}/clusters/${clusterID}/discovery/manualrules/admissions`,
@@ -98,9 +99,9 @@ const fetchAddManualrules = (clusterID, body) => ({
   },
 })
 
-export function addManualrules(clusterID, body) {
+export function addManualrules(clusterID, body, options) {
   return dispatch => {
-    return dispatch(fetchAddManualrules(clusterID, body))
+    return dispatch(fetchAddManualrules(clusterID, body, options))
   }
 }
 
