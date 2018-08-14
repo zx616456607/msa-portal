@@ -10,7 +10,8 @@
 const merge = require('webpack-merge');
 const common = require('./client.base.js')
 const path = require('path')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+// const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssConfig = require('./postcss')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -59,49 +60,50 @@ module.exports = merge(common, {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-              },
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              minimize: true,
             },
-            {
-              loader: 'postcss-loader',
-              options: postcssConfig,
-            },
-          ],
-        }),
+          },
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-              },
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              minimize: true,
             },
-            'less-loader',
-            {
-              loader: 'postcss-loader',
-              options: postcssConfig,
-            },
-          ],
-        }),
+          },
+          'less-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
       },
     ],
   },
   plugins: [
     // new WebpackMd5Hash(),
-    new ExtractTextPlugin({
-      filename: 'styles.[chunkhash:8].css',
-      allChunks: true,
+    // new ExtractTextPlugin({
+    //   filename: 'styles.[chunkhash:8].css',
+    //   allChunks: true,
+    // }),
+    new MiniCssExtractPlugin({
+      filename: 'styles.[contenthash:8].css',
+      chunkFilename: '[id].css',
     }),
+    new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
       // inject: false, // disabled inject
       minify: {
