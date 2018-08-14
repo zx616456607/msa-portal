@@ -51,6 +51,7 @@ module.exports = {
     filename: '[name].js',
     library: '[name]',
   },
+  mode: 'production',
   entry: {
     lib: vendors,
   },
