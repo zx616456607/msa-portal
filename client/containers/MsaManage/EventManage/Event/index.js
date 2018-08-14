@@ -159,7 +159,7 @@ class Event extends React.Component {
   renderEventType = text => {
     switch (text) {
       case 'InstanceDown':
-        return 'InstanceDown'
+        return '服务下线'
       case 'InstanceUp':
         return '服务注册'
       case 'InstanceRenewed':
