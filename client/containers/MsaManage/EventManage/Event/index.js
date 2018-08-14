@@ -31,13 +31,13 @@ const Option = Select.Option
 const EVENT_TYPES = [
   {
     type: 'InstanceDown',
-    text: '服务下线事件',
+    text: '服务下线',
   }, {
     type: 'InstanceUp',
     text: '服务注册',
   }, {
     type: 'InstanceRenewed',
-    text: '服务续约事件',
+    text: '服务续约',
   }, {
     type: 'EurekaServerStart',
     text: '注册服务启动',
