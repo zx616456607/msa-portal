@@ -14,21 +14,12 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Card, Button, DatePicker, Tooltip, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
-import createG6Flow from '../../../../components/CreateG6/flowChart'
 import './style/index.less'
 import { getZipkinDependencies } from '../../../../actions/callLinkTrack'
+import RelationChart from '@tenx-ui/relation-chart'
 
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
-const Chart4 = createG6Flow(chart => {
-  chart.render()
-  chart.edge()
-    .shape('smooth')
-    .style({
-      arrow: true,
-    })
-    .size(2)
-})
 
 class RelationShip extends React.Component {
 
@@ -40,14 +31,14 @@ class RelationShip extends React.Component {
     btnFive: 'primary',
     btnAnHour: 'default',
     btnHalFhour: 'default',
+    loading: true,
   }
 
   componentDidMount() {
-    const { clusterID, getZipkinDependencies } = this.props
     const query = {
       endTs: Date.parse(new Date(new Date() - 300 * 1000)),
     }
-    getZipkinDependencies(clusterID, query)
+    this.loadData(query)
   }
 
   handleTimer = () => {
@@ -64,7 +55,6 @@ class RelationShip extends React.Component {
   }
 
   handleLatelyTimer = key => {
-    const { clusterID, getZipkinDependencies } = this.props
     const query = {
       endTs: Date.parse(new Date()),
     }
@@ -96,11 +86,10 @@ class RelationShip extends React.Component {
     this.setState({
       latelyKey: key,
     })
-    getZipkinDependencies(clusterID, query)
+    this.loadData(query)
   }
 
   onOk = value => {
-    const { clusterID, getZipkinDependencies } = this.props
     this.setState({
       timers: (Date.parse(value[1]) - Date.parse(value[0])),
     })
@@ -108,7 +97,20 @@ class RelationShip extends React.Component {
       endTs: Date.parse(value[1]),
       lookback: (Date.parse(value[1]) - Date.parse(value[0])),
     }
-    getZipkinDependencies(clusterID, query)
+    this.loadData(query)
+  }
+
+  loadData = query => {
+    const { clusterID, getZipkinDependencies } = this.props
+    this.setState({
+      loading: true,
+    }, () => {
+      getZipkinDependencies(clusterID, query).then(() => {
+        this.setState({
+          loading: false,
+        })
+      })
+    })
   }
 
   filterNodes = edges => {
@@ -154,26 +156,40 @@ class RelationShip extends React.Component {
   }
 
   render() {
-    const { isTimerShow, timer, btnFive, btnAnHour, btnHalFhour } = this.state
+    const { isTimerShow, timer, btnFive, btnAnHour, btnHalFhour, latelyKey, loading } = this.state
     const { data } = this.props
+    const config = {
+      rankdir: 'LR',
+      marginx: 60,
+      marginy: 60,
+      ranker: 'tight-tree',
+    }
     if (!isEmpty(data)) {
       if (data.nodes.length > 0) {
         data.nodes.forEach(item => {
-          item.label = `${item.label}\n ${this.fliterAvg(item.id)}次/min`
+          item.height = 50
+          item.width = 50
+          item.shape = 'circle'
+          // item.label = typeof item.label === 'string' ? <div>{item.label}<br /> {this.fliterAvg(item.id)}次/min</div> : item.label
+          item.labelMinor = this.fliterAvg(item.id) + '次/min'
         })
       }
       if (data.edges.length > 0) {
         data.edges.forEach(item => {
+          item.labelpos = 'c'
+          item.arrowOffset = 10
+          item.withArrow = true
           if (item.errorCount > 0 && item.errorCount < item.callCount) {
-            item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
+            item.label = <div style={{ whiteSpace: 'nowrap' }}>{item.errorCount}/{item.callCount} calls</div>
             item.color = '#5ab46d'
-            item.errPart = true
-            item.shape = 'rect'
+            item.dashed = true
+            // item.errPart = true
+            // item.shape = 'rect'
           } else {
-            item.label = `${item.errorCount}/${item.callCount} calls (错误/总)`
+            item.label = <div style={{ whiteSpace: 'nowrap' }}>{item.errorCount}/{item.callCount} calls</div>
             item.color = '#5ab46d'
-            item.errPart = false
-            item.shape = 'rect'
+            // item.errPart = false
+            // item.shape = 'rect'
           }
           if (item.errorCount === item.callCount) {
             item.color = 'red'
@@ -181,9 +197,10 @@ class RelationShip extends React.Component {
         })
       }
     }
-
     const tipText = (<div>
       <span></span>
+      <div className="">服务名称下方的数值表示：平均请求频率</div>
+      <div className="">线上的数值表示：错误调用量／总调用量</div>
       <div className="content">发出的调用全部成功</div>
       <div className="line allLine"></div>
       <div className="arrow allArrow"></div>
@@ -194,10 +211,17 @@ class RelationShip extends React.Component {
       <div className="line errorLine"></div>
       <div className="arrow errorArrow"></div>
     </div>)
-
     return (
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
+          <Button style={{ marginRight: 5 }} icon="reload" onClick={() => {
+            isTimerShow ?
+              this.handleLatelyTimer(latelyKey)
+              :
+              this.onOk(timer)
+          }}>
+            刷新
+          </Button>
           <ButtonGroup className="relation-ship-time">
             <Button icon="calendar" onClick={() => this.handleTimer()}>
               自定义日期
@@ -235,10 +259,16 @@ class RelationShip extends React.Component {
         <div className="body" key="body">
           <Card>
             {
-              data &&
-              <Chart4
-                data={data}
-              />
+              data ?
+                <RelationChart
+                  graphConfigs={config}
+                  nodes={data.nodes || []}
+                  edges={data.edges || []}
+                  style={{ height: '500px' }}
+                  loading={loading}
+                />
+                :
+                null
             }
           </Card>
         </div>

@@ -38,6 +38,27 @@ export const gatewayPolicesListSlt = createSelector(
   }
 )
 
+export const gatewayHasOpenPolicySlt = createSelector(
+  [ gateway, getEntities ],
+  (gateway, getEntities) => {
+    const { gatewayHasOpenPolicy } = gateway
+    const { isFetching, content, totalPages, totalElements } = gatewayHasOpenPolicy
+    if (!content || !content.length) {
+      return {
+        isFetching,
+        gatewayHasOpenPolicy: [],
+        totalPages: 0,
+        totalElements: 0,
+      }
+    }
+    return {
+      isFetching,
+      gatewayHasOpenPolicy: content.map(id => getEntities.gatewayHasOpenPolicy[id]),
+      totalPages,
+      totalElements,
+    }
+  }
+)
 
 export const gatewayRoutesListSlt = createSelector(
   [ gateway, getEntities ],

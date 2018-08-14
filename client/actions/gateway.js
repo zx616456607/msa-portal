@@ -48,6 +48,38 @@ export function gatewayPagePoliciesList(clusterID, query) {
   }
 }
 
+export const GET_GATEWAY_HAS_OPEN_POLICY_REQUEST = 'GET_GATEWAY_HAS_OPEN_POLICY_REQUEST'
+export const GET_GATEWAY_HAS_OPEN_POLICY_SUCCESS = 'GET_GATEWAY_HAS_OPEN_POLICY_SUCCESS'
+export const GET_GATEWAY_HAS_OPEN_POLICY_FAILURE = 'GET_GATEWAY_HAS_OPEN_POLICY_FAILURE'
+
+const fetchGatewayHasOpenPolicy = (clusterID, query) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/policy`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GATEWAY_HAS_OPEN_POLICY_REQUEST,
+        GET_GATEWAY_HAS_OPEN_POLICY_SUCCESS,
+        GET_GATEWAY_HAS_OPEN_POLICY_FAILURE,
+      ],
+      endpoint,
+      options: {
+        method: 'GET',
+      },
+      schema: Schemas.GATEWAY_HAS_OPEN_POLICY_DATA,
+      // schema: {},
+    },
+  }
+}
+
+export function gatewayHasOpenPolicy(clusterID, query) {
+  return dispatch => {
+    return dispatch(fetchGatewayHasOpenPolicy(clusterID, query))
+  }
+}
+
 export const CREATE_GATEWAY_POLICY_REQUEST = 'CREATE_GATEWAY_POLICY_REQUEST'
 export const CREATE_GATEWAY_POLICY_SUCCESS = 'CREATE_GATEWAY_POLICY_SUCCESS'
 export const CREATE_GATEWAY_POLICY_FALIURE = 'CREATE_GATEWAY_POLICY_FALIURE'
@@ -247,3 +279,24 @@ export function updateGatewayRoute(clusterID, routeID, body) {
     return dispatch(fetchUpdateGatewayRoute(clusterID, routeID, body))
   }
 }
+
+export const CHECK_ROUTE_NAME_EXISTENCE_REQUEST = 'CHECK_ROUTE_NAME_EXISTENCE_REQUEST'
+export const CHECK_ROUTE_NAME_EXISTENCE_SUCCESS = 'CHECK_ROUTE_NAME_EXISTENCE_SUCCESS'
+export const CHECK_ROUTE_NAME_EXISTENCE_FAILURE = 'CHECK_ROUTE_NAME_EXISTENCE_FAILURE'
+
+const fetchRouteNameExitence = (clusterID, name) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_ROUTE_NAME_EXISTENCE_REQUEST,
+        CHECK_ROUTE_NAME_EXISTENCE_SUCCESS,
+        CHECK_ROUTE_NAME_EXISTENCE_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/route/has/${name}`,
+      schema: {},
+    },
+  }
+}
+
+export const checkRouteName = (clusterID, name) =>
+  dispatch => dispatch(fetchRouteNameExitence(clusterID, name))
