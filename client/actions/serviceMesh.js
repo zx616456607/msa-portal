@@ -11,7 +11,6 @@ import { toQuerystring } from '../common/utils'
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 import { Schemas } from '../middleware/schemas'
-import { AI_MODELAPP_URL } from '../constants/index'
 
 const { PAAS_API_URL } = API_CONFIG
 
@@ -29,9 +28,6 @@ function fetchAppList(cluster, query, pathname, callback) {
   }
   // const newQuery = Object.assign({}, query)
   let endpoint = `${PAAS_API_URL}/clusters/${cluster}/apps`
-  if (pathname === AI_MODELAPP_URL) {
-    endpoint += '/ai'
-  }
   if (query) {
     delete query.customizeOpts
     delete query.headers
