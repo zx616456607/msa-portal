@@ -1,0 +1,49 @@
+@import '../../../../assets/style/core/index.less';
+.NodeDetailModal.ant-modal {
+  font-size: 10px;
+  color: @font-color-2;
+  margin-right: 40px !important;
+  width: 380px !important;
+  .ant-modal-footer {
+    display: none;
+  }
+  .ant-modal-body {
+    padding: 0;
+  }
+  .baseMessage {
+    padding: @padding-medium;
+    >div {
+      margin: @padding-base 0;
+      >span:nth-child(1) {
+        display: inline-block;
+        width: 120px;
+      }
+    }
+  }
+  .ant-divider {
+    margin: 0;
+  }
+  .contentMessage {
+    padding-top: @padding-base;
+  }
+  .inOutTable {
+    list-style-type: none;
+    padding: 0;
+    li {
+      > span {
+        display: inline-block;
+        width: 25%;
+        line-height: 30px;
+        height: 30px;
+      }
+      border-bottom: 1px solid @border-color-base;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+  .cue {
+    text-align: center;
+    margin: @padding-small 0;
+  }
+}

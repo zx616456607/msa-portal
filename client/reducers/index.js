@@ -26,6 +26,7 @@ import certification from './certification'
 import eventManage from './eventManage'
 import globalConfig from './globalConfig'
 import zipkin from './callLinkTrack'
+import serviceMesh from './serviceMesh'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -79,6 +80,7 @@ const rootReducer = combineReducers({
   certification,
   eventManage,
   zipkin,
+  serviceMesh,
 })
 
 export default rootReducer
