@@ -20,8 +20,10 @@ const isDebug = !(process.env.NODE_ENV === 'production')
 let config
 
 if (!isDebug) {
+  console.warn('Use production webpack config ...')
   config = require('./client.prod')
 } else {
+  console.warn('Use development webpack config ...')
   config = require('./client.dev')
 }
 

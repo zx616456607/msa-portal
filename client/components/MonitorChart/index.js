@@ -48,7 +48,7 @@ export default class MonitorChart extends React.PureComponent {
     return (
       <Spin spinning={loading}>
         <Chart height={300} data={dv} scale={cols} forceFit>
-          <Legend position="top" offsetY={10}/>
+          <Legend position="top" offsetY={10} />
           <Axis name="timestamp"/>
           <Axis name="value" label={{ formatter: formatterValue || (val => val) }}/>
           <Tooltip crosshairs={{ type: 'y' }}/>

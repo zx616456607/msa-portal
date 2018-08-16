@@ -179,3 +179,4 @@ export const FRESH_FREQUENCY = {
     freshInterval: '6小时',
   },
 }
+

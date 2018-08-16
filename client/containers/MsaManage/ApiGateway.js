@@ -21,7 +21,7 @@ import {
   Switch, InputNumber,
   Form, Spin, Card, Checkbox,
   notification, Badge,
-  Row, Col,
+  Tooltip,
 } from 'antd'
 import {
   gatewayPagePoliciesList,
@@ -431,6 +431,15 @@ class ApiGateway extends React.Component {
       </Modal>
     )
   }
+
+  renderLabel = () => {
+    return (
+      <span>
+        选择微服务&nbsp;
+        <Tooltip title={'所选服务被移除后，该限流规则同时被移除'}><Icon type="info-circle-o" /></Tooltip>
+      </span>
+    )
+  }
   render() {
     const {
       form, policesList, isFetching,
@@ -558,7 +567,7 @@ class ApiGateway extends React.Component {
         >
           <Form>
             <FormItem
-              label="选择微服务"
+              label={this.renderLabel()}
               key="slectMicroService"
               {...formItemLayout}
             >
@@ -579,11 +588,6 @@ class ApiGateway extends React.Component {
                 )
               }
             </FormItem>
-            <Row>
-              <Col offset={7} className="desc-text">
-                <Icon type="info-circle-o" /> 所选服务被移除后，该限流规则同时被移除
-              </Col>
-            </Row>
             <FormItem
               label="限流类型"
               key="gatewayType"

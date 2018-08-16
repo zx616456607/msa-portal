@@ -146,7 +146,9 @@ const uaaZoneUsersSchema = new schema.Entity('uaaZoneUsers', {}, {
 const uaaZoneGroupUsersSchema = new schema.Entity('uaaZoneGroupUsers', {}, {
   idAttribute: 'value',
 })
-
+const appSchema = new schema.Entity('apps', {}, {
+  idAttribute: 'value',
+})
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -295,4 +297,7 @@ export const Schemas = {
     resources: [ uaaZoneUsersSchema ],
   },
   UAA_ZONE_GROUP_USERS_LIST_DATA: [ uaaZoneGroupUsersSchema ],
+  APPS: {
+    appList: [ appSchema ],
+  },
 }
