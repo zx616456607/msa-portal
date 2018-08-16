@@ -9,12 +9,14 @@
  */
 const path = require('path')
 const webpack = require('webpack')
-
+const siteConfig = require('../config')
+const { site } = siteConfig
+const env = process.env
+const analyze = !!process.env.ANALYZE_ENV
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
-console.warn('Use production webpack config ...')
-
-module.exports = {
+const configBase = {
   entry: {
     vendor: [
       '@babel/polyfill',
@@ -53,7 +55,21 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(env.NODE_ENV),
+      },
+    }),
     new SpriteLoaderPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.BannerPlugin({
+      banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
+      exclude: /\.svg$/,
+    }),
   ],
 }
+
+if (analyze) {
+  configBase.plugins.push(new BundleAnalyzerPlugin())
+}
+
+module.exports = configBase

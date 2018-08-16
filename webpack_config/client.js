@@ -10,41 +10,36 @@
  * @author Zhangpc
  */
 
-const webpack = require('webpack')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const siteConfig = require('../config')
-const { site } = siteConfig
-const analyze = !!process.env.ANALYZE_ENV
-const env = process.env
+// const webpack = require('webpack')
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const analyze = !!process.env.ANALYZE_ENV
 const isDebug = !(process.env.NODE_ENV === 'production')
-let config
+// let config
 
 if (!isDebug) {
   console.warn('Use production webpack config ...')
-  config = require('./client.prod')
+  module.exports = require('./client.prod')
 } else {
   console.warn('Use development webpack config ...')
-  config = require('./client.dev')
+  module.exports = require('./client.dev')
 }
 
 // for webpack build analyze
-if (analyze) {
-  config.plugins.push(new BundleAnalyzerPlugin())
-}
+// if (analyze) {
+//   config.plugins.push(new BundleAnalyzerPlugin())
+// }
 
-// for define env
-const envDefinePlugin = new webpack.DefinePlugin({
-  'process.env': {
-    NODE_ENV: JSON.stringify(env.NODE_ENV),
-  },
-})
-config.plugins.unshift(envDefinePlugin)
+// // for define env
+// const envDefinePlugin = new webpack.DefinePlugin({
+//   'process.env': {
+//     NODE_ENV: JSON.stringify(env.NODE_ENV),
+//   },
+// })
+// config.plugins.unshift(envDefinePlugin)
 
-// for banner license
-const licenseBannerPlugin = new webpack.BannerPlugin({
-  banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
-  exclude: /\.svg$/,
-})
-config.plugins.push(licenseBannerPlugin)
-
-module.exports = config
+// // for banner license
+// const licenseBannerPlugin = new webpack.BannerPlugin({
+//   banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
+//   exclude: /\.svg$/,
+// })
+// config.plugins.push(licenseBannerPlugin)
