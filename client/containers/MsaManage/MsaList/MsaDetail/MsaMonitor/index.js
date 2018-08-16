@@ -12,7 +12,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
+import isEmpty from 'lodash/isEmpty'
 import { msaMonitor, msaRealTimeMonitor } from '../../../../../actions/msa'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
@@ -20,6 +22,7 @@ import {
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
 } from '../../../../../constants'
 import Metric from '../../../../../components/Metric'
+import '../style/index.less'
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
@@ -198,14 +201,23 @@ class Monitor extends React.PureComponent {
     const { loading, currentValue, freshInterval, realTimeChecked, realTimeLoading } = this.state
     const { msaMetrics, msaRealTimeMetrics } = this.props
     return (
-      <Metric
-        value={currentValue}
-        onChange={this.handleTimeChange}
-        dataSource={msaMetrics}
-        realTimeDataSource={msaRealTimeMetrics}
-        handleSwitch={this.handleSwitch}
-        {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
-      />
+      <div className="msa-detail-monitor">
+        {
+          !isEmpty(msaMetrics) && !isEmpty(msaMetrics[METRICS_CPU].data) ?
+            <Metric
+              value={currentValue}
+              onChange={this.handleTimeChange}
+              dataSource={msaMetrics}
+              realTimeDataSource={msaRealTimeMetrics}
+              handleSwitch={this.handleSwitch}
+              {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
+            />
+            :
+            <div className="loading">
+              <Spin size="large"/>
+            </div>
+        }
+      </div>
     )
   }
 }
