@@ -193,6 +193,7 @@ export default class Metric extends React.PureComponent {
         <div className="control-box">
           <Popover
             content={this.renderContent()}
+            placement={'bottom'}
             trigger={'click'}
             visible={visible}
             overlayClassName="monitor-filter-content"
