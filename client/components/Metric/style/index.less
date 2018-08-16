@@ -11,7 +11,19 @@
  */
 @import '~assets/style/core/index.less';
 #metric-component {
-  .time-control-box {
-    text-align: right;
+  .control-box {
+    clear: both;
+    overflow: hidden;
+    .instance-filter {
+      float: left;
+    }
+    .time-control {
+      float: right;
+    }
+  }
+}
+.monitor-filter-content {
+  .ant-popover-inner-content {
+    padding: @padding-small 0 0 !important;
   }
 }
