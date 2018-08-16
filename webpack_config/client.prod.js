@@ -101,7 +101,7 @@ module.exports = merge(common, {
     // }),
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[id][contenthash:8].css',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
