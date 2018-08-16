@@ -670,26 +670,30 @@ class ApiGateway extends React.Component {
               key="status"
               {...formItemLayout}
             >
-              {
-                getFieldDecorator('status', {
-                  valuePropName: 'checked',
-                  initialValue: false,
-                  rules: [{
-                    required: true,
-                  }],
-                })(
-                  <Switch
-                    checkedChildren="开"
-                    unCheckedChildren="关"
-                  />
-                )
-              }
-              {
-                this.hasOpenPolicy() &&
-                <span className={'api-gateway-has-open-policy desc-text'}>
-                  <Icon type="info-circle-o" /> 该服务已存在启用状态的限流规则
-                </span>
-              }
+              <div className={'api-gateway-policy-container'}>
+                {
+                  getFieldDecorator('status', {
+                    valuePropName: 'checked',
+                    initialValue: false,
+                    rules: [{
+                      required: true,
+                    }],
+                  })(
+                    <Switch
+                      checkedChildren="开"
+                      unCheckedChildren="关"
+                      className="gateway-switch"
+                    />
+                  )
+                }
+                {
+                  this.hasOpenPolicy() &&
+                  <span className={'api-gateway-has-open-policy'}>
+                    <Icon type="info-circle-o" className={'gateway-info-o'}/>
+                    <span className="right-text">该服务已存在启用状态的限流规则，开启后将停用该服务的其他限流规则</span>
+                  </span>
+                }
+              </div>
             </FormItem> }
           </Form>
         </Modal>}
