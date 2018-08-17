@@ -9,6 +9,8 @@
  * 2017-08-24
  * @author zhaoyb
  */
+@import '../../../assets/style/core/index.less';
+
  .api-gateway {
   .page {
     //width: 20%;
@@ -25,8 +27,25 @@
     }
   }
  }
-.api-gateway-has-open-policy {
-  margin-left: 8px;
+.api-gateway-policy-container {
+  display: flex;
+  align-items: flex-start;
+  .gateway-switch {
+    margin-top: 8px !important;
+  }
+  .api-gateway-has-open-policy {
+    margin-left: 8px;
+    width: 400px;
+    display: flex;
+    align-items: center;
+    color: @font-color-3;
+    .gateway-info-o {
+      margin-right: 8px;
+    }
+    .right-text {
+      line-height: 20px;
+    }
+  }
 }
 .api-gateway-stop-modal {
   .title {

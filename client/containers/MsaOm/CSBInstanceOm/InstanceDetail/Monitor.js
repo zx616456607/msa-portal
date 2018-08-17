@@ -13,7 +13,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
+import isEmpty from 'lodash/isEmpty'
 import { instanceMonitor, instanceRealTimeMonitor } from '../../../../actions/CSB/instance'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
@@ -21,6 +23,7 @@ import {
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
 } from '../../../../constants'
 import Metric from '../../../../components/Metric'
+import './style/Monitor.less'
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
@@ -201,14 +204,21 @@ class Monitor extends React.Component {
     const { instanceMetrics, realTimeMonitor } = this.props
     return (
       <div id="instance-detail-monitor">
-        <Metric
-          value={currentValue}
-          onChange={this.handleTimeChange}
-          dataSource={instanceMetrics}
-          realTimeDataSource={realTimeMonitor}
-          handleSwitch={this.handleSwitch}
-          {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
-        />
+        {
+          !isEmpty(instanceMetrics) && !isEmpty(instanceMetrics[METRICS_CPU].data) ?
+            <Metric
+              value={currentValue}
+              onChange={this.handleTimeChange}
+              dataSource={instanceMetrics}
+              realTimeDataSource={realTimeMonitor}
+              handleSwitch={this.handleSwitch}
+              {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
+            />
+            :
+            <div className="loading">
+              <Spin size="large"/>
+            </div>
+        }
       </div>
     )
   }
