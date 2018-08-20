@@ -7,9 +7,9 @@
  * @author zhangtao
  * @date Monday August 13th 2018
  */
-const path = require('path');
-const merge = require('webpack-merge');
-const common = require('./client.base.js');
+const path = require('path')
+const merge = require('webpack-merge')
+const common = require('./client.base.js')
 const postcssConfig = require('./postcss')
 const webpack = require('webpack')
 

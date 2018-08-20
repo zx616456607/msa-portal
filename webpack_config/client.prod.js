@@ -7,11 +7,11 @@
  * @author zhangtao
  * @date Monday August 13th 2018
  */
-const merge = require('webpack-merge');
+const merge = require('webpack-merge')
 const common = require('./client.base.js')
 const path = require('path')
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const postcssConfig = require('./postcss')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')

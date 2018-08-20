@@ -24,7 +24,7 @@ function fetchAppList(cluster, query, pathname, callback) {
   // Front-end customization requirements
   let { customizeOpts, headers } = query || {}
   if (headers === 'default') {
-    headers = '';
+    headers = ''
   }
   // const newQuery = Object.assign({}, query)
   let endpoint = `${PAAS_API_URL}/clusters/${cluster}/apps`

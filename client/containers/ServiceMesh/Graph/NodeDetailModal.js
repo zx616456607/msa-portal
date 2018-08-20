@@ -38,7 +38,7 @@ const mainData = [
     number: 'asdf',
     time: 'fasd',
   },
-];
+]
 export default class NodeDetailModal extends React.Component {
   componentDidUpdate = prevProps => {
     const { isVisible } = this.props

@@ -7,38 +7,38 @@
  * @author zhangtao
  * @date Friday July 27th 2018
  */
-import React from 'react';
-import { Select, Button, Icon, Switch, DatePicker, Radio } from 'antd';
-import Page from '@tenx-ui/page';
+import React from 'react'
+import { Select, Button, Icon, Switch, DatePicker, Radio } from 'antd'
+import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import './styles/index.less'
-import moment from 'moment';
-import { connect } from 'react-redux';
+import moment from 'moment'
+import { connect } from 'react-redux'
 import { DEFAULT } from '../../../constants'
 import * as current from '../../../actions/current'
 import * as meshAction from '../../../actions/serviceMesh'
-import { getDeepValue } from '../../../../client/common/utils';
-import RelationChartComponent from './RelationChartComponent';
+import { getDeepValue } from '../../../../client/common/utils'
+import RelationChartComponent from './RelationChartComponent'
 // import SvgWraper from '../../../components/SvgWraper'
 // import NodeDetailModal from './NodeDetailModal'
-const { Option, OptGroup } = Select;
+const { Option, OptGroup } = Select
 // const ButtonGroup = Button.Group;
 const { RangePicker } = DatePicker
 
 
 function range(start, end) {
-  const result = [];
+  const result = []
   for (let i = start; i < end; i++) {
-    result.push(i);
+    result.push(i)
   }
-  return result;
+  return result
 }
 
 function mapStateToProps(state) {
-  const { entities, current, serviceMesh } = state;
-  const { projects, clusters } = entities;
-  const userProjects = current.projects && current.projects.ids || [];
+  const { entities, current, serviceMesh } = state
+  const { projects, clusters } = entities
+  const userProjects = current.projects && current.projects.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
   Object.keys(currentClusters).forEach(namespace => {
@@ -96,7 +96,7 @@ export default class ServiceMeshGraph extends React.Component {
   }
   handleChange = (itemType, value) => {
     const { searchQuery } = this.state
-    this.setState({ searchQuery: Object.assign({}, searchQuery, { [itemType]: value }) });
+    this.setState({ searchQuery: Object.assign({}, searchQuery, { [itemType]: value }) })
   }
   disabledRangeTime = (_, type) => {
     if (type === 'start') {
@@ -104,17 +104,17 @@ export default class ServiceMeshGraph extends React.Component {
         disabledHours: () => range(0, 60).splice(4, 20),
         disabledMinutes: () => range(30, 60),
         disabledSeconds: () => [ 55, 56 ],
-      };
+      }
     }
     return {
       disabledHours: () => range(0, 60).splice(20, 4),
       disabledMinutes: () => range(0, 31),
       disabledSeconds: () => [ 55, 56 ],
-    };
+    }
   }
   handleSelectChange = (itemType, value) => {
-    const { getDefaultClusters, getProjectClusters } = this.props;
-    const { searchQuery } = this.state;
+    const { getDefaultClusters, getProjectClusters } = this.props
+    const { searchQuery } = this.state
     // console.log('value', value)
     if (value === DEFAULT) {
       getDefaultClusters()
@@ -122,11 +122,11 @@ export default class ServiceMeshGraph extends React.Component {
       getProjectClusters(value)
     }
     const newSearchQuert = { ...searchQuery }
-    newSearchQuert.cluster = undefined;
-    newSearchQuert.app = undefined;
+    newSearchQuert.cluster = undefined
+    newSearchQuert.app = undefined
     newSearchQuert.item = value
-    this.node.focus(); // 默认重新选中集群
-    this.setState({ searchQuery: newSearchQuert });
+    this.node.focus() // 默认重新选中集群
+    this.setState({ searchQuery: newSearchQuert })
   }
   handleClusterChange = (itemType, value) => {
     const { loadAppList } = this.props
@@ -143,15 +143,15 @@ export default class ServiceMeshGraph extends React.Component {
     this.setState({ searchQuery: newSearchQuert })
   }
   render() {
-    const { current, projects, projectClusters, appsList } = this.props;
+    const { current, projects, projectClusters, appsList } = this.props
     const { searchQuery: { item, cluster, app, timeRange } } = this.state
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
-    let currentProjectClusters;
+    let currentProjectClusters
     if (!item) {
       currentProjectClusters = projectClusters[project.namespace] || []
     } else {
-      currentProjectClusters = projectClusters[item] || [];
+      currentProjectClusters = projectClusters[item] || []
     }
     return (
       <Page>
@@ -198,7 +198,7 @@ export default class ServiceMeshGraph extends React.Component {
                   (input, option) =>
                     option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
-                ref = { relnode => { this.node = relnode; } }
+                ref = { relnode => { this.node = relnode } }
                 value={cluster}
               >
                 {
