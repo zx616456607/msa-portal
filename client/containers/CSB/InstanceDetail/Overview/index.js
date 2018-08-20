@@ -83,7 +83,10 @@ const Chart3 = createG2(chart => {
 class InstanceDetailOverview extends React.Component {
   state = {
     width: 260,
-    height: 210,
+    height: 180,
+    plotCfg: {
+      margin: [ 40, 80, 40, 40 ],
+    },
   }
 
   componentWillMount() {
@@ -268,18 +271,25 @@ class InstanceDetailOverview extends React.Component {
                 bordered={false}
                 bodyStyle={{ height: 180, padding: '0px' }}
               >
-                <Chart
-                  data={publishedServiceData || []}
-                  width={this.state.width}
-                  height={this.state.height} />
-                <div className="desc">
-                  {
-                    publishedServiceData ?
-                      publishedServiceData.map((item, index) => {
-                        return this.getServiceStatusDesc(item.status, item.count, index)
-                      }) : ''
-                  }
-                </div>
+                <Row type={'flex'} align={'middle'}>
+                  <Col span={14}>
+                    <Chart
+                      data={publishedServiceData || []}
+                      width={this.state.width}
+                      plotCfg={this.state.plotCfg}
+                      height={this.state.height} />
+                  </Col>
+                  <Col span={10}>
+                    <div>
+                      {
+                        publishedServiceData ?
+                          publishedServiceData.map((item, index) => {
+                            return this.getServiceStatusDesc(item.status, item.count, index)
+                          }) : ''
+                      }
+                    </div>
+                  </Col>
+                </Row>
               </Card>
             </Col>
             <Col span={9}>
@@ -292,18 +302,25 @@ class InstanceDetailOverview extends React.Component {
                 bordered={false}
                 bodyStyle={{ height: 180, padding: '0px' }}
               >
-                <Chart1
-                  data={serviceubscribeData || []}
-                  width={this.state.width}
-                  height={this.state.height} />
-                <div className="desc-trial">
-                  {
-                    serviceubscribeData ?
-                      serviceubscribeData.map((item, index) => {
-                        return this.getStatusDesc(item.status, item.count, index)
-                      }) : ''
-                  }
-                </div>
+                <Row type={'flex'} align={'middle'}>
+                  <Col span={14}>
+                    <Chart1
+                      data={serviceubscribeData || []}
+                      width={this.state.width}
+                      plotCfg={this.state.plotCfg}
+                      height={this.state.height} />
+                  </Col>
+                  <Col span={10}>
+                    <div>
+                      {
+                        serviceubscribeData ?
+                          serviceubscribeData.map((item, index) => {
+                            return this.getStatusDesc(item.status, item.count, index)
+                          }) : ''
+                      }
+                    </div>
+                  </Col>
+                </Row>
               </Card>
             </Col>
           </Row>
@@ -333,18 +350,25 @@ class InstanceDetailOverview extends React.Component {
                 bordered={false}
                 bodyStyle={{ height: 180, padding: '0px' }}
               >
-                <Chart2
-                  data={subServiceData || []}
-                  width={this.state.width}
-                  height={this.state.height} />
-                <div className="des">
-                  {
-                    subServiceData ?
-                      subServiceData.map((item, index) => {
-                        return this.getServiceStatusDesc(item.status, item.count, index)
-                      }) : ''
-                  }
-                </div>
+                <Row type={'flex'} align={'middle'}>
+                  <Col span={14}>
+                    <Chart2
+                      data={subServiceData || []}
+                      width={this.state.width}
+                      plotCfg={this.state.plotCfg}
+                      height={this.state.height} />
+                  </Col>
+                  <Col span={10}>
+                    <div>
+                      {
+                        subServiceData ?
+                          subServiceData.map((item, index) => {
+                            return this.getServiceStatusDesc(item.status, item.count, index)
+                          }) : ''
+                      }
+                    </div>
+                  </Col>
+                </Row>
               </Card>
             </Col>
             <Col span={9} className={`${currentInstance.role === 1 || currentInstance.role === 4 ? 'show' : 'hide'}`}>
@@ -357,18 +381,25 @@ class InstanceDetailOverview extends React.Component {
                 bordered={false}
                 bodyStyle={{ height: 180, padding: '0px' }}
               >
-                <Chart3
-                  data={cansubServiceData || []}
-                  width={this.state.width}
-                  height={this.state.height} />
-                <div className="des">
-                  {
-                    cansubServiceData ?
-                      cansubServiceData.map((item, index) => {
-                        return this.getServiceStatusDesc(item.status, item.count, index)
-                      }) : ''
-                  }
-                </div>
+                <Row type={'flex'} align={'middle'}>
+                  <Col span={14}>
+                    <Chart3
+                      data={cansubServiceData || []}
+                      width={this.state.width}
+                      plotCfg={this.state.plotCfg}
+                      height={this.state.height} />
+                  </Col>
+                  <Col span={10}>
+                    <div>
+                      {
+                        cansubServiceData ?
+                          cansubServiceData.map((item, index) => {
+                            return this.getServiceStatusDesc(item.status, item.count, index)
+                          }) : ''
+                      }
+                    </div>
+                  </Col>
+                </Row>
               </Card>
             </Col>
           </Row>

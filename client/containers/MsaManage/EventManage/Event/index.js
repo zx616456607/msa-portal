@@ -166,7 +166,7 @@ class Event extends React.Component {
         return '服务续约'
       case 'EurekaServerStart':
         return 'Eureka server 启动'
-      case 'EurekaREgistryStart':
+      case 'EurekaRegistryStart':
         return '注册中心启动'
       default:
         return '未知'

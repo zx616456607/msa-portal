@@ -7,8 +7,8 @@
  * @author zhangtao
  * @date Tuesday August 7th 2018
  */
-import React from 'react';
-import RelationChart from '@tenx-ui/relation-chart';
+import React from 'react'
+import RelationChart from '@tenx-ui/relation-chart'
 import NodeDetailModal from './NodeDetailModal'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -19,7 +19,7 @@ const config = {
   ranksep: 150,
   marginx: 30,
   marginy: 30,
-}; // 默认relation-chart 配置
+} // 默认relation-chart 配置
 
 const formateNodesEdges = onClick => {
   const nodes = [
@@ -29,7 +29,7 @@ const formateNodesEdges = onClick => {
     { id: 'hford', label: 'Harrison Ford', width: 50, height: 50, onClick },
     { id: 'lwilson', label: 'Luke Wilson', width: 50, height: 50, onClick },
     { id: 'kbacon', label: 'Kevin Bacon', width: 50, height: 50, onClick },
-  ];
+  ]
   const edges = [
     { source: 'kspacey', target: 'swilliams', withArrow: true, arrowOffset: 10, label: 'hello' },
     { source: 'swilliams', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hi' },
@@ -49,18 +49,18 @@ export default class RelationChartComponent extends React.Component {
     edges: [],
   }
   componentDidMount = () => {
-    const { nodes, edges } = formateNodesEdges(this.onClick);
+    const { nodes, edges } = formateNodesEdges(this.onClick)
     this.setState({ nodes, edges })
   }
   onClick = lname => {
-    const { nodes } = this.state;
+    const { nodes } = this.state
     const newNodes = cloneDeep(nodes)
     newNodes.forEach(n => {
       if (n.active !== undefined) {
-        delete n.active;
+        delete n.active
       }
       if (n.id === lname) {
-        n.active = true;
+        n.active = true
       }
     })
     this.setState({ currentService: lname, visible: true, nodes: newNodes })
