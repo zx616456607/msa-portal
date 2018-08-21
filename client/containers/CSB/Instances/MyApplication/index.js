@@ -56,7 +56,7 @@ class MyApplication extends React.Component {
     confirmLoading: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData({}, true)
   }
 

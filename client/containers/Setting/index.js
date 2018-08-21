@@ -51,7 +51,7 @@ import './style/index.less'
 // ]
 
 class Setting extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     //
   }
 

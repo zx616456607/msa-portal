@@ -34,7 +34,7 @@ class MsaConfig extends React.Component {
     springcloudState: '',
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.load()
   }
 

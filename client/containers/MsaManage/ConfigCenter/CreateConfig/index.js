@@ -39,7 +39,7 @@ class CreateConfig extends React.Component {
     addLoading: false,
     releaseLoading: false,
   }
-  componentWillMount() {
+  componentDidMount() {
     const { location } = this.props
     const { detail } = parse(location.search)
     this.setState({

@@ -47,7 +47,7 @@ class CreateLinkRules extends React.Component {
     }],
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadInstancesList()
   }
 

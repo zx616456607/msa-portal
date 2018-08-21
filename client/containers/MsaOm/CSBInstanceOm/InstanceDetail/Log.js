@@ -18,7 +18,7 @@ import LogTemplate from '../../../../components/Log'
 class Log extends React.Component {
   static propTypes = {}
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

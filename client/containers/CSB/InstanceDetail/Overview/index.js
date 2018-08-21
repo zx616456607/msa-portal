@@ -89,7 +89,7 @@ class InstanceDetailOverview extends React.Component {
     },
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

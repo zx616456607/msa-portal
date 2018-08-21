@@ -57,7 +57,7 @@ import confirm from '../../components/Modal/confirm'
 // ]
 
 class Apm extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     const { loadApms, current, getApmService } = this.props
     const clusterID = current.config.cluster.id
     const body = {

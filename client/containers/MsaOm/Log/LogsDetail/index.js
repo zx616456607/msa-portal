@@ -8,7 +8,7 @@ class LogComponent extends React.Component {
     bigLog: false,
   }
 
-  componentWillMount() { }
+  componentDidMount() { }
 
   handleDown = () => { }
 

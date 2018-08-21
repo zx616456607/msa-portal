@@ -39,7 +39,7 @@ class CSBCascadingLinkRules extends React.Component {
     name: '',
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData({}, true)
   }
 

@@ -327,7 +327,7 @@ class MsaList extends React.Component {
             <div className="msa-btn-box layout-content-btns" key="btns">
               <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
               {/* <Button icon="poweroff">注销微服务</Button> */}
-              <Button icon="sync" onClick={this.loadMsaList}>刷新</Button>
+              <Button icon="sync" onClick={() => this.loadMsaList()}>刷新</Button>
               <Search
                 className="msa-search"
                 placeholder="按微服务名称搜索"

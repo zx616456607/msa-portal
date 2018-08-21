@@ -51,7 +51,7 @@ class CallLinkTracking extends React.Component {
     dockSize: DEFAULT_DOCK_SIZE,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { loadPPApps, clusterID, apmID, location } = this.props
     apmID && loadPPApps(clusterID, apmID)
     const { application, from, to } = location.query || {}
@@ -63,9 +63,6 @@ class CallLinkTracking extends React.Component {
         this.loadData()
       })
     }
-  }
-
-  componentDidMount() {
     this.appDom = document.getElementById('app')
     this.footerDom = document.getElementById('footer')
   }

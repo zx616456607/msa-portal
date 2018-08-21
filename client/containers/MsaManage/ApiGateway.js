@@ -59,7 +59,7 @@ class ApiGateway extends React.Component {
     isLoadingStopOrStart: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadGatewayPoliciesList()
   }
 

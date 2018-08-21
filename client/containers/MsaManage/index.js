@@ -117,7 +117,7 @@ class MsaManage extends React.Component {
     isDeployed: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { current, fetchSpingCloud, history } = this.props
     const clusterID = current.config.cluster.id
     fetchSpingCloud(clusterID).then(res => {
