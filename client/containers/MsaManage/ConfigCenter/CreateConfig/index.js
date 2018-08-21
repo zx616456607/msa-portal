@@ -280,7 +280,7 @@ class CreateConfig extends React.Component {
           <Row className="connent">
             <FormItem {...fromLayout} label="配置版本">
               {getFieldDecorator('edition', {
-                initialValue: detail !== 'false' ? branchName : undefined,
+                initialValue: branchName || undefined,
                 rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
               })(
                 <Select className="selects" placeholder="请选择配置版本" disabled={ detail === 'true' } onChange={this.handlechage}>

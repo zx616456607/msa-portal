@@ -117,7 +117,7 @@ class ConfigCenter extends React.Component {
         })
       }
       if (res.response.result.code === 200) {
-        this.loadData()
+        this.fetchList(branchName)
         notification.success({
           message: `删除成功 ${configName}`,
         })
