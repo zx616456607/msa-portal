@@ -27,6 +27,13 @@ module.exports = merge(common, {
     main: [
       './client/entry/index.js',
     ],
+    vendor: [
+      '@babel/polyfill',
+      'g2',
+      '@antv/g6',
+      'moment',
+      'codemirror',
+    ],
   },
   output: {
     path: path.join(__dirname, '../static/public'),

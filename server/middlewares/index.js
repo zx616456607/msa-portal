@@ -15,47 +15,32 @@
  *
  * @return {Object} webpack middleware
  */
-export function webpack() {
+export function webpackMiddleware() {
   const webpack = require('webpack')
   const webpackConfig = require('../../webpack_config/client')
   const compiler = webpack(webpackConfig)
   const koaWebpack = require('koa-webpack')
   return koaWebpack({
     compiler,
-    dev: {
-      // display no info to console (only warnings and errors)
-      noInfo: true,
-
-      // display nothing to the console
-      // quiet: false,
-
-      // switch into lazy mode
-      // that means no watching, but recompilation on every request
-      // lazy: true,
-
-      // watch options (only lazy: false)
+    devMiddleware: {
+      index: 'index.debug.html',
+      logLevel: 'info',
+      lazy: false,
       watchOptions: {
         aggregateTimeout: 300,
-        poll: true,
+        poll: 1000,
       },
-
-      // public path to bind the middleware to
-      // use the same as in webpack
       publicPath: webpackConfig.output.publicPath,
-
-      // custom headers
-      headers: { 'X-Custom-Header': 'yes' },
-
-      // options for formating the statistics
       stats: {
         colors: true,
       },
+      headers: { 'X-Custom-Header': 'yes' },
     },
-    hot: {
-      /* eslint-disable */
-      log: console.log,
-      path: '/__webpack_hmr',
-      heartbeat: 10 * 1000,
+    hotClient: {
+      logLevel: 'info',
+      allEntries: true,
+      autoConfigure: true,
+      hmr: true,
     },
   })
 }
@@ -69,4 +54,4 @@ export function webpack() {
  * import { jwt, webpack } fom './middlewares'
  * ```
  */
-export default { webpack }
+export default { webpackMiddleware }

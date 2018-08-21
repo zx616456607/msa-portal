@@ -52,7 +52,7 @@ class MsaList extends React.Component {
     hasZkhost: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadMsaList()
   }
 

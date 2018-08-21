@@ -17,15 +17,6 @@ const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const configBase = {
-  entry: {
-    vendor: [
-      '@babel/polyfill',
-      'g2',
-      '@antv/g6',
-      'moment',
-      'codemirror',
-    ],
-  },
   resolve: {
     modules: [
       path.join(__dirname, '../client'),
