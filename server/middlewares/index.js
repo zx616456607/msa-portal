@@ -15,16 +15,27 @@
  *
  * @return {Object} webpack middleware
  */
-export function webpack() {
+export function webpackMiddleware() {
   const webpack = require('webpack')
   const webpackConfig = require('../../webpack_config/client')
   const compiler = webpack(webpackConfig)
   const koaWebpack = require('koa-webpack')
   return koaWebpack({
     compiler,
-    dev: {
+    devMiddleware: {
+      logLevel: 'info',
+      watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000,
+      },
+      publicPath: webpackConfig.output.publicPath,
+      stats: {
+        colors: true,
+      },
+      headers: { 'X-Custom-Header': 'yes' },
+
       // display no info to console (only warnings and errors)
-      noInfo: true,
+      // noInfo: true,
 
       // display nothing to the console
       // quiet: false,
@@ -34,28 +45,29 @@ export function webpack() {
       // lazy: true,
 
       // watch options (only lazy: false)
-      watchOptions: {
-        aggregateTimeout: 300,
-        poll: true,
-      },
+      // watchOptions: {
+      //   aggregateTimeout: 300,
+      //   poll: 1000,
+      // },
 
       // public path to bind the middleware to
       // use the same as in webpack
-      publicPath: webpackConfig.output.publicPath,
+      // publicPath: webpackConfig.output.publicPath,
 
       // custom headers
-      headers: { 'X-Custom-Header': 'yes' },
+      // headers: { 'X-Custom-Header': 'yes' },
 
       // options for formating the statistics
-      stats: {
-        colors: true,
-      },
+      // stats: {
+      //   colors: true,
+      // },
     },
-    hot: {
+    hotClient: {
+      logLevel: 'info',
       /* eslint-disable */
-      log: console.log,
-      path: '/__webpack_hmr',
-      heartbeat: 10 * 1000,
+      // log: console.log,
+      // path: '/__webpack_hmr',
+      // heartbeat: 10 * 1000,
     },
   })
 }
@@ -69,4 +81,4 @@ export function webpack() {
  * import { jwt, webpack } fom './middlewares'
  * ```
  */
-export default { webpack }
+export default { webpackMiddleware }

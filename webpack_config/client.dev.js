@@ -13,14 +13,14 @@ const common = require('./client.base.js')
 const postcssConfig = require('./postcss')
 const webpack = require('webpack')
 
-const hotMiddleWareConfig = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'
+// const hotClientConfig = 'webpack-hot-client/client?path=/__webpack_hmr&timeout=20000'
 
 module.exports = merge(common, {
   devtool: '#cheap-module-eval-source-map',
   mode: 'development',
   entry: {
     main: [
-      hotMiddleWareConfig,
+      // hotClientConfig,
       'react-hot-loader/patch',
       './client/entry/index.js',
     ],
@@ -82,6 +82,6 @@ module.exports = merge(common, {
       context: __dirname,
       manifest: require('../manifest.json'),
     }),
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
   ],
 })
