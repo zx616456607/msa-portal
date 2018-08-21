@@ -8,32 +8,18 @@
  * @date Friday July 27th 2018
  */
 import React from 'react'
-import { Select, Button, Icon, Switch, DatePicker, Radio } from 'antd'
+import { Select, Button, Icon, Switch, DatePicker, Radio, TimePicker } from 'antd'
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import './styles/index.less'
-import moment from 'moment'
 import { connect } from 'react-redux'
 import { DEFAULT } from '../../../constants'
 import * as current from '../../../actions/current'
 import * as meshAction from '../../../actions/serviceMesh'
 import { getDeepValue } from '../../../../client/common/utils'
 import RelationChartComponent from './RelationChartComponent'
-// import SvgWraper from '../../../components/SvgWraper'
-// import NodeDetailModal from './NodeDetailModal'
 const { Option, OptGroup } = Select
-// const ButtonGroup = Button.Group;
-const { RangePicker } = DatePicker
-
-
-function range(start, end) {
-  const result = []
-  for (let i = start; i < end; i++) {
-    result.push(i)
-  }
-  return result
-}
 
 function mapStateToProps(state) {
   const { entities, current, serviceMesh } = state
@@ -54,18 +40,14 @@ function mapStateToProps(state) {
     appsList,
   }
 }
-@connect(mapStateToProps, {
-  getDefaultClusters: current.getDefaultClusters,
-  getProjectClusters: current.getProjectClusters,
-  loadAppList: meshAction.loadAppList,
-})
-export default class ServiceMeshGraph extends React.Component {
+class ServiceMeshGraph extends React.Component {
   state = {
     searchQuery: {}, // 搜索条件
+    isTimeRange: false, // 显示
   }
   node = null
   appNode = null
-  componentDidMount = async () => {
+  async componentDidMount() {
     const { current, projectClusters, loadAppList, getProjectClusters, getDefaultClusters,
     } = this.props
     const currentConfig = current.config || {}
@@ -98,20 +80,6 @@ export default class ServiceMeshGraph extends React.Component {
     const { searchQuery } = this.state
     this.setState({ searchQuery: Object.assign({}, searchQuery, { [itemType]: value }) })
   }
-  disabledRangeTime = (_, type) => {
-    if (type === 'start') {
-      return {
-        disabledHours: () => range(0, 60).splice(4, 20),
-        disabledMinutes: () => range(30, 60),
-        disabledSeconds: () => [ 55, 56 ],
-      }
-    }
-    return {
-      disabledHours: () => range(0, 60).splice(20, 4),
-      disabledMinutes: () => range(0, 31),
-      disabledSeconds: () => [ 55, 56 ],
-    }
-  }
   handleSelectChange = (itemType, value) => {
     const { getDefaultClusters, getProjectClusters } = this.props
     const { searchQuery } = this.state
@@ -142,9 +110,21 @@ export default class ServiceMeshGraph extends React.Component {
     newSearchQuert.cluster = value
     this.setState({ searchQuery: newSearchQuert })
   }
+  toogleTimePicker = () => {
+    const { isTimeRange } = this.state
+    this.setState({ isTimeRange: !isTimeRange })
+  }
+  timeRangeSelect =(key, value) => {
+    let { searchQuery, searchQuery: { timeRange = {} } } = this.state
+    if (typeof timeRange === 'number') {
+      timeRange = {}
+    }
+    timeRange[key] = value;
+    this.setState({ searchQuery: Object.assign({}, searchQuery, { timeRange }) })
+  }
   render() {
     const { current, projects, projectClusters, appsList } = this.props
-    const { searchQuery: { item, cluster, app, timeRange } } = this.state
+    const { searchQuery: { item, cluster, app, timeRange }, isTimeRange } = this.state
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
     let currentProjectClusters
@@ -156,7 +136,7 @@ export default class ServiceMeshGraph extends React.Component {
     return (
       <Page>
         <QueueAnim>
-          <div className="ServiceMeshGraph">
+          <div className="ServiceMeshGraph" key="body">
             <div className="searchBar">
               <Select
                 showSearch
@@ -237,29 +217,35 @@ export default class ServiceMeshGraph extends React.Component {
                   })
                 }
               </Select>
-              <RangePicker
-                disabledTime={this.disabledRangeTime}
-                showTime={{
-                  hideDisabledOptions: true,
-                  defaultValue: [ moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss') ],
-                }}
-                format="YYYY-MM-DD HH:mm:ss"
-                onChange={(_, dateStrings) => this.handleChange('timeRange', dateStrings)}
-              />
-              <Radio.Group value = {timeRange}
-                onChange={ e => this.handleChange('timeRange', e.target.value)}
-              >
-                <Radio.Button value={5}>最近5分钟</Radio.Button>
-                <Radio.Button value={30}>最近30分钟</Radio.Button>
-                <Radio.Button value={60}>最近1小时</Radio.Button>
-              </Radio.Group>
+              <Button className="TimePickerButton"
+                type="primary"
+                onClick={this.toogleTimePicker}
+                icon="calendar">
+                自定义时间
+              </Button>
+              {
+                isTimeRange === false ?
+                  <Radio.Group value = {timeRange}
+                    onChange={ e => this.handleChange('timeRange', e.target.value)}
+                  >
+                    <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
+                    <Radio.Button value={30}>最近30分钟</Radio.Button>
+                    <Radio.Button value={60}>最近1小时</Radio.Button>
+                  </Radio.Group>
+                  :
+                  <span >
+                    <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
+                    <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
+                    <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
+                  </span>
+              }
             </div>
             <div className="infoBar">
               <span className="meshInfo">{`应用: ${'x'}个`}</span>
               <span className="meshInfo">{`服务: ${'t'}个`}</span>
               <span className="meshInfo">{`调用: ${'y'}个`}</span>
               <Switch checkedChildren="开" unCheckedChildren="关"/>
-              <Button onClick={ () => this.node.focus() }><Icon type="sync"/>刷新</Button>
+              <Button onClick={this.handleChangeBttton }><Icon type="sync"/>刷新</Button>
             </div>
             <div className="SvgContainer">
               <RelationChartComponent/>
@@ -270,4 +256,10 @@ export default class ServiceMeshGraph extends React.Component {
     )
   }
 }
+
+export default connect(mapStateToProps, {
+  getDefaultClusters: current.getDefaultClusters,
+  getProjectClusters: current.getProjectClusters,
+  loadAppList: meshAction.loadAppList,
+})(ServiceMeshGraph)
 

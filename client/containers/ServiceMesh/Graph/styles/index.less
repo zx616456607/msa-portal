@@ -5,6 +5,7 @@
     margin: @padding-medium;
   }
   .searchBar {
+    display: flex;
     >div, span {
       margin-right: @padding-base;
     }
@@ -29,5 +30,31 @@
   .SvgContainer {
     position: relative;
     height: 100vh - 40px;
+  }
+  .TimePickerButton {
+    border: none;
+    border-radius: 4px 0 0 4px;
+  }
+  .fiveButton {
+    border-radius: 0 !important;
+  }
+  .daySelect, .firstTimeSelect {
+    margin: 0 !important;
+    input {
+      border-left: 0 !important;
+      border-right: 0 !important;
+      border-radius: 0 !important;
+    }
+  }
+  .secondTimeSelect {
+    input {
+      border-left: 0;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+  .firstTimeSelect {
+    .ant-time-picker-icon::after {
+      content: '~';
+    }
   }
 }
