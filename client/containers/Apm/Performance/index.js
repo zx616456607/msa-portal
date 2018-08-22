@@ -369,10 +369,9 @@ class Performance extends React.Component {
       gcData,
       tranData,
       isRowData,
-      nodeName,
     } = this.state
     const { apps } = this.props
-    this.nodeData()
+    // this.nodeData()
     const Charts = chart => {
       chart.line().position('time*count')
       chart.forceFit(true)
@@ -524,6 +523,7 @@ class Performance extends React.Component {
         chart.repaint()
       })
     }
+    const nodeList = agentData && agentData[exampleData.applicationName] || []
     const chartAry = [ Charts, Charts1, Charts2, Charts3 ]
     const ChartGroup = CreateG2Group(chartAry, true)
     const [ Chart, Chart1, Chart2, Chart3 ] = ChartGroup
@@ -566,12 +566,12 @@ class Performance extends React.Component {
               <Button className="type-change-btn">自动刷新</Button>
             </ButtonGroup>
           </div>
-          <Select className="example" value={exampleData.agentId} style={{ width: 120 }} onChange={this.handleOnExample}>
+          <Select className="example" style={{ width: 120 }} onChange={this.handleOnExample}
+            defaultValue={nodeList.length > 0 && nodeList[0].agentId || ''}>
             {
-              nodeName ?
-                nodeName.map(value => (
-                  <Option key={value}>{value}</Option>
-                )) : ''
+              nodeList && nodeList.map(item => {
+                return <Option key={item.agentId}>{item.agentId}</Option>
+              })
             }
           </Select>
         </div>
