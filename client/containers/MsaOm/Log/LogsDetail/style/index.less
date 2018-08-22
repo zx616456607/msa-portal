@@ -15,6 +15,7 @@
     padding: 0 !important;
   }
   .logs-detail {
+    height: 100%;
     .title {
      width: 100%;
      height: 40px;
@@ -39,6 +40,7 @@
      }
      .download {
        float: right;
+       color: #5cb85c;
        margin-right: 15px;
        line-height: 40px;
        font-size: 14px;
@@ -49,15 +51,15 @@
        font-size: 14px;
        line-height: 40px;
      }
-     & > div {
+     div {
        float: right;
        margin-right: 30px;
        display: inline-block;
      }
     }
-    .connent {
+    .log-body {
      width: 100%;
-     height: 500px;
+     height: 700px;
      overflow-y: auto;
      margin-bottom: 0;
      margin-top: 0;
@@ -67,23 +69,37 @@
        text-align: center;
        color: #d9d9d9;
      }
+     .logList {
+      padding: 15px;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      .logDetail {
+        width: 100%;
+        word-break: keep-all;
+        white-space: pre-wrap;
+        &:hover {
+          background-color: rgba(91, 91, 91, 0.5);
+        }
+      }
+      .logDetailActive {
+        background-color: rgba(91, 91, 91, 0.5);
+      }
+      .instanceSpan {
+        margin-right: 15px;
+        color: #ff0;
+      }
+      .logSpan {
+        color: #37fc34;
+      }
+      .noDataSpan {
+        color: #37fc34;
+      }
+    }
+    }
+    .msgBox {
+      height: calc(~"100% - 1px");
     }
   }
  }
- .bigLogBox {
-  z-index: 100;
-  position: fixed;
-  margin-top: 0 !important;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  .ant-card-body {
-    height: 100%;
-  }
-  .msgBox {
-    height: calc(~"100% - 40px");
-  }
-}
 
