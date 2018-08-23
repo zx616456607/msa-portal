@@ -180,7 +180,7 @@ class App extends React.Component {
       return
     }
     if (status === 409
-      && pathname.includes('/csb-instances-available/')
+      && pathname.includes('/csb-instances/available/')
       && pathname.includes('/publish-service')) {
       notification.warn({
         message: '该实例中已存在同名称同版本的服务',
