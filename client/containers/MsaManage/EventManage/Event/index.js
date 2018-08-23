@@ -89,7 +89,9 @@ class Event extends React.Component {
     const { eventType, eventLevel, rootPlace, appName, keyword, rangeDate } = this.state
     const [ start, end ] = rangeDate
     query = Object.assign({}, location.query,
-      { eventType, eventLevel, rootPlace, appName, keyword }, query)
+      { eventType, eventLevel, rootPlace,
+        appName: appName ? encodeURIComponent(appName) : '',
+        keyword: keyword ? encodeURIComponent(keyword) : '' }, query)
     if (start) {
       query = Object.assign({}, query, { startTime: new Date(start).getTime() })
     }
