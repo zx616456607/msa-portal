@@ -87,7 +87,7 @@ class MsaList extends React.Component {
                 message: '隐藏服务成功',
               })
               self.loadMsaList()
-            }, 1000)
+            }, 3000)
           })
         })
       },
@@ -113,7 +113,7 @@ class MsaList extends React.Component {
                 message: '取消隐藏服务成功',
               })
               self.loadMsaList()
-            }, 1000)
+            }, 3000)
           })
         })
       },
