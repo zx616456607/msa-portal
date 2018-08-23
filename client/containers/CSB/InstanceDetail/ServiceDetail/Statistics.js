@@ -68,7 +68,7 @@ class Statistics extends React.Component {
     rangeDateTime: [],
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { serviceId, instanceId, getInstanceServiceOverview } = this.props
     getInstanceServiceOverview(instanceId, serviceId)
     this.loadData()

@@ -61,6 +61,7 @@ import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionSe
 import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
 import PublishService from './containers/CSB/InstanceDetail/PublishService'
 import PublicServices from './containers/CSB/InstanceDetail/PublicService'
+// import ServiceMeshGraph from './containers/ServiceMesh/Graph'
 
 export const appChildRoutes = [
   {
@@ -75,6 +76,11 @@ export const appChildRoutes = [
     component: MsaManage,
     key: 'msa-manage',
   },
+  // {
+  //   path: '/service-mesh',
+  //   component: ServiceMeshGraph,
+  //   key: 'service-mesh',
+  // },
   {
     path: '/csb-instances',
     component: CSBInstances,

@@ -47,7 +47,7 @@ class BlackAndWhiteListModal extends React.Component {
     isFetching: true,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

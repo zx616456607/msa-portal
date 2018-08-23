@@ -201,9 +201,9 @@ class NamespaceSwitch extends React.Component {
               </Menu.Item>
               <SubMenu key="share" title="共享项目">
                 {
-                  projects.map(project => (
-                    <Menu.Item key={project.namespace}>
-                      {project.projectName}
+                  projects.map(p => (
+                    <Menu.Item key={p.namespace}>
+                      {p.projectName}
                     </Menu.Item>
                   ))
                 }

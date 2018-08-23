@@ -1,0 +1,33 @@
+@import '../../../../../client/assets/style/core/index.less';
+.ServiceMeshGraph {
+  margin-top: 55px + @padding-medium;
+  >div {
+    margin: @padding-medium;
+  }
+  .searchBar {
+    >div, span {
+      margin-right: @padding-base;
+    }
+  }
+  .infoBar {
+    overflow: hidden;
+    line-height: 32px;
+    height: 32px;
+    .meshInfo {
+      color: @primary-color;
+      padding-right: 50px;
+    }
+    >button {
+      float: right;
+      margin-right: @padding-base;
+    }
+    .ant-switch {
+      margin-top: 4px;
+      float: right;
+    }
+  }
+  .SvgContainer {
+    position: relative;
+    height: 100vh - 40px;
+  }
+}

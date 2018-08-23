@@ -51,7 +51,7 @@ class MsaComponents extends React.Component {
     loading: true,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.fetchApmId()
   }
 

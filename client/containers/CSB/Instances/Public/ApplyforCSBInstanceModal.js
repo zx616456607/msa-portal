@@ -38,7 +38,7 @@ class ApplyforCSBInstanceModal extends React.Component {
     isApplyfor: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { desc } = this.props
     this.setState({
       text: desc,

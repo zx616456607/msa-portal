@@ -1,145 +1,83 @@
-/**
+/*
  * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2017 TenxCloud. All Rights Reserved.
- */
-
-/**
- * App webpack dev config
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * ----
+ * client.dev.js page
  *
- * https://webpack.js.org/guides/migrating/
- * v0.1 - 2017-08-15
- * @author Zhangpc
+ * @author zhangtao
+ * @date Monday August 13th 2018
  */
-
 const path = require('path')
-const webpack = require('webpack')
+const merge = require('webpack-merge')
+const common = require('./client.base.js')
 const postcssConfig = require('./postcss')
-// const nodeModulesPath = path.join(__dirname, '/node_modules/')
-const hotMiddleWareConfig = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
+const webpack = require('webpack')
 
-console.warn('Use development webpack config ...')
-
-module.exports = {
+module.exports = merge(common, {
   devtool: '#cheap-module-eval-source-map',
-
-  entry: {
-    main: [
-      hotMiddleWareConfig,
-      'react-hot-loader/patch',
-      './client/entry/index.js',
-    ],
-    vendor: [
-      '@babel/polyfill',
-      'g2',
-      '@antv/g6',
-      'moment',
-      'codemirror',
-    ],
-  },
-
-  resolve: {
-    modules: [
-      path.join(__dirname, '../client'),
-      'node_modules',
-    ],
-    extensions: [ '.js', '.jsx', '.json' ],
-    alias: {
-      '@': path.join(__dirname, '../client'),
-    },
-  },
-
+  mode: 'development',
+  entry: [
+    'react-hot-loader/patch',
+    './client/entry/index.js',
+  ],
   output: {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].js',
     chunkFilename: '[id].chunk.js',
-    publicPath: '/public/',
   },
-
   module: {
-    rules: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: 'svg-sprite-loader',
-            options: {
-              extract: true,
-              esModule: false,
-              runtimeGenerator: require.resolve('./svg_runtime_generator'),
-            },
+    rules: [{
+      test: /\.svg$/,
+      use: [
+        {
+          loader: 'svg-sprite-loader',
+          options: {
+            extract: true,
+            esModule: false,
+            runtimeGenerator: require.resolve('./svg_runtime_generator'),
           },
-          {
-            loader: 'svgo-loader',
-            options: {
-              plugins: [
-                { removeTitle: true },
-                { removeStyleElement: true },
-                { removeAttrs: { attrs: 'path:fill' } },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
-        loader: 'url-loader',
-        options: {
-          limit: 5192, // 5KB 以下图片自动转成 base64 码
-          name: 'img/[name].[hash:8].[ext]',
         },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: postcssConfig,
+        {
+          loader: 'svgo-loader',
+          options: {
+            plugins: [
+              { removeTitle: true },
+              { removeStyleElement: true },
+              { removeAttrs: { attrs: 'path:fill' } },
+            ],
           },
-        ],
-      },
-      {
-        test: /\.less$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'less-loader',
-          {
-            loader: 'postcss-loader',
-            options: postcssConfig,
-          },
-        ],
-      },
-    ],
+        },
+      ],
+    }, {
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        'css-loader',
+        {
+          loader: 'postcss-loader',
+          options: postcssConfig,
+        },
+      ],
+    },
+    {
+      test: /\.less$/,
+      use: [
+        'style-loader',
+        'css-loader',
+        'less-loader',
+        {
+          loader: 'postcss-loader',
+          options: postcssConfig,
+        },
+      ],
+    }],
   },
-
   plugins: [
     new webpack.DllReferencePlugin({
       context: __dirname,
       manifest: require('../manifest.json'),
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.js',
-      // (Give the chunk a different name)
-      minChunks: Infinity,
-      // (with more entries, this ensures that no other module
-      //  goes into the vendor chunk)
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.js',
-    }),
-    new SpriteLoaderPlugin(),
-    // new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
+    // webpack-hot-client will auto add this plugin
+    // new webpack.HotModuleReplacementPlugin(),
   ],
-}
+})

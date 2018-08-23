@@ -1,33 +1,28 @@
-/**
+/*
  * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2017 TenxCloud. All Rights Reserved.
- */
-
-/**
- * App webpack dev config
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * ----
+ * client.prod.js page
  *
- * https://webpack.js.org/guides/migrating/
- * v0.1 - 2017-08-15
- * @author Zhangpc
+ * @author zhangtao
+ * @date Monday August 13th 2018
  */
-
+const merge = require('webpack-merge')
+const common = require('./client.base.js')
 const path = require('path')
-const webpack = require('webpack')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+// const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const postcssConfig = require('./postcss')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-// const WebpackMd5Hash = require('webpack-md5-hash')
-const postcssConfig = require('./postcss')
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
+const webpack = require('webpack')
 
-console.warn('Use production webpack config ...')
-
-const publicPath = '/public/'
 const svgHash = +new Date()
+const publicPath = '/public/'
 
-module.exports = {
+module.exports = merge(common, {
   devtool: '#cheap-source-map',
-
+  mode: 'production',
   entry: {
     main: [
       './client/entry/index.js',
@@ -40,32 +35,13 @@ module.exports = {
       'codemirror',
     ],
   },
-
-  resolve: {
-    modules: [
-      path.join(__dirname, '../client'),
-      'node_modules',
-    ],
-    alias: {
-      '@': path.join(__dirname, '..', 'client'),
-    },
-  },
-
   output: {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].[chunkhash:8].js',
     chunkFilename: '[id].chunk.[chunkhash:8].js',
-    publicPath,
   },
-
-  // https://webpack.js.org/plugins/uglifyjs-webpack-plugin/
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-      },
       {
         test: /\.svg$/,
         use: [
@@ -90,59 +66,51 @@ module.exports = {
         ],
       },
       {
-        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
-        loader: 'url-loader',
-        options: {
-          limit: 5192, // 5KB 以下图片自动转成 base64 码
-          name: 'img/[name].[hash:8].[ext]',
-        },
-      },
-      {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-              },
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              minimize: true,
             },
-            {
-              loader: 'postcss-loader',
-              options: postcssConfig,
-            },
-          ],
-        }),
+          },
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-              },
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              minimize: true,
             },
-            'less-loader',
-            {
-              loader: 'postcss-loader',
-              options: postcssConfig,
-            },
-          ],
-        }),
+          },
+          'less-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
       },
     ],
   },
-
   plugins: [
     // new WebpackMd5Hash(),
-    new ExtractTextPlugin({
+    // new ExtractTextPlugin({
+    //   filename: 'styles.[chunkhash:8].css',
+    //   allChunks: true,
+    // }),
+    new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css',
-      allChunks: true,
+      chunkFilename: '[id].[contenthash:8].css',
     }),
+    new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
       // inject: false, // disabled inject
       minify: {
@@ -156,14 +124,13 @@ module.exports = {
       svgHash,
       publicPath,
     }),
-    new SpriteLoaderPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      comments: false,
-      unused: true,
-      dead_code: true,
-    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   sourceMap: true,
+    //   comments: false,
+    //   unused: true,
+    //   dead_code: true,
+    // }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
@@ -171,18 +138,8 @@ module.exports = {
       threshold: 10240,
       minRatio: 0.8,
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.[chunkhash:8].js',
-      // (Give the chunk a different name)
-      minChunks: Infinity,
-      // (with more entries, this ensures that no other module
-      //  goes into the vendor chunk)
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.[hash:8].js',
-    }),
-    new webpack.NoEmitOnErrorsPlugin(),
   ],
-}
+  optimization: {
+    minimize: true,
+  },
+})

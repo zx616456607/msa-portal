@@ -34,7 +34,7 @@ class SubscriptionServices extends React.Component {
     subscriptServiceVisible: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData({ sort: 'publishTime,desc' }, true)
   }
 

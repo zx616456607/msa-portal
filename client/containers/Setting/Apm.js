@@ -37,7 +37,7 @@ class ApmSetting extends React.Component {
     serviceData: [],
     installSate: false,
   }
-  componentWillMount() {
+  componentDidMount() {
     const { pinpointName } = this.props
     if (pinpointName !== '') {
       this.fetchapmsId()

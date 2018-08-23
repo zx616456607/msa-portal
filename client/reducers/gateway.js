@@ -37,6 +37,31 @@ function policesList(state, action) {
   }
 }
 
+function gatewayHasOpenPolicy(state, action) {
+  switch (action.type) {
+    case ActionTyps.GET_GATEWAY_HAS_OPEN_POLICY_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTyps.GET_GATEWAY_HAS_OPEN_POLICY_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        code: action.response.result.code,
+        status: action.response.result.status,
+        ...action.response.result.data,
+      }
+    case ActionTyps.GET_GATEWAY_HAS_OPEN_POLICY_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 function routesList(state, action) {
   switch (action.type) {
     case ActionTyps.GET_GATEWAY_ROUTES_LIST_REQUEST:
@@ -65,10 +90,12 @@ function routesList(state, action) {
 const gateway = (state = {
   policesList: {},
   routesList: {},
+  gatewayHasOpenPolicy: {},
 }, action) => {
   return {
     policesList: policesList(state.policesList, action),
     routesList: routesList(state.routesList, action),
+    gatewayHasOpenPolicy: gatewayHasOpenPolicy(state.gatewayHasOpenPolicy, action),
   }
 }
 

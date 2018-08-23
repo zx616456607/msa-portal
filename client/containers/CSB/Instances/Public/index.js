@@ -43,6 +43,7 @@ class PublicInstances extends React.Component {
   }
 
   componentDidMount() {
+    this.loadData()
     const { location } = this.props
     const { query } = location
     const { name, sort } = query
@@ -51,10 +52,6 @@ class PublicInstances extends React.Component {
       name,
       sortOrder,
     }, () => this.loadData({}, true))
-  }
-
-  componentWillMount() {
-    this.loadData()
   }
 
   formatSortOrder = sort => {

@@ -32,7 +32,7 @@ class LinkRules extends React.Component {
     currentStep: 0,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

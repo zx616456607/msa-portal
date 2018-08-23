@@ -39,7 +39,7 @@ class CreateConfig extends React.Component {
     addLoading: false,
     releaseLoading: false,
   }
-  componentWillMount() {
+  componentDidMount() {
     const { location } = this.props
     const { detail } = parse(location.search)
     this.setState({
@@ -280,7 +280,7 @@ class CreateConfig extends React.Component {
           <Row className="connent">
             <FormItem {...fromLayout} label="配置版本">
               {getFieldDecorator('edition', {
-                initialValue: detail !== 'false' ? branchName : undefined,
+                initialValue: branchName || undefined,
                 rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
               })(
                 <Select className="selects" placeholder="请选择配置版本" disabled={ detail === 'true' } onChange={this.handlechage}>
@@ -326,7 +326,9 @@ class CreateConfig extends React.Component {
                     [ <Button key="close" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>,
                       <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> ]
                     :
-                    <Button className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>发布</Button>
+                    [
+                      <Button key="ok" className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>发布</Button>,
+                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> ]
                 }
               </div>
             }

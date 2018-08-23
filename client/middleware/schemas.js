@@ -56,6 +56,11 @@ const gatewayPolicies = new schema.Entity('gatewayPolicies', {}, {
   idAttribute: 'id',
 })
 
+// gatewayHasOpenPolicy
+const gatewayHasOpenPolicy = new schema.Entity('gatewayHasOpenPolicy', {}, {
+  idAttribute: 'id',
+})
+
 // GatewayRoutes
 const gatewayRoutesSchema = new schema.Entity('gatewayRoutes', {}, {
   idAttribute: 'id',
@@ -141,7 +146,9 @@ const uaaZoneUsersSchema = new schema.Entity('uaaZoneUsers', {}, {
 const uaaZoneGroupUsersSchema = new schema.Entity('uaaZoneGroupUsers', {}, {
   idAttribute: 'value',
 })
-
+const appSchema = new schema.Entity('apps', {}, {
+  idAttribute: 'value',
+})
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -185,6 +192,11 @@ export const Schemas = {
   GATEWAY_POLICIES_LIST_DATA: {
     data: {
       content: [ gatewayPolicies ],
+    },
+  },
+  GATEWAY_HAS_OPEN_POLICY_DATA: {
+    data: {
+      content: [ gatewayHasOpenPolicy ],
     },
   },
   GATEWAY_ROUTES_LIST_DATA: {
@@ -285,4 +297,7 @@ export const Schemas = {
     resources: [ uaaZoneUsersSchema ],
   },
   UAA_ZONE_GROUP_USERS_LIST_DATA: [ uaaZoneGroupUsersSchema ],
+  APPS: {
+    appList: [ appSchema ],
+  },
 }

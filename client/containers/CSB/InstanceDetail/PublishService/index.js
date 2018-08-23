@@ -45,8 +45,10 @@ class PublishService extends React.Component {
     confirmLoading: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.fetchEditData()
+    this.loadServiceGroups()
+    this.loadInstanceServiceInbound()
   }
 
   fetchEditData() {
@@ -61,11 +63,6 @@ class PublishService extends React.Component {
         serviceId: serviceID,
       })
     }
-  }
-
-  componentDidMount() {
-    this.loadServiceGroups()
-    this.loadInstanceServiceInbound()
   }
 
   loadServiceGroups = () => {

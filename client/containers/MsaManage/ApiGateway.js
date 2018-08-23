@@ -19,19 +19,20 @@ import {
   Pagination, Modal, Dropdown,
   Input, Menu, Select,
   Switch, InputNumber,
-  Form, Spin, Card,
+  Form, Spin, Card, Checkbox,
   notification, Badge,
-  Row, Col,
+  Tooltip,
 } from 'antd'
 import {
   gatewayPagePoliciesList,
   createGatewayPolicy,
   deleteGatewayPolicy,
   editGatewayPolicy,
+  gatewayHasOpenPolicy,
 } from '../../actions/gateway'
 import { getMsaList } from '../../actions/msa'
 import { msaListSlt } from '../../selectors/msa'
-import { gatewayPolicesListSlt } from '../../selectors/gateway'
+import { gatewayPolicesListSlt, gatewayHasOpenPolicySlt } from '../../selectors/gateway'
 import confirm from '../../components/Modal/confirm'
 
 const Search = Input.Search
@@ -52,9 +53,13 @@ class ApiGateway extends React.Component {
     currentRecord: undefined,
     currentHandle: undefined,
     currentPage: 1,
+    stopOrStartVisible: false,
+    stopOrStartItem: {},
+    iHasKnowCheckbox: false,
+    isLoadingStopOrStart: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadGatewayPoliciesList()
   }
 
@@ -135,38 +140,17 @@ class ApiGateway extends React.Component {
   }
 
   disableGateway = item => {
-    const { editGatewayPolicy, clusterID } = this.props
-    const {
-      id: policyID, type, service_id,
-      limits, refresh_interval, status,
-    } = item
-    const self = this
-    const body = {
-      type,
-      service_id,
-      limits,
-      refresh_interval,
-      status: !status,
+    const query = {
+      page: 0,
+      size: 99,
+      service_id: item.service_id,
     }
-    const handlerName = status ? '停用' : '启用'
-    confirm({
-      modalTitle: `${handlerName}操作`,
-      title: `确认将微服务 ${item.service_id} 的限流规则${handlerName}吗？`,
-      content: '',
-      onOk() {
-        return new Promise((resolve, reject) => {
-          editGatewayPolicy(clusterID, policyID, body).then(res => {
-            if (res.error) {
-              return reject()
-            }
-            resolve()
-            notification.success({
-              message: `${handlerName}微服务限流规则成功`,
-            })
-            self.reloadGatewayPolicyList()
-          })
-        })
-      },
+    !item.status && this.loadGatewayHasOpenPolicy(query)
+    this.setState({
+      stopOrStartVisible: true,
+      stopOrStartItem: item,
+      selectedServiceId: item.service_id,
+      isLoadingStopOrStart: false,
     })
   }
 
@@ -262,6 +246,32 @@ class ApiGateway extends React.Component {
     gatewayPagePoliciesList(clusterID, query)
   }
 
+  loadGatewayHasOpenPolicy = (newQuery = {}) => {
+    const query = Object.assign({}, DEFAULT_QUERY, newQuery)
+    const { gatewayHasOpenPolicy, clusterID } = this.props
+    gatewayHasOpenPolicy(clusterID, query)
+  }
+
+  hasOpenPolicy = () => {
+    const { gatewayHasOpenPolicyList } = this.props
+    const { selectedServiceId } = this.state
+    if (!selectedServiceId) return false
+    let flag = false
+    gatewayHasOpenPolicyList.map(policy =>
+      policy.service_id === selectedServiceId && policy.status && (flag = true))
+    return flag
+  }
+  onSelectServiceChange = v => {
+    const query = {
+      page: 0,
+      size: 99,
+      service_id: v,
+    }
+    this.loadGatewayHasOpenPolicy(query)
+    this.setState({
+      selectedServiceId: v,
+    })
+  }
   menuClick = (item, e) => {
     const { key } = e
     switch (key) {
@@ -344,7 +354,92 @@ class ApiGateway extends React.Component {
       searchValue,
     })
   }
+  handleStopOrStartCancel = () => {
+    this.setState({
+      stopOrStartVisible: false,
+      stopOrStartItem: {},
+      iHasKnowCheckbox: false,
+      isLoadingStopOrStart: false,
+    })
+  }
+  handleStopOrStartOk = async () => {
+    this.setState({
+      isLoadingStopOrStart: true,
+    })
+    const { stopOrStartItem } = this.state
+    const { editGatewayPolicy, clusterID } = this.props
+    const {
+      id: policyID, type, service_id,
+      limits, refresh_interval, status,
+    } = stopOrStartItem
+    const self = this
+    const body = { type, service_id, limits, refresh_interval, status: !status }
+    await editGatewayPolicy(clusterID, policyID, body)
+    notification.success({
+      message: `${status ? '停用' : '启用'}微服务限流规则成功`,
+    })
+    self.reloadGatewayPolicyList()
+    self.setState({
+      stopOrStartVisible: false,
+      stopOrStartItem: {},
+      iHasKnowCheckbox: false,
+      isLoadingStopOrStart: false,
+    })
+  }
+  renderStopOrStartModal = () => {
+    const {
+      stopOrStartVisible, stopOrStartItem, iHasKnowCheckbox, isLoadingStopOrStart } = this.state
+    if (!stopOrStartItem || !stopOrStartItem.service_id) return null
+    const {
+      service_id, status,
+    } = stopOrStartItem
+    const handlerName = status ? '停用' : '启用'
+    const footer = [
+      <Button
+        key="back"
+        onClick={this.handleStopOrStartCancel}>取消</Button>,
+      <Button
+        key="submit"
+        type="primary"
+        loading={isLoadingStopOrStart}
+        disabled={!status && this.hasOpenPolicy() && !iHasKnowCheckbox}
+        onClick={this.handleStopOrStartOk}>
+        确定
+      </Button>,
+    ]
+    return (
+      <Modal
+        title={`${handlerName}操作`}
+        visible={stopOrStartVisible}
+        onCancel={this.handleStopOrStartCancel}
+        footer={footer}
+        className={'api-gateway-stop-modal'}
+      >
+        <div className={'title'}>
+          <Icon className={'icon'} type="question-circle" />
+          {`确认将微服务 ${service_id} 的限流规则${handlerName}吗？`}
+        </div>
+        {
+          !status && this.hasOpenPolicy() &&
+          <Checkbox
+            value={iHasKnowCheckbox}
+            onChange={e => this.setState({ iHasKnowCheckbox: e.target.checked })}
+            className={'checkbox'}>
+            启用此规则的同时, 将停用微服务 {service_id} 的其他限流规则
+          </Checkbox>
+        }
+      </Modal>
+    )
+  }
 
+  renderLabel = () => {
+    return (
+      <span>
+        选择微服务&nbsp;
+        <Tooltip title={'所选服务被移除后，该限流规则同时被移除'}><Icon type="info-circle-o" /></Tooltip>
+      </span>
+    )
+  }
   render() {
     const {
       form, policesList, isFetching,
@@ -472,7 +567,7 @@ class ApiGateway extends React.Component {
         >
           <Form>
             <FormItem
-              label="选择微服务"
+              label={this.renderLabel()}
               key="slectMicroService"
               {...formItemLayout}
             >
@@ -486,17 +581,13 @@ class ApiGateway extends React.Component {
                   <Select
                     placeholder="请选择微服务"
                     disabled={currentHandle === 'edit'}
+                    onChange={this.onSelectServiceChange}
                   >
                     { this.renderMsaOption() }
                   </Select>
                 )
               }
             </FormItem>
-            <Row>
-              <Col offset={7} className="desc-text">
-                <Icon type="info-circle-o" /> 所选服务被移除后，该限流规则同时被移除
-              </Col>
-            </Row>
             <FormItem
               label="限流类型"
               key="gatewayType"
@@ -579,23 +670,36 @@ class ApiGateway extends React.Component {
               key="status"
               {...formItemLayout}
             >
-              {
-                getFieldDecorator('status', {
-                  valuePropName: 'checked',
-                  initialValue: false,
-                  rules: [{
-                    required: true,
-                  }],
-                })(
-                  <Switch
-                    checkedChildren="开"
-                    unCheckedChildren="关"
-                  />
-                )
-              }
+              <div className={'api-gateway-policy-container'}>
+                {
+                  getFieldDecorator('status', {
+                    valuePropName: 'checked',
+                    initialValue: false,
+                    rules: [{
+                      required: true,
+                    }],
+                  })(
+                    <Switch
+                      checkedChildren="开"
+                      unCheckedChildren="关"
+                      className="gateway-switch"
+                    />
+                  )
+                }
+                {
+                  this.hasOpenPolicy() &&
+                  <span className={'api-gateway-has-open-policy'}>
+                    <Icon type="info-circle-o" className={'gateway-info-o'}/>
+                    <span className="right-text">该服务已存在启用状态的限流规则，开启后将停用该服务的其他限流规则</span>
+                  </span>
+                }
+              </div>
             </FormItem> }
           </Form>
         </Modal>}
+        {
+          this.renderStopOrStartModal()
+        }
       </QueueAnim>
     )
   }
@@ -606,6 +710,7 @@ const mapStateToProps = state => {
   const { id } = current.config.cluster
   const { msaList, msaListLoading } = msaListSlt(state)
   const { policesList, isFetching, totalElements } = gatewayPolicesListSlt(state)
+  const { gatewayHasOpenPolicy } = gatewayHasOpenPolicySlt(state)
   return {
     clusterID: id,
     msaList,
@@ -613,6 +718,7 @@ const mapStateToProps = state => {
     policesList,
     isFetching,
     totalElements,
+    gatewayHasOpenPolicyList: gatewayHasOpenPolicy,
   }
 }
 
@@ -622,4 +728,5 @@ export default connect(mapStateToProps, {
   createGatewayPolicy,
   deleteGatewayPolicy,
   editGatewayPolicy,
+  gatewayHasOpenPolicy,
 })(Form.create()(ApiGateway))

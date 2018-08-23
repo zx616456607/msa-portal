@@ -59,7 +59,7 @@ class Performance extends React.Component {
     nodeName: [],
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { clusterID, apmID, loadPPApps } = this.props
     apmID && loadPPApps(clusterID, apmID)
     this.setState({

@@ -123,7 +123,7 @@ npm run lint-fix
 
 ```
 npm run i
-npm run build
+npm run build:pro
 ```
 * 生产模式启动项目
 
