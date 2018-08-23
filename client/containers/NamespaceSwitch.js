@@ -22,8 +22,7 @@ import {
   getProjectClusters,
   getDefaultClusters,
 } from '../actions/current'
-import clusterIcon from '../assets/img/cluster.svg'
-import projectIcon from '../assets/img/project.svg'
+import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
 const SubMenu = Menu.SubMenu
 const MY_PORJECT = '我的个人项目'
@@ -188,9 +187,10 @@ class NamespaceSwitch extends React.Component {
     })
     return (
       <div className={containerStyle}>
-        <svg className="menu-icon">
-          <use xlinkHref={`#${projectIcon.id}`} />
-        </svg>
+        <TenxIcon
+          type="backup"
+          size={14}
+          style={{ marginRight: 10 }}/>
         <div>项目</div>
         <div className={'divider'}/>
         <Dropdown
@@ -224,9 +224,10 @@ class NamespaceSwitch extends React.Component {
           </a>
         </Dropdown>
         <div className={'bigDivider'}/>
-        <svg className="menu-icon">
-          <use xlinkHref={`#${clusterIcon.id}`} />
-        </svg>
+        <TenxIcon
+          type="cluster"
+          size={14}
+          style={{ marginRight: 10 }}/>
         <div>集群</div>
         <div className={'divider'}/>
         <Dropdown

@@ -14,7 +14,8 @@ import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Select, Button, Form, Input, DatePicker } from 'antd'
 import LogComponent from './LogsDetail'
-import select from '../../../assets/img/msa-pam/select.svg'
+import TenxIcon from '@tenx-ui/icon'
+
 const FormItem = Form.Item
 const { RangePicker } = DatePicker
 
@@ -91,9 +92,11 @@ class Logs extends React.Component {
             </Col>
             <Col span={4} style={{ lineHeight: 2.6 }}>
               <Button type="primary">
-                <svg className="select">
-                  <use xlinkHref={`#${select.id}`} />
-                </svg>
+                <TenxIcon
+                  type="search"
+                  size={12}
+                  className="select"
+                />
                 立即查询
               </Button>
             </Col>

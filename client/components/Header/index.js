@@ -19,7 +19,6 @@ import classNames from 'classnames'
 // import cloneDeep from 'lodash/cloneDeep'
 // import { getMenuSelectedKeys } from '../../common/utils'
 // import { ROLE_SYS_ADMIN } from '../../constants'
-// import logo from '../../assets/img/logo.svg'
 import './style/index.less'
 
 const LayoutHeader = Layout.Header
@@ -108,11 +107,7 @@ export default class Header extends React.Component {
             </a>
           </Dropdown>
         </div>
-        {/* <Link to="/">
-          <svg className="logo">
-            <use xlinkHref={`#${logo.id}`} />
-          </svg>
-        </Link>
+        {/*
         <div className="user">
           <Dropdown
             overlay={
