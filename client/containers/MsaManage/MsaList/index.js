@@ -110,7 +110,6 @@ class MsaList extends React.Component {
             setTimeout(() => {
               resolve()
               notification.success({
-                message: '隐藏服务成功',
                 message: '取消隐藏服务成功',
               })
               self.loadMsaList()
