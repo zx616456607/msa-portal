@@ -15,6 +15,7 @@ import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom, Tooltip } from 'bizcharts'
 import { formatDate } from '../../common/utils'
 import './style/index.less'
+import EmptyCircle from '../../components/BlownChart/EmptyCircle'
 
 const cols = {
   count: { min: -10, max: 100 },
@@ -25,6 +26,35 @@ export default class BlownChart extends React.PureComponent {
 
   static propTypes = {
     dataSource: PropTypes.object.isRequired,
+  }
+
+  state = {}
+
+  componentDidMount() {
+    const radius = this.calculateRadius(this.props.dataSource)
+    this.setState({
+      radius,
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { dataSource: newDataSource } = nextProps
+    const { dataSource: oldDataSource } = this.props
+    const newRadius = this.calculateRadius(newDataSource)
+    const oldRadius = this.calculateRadius(oldDataSource)
+    if (newRadius !== oldRadius) {
+      this.setState({
+        radius: newRadius,
+      })
+    }
+  }
+
+  calculateRadius = dataSource => {
+    const {
+      reportingHosts, requestCount,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
+    } = dataSource
+    return (requestCount / (parseValue / 1000) / reportingHosts).toFixed(1)
   }
 
   renderFailureRage = () => {
@@ -57,10 +87,9 @@ export default class BlownChart extends React.PureComponent {
 
   formatMonitor = () => {
     const {
-      allPoint, reportingHosts, requestCount,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseValue,
+      allPoint,
     } = this.props.dataSource
-    const ratePerSecondPerHost = (requestCount / (parseValue / 1000) / reportingHosts).toFixed(1) // 圆半径
+    const ratePerSecondPerHost = this.calculateRadius(this.props.dataSource)
 
     const finalData = allPoint.map(item => {
       return {
@@ -90,6 +119,7 @@ export default class BlownChart extends React.PureComponent {
   }
 
   render() {
+    const { radius } = this.state
     const { dataSource } = this.props
     const {
       circuitBreakerName, requestCount, rollingCountShortCircuited,
@@ -99,21 +129,32 @@ export default class BlownChart extends React.PureComponent {
     return (
       <div className="blown-monitor">
         <div className="monitor-content">
-          <Chart className="blown-chart" height={150} width={156} padding={10} data={this.formatMonitor()} scale={cols} forceFit>
-            <Tooltip crosshairs={{ type: 'y' }}/>
-            <Geom
-              type="point"
-              tooltip={false}
-              active={false}
-              position="time*vertical"
-              size={[ 'radius', radius => Number(radius) * 10 || 4 ]}
-              shape={'circle'}
-              style={{ stroke: '#fff', lineWidth: 1 }}
-              color={this.renderColor()}
-              opacity={0.5}
-            />
-            <Geom type="line" position="time*count" size={2} color={this.renderColor()}/>
-          </Chart>
+          <div className="monitor-content-wrapper">
+            {
+              !Number(radius) &&
+              <div className="empty-data-box" style={{ color: this.renderColor() }}>
+                <EmptyCircle style={{ fill: this.renderColor() }}/>
+              </div>
+            }
+            <Chart className="blown-chart" height={150} width={156} padding={10} data={this.formatMonitor()} scale={cols} forceFit>
+              <Tooltip crosshairs={{ type: 'y' }}/>
+              {
+                Number(radius) ?
+                  <Geom
+                    type="point"
+                    tooltip={false}
+                    active={false}
+                    position="time*vertical"
+                    size={[ 'radius', radius => Number(radius) * 10 ]}
+                    shape={'circle'}
+                    style={{ stroke: '#fff', lineWidth: 1 }}
+                    color={this.renderColor()}
+                    opacity={0.5}
+                  /> : null
+              }
+              <Geom type="line" position="time*count" size={2} color={this.renderColor()}/>
+            </Chart>
+          </div>
           <div className="blow-chart-right">
             <AntTooltip title={circuitBreakerName}>
               <div className="service-name txt-of-ellipsis">{circuitBreakerName}</div>
