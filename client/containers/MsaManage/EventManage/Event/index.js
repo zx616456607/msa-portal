@@ -172,6 +172,14 @@ class Event extends React.Component {
         return '未知'
     }
   }
+  renderRootPlace = text => {
+    switch (text) {
+      case 'discovery:spring-cloud-discovery:8761':
+        return '注册中心'
+      default:
+        return '未知'
+    }
+  }
 
   renderEventLevel = text => {
     let displayName = ''
@@ -230,6 +238,7 @@ class Event extends React.Component {
         title: '事件源',
         width: '20%',
         dataIndex: 'rootPlace',
+        render: this.renderRootPlace,
       }, {
         title: '服务名称',
         width: '15%',
