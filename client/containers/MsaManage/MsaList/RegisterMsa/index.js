@@ -28,7 +28,9 @@ import {
 import {
   APP_NAME_REG,
   APP_NAME_REG_NOTICE,
-  HOST_REG,
+  // HOST_REG,
+  IP_REG,
+  HOSTNAME_REG,
   URL_REG,
 } from '../../../../constants'
 import {
@@ -295,7 +297,12 @@ class RegisterMsa extends React.Component {
               rules: [{
                 required: true,
                 whitespace: true,
-                pattern: HOST_REG,
+                validator: (rule, value, cb) => {
+                  if (HOSTNAME_REG.test(value) || IP_REG.test(value)) {
+                    return cb()
+                  }
+                  cb('请填写正确的服务地址')
+                },
                 message: '请填写正确的服务地址',
               }],
             })(
