@@ -26,7 +26,8 @@ module.exports = merge(common, {
     chunkFilename: '[id].chunk.js',
   },
   module: {
-    rules: [{
+    rules: [
+      /* {
       test: /\.svg$/,
       use: [
         {
@@ -48,29 +49,31 @@ module.exports = merge(common, {
           },
         },
       ],
-    }, {
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        'css-loader',
-        {
-          loader: 'postcss-loader',
-          options: postcssConfig,
-        },
-      ],
-    },
-    {
-      test: /\.less$/,
-      use: [
-        'style-loader',
-        'css-loader',
-        'less-loader',
-        {
-          loader: 'postcss-loader',
-          options: postcssConfig,
-        },
-      ],
-    }],
+      }, */
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new webpack.DllReferencePlugin({
