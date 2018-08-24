@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  Select, DatePicker, Input, Button,
+  Select, Input, Button,
   Card, Table, Form, Col, Row, Badge,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
@@ -27,28 +27,34 @@ import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import {
   getZipkinTracesList, getZipkinServices, getZipkinSpans,
 } from '../../../actions/callLinkTrack'
+import ApmTimePicker from '../../../components/ApmTimePicker'
 
 const FormItem = Form.Item
-const { RangePicker } = DatePicker
 const Option = Select.Option
-const ButtonGroup = Button.Group
 const colorMap = {
   success: G2.Global.colors['#2db7f5'],
   error: G2.Global.colors[7],
 }
 
+const btnArr = [{
+  key: 'fiveMin',
+  text: '最近5分钟',
+}, {
+  key: 'threeHour',
+  text: '最近3小时',
+}, {
+  key: 'anHour',
+  text: '最近1小时',
+}]
+
 class CallLinkTracking extends React.Component {
 
   state = {
-    endTs: '',
     isFliter: false,
     spanList: [],
     filterList: [],
-    isTimerShow: true,
+    rangeDateTime: [],
     filterSuccess: '',
-    btnFive: 'primary',
-    btnAnHour: 'default',
-    btnHalFhour: 'default',
     current: DEFAULT_PAGE,
   }
 
@@ -59,11 +65,13 @@ class CallLinkTracking extends React.Component {
   }
 
   load = () => {
+    const { rangeDateTime } = this.state
     const { clusterID, getZipkinTracesList } = this.props
     const time = new Date().getTime()
+    const five = Date.parse(new Date(new Date() - 300 * 1000))
     const query = {
-      endTs: time,
-      lookback: new Date().getTime() - time,
+      endTs: rangeDateTime.length > 0 ? Date.parse(formatDate(rangeDateTime[1])) : time,
+      lookback: rangeDateTime.length > 0 ? rangeDateTime[1] - rangeDateTime[0] : time - five,
     }
     getZipkinTracesList(clusterID, query)
   }
@@ -71,7 +79,7 @@ class CallLinkTracking extends React.Component {
   handleSearch = () => {
     const { form, clusterID, getZipkinTracesList } = this.props
     const { validateFields } = form
-    const { endTs } = this.state
+    const { rangeDateTime } = this.state
     validateFields((error, value) => {
       if (error) return
       let query
@@ -83,10 +91,10 @@ class CallLinkTracking extends React.Component {
         query = {
           serviceName: value.serviceName,
           spanName: value.spanName,
-          endTs: endTs ? endTs : value.endTs && value.endTs[1].valueOf(),
-          minDuration: value.minDuration * 1000,
+          endTs: Date.parse(formatDate(rangeDateTime[1])),
+          minDuration: value.minDuration ? value.minDuration * 1000 : undefined,
           limit: value.limit,
-          lookback: value.endTs && value.endTs[1] - value.endTs[0],
+          lookback: rangeDateTime[1] - rangeDateTime[0],
         }
         if (value.serviceName === 'all') {
           delete query.serviceName
@@ -138,52 +146,6 @@ class CallLinkTracking extends React.Component {
     getZipkinTracesList(clusterID)
   }
 
-  handleTimer = () => {
-    const { isTimerShow } = this.state
-    if (isTimerShow) {
-      this.setState({
-        isTimerShow: false,
-      })
-    } else {
-      this.setState({
-        isTimerShow: true,
-      }, () => {
-        this.load()
-      })
-    }
-  }
-
-  handleLatelyTimer = key => {
-    switch (key) {
-      case 'five':
-        this.setState({
-          btnFive: 'primary',
-          btnAnHour: 'default',
-          btnHalFhour: 'default',
-          endTs: Date.parse(new Date(new Date() - 300 * 1000)),
-        })
-        break
-      case 'halFhour':
-        this.setState({
-          btnFive: 'default',
-          btnAnHour: 'default',
-          btnHalFhour: 'primary',
-          endTs: Date.parse(new Date(new Date() - 30 * 60 * 1000)),
-        })
-        break
-      case 'anHour':
-        this.setState({
-          btnFive: 'default',
-          btnAnHour: 'primary',
-          btnHalFhour: 'default',
-          endTs: Date.parse(new Date(new Date() - 60 * 60 * 1000)),
-        })
-        break
-      default:
-        break
-    }
-  }
-
   tableChange = (pagination, filters) => {
     const { dataList } = this.props
     if (!isEmpty(filters)) {
@@ -217,16 +179,9 @@ class CallLinkTracking extends React.Component {
 
   render() {
     const {
-      spanList, isTimerShow, isFliter, filterList, btnFive, btnHalFhour, btnAnHour } = this.state
+      spanList, isFliter, filterList, rangeDateTime } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
-    // const pagination = {
-    //   simple: true,
-    //   total: 10 || 0,
-    //   pageSize: DEFAULT_PAGESIZE,
-    //   current,
-    //   // onChange: current => this.setState({ current }),
-    // }
     const cols = {
       traceId: {
         alias: 'TraceID',
@@ -368,33 +323,11 @@ class CallLinkTracking extends React.Component {
           </Row>
           <Row>
             <Col span={9}>
-              <ButtonGroup className="timer" onChange={() => this.handleBtn()}>
-                <Button icon="calendar" onClick={() => this.handleTimer()}>
-                  自定义日期
-                </Button>
-                {
-                  isTimerShow ?
-                    <Row>
-                      <Button className="btn" type={btnFive}
-                        onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                      <Button className="btn" type={btnHalFhour}
-                        onClick={() => this.handleLatelyTimer('halFhour')}>最近30分钟</Button>
-                      <Button className="btn" type={btnAnHour}
-                        onClick={() => this.handleLatelyTimer('anHour')}>最近1小时</Button>
-                    </Row> :
-                    <FormItem>
-                      {getFieldDecorator('endTs', {})(
-                        <RangePicker
-                          style={{ width: 270 }}
-                          showTime={{ format: 'HH:mm' }}
-                          format="YYYY-MM-DD HH:mm"
-                          className="endTs"
-                          placeholder={[ '开始时间', '结束时间' ]}
-                        />
-                      )}
-                    </FormItem>
-                }
-              </ButtonGroup>
+              <ApmTimePicker
+                value={rangeDateTime}
+                onChange={rangeDateTime => this.setState({ rangeDateTime })}
+                timeArr={btnArr}
+              />
             </Col>
             <Col>
               <Button type={'primary'} icon={'search'} className="search"

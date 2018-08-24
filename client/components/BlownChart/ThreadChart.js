@@ -14,6 +14,8 @@ import PropTypes from 'prop-types'
 import { Row, Col, Tooltip as AntTooltip } from 'antd'
 import { Chart, Geom } from 'bizcharts'
 import './style/index.less'
+import EmptyCircle from '../../components/BlownChart/EmptyCircle'
+
 const threadCols = {
   x: { min: 0, max: 1 },
   y: { min: 0, max: 1 },
@@ -25,6 +27,33 @@ export default class ThreadChart extends React.PureComponent {
     dataSource: PropTypes.object.isRequired,
   }
 
+  state = {}
+
+  componentDidMount() {
+    const radius = this.calculateRadius(this.props.dataSource)
+    this.setState({
+      radius,
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const newRadius = this.calculateRadius(nextProps.dataSource)
+    const oldRadius = this.calculateRadius(this.props.dataSource)
+    if (newRadius !== oldRadius) {
+      this.setState({
+        radius: newRadius,
+      })
+    }
+  }
+
+  calculateRadius = dataSource => {
+    const {
+      rollingCountThreadsExecuted, reportingHosts,
+      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseProperty,
+    } = dataSource
+    return (rollingCountThreadsExecuted / (parseProperty / 1000) / reportingHosts).toFixed(1)
+  }
+
   renderRequestFrequency = () => {
     const {
       rollingCountThreadsExecuted,
@@ -34,12 +63,7 @@ export default class ThreadChart extends React.PureComponent {
   }
 
   formatPoolCircleData = () => {
-    const {
-      rollingCountThreadsExecuted, reportingHosts,
-      propertyValue_metricsRollingStatisticalWindowInMilliseconds: parseProperty,
-    } = this.props.dataSource
-    const ratePerSecondPerHost
-      = rollingCountThreadsExecuted / (parseProperty / 1000) / reportingHosts
+    const ratePerSecondPerHost = this.calculateRadius(this.props.dataSource)
     return [{
       x: 0.5,
       y: 0.5,
@@ -61,6 +85,7 @@ export default class ThreadChart extends React.PureComponent {
   }
 
   render() {
+    const { radius } = this.state
     const { dataSource } = this.props
     const {
       poolName, currentActiveCount, rollingMaxActiveThreads,
@@ -70,19 +95,27 @@ export default class ThreadChart extends React.PureComponent {
     return (
       <div className="thread-monitor">
         <div className="monitor-content">
-          <Chart className="thread-chart" height={150} width={156} padding={10} data={this.formatPoolCircleData()} scale={threadCols} forceFit>
-            {/* <Tooltip crosshairs={{ type: 'y' }}/>*/}
-            <Geom
-              type="point"
-              position="x*y"
-              active={false}
-              size={[ 'radius', radius => Number(radius) * 10 || 4 ]}
-              shape={'circle'}
-              style={{ stroke: '#fff', lineWidth: 1 }}
-              color={this.renderColor()}
-              opacity={0.5}
-            />
-          </Chart>
+          <div className="monitor-content-wrapper">
+            {
+              !Number(radius) &&
+              <div className="empty-data-box" style={{ color: this.renderColor() }}>
+                <EmptyCircle style={{ fill: this.renderColor() }}/>
+              </div>
+            }
+            <Chart className="thread-chart" height={150} width={156} padding={10} data={this.formatPoolCircleData()} scale={threadCols} forceFit>
+              {/* <Tooltip crosshairs={{ type: 'y' }}/>*/}
+              <Geom
+                type="point"
+                position="x*y"
+                active={false}
+                size={[ 'radius', radius => Number(radius) * 10 ]}
+                shape={'circle'}
+                style={{ stroke: '#fff', lineWidth: 1 }}
+                color={this.renderColor()}
+                opacity={0.5}
+              />
+            </Chart>
+          </div>
           <div className="blow-chart-right">
             <div className="thread-name">
               <AntTooltip title={poolName}>

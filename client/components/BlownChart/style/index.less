@@ -20,9 +20,18 @@
     padding: @padding-medium;
     display: flex;
     justify-content: space-around;
+    .monitor-content-wrapper {
+      flex: 0 1 156px;
+      position: relative;
+      .empty-data-box {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
     .blown-chart, .thread-chart {
       height: 150px;
-      flex: 0 1 156px;
     }
     .blown-chart {
       border: @border-width-base dashed @border-color-base;
