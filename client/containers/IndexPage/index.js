@@ -15,11 +15,8 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Card, Select, Icon, Table } from 'antd'
 import CreateG2 from '../../components/CreateG2'
-import msaIcon from '../../assets/img/msa-manage/msa.svg'
-import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
-import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
-import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 import './style/index.less'
+import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
 const Option = Select.Option
 const Chart = CreateG2(chart => {
@@ -121,9 +118,10 @@ class IndexPage extends React.Component {
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
-                    <svg>
-                      <use xlinkHref={`#${msaIcon.id}`} />
-                    </svg>
+                    <TenxIcon
+                      type="msa"
+                      size={60}
+                    />
                     <div className="index-page-overview-left-title">
                     微服务数量
                     </div>
@@ -158,9 +156,10 @@ class IndexPage extends React.Component {
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
-                    <svg>
-                      <use xlinkHref={`#${configCenterIcon.id}`} />
-                    </svg>
+                    <TenxIcon
+                      type="config-center"
+                      size={60}
+                    />
                     <div className="index-page-overview-left-title">
                     配置数量
                     </div>
@@ -231,9 +230,10 @@ class IndexPage extends React.Component {
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
-                    <svg>
-                      <use xlinkHref={`#${apiGatewayIcon.id}`} />
-                    </svg>
+                    <TenxIcon
+                      type="gateway"
+                      size={60}
+                    />
                     <div className="index-page-overview-left-title">
                     限流规则
                     </div>
@@ -268,9 +268,10 @@ class IndexPage extends React.Component {
               <Row gutter={16}>
                 <Col span={15}>
                   <div className="index-page-overview-left">
-                    <svg>
-                      <use xlinkHref={`#${routingManageIcon.id}`} />
-                    </svg>
+                    <TenxIcon
+                      type="routing-manage"
+                      size={60}
+                    />
                     <div className="index-page-overview-left-title">
                     路由数量
                     </div>

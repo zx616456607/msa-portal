@@ -15,20 +15,9 @@ import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
-import logo from '../../assets/img/logo.svg'
 import logoSmall from '../../assets/img/logo-small.svg'
-import msaconfig from '../../assets/img/msa-manage/msa.svg'
-import topologyIcon from '../../assets/img/apm/apm.svg'
-import msaComponent from '../../assets/img/msa-om/msa-component.svg'
-import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
-import performanceIcon from '../../assets/img/apm/performance.svg'
-import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
-import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
-import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
-import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
-import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
-import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
-import eventManageIcon from '../../assets/img/msa-manage/event-manage.svg'
+import logoWide from '../../assets/img/logo-wide.svg'
+import TenxIcon from '@tenx-ui/icon'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
@@ -48,7 +37,7 @@ const menus = [
       }, {
         key: 'k41',
         to: '/msa-manage/config-center',
-        icon: configCenterIcon,
+        tenxIcon: 'config-center',
         name: '配置中心',
       }, {
         key: 'k42',
@@ -69,22 +58,22 @@ const menus = [
       }, {
         key: 'k43',
         to: '/msa-manage/routing-manage',
-        icon: routingManageIcon,
+        tenxIcon: 'routing-manage',
         name: '路由管理',
       }, {
         key: 'k44',
         to: '/msa-manage/api-gateway',
-        icon: apiGatewayIcon,
+        tenxIcon: 'gateway',
         name: '服务限流',
       }, {
         key: 'k45',
         to: '/msa-manage/blown-monitoring',
-        icon: blownMonitoringIcon,
+        tenxIcon: 'fusing',
         name: '熔断监控',
       }, {
         key: 'k46',
         to: '/msa-manage/certification-manage',
-        icon: certificationManageIcon,
+        tenxIcon: 'authentication',
         name: '认证管理',
         defaultopen: 'true',
         children: [
@@ -105,7 +94,7 @@ const menus = [
       }, {
         key: 'event-manage',
         to: '/msa-manage/event-manage',
-        icon: eventManageIcon,
+        tenxIcon: 'event-manage',
         name: '事件管理',
         defaultopen: 'true',
         children: [
@@ -177,17 +166,17 @@ const menus = [
       {
         key: 'k20',
         to: '/apms/topology',
-        icon: topologyIcon,
+        tenxIcon: 'apm',
         name: '微服务拓扑',
       }, {
         key: 'k21',
         to: '/apms/performance',
-        icon: performanceIcon,
+        tenxIcon: 'statistics',
         name: '微服务性能',
       }, {
         key: 'k22',
         to: '/apms/call-link-tracking',
-        icon: callLinkTrackingIcon,
+        tenxIcon: 'target',
         name: '调用链路跟踪',
       },
     ],
@@ -201,12 +190,12 @@ const menus = [
         key: 'k00',
         to: '/msa-om/components',
         name: '微服务组件',
-        icon: msaComponent,
+        tenxIcon: 'inject',
       }, {
         key: 'k01',
         to: '/cluster',
         name: 'CSB 运维',
-        icon: csbInstancesOm,
+        tenxIcon: 'tools',
         defaultopen: 'true',
         children: [
           {
@@ -245,12 +234,12 @@ const menus = [
         key: 'k11',
         to: '/setting/msa-config',
         name: '微服务配置',
-        icon: msaconfig,
+        tenxIcon: 'msa',
       }, {
         key: 'k12',
         to: '/setting/apms',
         name: 'APM 配置',
-        icon: topologyIcon,
+        tenxIcon: 'apm',
       },
     ],
   },
@@ -282,10 +271,18 @@ class SiderNav extends React.Component {
     toggleCollapsed && toggleCollapsed(collapsed)
   }
   renderMenuItem = data => {
-    const { children, name, icon, key, to, ...otherProps } = data
+    const { children, name, icon, key, to, tenxIcon, ...otherProps } = data
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
+    if (tenxIcon && (typeof tenxIcon === 'string')) {
+      iconDOM = <TenxIcon
+        type={tenxIcon}
+        style={{
+          marginRight: 10,
+          fontSize: 12,
+        }}/>
+    }
     if (children) {
       return (
         <SubMenu
@@ -381,9 +378,11 @@ class SiderNav extends React.Component {
       >
         <div className="sider-nav">
           <div className={'logoContainer'}>
-            <svg className={collapsed ? 'logoSmall ' : 'logo'}>
-              <use xlinkHref={`#${collapsed ? logoSmall.id : logo.id}`} />
-            </svg>
+            <img
+              className={collapsed ? 'logoSmall ' : 'logo'}
+              src={collapsed ? logoSmall : logoWide }
+              alt="logo"
+            />
           </div>
           {
             <Menu

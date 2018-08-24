@@ -22,8 +22,7 @@ import {
 } from '../../../../selectors/event'
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
-import URGENT_ICON from '../../../../assets/img/msa-manage/urgent.svg'
-import SLIGHT_ICON from '../../../../assets/img/msa-manage/slight.svg'
+import TenxIcon from '@tenx-ui/icon'
 
 const { RangePicker } = DatePicker
 const Option = Select.Option
@@ -190,16 +189,24 @@ class Event extends React.Component {
     switch (text) {
       case 'Critical':
         displayName = '严重'
-        icon = (<svg className="event-page-urgent">
-          <use xlinkHref={`${URGENT_ICON}`} />
-        </svg>)
+        icon = (
+          <TenxIcon
+            type="urgent"
+            size={12}
+            className="event-page-urgent"
+          />
+        )
         classname = 'error-status'
         break
       case 'Minor':
         displayName = '轻微'
-        icon = (<svg className="event-page-slight">
-          <use xlinkHref={`${SLIGHT_ICON}`} />
-        </svg>)
+        icon = (
+          <TenxIcon
+            type="down"
+            size={12}
+            className="event-page-slight"
+          />
+        )
         classname = 'primary-color'
         break
       case 'Major':

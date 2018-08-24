@@ -16,7 +16,7 @@
 }
 
 .logo {
-  width: 140px;
+  width: 160px;
   height: 41px;
   border-radius: 6px;
   margin: 11px 24px @padding-large 16px;
@@ -30,11 +30,10 @@
   float: left;
 }
 .itemIcon {
-  height: 14px;
-  width: 14px;
+  font-size: 14px;
   vertical-align: text-bottom;
   margin-right: 10px;
-  fill: @font-color-3;
+  color: @font-color-3;
 }
 .collapsedIcon {
   margin-left: -40px;
@@ -58,13 +57,13 @@
     .ant-menu-item > a {
       &:hover {
         .itemIcon {
-          fill: #fff;
+          color: #fff;
         }
       }
     }
     .ant-menu-item-selected.ant-menu-item > a {
       & > .itemIcon, &:hover > .itemIcon {
-        fill: #fff;
+        color: #fff;
       }
     }
     .ant-menu-item-selected.ant-menu-item {

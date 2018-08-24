@@ -42,7 +42,7 @@ module.exports = merge(common, {
   },
   module: {
     rules: [
-      {
+      /* {
         test: /\.svg$/,
         use: [
           {
@@ -64,7 +64,7 @@ module.exports = merge(common, {
             },
           },
         ],
-      },
+      }, */
       {
         test: /\.css$/,
         use: [
