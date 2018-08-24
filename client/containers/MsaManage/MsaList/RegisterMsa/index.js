@@ -159,11 +159,21 @@ class RegisterMsa extends React.Component {
         ruleId,
       }
     })
-    addInstancesIntoManualrules(clusterID, body).then(res => {
+    addInstancesIntoManualrules(clusterID, body, { isHandleError: true }).then(res => {
       this.setState({
         submitLoading: false,
       })
       if (res.error) {
+        let description = ''
+        if (res.status === 500) {
+          if (res.error === 'host:port cannot be same with other instances') {
+            description = 'host:port重复'
+          }
+        }
+        notification.warn({
+          message: '添加实例失败',
+          description,
+        })
         return
       }
       notification.success({

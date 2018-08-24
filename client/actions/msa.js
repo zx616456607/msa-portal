@@ -135,7 +135,8 @@ export const MSA_ADD_INSTANCES_INTO_MANUALRULES_REQUEST = 'MSA_ADD_INSTANCES_INT
 export const MSA_ADD_INSTANCES_INTO_MANUALRULES_SUCCESS = 'MSA_ADD_INSTANCES_INTO_MANUALRULES_SUCCESS'
 export const MSA_ADD_INSTANCES_INTO_MANUALRULES_FAILURE = 'MSA_ADD_INSTANCES_INTO_MANUALRULES_FAILURE'
 
-const fetchAddInstancesIntoManualrules = (clusterID, body) => ({
+const fetchAddInstancesIntoManualrules = (clusterID, body, options) => ({
+  options,
   [CALL_API]: {
     types: [
       MSA_ADD_INSTANCES_INTO_MANUALRULES_REQUEST,
@@ -151,9 +152,9 @@ const fetchAddInstancesIntoManualrules = (clusterID, body) => ({
   },
 })
 
-export function addInstancesIntoManualrules(clusterID, body) {
+export function addInstancesIntoManualrules(clusterID, body, options) {
   return dispatch => {
-    return dispatch(fetchAddInstancesIntoManualrules(clusterID, body))
+    return dispatch(fetchAddInstancesIntoManualrules(clusterID, body, options))
   }
 }
 
