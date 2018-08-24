@@ -294,7 +294,7 @@ class CreateConfig extends React.Component {
               )}
             </FormItem>
           </Row>
-          <Row className="connent">
+          <Row className="connent yaml-box">
             <FormItem {...fromLayout} label="配置内容">
               {getFieldDecorator('info', {
                 initialValue: currentYaml === '' ? yaml : currentYaml,
