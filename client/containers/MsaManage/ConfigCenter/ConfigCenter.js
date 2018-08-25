@@ -28,6 +28,7 @@ class ConfigCenter extends React.Component {
     configName: '',
     branchName: '',
     value: '',
+    backBranch: '',
     branchValue: '',
     configGitUrl: '',
     deleteVisible: false,
@@ -39,10 +40,19 @@ class ConfigCenter extends React.Component {
   }
 
   componentDidMount() {
+    const branch = sessionStorage.getItem('branch')
+    if (branch) {
+      this.setState({
+        backBranch: branch,
+      }, () => {
+        this.loadData()
+      })
+    }
     this.loadData()
   }
 
   loadData = () => {
+    const { backBranch } = this.state
     const { clusterID, getService, getBranchList } = this.props
     getService(clusterID).then(res => {
       if (res.error) return
@@ -60,7 +70,11 @@ class ConfigCenter extends React.Component {
               branchData: res.response.result.data,
               value: res.response.result.data[0].name,
             }, () => {
-              this.fetchList()
+              if (backBranch) {
+                this.fetchList(backBranch)
+              } else {
+                this.fetchList()
+              }
             })
           }
         })
@@ -85,7 +99,9 @@ class ConfigCenter extends React.Component {
   }
 
   handleChang = e => {
+    sessionStorage.clear()
     this.fetchList(e)
+    sessionStorage.setItem('branch', e)
     this.setState({
       branchName: e,
     })
@@ -150,7 +166,7 @@ class ConfigCenter extends React.Component {
 
   render() {
     const { envData, isFetching } = this.props
-    const { branchData, branchName } = this.state
+    const { branchData, branchName, backBranch } = this.state
     let branch = ''
     if (branchName) {
       branch = branchName
@@ -159,13 +175,14 @@ class ConfigCenter extends React.Component {
         branch = branchData[0].name
       }
     }
+    const branch_name = backBranch ? sessionStorage.getItem('branch') : branch
     const columns = [{
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
       width: '60%',
       render: (text, record) =>
-        <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch}`}>
+        <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch_name}`}>
           {text}
         </Link>,
     }, {
@@ -174,8 +191,8 @@ class ConfigCenter extends React.Component {
       dataIndex: 'operation',
       width: '40%',
       render: (text, record) => <div>
-        <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch}`)}>查看详情</Button>
-        <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch}`)}>更新</Button>
+        <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch_name}`)}>查看详情</Button>
+        <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch_name}`)}>更新</Button>
         <Button
           onClick={() => this.handleDelVisible(record.name)}
           disabled={this.state.isDelFetching && this.state.configName === record.name}>删除</Button>
@@ -193,18 +210,19 @@ class ConfigCenter extends React.Component {
           <Card className="config-center">
             <div className="branch">
               <span>版本分支：</span>
-              <Select style={{ width: 200 }} onChange={this.handleChang} value={branch}>
+              <Select style={{ width: 200 }} onChange={this.handleChang}
+                value={branch_name}>
                 {data}
               </Select>
             </div>
             <div>
               <div className="exploit layout-content-btns">
                 <div className="headers">
-                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branchName}`)}>
+                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branch_name}`)}>
                     <Icon type="plus" style={{ color: '#fff' }} />
                     <span className="font">添加配置</span>
                   </Button>
-                  <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch)}>刷新</Button>
+                  <Button className="refresh" icon="sync" onClick={() => this.handleRefresh(branch_name)}>刷新</Button>
                   <div className="pages">
                     <span className="total">共计{envData.length}条</span>
                     <Pagination {...pagination} />

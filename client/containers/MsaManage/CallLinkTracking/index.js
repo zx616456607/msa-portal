@@ -40,8 +40,8 @@ const btnArr = [{
   key: 'fiveMin',
   text: '最近5分钟',
 }, {
-  key: 'threeHour',
-  text: '最近3小时',
+  key: 'thirty',
+  text: '最近30分钟',
 }, {
   key: 'anHour',
   text: '最近1小时',
