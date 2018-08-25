@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
-import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
+import { Card, Table, Button, Input, Dropdown, Menu, Pagination, notification } from 'antd'
 import {
   getUaaAuth, getIdentityZones, getUaaRefreshToken, UAA_AUTH_FAILURE, deleteIdentityZone,
   UAA_REFRESH_TOKEN_FAILURE,
@@ -47,7 +47,6 @@ class AuthZone extends React.Component {
       } else {
         // 获取refresh token
         const res = await this.getUaaRefreshToken(refresh_token)
-        debugger
         if (res && res.error) {
           return
         }
@@ -68,7 +67,7 @@ class AuthZone extends React.Component {
   }
 
   getUaaAuthToken = async () => {
-    const { getUaaAuth, history } = this.props
+    const { getUaaAuth } = this.props
     const { client_id, client_secret, username, password } = DEFAULT_UAA
     const body = {
       username,
