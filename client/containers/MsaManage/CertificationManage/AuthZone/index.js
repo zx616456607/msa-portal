@@ -47,6 +47,7 @@ class AuthZone extends React.Component {
       } else {
         // 获取refresh token
         const res = await this.getUaaRefreshToken(refresh_token)
+        debugger
         if (res && res.error) {
           return
         }
@@ -78,12 +79,12 @@ class AuthZone extends React.Component {
     }
     const accessRes = await getUaaAuth(body)
     if (accessRes.type === UAA_AUTH_FAILURE) {
-      Modal.error({
-        title: '认证失败',
-        content: '请您刷新页面重试或点击确定返回',
-        closable: false,
-        onOk: () => history.go(0),
-      })
+      // Modal.error({
+      //   title: '认证失败',
+      //   content: '请您刷新页面重试或点击确定返回',
+      //   closable: false,
+      //   onOk: () => history.go(0),
+      // })
       return Promise.reject({ error: 'failure' })
     }
     const uaaToken = accessRes.response.entities.uaaAuth[UAA_JWT]

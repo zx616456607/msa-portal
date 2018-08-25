@@ -17,6 +17,7 @@ import './style/configCenter.less'
 import QueueAnim from 'rc-queue-anim'
 import { getService, getBranchList, getCenterEvn, getCenterConfig, delCenterConfig, putCenterConfig } from '../../../actions/configCenter'
 import { Button, Icon, Table, Pagination, Modal, Select, Input, notification, Card } from 'antd'
+import { formatDate } from '../../../common/utils'
 const Option = Select.Option
 const { TextArea } = Input
 
@@ -180,11 +181,20 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '60%',
+      width: '20%',
       render: (text, record) =>
         <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch_name}`}>
           {text}
         </Link>,
+    }, {
+      title: '最近更新时间',
+      dataIndex: 'lastCommitTime',
+      render: text => {
+        return <span>{formatDate(text)}</span>
+      }
+    }, {
+      title: '最近一次提交',
+      dataIndex: 'lastCommitMessage',
     }, {
       id: 'id',
       title: '操作',
