@@ -115,7 +115,7 @@ class RoutingManage extends React.Component {
       this.defaultQuery,
       {
         page: currentPage - 1,
-        routeid,
+        routeid: encodeURIComponent(routeid),
       },
       query
     )
