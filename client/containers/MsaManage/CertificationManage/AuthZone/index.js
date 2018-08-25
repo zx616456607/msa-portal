@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import isEmpty from 'lodash/isEmpty'
-import { Card, Table, Button, Input, Dropdown, Menu, Modal, Pagination, notification } from 'antd'
+import { Card, Table, Button, Input, Dropdown, Menu, Pagination, notification } from 'antd'
 import {
   getUaaAuth, getIdentityZones, getUaaRefreshToken, UAA_AUTH_FAILURE, deleteIdentityZone,
   UAA_REFRESH_TOKEN_FAILURE,
@@ -67,7 +67,7 @@ class AuthZone extends React.Component {
   }
 
   getUaaAuthToken = async () => {
-    const { getUaaAuth, history } = this.props
+    const { getUaaAuth } = this.props
     const { client_id, client_secret, username, password } = DEFAULT_UAA
     const body = {
       username,
@@ -78,12 +78,12 @@ class AuthZone extends React.Component {
     }
     const accessRes = await getUaaAuth(body)
     if (accessRes.type === UAA_AUTH_FAILURE) {
-      Modal.error({
-        title: '认证失败',
-        content: '请您刷新页面重试或点击确定返回',
-        closable: false,
-        onOk: () => history.go(0),
-      })
+      // Modal.error({
+      //   title: '认证失败',
+      //   content: '请您刷新页面重试或点击确定返回',
+      //   closable: false,
+      //   onOk: () => history.go(0),
+      // })
       return Promise.reject({ error: 'failure' })
     }
     const uaaToken = accessRes.response.entities.uaaAuth[UAA_JWT]

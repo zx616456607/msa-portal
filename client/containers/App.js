@@ -36,7 +36,7 @@ const errorMessageCloseObj = {}
 // the routes need hide namespace switch
 const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
-  // /^\/service-mesh/,
+  // /^\/setting/,
 ]
 
 class App extends React.Component {
@@ -184,6 +184,16 @@ class App extends React.Component {
       && pathname.includes('/publish-service')) {
       notification.warn({
         message: '该实例中已存在同名称同版本的服务',
+        onClose: () => {
+          resetErrorMessage()
+          errorMessageCloseObj[errorMessageBeforeDateTime] = true
+        },
+      })
+      return
+    }
+    if(status === 404 && pathname.includes('/msa-manage/certification-manage')) {
+      notification.warn({
+        message: '认证服务不可用，请检查认证服务状态',
         onClose: () => {
           resetErrorMessage()
           errorMessageCloseObj[errorMessageBeforeDateTime] = true
