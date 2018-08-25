@@ -240,7 +240,7 @@ class AuthZone extends React.Component {
             // onSearch={this.loadClientList}
           />
           <div className="page-box">
-            <span className="total">共 10 条</span>
+            <span className="total">共 {identityZoneList.length} 条</span>
             <Pagination {...pagination}/>
           </div>
         </div>
