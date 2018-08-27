@@ -275,9 +275,12 @@ class Step3 extends React.Component {
         if (isEdit === 'true') {
           res = await editService(instanceID, serviceId, body[0])
         } else {
-          res = await createService(instanceID, body)
+          res = await createService(instanceID, body, { isHandleError: true })
         }
         if (res.error) {
+          notification.warn({
+            message: '该实例中已存在同名称同版本的服务',
+          })
           this.setState({
             confirmLoading: false,
           })
