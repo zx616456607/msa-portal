@@ -13,8 +13,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ClassNames from 'classnames'
-import iconEye from '../../assets/img/components/secret-text/eye.svg'
-import iconEyeClosed from '../../assets/img/components/secret-text/eye-closed.svg'
+import TenxIcon from '@tenx-ui/icon'
 import './style/index.less'
 
 export default class SecretText extends React.Component {
@@ -37,7 +36,7 @@ export default class SecretText extends React.Component {
       return '-'
     }
     const { show } = this.state
-    const icon = show ? iconEyeClosed : iconEye
+    const icon = show ? 'eye-closed' : 'eye'
     const classNames = ClassNames('secret-text', {
       [className]: className,
     })
@@ -48,9 +47,12 @@ export default class SecretText extends React.Component {
     return (
       <span className={classNames} {...otherProps}>
         <font>{text}</font>
-        <svg className="eye-icon" onClick={() => this.setState({ show: !show })}>
-          <use xlinkHref={`#${icon.id}`} />
-        </svg>
+        <TenxIcon
+          type={icon}
+          size={14}
+          onClick={() => this.setState({ show: !show })}
+          className="eye-icon"
+        />
       </span>
     )
   }

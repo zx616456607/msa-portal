@@ -324,11 +324,11 @@ class MySubscribedService extends React.Component {
     }
     sortObj = Object.assign({}, sortObj, parseQueryToSortorder(sortObj, query))
     const columns = [
-      { title: '订阅服务名称', dataIndex: 'serviceName', width: '8%' },
+      { title: '订阅服务名称', dataIndex: 'serviceName', width: '9%' },
       {
         title: '服务状态',
         dataIndex: 'serviceStatus',
-        width: '8%',
+        width: '9%',
         filters: [
           { text: '已激活', value: 1 },
           { text: '已停用', value: 2 },
@@ -354,7 +354,7 @@ class MySubscribedService extends React.Component {
       {
         title: '订阅状态',
         dataIndex: 'status',
-        width: '8%',
+        width: '9%',
         filters: radioGroupValue === 1 ? subFilters : null,
         filteredValue: radioGroupValue === 1 ? subFilteredValue : null,
         render: text => renderCSBInstanceServiceApproveStatus(text),
@@ -401,7 +401,7 @@ class MySubscribedService extends React.Component {
         title: '操作',
         dataIndex: 'handle',
         key: 'handle',
-        width: '16%',
+        width: '13%',
         render: (text, record) => {
           if (record.status === 4) {
             return <Button type="primary" onClick={this.reSubscribeService.bind(this, record)}>重新订阅</Button>

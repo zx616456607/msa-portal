@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Select, Button, Form, Input, DatePicker } from 'antd'
 import LogComponent from './LogsDetail'
-import select from '../../../assets/img/msa-pam/select.svg'
+import TenxIcon from '@tenx-ui/icon'
 import { getClusterOfQueryLog, getServiceOfQueryLog, getQueryLogList,
   loadServiceContainerList } from '../../../actions/logs'
 import './style/index.less'
@@ -216,9 +216,11 @@ class Logs extends React.Component {
             </Col>
             <Col span={4} style={{ lineHeight: '3.5' }}>
               <Button type="primary" onClick={() => this.handleSearch()}>
-                <svg className="select">
-                  <use xlinkHref={`#${select.id}`} />
-                </svg>
+                <TenxIcon
+                  type="search"
+                  size={12}
+                  className="select"
+                />
                 立即查询
               </Button>
               <Button className="back" type={'primary'} icon={'rollback'}

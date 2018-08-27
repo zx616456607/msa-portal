@@ -22,8 +22,7 @@ import {
 } from '../../../../selectors/event'
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
-import URGENT_ICON from '../../../../assets/img/msa-manage/urgent.svg'
-import SLIGHT_ICON from '../../../../assets/img/msa-manage/slight.svg'
+import TenxIcon from '@tenx-ui/icon'
 
 const { RangePicker } = DatePicker
 const Option = Select.Option
@@ -89,7 +88,9 @@ class Event extends React.Component {
     const { eventType, eventLevel, rootPlace, appName, keyword, rangeDate } = this.state
     const [ start, end ] = rangeDate
     query = Object.assign({}, location.query,
-      { eventType, eventLevel, rootPlace, appName, keyword }, query)
+      { eventType, eventLevel, rootPlace,
+        appName: appName ? encodeURIComponent(appName) : '',
+        keyword: keyword ? encodeURIComponent(keyword) : '' }, query)
     if (start) {
       query = Object.assign({}, query, { startTime: new Date(start).getTime() })
     }
@@ -172,6 +173,14 @@ class Event extends React.Component {
         return '未知'
     }
   }
+  renderRootPlace = text => {
+    switch (text) {
+      case 'discovery:spring-cloud-discovery:8761':
+        return '注册中心'
+      default:
+        return '未知'
+    }
+  }
 
   renderEventLevel = text => {
     let displayName = ''
@@ -180,16 +189,24 @@ class Event extends React.Component {
     switch (text) {
       case 'Critical':
         displayName = '严重'
-        icon = (<svg className="event-page-urgent">
-          <use xlinkHref={`${URGENT_ICON}`} />
-        </svg>)
+        icon = (
+          <TenxIcon
+            type="urgent"
+            size={12}
+            className="event-page-urgent"
+          />
+        )
         classname = 'error-status'
         break
       case 'Minor':
         displayName = '轻微'
-        icon = (<svg className="event-page-slight">
-          <use xlinkHref={`${SLIGHT_ICON}`} />
-        </svg>)
+        icon = (
+          <TenxIcon
+            type="down"
+            size={12}
+            className="event-page-slight"
+          />
+        )
         classname = 'primary-color'
         break
       case 'Major':
@@ -230,6 +247,7 @@ class Event extends React.Component {
         title: '事件源',
         width: '20%',
         dataIndex: 'rootPlace',
+        render: this.renderRootPlace,
       }, {
         title: '服务名称',
         width: '15%',

@@ -170,9 +170,7 @@ class Header extends React.Component {
   render() {
     return (
       <div>
-        <svg className="logo">
-          <use xlinkHref={`#${logo.id}`} />
-        </svg>
+        <img src={logo} title="logo" alt="logo" />
       </div>
     )
   }

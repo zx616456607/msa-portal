@@ -13,10 +13,10 @@
 import React from 'react'
 // import propTypes from 'prop-types'
 import { Row, Col, Steps, Icon, Tooltip } from 'antd'
-import StepIcon from '../../../assets/img/csb/StepIcon.svg'
 import './style/ExpandRowSteps.less'
 import classNames from 'classnames'
 import cloneDeep from 'lodash/cloneDeep'
+import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
 const Step = Steps.Step
 const STEP_SIZE = 5
@@ -83,9 +83,13 @@ class ExpandRowSteps extends React.Component {
                 </Tooltip>
               </div>
             </div>}
-            icon={<svg className={svgClass}>
-              <use xlinkHref={`#${StepIcon.id}`}/>
-            </svg>}
+            icon={
+              <TenxIcon
+                type="step-circle"
+                size={25}
+                className={svgClass}
+              />
+            }
           />
         }
         return <Step
@@ -94,9 +98,13 @@ class ExpandRowSteps extends React.Component {
           status="finish"
           // title={<span className="step-item-title-content">已授权</span>}
           description={this.renderStepDescription(step)}
-          icon={<svg className={svgClass}>
-            <use xlinkHref={`#${StepIcon.id}`}/>
-          </svg>}
+          icon={
+            <TenxIcon
+              type="step-circle"
+              size={25}
+              className={svgClass}
+            />
+          }
         />
       })}
       {/* {*/}

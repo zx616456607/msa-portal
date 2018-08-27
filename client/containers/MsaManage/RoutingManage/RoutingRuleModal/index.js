@@ -75,8 +75,23 @@ class RoutingRuleModal extends React.Component {
       clusterID, form, addGatewayRoute, onCancel, loadRoutesList, currentRoute,
       updateGatewayRoute,
     } = this.props
-    const { validateFields } = form
-    validateFields((err, values) => {
+    const { validateFields, getFieldValue } = form
+    const validateArray = [
+      'routeId',
+      'path',
+      'msa-url-type',
+      'description',
+      'stripPrefix',
+      'retryable',
+      'status',
+    ]
+    const urlType = getFieldValue('msa-url-type')
+    if (urlType === 'id') {
+      validateArray.push('serviceId')
+    } else {
+      validateArray.push('url')
+    }
+    validateFields(validateArray, (err, values) => {
       if (err) {
         return
       }

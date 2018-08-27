@@ -11,3 +11,4 @@
  */
 
 import '../assets/style/common.less'
+import '@tenx-ui/icon/assets/index.css'

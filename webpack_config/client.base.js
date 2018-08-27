@@ -36,7 +36,7 @@ const configBase = {
         loader: 'babel-loader',
         exclude: /node_modules/,
       }, {
-        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2)$/,
+        test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2|svg)$/,
         loader: 'url-loader',
         options: {
           limit: 5192, // 5KB 以下图片自动转成 base64 码

@@ -299,7 +299,7 @@ class ApiGateway extends React.Component {
     }
     if (searchValue) {
       query = Object.assign({}, query, {
-        service_id: searchValue,
+        service_id: encodeURIComponent(searchValue),
       })
     }
     this.loadGatewayPoliciesList(query)
@@ -328,7 +328,7 @@ class ApiGateway extends React.Component {
     }
     if (searchValue) {
       query = Object.assign({}, query, {
-        service_id: searchValue,
+        service_id: encodeURIComponent(searchValue),
       })
     }
     this.loadGatewayPoliciesList(query)
@@ -342,7 +342,7 @@ class ApiGateway extends React.Component {
     const query = {
       page: 0,
       size: 10,
-      service_id: searchValue,
+      service_id: encodeURIComponent(searchValue),
     }
     this.loadGatewayPoliciesList(query)
   }

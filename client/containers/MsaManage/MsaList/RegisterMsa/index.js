@@ -28,7 +28,9 @@ import {
 import {
   APP_NAME_REG,
   APP_NAME_REG_NOTICE,
-  HOST_REG,
+  // HOST_REG,
+  IP_REG,
+  HOSTNAME_REG,
   URL_REG,
 } from '../../../../constants'
 import {
@@ -159,11 +161,21 @@ class RegisterMsa extends React.Component {
         ruleId,
       }
     })
-    addInstancesIntoManualrules(clusterID, body).then(res => {
+    addInstancesIntoManualrules(clusterID, body, { isHandleError: true }).then(res => {
       this.setState({
         submitLoading: false,
       })
       if (res.error) {
+        let description = ''
+        if (res.status === 500) {
+          if (res.error === 'host:port cannot be same with other instances') {
+            description = 'host:port重复'
+          }
+        }
+        notification.warn({
+          message: '添加实例失败',
+          description,
+        })
         return
       }
       notification.success({
@@ -285,7 +297,12 @@ class RegisterMsa extends React.Component {
               rules: [{
                 required: true,
                 whitespace: true,
-                pattern: HOST_REG,
+                validator: (rule, value, cb) => {
+                  if (HOSTNAME_REG.test(value) || IP_REG.test(value)) {
+                    return cb()
+                  }
+                  cb('请填写正确的服务地址')
+                },
                 message: '请填写正确的服务地址',
               }],
             })(

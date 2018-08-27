@@ -109,7 +109,7 @@ class CreateConfig extends React.Component {
     }
     const yamls = currentYaml === '' ? yaml : currentYaml
     if (yaml && currentYaml === '') {
-      notification.info({
+      notification.warn({
         message: '请填写配置内容',
       })
       return
@@ -209,16 +209,18 @@ class CreateConfig extends React.Component {
       return true
     })
     if (hasConfigName) {
-      notification.info({
-        message: '配置名称已存在',
+      notification.warn({
+        message: '提交失败',
+        description: '配置名称已存在',
       })
       return
     }
     this.props.form.validateFields(err => {
       if (err) return
       if (currentYaml === '') {
-        notification.info({
-          message: '请填写配置内容',
+        notification.warn({
+          message: '提交失败',
+          description: '请填写配置内容',
         })
         return
       }
@@ -294,7 +296,7 @@ class CreateConfig extends React.Component {
               )}
             </FormItem>
           </Row>
-          <Row className="connent">
+          <Row className="connent yaml-box">
             <FormItem {...fromLayout} label="配置内容">
               {getFieldDecorator('info', {
                 initialValue: currentYaml === '' ? yaml : currentYaml,

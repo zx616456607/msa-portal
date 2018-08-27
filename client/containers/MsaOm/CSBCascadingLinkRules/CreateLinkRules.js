@@ -20,7 +20,6 @@ import './style/CreateLinkRules.less'
 import QueueAnim from 'rc-queue-anim'
 import cloneDeep from 'lodash/cloneDeep'
 import classNames from 'classnames'
-import StepIcon from '../../../assets/img/csb/StepIcon.svg'
 import { connect } from 'react-redux'
 import { getInstances } from '../../../actions/CSB/instance'
 import { createCsbCascadingLinkRule } from '../../../actions/CSB/cascadingLinkRules'
@@ -31,6 +30,7 @@ import {
 } from '../../../constants'
 import { instancesSltMaker } from '../../../selectors/CSB/instance'
 import { parse as parseQuerystring } from 'query-string'
+import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -146,9 +146,11 @@ class CreateLinkRules extends React.Component {
     if (noInstance) {
       return <div className="no-instance-list">
         <div>
-          <svg className="StepIconSize no-instance-fill">
-            <use xlinkHref={`#${StepIcon.id}`}/>
-          </svg>
+          <TenxIcon
+            type="step-circle"
+            size={26}
+            className="no-instance-fill"
+          />
         </div>
         <div>
           请选择实例
@@ -164,9 +166,13 @@ class CreateLinkRules extends React.Component {
             status="finish"
             title={<div className="instance-name">实例 {values['target-0'].split('/')[1]}</div>}
             description={<div className="step-dec-style"></div>}
-            icon={<svg className="StepIcon StepIconSize">
-              <use xlinkHref={`#${StepIcon.id}`}/>
-            </svg>}
+            icon={
+              <TenxIcon
+                type="step-circle"
+                size={26}
+                className="StepIcon"
+              />
+            }
           />
         }
         {
@@ -178,9 +184,13 @@ class CreateLinkRules extends React.Component {
               status="finish"
               title={<div className="instance-name">实例 {instanceName}</div>}
               description={<div className="step-dec-style"></div>}
-              icon={<svg className="StepIcon StepIconSize">
-                <use xlinkHref={`#${StepIcon.id}`}/>
-              </svg>}
+              icon={
+                <TenxIcon
+                  type="step-circle"
+                  size={26}
+                  className="StepIcon"
+                />
+              }
             />
           })
         }

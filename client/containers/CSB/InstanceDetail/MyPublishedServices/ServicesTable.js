@@ -28,9 +28,7 @@ import {
   getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
 import './style/ServiceTable.less'
-import serviceAccess from '../../../../assets/img/csb/serviceAccess.svg'
-import serviceRelay from '../../../../assets/img/csb/serviceRelay.svg'
-import serviceOut from '../../../../assets/img/csb/serviceOut.svg'
+import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
 const modalTooptip = [
   {
@@ -377,19 +375,25 @@ class ServicesTable extends React.Component {
     const type = parseInt(cascadedType)
     const svgArray = [
       <Tooltip title="接入" placement="top" key="serviceAccess">
-        <svg className="serviceAccess">
-          <use xlinkHref={`#${serviceAccess.id}`} />
-        </svg>
+        <TenxIcon
+          type="access"
+          size={14}
+          className="serviceAccess"
+        />
       </Tooltip>,
       <Tooltip title="接力" placement="top" key="serviceRelay">
-        <svg className="serviceRelay">
-          <use xlinkHref={`#${serviceRelay.id}`} />
-        </svg>
+        <TenxIcon
+          type="ellipsis-circle"
+          size={14}
+          className="serviceRelay"
+        />
       </Tooltip>,
       <Tooltip title="开放" placement="top" key="serviceOut">
-        <svg className="serviceOut">
-          <use xlinkHref={`#${serviceOut.id}`} />
-        </svg>
+        <TenxIcon
+          type="way-out"
+          size={14}
+          className="serviceOut"
+        />
       </Tooltip>,
     ]
     switch (type) {

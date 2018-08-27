@@ -84,13 +84,15 @@ export const MSA_TYPES_TEXT = {
   [MSA_TYPE_MAN]: '手动注册',
   [MSA_TYPE_AUTO]: '自动注册',
 }
-//角色
+// 角色
 export const ROLE_USER = 0
-export const ROLE_PLATFORM_ADMIN = 3 //平台管理员
-export const ROLE_BASE_ADMIN = 4 //基础设施管理员
+export const ROLE_PLATFORM_ADMIN = 3 // 平台管理员
+export const ROLE_BASE_ADMIN = 4 // 基础设施管理员
 // RegExp
 export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const APP_NAME_REG_NOTICE = '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
+export const IP_REG = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/
+export const HOSTNAME_REG = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const URL_REG = /^https?:\/\/[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/
 export const ROUTE_REG = /^(\/[a-zA-Z0-9_\-]+)+$/

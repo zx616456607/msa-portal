@@ -202,7 +202,7 @@ const mapStateToProps = state => {
   const { clusters } = state.entities
   let host = ''
   let isFetching = false
-  if (state.globalConfig.data) {
+  if (state.globalConfig && state.globalConfig.data) {
     host = state.globalConfig.data.host
     isFetching = state.globalConfig.isFetching
   }

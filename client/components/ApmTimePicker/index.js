@@ -100,9 +100,9 @@ export default class ApmTimePicker extends React.Component {
       startTime = now - (3 * 60 * 60 * 1000)
     } else if (time === 'today') {
       startTime = new Date(new Date().setHours(0, 0, 0, 0))
-    } else if(time === 'thirty') {
+    } else if (time === 'thirty') {
       startTime = now - (30 * 60 * 1000)
-    } else if(time === 'anHour') {
+    } else if (time === 'anHour') {
       startTime = now - (60 * 60 * 1000)
     } else if (time === 'yesterday') {
       startTime = new Date(new Date(new Date()
