@@ -278,9 +278,9 @@ class RelationShip extends React.Component {
                   graphConfigs={config}
                   nodes={data.nodes || []}
                   edges={data.edges || []}
-                  style={{ height: '500px' }}
                   loading={loading}
                   onSvgClick = {this.onRelationChartClick}
+                  SvgHeight = "650px"
                 />
                 :
                 null
