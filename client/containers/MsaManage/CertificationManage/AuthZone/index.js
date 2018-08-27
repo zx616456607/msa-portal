@@ -31,6 +31,7 @@ const Search = Input.Search
 class AuthZone extends React.Component {
   state = {
     current: DEFAULT_PAGE,
+    authList: [],
   }
 
   async componentDidMount() {
@@ -64,6 +65,7 @@ class AuthZone extends React.Component {
   getZones = () => {
     const { getIdentityZones } = this.props
     getIdentityZones()
+    this.setState({ useStream: false })
   }
 
   getUaaAuthToken = async () => {
@@ -163,12 +165,32 @@ class AuthZone extends React.Component {
     })
   }
 
+  queryList = value => {
+    const { identityZoneList } = this.props
+    let useStream = true
+
+    if (!value) {
+      useStream = false
+    }
+    const authList = (identityZoneList || []).filter(list => {
+      if (list.name.indexOf(value) > -1) {
+        return true
+      }
+      return false
+    })
+    this.setState({ authList, useStream })
+  }
+
   render() {
-    const { inputValue, current, visible, currentAuthZone } = this.state
+    const { current, visible, currentAuthZone, authList, useStream } = this.state
     const { identityZoneList, zonesFetching, history } = this.props
+    let authLists = identityZoneList
+    if (useStream) {
+      authLists = authList
+    }
     const pagination = {
       simple: true,
-      total: 10 || 0,
+      total: authLists.length || 0,
       pageSize: DEFAULT_PAGESIZE,
       current,
       onChange: current => this.setState({ current }),
@@ -233,23 +255,23 @@ class AuthZone extends React.Component {
           {/* 删除*/}
           {/* </Button>*/}
           <Search
-            placeholder="按认证域 ID 搜索"
+            placeholder="按认证域名称搜索"
             style={{ width: 200 }}
-            value={inputValue}
-            onChange={e => this.setState({ inputValue: e.target.value })}
-            // onSearch={this.loadClientList}
+            // value={inputValue}
+            // onChange={e => this.setState({ inputValue: e.target.value })}
+            onSearch={this.queryList}
           />
           <div className="page-box">
-            <span className="total">共 {identityZoneList.length} 条</span>
+            <span className="total">共 {authLists.length || 0} 条</span>
             <Pagination {...pagination}/>
           </div>
         </div>
         <div className="layout-content-body" key="body">
-          <Card>
+          <Card id="AuthZone-body">
             <Table
               columns={columns}
-              dataSource={identityZoneList}
-              pagination={false}
+              dataSource={authLists}
+              pagination={pagination}
               loading={zonesFetching}
               rowKey={record => record.id}
             />
