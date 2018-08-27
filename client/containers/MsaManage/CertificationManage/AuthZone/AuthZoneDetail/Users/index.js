@@ -64,7 +64,7 @@ class Users extends React.Component {
     this.setState(preState => {
       return {
         [key]: !preState[key],
-        currentUser: record ? record : preState.currentUser,
+        currentUser: record ? record : null,
       }
     })
   }
