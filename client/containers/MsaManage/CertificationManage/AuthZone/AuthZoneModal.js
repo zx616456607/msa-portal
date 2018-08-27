@@ -114,6 +114,9 @@ class AuthZoneModal extends React.Component {
             {
               getFieldDecorator('name', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.name : '',
+                rules: [
+                  { required: true, max: 255, message: '请输入1~255个字符' },
+                ],
               })(
                 <Input placeholder={'请输入认证域名称'}/>
               )
@@ -126,6 +129,9 @@ class AuthZoneModal extends React.Component {
             {
               getFieldDecorator('subdomain', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.subdomain : '',
+                rules: [
+                  { required: true, max: 255, message: '请输入1~255个字符' },
+                ],
               })(
                 <Input placeholder={'请输入 SubDomain 名称'}/>
               )
@@ -138,6 +144,9 @@ class AuthZoneModal extends React.Component {
             {
               getFieldDecorator('description', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.description : '',
+                rules: [
+                  { required: false, max: 255, message: '请输入1~255个字符' },
+                ],
               })(
                 <TextArea placeholder={'请输入描述'}/>
               )
