@@ -191,7 +191,7 @@ class App extends React.Component {
       })
       return
     }
-    if(status === 404 && pathname.includes('/msa-manage/certification-manage')) {
+    if (status === 404 && pathname.includes('/msa-manage/certification-manage')) {
       notification.warn({
         message: '认证服务不可用，请检查认证服务状态',
         onClose: () => {
