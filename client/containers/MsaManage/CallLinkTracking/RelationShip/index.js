@@ -15,7 +15,7 @@ import QueueAnim from 'rc-queue-anim'
 import { Row, Card, Button, DatePicker, Tooltip, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import './style/index.less'
-import { getZipkinDependencies } from '../../../../actions/callLinkTrack'
+import { getZipkinDependencies, getActiveRelationChartNode } from '../../../../actions/callLinkTrack'
 import RelationChart from '@tenx-ui/relation-chart'
 
 const { RangePicker } = DatePicker
@@ -154,14 +154,25 @@ class RelationShip extends React.Component {
     }
     return avgTimer.toFixed(2)
   }
-
+  onClickNode = (lname, e) => {
+    e.stopPropagation();
+    const { getActiveRelationChartNode } = this.props;
+    getActiveRelationChartNode(lname, 'set')
+  }
+  onRelationChartClick = () => {
+    const { getActiveRelationChartNode } = this.props;
+    getActiveRelationChartNode(null, 'clear')
+  }
   render() {
     const { isTimerShow, timer, btnFive, btnAnHour, btnHalFhour, latelyKey, loading } = this.state
     const { data } = this.props
+    const onClickNode = this.onClickNode
     const config = {
       rankdir: 'LR',
       marginx: 60,
       marginy: 60,
+      nodesep: 60,
+      edgesep: 15,
       ranker: 'tight-tree',
     }
     if (!isEmpty(data)) {
@@ -172,6 +183,8 @@ class RelationShip extends React.Component {
           item.shape = 'circle'
           // item.label = typeof item.label === 'string' ? <div>{item.label}<br /> {this.fliterAvg(item.id)}次/min</div> : item.label
           item.labelMinor = this.fliterAvg(item.id) + '次/min'
+          item.onClick = onClickNode
+          item.isAnimated = true
         })
       }
       if (data.edges.length > 0) {
@@ -179,6 +192,7 @@ class RelationShip extends React.Component {
           item.labelpos = 'c'
           item.arrowOffset = 10
           item.withArrow = true
+          item.isAnimated = true
           if (item.errorCount > 0 && item.errorCount < item.callCount) {
             item.label = <div style={{ whiteSpace: 'nowrap' }}>{item.errorCount}/{item.callCount} calls</div>
             item.color = '#5ab46d'
@@ -266,6 +280,7 @@ class RelationShip extends React.Component {
                   edges={data.edges || []}
                   style={{ height: '500px' }}
                   loading={loading}
+                  onSvgClick = {this.onRelationChartClick}
                 />
                 :
                 null
@@ -290,4 +305,5 @@ const mapStateToProps = state => {
 }
 export default connect(mapStateToProps, {
   getZipkinDependencies,
+  getActiveRelationChartNode,
 })(RelationShip)
