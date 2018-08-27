@@ -85,7 +85,7 @@ const traceList = (state = {}, action) => {
 }
 
 const relationShipList = (state = {}, action) => {
-  const { type } = action
+  const { type, lname, operationType } = action
   switch (type) {
     case ActionTypes.GET_ZIPKIN_DEPENDENCIES_REQUEST:
       return {
@@ -103,6 +103,21 @@ const relationShipList = (state = {}, action) => {
         ...state,
         isFetching: true,
       }
+    case ActionTypes.ACTIVE_RElATION_CHART_NODE: {
+      const newstate = { ...state }
+      newstate.data.nodes.forEach(node => {
+        if (node.active !== undefined) {
+          delete node.active
+        }
+        if (node.id === lname && operationType === 'set') {
+          node.active = true
+        }
+      });
+      return {
+        ...newstate,
+        isFetching: false,
+      }
+    }
     default:
       return state
   }

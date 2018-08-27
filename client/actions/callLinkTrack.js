@@ -135,3 +135,17 @@ const fetchZipkinDependencies = (clusterId, query) => {
 export const getZipkinDependencies = (clusterId, query) =>
   dispatch => dispatch(fetchZipkinDependencies(clusterId, query))
 
+// 给被点击的调用链上的node添加active: true 属性
+export const ACTIVE_RElATION_CHART_NODE = 'ACTIVE_RElATION_CHART_NODE'
+
+const fetchActiveRelationChartNode = (lname, operationType) => {
+  return {
+    type: ACTIVE_RElATION_CHART_NODE,
+    lname,
+    operationType,
+  }
+}
+
+export const getActiveRelationChartNode = (lname, operationType) =>
+  dispatch => dispatch(fetchActiveRelationChartNode(lname, operationType))
+
