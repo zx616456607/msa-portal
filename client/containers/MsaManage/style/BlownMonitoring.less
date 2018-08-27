@@ -14,7 +14,11 @@
 .blown-monitoring {
   .monitor-wrapper {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: @padding-medium;
+    .monitor-list {
+      margin-bottom: @padding-small;
+    }
 
     @media screen and (max-width: 1540px) {
       .monitor-list {
