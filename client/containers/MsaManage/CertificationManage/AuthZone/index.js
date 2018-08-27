@@ -76,7 +76,7 @@ class AuthZone extends React.Component {
       client_secret,
       grant_type: 'password',
     }
-    const accessRes = await getUaaAuth(body)
+    const accessRes = await getUaaAuth(body, { isHandleError: true })
     if (accessRes.type === UAA_AUTH_FAILURE) {
       // Modal.error({
       //   title: '认证失败',
@@ -84,6 +84,9 @@ class AuthZone extends React.Component {
       //   closable: false,
       //   onOk: () => history.go(0),
       // })
+      notification.warn({
+        message: '认证服务不可用，请检查认证服务状态',
+      })
       return Promise.reject({ error: 'failure' })
     }
     const uaaToken = accessRes.response.entities.uaaAuth[UAA_JWT]

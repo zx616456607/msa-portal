@@ -24,10 +24,10 @@ export const UAA_AUTH_REQUEST = 'UAA_AUTH_REQUEST'
 export const UAA_AUTH_SUCCESS = 'UAA_AUTH_SUCCESS'
 export const UAA_AUTH_FAILURE = 'UAA_AUTH_FAILURE'
 
-const fetchUaaAuth = body => {
+const fetchUaaAuth = (body, options) => {
   const endpoint = `${CLIENT_API_URL}/oauth/token`
-
   return {
+    options,
     [CALL_API]: {
       types: [
         UAA_AUTH_REQUEST,
@@ -49,8 +49,8 @@ const fetchUaaAuth = body => {
   }
 }
 
-export const getUaaAuth = body =>
-  dispatch => dispatch(fetchUaaAuth(body))
+export const getUaaAuth = (body, options) =>
+  dispatch => dispatch(fetchUaaAuth(body, options))
 
 export const UAA_REFRESH_TOKEN_REQUEST = 'UAA_REFRESH_TOKEN_REQUEST'
 export const UAA_REFRESH_TOKEN_SUCCESS = 'UAA_REFRESH_TOKEN_SUCCESS'

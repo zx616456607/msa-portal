@@ -191,7 +191,7 @@ class ConfigCenter extends React.Component {
       dataIndex: 'lastCommitTime',
       render: text => {
         return <span>{formatDate(text)}</span>
-      }
+      },
     }, {
       title: '最近一次提交',
       dataIndex: 'lastCommitMessage',
