@@ -12,96 +12,45 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Row, Card, Button, DatePicker, Tooltip, Icon } from 'antd'
+import { Card, Button, Tooltip, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import './style/index.less'
 import { getZipkinDependencies, getActiveRelationChartNode } from '../../../../actions/callLinkTrack'
 import RelationChart from '@tenx-ui/relation-chart'
+import ApmTimePicker from '../../../../components/ApmTimePicker'
+import { formatDate } from '../../../../common/utils'
 
-const { RangePicker } = DatePicker
-const ButtonGroup = Button.Group
+const btnArr = [{
+  key: 'fiveMin',
+  text: '最近5分钟',
+}, {
+  key: 'thirty',
+  text: '最近30分钟',
+}, {
+  key: 'anHour',
+  text: '最近1小时',
+}]
 
 class RelationShip extends React.Component {
-
   state = {
-    timer: '',
     timers: '',
-    latelyKey: '',
-    isTimerShow: true,
-    btnFive: 'primary',
-    btnAnHour: 'default',
-    btnHalFhour: 'default',
     loading: true,
+    rangeDateTime: [],
   }
 
   componentDidMount() {
-    const query = {
-      endTs: Date.parse(new Date(new Date() - 300 * 1000)),
-    }
-    this.loadData(query)
+    this.loadData()
   }
 
-  handleTimer = () => {
-    const { isTimerShow } = this.state
-    if (isTimerShow) {
-      this.setState({
-        isTimerShow: false,
-      })
-    } else {
-      this.setState({
-        isTimerShow: true,
-      })
-    }
-  }
-
-  handleLatelyTimer = key => {
-    const query = {
-      endTs: Date.parse(new Date()),
-    }
-    switch (key) {
-      case 'five':
-        this.setState({
-          btnFive: 'primary',
-          btnAnHour: 'default',
-          btnHalFhour: 'default',
-        })
-        break
-      case 'halFhour':
-        this.setState({
-          btnFive: 'default',
-          btnAnHour: 'default',
-          btnHalFhour: 'primary',
-        })
-        break
-      case 'anHour':
-        this.setState({
-          btnFive: 'default',
-          btnAnHour: 'primary',
-          btnHalFhour: 'default',
-        })
-        break
-      default:
-        break
-    }
-    this.setState({
-      latelyKey: key,
-    })
-    this.loadData(query)
-  }
-
-  onOk = value => {
-    this.setState({
-      timers: (Date.parse(value[1]) - Date.parse(value[0])),
-    })
-    const query = {
-      endTs: Date.parse(value[1]),
-      lookback: (Date.parse(value[1]) - Date.parse(value[0])),
-    }
-    this.loadData(query)
-  }
-
-  loadData = query => {
+  loadData = () => {
+    const { rangeDateTime } = this.state
     const { clusterID, getZipkinDependencies } = this.props
+    const time = new Date().getTime()
+    const five = Date.parse(new Date(new Date() - 300 * 1000))
+    const query = {
+      endTs: rangeDateTime.length > 0 ? Date.parse(formatDate(rangeDateTime[1])) : time,
+      lookback: rangeDateTime.length > 0 ? rangeDateTime[1] - rangeDateTime[0] : time - five,
+    }
     this.setState({
       loading: true,
     }, () => {
@@ -128,27 +77,33 @@ class RelationShip extends React.Component {
   }
 
   fliterAvg = value => {
-    const { timers, latelyKey } = this.state
+    const { rangeDateTime } = this.state
     const { data } = this.props
     let avgTimer
+    const timers = (rangeDateTime[1] - rangeDateTime[0]) / 1000 / 60
     const avgAry = this.filterNodes(data.edges)
-    // if(avgAry.length === 0) return 0
-    let time = 5
-    switch (latelyKey) {
-      case 'five':
-        time = 5
-        break
-      case 'halFhour':
-        time = 30
-        break
-      case 'anHour':
-        time = 60
-        break
-      default:
-        break
-    }
+    // let time = 5
+    // switch (timers) {
+    //   case '300000':
+    //     time = 5
+    //     break
+    //   case '1800000':
+    //     time = 30
+    //     break
+    //   case '3600000':
+    //     time = 60
+    //     break
+    //   default:
+
+    //     break
+    // }
+    // if (avgAry[value]) {
+    //   avgTimer = timers ? (timers / 1000) / 1000 / 60 : avgAry[value].callCount / time
+    // } else {
+    //   avgTimer = 0.00
+    // }
     if (avgAry[value]) {
-      avgTimer = timers ? (timers / 1000) / 1000 / 60 : avgAry[value].callCount / time
+      avgTimer = avgAry[value].callCount / timers
     } else {
       avgTimer = 0.00
     }
@@ -164,7 +119,7 @@ class RelationShip extends React.Component {
     getActiveRelationChartNode(null, 'clear')
   }
   render() {
-    const { isTimerShow, timer, btnFive, btnAnHour, btnHalFhour, latelyKey, loading } = this.state
+    const { loading, rangeDateTime } = this.state
     const { data } = this.props
     const onClickNode = this.onClickNode
     const config = {
@@ -228,47 +183,20 @@ class RelationShip extends React.Component {
     return (
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
-          <Button style={{ marginRight: 5 }} icon="reload" onClick={() => {
-            isTimerShow ?
-              this.handleLatelyTimer(latelyKey)
-              :
-              this.onOk(timer)
-          }}>
+          <Button style={{ marginRight: 5 }} icon="reload" onClick={() => this.loadData()}>
             刷新
           </Button>
-          <ButtonGroup className="relation-ship-time">
-            <Button icon="calendar" onClick={() => this.handleTimer()}>
-              自定义日期
-            </Button>
-            {
-              isTimerShow ?
-                <Row>
-                  <Button className="btn" type={btnFive} onClick={() => this.handleLatelyTimer('five')} >
-                    最近5分钟
-                  </Button>
-                  <Button className="btn" type={btnHalFhour} onClick={() => this.handleLatelyTimer('halFhour')}>
-                    最近30分钟
-                  </Button>
-                  <Button className="btn" type={btnAnHour} onClick={() => this.handleLatelyTimer('anHour')}>
-                    最近1小时
-                  </Button>
-                </Row> :
-                <Row>
-                  <RangePicker
-                    showTime={{ format: 'HH:mm' }}
-                    format="YYYY-MM-DD HH:mm"
-                    value={timer}
-                    onOk={this.onOk}
-                    onChange={timer => this.setState({ timer })}
-                  />
-                </Row>
-            }
-            <div className="tip">
-              <Tooltip placement="bottom" title={tipText}>
-                <Icon type="question-circle-o" />
-              </Tooltip>
-            </div>
-          </ButtonGroup>
+          <ApmTimePicker
+            value={rangeDateTime}
+            onChange={rangeDateTime => this.setState({ rangeDateTime })}
+            timeArr={btnArr}
+            onOk={this.loadData}
+          />
+          <div className="tip">
+            <Tooltip placement="bottom" title={tipText}>
+              <Icon type="question-circle-o" />
+            </Tooltip>
+          </div>
         </div>
         <div className="body" key="body">
           <Card>
