@@ -264,7 +264,7 @@ class InstanceDetailOverview extends React.Component {
             </Col>
             <Col span={9}>
               <Card title="我发布的服务"
-                extra={<Link to={`/csb-instancesavailable/${instanceID}/my-published-services`}>
+                extra={<Link to={`/csb-instances/available/${instanceID}/my-published-services`}>
                   更多>>
                 </Link>
                 }
