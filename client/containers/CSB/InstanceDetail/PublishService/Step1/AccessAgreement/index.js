@@ -22,7 +22,6 @@ import {
   URL_REG,
 } from '../../../../../../constants'
 import {
-  sleep,
   getCSBServiceOpenType,
 } from '../../../../../../common/utils'
 import {
@@ -38,8 +37,8 @@ const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
 
-const ENDPOINT_METHOD = [ 'GET', 'POST', 'PUT', 'DELETE' ]
-const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE', '所有方法' ]
+// const ENDPOINT_METHOD = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+// const ENDPOINT_METHODS = [ 'GET', 'POST', 'PUT', 'DELETE', '所有方法' ]
 // const ENDPOINT_REQUEST_TYPE = [ 'HTTP', 'JSON' ]
 // const ENDPOINT_RESPONSE_TYPE = [
 //   {
@@ -66,13 +65,23 @@ class AccessAgreement extends React.Component {
         pingLoading: true,
         pingSuccess: null,
       })
+      this.shinning = false
       pingService(instanceID, { url: values.targetDetail }).then(res => {
         this.setState({ pingLoading: false })
         if (res.error) {
           this.setState({ pingSuccess: false })
           return
         }
-        this.setState({ pingSuccess: true })
+        let pingMethod
+        try {
+          pingMethod = res.response.result.body.replace('[', '').replace(']', '').split(',')
+        } catch (error) {
+          pingMethod = []
+        }
+        form.setFieldsValue({
+          method: pingMethod,
+        })
+        this.setState({ pingSuccess: true, pingMethod })
       })
     })
   }
@@ -130,19 +139,9 @@ class AccessAgreement extends React.Component {
     return result
   }
 
-  filterSelect = async value => {
-    const { setFieldsValue } = this.props.form
-    if (value.indexOf('所有方法') !== -1) {
-      await sleep()
-      setFieldsValue({
-        method: ENDPOINT_METHOD,
-      })
-    }
-  }
-
   render() {
     const { formItemLayout, form, className, dataList, isEdit } = this.props
-    const { pingSuccess } = this.state
+    const { pingSuccess, pingMethod } = this.state
     const { getFieldDecorator, getFieldValue, setFieldsValue } = form
     const { transformationDetail, transformationType, type, targetDetail } = dataList
     const protocol = getFieldValue('protocol')
@@ -152,6 +151,7 @@ class AccessAgreement extends React.Component {
     })
     const pingBtnClassNames = ClassNames({
       'right-btn': true,
+      shinning: this.shinning,
       success: pingSuccess === true,
       failed: pingSuccess === false,
     })
@@ -316,6 +316,7 @@ class AccessAgreement extends React.Component {
                   pattern: URL_REG,
                   message: '请填写正确的服务地址',
                 }],
+                onChange: () => { this.shinning = true },
               })(
                 <Input placeholder="请提供接入服务的基础 URL" />
               )}
@@ -334,18 +335,15 @@ class AccessAgreement extends React.Component {
               key="method"
             >
               {getFieldDecorator('method', {
-                initialValue: this.filterMethod(getValueFromLimitDetail(limitationDetail, 'method')) || ENDPOINT_METHOD,
+                initialValue: this.filterMethod(getValueFromLimitDetail(limitationDetail, 'method')),
                 rules: [{
                   required: true,
-                  message: '请选择方法',
+                  message: '请输入端点地址点击“测试连接”获取方法',
                 }],
-                onChange: e => {
-                  this.filterSelect(e)
-                },
               })(
-                <Select placeholder="请选择方法" mode="multiple">
+                <Select placeholder="请点击“测试连接”获取方法" mode="multiple">
                   {
-                    ENDPOINT_METHODS.map(method => <Option key={method}>{method}</Option>)
+                    (pingMethod || []).map(method => <Option key={method}>{method}</Option>)
                   }
                 </Select>
               )}

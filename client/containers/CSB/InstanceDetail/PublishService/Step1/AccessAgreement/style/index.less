@@ -12,6 +12,21 @@
 
 @import '~assets/style/core/index.less';
 
+@keyframes fade {
+  0% {
+    border-color: #d9d9d9;
+    box-shadow: 0 0 0 #fff;
+  }
+  50% {
+    border-color: #2db7f5;
+    box-shadow: 0 0 10px #2db7f5;
+  }
+  to {
+    border-color: #d9d9d9;
+    box-shadow: 0 0 0 #fff;
+  }
+}
+
 .access-agreement {
   .right-btn {
     &.success {
@@ -32,5 +47,10 @@
     .ant-switch {
       margin-right: @padding-base;
     }
+  }
+  .shinning {
+    border-color: #2db7f5;
+    box-shadow: 0 0 5px #2db7f5;
+    animation: fade 2s infinite;
   }
 }
