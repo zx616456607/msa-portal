@@ -62,25 +62,31 @@ class CallLinkTrackDetail extends React.PureComponent {
     })
   }
 
-  filterProgress = (text, success, duration) => {
+  filterProgress = (success, duration) => {
     const { detailData } = this.props
-    if (text) {
-      if (text.length === 2) {
-        return <Progress
-          status={success ? 'success' : 'exception'}
-          showInfo={false}
-          percent={100}
-        />
-      }
-      if (text.length === 4) {
-        const countMS = Math.ceil((duration / detailData[0].duration) * 100)
-        return <Progress
-          status={success ? 'success' : 'exception'}
-          showInfo={false}
-          percent={countMS}
-        />
-      }
-    }
+    // if (text && duration !== 0) {
+    //   if (text.length === 2) {
+    //     return <Progress
+    //       status={success ? 'success' : 'exception'}
+    //       showInfo={false}
+    //       percent={Math.ceil((duration_value/detailData[0].duration)*100)}
+    //     />
+    //   }
+    //   if (text.length === 4) {
+    //     const countMS = Math.ceil((duration / detailData[0].duration) * 100)
+    //     return <Progress
+    //       status={success ? 'success' : 'exception'}
+    //       showInfo={false}
+    //       percent={countMS}
+    //     />
+    //   }
+    // }
+    const countMS = Math.ceil((duration / detailData[0].duration) * 100)
+    return <Progress
+      status={success ? 'success' : 'exception'}
+      showInfo={false}
+      percent={countMS}
+    />
   }
 
   render() {
@@ -113,7 +119,7 @@ class CallLinkTrackDetail extends React.PureComponent {
       title: `时间线 0 ms - ${detailData.length > 0 && detailData[0].duration / 1000} ms`,
       dataIndex: 'annotations',
       width: '20%',
-      render: (text, record) => this.filterProgress(text, record.success, record.duration, record),
+      render: (text, record) => this.filterProgress(record.success, record.duration),
     }, {
       title: '操作',
       width: '15%',
