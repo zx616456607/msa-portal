@@ -37,7 +37,6 @@ export default class Control extends React.Component {
   render() {
     const { detail } = this.props
     const limitationDetail = JSON.parse(detail.limitationDetail) || {}
-
     const oauth2Detail = JSON.parse(detail.authenticationDetail || '{}')
     const {
       endpoint,
@@ -45,6 +44,12 @@ export default class Control extends React.Component {
       clientSecret,
     } = oauth2Detail
     const openOAuth = detail.authenticationType && detail.authenticationType === 'oauth2'
+    let xmlList = false
+    if(limitationDetail) {
+      if(limitationDetail[1].maxAttibuteCount && limitationDetail[1].maxAttibuteCount) {
+        xmlList = true
+      }
+    }
     return (
       <div className="service-control">
         <div className="service-control-body">
@@ -53,49 +58,55 @@ export default class Control extends React.Component {
             <Row>
               <Col span={6}>
                 <div className="txt-of-ellipsis">
-                每{ getValueFromLimitDetail(limitationDetail, 'duration') }最大调用量
+                  每{getValueFromLimitDetail(limitationDetail, 'duration')}最大调用量
                 </div>
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                  { getValueFromLimitDetail(limitationDetail, 'limit') }
+                  {getValueFromLimitDetail(limitationDetail, 'limit')}
                 </div>
               </Col>
             </Row>
           </div>
-          <div className="second-title">防止 XML 攻击</div>
-          <div className="row-table">
-            <Row>
-              <Col span={6}>
-                <div className="txt-of-ellipsis">XML 元素名称长度</div>
-              </Col>
-              <Col span={18}>
-                <div className="txt-of-ellipsis">
-                最长 { getValueFromLimitDetail(limitationDetail, 'maxElementNameLength') } 位
+          {
+            xmlList &&
+            <div>
+              <div className="second-title">防止 XML 攻击</div>
+              <div className="row-table">
+                <Row>
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">XML 元素名称长度</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      最长 {getValueFromLimitDetail(limitationDetail, 'maxElementNameLength')} 位
                 </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <div className="txt-of-ellipsis">XML 各元素属性数量</div>
-              </Col>
-              <Col span={18}>
-                <div className="txt-of-ellipsis">
-                最多 { getValueFromLimitDetail(limitationDetail, 'maxAttibuteCount') } 个
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">XML 各元素属性数量</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      最多 {getValueFromLimitDetail(limitationDetail, 'maxAttibuteCount')} 个
                 </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <div className="txt-of-ellipsis">移除 DTDs</div>
-              </Col>
-              <Col span={18}>
-                <div className="txt-of-ellipsis">
-                  { getValueFromLimitDetail(limitationDetail, 'removeDTD') }
-                </div>
-              </Col>
-            </Row>
-          </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={6}>
+                    <div className="txt-of-ellipsis">移除 DTDs</div>
+                  </Col>
+                  <Col span={18}>
+                    <div className="txt-of-ellipsis">
+                      {getValueFromLimitDetail(limitationDetail, 'removeDTD')}
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+          }
+
           <div className="second-title">访问控制</div>
           <div className="row-table">
             <Row>
@@ -104,7 +115,7 @@ export default class Control extends React.Component {
               </Col>
               <Col span={18}>
                 <div className="txt-of-ellipsis">
-                  { this.renderAuthType() }
+                  {this.renderAuthType()}
                 </div>
               </Col>
             </Row>
