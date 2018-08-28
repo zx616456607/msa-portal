@@ -34,7 +34,7 @@ export default class Parameters extends React.Component {
     }]
     return (
       <div className="service-parameters">
-        <div className="error-code">
+        <div className="parameters-info">
           <div className="second-title">错误代码</div>
           <Table
             dataSource={errorCode}
@@ -42,8 +42,8 @@ export default class Parameters extends React.Component {
             pagination={false}
             size="middle"
           />
-          <div className="second-title">模拟返回结果</div>
-          <Input.TextArea />
+          <div className="second-title" style={{ margin: '24px 0 24px 0' }} >模拟返回结果</div>
+          <Input.TextArea rows={4} />
         </div>
       </div>
     )
