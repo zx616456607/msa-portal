@@ -53,7 +53,6 @@ class ConfigCenter extends React.Component {
   }
 
   loadData = () => {
-    const { backBranch } = this.state
     const { clusterID, getService, getBranchList } = this.props
     getService(clusterID).then(res => {
       if (res.error) return
@@ -71,6 +70,7 @@ class ConfigCenter extends React.Component {
               branchData: res.response.result.data,
               value: res.response.result.data[0].name,
             }, () => {
+              const { backBranch } = this.state
               if (backBranch) {
                 this.fetchList(backBranch)
               } else {
@@ -181,7 +181,7 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '20%',
+      width: '25%',
       render: (text, record) =>
         <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch_name}`}>
           {text}
@@ -189,17 +189,19 @@ class ConfigCenter extends React.Component {
     }, {
       title: '最近更新时间',
       dataIndex: 'lastCommitTime',
+      width: '25%',
       render: text => {
         return <span>{formatDate(text)}</span>
       },
     }, {
       title: '最近一次提交',
       dataIndex: 'lastCommitMessage',
+      width: '25%',
     }, {
       id: 'id',
       title: '操作',
       dataIndex: 'operation',
-      width: '40%',
+      width: '30%',
       render: (text, record) => <div>
         <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch_name}`)}>查看详情</Button>
         <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch_name}`)}>更新</Button>
