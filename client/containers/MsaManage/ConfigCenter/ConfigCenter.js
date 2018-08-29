@@ -181,7 +181,7 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '25%',
+      width: '27%',
       render: (text, record) =>
         <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch_name}`}>
           {text}
@@ -196,12 +196,12 @@ class ConfigCenter extends React.Component {
     }, {
       title: '最近一次提交',
       dataIndex: 'lastCommitMessage',
-      width: '24%',
+      width: '21%',
     }, {
       id: 'id',
       title: '操作',
       dataIndex: 'operation',
-      width: '30%',
+      width: '27%',
       render: (text, record) => <div>
         <Button className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branch_name}`)}>查看详情</Button>
         <Button className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branch_name}`)}>更新</Button>
