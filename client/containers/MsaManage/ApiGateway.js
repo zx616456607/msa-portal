@@ -221,9 +221,27 @@ class ApiGateway extends React.Component {
   handleOk = () => {
     const { currentHandle } = this.state
     const { form } = this.props
-    const { validateFields } = form
+    const { validateFields, setFields } = form
     validateFields((errors, values) => {
       if (errors) {
+        return
+      }
+      if (!/^[0-9]+$/.test(values.limits)) {
+        setFields({
+          limits: {
+            value: values.limits,
+            errors: [ new Error('不支持小数点') ],
+          },
+        })
+        return
+      }
+      if (!/^[0-9]*[1-9][0-9]*$/.test(values.refresh_interval)) {
+        setFields({
+          refresh_interval: {
+            value: values.refresh_interval,
+            errors: [ new Error('不支持小数点') ],
+          },
+        })
         return
       }
       this.setState({
@@ -639,13 +657,13 @@ class ApiGateway extends React.Component {
                   initialValue: 1,
                   rules: [{
                     required: true,
-                    message: '请输入限流阈值',
+                    message: '请输入限流阈值,0~999999',
                   }],
                 })(
-                  <InputNumber placeholder="请输入限流阈值"/>
+                  <InputNumber placeholder="请输入限流阈值" min={0} step={100} max={999999} />
                 )
               }
-              次
+              &nbsp;&nbsp;次
             </FormItem>
             <FormItem
               label="窗口"
@@ -660,10 +678,10 @@ class ApiGateway extends React.Component {
                     message: '请输入窗口',
                   }],
                 })(
-                  <InputNumber placeholder="请输入窗口"/>
+                  <InputNumber placeholder="请输入窗口" min={1} max={60} />
                 )
               }
-              秒
+              &nbsp;&nbsp;秒
             </FormItem>
             { currentHandle === 'create' && <FormItem
               label="默认开启"
