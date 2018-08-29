@@ -21,7 +21,6 @@ import koaBunyanLogger from 'koa-bunyan-logger'
 import serveStatic from 'koa-static'
 import config from '../config'
 import packageJSON from '../package.json'
-import middlewares from './middlewares'
 import indexRoutes from './routes'
 import { format as formatError } from './service/errors'
 // set root dir to global
@@ -123,8 +122,8 @@ export default async function start() {
 
   if (isDebug) {
     // webpack middleware for dev and hot reload
-    // app.use(middlewares.webpack())
-    const middleware = await middlewares.webpackMiddleware()
+    const { webpackMiddleware } = require('./middlewares')
+    const middleware = await webpackMiddleware()
     app.use(middleware)
   }
 
