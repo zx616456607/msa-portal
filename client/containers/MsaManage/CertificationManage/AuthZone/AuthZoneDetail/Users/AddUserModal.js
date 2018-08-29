@@ -207,7 +207,7 @@ class AddUserModal extends React.Component {
                     required: true,
                     whitespace: true,
                     pattern: EMAIL_REG,
-                    message: '请填写正确的服务地址',
+                    message: '请填写正确的邮箱地址',
                   },
                 ],
                 initialValue: !isEmpty(currentUser) ? currentUser.emails[0].value : '',
@@ -226,7 +226,7 @@ class AddUserModal extends React.Component {
                   {
                     whitespace: true,
                     pattern: PHONE_REG,
-                    message: '请填写正确的服务地址',
+                    message: '请填写正确的手机号',
                   },
                 ],
                 initialValue:
