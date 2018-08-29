@@ -38,12 +38,8 @@
   "author": "zhangpc@tenxcloud.com",
   "license": "ISC",
   "dependencies": {
-    "@antv/data-set": "^0.8.9",
     "@babel/polyfill": "7.0.0-beta.37",
     "@babel/register": "7.0.0-beta.37",
-    "@tenx-ui/page": "^1.0.2",
-    "@tenx-ui/return-button": "^0.0.2",
-    "@tenx-ui/webSocket": "^1.1.1",
     "babel-preset-env": "^1.6.1",
     "bluebird": "^3.4.7",
     "cross-env": "^5.2.0",
@@ -59,6 +55,7 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
+    "@antv/data-set": "^0.8.9",
     "@antv/g6": "1.1.1",
     "@babel/core": "7.0.0-beta.37",
     "@babel/plugin-transform-runtime": "7.0.0-beta.37",
@@ -69,8 +66,11 @@
     "@tenx-ui/ellipsis": "0.0.2",
     "@tenx-ui/icon": "^1.0.13",
     "@tenx-ui/loader": "^0.0.3",
+    "@tenx-ui/page": "^1.0.2",
     "@tenx-ui/relation-chart": "^0.2.6",
+    "@tenx-ui/return-button": "^0.0.2",
     "@tenx-ui/select-with-checkbox": "0.0.4-beta.1",
+    "@tenx-ui/webSocket": "^1.1.2",
     "antd": "^3.1.6",
     "autoprefixer": "^7.1.6",
     "babel-jest": "^21.2.0",
