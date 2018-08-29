@@ -32,8 +32,8 @@ const tooltip = [{
   title: '重新部署',
   content: '该操作将重新部署 SpringCloud 对应组件, 可能会影响微服务的正常运行。请谨慎操作！',
 }, {
-  title: '水平扩展',
-  content: 'Tips：实例数量调整, 保存后系统将调整实例数量至设置预期',
+  title: '启动组件',
+  content: '该操作将启动 SpringCloud 对应组件。',
 }]
 
 const SHOW_BTN_COMPONENTS = [ 'spring-cloud-config', 'hystrix-turbine', 'spring-cloud-discovery' ]
@@ -163,10 +163,14 @@ class MsaComponents extends React.Component {
   }
 
   handleButtonClick = record => {
+    let targetTip = tooltip[0]
+    if (record.status === 3) {
+      targetTip = tooltip[3]
+    }
     this.setState({
       toopVisible: true,
-      tooltipTitle: tooltip[0].title,
-      tooltipContent: tooltip[0].content,
+      tooltipTitle: targetTip.title,
+      tooltipContent: targetTip.content,
       componentName: record.component,
     })
   }
@@ -179,12 +183,8 @@ class MsaComponents extends React.Component {
         return tooltip[1]
       case '重新部署':
         return tooltip[2]
-      case '查看日志':
-        return tooltip[4]
-      case '高可用':
-        return tooltip[5]
       default:
-        return
+        return tooltip[3]
     }
   }
   handleMenuClick = (e, value) => {
@@ -340,14 +340,14 @@ class MsaComponents extends React.Component {
       render: (text, record) => <div>
         <Dropdown.Button onClick={() => this.handleButtonClick(record)} overlay={
           <Menu onClick={e => this.handleMenuClick(e, record)} style={{ width: 100 }}>
-            <Menu.Item key="停止组件">停止组件</Menu.Item>
+            { record.status !== 3 && <Menu.Item key="停止组件">停止组件</Menu.Item> }
             <Menu.Item key="重新部署">重新部署</Menu.Item>
             {
               SHOW_BTN_COMPONENTS.includes(record.component) &&
               <Menu.Item key="水平扩展">水平扩展</Menu.Item>
             }
           </Menu>
-        }>重启组件</Dropdown.Button>
+        }>{ record.status === 3 ? '启动组件' : '重启组件' }</Dropdown.Button>
       </div>,
     }]
 

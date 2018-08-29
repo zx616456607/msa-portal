@@ -45,8 +45,8 @@ export default class Control extends React.Component {
     } = oauth2Detail
     const openOAuth = detail.authenticationType && detail.authenticationType === 'oauth2'
     let xmlList = false
-    if(limitationDetail) {
-      if(limitationDetail[1].maxAttibuteCount && limitationDetail[1].maxAttibuteCount) {
+    if (limitationDetail) {
+      if (limitationDetail[1].maxAttibuteCount && limitationDetail[1].maxAttibuteCount) {
         xmlList = true
       }
     }
@@ -80,7 +80,7 @@ export default class Control extends React.Component {
                   <Col span={18}>
                     <div className="txt-of-ellipsis">
                       最长 {getValueFromLimitDetail(limitationDetail, 'maxElementNameLength')} 位
-                </div>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
@@ -90,7 +90,7 @@ export default class Control extends React.Component {
                   <Col span={18}>
                     <div className="txt-of-ellipsis">
                       最多 {getValueFromLimitDetail(limitationDetail, 'maxAttibuteCount')} 个
-                </div>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
