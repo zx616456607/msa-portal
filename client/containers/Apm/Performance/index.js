@@ -164,7 +164,7 @@ class Performance extends React.Component {
       if (res.error) {
         return
       }
-      var { JVM_MEMORY_HEAP_MAX, JVM_MEMORY_HEAP_USED,
+      const { JVM_MEMORY_HEAP_MAX, JVM_MEMORY_HEAP_USED,
         JVM_MEMORY_NON_HEAP_MAX, JVM_MEMORY_NON_HEAP_USED } =
         this.sixToSeven(res.response.result).charts || {}
 
@@ -184,7 +184,7 @@ class Performance extends React.Component {
         }
       ))
       let frame = new Frame(heapAry)
-      frame = Frame.combinColumns(frame, ['xVal'], 'count')
+      frame = Frame.combinColumns(frame, [ 'xVal' ], 'count')
       this.setState({
         heapData: frame,
       })
@@ -198,7 +198,7 @@ class Performance extends React.Component {
         }
       ))
       let frames = new Frame(permAry)
-      frames = Frame.combinColumns(frames, ['xVal'], 'count')
+      frames = Frame.combinColumns(frames, [ 'xVal' ], 'count')
       this.setState({
         gcData: frames,
       })
@@ -223,7 +223,7 @@ class Performance extends React.Component {
         }
       ))
       let frame = new Frame(cpumAry)
-      frame = Frame.combinColumns(frame, ['yVal', 'xVal'], 'value')
+      frame = Frame.combinColumns(frame, [ 'yVal', 'xVal' ], 'value')
       this.setState({
         cpuData: frame,
       })
@@ -233,8 +233,8 @@ class Performance extends React.Component {
       if (res.error) {
         return
       }
-      var { TPS_TOTAL, TPS_SAMPLED_NEW, TPS_UNSAMPLED_NEW,
-        TPS_SAMPLED_CONTINUATION, TPS_UNSAMPLED_CONTINUATION
+      const { TPS_TOTAL, TPS_SAMPLED_NEW, TPS_UNSAMPLED_NEW,
+        TPS_SAMPLED_CONTINUATION, TPS_UNSAMPLED_CONTINUATION,
       } = this.sixToSeven(res.response.result).charts || {}
       const chartJVM = {
         unsampled_c: TPS_UNSAMPLED_CONTINUATION,
@@ -264,7 +264,7 @@ class Performance extends React.Component {
       let frame = new Frame(tranAry)
       frame = Frame.combinColumns(
         frame,
-        ['total', 'unsampledNew', 'sampledNew', 'sampledContinuation'],
+        [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ],
         'count'
       )
       this.setState({
@@ -295,6 +295,9 @@ class Performance extends React.Component {
   }
 
   convertOneKey = (schema, x, y) => {
+    if(!y || y.length) {
+      return []
+    }
     const metricIndex = {}
     for (let i = 0; i < schema.length; ++i) {
       const key = schema[i]
@@ -464,7 +467,7 @@ class Performance extends React.Component {
         },
       })
       chart.legend(false)
-      chart.area().position('time*yVal').color('type', ['#43b5d8'])
+      chart.area().position('time*yVal').color('type', [ '#43b5d8' ])
       chart.intervalStack().position('time*count')
       chart.render()
       chart.on('plotdblclick', () => {
@@ -524,7 +527,7 @@ class Performance extends React.Component {
         alias: 'TPS',
       })
       chart.legend(false)
-      chart.area().position('time*count').color('type', ['#43b5d8'])
+      chart.area().position('time*count').color('type', [ '#43b5d8' ])
         .size(2)
         .shape('smooth')
       // chart.line().position('time*unsampledNew')
@@ -571,7 +574,7 @@ class Performance extends React.Component {
         },
       })
       chart.legend(false)
-      chart.area().position('time*yVal').color('type', ['#43b5d8'])
+      chart.area().position('time*yVal').color('type', [ '#43b5d8' ])
       chart.intervalStack().position('time*count')
       chart.render()
       chart.on('plotdblclick', () => {
@@ -580,9 +583,9 @@ class Performance extends React.Component {
       })
     }
     const nodeList = agentData && agentData[exampleData.applicationName] || []
-    const chartAry = [Charts, Charts1, Charts2, Charts3]
+    const chartAry = [ Charts, Charts1, Charts2, Charts3 ]
     const ChartGroup = CreateG2Group(chartAry, true)
-    const [Chart, Chart1, Chart2, Chart3] = ChartGroup
+    const [ Chart, Chart1, Chart2, Chart3 ] = ChartGroup
     return (
       <QueueAnim className="apm-performance">
         <div className="layout-content-btns" key="btns">
