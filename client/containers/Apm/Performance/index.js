@@ -295,7 +295,7 @@ class Performance extends React.Component {
   }
 
   convertOneKey = (schema, x, y) => {
-    if(!y || y.length) {
+    if (y.length === 0) {
       return []
     }
     const metricIndex = {}
@@ -382,7 +382,7 @@ class Performance extends React.Component {
           break
         default:
           this.setState({
-            customTimer: Date.parse(new Date()),
+            customTimer: Date.parse(new Date(new Date().setHours(0, 0, 0, 0))),
           })
           this.handleSelect(serviceName)
           break
