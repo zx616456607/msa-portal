@@ -141,9 +141,14 @@ class CallLinkTracking extends React.Component {
   }
 
   handleReset = () => {
+    const { rangeDateTime } = this.state
     const { clusterID, getZipkinTracesList } = this.props
     this.props.form.resetFields()
-    getZipkinTracesList(clusterID)
+    const query = {
+      endTs: Date.parse(formatDate(rangeDateTime[1])),
+      lookback: rangeDateTime[1] - rangeDateTime[0],
+    }
+    getZipkinTracesList(clusterID, query)
   }
 
   tableChange = (pagination, filters) => {
