@@ -33,6 +33,7 @@ import {
   saveCascadedServicesWs, removeCascadedServicesWs, saveCascadedServicesProgress,
 } from '../../../actions/CSB/instanceService'
 import './style/index.less'
+import { cascadingLinkRuleSlt } from '../../../selectors/CSB/cascadingLinkRules'
 
 const { CSB_API_URL } = API_CONFIG
 
@@ -44,7 +45,7 @@ class CSBInstanceDetail extends React.Component {
   componentDidMount() {
     const {
       instanceID, getInstanceByID, jwtToken, saveCascadedServicesWs,
-      cascadedServicesWebsocket, saveCascadedServicesProgress,
+      cascadedServicesWebsocket,
     } = this.props
     // get instance by id
     getInstanceByID(UNUSED_CLUSTER_ID, instanceID).then(res => {
@@ -65,11 +66,13 @@ class CSBInstanceDetail extends React.Component {
       }
       const ws = new SockJS(`${CSB_API_URL}/cascaded-services?${toQuerystring(query)}`)
       const stompWs = Stomp.over(ws)
+      const that = this
       const connectCb = frame => {
         console.warn('frame', frame)
         this.stompWsSubscribe = stompWs.subscribe('/user/api/v1/cascaded-services/progress', ({ body, ack }) => {
+          const { saveCascadedServicesProgress, instanceList } = that.props
           const progress = JSON.parse(body)
-          const { msg, notifyType } = formatWSMessage(progress)
+          const { msg, notifyType } = formatWSMessage(progress, instanceList)
           notification[notifyType]({
             message: msg,
           })
@@ -217,11 +220,15 @@ const mapStateToProps = (state, ownProps) => {
   const { cascadedServicesWebsocket } = CSB
   const { match } = ownProps
   const { instanceID } = match.params
+  const cascadingLinkRules = cascadingLinkRuleSlt(state, ownProps)
+  let instanceList = []
+  cascadingLinkRules.content.map(ins => (instanceList = instanceList.concat(ins.instances)))
   return {
     instanceID,
     currentInstance: csbAvaInstances && csbAvaInstances[instanceID],
     jwtToken: auth.jwt.token,
     cascadedServicesWebsocket,
+    instanceList,
   }
 }
 

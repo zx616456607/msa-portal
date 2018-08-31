@@ -13,6 +13,7 @@
 import React from 'react'
 import { Spin, Badge, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
+import find from 'lodash/find'
 import { SECONDS_CONVERSION } from '../../constants'
 
 
@@ -141,8 +142,13 @@ export function renderCSBInstanceStatus(instanceStatus) {
   return <Badge status={status} text={text} />
 }
 
-export function formatWSMessage(message) {
-  const { type } = message
+export function formatWSMessage(message, instances) {
+  const { type, instanceId } = message
+  let insName = ''
+  if (instanceId) {
+    const ins = find(instances, { id: instanceId })
+    if (ins && ins.name) insName = ins.name
+  }
   let notifyType = 'warning'
   let msg = ''
   switch (type) {
@@ -190,7 +196,7 @@ export function formatWSMessage(message) {
       notifyType = 'success'
       break
     case 'finished_one_instance_publishing':
-      msg = '在一个实例上发布成功'
+      msg = `在 ${insName} 实例上发布成功`
       notifyType = 'success'
       break
     case 'finished_all_publishing':
@@ -202,7 +208,7 @@ export function formatWSMessage(message) {
       notifyType = 'success'
       break
     case 'finished_one_instance_concealing':
-      msg = '在一个实例上注销成功'
+      msg = `在 ${insName} 实例上注销成功`
       notifyType = 'success'
       break
     case 'finished_all_concealing':
