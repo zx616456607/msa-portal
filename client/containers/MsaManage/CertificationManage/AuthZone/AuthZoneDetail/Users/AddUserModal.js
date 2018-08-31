@@ -112,6 +112,31 @@ class AddUserModal extends React.Component {
     callback()
   }
 
+  checkUserName = (rules, value, cb) => {
+    if (!value) {
+      return cb()// view have message
+    }
+    const { userList, currentUser } = this.props
+    if (value.length < 3 || value.length > 64) {
+      return cb('用户名长度为3 ~ 64位字符')
+    }
+    if (isEmpty(currentUser)) {
+      let hasUserName = false
+      userList.every(item => {
+        if (item.userName === value) {
+          hasUserName = true
+          return false
+        }
+        return true
+      })
+      if (hasUserName) {
+        return cb('用户名已存在')
+      }
+      return cb()
+    }
+    cb()
+  }
+
   render() {
     const { loading } = this.state
     const { form, visible, closeModal, currentUser } = this.props
@@ -140,6 +165,9 @@ class AddUserModal extends React.Component {
                     required: true,
                     whitespace: true,
                     message: '请填写用户名称',
+                  },
+                  {
+                    validator: this.checkUserName,
                   },
                 ],
                 initialValue: !isEmpty(currentUser) ? currentUser.userName : '',
