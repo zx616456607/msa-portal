@@ -80,10 +80,6 @@ class GroupsModal extends React.Component {
                 },
               ],
               initialValue: editGroup ? editData.displayName : '',
-              rules: [{
-                required: true,
-                message: '请输入组名称',
-              }],
             })(
               <Input placeholder="请输入组名称" />
             )
