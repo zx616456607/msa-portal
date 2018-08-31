@@ -18,7 +18,10 @@
  * @return {string} cookie
  */
 
-import { DEFAULT, DEFAULT_TIME_FORMAT } from '../constants'
+import { DEFAULT, DEFAULT_TIME_FORMAT,
+  HOSTNAME_REG,
+  IP_WITH_PORT_REG,
+} from '../constants'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 
@@ -493,3 +496,31 @@ export function formatServiceOpenProtocol(type) {
  */
 export const getDeepValue = (target, propsList) => propsList.reduce(
   (result, prop) => ((result && result[prop]) ? result[prop] : null), target)
+
+/**
+ * validator: service export check ip or domain
+ * value not wrap http(s)
+ */
+
+export function ipOrDomainValidator(rule, value, cb) {
+  if (!value) {
+    return cb() // view have 'message', so cb()
+  }
+  if (!/^[a-zA-Z0-9]/.test(value)) {
+    return cb('请输入合理的IP或域名地址')
+  }
+  if (/^\d/.test(value)) {
+    if (!IP_WITH_PORT_REG.test(value)) {
+      return cb('请输入合理的IP地址')
+    }
+  }
+  if (/^[a-zA-Z]/.test(value)) {
+    if (/^(http[s]?:)/.test(value)) {
+      return cb('域名不含 http(s)')
+    }
+    if (!HOSTNAME_REG.test(value)) {
+      return cb('请输入合理的域名地址')
+    }
+  }
+  cb()
+}
