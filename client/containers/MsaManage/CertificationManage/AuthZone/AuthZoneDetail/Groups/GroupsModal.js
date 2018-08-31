@@ -72,6 +72,13 @@ class GroupsModal extends React.Component {
         <FormItem {...formItemLayout} label="组名称">
           {
             getFieldDecorator('groupName', {
+              rules: [
+                {
+                  required: true,
+                  whitespace: true,
+                  message: '请填写组名称',
+                },
+              ],
               initialValue: editGroup ? editData.displayName : '',
             })(
               <Input placeholder="请输入组名称" />
