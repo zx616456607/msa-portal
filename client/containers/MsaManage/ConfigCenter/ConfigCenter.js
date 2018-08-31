@@ -197,6 +197,7 @@ class ConfigCenter extends React.Component {
       title: '最近一次提交',
       dataIndex: 'lastCommitMessage',
       width: '21%',
+      render: text => decodeURIComponent(text)
     }, {
       id: 'id',
       title: '操作',

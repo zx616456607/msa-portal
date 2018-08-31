@@ -230,7 +230,7 @@ class CreateConfig extends React.Component {
       const query = {
         branch_name: branchName,
         file_path: inputValue,
-        commit_message: textAreaValue,
+        commit_message: encodeURIComponent(textAreaValue),
         project_url: configGitUrl,
       }
       addCenterConfig(clusterID, currentYaml, query).then(res => {
