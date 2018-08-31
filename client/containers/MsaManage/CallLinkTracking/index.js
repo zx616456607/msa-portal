@@ -14,7 +14,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  Select, Input, Button,
+  Select, Input, Button, InputNumber,
   Card, Table, Form, Col, Row, Badge,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
@@ -301,11 +301,11 @@ class CallLinkTracking extends React.Component {
                   </Select>
                 )}
               </FormItem>
-            </Col>
+            </Col>请填写确认密码 请输入确认密码
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('limit', {})(
-                  <Input placeholder="返回条数，默认10条" className="resCount" />
+                  <InputNumber min={1} max={900} placeholder="返回条数，默认10条" className="resCount" />
                 )}
               </FormItem>
             </Col>
