@@ -102,10 +102,10 @@ class CreateConfig extends React.Component {
       yaml } = this.state
     const { putCenterConfig, clusterID } = this.props
     const query = {
-      branch_name: branchName,
-      file_path: inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue,
-      commit_message: textAreaValue === '' ? '添加一个配置' : textAreaValue,
-      project_url: configGitUrl,
+      branch_name: encodeURIComponent(branchName),
+      file_path: encodeURIComponent(inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue),
+      commit_message: encodeURIComponent(textAreaValue === '' ? '添加一个配置' : textAreaValue),
+      project_url: encodeURIComponent(configGitUrl),
     }
     const yamls = currentYaml === '' ? yaml : currentYaml
     if (yaml && currentYaml === '') {
@@ -228,10 +228,10 @@ class CreateConfig extends React.Component {
         addLoading: true,
       })
       const query = {
-        branch_name: branchName,
-        file_path: inputValue,
-        commit_message: textAreaValue,
-        project_url: configGitUrl,
+        branch_name: encodeURIComponent(branchName),
+        file_path: encodeURIComponent(inputValue),
+        commit_message: encodeURIComponent(textAreaValue),
+        project_url: encodeURIComponent(configGitUrl),
       }
       addCenterConfig(clusterID, currentYaml, query).then(res => {
         if (res.error) {
@@ -275,7 +275,7 @@ class CreateConfig extends React.Component {
                 initialValue: detail !== 'false' ? projectName : undefined,
                 rules: [{ required: true, pattern: REPOSITORY_REGEXP, whitespace: true, message: '配置名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头' }],
               })(
-                <Input className="selects" placeholder="请输入配置名称" disabled={ detail === 'true' } onChange={this.handleInput} />
+                <Input className="selects" placeholder="请输入配置名称" disabled={detail === 'true'} onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
@@ -285,7 +285,7 @@ class CreateConfig extends React.Component {
                 initialValue: branchName || undefined,
                 rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
               })(
-                <Select className="selects" placeholder="请选择配置版本" disabled={ detail === 'true' } onChange={this.handlechage}>
+                <Select className="selects" placeholder="请选择配置版本" disabled={detail === 'true'} onChange={this.handlechage}>
                   {
                     branchData ?
                       branchData.map((item, index) => (
@@ -336,16 +336,16 @@ class CreateConfig extends React.Component {
             }
             {
               detail === 'true' &&
-                <div>
-                  <Button type="primary" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>确定</Button>
-                </div>
+              <div>
+                <Button type="primary" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>确定</Button>
+              </div>
             }
             {
               detail === 'false' &&
-                <div>
-                  <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
-                  <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确定</Button>
-                </div>
+              <div>
+                <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
+                <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确定</Button>
+              </div>
             }
           </div>
         </Card>
