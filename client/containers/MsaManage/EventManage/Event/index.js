@@ -257,13 +257,13 @@ class Event extends React.Component {
         width: '20%',
         dataIndex: 'instanceId',
       }, {
-        title: '事件详情',
-        width: '10%',
-        dataIndex: 'describe',
-        render: _ => _ || '-',
+        // title: '事件详情',
+        // width: '10%',
+        // dataIndex: 'describe',
+        // render: _ => _ || '-',
       }, {
         title: '产生时间',
-        width: '10%',
+        width: '20%',
         dataIndex: 'eventTime',
         sorter: true,
         render: text => formatDate(text),
