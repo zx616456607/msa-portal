@@ -296,7 +296,7 @@ class CallLinkTracking extends React.Component {
                   </Select>
                 )}
               </FormItem>
-            </Col>
+            </Col>请填写确认密码 请输入确认密码
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('limit', {})(

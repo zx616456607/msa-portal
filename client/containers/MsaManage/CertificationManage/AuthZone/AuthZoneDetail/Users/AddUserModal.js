@@ -128,9 +128,7 @@ class AddUserModal extends React.Component {
         onOk={this.handleConfirm}
         confirmLoading={loading}
       >
-        <Form
-          hideRequiredMark={true}
-        >
+        <Form>
           <FormItem
             label={'用户名'}
             {...formItemLayout}
