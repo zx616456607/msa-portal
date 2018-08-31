@@ -502,7 +502,7 @@ export const getDeepValue = (target, propsList) => propsList.reduce(
  * value not wrap http(s)
  */
 
-export function ipOrDomainValidator(role, value, cb) {
+export function ipOrDomainValidator(rule, value, cb) {
   if (!value) {
     return cb() // view have 'message', so cb()
   }
