@@ -183,8 +183,8 @@ class ConfigCenter extends React.Component {
       dataIndex: 'name',
       width: '27%',
       render: (text, record) =>
-        <Link to={`/msa-manage/config-center/${text}?detail=true&id=${record.id}&branch=${branch_name}`}>
-          {text}
+        <Link to={`/msa-manage/config-center/${decodeURIComponent(text)}?detail=true&id=${record.id}&branch=${branch_name}`}>
+          {decodeURIComponent(text)}
         </Link>,
     }, {
       title: '最近更新时间',
@@ -197,7 +197,7 @@ class ConfigCenter extends React.Component {
       title: '最近一次提交',
       dataIndex: 'lastCommitMessage',
       width: '21%',
-      render: text => decodeURIComponent(text)
+      render: text => decodeURIComponent(text),
     }, {
       id: 'id',
       title: '操作',
