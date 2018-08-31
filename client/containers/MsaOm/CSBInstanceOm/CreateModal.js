@@ -18,6 +18,7 @@ import { createInstance, editInstance, checkInstanceName } from '../../../action
 import {
   ASYNC_VALIDATOR_TIMEOUT,
 } from '../../../constants'
+import { ipOrDomainValidator } from '../../../common/utils'
 
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -145,25 +146,7 @@ class InstanceModal extends React.Component {
     }
     callback()
   }
-  ipOrDomainValidator = (rule, value, cb) => {
-    if (!value) return cb()
-    const domain = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:[1-9]{1}[0-9]{1,4})?$/
-    const ipWithPort = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(:[1-9]{1}[0-9]{1,4})?$/
-    if (/^\d/.test(value)) {
-      if (!ipWithPort.test(value)) {
-        return cb('请输入合理的IP地址')
-      }
-    }
-    if (/^[a-zA-Z]/.test(value)) {
-      if (/^(http[s]?:)/.test(value)) {
-        return cb('域名不含 http(s)')
-      }
-      if (!domain.test(value)) {
-        return cb('请输入合理的域名地址')
-      }
-    }
-    cb()
-  }
+
   render() {
     const { confirmLoading } = this.state
     const { form, currentInstance, clusterList, visible } = this.props
@@ -242,7 +225,7 @@ class InstanceModal extends React.Component {
                   // pattern: HOST_REG,
                   message: '请输入实例出口地址',
                 }, {
-                  validator: this.ipOrDomainValidator,
+                  validator: ipOrDomainValidator,
                 },
               ],
               initialValue: currentInstance ? currentInstance.host : '',
