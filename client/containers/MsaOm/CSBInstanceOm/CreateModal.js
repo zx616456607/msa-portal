@@ -16,7 +16,7 @@ import { Modal, Form, Input, Select, notification } from 'antd'
 import { getAllClusters } from '../../../actions/current'
 import { createInstance, editInstance, checkInstanceName } from '../../../actions/CSB/instance'
 import {
-  HOST_REG, ASYNC_VALIDATOR_TIMEOUT,
+  ASYNC_VALIDATOR_TIMEOUT,
 } from '../../../constants'
 
 const { TextArea } = Input
@@ -147,10 +147,21 @@ class InstanceModal extends React.Component {
   }
   ipOrDomainValidator = (rule, value, cb) => {
     if (!value) return cb()
-    const domain = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
-    const ip = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-    const ipWithPort = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):(\d{1,5})$/
-    if (!domain.test(value) && !ip.test(value) && !ipWithPort.test(value)) cb('请输入ip或域名, 域名不含 http(s)')
+    const domain = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:[1-9]{1}[0-9]{1,4})?$/
+    const ipWithPort = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(:[1-9]{1}[0-9]{1,4})?$/
+    if (/^\d/.test(value)) {
+      if (!ipWithPort.test(value)) {
+        return cb('请输入合理的IP地址')
+      }
+    }
+    if (/^[a-zA-Z]/.test(value)) {
+      if (/^(http[s]?:)/.test(value)) {
+        return cb('域名不含 http(s)')
+      }
+      if (!domain.test(value)) {
+        return cb('请输入合理的域名地址')
+      }
+    }
     cb()
   }
   render() {
@@ -228,7 +239,7 @@ class InstanceModal extends React.Component {
                 {
                   required: true,
                   whitespace: true,
-                  pattern: HOST_REG,
+                  // pattern: HOST_REG,
                   message: '请输入实例出口地址',
                 }, {
                   validator: this.ipOrDomainValidator,
