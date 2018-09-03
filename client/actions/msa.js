@@ -283,12 +283,13 @@ export const MSA_CONFIG_REQUEST = 'MSA_CONFIG_REQUEST'
 export const MSA_CONFIG_SUCCESS = 'MSA_CONFIG_SUCCESS'
 export const MSA_CONFIG_FAILURE = 'MSA_CONFIG_FAILURE'
 
-const fetchMsaConfig = (clusterID, serviceInfo) => {
+const fetchMsaConfig = (clusterID, serviceInfo, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/config`
   /* if (query) {
     endpoint += `?${toQuerystring(query)}`
   } */
   return {
+    options,
     [CALL_API]: {
       types: [ MSA_CONFIG_REQUEST, MSA_CONFIG_SUCCESS, MSA_CONFIG_FAILURE ],
       endpoint,
@@ -297,9 +298,9 @@ const fetchMsaConfig = (clusterID, serviceInfo) => {
   }
 }
 
-export function getMsaConfig(clusterID, serviceInfo) {
+export function getMsaConfig(clusterID, serviceInfo, options) {
   return dispatch => {
-    return dispatch(fetchMsaConfig(clusterID, serviceInfo))
+    return dispatch(fetchMsaConfig(clusterID, serviceInfo, options))
   }
 }
 

@@ -28,7 +28,13 @@ class MsaDetailConfig extends React.Component {
 
   loadMsaConfig = () => {
     const { getMsaConfig, clusterID, name, instances } = this.props
-    getMsaConfig(clusterID, `${name}:${instances[0].port}`)
+    getMsaConfig(clusterID, `${name}:${instances[0].port}`, { isHandleError: true }).then(res => {
+      if (res.status === 404) {
+        notification.warn({
+          message: '没有相关配置',
+        })
+      }
+    })
   }
 
   componentDidMount() {
