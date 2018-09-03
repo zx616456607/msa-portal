@@ -891,9 +891,10 @@ export const ADD_GROUPS_DETAIL_USER_REQUEST = 'ADD_GROUPS_DETAIL_USER_REQUEST'
 export const ADD_GROUPS_DETAIL_USER_SUCCESS = 'ADD_GROUPS_DETAIL_USER_SUCCESS'
 export const ADD_GROUPS_DETAIL_USER_FAILURE = 'ADD_GROUPS_DETAIL_USER_FAILURE'
 
-const createGroupUser = (token, id, body, zoneInfo) => {
+const createGroupUser = (token, id, body, options, zoneInfo) => {
   const { id: zoneId, subdomain } = zoneInfo
   return {
+    options,
     [CALL_API]: {
       types: [
         ADD_GROUPS_DETAIL_USER_REQUEST,
@@ -916,11 +917,11 @@ const createGroupUser = (token, id, body, zoneInfo) => {
   }
 }
 
-export const addGroupsUser = (id, body) =>
+export const addGroupsUser = (id, body, options) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     const { identityZoneDetail } = getState().certification
-    return dispatch(createGroupUser(access_token, id, body, identityZoneDetail))
+    return dispatch(createGroupUser(access_token, id, body, options, identityZoneDetail))
   }
 
 /* <-------------------------- Groups end -------------------------->*/

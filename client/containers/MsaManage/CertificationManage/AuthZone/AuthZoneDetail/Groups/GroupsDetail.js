@@ -139,7 +139,11 @@ class GroupsDetail extends React.Component {
       delResult = await this.handleDelGroupUsers(delKeys)
     }
     if (!isEmpty(addResult)) {
-      failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+      if (addResult.includes(409)) {
+        failedMessage += '默认的组不允许添加用户'
+      } else {
+        failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+      }
     }
     if (!isEmpty(delResult)) {
       failedMessage += `移除用户 ${delResult.toString()} 失败；\n`
@@ -170,14 +174,19 @@ class GroupsDetail extends React.Component {
         type: 'USER',
         value: user.id,
       }
-      return addGroupsUser(groupInfo.id, body)
+      return addGroupsUser(groupInfo.id, body, { isHandleError: true })
     })
     const resultArray = await Promise.all(promiseArray)
     const failedArray = []
     resultArray.every(res => {
-      const { type, value } = res.response.result
-      if (type === ADD_GROUPS_DETAIL_USER_FAILURE) {
-        failedArray.push(value)
+      const { type, status } = res
+      if (status === 409) {
+        failedArray.push(status)
+      } else {
+        const { value } = res.response.result
+        if (type === ADD_GROUPS_DETAIL_USER_FAILURE) {
+          failedArray.push(value)
+        }
       }
       return true
     })
@@ -193,7 +202,8 @@ class GroupsDetail extends React.Component {
     const resultArray = await Promise.all(promiseArray)
     const failedArray = []
     resultArray.every(res => {
-      const { type, value } = res.response.result
+      const { type } = res
+      const { value } = res.response.result
       if (type === DELETE_GROUP_USER_FAILURE) {
         failedArray.push(value)
       }
