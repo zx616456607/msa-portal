@@ -169,16 +169,6 @@ class App extends React.Component {
       })
       return
     }
-    if (status === 404 && pathname.includes('/msa-manage/detail/')) {
-      notification.warn({
-        message: '没有相关配置',
-        onClose: () => {
-          resetErrorMessage()
-          errorMessageCloseObj[errorMessageBeforeDateTime] = true
-        },
-      })
-      return
-    }
     if (status === 409
       && pathname.includes('/csb-instances-available/')
       && pathname.includes('/publish-service')) {

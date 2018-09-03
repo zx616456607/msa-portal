@@ -271,7 +271,7 @@ class Users extends React.Component {
           }
         </div>,
       },
-      {
+      /* {
         title: '邮箱验证',
         dataIndex: 'verified',
         key: 'verified',
@@ -279,7 +279,7 @@ class Users extends React.Component {
         render: text => <div className={text ? 'success-status' : 'error-status'}>
           {text ? '已验证' : '未验证'}
         </div>,
-      },
+      },*/
       {
         title: '创建时间',
         dataIndex: 'meta.created',
