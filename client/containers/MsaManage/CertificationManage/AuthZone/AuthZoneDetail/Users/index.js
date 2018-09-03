@@ -342,6 +342,7 @@ class Users extends React.Component {
           addVisible &&
           <AddUserModal
             visible={addVisible}
+            userList={zoneUsers}
             {...{ currentUser }}
             closeModal={() => this.toggleVisible('addVisible')}
             loadData={this.loadUserList}
