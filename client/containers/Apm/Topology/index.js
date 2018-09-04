@@ -434,7 +434,7 @@ class Topology extends React.Component {
           nodes.forEach(v => {
             if (v.id === name) {
               this.getCurrentNode(v.id)
-              v.active = !v.active ? true : false
+              v.active = !v.active
             } else {
               v.active = false
             }
