@@ -21,7 +21,7 @@ import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '
 import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
-import createG6 from '../../../components/CreateG6'
+import RelationChart from '@tenx-ui/relation-chart'
 import G6 from '@antv/g6'
 import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
@@ -169,7 +169,6 @@ const Chart3 = createG2(chart => {
     .size(9)
   chart.render()
 })
-let Chart4
 class Topology extends React.Component {
   constructor() {
     super()
@@ -209,50 +208,6 @@ class Topology extends React.Component {
   componentDidMount() {
     const { loadPPApps, clusterID, apmID } = this.props
     apmID && loadPPApps(clusterID, apmID)
-    Chart4 = createG6(chart => {
-      chart.render()
-      chart.edge()
-        .shape('smooth')
-        .style({
-          arrow: true,
-        })
-        .size(2)
-      chart.on('click', ev => {
-        let key = ''
-        const item = ev.item
-        if (chart.isNode(item)) {
-          key = item._attrs.model.id
-          this.getCurrentNode(key)
-          chart.setItemActived(item, true)
-        } else if (chart.isEdge(item)) {
-          key = item._attrs.model.source
-          const group = item.getShapeCfg()
-          const { source, target } = group
-          this.getCurrentNode(key)
-          chart.setItemActived(source, true)
-          chart.setItemActived(target, true)
-        }
-        chart.refresh()
-      })
-      chart.on('itemmouseenter', ev => {
-        const item = ev.item
-        if (chart.isEdge(item)) {
-          chart.update(item, {
-            color: '#2db7f5',
-          })
-          chart.refresh()
-        }
-      })
-      chart.on('itemmouseleave', ev => {
-        const item = ev.item
-        if (chart.isEdge(item)) {
-          chart.update(item, {
-            color: '#999',
-          })
-          chart.refresh()
-        }
-      })
-    })
   }
   loadScatter = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
@@ -463,29 +418,39 @@ class Topology extends React.Component {
     })
   }
   getTopologyData = () => {
-    const origin = window.location.origin
     const { nodeDataArray, linkDataArray } = this.state
-    const iconArr = [ 'user', 'mysql', 'tomcat', 'java' ]
     let nodes = []
     const edges = []
     nodeDataArray.length && nodeDataArray.forEach(item => {
-      const shape = iconArr.includes(item.serviceType.toLowerCase())
-        ? `${origin}/img/service/${item.serviceType.toLowerCase()}.png`
-        : `${origin}/img/service/java.png`
       nodes.push({
-        shape,
+        shape: 'circle',
         label: item.applicationName,
-        size: [ 50, 50 ],
+        width: 50,
+        height: 50,
         id: item.key,
         serviceType: item.serviceType,
+        onClick: (name, e) => {
+          e.stopPropagation();
+          nodes.forEach(v => {
+            if (v.id === name) {
+              this.getCurrentNode(v.id)
+              v.active = !v.active ? true : false
+            } else {
+              v.active = false
+            }
+          })
+        },
       })
     })
     linkDataArray.length && linkDataArray.forEach(item => {
       const label = `${item.errorCount}/${item.totalCount}(失败/总共)`
       edges.push({
-        shape: 'arrow',
+        withArrow: true,
+        arrowOffset: 10,
         source: item.from,
         target: item.to,
+        width: 50,
+        height: 50,
         label,
       })
     })
@@ -630,6 +595,14 @@ class Topology extends React.Component {
       errorCount,
     } = this.state
     const { apps } = this.props
+    const config = {
+      rankdir: 'TB',
+      align: 'DL',
+      marginx: 300,
+      marginy: 230,
+      nodesep: 60,
+      edgesep: 15,
+    }
     return (
       <QueueAnim className="topology">
         <div className="layout-content-btns" key="btns">
@@ -668,11 +641,10 @@ class Topology extends React.Component {
               <Col span={14} className="topology-body-relation-schema">
                 {
                   !isEmpty(topologyData) &&
-                  <Chart4
-                    data={topologyData}
-                    // width={800}
-                    height={1000}
-                    grid={this.state.grid}
+                  <RelationChart
+                    graphConfigs={config}
+                    {...topologyData}
+                    SvgHeight = "1000px"
                   />
                 }
               </Col>
