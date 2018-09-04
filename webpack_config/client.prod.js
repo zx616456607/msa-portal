@@ -30,7 +30,6 @@ module.exports = merge(common, {
     vendor: [
       '@babel/polyfill',
       'g2',
-      '@antv/g6',
       'moment',
       'codemirror',
     ],

@@ -14,9 +14,7 @@ const path = require('path')
 const webpack = require('webpack')
 
 console.warn('Build webpack dll ...')
-
 const vendors = [
-  '@antv/g6',
   'antd',
   'classnames',
   'codemirror',

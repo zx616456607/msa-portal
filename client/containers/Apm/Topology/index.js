@@ -22,7 +22,6 @@ import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
 import RelationChart from '@tenx-ui/relation-chart'
-import G6 from '@antv/g6'
 import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 import flatten from 'lodash/flatten'
@@ -419,7 +418,7 @@ class Topology extends React.Component {
   }
   getTopologyData = () => {
     const { nodeDataArray, linkDataArray } = this.state
-    let nodes = []
+    const nodes = []
     const edges = []
     nodeDataArray.length && nodeDataArray.forEach(item => {
       nodes.push({
@@ -457,20 +456,6 @@ class Topology extends React.Component {
     if (!nodes.length && !edges.length) {
       return
     }
-    const margin = 10
-    const height1 = 600 - 2 * margin
-    const width1 = 500 - 2 * margin
-    const layout = new G6.Layout.Flow({
-      nodes,
-      edges,
-    })
-    nodes = layout.getNodes()
-    nodes.forEach(node => {
-      const x = node.x * width1 + margin
-      const y = node.y * height1 + margin
-      node.x = x
-      node.y = y
-    })
     const topologyData = { nodes, edges }
     this.setState({
       topologyData,
@@ -582,6 +567,11 @@ class Topology extends React.Component {
         return images.JAVA
     }
   }
+  clearNodesActive = () => {
+    this.state.topologyData.nodes.forEach(v => {
+      v.active = false
+    })
+  }
   render() {
     const {
       application,
@@ -645,6 +635,7 @@ class Topology extends React.Component {
                     graphConfigs={config}
                     {...topologyData}
                     SvgHeight = "1000px"
+                    onSvgClick={this.clearNodesActive}
                   />
                 }
               </Col>
