@@ -38,16 +38,17 @@ class ServiceDetail extends React.Component {
   renderDropdown = () => {
     const currentService = this.renderCurrentService()
     const { status, cascadedType } = currentService
+    const cantUesed = status === 4
     const disabled =
-      (!cascadedType && status === 4) || (cascadedType && ![ 5, 6 ].includes(cascadedType))
+      (!cascadedType && cantUesed) || (cascadedType && ![ 5, 6 ].includes(cascadedType))
     const menu = (
       <Menu onClick={this.handleMenu} style={{ width: 109 }}>
-        <Menu.Item key="list">黑／白名单</Menu.Item>
+        <Menu.Item key="list" disabled={cantUesed}>黑／白名单</Menu.Item>
         <Menu.Item key="logout" disabled={disabled}>注销</Menu.Item>
       </Menu>
     )
     return (
-      <Dropdown.Button overlay={menu} onClick={this.handleDown}>
+      <Dropdown.Button overlay={menu} onClick={this.handleDown} disabled={cantUesed}>
         { status === 1 ? '停止服务' : '启动服务' }
       </Dropdown.Button>
     )
