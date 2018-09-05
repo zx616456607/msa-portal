@@ -23,15 +23,19 @@ import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../
 import { Card, Button, Table, Dropdown, Menu, Modal, Icon, notification } from 'antd'
 
 const tooltip = [{
+  id: 'restart',
   title: '重启组件',
   content: '该操作将重启 SpringCloud 对应组件, 重启会消耗一段时间, 重启后组件相关服务自动生效。',
 }, {
+  id: 'stop',
   title: '停止组件',
   content: '该操作将停止 SpringCloud 对应组件, 可能会影响微服务的正常运行。请谨慎操作！',
 }, {
+  id: 'redeploy',
   title: '重新部署',
   content: '该操作将重新部署 SpringCloud 对应组件, 可能会影响微服务的正常运行。请谨慎操作！',
 }, {
+  id: 'start',
   title: '启动组件',
   content: '该操作将启动 SpringCloud 对应组件。',
 }]
@@ -169,7 +173,7 @@ class MsaComponents extends React.Component {
     }
     this.setState({
       toopVisible: true,
-      tooltipTitle: targetTip.title,
+      tooltipTitle: targetTip,
       tooltipContent: targetTip.content,
       componentName: record.component,
     })
@@ -199,7 +203,7 @@ class MsaComponents extends React.Component {
     const tips = this.tooptic(e.key)
     this.setState({
       toopVisible: true,
-      tooltipTitle: tips.title,
+      tooltipTitle: tips,
       tooltipContent: tips.content,
       componentName: value.component,
     })
@@ -227,7 +231,7 @@ class MsaComponents extends React.Component {
   handleCommit = () => {
     const { componentName, tooltipTitle, apmID } = this.state
     const { clusterId, getStart, getStop, getRedeploy } = this.props
-    if (tooltipTitle === '重启组件' || tooltipTitle === '启动组件') {
+    if (tooltipTitle.id === 'restart' || tooltipTitle.id === 'start') {
       const query = {
         apmID: apmID[0].id,
         componentName,
@@ -235,13 +239,13 @@ class MsaComponents extends React.Component {
       getStart(clusterId, query).then(res => {
         if (res.error) {
           notification.error({
-            message: `重启组件 ${componentName} 失败`,
+            message: `${tooltipTitle.title} ${componentName} 失败`,
           })
           return
         }
         if (res.response.result.code === 200) {
           notification.success({
-            message: `重启组件 ${componentName} 成功`,
+            message: `${tooltipTitle.title} ${componentName} 成功`,
           })
           this.setState({
             toopVisible: false,
@@ -251,7 +255,7 @@ class MsaComponents extends React.Component {
           }, 1000)
         }
       })
-    } if (tooltipTitle === '停止组件') {
+    } if (tooltipTitle.id === 'stop') {
       const query = {
         apmID: apmID[0].id,
         componentName,
@@ -273,7 +277,7 @@ class MsaComponents extends React.Component {
           this.fetchApmId()
         }
       })
-    } if (tooltipTitle === '重新部署') {
+    } if (tooltipTitle.id === 'redeploy') {
       const query = {
         apmID: apmID[0].id,
         componentName,
@@ -369,7 +373,7 @@ class MsaComponents extends React.Component {
               rowKey={row => row.id} />
           </div>
         </Card>
-        <Modal title={tooltipTitle} visible={toopVisible} onCancel={this.handleToopCancel}
+        <Modal title={tooltipTitle.title} visible={toopVisible} onCancel={this.handleToopCancel}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleToopCancel}>取 消</Button>,
             <Button key="submit" type="primary" onClick={this.handleCommit}>确 定</Button>,
@@ -379,7 +383,7 @@ class MsaComponents extends React.Component {
               <Icon type="exclamation-circle" style={{ fontSize: 25, color: '#ffbf00' }} />
             </div>
             <div style={{ width: '90%', marginLeft: 40 }}>
-              <div>{tooltipTitle}</div>
+              <div>{tooltipTitle.title}</div>
               <span>{tooltipContent}</span>
             </div>
           </div>
