@@ -36,11 +36,61 @@ const appsList = (state = {}, action) => {
   }
 }
 
+const serviceList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.SERVICE_GET_ALL_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.SERVICE_GET_ALL_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: action.response.result.data,
+      }
+    case ActionTypes.SERVICE_GET_ALL_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+const graphDataList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.SERVICE_MESH_GRAPH_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.SERVICE_MESH_GRAPH_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: action.response.result.data,
+      }
+    case ActionTypes.SERVICE_MESH_GRAPH_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const serviceMesh = (state = {
   apps: {},
 }, action) => {
   return {
     appsList: appsList(state.appsList, action),
+    serviceList: serviceList(state.serviceList, action),
+    graphDataList: graphDataList(state.graphDataList, action),
   }
 }
 
