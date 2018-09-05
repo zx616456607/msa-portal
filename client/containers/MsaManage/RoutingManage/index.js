@@ -166,9 +166,9 @@ class RoutingManage extends React.Component {
       dataIndex: 'description',
       render: desc => desc || '-',
     }, {
-      title: '去掉路径前缀',
-      dataIndex: 'stripPrefix',
-      render: (text, record) => (record.stripPrefix ? '开启' : '关闭'),
+      // title: '去掉路径前缀',
+      // dataIndex: 'stripPrefix',
+      // render: (text, record) => (record.stripPrefix ? '开启' : '关闭'),
     }, {
       title: '失败重试',
       dataIndex: 'retryable',
