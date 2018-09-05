@@ -177,6 +177,7 @@ class SubscriptServiceModal extends React.Component {
                 })(
                   <InputNumber
                     min={1}
+                    max={999999999}
                     placeholder="请填写整数"
                   />
                 )
