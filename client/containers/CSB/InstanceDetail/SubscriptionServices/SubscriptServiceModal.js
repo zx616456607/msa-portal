@@ -152,6 +152,9 @@ class SubscriptServiceModal extends React.Component {
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
     }
+    // 消费凭证选项列表
+    const consumerVouchersOptions = content && content.filter(
+      v => v.subscribedServiceNames.indexOf(serviceName) < 0)
     return <Modal
       title="订阅服务"
       visible={visible}
@@ -207,18 +210,11 @@ class SubscriptServiceModal extends React.Component {
                 filterOption={this.filterConsumerVoucher}
               >
                 {
-                  content ? content.map(item => {
-                    const { subscribedServiceNames = [] } = item
-                    let isUsed = false
-                    subscribedServiceNames.forEach(item => {
-                      if (item === serviceName) {
-                        isUsed = true
-                      }
-                    })
-                    return !isUsed && <Option key={item.id} value={item.id} disabled={isUsed}>
+                  consumerVouchersOptions.map(item => {
+                    return <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
-                  }) : []
+                  })
                 }
               </Select>
             )
