@@ -8,7 +8,7 @@
  * @date Friday July 27th 2018
  */
 import React from 'react'
-import { Select, Button, Icon, Switch, DatePicker, Radio, TimePicker } from 'antd'
+import { Select, Button, Icon, DatePicker, Radio, TimePicker, notification } from 'antd'
 import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
@@ -19,6 +19,8 @@ import * as current from '../../../actions/current'
 import * as meshAction from '../../../actions/serviceMesh'
 import { getDeepValue } from '../../../../client/common/utils'
 import RelationChartComponent from './RelationChartComponent'
+import debounce from 'lodash/debounce'
+import moment from 'moment'
 const { Option, OptGroup } = Select
 
 function mapStateToProps(state) {
@@ -31,8 +33,8 @@ function mapStateToProps(state) {
     const clusterList = currentClusters[namespace].ids || []
     projectClusters[namespace] = clusterList.map(id => clusters[id])
   })
-  const appsList = serviceMesh && serviceMesh.appsList && serviceMesh.appsList.data &&
-   serviceMesh.appsList.data.apps || []
+  const appsList = serviceMesh && serviceMesh.serviceList && serviceMesh.serviceList.data &&
+   serviceMesh.serviceList.data.services || []
   return {
     current: current || {},
     projects: userProjects.map(namespace => projects[namespace]),
@@ -67,12 +69,12 @@ class ServiceMeshGraph extends React.Component {
     }
     const data = await loadAppList(
       currentProjectClusters[0].clusterID,
-      { headers: project.namespace }
+      { headers: project.namespace, from: 0, size: 10 }
     )
     this.setState({ searchQuery: {
       item: project.namespace,
       cluster: currentProjectClusters[0].clusterID,
-      app: getDeepValue(data, [ 'response', 'result', 'data', 'apps', 0, 'name' ]),
+      app: getDeepValue(data, [ 'response', 'result', 'data', 'services', 0, 'deployment', 'metadata', 'name' ]),
       timeRange: 5 },
     })
   }
@@ -99,10 +101,9 @@ class ServiceMeshGraph extends React.Component {
   handleClusterChange = (itemType, value) => {
     const { loadAppList } = this.props
     const { searchQuery } = this.state
-    // this.handleChange(itemType, value)
 
     if (searchQuery.item) {
-      loadAppList(value, { headers: searchQuery.item })
+      loadAppList(value, { headers: searchQuery.item, from: 0, size: 10 })
     }
     this.appNode.focus()
     const newSearchQuert = { ...searchQuery }
@@ -114,13 +115,40 @@ class ServiceMeshGraph extends React.Component {
     const { isTimeRange } = this.state
     this.setState({ isTimeRange: !isTimeRange })
   }
+  rangeTime = { day: null, first: null, second: null }
   timeRangeSelect =(key, value) => {
-    let { searchQuery, searchQuery: { timeRange = {} } } = this.state
-    if (typeof timeRange === 'number') {
-      timeRange = {}
+    const { searchQuery, isTimeRange } = this.state
+    if (!isTimeRange) {
+      const timeRange = { begin: moment().subtract(value, 'm').valueOf(), end: moment().valueOf() }
+      return this.setState({ searchQuery: Object.assign({}, searchQuery, { timeRange }) })
     }
-    timeRange[key] = value;
-    this.setState({ searchQuery: Object.assign({}, searchQuery, { timeRange }) })
+    this.rangeTime[key] = value
+    // 除了当前的key, 别的字段都不能等于null
+    const checkRangeTime = Object.entries(this.rangeTime)
+      .filter(([ rkey ]) => rkey !== key)
+      .every(arr => arr[1] !== null)
+    if (checkRangeTime) {
+      const day = this.rangeTime.day.format('MMMM Do YYYY, h:mm:ss a').split(',')
+      const first = this.rangeTime.first.format('MMMM Do YYYY, h:mm:ss a').split(',')
+      const second = this.rangeTime.second.format('MMMM Do YYYY, h:mm:ss a').split(',')
+      const timeRange = { begin: moment(`${day[0]},${first[1]}`, 'MMMM Do YYYY, h:mm:ss a').valueOf(),
+        end: moment(`${day[0]},${second[1]}`, 'MMMM Do YYYY, h:mm:ss a').valueOf() }
+      if (timeRange.begin >= timeRange.end) {
+        notification.warn({
+          message: '起始时间不能大于结束时间',
+        })
+        return
+      }
+      this.setState({ searchQuery: Object.assign({}, searchQuery, { timeRange }) })
+    }
+  }
+  debounceSearchApp = value => {
+    const { loadAppList } = this.props
+    const { searchQuery = {} } = this.state
+    const searchApp = () => {
+      loadAppList(searchQuery.cluster, { headers: searchQuery.item, from: 0, size: 100, filter: `name ${value}` })
+    }
+    debounce(searchApp, 800)()
   }
   render() {
     const { current, projects, projectClusters, appsList } = this.props
@@ -133,6 +161,7 @@ class ServiceMeshGraph extends React.Component {
     } else {
       currentProjectClusters = projectClusters[item] || []
     }
+    // console.log('timeRange', timeRange, this.rangeTime)
     return (
       <Page>
         <QueueAnim>
@@ -197,22 +226,24 @@ class ServiceMeshGraph extends React.Component {
                 }
               </Select>
               <Select
-                showSearch
+                showSearch={true}
+                onSearch={this.debounceSearchApp}
                 style={{ width: 160 }}
                 optionFilterProp="children"
-                placeholder="选择应用"
+                placeholder="选择服务"
                 onChange={value => this.handleChange('app', value)}
-                filterOption={
-                  (input, option) =>
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }
                 value={app}
                 ref={ relnode => { this.appNode = relnode } }
+                filterOption={false}
               >
                 {
                   cluster && appsList.map(apps => {
                     return (
-                      <Option key={apps.name} value={apps.name}>{ apps.name }</Option>
+                      <Option
+                        key={apps.deployment.metadata.name}
+                        value={apps.deployment.metadata.name}>
+                        { apps.deployment.metadata.name }
+                      </Option>
                     )
                   })
                 }
@@ -226,7 +257,7 @@ class ServiceMeshGraph extends React.Component {
               {
                 isTimeRange === false ?
                   <Radio.Group value = {timeRange}
-                    onChange={ e => this.handleChange('timeRange', e.target.value)}
+                    onChange={ e => this.timeRangeSelect('singleTime', e.target.value)}
                   >
                     <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
                     <Radio.Button value={30}>最近30分钟</Radio.Button>
@@ -244,11 +275,11 @@ class ServiceMeshGraph extends React.Component {
               <span className="meshInfo">{`应用: ${'x'}个`}</span>
               <span className="meshInfo">{`服务: ${'t'}个`}</span>
               <span className="meshInfo">{`调用: ${'y'}个`}</span>
-              <Switch checkedChildren="开" unCheckedChildren="关"/>
+              {/* <Switch checkedChildren="开" unCheckedChildren="关"/> */}
               <Button onClick={this.handleChangeBttton }><Icon type="sync"/>刷新</Button>
             </div>
             <div className="SvgContainer">
-              <RelationChartComponent/>
+              <RelationChartComponent searchQuery={this.state.searchQuery}/>
             </div>
           </div>
         </QueueAnim>
@@ -260,6 +291,6 @@ class ServiceMeshGraph extends React.Component {
 export default connect(mapStateToProps, {
   getDefaultClusters: current.getDefaultClusters,
   getProjectClusters: current.getProjectClusters,
-  loadAppList: meshAction.loadAppList,
+  loadAppList: meshAction.loadAllServices,
 })(ServiceMeshGraph)
 

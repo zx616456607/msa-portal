@@ -11,6 +11,8 @@ import React from 'react'
 import RelationChart from '@tenx-ui/relation-chart'
 import NodeDetailModal from './NodeDetailModal'
 import cloneDeep from 'lodash/cloneDeep'
+import { connect } from 'react-redux'
+import * as meshAction from '../../../actions/serviceMesh'
 
 const config = {
   rankdir: 'LR',
@@ -41,6 +43,7 @@ const formateNodesEdges = onClick => {
   return { nodes, edges }
 }
 
+@connect(mapStateToProps, { loadServiceMeshGraph: meshAction.loadServiceMeshGraph })
 export default class RelationChartComponent extends React.Component {
   state = {
     visible: false,
@@ -48,9 +51,30 @@ export default class RelationChartComponent extends React.Component {
     nodes: [],
     edges: [],
   }
-  componentDidMount = () => {
+  componentDidMount() {
     const { nodes, edges } = formateNodesEdges(this.onClick)
     this.setState({ nodes, edges })
+  }
+  componentWillReceiveProps(nextProps = {}) {
+    // 当用户修改任何的检索条件时, 在这里检查搜索条件是否合法并且是否和上次的不一样, 如果同时满足这两个情况,
+    // 就向后台重新请求新的拓扑图数据
+    // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
+    // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
+    // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
+    const { app, cluster, item, timeRange } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange,
+    } = this.props.searchQuery
+    const { begin, end } = timeRange
+    const { begin: cbegin, end: cend } = ctimeRange
+    const { loadServiceMeshGraph } = this.props
+    const check = typeof app === 'string' && typeof cluster === 'string' && typeof item === 'string'
+    && typeof timeRange === 'object'
+    const diff = app !== capp || cluster !== ccluster || item !== citem || begin !== cbegin ||
+    end !== cend
+    if (check && diff) {
+      loadServiceMeshGraph(cluster, { project: item },
+        { service: app, begin: 0, end: 1000 })
+    }
   }
   onClick = lname => {
     const { nodes } = this.state
@@ -80,5 +104,13 @@ export default class RelationChartComponent extends React.Component {
           serviceName={currentService} />
       </div>
     )
+  }
+}
+
+function mapStateToProps(state) {
+  const { serviceMesh } = state
+  const graphDataList = serviceMesh && serviceMesh.graphDataList
+  return {
+    graphDataList,
   }
 }
