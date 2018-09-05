@@ -214,7 +214,7 @@ class SubscriptServiceModal extends React.Component {
                         isUsed = true
                       }
                     })
-                    return <Option key={item.id} value={item.id} disabled={isUsed}>
+                    return !isUsed && <Option key={item.id} value={item.id} disabled={isUsed}>
                       {item.name}
                     </Option>
                   }) : []
