@@ -227,7 +227,7 @@ class MsaComponents extends React.Component {
   handleCommit = () => {
     const { componentName, tooltipTitle, apmID } = this.state
     const { clusterId, getStart, getStop, getRedeploy } = this.props
-    if (tooltipTitle === '重启组件') {
+    if (tooltipTitle === '重启组件' || tooltipTitle === '启动组件') {
       const query = {
         apmID: apmID[0].id,
         componentName,
