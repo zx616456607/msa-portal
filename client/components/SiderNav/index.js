@@ -15,8 +15,6 @@ import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
-import logoSmall from '../../assets/img/logo-small.svg'
-import logoWide from '../../assets/img/logo-wide.svg'
 import TenxIcon from '@tenx-ui/icon'
 
 const { Sider } = Layout
@@ -380,7 +378,7 @@ class SiderNav extends React.Component {
           <div className={'logoContainer'}>
             <img
               className={collapsed ? 'logoSmall ' : 'logo'}
-              src={collapsed ? logoSmall : logoWide }
+              src={collapsed ? 'logo-small.png' : 'logo-wide.png' }
               alt="logo"
             />
           </div>
