@@ -378,7 +378,7 @@ class SiderNav extends React.Component {
           <div className={'logoContainer'}>
             <img
               className={collapsed ? 'logoSmall ' : 'logo'}
-              src={collapsed ? 'logo-small.png' : 'logo-wide.png' }
+              src={collapsed ? '/logo-small.png' : '/logo-wide.png' }
               alt="logo"
             />
           </div>
