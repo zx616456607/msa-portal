@@ -13,7 +13,8 @@ import NodeDetailModal from './NodeDetailModal'
 import cloneDeep from 'lodash/cloneDeep'
 import { connect } from 'react-redux'
 import * as meshAction from '../../../actions/serviceMesh'
-
+import { Icon } from 'antd'
+import './styles/RelationChartComponent.less'
 const config = {
   rankdir: 'LR',
   nodesep: 50,
@@ -22,23 +23,33 @@ const config = {
   marginx: 30,
   marginy: 30,
 } // 默认relation-chart 配置
-
+const TenxNodeFactory = (icon, name, v) => () => <div className="TenxNode" >
+  <Icon type={icon} theme="outlined" />
+  <div>{name}</div>
+  <div>{v}</div>
+</div>
 const formateNodesEdges = onClick => {
   const nodes = [
-    { id: 'kspacey', label: 'Kevin Spacey', width: 50, height: 50, onClick },
-    { id: 'swilliams', label: 'Saul Williams', width: 50, height: 50, onClick },
-    { id: 'bpitt', label: 'Brad Pitt', width: 50, height: 50, onClick },
-    { id: 'hford', label: 'Harrison Ford', width: 50, height: 50, onClick },
-    { id: 'lwilson', label: 'Luke Wilson', width: 50, height: 50, onClick },
-    { id: 'kbacon', label: 'Kevin Bacon', width: 50, height: 50, onClick },
+    { id: 'kspacey', label: 'Kevin Spacey', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('android', 'github', 'v1') },
+    { id: 'swilliams', label: 'Saul Williams', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('twitter', 'github', 'v1') },
+    { id: 'bpitt', label: 'Brad Pitt', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('gitlab', 'github', 'v1') },
+    { id: 'hford', label: 'Harrison Ford', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
+    { id: 'lwilson', label: 'Luke Wilson', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
+    { id: 'kbacon', label: 'Kevin Bacon', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
+      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
   ]
   const edges = [
-    { source: 'kspacey', target: 'swilliams', withArrow: true, arrowOffset: 10, label: 'hello' },
-    { source: 'swilliams', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hi' },
-    { source: 'bpitt', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hey' },
-    { source: 'hford', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'yo' },
-    { source: 'lwilson', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'ha' },
-    { source: 'kbacon', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'hehe' },
+    { source: 'kspacey', target: 'swilliams', withArrow: true, arrowOffset: 10, label: 'hello', isAnimated: true },
+    { source: 'swilliams', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hi', isAnimated: true },
+    { source: 'bpitt', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hey', isAnimated: true },
+    { source: 'hford', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'yo', isAnimated: true },
+    { source: 'lwilson', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'ha', isAnimated: true },
+    { source: 'kbacon', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'hehe', isAnimated: true },
   ]
   return { nodes, edges }
 }
@@ -61,8 +72,8 @@ export default class RelationChartComponent extends React.Component {
     // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
     // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
     // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
-    const { app, cluster, item, timeRange } = nextProps.searchQuery
-    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange,
+    const { app, cluster, item, timeRange = {} } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange = {},
     } = this.props.searchQuery
     const { begin, end } = timeRange
     const { begin: cbegin, end: cend } = ctimeRange
@@ -76,7 +87,8 @@ export default class RelationChartComponent extends React.Component {
         { service: app, begin: 0, end: 1000 })
     }
   }
-  onClick = lname => {
+  onClick = (lname, e) => {
+    e.stopPropagation();
     const { nodes } = this.state
     const newNodes = cloneDeep(nodes)
     newNodes.forEach(n => {
@@ -89,19 +101,30 @@ export default class RelationChartComponent extends React.Component {
     })
     this.setState({ currentService: lname, visible: true, nodes: newNodes })
   }
+  onRelationChartClick = () => {
+    const { nodes } = this.state;
+    const newNodes = [ ...nodes ];
+    newNodes.forEach(n => {
+      if (n.active !== undefined) {
+        delete n.active;
+      }
+    })
+    this.setState({ nodes: newNodes, visible: false })
+  }
   render() {
     const { visible, currentService, nodes, edges } = this.state
-    // console.log('nodes', nodes)
     return (
       <div className="wrap">
         <RelationChart
           graphConfigs={config}
           nodes={nodes}
           edges={edges}
-          style={{ height: '500px' }}
+          SvgHeight = { '65vh' }
+          onSvgClick = {this.onRelationChartClick}
+          ref = {r => { this.relationChart = r }}
         />
         <NodeDetailModal isVisible={visible} onClose={() => this.setState({ visible: false })}
-          serviceName={currentService} />
+          serviceName={currentService} getContainer={this.relationChart} />
       </div>
     )
   }
