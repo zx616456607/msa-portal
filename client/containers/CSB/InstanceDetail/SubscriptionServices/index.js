@@ -35,7 +35,15 @@ class SubscriptionServices extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData({ sort: 'publishTime,desc' }, true)
+    this.loadData(this.props, { sort: 'publishTime,desc' }, true)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { location } = nextProps
+    const { location: oldLocation } = this.props
+    if (location.search !== oldLocation.search && isEmpty(location.search)) {
+      this.loadData(nextProps, { sort: 'publishTime,desc' })
+    }
   }
 
   closeSubscriptServiceModal = () => {
@@ -44,8 +52,8 @@ class SubscriptionServices extends React.Component {
     })
   }
 
-  loadData = (query, isFirst) => {
-    const { subscribableServices, match, location, history } = this.props
+  loadData = (props, query, isFirst) => {
+    const { subscribableServices, match, location, history } = props || this.props
     const { instanceID } = match.params
     const { name } = this.state
     query = Object.assign({}, location.query, { name }, query)
@@ -73,7 +81,7 @@ class SubscriptionServices extends React.Component {
       const { status } = filters
       statusStr = status
     }
-    this.loadData({ sort: sortStr, status: statusStr })
+    this.loadData(this.props, { sort: sortStr, status: statusStr })
   }
 
   openSubscriptServiceModal = record => {
@@ -141,16 +149,16 @@ class SubscriptionServices extends React.Component {
       total: totalElements,
       pageSize: size,
       current: parseInt(query.page, 10) || 1,
-      onChange: page => this.loadData({ page }),
+      onChange: page => this.loadData(this.props, { page }),
     }
     return (
       <QueueAnim id="subscription-services">
         <div className="layout-content-btns" key="layout-content-btns">
-          <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
+          <Button type="primary" icon="reload" onClick={() => this.loadData(this.props)}>刷新</Button>
           <Search
             placeholder="按服务名称搜索"
             onChange={e => this.setState({ name: e.target.value })}
-            onSearch={() => this.loadData({ name, page: 1 })}
+            onSearch={() => this.loadData(this.props, { name, page: 1 })}
             className="search-style"
           />
           {

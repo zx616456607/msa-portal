@@ -262,11 +262,11 @@ class RoutingRuleModal extends React.Component {
             <Input.TextArea placeholder="请填写路由规则描述" />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="去掉路径前缀">
+        {/* <FormItem {...formItemLayout} label="去掉路径前缀">
           {getFieldDecorator('stripPrefix', { valuePropName: 'checked' })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
-        </FormItem>
+        </FormItem> */}
         <FormItem {...formItemLayout} label="失败重试机制">
           {getFieldDecorator('retryable', { valuePropName: 'checked' })(
             <Switch checkedChildren="开" unCheckedChildren="关" />

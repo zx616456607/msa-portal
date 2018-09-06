@@ -56,3 +56,61 @@ export function loadAppList(cluster, query, pathname, callback) {
     return dispatch(fetchAppList(cluster, query, pathname, callback))
   }
 }
+
+// Get all service
+export const SERVICE_GET_ALL_LIST_REQUEST = 'SERVICE_GET_ALL_LIST_REQUEST'
+export const SERVICE_GET_ALL_LIST_SUCCESS = 'SERVICE_GET_ALL_LIST_SUCCESS'
+export const SERVICE_GET_ALL_LIST_FAILURE = 'SERVICE_GET_ALL_LIST_FAILURE'
+
+function fetchAllServices(cluster, query, callback) {
+  let { customizeOpts, headers } = query || {}
+  if (headers === 'default') {
+    headers = ''
+  }
+  delete query.customizeOpts
+  delete query.headers
+  return {
+    customizeOpts,
+    [CALL_API]: {
+      types: [ SERVICE_GET_ALL_LIST_REQUEST, SERVICE_GET_ALL_LIST_SUCCESS,
+        SERVICE_GET_ALL_LIST_FAILURE ],
+      endpoint: `${PAAS_API_URL}/clusters/${cluster}/services?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers: {
+          project: headers },
+      },
+    },
+    callback,
+  }
+}
+
+export function loadAllServices(cluster, query, callback) {
+  return dispath => {
+    return dispath(fetchAllServices(cluster, query, callback))
+  }
+}
+
+// 获取拓扑图信息
+export const SERVICE_MESH_GRAPH_REQUEST = 'SERVICE_MESH_GRAPH_REQUEST'
+export const SERVICE_MESH_GRAPH_SUCCESS = 'SERVICE_MESH_GRAPH_SUCCESS'
+export const SERVICE_MESH_GRAPH_FAILURE = 'SERVICE_MESH_GRAPH_FAILURE'
+function fetchServiceMeshGraph(cluster, headers, query, callback) {
+  return {
+    [CALL_API]: {
+      types: [ SERVICE_MESH_GRAPH_REQUEST, SERVICE_MESH_GRAPH_SUCCESS, SERVICE_MESH_GRAPH_FAILURE ],
+      endpoint: `servicemesh/clusters/${cluster}/telemetry/servicegraph?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers,
+      },
+    },
+    callback,
+  }
+}
+
+export function loadServiceMeshGraph(cluster, headers, query, callback) {
+  return dispatch => {
+    return dispatch(fetchServiceMeshGraph(cluster, headers, query, callback))
+  }
+}
