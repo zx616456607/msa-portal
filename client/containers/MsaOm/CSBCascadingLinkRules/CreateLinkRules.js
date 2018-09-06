@@ -339,9 +339,13 @@ class CreateLinkRules extends React.Component {
                   {
                     getFieldDecorator('description', {
                       rules: [{
+                        required: true,
+                        message: '链路规则描述不能为空',
+                      }, {
                         validator: (rule, value, callback) => {
-                          if (!value) return callback('链路规则描述不能为空')
+                          if (!value) return callback()
                           if (value.length < 5) return callback('请输入至少五个字符')
+                          if (value.length > 255) return callback('描述信息最多255个字符')
                           return callback()
                         },
                       }],
