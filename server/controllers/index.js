@@ -10,10 +10,11 @@
  * @date 2017-08-15
  */
 import { initialConfig } from '../../config'
+import { title } from '../../config/constants'
 
 export async function render(ctx) {
   const data = {
-    title: '微服务治理平台 | 时速云',
+    title,
     initialState: JSON.stringify({
       config: initialConfig,
     }),
