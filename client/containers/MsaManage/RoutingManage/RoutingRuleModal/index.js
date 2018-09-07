@@ -169,7 +169,36 @@ class RoutingRuleModal extends React.Component {
       })
     }, ASYNC_VALIDATOR_TIMEOUT)
   }
-
+  checkServiceAddress = (rules, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    if (!URL_REG.test(value)) {
+      return cb('服务地址格式不正确')
+    }
+    let hasError = false
+    const newValue = value.replace(/https?:\/\/(www.)?/, '')
+    const newRep = newValue.split('.')
+    // number and port + router regex
+    const portRouter = /^\d+(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{4}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?(\/[a-zA-Z0-9_\-\/\?#]*)?$/
+    if (/^\d/.test(newRep[0])) { // first has number in ip+port regex
+      newValue.split('.').every(item => {
+        if (parseInt(item) > 255) {
+          hasError = true
+          return false
+        }
+        if (!portRouter.test(item)) {
+          hasError = true
+          return false
+        }
+        return true
+      })
+    }
+    if (hasError) {
+      return cb('服务地址IP或端口格式不正确')
+    }
+    cb()
+  }
   render() {
     const { form, msaList, visible, onCancel, currentRoute } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -249,8 +278,10 @@ class RoutingRuleModal extends React.Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  pattern: URL_REG,
-                  message: '请填写正确的地址',
+                  // pattern: IP_REG,
+                  message: '请填写地址',
+                }, {
+                  validator: this.checkServiceAddress,
                 }],
               })(
                 <Input placeholder="请填写完整的路由 URL，如：http://192.168.0.1/rule" />
