@@ -20,7 +20,7 @@ export const SPRINGCLOUD_FAILURE = 'SPRINGCLOUD_FAILURE'
 
 const fetchSpringCloud = (clusterID, project) => {
   let headers
-  if (project) {
+  if (project && project !== 'default') {
     headers = { project }
   }
   return {
@@ -42,7 +42,13 @@ export const FETCH_SPRINGCLOUD_REQUEST = 'FETCH_SPRINGCLOUD_REQUEST'
 export const FETCH_SPRINGCLOUD_SUCCESS = 'FETCH_SPRINGCLOUD_SUCCESS'
 export const FETCH_SPRINGCLOUD_FAILURE = 'FETCH_SPRINGCLOUD_FAILURE'
 
-const fetchSpingCloudInfo = clusterID => {
+const fetchSpingCloudInfo = (clusterID, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = {
+      project,
+    }
+  }
   return {
     clusterID,
     [CALL_API]: {
@@ -50,14 +56,15 @@ const fetchSpingCloudInfo = clusterID => {
       endpoint: `/clusters/${clusterID}/springcloud/deployed`,
       schema: {},
       options: {
+        headers,
         method: 'GET',
       },
     },
   }
 }
 
-export const fetchSpingCloud = clusterID => dispatch => {
-  return dispatch(fetchSpingCloudInfo(clusterID))
+export const fetchSpingCloud = (clusterID, project) => dispatch => {
+  return dispatch(fetchSpingCloudInfo(clusterID, project))
 }
 
 export const MSA_STATE_REQUEST = 'MSA_STATE_REQUEST'
@@ -65,7 +72,11 @@ export const MSA_STATE_SUCCESS = 'MSA_STATE_SUCCESS'
 export const MSA_STATE_FAILURE = 'MSA_STATE_FAILURE'
 
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchMsaState = (clusterID, id) => {
+const fetchMsaState = (clusterID, id, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = { project }
+  }
   return {
     id,
     clusterID,
@@ -74,6 +85,7 @@ const fetchMsaState = (clusterID, id) => {
       endpoint: `/clusters/${clusterID}/springcloud/${id}/state`,
       schema: {},
       options: {
+        headers,
         method: 'GET',
       },
     },
@@ -82,8 +94,8 @@ const fetchMsaState = (clusterID, id) => {
 
 // Fetches a page of apms.
 // Relies on Redux Thunk middleware.
-export const getMsaState = (clusterID, id) => dispatch => {
-  return dispatch(fetchMsaState(clusterID, id))
+export const getMsaState = (clusterID, id, namespace) => dispatch => {
+  return dispatch(fetchMsaState(clusterID, id, namespace))
 }
 
 export const MSA_INSTALL_REQUEST = 'MSA_INSTALL_REQUEST'

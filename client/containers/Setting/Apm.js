@@ -16,6 +16,7 @@ import './style/Apm.less'
 import { Row, Col, Select, Button, Modal, Icon, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
+import ProjectCluster from '../../components/ProjectCluster'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 const Option = Select.Option
 
@@ -23,70 +24,72 @@ class ApmSetting extends React.Component {
   state = {
     apms: [],
     percent: 0,
-    state: '',
     version: '',
     apmsId: '',
     apmState: false,
     uninstall: false,
-    colony: '',
     project: '',
     projectNames: [],
-    isProject: false,
-    colonyData: [],
     projectsData: [],
     serviceData: [],
     installSate: false,
+    isHealthy: false,
+    componentState: false,
   }
-  componentDidMount() {
-    const { pinpointName } = this.props
-    if (pinpointName !== '') {
-      this.fetchapmsId()
-      this.apmService()
-    }
-    // this.projectList()
+  componentWillMount() {
+    this.load()
+  }
+
+  load = () => {
+    this.fetchapmsId()
   }
 
   fetchapmsId = () => {
-    const { loadApms, clusterID } = this.props
-    loadApms(clusterID).then(res => {
+    const { loadApms, clusterID, projectConfig } = this.props
+    const { namespace } = projectConfig.project
+    loadApms(clusterID, namespace).then(res => {
       if (res.error) return
-      if (res.response.result.code === 200) {
-        this.setState({
-          apmsId: res.response.result.data.apms[0],
-        })
-        this.assemblyState(res.response.result.data.apms[0])
-      }
+      this.assemblyState(res.response.result.data.apms[0])
     })
   }
 
-  assemblyState = ids => {
-    const { getApmState, apmID, clusterID } = this.props
-    if (ids) {
+  assemblyState = apmId => {
+    const { getApmState, apmList, clusterID, projectConfig } = this.props
+    const { configDetail } = apmList || {}
+    if (apmId) {
       const query = {
-        id: ids !== '' ? ids : apmID,
+        id: apmId,
         cluster: clusterID,
       }
-      getApmState(query).then(res => {
+      const { namespace } = projectConfig.project
+      getApmState(query, namespace).then(res => {
         if (res.error) return
-        let isHealthy = ''
         // TODO: use the status code to show the actual status
         if (res.response.result.data.status === 1) {
-          isHealthy = 'true'
+          this.setState({
+            isHealthy: true,
+            componentState: true,
+            version: configDetail && JSON.parse(configDetail).version,
+          })
         }
-        this.setState({
-          state: isHealthy,
-        })
+      })
+    } else {
+      this.setState({
+        version: '',
+        isHealthy: false,
+        componentState: false,
       })
     }
   }
 
   apmService = () => {
-    const { clusterID, getApmService } = this.props
+    const { clusterID, getApmService, projectConfig } = this.props
     const body = {
       id: clusterID,
       pinpoint: 'pinpoint',
     }
-    getApmService(body).then(res => {
+    const { namespace } = projectConfig.project
+    getApmService(body, namespace).then(res => {
       if (res.error) { return }
       this.setState({
         serviceData: res.response.result.data,
@@ -164,8 +167,8 @@ class ApmSetting extends React.Component {
    * 安装
    */
   handleInstall = () => {
-    const { clusterID, postApm } = this.props
-    const { project } = this.state
+    const { clusterID, postApm, projectConfig } = this.props
+    const { namespace } = projectConfig.project
     // if (isProject === false) return
     this.setState({
       installSate: true,
@@ -176,52 +179,11 @@ class ApmSetting extends React.Component {
       scope: 'namespace',
       displayName: '',
     }
-    postApm(body, clusterID, project).then(res => {
+    postApm(body, clusterID, namespace).then(res => {
       if (res.error) return
-      this.apmService()
-      this.projectList()
+      // this.apmService()
+      // this.projectList()
       this.fetchapmsId()
-    })
-  }
-
-  handleProject = value => {
-    const { serviceData } = this.state
-    const { getProjectClusters } = this.props
-    const values = value.split(',')
-    const projectName = values[0]
-    const nameSpace = values[1]
-    const serviceAry = []
-    serviceData.forEach(item => {
-      if (item.namespace === nameSpace) {
-        const nameAry = {
-          space: nameSpace,
-          version: JSON.parse(item.configDetail),
-        }
-        serviceAry.push(nameAry)
-      }
-    })
-    if (serviceAry.length > 0) {
-      if (serviceAry[0].space === nameSpace) {
-        this.setState({
-          apmState: true,
-          version: serviceAry[0].version,
-        })
-      }
-    } else {
-      this.setState({
-        apmState: false,
-      })
-    }
-
-    this.setState({
-      project: nameSpace,
-      isProject: true,
-    })
-    getProjectClusters(projectName).then(res => {
-      if (res.error) return
-      this.setState({
-        colonyData: res.response.result.data.clusters,
-      })
     })
   }
 
@@ -231,29 +193,25 @@ class ApmSetting extends React.Component {
     })
   }
   handleDel = () => {
-    const { removeApmRow, clusterID, defaultName, project } = this.props
-    const { serviceData } = this.state
-    if (Object.keys(serviceData).length === 0) return
-    serviceData.forEach(item => {
-      if (item.namespace === defaultName) {
-        const body = {
-          id: item.id,
-          cluster: clusterID,
-        }
-        const projectName = project.namespace === 'default' ? defaultName : project.namespace
-        removeApmRow(body, projectName).then(res => {
-          if (res.error) return
-          this.apmService()
-          this.projectList()
-          this.setState({
-            installSate: false,
-            apmState: false,
-            uninstall: false,
-            state: '',
-            version: '',
-          })
-        })
-      }
+    const { removeApmRow, apmList, clusterID, projectConfig } = this.props
+    const body = {
+      id: apmList.id,
+      cluster: clusterID,
+    }
+    // const projectName = project.namespace === 'default' ? defaultName : project.namespace
+    const { namespace } = projectConfig.project
+    removeApmRow(body, namespace).then(res => {
+      if (res.error) return
+      // this.apmService()
+      // this.projectList()
+      this.setState({
+        installSate: false,
+        // apmState: false,
+        uninstall: false,
+        isHealthy: false,
+        componentState: false,
+        version: '',
+      })
     })
   }
 
@@ -291,10 +249,10 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-    const { apmState, state } = this.state
+    const { isHealthy, componentState } = this.state
     let healthy = null
-    if (state !== '') {
-      healthy = state ? <span className="desc"><font color="#5cb85c">健康</font></span> :
+    if (componentState) {
+      healthy = isHealthy ? <span className="desc"><font color="#5cb85c">健康</font></span> :
         <span className="descs">不健康</span>
     } else {
       healthy = <span className="descs">未安装</span>
@@ -303,39 +261,13 @@ class ApmSetting extends React.Component {
     return (
       <QueueAnim>
         <div key="layout-content-btns">
+          <ProjectCluster callback={this.load} />
           <Card
             title="APM配置"
             className="apm_config_style"
           >
             <Row className="contents">
               <Col className="left">
-                {/* <Row className="apms">
-                  <Col span={6}>项目</Col>
-                  <Col span={18}>
-                    <Select style={{ width: 300 }} onChange={this.handleProject} defaultValue={MY_PORJECT}>
-                      {
-                        projectsData ?
-                          projectsData.map((item, index) => (
-                            <Option key={index}
-                              value={item.projectName + ',' + item.namespace}>{item.projectName}</Option>
-                          )): ''
-                      }
-                    </Select>
-                  </Col>
-                </Row>
-                <Row className="apms">
-                  <Col span={6}>集群</Col>
-                  <Col span={18}>
-                    <Select style={{ width: 300 }} onChange={this.handleColony}>
-                      {
-                        colonyData ?
-                          colonyData.map((item, index) => (
-                            <Option key={index} value={item.cluster.clusterID}>{item.cluster.clusterName}</Option>
-                          )): ''
-                      }
-                    </Select>
-                  </Col>
-                </Row> */}
                 <Row className="apms">
                   <Col span={5}>基础服务</Col>
                   <Col span={19}>
@@ -348,7 +280,7 @@ class ApmSetting extends React.Component {
                   <Col span={5}>安装情况</Col>
                   <Col span={19}>
                     {
-                      apmState ?
+                      isHealthy ?
                         <Row className="install">
                           <Icon className="ico" type="check-circle-o" />&nbsp;
                           <span className="existence" >已安装</span>
@@ -367,7 +299,7 @@ class ApmSetting extends React.Component {
                 <Row className="apms">
                   <Col span={5}>组件版本</Col>
                   <Col span={19}>
-                    <span className="version">{this.state.version.version}</span>
+                    <span className="version">{this.state.version}</span>
                   </Col>
                 </Row>
               </Col>
@@ -396,9 +328,11 @@ const mapStateToProps = state => {
   const aryApmID = []
   const { current, entities, queryApms } = state
   const { cluster, project } = current.config
+  const { projectsList, apms } = entities
+  const userProjectsList = current.projectsList && current.projectsList.ids || []
   const projectID = current.projects.ids
   const clusterID = cluster.id
-  const clusters = entities.clusters ? entities.clusters[clusterID] : ''
+  // const clusters = entities.clusters ? entities.clusters[clusterID] : ''
   const apmIds = queryApms[project.namespace] ? queryApms[project.namespace][clusterID] : ''
   const c_isFetching = apmIds ? apmIds.isFetching : true
   const apmID = c_isFetching === false ? queryApms[project.namespace][clusterID].ids[0] : ''
@@ -408,17 +342,23 @@ const mapStateToProps = state => {
   projects.push(entities.projects)
   const { info } = current.user
   const userId = info.userID
+  const { projectConfig } = current
+  const apmList = apms && apms[apmID]
   return {
     apmID,
     userId,
+    current,
+    apmList,
     project,
     projects,
-    clusters,
+    // clusters,
     clusterID,
     projectID,
     aryApmID,
     defaultName,
     pinpointName,
+    projectConfig,
+    projectsList: userProjectsList.map(namespace => projectsList[namespace]),
   }
 }
 

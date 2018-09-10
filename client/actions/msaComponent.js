@@ -18,7 +18,7 @@ export const MSACOMPONENT_LIST_FAILURE = 'MSACOMPONENT_LIST_FAILURE'
 
 const fetchMsaComponentInfo = (clusterID, apmID, project) => {
   let headers
-  if (project) {
+  if (project && project !== 'default') {
     headers = { project }
   }
   return {

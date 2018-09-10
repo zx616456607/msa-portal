@@ -118,7 +118,7 @@ class MsaManage extends React.Component {
   }
 
   componentDidMount() {
-    const { current, fetchSpingCloud, history } = this.props
+    const { current, fetchSpingCloud } = this.props
     const clusterID = current.config.cluster.id
     fetchSpingCloud(clusterID).then(res => {
       let isDeployed = false
@@ -140,14 +140,15 @@ class MsaManage extends React.Component {
         confirm({
           modalTitle: '提示',
           title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
-          okText: '前往安装',
+          content: '请联系项目管理员安装',
+          okText: '知道了',
           hideCancelButton: true,
           cancelText: '返回首页',
           onOk: () => {
-            history.push('/setting/msa-config')
+            // history.push('/setting/msa-config')
           },
           onCancel: () => {
-            history.push('/')
+            // history.push('/')
           },
         })
       }

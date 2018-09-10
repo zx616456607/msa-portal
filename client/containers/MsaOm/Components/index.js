@@ -19,6 +19,7 @@ import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
 import { formatFromnow } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
+import ProjectCluster from '../../../components/ProjectCluster'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Table, Dropdown, Menu, Modal, Icon, notification } from 'antd'
 
@@ -73,8 +74,9 @@ class MsaComponents extends React.Component {
   }
 
   fetchApmId = () => {
-    const { fetchSpingCloud, clusterId } = this.props
-    fetchSpingCloud(clusterId).then(res => {
+    const { fetchSpingCloud, clusterId, projectConfig } = this.props
+    const { namespace } = projectConfig.project
+    fetchSpingCloud(clusterId, namespace).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
@@ -88,19 +90,14 @@ class MsaComponents extends React.Component {
 
   load = () => {
     const { apmID } = this.state
-    const { fetchMsaComponentList, clusterId, nameSpace, info } = this.props
-    const project = nameSpace === 'default' ? info.namespace : nameSpace
+    const { fetchMsaComponentList, clusterId, projectConfig } = this.props
+    const { namespace } = projectConfig.project
     if (!isEmpty(apmID)) {
-      apmID.forEach(item => {
-        if (item.namespace === project) {
-          const query = {
-            id: item.id,
-          }
-          fetchMsaComponentList(clusterId, query, project)
-        }
-      })
+      const query = {
+        id: apmID[0].id,
+      }
+      fetchMsaComponentList(clusterId, query, namespace)
     }
-
   }
 
   nameList = value => {
@@ -354,11 +351,11 @@ class MsaComponents extends React.Component {
         }>{ record.status === 3 ? '启动组件' : '重启组件' }</Dropdown.Button>
       </div>,
     }]
-
     return (
       <QueueAnim className="info">
         <div className="nav" key="nav">
-          <Button type="primary" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
+          <div className="info-project"><ProjectCluster callback={this.fetchApmId}/></div>
+          <Button type="primary" className="info-btn" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
           <div className="pages">
             <span className="total">共计 {metaData.length} 条&nbsp;&nbsp;</span>
           </div>
@@ -411,11 +408,14 @@ const mapStateToProps = state => {
   const { info } = current.user
   const nameSpace = project.namespace
   const clusterId = cluster.id
+  const { projectConfig } = current
+
   return {
     meta,
     info,
     nameSpace,
     clusterId,
+    projectConfig,
   }
 }
 

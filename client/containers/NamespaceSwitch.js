@@ -19,6 +19,7 @@ import './style/NamespaceSwitch.less'
 import {
   setCurrentConfig,
   getUserProjects,
+  getProjectList,
   getProjectClusters,
   getDefaultClusters,
 } from '../actions/current'
@@ -37,11 +38,13 @@ class NamespaceSwitch extends React.Component {
   componentDidMount() {
     const {
       userID,
+      getProjectList,
       getUserProjects,
       setCurrentConfig,
       getDefaultClusters,
       getProjectClusters,
     } = this.props
+    getProjectList()
     getUserProjects(userID).then(res => {
       if (res.error) {
         notification.error({
@@ -175,6 +178,7 @@ class NamespaceSwitch extends React.Component {
       projectClusters,
       className,
       noSelfClassName,
+      projectsList,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -185,14 +189,15 @@ class NamespaceSwitch extends React.Component {
       [className]: !!className,
       container: true,
     })
+
     return (
       <div className={containerStyle}>
         <TenxIcon
           type="backup"
           size={14}
-          style={{ marginRight: 10 }}/>
+          style={{ marginRight: 10 }} />
         <div>项目</div>
-        <div className={'divider'}/>
+        <div className={'divider'} />
         <Dropdown
           overlay={
             <Menu selectable onSelect={this.handleProjectChange}>
@@ -201,11 +206,19 @@ class NamespaceSwitch extends React.Component {
               </Menu.Item>
               <SubMenu key="share" title="共享项目">
                 {
-                  projects.map(p => (
-                    <Menu.Item key={p.namespace}>
-                      {p.projectName}
-                    </Menu.Item>
-                  ))
+                  // projects.map(p => (
+                  //   <Menu.Item key={p.namespace}>
+                  //     {p.projectName}
+                  //   </Menu.Item>
+                  // ))
+                  projectsList.length > 0 && projectsList.forEach(item => {
+                    if (!item.outlineRoles.includes('no-participator')) {
+                      return (
+                        <Menu.Item key={item.namespace}>
+                          {item.projectName}
+                        </Menu.Item>)
+                    }
+                  })
                 }
                 {
                   projects.length === 0 && (
@@ -223,13 +236,13 @@ class NamespaceSwitch extends React.Component {
             <Icon type="down" />
           </a>
         </Dropdown>
-        <div className={'bigDivider'}/>
+        <div className={'bigDivider'} />
         <TenxIcon
           type="cluster"
           size={14}
-          style={{ marginRight: 10 }}/>
+          style={{ marginRight: 10 }} />
         <div>集群</div>
-        <div className={'divider'}/>
+        <div className={'divider'} />
         <Dropdown
           visible={clustersDropdownVisible}
           onVisibleChange={visible => this.setState({ clustersDropdownVisible: visible })}
@@ -264,23 +277,27 @@ class NamespaceSwitch extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { projects, clusters } = entities
+  const { projects, projectsList, clusters } = entities
   const userProjects = current.projects && current.projects.ids || []
+  const userProjectsList = current.projectsList && current.projectsList.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
   Object.keys(currentClusters).forEach(namespace => {
     const clusterList = currentClusters[namespace].ids || []
     projectClusters[namespace] = clusterList.map(id => clusters[id])
+    projectClusters[namespace] = clusterList.map(id => clusters[id])
   })
   return {
     current: current || {},
     projects: userProjects.map(namespace => projects[namespace]),
+    projectsList: userProjectsList.map(namespace => projectsList[namespace]),
     projectClusters,
   }
 }
 
 export default connect(mapStateToProps, {
   setCurrentConfig,
+  getProjectList,
   getUserProjects,
   getProjectClusters,
   getDefaultClusters,
