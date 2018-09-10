@@ -108,7 +108,11 @@ export const GET_SERVICE_QUERY_LOG_REQUEST = 'GET_SERVICE_QUERY_LOG_REQUEST'
 export const GET_SERVICE_QUERY_LOG_SUCCESS = 'GET_SERVICE_QUERY_LOG_SUCCESS'
 export const GET_SERVICE_QUERY_LOG_FAILURE = 'GET_SERVICE_QUERY_LOG_FAILURE'
 
-function fetchQueryLogList(cluster, query, state, body) {
+function fetchQueryLogList(cluster, query, state, body, project) {
+  let headers
+  if (project && project !== 'default') {
+    headers = { project }
+  }
   let endpoint
   if (state) {
     endpoint = `/clusters/${cluster}/logs/instances/${query}/logs`
@@ -126,6 +130,7 @@ function fetchQueryLogList(cluster, query, state, body) {
       options: {
         method: 'POST',
         body,
+        headers,
       },
       schema: {},
     },

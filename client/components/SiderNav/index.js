@@ -10,7 +10,7 @@
  * @date 2018-05-16
  */
 import React from 'react'
-import { Layout, Menu, Icon } from 'antd'
+import { Layout, Menu, Icon, Tooltip } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import find from 'lodash/find'
@@ -179,18 +179,56 @@ const menus = [
       },
     ],
   }, {
+    key: 'k4',
+    to: '/management',
+    icon: 'user',
+    name: '项目管理员',
+  }, {
     key: 'msa-om',
     to: '/msa-om',
-    name: '微服务运维',
-    icon: 'appstore',
+    name: '项目基础安装与运维',
+    icon: 'tool',
     children: [
       {
         key: 'k00',
+        to: '/setting/msa-config',
+        name: '微服务配置',
+        tenxIcon: 'msa',
+      }, {
+        key: 'k01',
+        to: '/setting/apms',
+        name: 'APM 配置',
+        tenxIcon: 'apm',
+      }, {
+        key: 'k02',
         to: '/msa-om/components',
         name: '微服务组件',
         tenxIcon: 'inject',
       }, {
-        key: 'k01',
+        key: 'k03',
+        to: '/msa-om/log',
+        name: '日志查询',
+        icon: 'file-text',
+      },
+    ],
+  }, {
+    key: 'k5',
+    to: '/management',
+    icon: 'user',
+    name: '系统管理员',
+  }, {
+    key: 'k1',
+    to: '/setting',
+    name: '系统设置',
+    icon: 'setting',
+    children: [
+      {
+        key: 'k10',
+        to: '/setting/global-setting',
+        name: '全局配置',
+        icon: 'setting',
+      }, {
+        key: 'k11',
         to: '/cluster',
         name: 'CSB 运维',
         tenxIcon: 'tools',
@@ -210,35 +248,18 @@ const menus = [
             name: '级联链路规则',
           },
         ],
-      }, {
-        key: 'k02',
-        to: '/msa-om/log',
-        name: '日志查询',
-        icon: 'file-text',
       },
-    ],
-  }, {
-    key: 'k1',
-    to: '/setting',
-    name: '系统设置',
-    icon: 'setting',
-    children: [
-      {
-        key: 'k10',
-        to: '/setting/global-setting',
-        name: '全局配置',
-        icon: 'setting',
-      }, {
-        key: 'k11',
-        to: '/setting/msa-config',
-        name: '微服务配置',
-        tenxIcon: 'msa',
-      }, {
-        key: 'k12',
-        to: '/setting/apms',
-        name: 'APM 配置',
-        tenxIcon: 'apm',
-      },
+      //  {
+      //   key: 'k11',
+      //   to: '/setting/msa-config',
+      //   name: '微服务配置',
+      //   tenxIcon: 'msa',
+      // }, {
+      //   key: 'k12',
+      //   to: '/setting/apms',
+      //   name: 'APM 配置',
+      //   tenxIcon: 'apm',
+      // },
     ],
   },
 ]
@@ -269,6 +290,7 @@ class SiderNav extends React.Component {
     toggleCollapsed && toggleCollapsed(collapsed)
   }
   renderMenuItem = data => {
+    const { collapsed } = this.state
     const { children, name, icon, key, to, tenxIcon, ...otherProps } = data
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
@@ -279,13 +301,13 @@ class SiderNav extends React.Component {
         style={{
           marginRight: 10,
           fontSize: 12,
-        }}/>
+        }} />
     }
     if (children) {
       return (
         <SubMenu
           key={key}
-          title={<span>{ iconDOM }<span>{name}</span></span>}
+          title={<span>{iconDOM}<span>{name}</span></span>}
           {...otherProps}
         >
           {
@@ -294,9 +316,30 @@ class SiderNav extends React.Component {
         </SubMenu>
       )
     }
+    let menuItems
+    // if (collapsed && to === '') {
+    //   menuItems = <Icon type="user" />
+    // } else
+    if (to !== '/management') {
+      menuItems = <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+    } else if (!collapsed) {
+      menuItems =
+        <Tooltip placement="right" title={key === 'k4'
+          ? '作为某项目的管理员,有权限配置项目相关' : '作为系统管理员,有权限配置系统相关'}>
+          <span className="nav-text navFont">{name}</span>
+        </Tooltip>
+    } else {
+      menuItems = <Icon type="user" />// <span className="navSolid">{name}</span>
+    }
+
     return (
-      <Menu.Item key={key} {...otherProps}>
-        <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+      <Menu.Item key={key} {...otherProps} >
+        {
+          // collapsed && to === '' ?
+          //   <Icon type="user" /> :
+          //   <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+          menuItems
+        }
       </Menu.Item>
     )
   }
@@ -321,13 +364,13 @@ class SiderNav extends React.Component {
       // (to === pathname) && list.push(key)
       if (pathname.indexOf(to) > -1) {
         (list.length === 0) && list.push(obj)
-        ;(list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
+        ; (list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
       }
       return list
     }
     let s = []
     menus.map(menu => finderPath(menu, s))
-    ;(s.length > 0) && (s = [ s[0].key ])
+    ; (s.length > 0) && (s = [ s[0].key ])
     if (collapsed) {
       defaultOpenKeys = []
       s = []
@@ -365,7 +408,11 @@ class SiderNav extends React.Component {
 
   render() {
     const { collapsed, currentUser } = this.props
-    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ? menus.filter(menu => menu.key !== 'msa-om') : menus
+    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ?
+      // menu.key !== 'msa-om'
+      menus.filter(menu => {
+        return menu.key !== 'k1' && menu.key !== 'k5'
+      }) : menus
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
@@ -378,7 +425,7 @@ class SiderNav extends React.Component {
           <div className={'logoContainer'}>
             <img
               className={collapsed ? 'logoSmall ' : 'logo'}
-              src={collapsed ? '/logo-small.png' : '/logo-wide.png' }
+              src={collapsed ? '/logo-small.png' : '/logo-wide.png'}
               alt="logo"
             />
           </div>
@@ -388,7 +435,7 @@ class SiderNav extends React.Component {
               theme="dark"
               mode="inline"
               onOpenChange={this.onOpenChange}
-              // onClick={data => console.log('ddd', data) }
+              // onMouseLeave={data => console.log('ddd', data)}
               selectedKeys={this.findSelectedNOpenKeys().selectedKeys}
               openKeys={this.state.openKeys}
             >

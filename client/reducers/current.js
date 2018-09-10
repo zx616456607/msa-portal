@@ -24,6 +24,18 @@ function config(state, action) {
   }
 }
 
+function projectConfig(state, action) {
+  switch (action.type) {
+    case ActionTypes.SET_PROJECT_CONFIG:
+      return {
+        ...state,
+        ...action.current,
+      }
+    default:
+      return state
+  }
+}
+
 function user(state, action) {
   const { userID, type } = action
   switch (type) {
@@ -62,6 +74,29 @@ function projects(state = {}, action) {
         ids: action.response.result.data,
       }
     case ActionTypes.USER_PROJECTS_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+function projectsList(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.FETCH_PROJECT_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.FETCH_PROJECT_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ids: action.response.result.data.projects,
+      }
+    case ActionTypes.FETCH_PROJECT_LIST_FAILURE:
       return {
         ...state,
         isFetching: false,
@@ -148,16 +183,20 @@ function ui(state = {
 }
 const current = (state = {
   config: { project: {}, cluster: {} },
+  projectConfig: { project: {}, cluster: {} },
   user: {},
   projects: {},
+  projectsList: {},
   clusters: {},
   ui: { collapsed: false },
 }, action) => {
   return {
     config: config(state.config, action),
+    projectConfig: projectConfig(state.projectConfig, action),
     user: user(state.user, action),
     projects: projects(state.projects, action),
     clusters: clusters(state.clusters, action),
+    projectsList: projectsList(state.projectsList, action),
     allClusters: allClusters(state.allClusters, action),
     ui: ui(state.ui, action),
   }

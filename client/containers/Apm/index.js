@@ -86,11 +86,12 @@ class Apm extends React.Component {
         confirm({
           modalTitle: '提示',
           title: '当前项目 & 集群：PinPoint 基础服务组件未安装',
-          okText: '前往安装',
+          content: '请联系项目管理员安装',
+          okText: '知道了',
           hideCancelButton: true,
           cancelText: '返回首页',
           onOk: () => {
-            history.push('/setting/apms')
+            // history.push('/setting/apms')
           },
           onCancel: () => {
             history.push('/')

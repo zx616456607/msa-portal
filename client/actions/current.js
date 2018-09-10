@@ -46,6 +46,15 @@ export function setCurrentConfig(current) {
   }
 }
 
+export const SET_PROJECT_CONFIG = 'SET_PROJECT_CONFIG'
+
+export function setProjectConfig(current) {
+  return {
+    current,
+    type: SET_PROJECT_CONFIG,
+  }
+}
+
 export const CURRENT_USER_REQUEST = 'CURRENT_USER_REQUEST'
 export const CURRENT_USER_SUCCESS = 'CURRENT_USER_SUCCESS'
 export const CURRENT_USER_FAILURE = 'CURRENT_USER_FAILURE'
@@ -162,4 +171,24 @@ const fetchAllClusters = query => {
 
 export const getAllClusters = query => dispatch => {
   return dispatch(fetchAllClusters(query))
+}
+
+export const FETCH_PROJECT_LIST_REQUEST = 'FETCH_PROJECT_LIST_REQUEST'
+export const FETCH_PROJECT_LIST_SUCCESS = 'FETCH_PROJECT_LIST_SUCCESS'
+export const FETCH_PROJECT_LIST_FAILURE = 'FETCH_PROJECT_LIST_FAILURE'
+
+// Get clusters of projectList.
+// Relies on the custom API middleware defined in ../middleware/api.js.
+const fetchProjectList = query => {
+  return {
+    [CALL_API]: {
+      types: [ FETCH_PROJECT_LIST_REQUEST, FETCH_PROJECT_LIST_SUCCESS, FETCH_PROJECT_LIST_FAILURE ],
+      endpoint: `/projects/list?${toQuerystring(query)}`,
+      schema: Schemas.PROJECTLIST_ARRAY_DATA,
+    },
+  }
+}
+
+export const getProjectList = query => dispatch => {
+  return dispatch(fetchProjectList(query))
 }
