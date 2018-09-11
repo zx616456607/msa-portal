@@ -28,6 +28,7 @@ import {
   getZipkinTracesList, getZipkinServices, getZipkinSpans,
 } from '../../../actions/callLinkTrack'
 import ApmTimePicker from '../../../components/ApmTimePicker'
+import moment from 'moment'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -141,13 +142,22 @@ class CallLinkTracking extends React.Component {
   }
 
   handleReset = () => {
-    const { rangeDateTime } = this.state
     const { clusterID, getZipkinTracesList } = this.props
     this.props.form.resetFields()
+    const time = new Date().getTime()
+    const fiveMin = 5 * 60 * 1000
+    const five = Date.parse(new Date(new Date() - fiveMin))
+
     const query = {
-      endTs: Date.parse(formatDate(rangeDateTime[1])),
-      lookback: rangeDateTime[1] - rangeDateTime[0],
+      endTs: time,
+      lookback: time - five,
     }
+    this.setState({
+      rangeDateTime: [ moment(time - fiveMin), moment(new Date().getTime()) ],
+      resetTime: true,
+      currentRadio: btnArr[0].key,
+    }, () => this.setState({ resetTime: false })
+    )
     getZipkinTracesList(clusterID, query)
   }
 
@@ -184,7 +194,7 @@ class CallLinkTracking extends React.Component {
 
   render() {
     const {
-      spanList, isFliter, filterList, rangeDateTime } = this.state
+      spanList, isFliter, filterList, rangeDateTime, resetTime } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
     const cols = {
@@ -320,7 +330,7 @@ class CallLinkTracking extends React.Component {
               <FormItem>
                 {getFieldDecorator('traceId', {})(
                   <div>
-                    <Input placeholder="Trace ID，其他条件设置无效" className="trace" />
+                    <Input placeholder="Trace ID，其它条件设置无效" className="trace" />
                   </div>
                 )}
               </FormItem>
@@ -330,6 +340,7 @@ class CallLinkTracking extends React.Component {
             <Col span={9}>
               <ApmTimePicker
                 value={rangeDateTime}
+                resetTime={resetTime}
                 onChange={rangeDateTime => this.setState({ rangeDateTime })}
                 timeArr={btnArr}
               />
