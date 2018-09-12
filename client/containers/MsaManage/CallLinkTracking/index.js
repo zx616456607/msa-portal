@@ -18,11 +18,11 @@ import {
   Card, Table, Form, Col, Row, Badge,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
+import { DEFAULT, DEFAULT_PAGE, DEFAULT_TIME_FORMAT } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
 import isEmpty from 'lodash/isEmpty'
-import { formatFromnow, formatDate } from '../../../common/utils'
+import { formatDate } from '../../../common/utils'
 import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import {
   getZipkinTracesList, getZipkinServices, getZipkinSpans,
@@ -132,7 +132,7 @@ class CallLinkTracking extends React.Component {
         success: item.success ? '成功' : '失败',
         serviceName: item.serviceName,
         duration: item.duration / 1000,
-        startTime: `${formatDate(item.startTime, 'hh:mm:ss')} pm`, // item.startTime
+        startTime: `${formatDate(item.startTime)}`, // item.startTime
         spanCount: item.spanCount,
       }
       dataAry.push(columns)
@@ -214,7 +214,7 @@ class CallLinkTracking extends React.Component {
       startTime: {
         alias: '开始时间',
         // type: 'timeCat',
-        // mask: 'hh:mm:ss',
+        mask: DEFAULT_TIME_FORMAT,
         tickCount: 5,
       },
     }
@@ -254,10 +254,10 @@ class CallLinkTracking extends React.Component {
       render: text => <div>{text / 1000}</div>,
     }, {
       title: '开始时间',
-      width: '10%',
+      width: '15%',
       dataIndex: 'startTime',
       sorter: (a, b) => a.startTime - b.startTime,
-      render: time => formatFromnow(time),
+      render: time => formatDate(time),
     }, {
       title: '操作',
       width: '10%',
