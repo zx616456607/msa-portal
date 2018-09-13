@@ -62,3 +62,29 @@ const putZkhost = (clusterId, data) => {
 export const setZkhost = (clusterId, data) => {
   return putZkhost(clusterId, data)
 }
+
+// 获取apm配置
+export const GET_MSA_CONFIG_REQUEST = 'GET_MSA_CONFIG_REQUEST'
+export const GET_MSA_CONFIG_SUCCESS = 'GET_MSA_CONFIG_SUCCESS'
+export const GET_MSA_CONFIG_FAILURE = 'GET_MSA_CONFIG_FAILURE'
+
+const fetchGlobalConfigByType = (clusterID, type, callback) => {
+  const endpoint = `/cluster/${clusterID}/${type}`
+  return {
+    [CALL_API]: {
+      types: [ GET_MSA_CONFIG_REQUEST,
+        GET_MSA_CONFIG_SUCCESS,
+        GET_MSA_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'GET',
+      },
+    },
+    callback,
+  }
+}
+
+export const getGlobalConfigByType = (clusterID, type, callback) => {
+  return dispatch => dispatch(fetchGlobalConfigByType(clusterID, type, callback))
+}

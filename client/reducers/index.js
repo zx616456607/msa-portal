@@ -24,6 +24,9 @@ import * as sringcloudComponent from './springcloud'
 import CSB from './CSB'
 import certification from './certification'
 import eventManage from './eventManage'
+
+import springCloudAndApm from './globalConfig'
+
 import zipkin from './callLinkTrack'
 import serviceMesh from './serviceMesh'
 
@@ -66,6 +69,7 @@ const rootReducer = combineReducers({
   entities,
   errorObject,
   config,
+  springCloudAndApm,
   routing,
   current,
   ...apm,
