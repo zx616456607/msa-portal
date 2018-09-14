@@ -41,7 +41,7 @@ class RoutingRuleModal extends React.Component {
       const { setFieldsValue, resetFields } = form
       resetFields()
       const {
-        routeId, path, serviceId, url, description, stripPrefix,
+        routeId, path, serviceId, url, description,
         retryable, status,
       } = currentRoute
       const msaUrlType = url ? 'url' : 'id'
@@ -50,7 +50,7 @@ class RoutingRuleModal extends React.Component {
         routeId,
         path,
         description,
-        stripPrefix,
+        // stripPrefix,
         retryable,
         status,
       }
@@ -81,7 +81,7 @@ class RoutingRuleModal extends React.Component {
       'path',
       'msa-url-type',
       'description',
-      'stripPrefix',
+      // 'stripPrefix',
       'retryable',
       'status',
     ]
@@ -106,11 +106,18 @@ class RoutingRuleModal extends React.Component {
         confirmLoading: true,
       })
       if (!currentRoute) {
-        addGatewayRoute(clusterID, values).then(res => {
+        addGatewayRoute(clusterID, values, { isHandleError: true }).then(res => {
           this.setState({
             confirmLoading: false,
           })
           if (res.error) {
+            let message = res.message
+            if (res.error.indexOf('path exist') > -1) {
+              message = '路由路径已存在'
+            }
+            notification.warn({
+              message,
+            })
             return
           }
           notification.success({
@@ -121,11 +128,18 @@ class RoutingRuleModal extends React.Component {
         })
         return
       }
-      updateGatewayRoute(clusterID, currentRoute.id, body).then(res => {
+      updateGatewayRoute(clusterID, currentRoute.id, body, { isHandleError: true }).then(res => {
         this.setState({
           confirmLoading: false,
         })
         if (res.error) {
+          let message = res.message
+          if (res.error.indexOf('path exist') > -1) {
+            message = '路由路径已存在'
+          }
+          notification.warn({
+            message,
+          })
           return
         }
         notification.success({
@@ -157,6 +171,12 @@ class RoutingRuleModal extends React.Component {
     if (currentRoute && (currentRoute.routeId === value)) {
       return callback()
     }
+    if (!value) {
+      return callback()
+    }
+    if (!APP_NAME_REG.test(value)) {
+      return callback(APP_NAME_REG_NOTICE)
+    }
     this.routeNameTimeout = setTimeout(() => {
       checkRouteName(clusterID, value).then(res => {
         if (res.response.result.data.has) {
@@ -168,6 +188,18 @@ class RoutingRuleModal extends React.Component {
         callback('请求出错')
       })
     }, ASYNC_VALIDATOR_TIMEOUT)
+  }
+  routePathCheck = (rules, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    if (!ROUTE_REG.test(value)) {
+      return cb('以/开头，由数字、字母、中划线、下划线组成')
+    }
+    if (/\/[*]+$/.test(value)) {
+      return cb('一级路由路径不能以*结尾')
+    }
+    cb()
   }
   checkServiceAddress = (rules, value, cb) => {
     if (!value) {
@@ -221,8 +253,7 @@ class RoutingRuleModal extends React.Component {
             rules: [{
               required: true,
               whitespace: true,
-              pattern: APP_NAME_REG,
-              message: '路由名称' + APP_NAME_REG_NOTICE,
+              message: '请输入路由名称',
             }, {
               validator: this.routeNameCheck,
             }],
@@ -234,8 +265,9 @@ class RoutingRuleModal extends React.Component {
           {getFieldDecorator('path', {
             rules: [{
               required: true,
-              pattern: ROUTE_REG,
-              message: '以/开头，由数字、字母、中划线、下划线组成',
+              message: '请填写路由路径地址',
+            }, {
+              validator: this.routePathCheck,
             }],
           })(
             <Input placeholder="/service/demo/**" />
