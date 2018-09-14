@@ -69,7 +69,7 @@ export const GET_MSA_CONFIG_SUCCESS = 'GET_MSA_CONFIG_SUCCESS'
 export const GET_MSA_CONFIG_FAILURE = 'GET_MSA_CONFIG_FAILURE'
 
 const fetchGlobalConfigByType = (clusterID, type, callback) => {
-  const endpoint = `/cluster/${clusterID}/${type}`
+  const endpoint = `/configs/${type}`
   return {
     [CALL_API]: {
       types: [ GET_MSA_CONFIG_REQUEST,

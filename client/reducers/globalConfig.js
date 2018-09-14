@@ -49,16 +49,9 @@ import * as ActionTypes from '../actions/globalConfig'
   }
 }*/
 
-const data = {
-  configDetail: '{"url":"http://192.168.1.58:8989","canDeployPersonalServer":{"springcloud":false,"pinpoint":false}}',
-  configID: 'cc2739d3-12c9-4864-b5f1-01e99d61msa',
-  configType: 'msa',
-  createTime: '2018-09-13T09:12:58Z',
-  description: '',
-}
+
 const springCloudAndApmState = {
   isFetching: false,
-  ...data,
 }
 
 const springCloudAndApm = (state = springCloudAndApmState, action) => {
@@ -71,13 +64,12 @@ const springCloudAndApm = (state = springCloudAndApmState, action) => {
     case ActionTypes.GET_MSA_CONFIG_SUCCESS:
       return {
         ...state,
-        ...data,
+        ...action.response.result.data,
         isFetching: false,
       }
     case ActionTypes.GET_MSA_CONFIG_FAILURE:
       return {
         ...state,
-        ...data,
         isFetching: false,
       }
     default:
