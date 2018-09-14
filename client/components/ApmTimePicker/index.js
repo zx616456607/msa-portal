@@ -65,6 +65,12 @@ export default class ApmTimePicker extends React.Component {
         value,
       })
     }
+    if (nextProps.resetTime === true) { // upstream reset btn
+      this.setState({
+        isRangeTime: false,
+        currentRadio: 'fiveMin',
+      })
+    }
   }
   componentWillUnmount() {
     clearInterval(this.timeInterval)

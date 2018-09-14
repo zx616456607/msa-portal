@@ -87,8 +87,9 @@ class Logs extends React.Component {
   }
 
   handleSearch = () => {
-    const { form, clusterID, getQueryLogList } = this.props
+    const { form, clusterID, getQueryLogList, projectConfig } = this.props
     const { validateFields } = form
+    const { namespace } = projectConfig.project
     validateFields((error, value) => {
       if (error) return
       const body = {
@@ -103,7 +104,7 @@ class Logs extends React.Component {
       }
       const query = value.example ? value.example : value.server
       const state = !!value.example
-      getQueryLogList(clusterID, query, state, body).then(res => {
+      getQueryLogList(clusterID, query, state, body, namespace).then(res => {
         this.setState({
           logs: res.response.result.data,
         })
@@ -116,8 +117,11 @@ class Logs extends React.Component {
   }
 
   render() {
-    const { logs, bigLog, serverName, clusterList, serviceList, exampleList } = this.state
-    const { projectList, form } = this.props
+    const { logs, bigLog, serverName, serviceList, exampleList } = this.state
+    const { current, form, projectClusters, projectsList } = this.props
+    const currentConfig = current.config || {}
+    const project = currentConfig.project || {}
+    const clusters = projectClusters[project.namespace] || []
     const { getFieldDecorator } = form
     return (
       <QueueAnim className="log">
@@ -132,8 +136,11 @@ class Logs extends React.Component {
                   <Select style={{ width: '90%' }} placeholder="选择项目" size="default" showSearch>
                     <Option key="default">个人项目</Option>
                     {
-                      projectList && projectList.map(item => {
-                        return <Option key={item}>{item}</Option>
+                      projectsList.map(item => {
+                        if (!item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')) {
+                          return <Option key={item.namespace}>{item.projectName}</Option>
+                        }
+                        return null
                       })
                     }
                   </Select>
@@ -148,9 +155,9 @@ class Logs extends React.Component {
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择集群" size="default" showSearch>
                     {
-                      clusterList && clusterList.map(item => {
-                        return <Option key={item.clusterID}>{item.clusterName}</Option>
-                      })
+                      clusters && clusters.map(item => (
+                        <Option key={item.clusterID}>{item.clusterName}</Option>
+                      ))
                     }
                   </Select>
                 )}
@@ -164,9 +171,9 @@ class Logs extends React.Component {
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择服务" size="default" showSearch>
                     {
-                      serviceList.length > 0 && serviceList.map(item => {
-                        return <Option key={item.serviceName}>{item.serviceName}</Option>
-                      })
+                      serviceList.length > 0 && serviceList.map(item => (
+                        <Option key={item.serviceName}>{item.serviceName}</Option>
+                      ))
                     }
                   </Select>
                 )}
@@ -180,9 +187,9 @@ class Logs extends React.Component {
                   <Select style={{ width: '100%' }} placeholder="选择实例" size="default"
                     showSearch>
                     {
-                      exampleList && exampleList.map(item => {
-                        return <Option key={item.metadata.name}>{item.metadata.name}</Option>
-                      })
+                      exampleList && exampleList.map(item => (
+                        <Option key={item.metadata.name}>{item.metadata.name}</Option>
+                      ))
                     }
                   </Select>
                 )}
@@ -242,7 +249,7 @@ class Logs extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { clusters } = entities
+  const { clusters, projectsList } = entities
   const { cluster } = current.config
   const clusterID = cluster.id
   const projectList = current.projects.ids || []
@@ -252,11 +259,15 @@ const mapStateToProps = state => {
     const clusterList = currentClusters[namespace].ids || []
     projectClusters[namespace] = clusterList.map(id => clusters[id])
   })
+  const { projectConfig } = current
+  const userProjectsList = current.projectsList && current.projectsList.ids || []
   return {
     clusterID,
     current: current || {},
     projectList,
     projectClusters,
+    projectConfig,
+    projectsList: userProjectsList.map(namespace => projectsList[namespace]),
   }
 }
 

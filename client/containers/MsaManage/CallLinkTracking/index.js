@@ -18,16 +18,17 @@ import {
   Card, Table, Form, Col, Row, Badge,
 } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import { DEFAULT, DEFAULT_PAGE } from '../../../constants/index'
+import { DEFAULT, DEFAULT_PAGE, DEFAULT_TIME_FORMAT } from '../../../constants/index'
 import cloneDeep from 'lodash/cloneDeep'
 import './style/index.less'
 import isEmpty from 'lodash/isEmpty'
-import { formatFromnow, formatDate } from '../../../common/utils'
+import { formatDate } from '../../../common/utils'
 import { Chart, Geom, Axis, G2, Tooltip } from 'bizcharts'
 import {
   getZipkinTracesList, getZipkinServices, getZipkinSpans,
 } from '../../../actions/callLinkTrack'
 import ApmTimePicker from '../../../components/ApmTimePicker'
+import moment from 'moment'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -131,7 +132,7 @@ class CallLinkTracking extends React.Component {
         success: item.success ? '成功' : '失败',
         serviceName: item.serviceName,
         duration: item.duration / 1000,
-        startTime: `${formatDate(item.startTime, 'hh:mm:ss')} pm`, // item.startTime
+        startTime: `${formatDate(item.startTime)}`, // item.startTime
         spanCount: item.spanCount,
       }
       dataAry.push(columns)
@@ -141,13 +142,22 @@ class CallLinkTracking extends React.Component {
   }
 
   handleReset = () => {
-    const { rangeDateTime } = this.state
     const { clusterID, getZipkinTracesList } = this.props
     this.props.form.resetFields()
+    const time = new Date().getTime()
+    const fiveMin = 5 * 60 * 1000
+    const five = Date.parse(new Date(new Date() - fiveMin))
+
     const query = {
-      endTs: Date.parse(formatDate(rangeDateTime[1])),
-      lookback: rangeDateTime[1] - rangeDateTime[0],
+      endTs: time,
+      lookback: time - five,
     }
+    this.setState({
+      rangeDateTime: [ moment(time - fiveMin), moment(new Date().getTime()) ],
+      resetTime: true,
+      currentRadio: btnArr[0].key,
+    }, () => this.setState({ resetTime: false })
+    )
     getZipkinTracesList(clusterID, query)
   }
 
@@ -184,7 +194,7 @@ class CallLinkTracking extends React.Component {
 
   render() {
     const {
-      spanList, isFliter, filterList, rangeDateTime } = this.state
+      spanList, isFliter, filterList, rangeDateTime, resetTime } = this.state
     const { history, form, dataList, isFetching, servicesList } = this.props
     const { getFieldDecorator } = form
     const cols = {
@@ -204,7 +214,7 @@ class CallLinkTracking extends React.Component {
       startTime: {
         alias: '开始时间',
         // type: 'timeCat',
-        // mask: 'hh:mm:ss',
+        mask: DEFAULT_TIME_FORMAT,
         tickCount: 5,
       },
     }
@@ -244,10 +254,10 @@ class CallLinkTracking extends React.Component {
       render: text => <div>{text / 1000}</div>,
     }, {
       title: '开始时间',
-      width: '10%',
+      width: '15%',
       dataIndex: 'startTime',
       sorter: (a, b) => a.startTime - b.startTime,
-      render: time => formatFromnow(time),
+      render: time => formatDate(time),
     }, {
       title: '操作',
       width: '10%',
@@ -320,7 +330,7 @@ class CallLinkTracking extends React.Component {
               <FormItem>
                 {getFieldDecorator('traceId', {})(
                   <div>
-                    <Input placeholder="Trace ID，其他条件设置无效" className="trace" />
+                    <Input placeholder="Trace ID，其它条件设置无效" className="trace" />
                   </div>
                 )}
               </FormItem>
@@ -330,6 +340,7 @@ class CallLinkTracking extends React.Component {
             <Col span={9}>
               <ApmTimePicker
                 value={rangeDateTime}
+                resetTime={resetTime}
                 onChange={rangeDateTime => this.setState({ rangeDateTime })}
                 timeArr={btnArr}
               />

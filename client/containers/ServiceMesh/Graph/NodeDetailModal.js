@@ -10,6 +10,7 @@
 import React from 'react'
 import { Modal, Divider } from 'antd'
 import InOutGraph from './InOutGraph'
+import { findDOMNode } from 'react-dom';
 import './styles/NodeDetailModal.less'
 
 const inOutData = [
@@ -50,14 +51,17 @@ export default class NodeDetailModal extends React.Component {
     // const { serviceName } = this.props
   }
   render() {
-    const { isVisible, onClose, serviceName } = this.props
+    const { isVisible, onClose, serviceName, getContainer } = this.props
     return (
       <div className="NodeDetailModal">
         <Modal className="NodeDetailModal"
+          wrapClassName="ServiceMeshNodeDetailModalWrap"
           visible = {isVisible}
           onCancel = {onClose}
           width={380}
           mask={false}
+          maskStyle={ { pointerEvents: 'none', backgroundColor: 'red' } }
+          getContainer={() => findDOMNode(getContainer)}
         >
           {/* <div>{serviceName}</div> */}
           <div className="baseMessage">

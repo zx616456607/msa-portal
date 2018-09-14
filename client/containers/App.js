@@ -27,6 +27,7 @@ import { Route, Switch } from 'react-router-dom'
 import { appChildRoutes } from '../RoutesDom'
 import CustomizeSider from '../components/SiderNav'
 import './style/App.less'
+import { footer } from '../../config/constants'
 
 const { Footer } = Layout
 let errorMessageBefore
@@ -36,7 +37,8 @@ const errorMessageCloseObj = {}
 // the routes need hide namespace switch
 const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
-  // /^\/setting/,
+  /^\/setting/, /^\/msa-om/,
+  /^\/msa-om\/log/,
 ]
 
 class App extends React.Component {
@@ -274,7 +276,7 @@ class App extends React.Component {
 
           { this.renderChildren() }
           <Footer style={{ textAlign: 'center' }} id="footer">
-            © 2018 微服务治理平台 v1.2
+            {footer}
           </Footer>
         </Layout>
       </Layout>

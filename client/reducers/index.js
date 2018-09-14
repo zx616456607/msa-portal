@@ -33,6 +33,7 @@ const entities = (state = {
   auth: {},
   apms: {},
   projects: {},
+  projectsList: {},
   ppApps: {},
   msaList: {},
   gatewayPolicies: {},

@@ -165,6 +165,7 @@ class ConsumerVouchers extends React.Component {
     confirmUpdateConsumerVoucher(instanceID, id).then(res => {
       this.setState({ confirmLoading: false })
       if (res.error) return
+      this.loadData()
       notification.success({ message: '确认更新成功' })
       this.setState({ updateVisible: false })
     })
@@ -193,6 +194,7 @@ class ConsumerVouchers extends React.Component {
     triggerUpdateConsumerVoucher(instanceID, id, body).then(res => {
       this.setState({ updateVisible: false })
       if (res.error) return
+      this.loadData()
       if (updateSetting === 'immediately') {
         this.confirmUpdateConsumeVoucher()
         return

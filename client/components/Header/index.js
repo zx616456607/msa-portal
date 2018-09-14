@@ -11,7 +11,8 @@
  */
 
 import React from 'react'
-import { Layout,
+import {
+  Layout, Tag,
   Menu, Dropdown, Icon,
 } from 'antd'
 import { Link } from 'react-router-dom'
@@ -19,6 +20,8 @@ import classNames from 'classnames'
 // import cloneDeep from 'lodash/cloneDeep'
 // import { getMenuSelectedKeys } from '../../common/utils'
 // import { ROLE_SYS_ADMIN } from '../../constants'
+import { ROLE_USER, ROLE_SYS_ADMIN, ROLE_BASE_ADMIN, ROLE_PLATFORM_ADMIN } from '../../constants'
+// import logo from '../../assets/img/logo.svg'
 import './style/index.less'
 
 const LayoutHeader = Layout.Header
@@ -80,15 +83,29 @@ export default class Header extends React.Component {
       'width-small': !collapsed,
       'layout-border': true,
     })
+    const roleName = role => {
+      switch (role) {
+        case ROLE_SYS_ADMIN:
+          return '系统管理员'
+        case ROLE_PLATFORM_ADMIN:
+          return '平台管理员'
+        case ROLE_BASE_ADMIN:
+          return '基础设施管理员'
+        case ROLE_USER:
+          return '普通成员'
+        default:
+          break
+      }
+    }
     return (
       <LayoutHeader className={containerStyles}>
         {children}
         {/* <div/>作为占位符, 当children不存在时, 防止name跑到左侧 */}
-        <div/>
+        <div />
         <div>
           <Dropdown
             overlay={
-              <Menu>
+              <Menu style={{ top: 55 }}>
                 <Menu.Item key="apm-setting">
                   <Link to="/setting/apms">
                     APM 配置
@@ -102,9 +119,28 @@ export default class Header extends React.Component {
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link">
-              {currentUser.userName || '...'} <Icon type="down" />
-            </a>
+            {/* <div>
+              <a className="ant-dropdown-link">
+                {currentUser.userName || '...'}
+              </a>
+              <span className="role">系统管理员</span>
+              <Icon type="down" />
+            </div> */}
+            <div className="user-panel-trigger userBtn">
+              <div className="userBtnText">
+                <div className="ant-dropdown-link">{currentUser.userName || '...'}</div>
+                <div>
+                  <Tag>
+                    {
+                      roleName(currentUser.role)
+                    }
+                  </Tag>
+                </div>
+              </div>
+              <div className="userBtnIcon">
+                <Icon type="down" />
+              </div>
+            </div>
           </Dropdown>
         </div>
         {/*
