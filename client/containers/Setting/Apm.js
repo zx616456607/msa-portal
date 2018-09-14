@@ -13,11 +13,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/Apm.less'
-import { Row, Col, Select, Button, Modal, Icon, Card } from 'antd'
+import { Row, Col, Select, Button, Tooltip, Modal, Icon, Card } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
 import ProjectCluster from '../../components/ProjectCluster'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
+import { getGlobalConfigByType } from '../../actions/globalConfig'
 const Option = Select.Option
 
 class ApmSetting extends React.Component {
@@ -36,12 +37,23 @@ class ApmSetting extends React.Component {
     isHealthy: false,
     componentState: false,
   }
+
+  componentDidMount() {
+    const { pinpointName, clusterID, getGlobalConfigByType } = this.props
+    getGlobalConfigByType(clusterID, 'msa')
+    if (pinpointName !== '') {
+      this.fetchapmsId()
+      this.apmService()
+    }
+    // this.projectList()
+  }
   componentWillMount() {
     this.load()
   }
 
   load = () => {
     this.fetchapmsId()
+
   }
 
   fetchapmsId = () => {
@@ -249,6 +261,15 @@ class ApmSetting extends React.Component {
   }
 
   render() {
+
+    const { springCloudAndApm } = this.props
+    let pinpoint = false
+    if (springCloudAndApm.configDetail) {
+      const data = JSON.parse(springCloudAndApm.configDetail)
+      if (data.canDeployPersonalServer) {
+        pinpoint = data.canDeployPersonalServer.pinpoint
+      }
+    }
     const { isHealthy, componentState } = this.state
     let healthy = null
     if (componentState) {
@@ -286,7 +307,17 @@ class ApmSetting extends React.Component {
                           <span className="existence" >已安装</span>
                           <span className="unload" onClick={this.handleUnload}>卸载</span>
                         </Row> :
-                        <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                        <div>
+                          {
+                            !pinpoint ?
+                              <Tooltip title= "个人项目已禁止安装 APM组件，请使用共享项目">
+                                <Button type="primary" disabled >安装</Button>
+                              </Tooltip>
+                              :
+                              <Button type="primary" onClick={this.handleInstall}>安装</Button>
+
+                          }
+                        </div>
                     }
                   </Col>
                 </Row>
@@ -326,7 +357,7 @@ class ApmSetting extends React.Component {
 const mapStateToProps = state => {
   const projects = []
   const aryApmID = []
-  const { current, entities, queryApms } = state
+  const { current, entities, queryApms, springCloudAndApm } = state
   const { cluster, project } = current.config
   const { projectsList, apms } = entities
   const userProjectsList = current.projectsList && current.projectsList.ids || []
@@ -357,6 +388,7 @@ const mapStateToProps = state => {
     aryApmID,
     defaultName,
     pinpointName,
+    springCloudAndApm,
     projectConfig,
     projectsList: userProjectsList.map(namespace => projectsList[namespace]),
   }
@@ -371,4 +403,5 @@ export default connect(mapStateToProps, {
   getApmService,
   getUserProjects,
   getProjectClusters,
+  getGlobalConfigByType,
 })(ApmSetting)
