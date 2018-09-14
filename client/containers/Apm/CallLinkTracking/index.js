@@ -49,6 +49,7 @@ class CallLinkTracking extends React.Component {
     rangeDateTime: [],
     loading: false,
     dockSize: DEFAULT_DOCK_SIZE,
+    spaceHeight: 0,
   }
 
   componentDidMount() {
@@ -186,12 +187,18 @@ class CallLinkTracking extends React.Component {
   }
 
   onDockSizeChange = size => {
+    clearTimeout(this.addBodyHeight)
     this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
     this.appDom.style.overflow = 'auto'
     this.footerDom.style.display = 'none'
     this.setState({
       dockSize: size,
     })
+    this.addBodyHeight = setTimeout(() => {
+      this.setState({
+        spaceHeight: document.querySelector('div.transaction-inspector').offsetHeight,
+      })
+    }, 200)
   }
 
   changeDockSize = dockSize => this.setState({ dockSize })
@@ -316,6 +323,7 @@ class CallLinkTracking extends React.Component {
               })}
             />
           </Card>
+          <div style={{ width: '100%', height: this.state.spaceHeight }}/>
         </div>
         <div className="call-stack-dock">
           <Dock
