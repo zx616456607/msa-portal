@@ -17,19 +17,33 @@ import './style/index.less'
 import QueueAnim from 'rc-queue-anim'
 import { Button } from 'antd'
 import GatewayCard from './Card'
+import GatewayModal from './GatewayModal'
 
 export default class MeshGateway extends React.Component {
+  state = {
+    modal: false,
+    modalType: 'create',
+  }
+  onCreateBtnClick = () => this.setState({
+    modal: true,
+    modalType: 'create',
+  })
+  closeModal = () => this.setState({
+    modal: false,
+  })
   render() {
+    const { modal, modalType } = this.state
     return (
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
-          <Button icon="plus" type="primary">创建网关</Button>
+          <Button onClick={this.onCreateBtnClick} icon="plus" type="primary">创建网关</Button>
         </div>
         <div className="content">
           {
             [ 1, 2, 3, 4, 5, 6, 7, 8 ].map(i => <GatewayCard key={i}/>)
           }
         </div>
+        <GatewayModal visible={modal} type={modalType} closeModal={this.closeModal}/>
       </QueueAnim>
     )
   }
