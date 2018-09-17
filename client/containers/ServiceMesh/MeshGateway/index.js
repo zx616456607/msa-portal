@@ -18,21 +18,43 @@ import QueueAnim from 'rc-queue-anim'
 import { Button } from 'antd'
 import GatewayCard from './Card'
 import GatewayModal from './GatewayModal'
+import confirm from '../../../components/Modal/confirm'
 
 export default class MeshGateway extends React.Component {
   state = {
-    modal: false,
+    addModal: false,
     modalType: 'create',
   }
   onCreateBtnClick = () => this.setState({
-    modal: true,
+    addModal: true,
     modalType: 'create',
   })
-  closeModal = () => this.setState({
-    modal: false,
+  closeAddModal = () => this.setState({
+    addModal: false,
   })
+  deleteGateway = () => {
+    confirm({
+      modalTitle: '删除操作',
+      title: '确定删除 xxx 网关?',
+      content: <div>删除该网关后，已使用此网关的路由策略中的服务将不能通过此网关出口被访问</div>,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        // return deleteClient().then(() => {
+        //   notification.success({
+        //     message: '删除成功',
+        //   })
+        //   this.loadClientList()
+        // }).catch(() => {
+        //   notification.warn({
+        //     message: '删除失败',
+        //   })
+        // })
+      },
+    })
+  }
   render() {
-    const { modal, modalType } = this.state
+    const { addModal, modalType } = this.state
     return (
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
@@ -40,10 +62,15 @@ export default class MeshGateway extends React.Component {
         </div>
         <div className="content">
           {
-            [ 1, 2, 3, 4, 5, 6, 7, 8 ].map(i => <GatewayCard key={i}/>)
+            [ 1, 2, 3, 4, 5, 6, 7, 8 ].map(i =>
+              <GatewayCard
+                key={i}
+                onDelete={this.deleteGateway}
+              />
+            )
           }
         </div>
-        <GatewayModal visible={modal} type={modalType} closeModal={this.closeModal}/>
+        <GatewayModal visible={addModal} type={modalType} closeModal={this.closeAddModal}/>
       </QueueAnim>
     )
   }

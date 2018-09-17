@@ -26,6 +26,7 @@ export default class GatewayCard extends React.Component {
     </div>
   )
   render() {
+    const { onDelete } = this.props
     return (
       <div className="mesh-gateway-card">
         <div className="top">
@@ -47,7 +48,7 @@ export default class GatewayCard extends React.Component {
           <span className="divider"/>
           <div className="action"><Icon type="edit"/> 编辑</div>
           <span className="divider"/>
-          <div className="action"><Icon type="delete"/> 删除</div>
+          <div className="action" onClick={onDelete}><Icon type="delete"/> 删除</div>
         </div>
       </div>
     )
