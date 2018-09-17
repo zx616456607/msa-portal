@@ -62,6 +62,7 @@ import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
 import PublishService from './containers/CSB/InstanceDetail/PublishService'
 import PublicServices from './containers/CSB/InstanceDetail/PublicService'
 import ServiceMeshGraph from './containers/ServiceMesh/Graph'
+import MeshGateway from './containers/ServiceMesh/MeshGateway'
 
 export const appChildRoutes = [
   {
@@ -80,6 +81,11 @@ export const appChildRoutes = [
     path: '/service-mesh',
     component: ServiceMeshGraph,
     key: 'service-mesh',
+  },
+  {
+    path: '/mesh-gateway',
+    component: MeshGateway,
+    key: 'mesh-gateway',
   },
   {
     path: '/csb-instances',
