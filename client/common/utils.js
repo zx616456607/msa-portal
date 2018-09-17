@@ -524,3 +524,28 @@ export function ipOrDomainValidator(rule, value, cb) {
   }
   cb()
 }
+
+/**
+ * check uaa default group
+ * @param {string} group name
+ * @return {boolean} is default group
+ */
+export const isUaaDefaultGroup = group => {
+  const defaultGroups = [
+    'cloud_controller_service_permissions.read',
+    'scim.userids',
+    'cloud_controller.write',
+    'uaa.user',
+    'oauth.approvals',
+    'user_attributes',
+    'profile',
+    'openid',
+    'password.write',
+    'uaa.offline_token',
+    'roles',
+    'approvals.me',
+    'scim.me',
+    'cloud_controller.read',
+  ]
+  return defaultGroups.includes(group)
+}

@@ -19,7 +19,7 @@ import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 import intersection from 'lodash/intersection'
 import difference from 'lodash/difference'
-import { formatDate } from '../../../../../../common/utils'
+import { formatDate, isUaaDefaultGroup } from '../../../../../../common/utils'
 import {
   createGroup, getGroupList, deleteGroup, updateGroup,
   addGroupsUser, deleteGroupUser, ADD_GROUPS_DETAIL_USER_FAILURE,
@@ -236,38 +236,45 @@ class Groups extends React.Component {
         title: '组名',
         key: 'displayName',
         dataIndex: 'displayName',
-        width: '20%',
+        width: '16%',
         render: (text, record) => <a onClick={() => this.handleDetail(record)}>{text}</a>,
+      },
+      {
+        title: '类型',
+        width: '16%',
+        key: 'isDefaultGroup',
+        dataIndex: 'displayName',
+        render: text => (isUaaDefaultGroup(text) ? '系统默认' : '自定义'),
       },
       {
         title: '用户（个）',
         dataIndex: 'members',
         key: 'members',
-        width: '20%',
+        width: '16%',
         render: text => <div>{text.length}</div>,
       },
       {
         title: '描述',
         dataIndex: 'description',
         key: 'description',
-        width: '20%',
+        width: '16%',
         render: desc => desc || '-',
       },
       {
         title: '创建时间',
         dataIndex: 'meta.created',
         key: 'meta.created',
-        width: '20%',
+        width: '16%',
         render: time => formatDate(time),
       },
       {
         title: '操作',
-        width: '20%',
+        width: '16%',
         render: record => {
           const menu = (
             <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e, record)}>
-              <Menu.Item key="groupName">管理组用户</Menu.Item>
-              <Menu.Item key="del">删除</Menu.Item>
+              <Menu.Item key="groupName" disabled={isUaaDefaultGroup(record.displayName)}>管理组用户</Menu.Item>
+              <Menu.Item key="del" disabled={isUaaDefaultGroup(record.displayName)}>删除</Menu.Item>
             </Menu>
           )
           return (
