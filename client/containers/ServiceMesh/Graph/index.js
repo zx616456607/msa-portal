@@ -150,6 +150,13 @@ class ServiceMeshGraph extends React.Component {
     }
     debounce(searchApp, 800)()
   }
+  loadGraph = () => {
+    const { loadServiceMeshGraph } = this.props
+    const { app, cluster, item, timeRange: { begin, end } = {} } = this.state.searchQuery
+    const check = [ app, cluster, item, begin, end ].every(item => item !== undefined)
+    check && loadServiceMeshGraph(cluster, { project: item },
+      { service: app, begin: 0, end: 1000 })
+  }
   render() {
     const { current, projects, projectClusters, appsList } = this.props
     const { searchQuery: { item, cluster, app, timeRange }, isTimeRange } = this.state
@@ -161,7 +168,6 @@ class ServiceMeshGraph extends React.Component {
     } else {
       currentProjectClusters = projectClusters[item] || []
     }
-    // console.log('timeRange', timeRange, this.rangeTime)
     return (
       <Page>
         <QueueAnim>
@@ -275,8 +281,7 @@ class ServiceMeshGraph extends React.Component {
               <span className="meshInfo">{`应用: ${'x'}个`}</span>
               <span className="meshInfo">{`服务: ${'t'}个`}</span>
               <span className="meshInfo">{`调用: ${'y'}个`}</span>
-              {/* <Switch checkedChildren="开" unCheckedChildren="关"/> */}
-              <Button onClick={this.handleChangeBttton }><Icon type="sync"/>刷新</Button>
+              <Button onClick={this.loadGraph}><Icon type="sync"/>刷新</Button>
             </div>
             <div className="SvgContainer">
               <RelationChartComponent searchQuery={this.state.searchQuery}/>
@@ -292,5 +297,6 @@ export default connect(mapStateToProps, {
   getDefaultClusters: current.getDefaultClusters,
   getProjectClusters: current.getProjectClusters,
   loadAppList: meshAction.loadAllServices,
+  loadServiceMeshGraph: meshAction.loadServiceMeshGraph,
 })(ServiceMeshGraph)
 
