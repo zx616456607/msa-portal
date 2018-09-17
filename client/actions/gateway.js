@@ -198,9 +198,10 @@ export const ADD_GATEWAY_ROUTE_REQUEST = 'ADD_GATEWAY_ROUTE_REQUEST'
 export const ADD_GATEWAY_ROUTE_SUCCESS = 'ADD_GATEWAY_ROUTE_SUCCESS'
 export const ADD_GATEWAY_ROUTE_FAILURE = 'ADD_GATEWAY_ROUTE_FAILURE'
 
-const fetchAddGatewayRoute = (clusterID, body) => {
+const fetchAddGatewayRoute = (clusterID, body, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route`
   return {
+    options,
     [CALL_API]: {
       types: [
         ADD_GATEWAY_ROUTE_REQUEST,
@@ -217,9 +218,9 @@ const fetchAddGatewayRoute = (clusterID, body) => {
   }
 }
 
-export function addGatewayRoute(clusterID, body) {
+export function addGatewayRoute(clusterID, body, options) {
   return dispatch => {
-    return dispatch(fetchAddGatewayRoute(clusterID, body))
+    return dispatch(fetchAddGatewayRoute(clusterID, body, options))
   }
 }
 
@@ -255,9 +256,10 @@ export const UPDATE_GATEWAY_ROUTE_REQUEST = 'UPDATE_GATEWAY_ROUTE_REQUEST'
 export const UPDATE_GATEWAY_ROUTE_SUCCESS = 'UPDATE_GATEWAY_ROUTE_SUCCESS'
 export const UPDATE_GATEWAY_ROUTE_FAILURE = 'UPDATE_GATEWAY_ROUTE_FAILURE'
 
-const fetchUpdateGatewayRoute = (clusterID, routeID, body) => {
+const fetchUpdateGatewayRoute = (clusterID, routeID, body, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route/${routeID}`
   return {
+    options,
     [CALL_API]: {
       types: [
         UPDATE_GATEWAY_ROUTE_REQUEST,
@@ -274,9 +276,9 @@ const fetchUpdateGatewayRoute = (clusterID, routeID, body) => {
   }
 }
 
-export function updateGatewayRoute(clusterID, routeID, body) {
+export function updateGatewayRoute(clusterID, routeID, body, options) {
   return dispatch => {
-    return dispatch(fetchUpdateGatewayRoute(clusterID, routeID, body))
+    return dispatch(fetchUpdateGatewayRoute(clusterID, routeID, body, options))
   }
 }
 

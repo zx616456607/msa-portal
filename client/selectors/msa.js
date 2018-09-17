@@ -19,7 +19,7 @@ export const msaListSlt = createSelector(
   [ getMsa, getEntities ],
   (msa, entities) => {
     const { msaNameList } = msa || {}
-    const { data } = msaNameList || { data: [] }
+    const { data: msaData } = msaNameList || { data: [] }
     const { msaList } = entities || {}
     function getServiceUpSum(data) {
       if (!data.length) return 0
@@ -37,7 +37,7 @@ export const msaListSlt = createSelector(
       })
     }
     return {
-      msaList: formateList(data && data.length && data.map(item => msaList[item]) || []),
+      msaList: formateList(msaData && msaData.length && msaData.map(item => msaList[item]) || []),
       msaListLoading: msaNameList.isFetching,
     }
   }

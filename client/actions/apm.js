@@ -51,7 +51,7 @@ export const ADD_APM_FAILURE = 'ADD_APM_FAILURE'
 
 const addApms = (body, clusterID, project) => {
   let headers
-  if (project) {
+  if (project && project !== 'default') {
     headers = { project }
   }
   return {
