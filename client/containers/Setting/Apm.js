@@ -138,9 +138,10 @@ class ApmSetting extends React.Component {
     const serviceAry = []
     data.forEach(item => {
       if (item.namespace === nameSpace) {
+        const configDetail = JSON.parse(item.configDetail) || {}
         const nameAry = {
           space: nameSpace,
-          version: JSON.parse(item.configDetail),
+          version: configDetail.version,
         }
         serviceAry.push(nameAry)
       }

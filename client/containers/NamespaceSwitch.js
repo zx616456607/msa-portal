@@ -174,7 +174,6 @@ class NamespaceSwitch extends React.Component {
   render() {
     const {
       current,
-      projects,
       projectClusters,
       className,
       noSelfClassName,
@@ -211,17 +210,18 @@ class NamespaceSwitch extends React.Component {
                   //     {p.projectName}
                   //   </Menu.Item>
                   // ))
-                  projectsList.length > 0 && projectsList.forEach(item => {
+                  projectsList.length > 0 && projectsList.map(item => {
                     if (!item.outlineRoles.includes('no-participator')) {
                       return (
                         <Menu.Item key={item.namespace}>
                           {item.projectName}
                         </Menu.Item>)
                     }
+                    return null
                   })
                 }
                 {
-                  projects.length === 0 && (
+                  projectsList.length === 0 && (
                     <Menu.Item key="no-project" disabled>
                       暂无项目
                     </Menu.Item>

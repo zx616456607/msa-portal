@@ -25,7 +25,7 @@ import {
   getGroupList,
   ADD_GROUPS_DETAIL_USER_FAILURE, DELETE_GROUP_USER_FAILURE,
 } from '../../../../../../actions/certification'
-import { formatDate } from '../../../../../../common/utils'
+import { formatDate, isUaaDefaultGroup } from '../../../../../../common/utils'
 import { zoneUserListSlt, zoneGroupUserListSlt } from '../../../../../../selectors/certification'
 import confirm from '../../../../../../components/Modal/confirm'
 import GroupsModal from './GroupsModal'
@@ -233,7 +233,7 @@ class GroupsDetail extends React.Component {
     const _DataAry = !isEmpty(zoneGroupUsers) ? zoneGroupUsers.filter(item => item.type !== 'GROUP') : []
     const menu = (
       <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e)}>
-        <Menu.Item key="groupName">管理组用户</Menu.Item>
+        <Menu.Item key="groupName" disabled={isUaaDefaultGroup(groupInfo.displayName)}>管理组用户</Menu.Item>
       </Menu>
     )
     const pagination = {
