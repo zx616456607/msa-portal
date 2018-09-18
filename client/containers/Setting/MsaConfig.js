@@ -16,7 +16,7 @@ import './style/MsaConfig.less'
 import isEmpty from 'lodash/isEmpty'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
 import { getGlobalConfigByType } from '../../actions/globalConfig'
-import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card, Form, Tooltip } from 'antd'
+import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card, Form, Tooltip, Spin } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import ProjectCluster from '../../components/ProjectCluster'
 const Option = Select.Option
@@ -31,6 +31,7 @@ class MsaConfig extends React.Component {
     uninstall: false,
     installSate: false,
     notCurAry: [],
+    isLoading: true,
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -46,6 +47,9 @@ class MsaConfig extends React.Component {
   load = () => {
     const { loadSpringCloud, cluster, projectConfig } = this.props
     const { namespace } = projectConfig.project
+    this.setState({
+      isLoading: true,
+    })
     loadSpringCloud(cluster.id, namespace).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
@@ -69,6 +73,7 @@ class MsaConfig extends React.Component {
       return this.setState({
         gitLab: {},
         msaState: false,
+        isLoading: false,
         springcloudState: '',
       })
     }
@@ -78,6 +83,7 @@ class MsaConfig extends React.Component {
         const { status } = res.response.result.data
         this.setState({
           msaState: true,
+          isLoading: false,
           springcloudState: status,
           gitLab: list[0].configDetail,
         })
@@ -261,185 +267,190 @@ class MsaConfig extends React.Component {
     }
     const clutser_name = clusterName && clusterName.replace(/[\u4e00-\u9fa5]/g, '')
     const title_extra =
-      (<div>{`( 项目：${namespace === 'default' ? '个人项目' : namespace}  集群：${clutser_name})`}</div>)
+      <span className="msa-project">
+        ( 项目：{namespace === 'default' ? '个人项目' : namespace} 集群：{clutser_name})
+      </span>
     return (
       <QueueAnim>
-        <div key="layout-content-btns">
-          <ProjectCluster callback={this.load} />
-          <Card
-            title="微服务配置"
-            extra={title_extra}
-            className="msa_config_style"
-          >
-            <Row className="conten">
-              <Col className="left" span={12}>
-                <FormItem
-                  label={'基础服务'}
-                  {...formItemLayout}
-                >
-                  {
-                    getFieldDecorator('service', {
-                      initialValue: 'SpringCloud',
-                    })(
-                      <Select style={{ width: 300 }}>
-                        <Option value="SpringCloud">SpringCloud</Option>
-                      </Select>
-                    )
-                  }
-                </FormItem>
-                <FormItem
-                  label={'Gitlab 地址'}
-                  {...formItemLayout}
-                >
-                  {
-                    getFieldDecorator('gitUrl', {
-                      rules: [{
-                        required: true,
-                        message: 'Gitlab 地址不能为空',
-                      }, {
-                        type: 'url',
-                        message: '请输入 http 协议地址',
-                      }],
-                      initialValue: gitUrl || '',
-                    })(
-                      <Input
-                        style={{ width: 300 }}
-                        disabled={!this.state.isEdit}
-                        placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
-                      />
-                    )
-                  }
-                </FormItem>
-                <FormItem
-                  label={'用户名'}
-                  {...formItemLayout}
-                >
-                  {
-                    getFieldDecorator('gitUser', {
-                      rules: [{
-                        required: true,
-                        message: 'Gitlab 用户名不能为空',
-                      }],
-                      initialValue: gitUser || '',
-                    })(
-                      <Input
-                        style={{ width: 300 }}
-                        disabled={!this.state.isEdit}
-                        placeholder="请输入 Gitlab 用户名"
-                      />
-                    )
-                  }
-                </FormItem>
-                <FormItem
-                  label={'密码'}
-                  {...formItemLayout}
-                >
-                  {
-                    getFieldDecorator('gitPassword', {
-                      rules: [{
-                        required: true,
-                        message: 'Gitlab 密码不能为空',
-                      }],
-                      initialValue: gitPassword || '',
-                    })(
-                      <Input
-                        style={{ width: 300 }}
-                        type={'password'}
-                        disabled={!this.state.isEdit}
-                        placeholder="请输入 Gitlab 密码"
-                      />
-                    )
-                  }
-                </FormItem>
-                <FormItem
-                  label={'Token'}
-                  {...formItemLayout}
-                >
-                  {
-                    getFieldDecorator('gitToken', {
-                      rules: [{
-                        required: true,
-                        message: 'token 不能为空',
-                      }],
-                      initialValue: gitToken || '',
-                    })(
-                      <Input
-                        style={{ width: 300 }}
-                        type={'password'}
-                        disabled={!this.state.isEdit}
-                        placeholder="Private Token:（位于 Profile Settings → Account）"
-                      />
-                    )
-                  }
-                </FormItem>
-                <Row>
-                  <Col offset={5}>
+        <Spin spinning={this.state.isLoading}>
+          <div key="layout-content-btns">
+            <ProjectCluster callback={() => this.load()} />
+            <Card
+              title="微服务配置"
+              extra={title_extra}
+              className="msa_config_style"
+            >
+              <Row className="conten">
+                <Col className="left" span={12}>
+                  <FormItem
+                    label={'基础服务'}
+                    {...formItemLayout}
+                  >
                     {
-                      this.state.isEdit ?
-                        <div className="btn_save">
-                          <Button className="close" onClick={this.handleClose}>取消</Button>
-                          <Button className="save" type="primary" onClick={this.handleSave}>保存</Button>
-                        </div> :
-                        <Tooltip
-                          title={!springcloud ? '个人项目已禁止安装Spring Cloud 组件，请使用共享项目' : '编辑配置即可安装'} placement={'right'} defaultVisible={true}
-                          getTooltipContainer={() => document.getElementsByClassName('btn_edit')[0]}
-                        >
-                          <Button className="btn_edit" type="primary" disabled= {!springcloud} onClick={this.handleEdit}>编辑</Button>
-                        </Tooltip>
+                      getFieldDecorator('service', {
+                        initialValue: 'SpringCloud',
+                      })(
+                        <Select style={{ width: 300 }}>
+                          <Option value="SpringCloud">SpringCloud</Option>
+                        </Select>
+                      )
                     }
-                  </Col>
-                </Row>
-              </Col>
-              <Col className="rigth" span={12}>
-                <Row className="msa">
-                  <Col span={5}>安装情况</Col>
-                  <Col span={19}>
+                  </FormItem>
+                  <FormItem
+                    label={'Gitlab 地址'}
+                    {...formItemLayout}
+                  >
                     {
-                      msaState ?
-                        <Row className="install">
-                          <Icon className="ico" type="check-circle-o" />&nbsp;
-                          <span className="existence" >已安装</span>
-                          <span className="unload" onClick={this.handleUnload}>卸载</span>
-                        </Row> :
-                        <Button
-                          type="primary"
-                          disabled={this.state.isEdit || this.disabledInstall()}
-                          onClick={this.handleInstall}
-                          loading={installLoading}
-                        >
-                          安装
-                        </Button>
+                      getFieldDecorator('gitUrl', {
+                        rules: [{
+                          required: true,
+                          message: 'Gitlab 地址不能为空',
+                        }, {
+                          type: 'url',
+                          message: '请输入 http 协议地址',
+                        }],
+                        initialValue: gitUrl || '',
+                      })(
+                        <Input
+                          style={{ width: 300 }}
+                          disabled={!this.state.isEdit}
+                          placeholder="Config Server Gitlab 地址（如 https://git.demo.com）"
+                        />
+                      )
                     }
-                  </Col>
-                </Row>
-                <Row className="msa">
-                  <Col span={5}>组件状态</Col>
-                  <Col span={19}>
-                    {healthy}
-                  </Col>
-                </Row>
-                <Row className="msa">
-                  <Col span={5}>组件版本</Col>
-                  <Col span={19}>
-                    <span className="desc">{version}</span>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
-              footer={[
-                <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
-                <Button key="submit" type="primary" loading={this.state.delLoading} onClick={this.handleDel}> 继续卸载 </Button>,
-              ]}>
-              <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span>即将在当前项目内卸载 SpringCloud 基础服务, 卸载后该项目内应用将无法继续使用微服务部分功能</span>
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
-              </div>
-            </Modal>
-          </Card>
-        </div>
+                  </FormItem>
+                  <FormItem
+                    label={'用户名'}
+                    {...formItemLayout}
+                  >
+                    {
+                      getFieldDecorator('gitUser', {
+                        rules: [{
+                          required: true,
+                          message: 'Gitlab 用户名不能为空',
+                        }],
+                        initialValue: gitUser || '',
+                      })(
+                        <Input
+                          style={{ width: 300 }}
+                          disabled={!this.state.isEdit}
+                          placeholder="请输入 Gitlab 用户名"
+                        />
+                      )
+                    }
+                  </FormItem>
+                  <FormItem
+                    label={'密码'}
+                    {...formItemLayout}
+                  >
+                    {
+                      getFieldDecorator('gitPassword', {
+                        rules: [{
+                          required: true,
+                          message: 'Gitlab 密码不能为空',
+                        }],
+                        initialValue: gitPassword || '',
+                      })(
+                        <Input
+                          style={{ width: 300 }}
+                          type={'password'}
+                          disabled={!this.state.isEdit}
+                          placeholder="请输入 Gitlab 密码"
+                        />
+                      )
+                    }
+                  </FormItem>
+                  <FormItem
+                    label={'Token'}
+                    {...formItemLayout}
+                  >
+                    {
+                      getFieldDecorator('gitToken', {
+                        rules: [{
+                          required: true,
+                          message: 'token 不能为空',
+                        }],
+                        initialValue: gitToken || '',
+                      })(
+                        <Input
+                          style={{ width: 300 }}
+                          type={'password'}
+                          disabled={!this.state.isEdit}
+                          placeholder="Private Token:（位于 Profile Settings → Account）"
+                        />
+                      )
+                    }
+                  </FormItem>
+                  <Row>
+                    <Col offset={5}>
+                      {
+                        this.state.isEdit ?
+                          <div className="btn_save">
+                            <Button className="close" onClick={this.handleClose}>取消</Button>
+                            <Button className="save" type="primary" onClick={this.handleSave}>保存</Button>
+                          </div> :
+                          <Tooltip
+                            title={!springcloud ? '个人项目已禁止安装Spring Cloud 组件，请使用共享项目' : '编辑配置即可安装'}
+                            placement={'right'} defaultVisible={true}
+                            getTooltipContainer={() => document.getElementsByClassName('btn_edit')[0]}
+                          >
+                            <Button className="btn_edit" type="primary" disabled={!springcloud} onClick={this.handleEdit}>编辑</Button>
+                          </Tooltip>
+                      }
+                    </Col>
+                  </Row>
+                </Col>
+                <Col className="rigth" span={12}>
+                  <Row className="msa">
+                    <Col span={5}>安装情况</Col>
+                    <Col span={19}>
+                      {
+                        msaState ?
+                          <Row className="install">
+                            <Icon className="ico" type="check-circle-o" />&nbsp;
+                            <span className="existence" >已安装</span>
+                            <span className="unload" onClick={this.handleUnload}>卸载</span>
+                          </Row> :
+                          <Button
+                            type="primary"
+                            disabled={this.state.isEdit || this.disabledInstall()}
+                            onClick={this.handleInstall}
+                            loading={installLoading}
+                          >
+                            安装
+                          </Button>
+                      }
+                    </Col>
+                  </Row>
+                  <Row className="msa">
+                    <Col span={5}>组件状态</Col>
+                    <Col span={19}>
+                      {healthy}
+                    </Col>
+                  </Row>
+                  <Row className="msa">
+                    <Col span={5}>组件版本</Col>
+                    <Col span={19}>
+                      <span className="desc">{version}</span>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
+                footer={[
+                  <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
+                  <Button key="submit" type="primary" loading={this.state.delLoading} onClick={this.handleDel}> 继续卸载 </Button>,
+                ]}>
+                <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+                  <span>即将在当前项目内卸载 SpringCloud 基础服务, 卸载后该项目内应用将无法继续使用微服务部分功能</span>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+                </div>
+              </Modal>
+            </Card>
+          </div>
+        </Spin>
       </QueueAnim>
     )
   }
