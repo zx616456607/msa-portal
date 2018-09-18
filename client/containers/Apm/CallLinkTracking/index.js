@@ -49,6 +49,8 @@ class CallLinkTracking extends React.Component {
     rangeDateTime: [],
     loading: false,
     dockSize: DEFAULT_DOCK_SIZE,
+    spaceHeight: 0,
+    selectedRowKeys: [],
   }
 
   componentDidMount() {
@@ -173,6 +175,7 @@ class CallLinkTracking extends React.Component {
     this.setState({
       isVisible: true,
       currentRecord: record,
+      selectedRowKeys: [ record.spanId ],
     })
     const { loadTransactionInfo, clusterID, apmID } = this.props
     const { agentId, spanId, traceId, collectorAcceptTime } = record
@@ -186,12 +189,18 @@ class CallLinkTracking extends React.Component {
   }
 
   onDockSizeChange = size => {
+    clearTimeout(this.addBodyHeight)
     this.appDom.style.maxHeight = `${(1 - size - 0.01) * 100}%`
     this.appDom.style.overflow = 'auto'
     this.footerDom.style.display = 'none'
     this.setState({
       dockSize: size,
     })
+    this.addBodyHeight = setTimeout(() => {
+      this.setState({
+        spaceHeight: document.querySelector('div.transaction-inspector').offsetHeight,
+      })
+    }, 200)
   }
 
   changeDockSize = dockSize => this.setState({ dockSize })
@@ -203,7 +212,9 @@ class CallLinkTracking extends React.Component {
     })
     this.onDockSizeChange(0)
   }
-
+  onSelectedRowKeysChange = selectedRowKeys => this.setState({
+    selectedRowKeys,
+  })
   render() {
     const { apps, transaction, transactionInfo } = this.props
     const {
@@ -213,6 +224,7 @@ class CallLinkTracking extends React.Component {
       loading,
       currentRecord,
       agentList,
+      selectedRowKeys,
     } = this.state
     const columns = [{
       title: '#',
@@ -260,6 +272,12 @@ class CallLinkTracking extends React.Component {
     data.forEach((item, index) => {
       item.index = index
     })
+    const rowSelection = {
+      hideDefaultSelections: true,
+      type: 'radio',
+      onChange: this.onSelectedRowKeysChange,
+      selectedRowKeys,
+    }
     return (
       <QueueAnim className="call-link-tracking">
         <div className="layout-content-btns" key="btns">
@@ -314,8 +332,10 @@ class CallLinkTracking extends React.Component {
               onRow={record => ({
                 onClick: () => this.handleRowClick(record),
               })}
+              rowSelection={rowSelection}
             />
           </Card>
+          <div style={{ width: '100%', height: this.state.spaceHeight }}/>
         </div>
         <div className="call-stack-dock">
           <Dock
