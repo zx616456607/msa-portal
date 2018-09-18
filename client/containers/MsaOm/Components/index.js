@@ -80,6 +80,7 @@ class MsaComponents extends React.Component {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
+          loading: true,
           apmID: res.response.result.data,
         }, () => {
           this.load()
@@ -97,6 +98,9 @@ class MsaComponents extends React.Component {
         id: apmID[0].id,
       }
       fetchMsaComponentList(clusterId, query, namespace)
+      this.setState({
+        loading: false,
+      })
     }
   }
 
