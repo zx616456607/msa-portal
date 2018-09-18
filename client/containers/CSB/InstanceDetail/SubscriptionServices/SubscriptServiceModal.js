@@ -153,8 +153,8 @@ class SubscriptServiceModal extends React.Component {
       wrapperCol: { span: 18 },
     }
     // 消费凭证选项列表
-    const consumerVouchersOptions = content && content.filter(
-      v => v.subscribedServiceNames.indexOf(serviceName) < 0)
+    const consumerVouchersOptions = content.length !== 0 && content.filter(
+      v => v.subscribedServiceNames && v.subscribedServiceNames.indexOf(serviceName) < 0)
     return <Modal
       title="订阅服务"
       visible={visible}
@@ -181,7 +181,8 @@ class SubscriptServiceModal extends React.Component {
                   <InputNumber
                     min={1}
                     max={999999999}
-                    placeholder="请填写整数"
+                    style={{ width: 180 }}
+                    placeholder="请输入1~999999999整数"
                   />
                 )
               }
@@ -210,7 +211,7 @@ class SubscriptServiceModal extends React.Component {
                 filterOption={this.filterConsumerVoucher}
               >
                 {
-                  consumerVouchersOptions.map(item => {
+                  consumerVouchersOptions && consumerVouchersOptions.map(item => {
                     return <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
