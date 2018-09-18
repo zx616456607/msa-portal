@@ -181,7 +181,8 @@ class SubscriptServiceModal extends React.Component {
                   <InputNumber
                     min={1}
                     max={999999999}
-                    placeholder="请填写整数"
+                    style={{ width: 180 }}
+                    placeholder="请输入1~999999999整数"
                   />
                 )
               }
