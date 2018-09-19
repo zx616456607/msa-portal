@@ -153,6 +153,13 @@ const uaaZoneGroupUsersSchema = new schema.Entity('uaaZoneGroupUsers', {}, {
 const appSchema = new schema.Entity('apps', {}, {
   idAttribute: 'value',
 })
+
+const meshIngressGatewayListDataSchema = new schema.Entity('meshIngressGatewayList', {}, {
+  idAttribute: 'hashedName',
+})
+const meshGatewayListDataSchema = new schema.Entity('meshGatewayList', {}, {
+  idAttribute: value => value.metadata.name,
+})
 // Schemas for tce API responses.
 export const Schemas = {
   APM: apmSchema,
@@ -309,4 +316,6 @@ export const Schemas = {
   APPS: {
     appList: [ appSchema ],
   },
+  MESH_INGRESS_GATEWAY_LIST_DATA: [ meshIngressGatewayListDataSchema ],
+  MESH_GATEWAY_LIST_DATA: [ meshGatewayListDataSchema ],
 }
