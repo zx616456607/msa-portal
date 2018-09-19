@@ -68,12 +68,13 @@ const graphDataList = (state = {}, action) => {
         ...state,
         isFetching: true,
       }
-    case ActionTypes.SERVICE_MESH_GRAPH_SUCCESS:
+    case ActionTypes.SERVICE_MESH_GRAPH_SUCCESS: {
       return {
         ...state,
         isFetching: false,
-        data: action.response.result.data,
+        data: action.response.result,
       }
+    }
     case ActionTypes.SERVICE_MESH_GRAPH_FAILURE:
       return {
         ...state,

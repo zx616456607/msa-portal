@@ -92,17 +92,20 @@ export function loadAllServices(cluster, query, callback) {
 }
 
 // 获取拓扑图信息
+// TODO: 后台目前还处于摸索期, 这个url的参数目前只能写死
 export const SERVICE_MESH_GRAPH_REQUEST = 'SERVICE_MESH_GRAPH_REQUEST'
 export const SERVICE_MESH_GRAPH_SUCCESS = 'SERVICE_MESH_GRAPH_SUCCESS'
 export const SERVICE_MESH_GRAPH_FAILURE = 'SERVICE_MESH_GRAPH_FAILURE'
 function fetchServiceMeshGraph(cluster, headers, query, callback) {
+  cluster = 'CID-88553dfba3c8'
   return {
     [CALL_API]: {
       types: [ SERVICE_MESH_GRAPH_REQUEST, SERVICE_MESH_GRAPH_SUCCESS, SERVICE_MESH_GRAPH_FAILURE ],
-      endpoint: `servicemesh/clusters/${cluster}/telemetry/servicegraph?${toQuerystring(query)}`,
+      endpoint: `http://192.168.1.225:38574/api/v3/servicemesh/clusters/${cluster}/telemetry/servicegraph?service=productpage`,
+      // ${toQuerystring(query)}`,
       schema: {},
       options: {
-        headers,
+        // headers,
       },
     },
     callback,

@@ -11,12 +11,29 @@ import React from 'react'
 import { Chart, Axis, Geom, Tooltip, Coord, Legend } from 'bizcharts'
 import { DataSet } from '@antv/data-set'
 import './styles/InOutGraph.less'
+
+// 将数据装换成百分比形式
+function formatStatus(total, data) {
+  return parseFloat(data / total).toFixed(2) * 100
+}
 export default class InOutGraph extends React.Component {
   render() {
+    const { inDetail = {}, outDetail = {} } = this.props
     const data = [
-      { State: 'In', OK: 100, '3xx': 0, '4xx': 0, '5xx': 0 },
-      { State: 'Out', OK: 90, '3xx': 0, '4xx': 0, '5xx': 10 },
+      { State: 'In',
+        OK: formatStatus(inDetail.total, inDetail[200]),
+        '3xx': formatStatus(inDetail.total, inDetail[300]),
+        '4xx': formatStatus(inDetail.total, inDetail[400]),
+        '5xx': formatStatus(inDetail.total, inDetail[500]),
+      },
+      { State: 'Out',
+        OK: formatStatus(outDetail.total, outDetail[200]),
+        '3xx': formatStatus(outDetail.total, outDetail[300]),
+        '4xx': formatStatus(outDetail.total, outDetail[400]),
+        '5xx': formatStatus(outDetail.total, outDetail[500]),
+      },
     ]
+
     const ds = new DataSet()
     const dv = ds.createView().source(data)
     dv.transform({

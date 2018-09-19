@@ -6,6 +6,7 @@
   }
   .searchBar {
     display: flex;
+    flex-wrap: wrap;
     >div, span {
       margin-right: @padding-base;
     }
@@ -57,5 +58,13 @@
     .ant-time-picker-icon::after {
       content: '~';
     }
+  }
+  .operationButton {
+    display: inline-block;
+    flex-basis: 600px;
+  }
+  .graphInfo {
+    color: @font-color-4;
+    line-height: 32px;
   }
 }
