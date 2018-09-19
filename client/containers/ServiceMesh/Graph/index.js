@@ -35,11 +35,14 @@ function mapStateToProps(state) {
   })
   const appsList = serviceMesh && serviceMesh.serviceList && serviceMesh.serviceList.data &&
    serviceMesh.serviceList.data.services || []
+  // graphData 数据
+  const { serviceMesh: { graphDataList = {} } = {} } = state
   return {
     current: current || {},
     projects: userProjects.map(namespace => projects[namespace]),
     projectClusters,
     appsList,
+    graphDataList,
   }
 }
 class ServiceMeshGraph extends React.Component {
@@ -50,7 +53,7 @@ class ServiceMeshGraph extends React.Component {
   node = null
   appNode = null
   async componentDidMount() {
-    const { current, projectClusters, loadAppList, getProjectClusters, getDefaultClusters,
+    const { current, loadAppList, getProjectClusters, getDefaultClusters,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -59,6 +62,13 @@ class ServiceMeshGraph extends React.Component {
     } else {
       await getProjectClusters(project.namespace)
     }
+    // 这里必须要重新从this.props中重新拿一下projectClusters.
+    // 因为当代码跑到上一个await的时候, async被暂停, 转而去执行redux相关的操作
+    // 如果在async最前面就去this.props中去拿projectClusters的话
+    // await返回后执行下面的同步代码,实际上相当于拿的还是上一次的projectClusters, 因为我的代码中写的
+    // 每次都会返回一个新的projectClusters, 所以它的引用不同. 所以只能拿到之前的projectClusters
+    // 而如果在使用的时候, 重新从this.porps中拿一下, 就能拿到最新的数据了.
+    const { projectClusters } = this.props
     const currentProjectClusters = projectClusters[project.namespace] || []
     if (currentProjectClusters.length === 0) {
       this.setState({ searchQuery: {
@@ -152,13 +162,13 @@ class ServiceMeshGraph extends React.Component {
   }
   loadGraph = () => {
     const { loadServiceMeshGraph } = this.props
-    const { app, cluster, item, timeRange: { begin, end } = {} } = this.state.searchQuery
-    const check = [ app, cluster, item, begin, end ].every(item => item !== undefined)
+    const { app, cluster, item } = this.state.searchQuery
+    const check = [ app, cluster, item ].every(item => ![ undefined, null ].includes(item))
     check && loadServiceMeshGraph(cluster, { project: item },
       { service: app, begin: 0, end: 1000 })
   }
   render() {
-    const { current, projects, projectClusters, appsList } = this.props
+    const { current, projects, projectClusters } = this.props
     const { searchQuery: { item, cluster, app, timeRange }, isTimeRange } = this.state
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -175,7 +185,7 @@ class ServiceMeshGraph extends React.Component {
             <div className="searchBar">
               <Select
                 showSearch
-                style={{ width: 160 }}
+                style={{ width: 120 }}
                 optionFilterProp="children"
                 placeholder="选择项目"
                 onChange={value => this.handleSelectChange('item', value)}
@@ -205,7 +215,7 @@ class ServiceMeshGraph extends React.Component {
               </Select>
               <Select
                 showSearch
-                style={{ width: 160 }}
+                style={{ width: 120 }}
                 optionFilterProp="children"
                 placeholder="选择集群"
                 onChange={value => this.handleClusterChange('cluster', value)}
@@ -234,7 +244,7 @@ class ServiceMeshGraph extends React.Component {
               <Select
                 showSearch={true}
                 onSearch={this.debounceSearchApp}
-                style={{ width: 160 }}
+                style={{ width: 120 }}
                 optionFilterProp="children"
                 placeholder="选择服务"
                 onChange={value => this.handleChange('app', value)}
@@ -242,7 +252,7 @@ class ServiceMeshGraph extends React.Component {
                 ref={ relnode => { this.appNode = relnode } }
                 filterOption={false}
               >
-                {
+                {/* {
                   cluster && appsList.map(apps => {
                     return (
                       <Option
@@ -252,39 +262,54 @@ class ServiceMeshGraph extends React.Component {
                       </Option>
                     )
                   })
-                }
+                } */}
+                <Option
+                  key={'1'}
+                  value={1}>
+                  { 1 }
+                </Option>
               </Select>
-              <Button className="TimePickerButton"
-                type="primary"
-                onClick={this.toogleTimePicker}
-                icon="calendar">
+              <div
+                className="operationButton"
+              >
+                <Button className="TimePickerButton"
+                  type="primary"
+                  onClick={this.toogleTimePicker}
+                  icon="calendar">
                 自定义时间
-              </Button>
-              {
-                isTimeRange === false ?
-                  <Radio.Group value = {timeRange}
-                    onChange={ e => this.timeRangeSelect('singleTime', e.target.value)}
-                  >
-                    <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
-                    <Radio.Button value={30}>最近30分钟</Radio.Button>
-                    <Radio.Button value={60}>最近1小时</Radio.Button>
-                  </Radio.Group>
-                  :
-                  <span >
-                    <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
-                    <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
-                    <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
-                  </span>
-              }
+                </Button>
+                {
+                  isTimeRange === false ?
+                    <Radio.Group value = {timeRange}
+                      onChange={ e => this.timeRangeSelect('singleTime', e.target.value)}
+                    >
+                      <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
+                      <Radio.Button value={30}>最近30分钟</Radio.Button>
+                      <Radio.Button value={60}>最近1小时</Radio.Button>
+                    </Radio.Group>
+                    :
+                    <span >
+                      <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
+                      <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
+                      <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
+                    </span>
+                }
+              </div>
             </div>
             <div className="infoBar">
-              <span className="meshInfo">{`应用: ${'x'}个`}</span>
+              {/*
+              //TODO: 后端目前没有, 有了再加
+               <span className="meshInfo">{`应用: ${'x'}个`}</span>
               <span className="meshInfo">{`服务: ${'t'}个`}</span>
-              <span className="meshInfo">{`调用: ${'y'}个`}</span>
+              <span className="meshInfo">{`调用: ${'y'}个`}</span> */}
+              <span className="graphInfo"> 展示满足以上筛选条件的, 所有启用 service Mesh 的微服务拓扑 </span>
               <Button onClick={this.loadGraph}><Icon type="sync"/>刷新</Button>
             </div>
             <div className="SvgContainer">
-              <RelationChartComponent searchQuery={this.state.searchQuery}/>
+              <RelationChartComponent
+                searchQuery={this.state.searchQuery}
+                graphDataList={this.props.graphDataList}
+              />
             </div>
           </div>
         </QueueAnim>

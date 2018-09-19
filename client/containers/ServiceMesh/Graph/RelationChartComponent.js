@@ -13,7 +13,9 @@ import NodeDetailModal from './NodeDetailModal'
 import cloneDeep from 'lodash/cloneDeep'
 import { connect } from 'react-redux'
 import * as meshAction from '../../../actions/serviceMesh'
-import { Icon } from 'antd'
+import { findDOMNode } from 'react-dom';
+import serviceImg from '../../../assets/img/serviceMesh/serviceMesh.jpg'
+// import { Icon } from 'antd'
 import './styles/RelationChartComponent.less'
 const config = {
   rankdir: 'LR',
@@ -23,37 +25,24 @@ const config = {
   marginx: 30,
   marginy: 30,
 } // 默认relation-chart 配置
-const TenxNodeFactory = (icon, name, v) => () => <div className="TenxNode" >
-  <Icon type={icon} theme="outlined" />
-  <div>{name}</div>
-  <div>{v}</div>
-</div>
-const formateNodesEdges = onClick => {
-  const nodes = [
-    { id: 'kspacey', label: 'Kevin Spacey', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('android', 'github', 'v1') },
-    { id: 'swilliams', label: 'Saul Williams', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('twitter', 'github', 'v1') },
-    { id: 'bpitt', label: 'Brad Pitt', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('gitlab', 'github', 'v1') },
-    { id: 'hford', label: 'Harrison Ford', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
-    { id: 'lwilson', label: 'Luke Wilson', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
-    { id: 'kbacon', label: 'Kevin Bacon', width: 50, height: 50, shape: 'circle', onClick, isAnimated: true,
-      TenxNode: TenxNodeFactory('dribbble', 'github', 'v1') },
-  ]
-  const edges = [
-    { source: 'kspacey', target: 'swilliams', withArrow: true, arrowOffset: 10, label: 'hello', isAnimated: true },
-    { source: 'swilliams', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hi', isAnimated: true },
-    { source: 'bpitt', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'hey', isAnimated: true },
-    { source: 'hford', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'yo', isAnimated: true },
-    { source: 'lwilson', target: 'kbacon', withArrow: true, arrowOffset: 10, label: 'ha', isAnimated: true },
-    { source: 'kbacon', target: 'lwilson', withArrow: true, arrowOffset: 10, label: 'hehe', isAnimated: true },
-  ]
-  return { nodes, edges }
+// const TenxNodeFactory = (icon, name, v) => () => <div className="TenxNode" >
+//   <Icon type={icon} theme="outlined" />
+//   <div>{name}</div>
+//   <div>{v}</div>
+// </div>
+
+const ServiceMeshNode = () => {
+  return (
+    <div className="TenxNode">
+      <img style={{ height: 35, width: 35, marginLeft: 8 }} src={serviceImg} alt=""/>
+    </div>)
 }
 
+// 根据后端数据结构获取http各种状态码回来的综合
+function formateNumber(message, code) {
+  return message.map(item => { return item[code] || 0 })
+    .reduce((total, current) => total + parseInt(current), 0)
+}
 @connect(mapStateToProps, { loadServiceMeshGraph: meshAction.loadServiceMeshGraph })
 export default class RelationChartComponent extends React.Component {
   state = {
@@ -61,10 +50,10 @@ export default class RelationChartComponent extends React.Component {
     currentService: '',
     nodes: [],
     edges: [],
+    loading: false,
+    fullScreenMode: false, // 默认不是全屏
   }
   componentDidMount() {
-    const { nodes, edges } = formateNodesEdges(this.onClick)
-    this.setState({ nodes, edges })
   }
   componentWillReceiveProps(nextProps = {}) {
     // 当用户修改任何的检索条件时, 在这里检查搜索条件是否合法并且是否和上次的不一样, 如果同时满足这两个情况,
@@ -72,24 +61,61 @@ export default class RelationChartComponent extends React.Component {
     // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
     // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
     // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
-    const { app, cluster, item, timeRange = {} } = nextProps.searchQuery
-    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange = {},
+    const { app, cluster, item } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem,
     } = this.props.searchQuery
-    const { begin, end } = timeRange
-    const { begin: cbegin, end: cend } = ctimeRange
+    // const { begin, end } = timeRange
+    // const { begin: cbegin, end: cend } = ctimeRange
     const { loadServiceMeshGraph } = this.props
     const check = typeof app === 'string' && typeof cluster === 'string' && typeof item === 'string'
-    && typeof timeRange === 'object'
-    const diff = app !== capp || cluster !== ccluster || item !== citem || begin !== cbegin ||
-    end !== cend
+    const diff = app !== capp || cluster !== ccluster || item !== citem
     if (check && diff) {
       loadServiceMeshGraph(cluster, { project: item },
         { service: app, begin: 0, end: 1000 })
     }
+    const { graphDataList = {} } = nextProps
+    const { graphDataList: thisGraphDataList = {} } = this.props
+    if (graphDataList !== thisGraphDataList) { // 如果两次回来的不是同一个对象
+      const { isFetching = false, data: { nodes = [], edges = [] } = {} } = graphDataList
+      const newNodes = nodes.map(node => {
+        const onClick = this.onClick
+        return {
+          id: node.id,
+          label: node.name,
+          version: node.version,
+          namespace: node.namespace,
+          protocol: node.protocol,
+          width: 50,
+          height: 50,
+          shape: 'circle',
+          onClick,
+          isAnimated: true,
+          TenxNode: ServiceMeshNode,
+        }
+      })
+      const newEdges = edges.map((edge = {}) => {
+        const { detail = {} } = edge
+        const totalDenominator = Object.values(detail)
+          .reduce((total, current) => parseInt(current) + total, 0)
+        const totalMember = detail['200'] || 0
+        const lineLabel = `${totalMember} / ${totalDenominator} calls ${parseFloat(edge.latency).toFixed(6) || 0}ms`
+        const lineLabelNode = <div title={lineLabel} >{lineLabel}</div>
+        return {
+          source: edge.from,
+          target: edge.to,
+          withArrow: true,
+          arrowOffset: 10,
+          label: lineLabelNode,
+          isAnimated: true,
+          detail: edge.detail,
+        }
+      })
+      this.setState({ loading: isFetching, nodes: newNodes, edges: newEdges })
+    }
   }
   onClick = (lname, e) => {
     e.stopPropagation();
-    const { nodes } = this.state
+    const { nodes, edges = [] } = this.state
     const newNodes = cloneDeep(nodes)
     newNodes.forEach(n => {
       if (n.active !== undefined) {
@@ -99,7 +125,36 @@ export default class RelationChartComponent extends React.Component {
         n.active = true
       }
     })
-    this.setState({ currentService: lname, visible: true, nodes: newNodes })
+    const message = edges.filter(({ target }) => target === lname).map(({ detail }) => detail)
+    const messageTotal = message.map(item => {
+      return Object.values(item).reduce((total, current) => total + parseInt(current), 0)
+    }).reduce((total, current) => total + current, 0)
+    const choiceNodes = newNodes.filter(({ active }) => active)
+    const outMessage = edges.filter(({ source }) => source === lname).map(({ detail }) => detail)
+    const outMessageTotal = outMessage.map(item => {
+      return Object.values(item).reduce((total, current) => total + parseInt(current), 0)
+    }).reduce((total, current) => total + current, 0)
+    const currentService = {
+      inDetail: {
+        total: messageTotal,
+        200: formateNumber(message, '200'),
+        300: formateNumber(message, '300'),
+        400: formateNumber(message, '400'),
+        500: formateNumber(message, '500'),
+      },
+      outDetail: {
+        total: outMessageTotal,
+        200: formateNumber(outMessage, '200'),
+        300: formateNumber(outMessage, '300'),
+        400: formateNumber(outMessage, '400'),
+        500: formateNumber(outMessage, '500'),
+      },
+      name: choiceNodes[0].label,
+      version: choiceNodes[0].version,
+      namespace: choiceNodes[0].namespace,
+      protocol: choiceNodes[0].protocol,
+    }
+    this.setState({ currentService, visible: true, nodes: newNodes })
   }
   onRelationChartClick = () => {
     const { nodes } = this.state;
@@ -111,8 +166,11 @@ export default class RelationChartComponent extends React.Component {
     })
     this.setState({ nodes: newNodes, visible: false })
   }
+  fullScreenMode = fullScreenMode => {
+    this.setState({ fullScreenMode })
+  }
   render() {
-    const { visible, currentService, nodes, edges } = this.state
+    const { visible, currentService, nodes, edges, loading } = this.state
     return (
       <div className="wrap">
         <RelationChart
@@ -122,9 +180,19 @@ export default class RelationChartComponent extends React.Component {
           SvgHeight = { '65vh' }
           onSvgClick = {this.onRelationChartClick}
           ref = {r => { this.relationChart = r }}
+          loading={loading}
+          fullScreenMode={this.fullScreenMode}
         />
-        <NodeDetailModal isVisible={visible} onClose={() => this.setState({ visible: false })}
-          serviceName={currentService} getContainer={this.relationChart} />
+        {/* 这里要放两个相同的输入的框的原因是, 全屏和非全屏模式下, modal需要渲染在不同的节点下面, 如果
+         modal虽然可以指定渲染节点,但是是一次性的, 所以必须u指定两个, 一个全屏模式下使用, 一个非全屏模式下使用,  */}
+        <NodeDetailModal isVisible={this.state.fullScreenMode && visible}
+          onClose={() => this.setState({ visible: false })}
+          serviceName={currentService} getContainer={findDOMNode(this.relationChart)}
+        />
+        <NodeDetailModal isVisible={!this.state.fullScreenMode && visible}
+          onClose={() => this.setState({ visible: false })}
+          serviceName={currentService} getContainer={findDOMNode(document.body)}
+        />
       </div>
     )
   }

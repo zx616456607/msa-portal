@@ -10,36 +10,38 @@
 import React from 'react'
 import { Modal, Divider } from 'antd'
 import InOutGraph from './InOutGraph'
-import { findDOMNode } from 'react-dom';
 import './styles/NodeDetailModal.less'
 
-const inOutData = [
-  {
-    name: '',
-    all: '总计',
-    success: '成功率',
-    failure: '失误率',
-  }, {
-    name: 'In',
-    all: '0',
-    success: '100%',
-    failure: '0%',
-  }, {
-    name: 'Out',
-    all: '0',
-    success: '10%',
-    failure: '90%',
-  },
-]
+function formateInOutData(inData = {}, outDetail = {}) {
+  const inOutData = [
+    {
+      name: '',
+      all: '总计',
+      success: '成功率',
+      failure: '失误率',
+    }, {
+      name: 'In',
+      all: inData.total,
+      success: `${parseFloat(inData[200] / inData.total).toFixed(2) * 100}%`,
+      failure: `${parseFloat((inData.total - inData[200]) / inData.total).toFixed(2) * 100}%`,
+    }, {
+      name: 'Out',
+      all: outDetail.total,
+      success: `${parseFloat(outDetail[200] / outDetail.total).toFixed(2) * 100}%`,
+      failure: `${parseFloat((outDetail.total - outDetail[200]) / outDetail.total).toFixed(2) * 100}%`,
+    },
+  ]
+  return inOutData
+}
 
-const mainData = [
-  {
-    service: 'dsa',
-    port: '222',
-    number: 'asdf',
-    time: 'fasd',
-  },
-]
+// const mainData = [
+//   {
+//     service: 'dsa',
+//     port: '222',
+//     number: 'asdf',
+//     time: 'fasd',
+//   },
+// ]
 export default class NodeDetailModal extends React.Component {
   componentDidUpdate = prevProps => {
     const { isVisible } = this.props
@@ -52,6 +54,7 @@ export default class NodeDetailModal extends React.Component {
   }
   render() {
     const { isVisible, onClose, serviceName, getContainer } = this.props
+    const { serviceName: { inDetail = {}, outDetail = {} } = {} } = this.props
     return (
       <div className="NodeDetailModal">
         <Modal className="NodeDetailModal"
@@ -61,20 +64,30 @@ export default class NodeDetailModal extends React.Component {
           width={380}
           mask={false}
           maskStyle={ { pointerEvents: 'none', backgroundColor: 'red' } }
-          getContainer={() => findDOMNode(getContainer)}
+          getContainer={() => getContainer}
         >
           {/* <div>{serviceName}</div> */}
           <div className="baseMessage">
-            <div><span className="item">服务:</span><span className="info">{serviceName}</span></div>
-            <div><span className="item">项目:</span><span className="info">{serviceName}</span></div>
-            <div><span className="item">服务类型:</span><span className="info">{serviceName}</span></div>
-            <div><span className="item">服务版本</span><span className="info"></span>{serviceName}</div>
+            <div>
+              <span className="item">服务:</span><span className="info">{serviceName.name}</span>
+            </div>
+            <div>
+              <span className="item">项目:</span>
+              <span className="info">{serviceName.namespace}</span>
+            </div>
+            {/* <div>
+            <span className="item">服务类型:</span>
+            <span className="info">{serviceName.protocol}</span>
+            </div> */}
+            {/* <div>
+            <span className="item">服务版本</span>
+            <span className="info"></span>{serviceName.version}</div> */}
           </div>
           <Divider/>
           <div className="baseMessage contentMessage">
             <div style={{ fontSize: '12px' }}>QPS(每秒钟请求次数)</div>
             <ul className="inOutTable">
-              {inOutData.map(({ name, all, success, failure }) => {
+              {formateInOutData(inDetail, outDetail).map(({ name, all, success, failure }) => {
                 return (
                   <li key={name}>
                     <span>{name}</span>
@@ -85,8 +98,8 @@ export default class NodeDetailModal extends React.Component {
                 )
               })}
             </ul>
-            <InOutGraph/>
-            <ul className="mainTable inOutTable">
+            <InOutGraph inDetail={inDetail} outDetail={outDetail}/>
+            {/* <ul className="mainTable inOutTable">
               <li key="main">
                 <span>依赖服务</span>
                 <span>端口</span>
@@ -106,7 +119,7 @@ export default class NodeDetailModal extends React.Component {
                   )
                 })
               }
-            </ul>
+            </ul> */}
           </div>
         </Modal>
       </div>
