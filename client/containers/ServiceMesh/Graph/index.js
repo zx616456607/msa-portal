@@ -168,7 +168,7 @@ class ServiceMeshGraph extends React.Component {
       { service: app, begin: 0, end: 1000 })
   }
   render() {
-    const { current, projects, projectClusters } = this.props
+    const { current, projects, projectClusters, appsList } = this.props
     const { searchQuery: { item, cluster, app, timeRange }, isTimeRange } = this.state
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -252,7 +252,7 @@ class ServiceMeshGraph extends React.Component {
                 ref={ relnode => { this.appNode = relnode } }
                 filterOption={false}
               >
-                {/* {
+                {
                   cluster && appsList.map(apps => {
                     return (
                       <Option
@@ -262,12 +262,7 @@ class ServiceMeshGraph extends React.Component {
                       </Option>
                     )
                   })
-                } */}
-                <Option
-                  key={'1'}
-                  value={1}>
-                  { 1 }
-                </Option>
+                }
               </Select>
               <div
                 className="operationButton"
