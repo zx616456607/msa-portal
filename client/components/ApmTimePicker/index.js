@@ -46,9 +46,10 @@ export default class ApmTimePicker extends React.Component {
     onOk: PropTypes.func.isRequired,
   }
   state = {
-    value: [],
+    value: [ moment().subtract(2, 'days'), moment() ],
     isRangeTime: false,
     currentRadio: 'fiveMin',
+    hasClicked: false,
   }
   componentDidMount() {
     const { value } = this.props
@@ -63,12 +64,6 @@ export default class ApmTimePicker extends React.Component {
     if (value && (value[0] !== this.props.value[0] || value[1] !== this.props.value[1])) {
       this.setState({
         value,
-      })
-    }
-    if (nextProps.resetTime === true) { // upstream reset btn
-      this.setState({
-        isRangeTime: false,
-        currentRadio: 'fiveMin',
       })
     }
   }
@@ -117,6 +112,9 @@ export default class ApmTimePicker extends React.Component {
         .valueOf()
     } else if (time === 'beforeYes') {
       startTime = new Date(new Date().setDate(new Date().getDate() - 2))
+      startTime = new Date(startTime).valueOf()
+    } else if (time === 'last7days') {
+      startTime = new Date(new Date().setDate(new Date().getDate() - 7))
         .setHours(0, 0, 0, 0)
       startTime = new Date(startTime).valueOf()
     }
@@ -159,11 +157,49 @@ export default class ApmTimePicker extends React.Component {
         currentRadio: null,
       })
     }
-    this.setState({ isRangeTime: !isRangeTime })
+    this.setState({
+      isRangeTime: !isRangeTime,
+      value: [ moment(), moment() ],
+      hasClicked: false,
+    })
+  }
+  disabledDate = date => {
+    const { limitDays } = this.props
+    return (date.diff(this.state.value[0], 'days') < -limitDays) || (date.diff(this.state.value[0], 'days') > limitDays) // 保证选定起始日期后，只能选择某段时间内作为结束日期
+  }
+  range = (start, end) => {
+    const result = [];
+    for (let i = start; i < end; i++) {
+      result.push(i);
+    }
+    return result;
+  }
+  disabledRangeTime = (_, type) => {
+    const { value } = this.state
+    if (type === 'start') {
+      return {
+        disabledHours: () => this.range(0, 60).splice(0, value[1].hour()),
+        disabledMinutes: () => this.range(0, value[1].minutes()),
+        disabledSeconds: () => this.range(0, value[1].seconds()),
+      };
+    }
+    return {
+      disabledHours: () => [],
+      disabledMinutes: () => [],
+      disabledSeconds: () => [],
+    };
+  }
+  dateClick = current => {
+    const timeMoment = this.state.value
+    timeMoment[0] = current
+    this.setState({
+      hasClicked: true,
+      value: timeMoment,
+    })
   }
   render() {
-    const { value, isRangeTime, currentRadio } = this.state
-    const { timeArr } = this.props
+    const { value, isRangeTime, currentRadio, hasClicked } = this.state
+    const { timeArr, limitDays } = this.props
     return (
       <div className="apm-timepicker">
         <Button
@@ -179,7 +215,13 @@ export default class ApmTimePicker extends React.Component {
             <RangePicker
               className="apm-timepicker-component"
               key="timePicker"
-              showTime={{ format: 'HH:mm' }}
+              showTime={{
+                defaultValue: [ moment().subtract(2, 'days'), moment() ],
+              }}
+              dateRender={current => <div className="ant-calendar-date" onClick={() => this.dateClick(current)}>{current.date()}</div>}
+              disabledDate={limitDays && hasClicked ? this.disabledDate : () => false}
+              disabledTime={limitDays && hasClicked ? this.disabledRangeTime : () => false}
+              renderExtraFooter={() => (limitDays ? <span className="apm-range-picker-tip">时间长度不超过{limitDays}天</span> : '')}
               format="YYYY-MM-DD HH:mm"
               placeholder={[ '开始日期', '结束日期' ]}
               value={value}
