@@ -25,7 +25,7 @@ import RelationChart from '@tenx-ui/relation-chart'
 import classNames from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 import flatten from 'lodash/flatten'
-
+message.config({ top: 90 })
 const G2 = require('g2')
 const Option = Select.Option
 const images = {
@@ -202,6 +202,7 @@ class Topology extends React.Component {
       totalCount: 0,
       errorCount: 0,
       topologyData: {},
+      topologyLoading: false,
     }
   }
   componentDidMount() {
@@ -417,6 +418,9 @@ class Topology extends React.Component {
     })
   }
   getTopologyData = () => {
+    this.setState({
+      topologyLoading: false,
+    })
     const { nodeDataArray, linkDataArray } = this.state
     const nodes = []
     const edges = []
@@ -471,6 +475,11 @@ class Topology extends React.Component {
       message.warning('请选择开始跟结束时间')
       return
     }
+    this.setState({
+      nodeDataArray: [],
+      linkDataArray: [],
+      topologyLoading: true,
+    })
     this.loadScatter()
     this.getPinpointMap()
     this.getAgentListWithStatus()
@@ -527,6 +536,8 @@ class Topology extends React.Component {
     appName = application
     this.setState({
       application,
+      nodeDataArray: [],
+      linkDataArray: [],
     }, () => {
       this.getData()
     })
@@ -583,6 +594,7 @@ class Topology extends React.Component {
       currentNode,
       totalCount,
       errorCount,
+      topologyLoading,
     } = this.state
     const { apps } = this.props
     const config = {
@@ -634,6 +646,7 @@ class Topology extends React.Component {
                   <RelationChart
                     graphConfigs={config}
                     {...topologyData}
+                    loading={topologyLoading}
                     SvgHeight = "1000px"
                     onSvgClick={this.clearNodesActive}
                   />

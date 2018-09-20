@@ -9,7 +9,7 @@
  * 2017-09-06
  * @author zhangxuan
  */
-
+@import "../../../assets/style/core/index.less";
 .apm-timepicker {
   display: inline-block;
   .type-change-btn {
@@ -29,4 +29,16 @@
     }
   }
 }
+.ant-calendar-range-bottom {
+  position: relative;
+  .apm-range-picker-tip {
+    border-top: none;
+    position: absolute;
+    color: @font-color-4 !important;
+  }
+  .ant-calendar-footer-btn {
+    border-top: none !important;
+  }
+}
+
 
