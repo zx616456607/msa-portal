@@ -164,7 +164,8 @@ export default class ApmTimePicker extends React.Component {
     })
   }
   disabledDate = date => {
-    return (date.diff(this.state.value[0], 'days') < -2) || (date.diff(this.state.value[0], 'days') > 2) // 保证选定起始日期后，只能选择某段时间内作为结束日期
+    const { limitDays } = this.props
+    return (date.diff(this.state.value[0], 'days') < -limitDays) || (date.diff(this.state.value[0], 'days') > limitDays) // 保证选定起始日期后，只能选择某段时间内作为结束日期
   }
   range = (start, end) => {
     const result = [];
@@ -198,9 +199,7 @@ export default class ApmTimePicker extends React.Component {
   }
   render() {
     const { value, isRangeTime, currentRadio, hasClicked } = this.state
-    const { timeArr } = this.props
-    const isTopology = window.location.pathname === '/apms/topology'
-
+    const { timeArr, limitDays } = this.props
     return (
       <div className="apm-timepicker">
         <Button
@@ -220,9 +219,9 @@ export default class ApmTimePicker extends React.Component {
                 defaultValue: [ moment().subtract(2, 'days'), moment() ],
               }}
               dateRender={current => <div className="ant-calendar-date" onClick={() => this.dateClick(current)}>{current.date()}</div>}
-              disabledDate={isTopology && hasClicked ? this.disabledDate : () => false}
-              disabledTime={isTopology && hasClicked ? this.disabledRangeTime : () => false}
-              renderExtraFooter={() => (isTopology ? <span className="apm-range-picker-tip">时间长度不超过2天</span> : '')}
+              disabledDate={limitDays && hasClicked ? this.disabledDate : () => false}
+              disabledTime={limitDays && hasClicked ? this.disabledRangeTime : () => false}
+              renderExtraFooter={() => (limitDays ? <span className="apm-range-picker-tip">时间长度不超过{limitDays}天</span> : '')}
               format="YYYY-MM-DD HH:mm"
               placeholder={[ '开始日期', '结束日期' ]}
               value={value}

@@ -629,6 +629,7 @@ class Topology extends React.Component {
             onOk={this.getData}
             onChange={this.getTimeRange}
             value={rangeDateTime}
+            limitDays={2}
           />
         </div>
         {
