@@ -85,12 +85,12 @@ class Event extends React.Component {
 
   loadData = async (query, isFirst) => {
     const { eventLogList, clusterID, history, location } = this.props
-    const { eventType, eventLevel, rootPlace, appName, keyword, rangeDate } = this.state
+    const { eventType, eventLevel, rootPlace, appName, rangeDate } = this.state
     const [ start, end ] = rangeDate
     query = Object.assign({}, location.query,
       { eventType, eventLevel, rootPlace,
         appName: appName ? encodeURIComponent(appName) : '',
-        keyword: keyword ? encodeURIComponent(keyword) : '' }, query)
+      })
     if (start) {
       query = Object.assign({}, query, { startTime: new Date(start).getTime() })
     }
@@ -140,7 +140,6 @@ class Event extends React.Component {
       eventLevel: undefined,
       rootPlace: undefined,
       appName: '',
-      keyword: '',
       rangeDate: [],
     }, () => this.loadData({ page: 1 }))
   }
@@ -319,12 +318,6 @@ class Event extends React.Component {
             style={{ width: 200 }}
             value={this.state.appName}
             onChange={e => this.setState({ appName: e.target.value })}
-          />
-          <Input
-            placeholder="请输入事件关键字"
-            style={{ width: 200 }}
-            value={this.state.keyword}
-            onChange={e => this.setState({ keyword: e.target.value })}
           />
           <RangePicker
             showTime={{ format: 'HH:mm' }}

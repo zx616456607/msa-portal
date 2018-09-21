@@ -26,8 +26,8 @@ import {
   Tooltip,
 } from 'antd'
 import {
-  APP_NAME_REG,
-  APP_NAME_REG_NOTICE,
+  // APP_NAME_REG,
+  // APP_NAME_REG_NOTICE,
   // HOST_REG,
   IP_REG,
   HOSTNAME_REG,
@@ -371,8 +371,8 @@ class RegisterMsa extends React.Component {
               rules: [{
                 required: true,
                 whitespace: true,
-                pattern: APP_NAME_REG,
-                message: '微服务名称' + APP_NAME_REG_NOTICE,
+                pattern: /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/,
+                message: '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾【不支持大写】',
               }],
             })(
               <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>
