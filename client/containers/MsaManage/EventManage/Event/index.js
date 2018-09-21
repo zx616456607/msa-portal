@@ -84,12 +84,14 @@ class Event extends React.Component {
   }
 
   loadData = async (query, isFirst) => {
+    query = query || {}
     const { eventLogList, clusterID, history, location } = this.props
     const { eventType, eventLevel, rootPlace, appName, rangeDate } = this.state
     const [ start, end ] = rangeDate
     query = Object.assign({}, location.query,
       { eventType, eventLevel, rootPlace,
         appName: appName ? encodeURIComponent(appName) : '',
+        page: query.page || 1,
       })
     if (start) {
       query = Object.assign({}, query, { startTime: new Date(start).getTime() })
@@ -226,7 +228,9 @@ class Event extends React.Component {
       <span style={{ marginLeft: 5 }}>{displayName}</span>
     </span>
   }
-
+  changeQueryType(typeObj) {
+    this.setState(typeObj)
+  }
   render() {
     const { location, eventList, isFetching, totalElements } = this.props
     const { query } = location
@@ -282,7 +286,7 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件类型"
-            onChange={eventType => this.setState({ eventType })}
+            onChange={eventType => this.changeQueryType({ eventType })}
             value={this.state.eventType}
             allowClear={true}
           >
@@ -294,7 +298,7 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件级别"
-            onChange={eventLevel => this.setState({ eventLevel })}
+            onChange={eventLevel => this.changeQueryType({ eventLevel })}
             value={this.state.eventLevel}
             allowClear={true}
           >
@@ -305,7 +309,7 @@ class Event extends React.Component {
           <Select
             style={{ width: 200 }}
             placeholder="事件源"
-            onChange={rootPlace => this.setState({ rootPlace })}
+            onChange={rootPlace => this.changeQueryType({ rootPlace })}
             value={this.state.rootPlace}
             allowClear={true}
           >
@@ -317,7 +321,7 @@ class Event extends React.Component {
             placeholder="服务名称"
             style={{ width: 200 }}
             value={this.state.appName}
-            onChange={e => this.setState({ appName: e.target.value })}
+            onChange={e => this.changeQueryType({ appName: e.target.value })}
           />
           <RangePicker
             showTime={{ format: 'HH:mm' }}
