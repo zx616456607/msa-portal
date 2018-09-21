@@ -196,7 +196,7 @@ class RoutingRuleModal extends React.Component {
     if (!ROUTE_REG.test(value)) {
       return cb('以/开头，由数字、字母、中划线、下划线组成')
     }
-    if (/\/[*]+$/.test(value)) {
+    if (/^\/[*]+(\/.+)?$/.test(value)) {
       return cb('一级路由路径不能以*结尾')
     }
     cb()
