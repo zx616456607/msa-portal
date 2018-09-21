@@ -145,8 +145,8 @@ class CreateServiceGroupModal extends React.Component {
                   if (!value) {
                     return callback('服务组名称不能为空')
                   }
-                  if (!/^[a-zA-Z][a-zA-Z0-9\-]{2,62}$/.test(value)) {
-                    return callback('支持1-63位字母、数字或中划线-组成')
+                  if (!/^[a-zA-Z][a-zA-Z0-9\-]{0,62}$/.test(value)) {
+                    return callback('以字母开头，支持1-63位字母、数字或中划线-组成')
                   }
                   return callback()
                 },
