@@ -48,6 +48,7 @@ class ConfigCenter extends React.Component {
       }, () => {
         this.loadData()
       })
+      return
     }
     this.loadData()
   }
@@ -88,7 +89,7 @@ class ConfigCenter extends React.Component {
     const { configGitUrl, value } = this.state
     const evnQuery = {
       project_url: configGitUrl,
-      branch_name: branch === undefined ? value : branch,
+      branch_name: branch || value,
     }
     getCenterEvn(clusterID, evnQuery)
   }
@@ -116,11 +117,11 @@ class ConfigCenter extends React.Component {
   }
 
   handleDel = () => {
-    const { configGitUrl, configName, message, branchName, value } = this.state
+    const { configGitUrl, configName, message, branchName, value, backBranch } = this.state
     const { delCenterConfig, clusterID } = this.props
     const query = {
       project_url: configGitUrl,
-      branch_name: branchName || value,
+      branch_name: branchName || backBranch || value,
       file_path: configName,
       commit_message: message === '' ? '删除一个配置' : message,
     }
@@ -128,21 +129,23 @@ class ConfigCenter extends React.Component {
       isDelFetching: true,
     })
     delCenterConfig(clusterID, query).then(res => {
-      if (res.error) {
-        notification.error({
-          message: `删除失败 ${configName}`,
-        })
-      }
-      if (res.response.result.code === 200) {
-        this.fetchList(branchName || value)
-        notification.success({
-          message: `删除成功 ${configName}`,
-        })
-      }
       this.setState({
         deleteVisible: false,
         isDelFetching: false,
       })
+      if (res.error) {
+        notification.error({
+          message: `删除配置 ${configName} 失败`,
+        })
+        return
+      }
+      if (res.response.result.code === 200) {
+        this.fetchList(query.branch_name)
+        notification.success({
+          message: `删除配置 ${configName} 成功`,
+        })
+      }
+
     })
   }
 
