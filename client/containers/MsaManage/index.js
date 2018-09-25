@@ -22,6 +22,7 @@ import { msaManageChildRoutes } from '../../RoutesDom'
 import { renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import confirm from '../../components/Modal/confirm'
+import spingCloud from '../../assets/img/apm/Sringcloud.png'
 // import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 // import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 // import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
@@ -159,7 +160,7 @@ class MsaManage extends React.Component {
     const { children } = this.props
     const { isDeployed } = this.state
     if (!isDeployed) {
-      return renderLoading('加载微服务中 ...')
+      return renderLoading(spingCloud)
     }
     return [
       children,
