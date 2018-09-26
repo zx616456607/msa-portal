@@ -25,6 +25,7 @@ import { renderLoading } from '../../components/utils'
 // import performanceIcon from '../../assets/img/apm/performance.svg'
 // import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
 import confirm from '../../components/Modal/confirm'
+import pinPoint from '../../assets/img/apm/Pinpoint.png'
 
 // const menus = [
 //   {
@@ -106,7 +107,7 @@ class Apm extends React.Component {
   renderChildren = () => {
     const { apms, children } = this.props
     if (!apms || !apms.ids || apms.isFetching) {
-      return renderLoading('加载 APM 中 ...')
+      return renderLoading(pinPoint)
     }
     return [
       children,
