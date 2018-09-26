@@ -43,7 +43,7 @@ class AuthZoneModal extends React.Component {
       })
       if (!isEmpty(currentAuthZone)) {
         const mergeBody = Object.assign({}, values, { id: currentAuthZone.id })
-        const updateRes = await updateIdentityZone(mergeBody)
+        const updateRes = await updateIdentityZone(mergeBody, { isHandleError: true })
         if (updateRes.error) {
           notification.warn({
             message: '修改认证域失败',
@@ -63,7 +63,7 @@ class AuthZoneModal extends React.Component {
         loadDate && loadDate()
         return
       }
-      const createRes = await createIdentityZones(values)
+      const createRes = await createIdentityZones(values, { isHandleError: true })
       if (createRes.error) {
         notification.warn({
           message: '创建认证域失败',

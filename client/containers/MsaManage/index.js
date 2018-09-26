@@ -21,7 +21,7 @@ import { Route, Switch } from 'react-router-dom'
 import { msaManageChildRoutes } from '../../RoutesDom'
 import { renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
-import confirm from '../../components/Modal/confirm'
+import spingCloud from '../../assets/img/apm/Sringcloud.png'
 // import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 // import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 // import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
@@ -115,6 +115,7 @@ import confirm from '../../components/Modal/confirm'
 class MsaManage extends React.Component {
   state = {
     isDeployed: false,
+    loading: true,
   }
 
   componentDidMount() {
@@ -135,31 +136,22 @@ class MsaManage extends React.Component {
           }
         })
       }
-      this.setState({ isDeployed })
-      if (!isDeployed) {
-        confirm({
-          modalTitle: '提示',
-          title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
-          content: '请联系项目管理员安装',
-          okText: '知道了',
-          hideCancelButton: true,
-          cancelText: '返回首页',
-          onOk: () => {
-            // history.push('/setting/msa-config')
-          },
-          onCancel: () => {
-            // history.push('/')
-          },
-        })
-      }
+      this.setState({ isDeployed, loading: false })
     })
   }
 
   renderChildren = () => {
     const { children } = this.props
-    const { isDeployed } = this.state
+    const { isDeployed, loading } = this.state
+    if (loading) {
+      return renderLoading('加载 SpingCloud 中 ...')
+    }
     if (!isDeployed) {
-      return renderLoading('加载微服务中 ...')
+      return <div className="loading">
+        <img alt="spingcloud-not-intall" src={spingCloud}/>
+        <div>当前项目对应的集群，未安装 SpingCloud 基础服务组件，</div>
+        <div>请『联系系统管理员』安装</div>
+      </div>
     }
     return [
       children,

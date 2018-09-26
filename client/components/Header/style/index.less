@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: space-between;
   position: fixed;
-  z-index: 1000000; // 防止 timePicker 等弹出层遮挡 header
+  z-index: @zindex-affix; // Header层级10, 高于一般的页面, 低于各种弹出层
   .role {
     background-color: #f7f7f7;
     padding: 1px 3px;
