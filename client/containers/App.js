@@ -183,6 +183,16 @@ class App extends React.Component {
       })
       return
     }
+    if (status === 503 && message === '503 Service Unavailable') {
+      notification.warn({
+        message: '服务不可用',
+        onClose: () => {
+          resetErrorMessage()
+          errorMessageCloseObj[errorMessageBeforeDateTime] = true
+        },
+      })
+      return
+    }
     errorMessageBefore = message
     errorMessageBeforeDateTime = Date.now()
     setTimeout(() => {
