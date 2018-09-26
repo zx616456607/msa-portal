@@ -282,8 +282,9 @@ const CREATE_IDENTITY_ZONES_REQUEST = 'CREATE_IDENTITY_ZONES_REQUEST'
 const CREATE_IDENTITY_ZONES_SUCCESS = 'CREATE_IDENTITY_ZONES_SUCCESS'
 const CREATE_IDENTITY_ZONES_FAILURE = 'CREATE_IDENTITY_ZONES_FAILURE'
 
-const fetchCreateIdentityZones = (body, token) => {
+const fetchCreateIdentityZones = (body, token, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         CREATE_IDENTITY_ZONES_REQUEST,
@@ -304,10 +305,10 @@ const fetchCreateIdentityZones = (body, token) => {
   }
 }
 
-export const createIdentityZones = body =>
+export const createIdentityZones = (body, options) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchCreateIdentityZones(body, access_token))
+    return dispatch(fetchCreateIdentityZones(body, access_token, options))
   }
 
 export const IDENTITY_ZONE_DETAIL_REQUEST = 'IDENTITY_ZONE_DETAIL_REQUEST'
@@ -343,8 +344,9 @@ const UPDATE_IDENTITY_ZONE_REQUEST = 'UPDATE_IDENTITY_ZONE_REQUEST'
 const UPDATE_IDENTITY_ZONE_SUCCESS = 'UPDATE_IDENTITY_ZONE_SUCCESS'
 const UPDATE_IDENTITY_ZONE_FAILURE = 'UPDATE_IDENTITY_ZONE_FAILURE'
 
-const fetchUpdateIdentityZone = (body, token) => {
+const fetchUpdateIdentityZone = (body, token, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         UPDATE_IDENTITY_ZONE_REQUEST,
@@ -365,10 +367,10 @@ const fetchUpdateIdentityZone = (body, token) => {
   }
 }
 
-export const updateIdentityZone = body =>
+export const updateIdentityZone = (body, options) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
-    return dispatch(fetchUpdateIdentityZone(body, access_token))
+    return dispatch(fetchUpdateIdentityZone(body, access_token, options))
   }
 
 const DELETE_IDENTITY_ZONE_REQUEST = 'DELETE_IDENTITY_ZONE_REQUEST'

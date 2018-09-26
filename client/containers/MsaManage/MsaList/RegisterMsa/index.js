@@ -123,7 +123,7 @@ class RegisterMsa extends React.Component {
             description = '微服务名称重复'
           }
           if (res.error === 'host:port cannot be same with other instances') {
-            description = 'host:port重复'
+            description = '服务地址:服务端口重复'
           }
         }
         notification.warn({
@@ -169,7 +169,7 @@ class RegisterMsa extends React.Component {
         let description = ''
         if (res.status === 500) {
           if (res.error === 'host:port cannot be same with other instances') {
-            description = 'host:port重复'
+            description = '服务地址:服务端口重复'
           }
         }
         notification.warn({

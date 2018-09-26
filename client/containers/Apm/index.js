@@ -24,7 +24,7 @@ import { renderLoading } from '../../components/utils'
 // import topologyIcon from '../../assets/img/apm/topology.svg'
 // import performanceIcon from '../../assets/img/apm/performance.svg'
 // import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
-import confirm from '../../components/Modal/confirm'
+import pinPoint from '../../assets/img/apm/Pinpoint.png'
 
 // const menus = [
 //   {
@@ -68,45 +68,21 @@ class Apm extends React.Component {
       if (res.error) {
         return
       }
-      const { config, user } = current
-      const projectNamespace = config.project.namespace
-      let namespace = config.project.namespace
-      if (projectNamespace === 'default') {
-        namespace = user.info.namespace
-      }
-      const ApmStatusArray = res.response.result.data
-      let currentNamespaceStatus = false
-      ApmStatusArray.forEach(item => {
-        if (item.namespace === namespace) {
-          currentNamespaceStatus = true
-        }
-      })
-      if (!currentNamespaceStatus) {
-        const { history } = this.props
-        confirm({
-          modalTitle: '提示',
-          title: '当前项目 & 集群：PinPoint 基础服务组件未安装',
-          content: '请联系项目管理员安装',
-          okText: '知道了',
-          hideCancelButton: true,
-          cancelText: '返回首页',
-          onOk: () => {
-            // history.push('/setting/apms')
-          },
-          onCancel: () => {
-            history.push('/')
-          },
-        })
-        return
-      }
-      loadApms(clusterID)
+      loadApms(clusterID, current.config.project.namespace)
     })
   }
 
   renderChildren = () => {
     const { apms, children } = this.props
-    if (!apms || !apms.ids || apms.isFetching) {
+    if (!apms || apms.isFetching === true) {
       return renderLoading('加载 APM 中 ...')
+    }
+    if (!apms.ids || apms.ids.length === 0) {
+      return <div className="loading">
+        <img alt="pinpoint-not-intall" src={pinPoint}/>
+        <div>当前项目对应的集群，未安装 PinPoint 基础服务组件，</div>
+        <div>请『联系系统管理员』安装</div>
+      </div>
     }
     return [
       children,
@@ -162,7 +138,7 @@ const mapStateToProps = state => {
   const { current, queryApms } = state
   const { project, cluster } = current.config
   let apms = queryApms[project.namespace] || {}
-  apms = apms[cluster.id] || {}
+  apms = apms[cluster.id] || { isFetching: true }
   return {
     auth: state.entities.auth,
     current: current || {},
