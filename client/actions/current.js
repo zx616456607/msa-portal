@@ -29,15 +29,15 @@ export const SET_CURRENT_CONFIG = 'SET_CURRENT_CONFIG'
 export function setCurrentConfig(current) {
   if (localStorage) {
     const config = localStorage.getItem(USER_CURRENT_CONFIG)
-    let [ namespace, clusterID ] = config && config.split(',') || []
-    if (current.project) {
-      namespace = current.project.namespace
+    const [ namespace ] = config && config.split(',') || []
+    if (current.project && current.cluster.id) { // 如果两个参数都有的时候
+      localStorage.setItem(USER_CURRENT_CONFIG, `${current.project.namespace},${current.cluster.id}`)
     }
-    if (current.cluster) {
-      clusterID = current.cluster.id
+    if (current.project && !current.cluster.id) {
+      localStorage.setItem(USER_CURRENT_CONFIG, `${current.project.namespace},`)
     }
-    if (namespace && clusterID) {
-      localStorage.setItem(USER_CURRENT_CONFIG, `${namespace},${clusterID}`)
+    if (!current.project && current.cluster) {
+      localStorage.setItem(USER_CURRENT_CONFIG, `${namespace},${current.cluster.id}`)
     }
   }
   return {
