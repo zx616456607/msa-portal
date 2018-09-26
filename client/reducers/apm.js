@@ -16,12 +16,12 @@ import { DEFAULT } from '../constants'
 
 export const queryApms = (state = {}, action) => {
   const { type, clusterID } = action
-  const namespace = action.namespace || DEFAULT
+  const project = action.project || DEFAULT
   switch (type) {
     case ActionTypes.APMS_REQUEST:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
+        [project]: Object.assign({}, state[project], {
           [clusterID]: {
             isFetching: true,
           },
@@ -30,7 +30,7 @@ export const queryApms = (state = {}, action) => {
     case ActionTypes.APMS_SUCCESS:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
+        [project]: Object.assign({}, state[project], {
           [clusterID]: {
             isFetching: false,
             ids: union(state.ids, action.response.result.data.apms),
@@ -40,7 +40,7 @@ export const queryApms = (state = {}, action) => {
     case ActionTypes.APMS_FAILURE:
       return {
         ...state,
-        [namespace]: Object.assign({}, state[namespace], {
+        [project]: Object.assign({}, state[project], {
           [clusterID]: {
             isFetching: false,
           },
