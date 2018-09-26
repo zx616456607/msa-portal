@@ -11,15 +11,18 @@
  */
 
 import React from 'react'
-import { Spin, Badge, Icon } from 'antd'
+import { Badge, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import find from 'lodash/find'
 import { SECONDS_CONVERSION } from '../../constants'
 
 
-export function renderLoading(tip) {
+export function renderLoading(src) {
   return <div className="loading">
-    <Spin size="large" tip={tip} />
+    {/* <Spin size="large" tip={tip} /> */}
+    <img src={src}/>
+    <div>当前项目对应的集群，未安装 PinPoint 基础服务组件，</div>
+    <div className="loading-tip">请『联系系统管理员』安装</div>
   </div>
 }
 
