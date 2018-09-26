@@ -10,7 +10,9 @@
  * @author zhangpc
  */
 @import "index.less";
-
+.ant-notification {
+  z-index: @zindex-notification-high; // 1070,高于 Header 的1060,以及其他 timePicker 等弹出层
+}
 .ant-modal-content {
   .ant-modal-header {
     background-color: @backgroud-color-navigation;
