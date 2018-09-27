@@ -73,7 +73,7 @@ class CreateServiceGroupModal extends React.Component {
       if (isEdit) {
         currentAction = updateGroup(instanceID, initailValue.id, values)
       } else {
-        currentAction = createGroup(instanceID, values)
+        currentAction = createGroup(instanceID, values, { isHandleError: true })
       }
       this.setState({
         confirmLoading: true,
@@ -83,6 +83,13 @@ class CreateServiceGroupModal extends React.Component {
           confirmLoading: false,
         })
         if (res.error) {
+          if (res.status === 409) {
+            notification.warn({
+              message: `${isEdit ? '编辑' : '创建'}服务组失败`,
+              description: '服务组名称已存在',
+            })
+            return
+          }
           return
         }
         closeModalMethod()
