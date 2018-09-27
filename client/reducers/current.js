@@ -90,12 +90,14 @@ function projectsList(state = {}, action) {
         ...state,
         isFetching: true,
       }
-    case ActionTypes.FETCH_PROJECT_LIST_SUCCESS:
+    case ActionTypes.FETCH_PROJECT_LIST_SUCCESS: {
+      const { data: { projects = [] } = {} } = action.response.result
       return {
         ...state,
         isFetching: false,
-        ids: action.response.result.data.projects,
+        ids: projects,
       }
+    }
     case ActionTypes.FETCH_PROJECT_LIST_FAILURE:
       return {
         ...state,

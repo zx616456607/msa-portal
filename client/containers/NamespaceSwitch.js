@@ -14,37 +14,33 @@ import React from 'react'
 import { connect } from 'react-redux'
 import ClassNames from 'classnames'
 import { Menu, Dropdown, Icon, notification } from 'antd'
-import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
+import { USER_CURRENT_CONFIG } from '../constants'
 import './style/NamespaceSwitch.less'
 import {
   setCurrentConfig,
   getUserProjects,
   getProjectList,
   getProjectClusters,
-  getDefaultClusters,
 } from '../actions/current'
 import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
-const SubMenu = Menu.SubMenu
-const MY_PORJECT = '我的个人项目'
 
 class NamespaceSwitch extends React.Component {
   state = {
-    projectsText: '请选择项目项目',
+    projectsText: '请选择项目',
     clustersText: '请选择集群',
     clustersDropdownVisible: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const {
       userID,
       getProjectList,
       getUserProjects,
       setCurrentConfig,
-      getDefaultClusters,
       getProjectClusters,
     } = this.props
-    getProjectList()
+    await getProjectList()
     getUserProjects(userID).then(res => {
       if (res.error) {
         notification.error({
@@ -52,6 +48,8 @@ class NamespaceSwitch extends React.Component {
         })
         return
       }
+      // 当非首次登录, 或刷新页面的时候, 从localStorage中读取当前设置namespace和clusterID
+      // 类似一个保存上次设置的功能
       let namespace
       let clusterID
       // let setCurrentConfigFlag
@@ -65,27 +63,34 @@ class NamespaceSwitch extends React.Component {
           clusterID = configArray[1]
           currentNamespace = namespace
           currentClusterID = clusterID
-          // setCurrentConfigFlag = true
-          setCurrentConfig({
-            project: { namespace },
-            cluster: { id: clusterID },
-          })
+          if (clusterID === '') {
+            setCurrentConfig({
+              project: { namespace },
+              cluster: { },
+            })
+          } else {
+            setCurrentConfig({
+              project: { namespace },
+              cluster: { id: clusterID },
+            })
+          }
         }
       }
       const projects = res.response.entities.projects || {}
-      if (!namespace || !clusterID) {
-        namespace = DEFAULT
-      }
       let projectsText
       let clustersText
       const handleProjectClusters = (clusters, clustersObj) => {
         if (!clusters || clusters.length === 0) {
-          notification.warn({
-            message: '该项目下没有集群',
+          this.setState({
+            clustersText: '...',
+          })
+          setCurrentConfig({ space: { noClustersFlag: true },
           })
           return
         }
         let currentCluster
+        // 判断localStorage 中的clusterID 是否真的还存在, 如果真的存在就使用, 如果
+        // 不存在的了, 就默认使用第一个
         clusters.every(id => {
           const cluster = clustersObj[id]
           if (id === clusterID) {
@@ -110,22 +115,23 @@ class NamespaceSwitch extends React.Component {
           })
         }
       }
-      if (namespace === DEFAULT) {
-        projectsText = MY_PORJECT
-        getDefaultClusters().then(res => {
-          if (res.error) {
-            notification.error({
-              message: '获取集群失败，请刷新页面重试',
-            })
-            return
-          }
-          const clustersObj = res.response.entities.clusters
-          const clusters = res.response.result.clusters
-          handleProjectClusters(clusters, clustersObj)
+      const myProjectList = this.props.projectsList.
+        filter(({ outlineRoles }) => !outlineRoles.includes('no-participator'))
+      if (myProjectList.length === 0) { // 如果当前账户没有可用项目,则显示对应页面
+        this.setState({
+          projectsText: '...',
+          clustersText: '...',
         })
+        setCurrentConfig({ space: { noProjectsFlag: true } })
         return
       }
+      if (!namespace) {
+        namespace = myProjectList[0].namespace
+      }
       projectsText = projects && projects[namespace] && projects[namespace].projectName
+      this.setState({
+        projectsText,
+      })
       getProjectClusters(namespace).then(res => {
         if (res.error) {
           notification.error({
@@ -140,22 +146,58 @@ class NamespaceSwitch extends React.Component {
     })
   }
 
-  handleProjectChange = ({ item, key }) => {
-    const { setCurrentConfig, getProjectClusters, getDefaultClusters } = this.props
+  handleProjectChange = async ({ item, key }) => {
+    const { setCurrentConfig, getProjectClusters } = this.props
+    await getProjectClusters(key)
+    const clusterArray = this.props.projectClusters[item.props.children]
+    if (clusterArray.length === 0) {
+      setCurrentConfig({
+        space: {
+          noClustersFlag: true,
+        },
+        cluster: {},
+      })
+    }
+    const setStateAndLoacalStorge = () => {
+      this.setState({
+        projectsText: item.props.children,
+        clustersDropdownVisible: true,
+        clustersText: '请选择集群',
+      })
+      setCurrentConfig({
+        project: {
+          namespace: key,
+        },
+        cluster: {},
+      })
+    }
+    const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
+    // localStorage中无设置值, 请用户重新选择集群
+    if (!currentConfig) {
+      setStateAndLoacalStorge()
+      return
+    }
+    const configArray = currentConfig.split(',')
+    const clusterID = configArray[1]
+    if (clusterID === '') { // 如果用户并没有设置集群id
+      setStateAndLoacalStorge()
+      return
+    }
+    const clusterIDInCurrentCluster = clusterArray
+      .some(({ clusterID: clusterIDInner }) => clusterIDInner === clusterID)
+    if (!clusterIDInCurrentCluster) { // 如果用户设置的cluster在新的集群中没有
+      setStateAndLoacalStorge()
+      return
+    }
     this.setState({
       projectsText: item.props.children,
       clustersDropdownVisible: true,
-      clustersText: '请选择集群',
     })
-    if (key === DEFAULT) {
-      getDefaultClusters()
-    } else {
-      getProjectClusters(key)
-    }
     setCurrentConfig({
       project: {
         namespace: key,
       },
+      cluster: { id: clusterID },
     })
   }
   handleClusterChange = ({ item, key }) => {
@@ -168,6 +210,7 @@ class NamespaceSwitch extends React.Component {
       cluster: {
         id: key,
       },
+      space: { noClustersFlag: false },
     })
   }
 
@@ -188,7 +231,6 @@ class NamespaceSwitch extends React.Component {
       [className]: !!className,
       container: true,
     })
-
     return (
       <div className={containerStyle}>
         <TenxIcon
@@ -200,34 +242,25 @@ class NamespaceSwitch extends React.Component {
         <Dropdown
           overlay={
             <Menu selectable onSelect={this.handleProjectChange}>
-              <Menu.Item key="default">
-                {MY_PORJECT}
-              </Menu.Item>
-              <SubMenu key="share" title="共享项目">
-                {
-                  // projects.map(p => (
-                  //   <Menu.Item key={p.namespace}>
-                  //     {p.projectName}
-                  //   </Menu.Item>
-                  // ))
-                  projectsList.length > 0 && projectsList.map(item => {
-                    if (!item.outlineRoles.includes('no-participator')) {
-                      return (
-                        <Menu.Item key={item.namespace}>
-                          {item.projectName}
-                        </Menu.Item>)
-                    }
-                    return null
-                  })
-                }
-                {
-                  projectsList.length === 0 && (
-                    <Menu.Item key="no-project" disabled>
+              {
+                projectsList.length > 0 && projectsList.map(item => {
+                  if (!item.outlineRoles.includes('no-participator')) {
+                    return (
+                      <Menu.Item key={item.namespace}>
+                        {item.projectName}
+                      </Menu.Item>)
+                  }
+                  return null
+                })
+              }
+              {
+                projectsList.length === 0 && (
+                  <Menu.Item key="no-project" disabled>
                       暂无项目
-                    </Menu.Item>
-                  )
-                }
-              </SubMenu>
+                  </Menu.Item>
+                )
+              }
+              {/* </SubMenu> */}
             </Menu>
           }
           trigger={[ 'click' ]}>
@@ -300,5 +333,4 @@ export default connect(mapStateToProps, {
   getProjectList,
   getUserProjects,
   getProjectClusters,
-  getDefaultClusters,
 })(NamespaceSwitch)

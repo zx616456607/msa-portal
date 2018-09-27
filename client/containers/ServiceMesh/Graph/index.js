@@ -21,7 +21,7 @@ import { getDeepValue } from '../../../../client/common/utils'
 import RelationChartComponent from './RelationChartComponent'
 import debounce from 'lodash/debounce'
 import moment from 'moment'
-const { Option, OptGroup } = Select
+const { Option } = Select
 
 function mapStateToProps(state) {
   const { entities, current, serviceMesh } = state
@@ -195,23 +195,21 @@ class ServiceMeshGraph extends React.Component {
                 }
                 value={item}
               >
-                <Option value="default">我的个人项目</Option>
-                <OptGroup label="共享项目">
-                  {
-                    projects.map(p => (
-                      <Option key={p.namespace}>
-                        {p.projectName}
-                      </Option>
-                    ))
-                  }
-                  {
-                    projects.length === 0 && (
-                      <Option key="no-project" disabled>
+                {/* <Option value="default">我的个人项目</Option> */}
+                {
+                  projects.map(p => (
+                    <Option key={p.namespace}>
+                      {p.projectName}
+                    </Option>
+                  ))
+                }
+                {
+                  projects.length === 0 && (
+                    <Option key="no-project" disabled>
                         暂无项目
-                      </Option>
-                    )
-                  }
-                </OptGroup>
+                    </Option>
+                  )
+                }
               </Select>
               <Select
                 showSearch

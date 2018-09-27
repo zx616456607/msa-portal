@@ -28,6 +28,8 @@ import { appChildRoutes } from '../RoutesDom'
 import CustomizeSider from '../components/SiderNav'
 import './style/App.less'
 import { footer } from '../../config/constants'
+import noProjectsImage from '../assets/img/no-projects.png'
+import noClustersImage from '../assets/img/no-clusters.png'
 
 const { Footer } = Layout
 let errorMessageBefore
@@ -38,7 +40,7 @@ const errorMessageCloseObj = {}
 const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
   /^\/setting/, /^\/msa-om/,
-  /^\/msa-om\/log/,
+  /^\/msa-om\/log/, /^\/service-mesh/,
 ]
 
 class App extends React.Component {
@@ -214,14 +216,45 @@ class App extends React.Component {
     const { current, children } = this.props
     const { switchProjectOrCluster, switchProjectOrClusterText } = this.state
     const { config, user } = current
+    const { space: { noProjectsFlag, noClustersFlag } = {} } = config
+
+    if (!user || !user.info) {
+      return renderLoading('加载用户信息中 ...')
+    }
+    const noHeadernoShow = HIDE_NAMESPACE_SWITCH_ROUTES
+      .some(regExp => regExp.test(location.pathname))
+    // 当没有可用项目时
+    if (noProjectsFlag && !noHeadernoShow) {
+      return (
+        <div className="noclustersOrPrjects">
+          <div className="noclustersOrPrjectsinfoWrap">
+            <img src={noProjectsImage} alt="no-projects" />
+            <br />
+            <span>
+          帐号还未加入任何项目，请先『创建项目』或『联系管理员加入项目』
+            </span>
+          </div>
+        </div>)
+    }
+    // 当没有可用集群时
+    if (noClustersFlag && !noHeadernoShow) {
+      return (
+        <div className="noclustersOrPrjects">
+          <div className="noclustersOrPrjectsinfoWrap">
+            <img src={noClustersImage} alt="no-clusters" />
+            <br />
+            <span>
+            项目暂无授权的集群，请先申请『授权集群』或选择其他项目
+            </span>
+          </div>
+        </div>
+      )
+    }
     if (!config.project || !config.project.namespace) {
       return renderLoading('加载基础配置中 ...')
     }
     if (!config.cluster || !config.cluster.id) {
       return renderLoading('加载集群配置中 ...')
-    }
-    if (!user || !user.info) {
-      return renderLoading('加载用户信息中 ...')
     }
     if (switchProjectOrCluster) {
       return renderLoading(switchProjectOrClusterText)
