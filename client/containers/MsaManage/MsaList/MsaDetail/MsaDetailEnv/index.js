@@ -17,6 +17,7 @@ import {
   getMsaEnv,
 } from '../../../../../actions/msa'
 import './style/index.less'
+import { MSA_TYPE_MAN } from '../../../../../constants'
 
 class MsaDetailEnv extends React.Component {
   loadMsaEnv = () => {
@@ -29,7 +30,7 @@ class MsaDetailEnv extends React.Component {
   }
 
   render() {
-    const { msaEnv } = this.props
+    const { msaEnv, registryType } = this.props
     const { isFetching: loading, data } = msaEnv
     const dataKeys = Object.keys(data || {})
     const dataSource = dataKeys.map(key => ({
@@ -45,6 +46,12 @@ class MsaDetailEnv extends React.Component {
       dataIndex: 'value',
       width: '60%',
     }]
+    const locale = {
+      emptyText: '暂无数据',
+    };
+    if (registryType === MSA_TYPE_MAN) {
+      locale.emptyText = '无法获取外部服务数据'
+    }
     return (
       <div className="msaDetailEnv">
         <div className="layout-content-btns">
@@ -54,6 +61,7 @@ class MsaDetailEnv extends React.Component {
         </div>
         <Table
           bordered
+          locale={locale}
           className="msaDetailEnv-table"
           pagination={false}
           columns={columns}
