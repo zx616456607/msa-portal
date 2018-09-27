@@ -123,6 +123,11 @@ class Logs extends React.Component {
     const project = currentConfig.project || {}
     const clusters = projectClusters[project.namespace] || []
     const { getFieldDecorator } = form
+    const projectItems = projectsList.filter(item =>
+      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+    )
+    const disabledProjectSelect = projectItems.length === 0;
+    const defaultProject = disabledProjectSelect ? undefined : projectItems[0].namespace
     return (
       <QueueAnim className="log">
         <div className="form" key="from">
@@ -130,18 +135,13 @@ class Logs extends React.Component {
             <Col span={6}>
               <FormItem>
                 {getFieldDecorator('project', {
-                  initialValue: 'default',
+                  initialValue: defaultProject,
                   onChange: e => this.handleProject(e),
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择项目" size="default" showSearch>
-                    <Option key="default">个人项目</Option>
                     {
-                      projectsList.map(item => {
-                        if (!item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')) {
-                          return <Option key={item.namespace}>{item.projectName}</Option>
-                        }
-                        return null
-                      })
+                      projectItems.map(({ namespace, projectName }) =>
+                        <Option key={namespace}>{projectName}</Option>)
                     }
                   </Select>
                 )}

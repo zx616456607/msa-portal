@@ -26,9 +26,9 @@ class ProjectCluster extends React.Component {
     clustersText: '请选择集群',
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { getProjectList, setProjectConfig } = this.props
-    getProjectList().then(res => {
+    await getProjectList().then(res => {
       if (res.error) {
         notification.error({
           message: '获取用户项目失败，请刷新页面重试',
@@ -49,6 +49,19 @@ class ProjectCluster extends React.Component {
           })
         }
       }
+    })
+    const { current, projectsList, projectClusters, setProjectAndClusterStatus } = this.props
+    const currentConfig = current.config || {}
+    const project = currentConfig.project || {}
+    const clusters = projectClusters[project.namespace] || []
+    const projectItems = projectsList.filter(item =>
+      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+    )
+    const disabledProjectSelect = projectItems.length === 0;
+    const disabledClusters = clusters.length === 0;
+    setProjectAndClusterStatus({
+      noClustersFlag: disabledClusters,
+      noProjectsFlag: disabledProjectSelect,
     })
   }
 
@@ -104,27 +117,31 @@ class ProjectCluster extends React.Component {
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
     const clusters = projectClusters[project.namespace] || []
+    const projectItems = projectsList.filter(item =>
+      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+    )
+    const disabledProjectSelect = projectItems.length === 0;
+    const defaultProject = disabledProjectSelect ? undefined : projectItems[0].namespace
+
+    const disabledClusters = clusters.length === 0;
     return (
       <div id="project-cluster">
         <Row className="header-project">
           <Col span={6}>
             <span>项目</span>
-            <Select style={{ width: 200 }} defaultValue="个人项目" onChange={e => this.handleProject(e)}>
-              <Option key="default">个人项目</Option>
+            <Select style={{ width: 200 }} defaultValue={defaultProject}
+              onChange={e => this.handleProject(e)} disabled={disabledProjectSelect}>
               {
-                projectsList.map(item => {
-                  if (!item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')) {
-                    return <Option key={item.namespace}>{item.projectName}</Option>
-                  }
-                  return null
-                })
+                projectItems.map(({ namespace, projectName }) =>
+                  <Option key={namespace}>{projectName}</Option>)
               }
             </Select>
           </Col>
           <Col span={6}>
             <span>集群</span>
             <Select style={{ width: 200 }} onChange={() => this.handleCluster()} defaultValue={
-              clusters && clusters.length > 0 && clusters[0].clusterName}>
+              clusters && clusters.length > 0 && clusters[0].clusterName}
+            disabled={disabledClusters}>
               {
                 clusters.map(cluster => (
                   <Option key={cluster.clusterID} disabled={!cluster.isOk}>
