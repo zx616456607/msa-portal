@@ -26,8 +26,9 @@ export const CREATE_CSB_INSTANCE_SERVICE_GROUP_FAILURE = 'CREATE_CSB_INSTANCE_SE
 
 // Create an instance service group
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchCreateGroup = (instanceID, body) => {
+const fetchCreateGroup = (instanceID, body, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         CREATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST,
@@ -44,8 +45,8 @@ const fetchCreateGroup = (instanceID, body) => {
   }
 }
 
-export const createGroup = (instanceID, body) =>
-  dispatch => dispatch(fetchCreateGroup(instanceID, body))
+export const createGroup = (instanceID, body, options) =>
+  dispatch => dispatch(fetchCreateGroup(instanceID, body, options))
 
 export const UPDATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST = 'UPDATE_CSB_INSTANCE_SERVICE_GROUP_REQUEST'
 export const UPDATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS = 'UPDATE_CSB_INSTANCE_SERVICE_GROUP_SUCCESS'

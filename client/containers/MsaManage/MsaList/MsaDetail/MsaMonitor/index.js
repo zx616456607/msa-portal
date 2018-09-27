@@ -203,7 +203,7 @@ class Monitor extends React.PureComponent {
     return (
       <div className="msa-detail-monitor">
         {
-          !isEmpty(msaMetrics) && !isEmpty(msaMetrics[METRICS_CPU].data) ?
+          !isEmpty(msaMetrics) && !msaMetrics[METRICS_CPU].isFetching ?
             <Metric
               value={currentValue}
               onChange={this.handleTimeChange}

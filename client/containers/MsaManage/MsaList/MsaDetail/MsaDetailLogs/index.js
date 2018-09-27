@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import './style/index.less'
 import { getMsaLogs } from '../../../../../actions/msa'
 import LogTemplate from '../../../../../components/Log'
+import { MSA_TYPE_MAN } from '../../../../../constants'
 
 class MsaDetailLogs extends React.Component {
 
@@ -29,14 +30,21 @@ class MsaDetailLogs extends React.Component {
   }
 
   render() {
-    const { msaLogs } = this.props
+    const { msaLogs, registryType } = this.props
     const { data = [], isFetching } = msaLogs
+    const locale = {
+      emptyText: '暂无日志',
+    };
+    if (registryType === MSA_TYPE_MAN) {
+      locale.emptyText = '无法获取外部服务数据'
+    }
     return (
       <div>
         <LogTemplate
           loadData={this.loadData}
           data={data}
           isFetching={isFetching}
+          locale={locale}
         />
       </div>
     )

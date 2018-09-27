@@ -322,7 +322,7 @@ class CallLinkTracking extends React.Component {
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('minDuration', {})(
-                  <Input placeholder="耗时（ms）>=" className="input-style" />
+                  <InputNumber min={1} max={3600000} placeholder="耗时（ms）>=" className="input-style" />
                 )}
               </FormItem>
             </Col>

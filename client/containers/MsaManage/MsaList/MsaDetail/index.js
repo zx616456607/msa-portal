@@ -90,12 +90,14 @@ class MsaDetail extends React.Component {
                 name={name}
                 instances={instances}
                 clusterID={clusterID}
+                registryType={msaDetail.type}
               />
             </TabPane>
             <TabPane tab="日志信息" key="log">
               <MsaDetailLogs
                 msaDetail={msaDetail}
                 clusterID={clusterID}
+                registryType={msaDetail.type}
               />
             </TabPane>
             <TabPane tab="监控" key="monitor">

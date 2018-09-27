@@ -10,7 +10,7 @@
  * @author zhangxuan
  */
 import React from 'react'
-import { Input, Modal, Form, Switch, Radio, Select, notification } from 'antd'
+import { Input, Modal, Form, Switch, Radio, Select, notification, Tooltip, Icon } from 'antd'
 import { connect } from 'react-redux'
 import {
   APP_NAME_REG,
@@ -239,6 +239,20 @@ class RoutingRuleModal extends React.Component {
       wrapperCol: { span: 16 },
     }
     const titleText = currentRoute ? '修改' : '添加'
+    const renderNotice = (
+      <span>
+        路由路径&nbsp;
+        <Tooltip overlayClassName="routingTooltip" title={(
+          <div>
+            <div key="notice-1">精确匹配 (/demo): 路径必须精确匹配/demo</div>
+            <div key="notice-2">单级目录 (/demo/*): 路由路径可匹配单级目录</div>
+            <div key="notice-3">多级目录 (/demo/**): 路由路径可匹配多级目录</div>
+          </div>
+        )}>
+          <Icon type="question-circle-o" />
+        </Tooltip>
+      </span>
+    )
     return (
       <Modal
         title={`${titleText}路由规则`}
@@ -261,7 +275,7 @@ class RoutingRuleModal extends React.Component {
             <Input placeholder="请填写路由名称" />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="路由路径">
+        <FormItem {...formItemLayout} label={renderNotice}>
           {getFieldDecorator('path', {
             rules: [{
               required: true,
