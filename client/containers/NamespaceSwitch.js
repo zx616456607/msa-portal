@@ -148,13 +148,9 @@ class NamespaceSwitch extends React.Component {
 
   handleProjectChange = async ({ item, key }) => {
     const { setCurrentConfig, getProjectClusters } = this.props
-    this.setState({
-      projectsText: item.props.children,
-      clustersDropdownVisible: true,
-      clustersText: '请选择集群',
-    })
     await getProjectClusters(key)
-    if (this.props.projectClusters[item.props.children].length === 0) {
+    const clusterArray = this.props.projectClusters[item.props.children]
+    if (clusterArray.length === 0) {
       setCurrentConfig({
         space: {
           noClustersFlag: true,
@@ -162,11 +158,46 @@ class NamespaceSwitch extends React.Component {
         cluster: {},
       })
     }
+    const setStateAndLoacalStorge = () => {
+      this.setState({
+        projectsText: item.props.children,
+        clustersDropdownVisible: true,
+        clustersText: '请选择集群',
+      })
+      setCurrentConfig({
+        project: {
+          namespace: key,
+        },
+        cluster: {},
+      })
+    }
+    const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
+    // localStorage中无设置值, 请用户重新选择集群
+    if (!currentConfig) {
+      setStateAndLoacalStorge()
+      return
+    }
+    const configArray = currentConfig.split(',')
+    const clusterID = configArray[1]
+    if (clusterID === '') { // 如果用户并没有设置集群id
+      setStateAndLoacalStorge()
+      return
+    }
+    const clusterIDInCurrentCluster = clusterArray
+      .some(({ clusterID: clusterIDInner }) => clusterIDInner === clusterID)
+    if (!clusterIDInCurrentCluster) { // 如果用户设置的cluster在新的集群中没有
+      setStateAndLoacalStorge()
+      return
+    }
+    this.setState({
+      projectsText: item.props.children,
+      clustersDropdownVisible: true,
+    })
     setCurrentConfig({
       project: {
         namespace: key,
       },
-      cluster: {},
+      cluster: { id: clusterID },
     })
   }
   handleClusterChange = ({ item, key }) => {
