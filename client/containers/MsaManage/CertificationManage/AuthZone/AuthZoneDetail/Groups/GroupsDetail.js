@@ -233,7 +233,7 @@ class GroupsDetail extends React.Component {
     const _DataAry = !isEmpty(zoneGroupUsers) ? zoneGroupUsers.filter(item => item.type !== 'GROUP') : []
     const menu = (
       <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e)}>
-        <Menu.Item key="groupName" disabled={isUaaDefaultGroup(groupInfo.displayName)}>管理组用户</Menu.Item>
+        <Menu.Item key="groupName">管理组用户</Menu.Item>
       </Menu>
     )
     const pagination = {
@@ -285,9 +285,12 @@ class GroupsDetail extends React.Component {
                 </div>
               </Col>
               <Col span={12} className="groups-detail-header-btns">
-                <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup()}>
-                  编辑
-                </Dropdown.Button>
+                {
+                  !isUaaDefaultGroup(groupInfo.displayName) &&
+                  <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup()}>
+                    编辑
+                  </Dropdown.Button>
+                }
               </Col>
             </Row>
             <Row>

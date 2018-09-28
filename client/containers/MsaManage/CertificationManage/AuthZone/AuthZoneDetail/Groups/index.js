@@ -222,7 +222,7 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { dataList, isFetching, zoneUsers } = this.props
+    const { dataList, isFetching, zoneUsers, userCount } = this.props
     const { resources, totalResults } = dataList
     const pagination = {
       simple: true,
@@ -251,7 +251,7 @@ class Groups extends React.Component {
         dataIndex: 'members',
         key: 'members',
         width: '16%',
-        render: text => <div>{text.length}</div>,
+        render: (text, record) => (isUaaDefaultGroup(record.displayName) ? userCount : text.length),
       },
       {
         title: '描述',
@@ -273,14 +273,15 @@ class Groups extends React.Component {
         render: record => {
           const menu = (
             <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e, record)}>
-              <Menu.Item key="groupName" disabled={isUaaDefaultGroup(record.displayName)}>管理组用户</Menu.Item>
-              <Menu.Item key="del" disabled={isUaaDefaultGroup(record.displayName)}>删除</Menu.Item>
+              <Menu.Item key="groupName">管理组用户</Menu.Item>
+              <Menu.Item key="del">删除</Menu.Item>
             </Menu>
           )
           return (
-            <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup(record)}>
+            isUaaDefaultGroup(record.displayName) ? '-' :
+              <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup(record)}>
               编辑
-            </Dropdown.Button>
+              </Dropdown.Button>
           )
         },
       },
@@ -354,11 +355,15 @@ const mapStateToProps = state => {
   const { certification } = state
   const { zoneGroups } = certification
   const { data, isFetching } = zoneGroups
+  const { zoneUsers } = certification
+  const { data: userData } = zoneUsers
+  const { totalResults: userCount } = userData || { totalResults: 0 }
   const dataList = data || []
   return {
     dataList,
     isFetching,
     ...zoneUserListSlt(state),
+    userCount,
   }
 }
 
