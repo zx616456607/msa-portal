@@ -45,6 +45,15 @@ class AuthZoneModal extends React.Component {
         const mergeBody = Object.assign({}, values, { id: currentAuthZone.id })
         const updateRes = await updateIdentityZone(mergeBody, { isHandleError: true })
         if (updateRes.error) {
+          if (updateRes.status === 409) {
+            notification.warn({
+              message: '认证域名称重复',
+            })
+            this.setState({
+              loading: false,
+            })
+            return
+          }
           notification.warn({
             message: '修改认证域失败',
           })
@@ -65,6 +74,15 @@ class AuthZoneModal extends React.Component {
       }
       const createRes = await createIdentityZones(values, { isHandleError: true })
       if (createRes.error) {
+        if (createRes.status === 409) {
+          notification.warn({
+            message: '认证域名称重复',
+          })
+          this.setState({
+            loading: false,
+          })
+          return
+        }
         notification.warn({
           message: '创建认证域失败',
         })
