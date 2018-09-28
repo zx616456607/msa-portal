@@ -222,7 +222,7 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { dataList, isFetching, zoneUsers } = this.props
+    const { dataList, isFetching, zoneUsers, userCount } = this.props
     const { resources, totalResults } = dataList
     const pagination = {
       simple: true,
@@ -251,7 +251,7 @@ class Groups extends React.Component {
         dataIndex: 'members',
         key: 'members',
         width: '16%',
-        render: text => <div>{text.length}</div>,
+        render: (text, record) => (isUaaDefaultGroup(record.displayName) ? userCount : text.length),
       },
       {
         title: '描述',
@@ -354,11 +354,15 @@ const mapStateToProps = state => {
   const { certification } = state
   const { zoneGroups } = certification
   const { data, isFetching } = zoneGroups
+  const { zoneUsers } = certification
+  const { data: userData } = zoneUsers
+  const { totalResults: userCount } = userData || { totalResults: 0 }
   const dataList = data || []
   return {
     dataList,
     isFetching,
     ...zoneUserListSlt(state),
+    userCount,
   }
 }
 
