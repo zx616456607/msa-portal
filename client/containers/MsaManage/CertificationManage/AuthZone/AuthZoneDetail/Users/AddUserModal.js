@@ -103,7 +103,7 @@ class AddUserModal extends React.Component {
   confirmPasswordCheck = (rules, value, callback) => {
     const { getFieldValue } = this.props.form
     if (!value) {
-      return callback('请输入确认密码')
+      return // callback('请输入确认密码')
     }
     const password = getFieldValue('password')
     if (value !== password) {
