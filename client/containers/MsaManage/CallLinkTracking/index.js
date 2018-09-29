@@ -359,7 +359,8 @@ class CallLinkTracking extends React.Component {
         </div>
         <div className="chart" key="chart">
           <Chart height="225" padding={{ top: 40, right: '4%', bottom: '25%', left: '6%' }}
-            scale={cols} data={isFliter ? filterList : this.fliterChartData(dataList)} forceFit>
+            scale={cols} data={isFliter ?
+              this.fliterChartData(filterList) : this.fliterChartData(dataList)} forceFit>
             <Tooltip crosshairs={{ type: 'cross' }} />
             {/* <View data={isFliter ? filterList : this.fliterChartData(dataList)}> */}
             <Axis name="startTime" />
