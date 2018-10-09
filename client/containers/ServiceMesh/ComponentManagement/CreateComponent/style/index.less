@@ -1,0 +1,98 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * ComponentManagement style
+ *
+ * 2018-09-30
+ * @author zhaoyb
+ */
+ @import "../../../../../assets/style/core/index.less";
+
+.create-component {
+  .create-component-btn {
+    .back {
+      display: inline-block;
+      float: left;
+      height: 30px;
+      .backjia {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent;
+        border-top: 15px solid transparent;
+        border-right: 15px solid #00b8f2;
+        font-size: 0;
+        line-height: 0;
+      }
+      .btn-back {
+        display: inline-block;
+        background: #00b8f2;
+        color: white;
+        height: 30px;
+        line-height: 28px;
+        vertical-align: top;
+        width: 45px;
+        padding-left: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+    }
+    .title {
+      vertical-align: middle;
+      line-height: 25px;
+      padding-left: 10px;
+      font-size: 16px;
+      border-left: 5px solid #00a0e9;
+      margin-left: 6%;
+      margin-right: 50px;
+    }
+  }
+  .create-component-body {
+    .form-title {
+      padding-left: 16%;
+    }
+    .service {
+      padding-right: 15px;
+    }
+    .dotted {
+      border-bottom: 1px dashed @border-color-base;
+      margin: 20px 0;
+    }
+    .serviceHeader {
+      width: 64%;
+      margin-left: 63px;
+      background-color: #f2f2f2;
+      margin-top: 15px;
+      & > div {
+        padding: 15px 25px;
+      }
+      border: @border-width-base @border-style-base @border-color-base;
+      border-bottom: none;
+    }
+    .serviceList {
+      width: 64%;
+      margin-left: 63px;
+      & > div {
+        padding: 15px 0 15px 25px;
+        .ant-form-item {
+          margin-bottom: 0;
+        }
+      }
+      border: @border-width-base @border-style-base @border-color-base;
+      &:not(:last-of-type) {
+        border-bottom: none;
+      }
+    }
+    .btn-bottom {
+      margin-left: 21%;
+      .cancel {
+        margin-right: 20px;
+      }
+    }
+  }
+}

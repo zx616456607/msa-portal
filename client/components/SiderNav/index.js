@@ -116,6 +116,11 @@ const menus = [
         to: '/service-mesh',
         icon: 'question',
         name: '微服务拓扑',
+      }, {
+        key: 'k2',
+        to: '/service-mesh/component-management',
+        icon: 'question',
+        name: '组件管理',
       },
     ],
   },
