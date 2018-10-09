@@ -302,3 +302,24 @@ const fetchRouteNameExitence = (clusterID, name) => {
 
 export const checkRouteName = (clusterID, name) =>
   dispatch => dispatch(fetchRouteNameExitence(clusterID, name))
+
+export const CHECK_ROUTE_PATH_EXISTENCE_REQUEST = 'CHECK_ROUTE_PATH_EXISTENCE_REQUEST'
+export const CHECK_ROUTE_PATH_EXISTENCE_SUCCESS = 'CHECK_ROUTE_PATH_EXISTENCE_SUCCESS'
+export const CHECK_ROUTE_PATH_EXISTENCE_FAILURE = 'CHECK_ROUTE_PATH_EXISTENCE_FAILURE'
+
+const fetchRoutePathExitence = (clusterID, routePath) => {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_ROUTE_PATH_EXISTENCE_REQUEST,
+        CHECK_ROUTE_PATH_EXISTENCE_SUCCESS,
+        CHECK_ROUTE_PATH_EXISTENCE_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/route/has/path?routePath=${routePath}`,
+      schema: {},
+    },
+  }
+}
+
+export const checkRoutePath = (clusterID, routePath) =>
+  dispatch => dispatch(fetchRoutePathExitence(clusterID, routePath))
