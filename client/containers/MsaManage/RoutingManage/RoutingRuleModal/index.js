@@ -190,6 +190,7 @@ class RoutingRuleModal extends React.Component {
     }, ASYNC_VALIDATOR_TIMEOUT)
   }
   routePathCheck = (rules, value, cb) => {
+    clearTimeout(this.routePathTimeout)
     if (!value) {
       return cb()
     }
@@ -199,7 +200,18 @@ class RoutingRuleModal extends React.Component {
     if (/^\/[*]+(\/.+)?$/.test(value)) {
       return cb('一级路由路径不能以*结尾')
     }
-    cb()
+    const { checkRoutePath, clusterID } = this.props
+    this.routePathTimeout = setTimeout(() => {
+      checkRoutePath(clusterID, value).then(res => {
+        if (res.response.result.data.has) {
+          cb('路由路径已经存在')
+        } else {
+          cb()
+        }
+      }).catch(() => {
+        cb('请求出错')
+      })
+    }, ASYNC_VALIDATOR_TIMEOUT)
   }
   checkServiceAddress = (rules, value, cb) => {
     if (!value) {
@@ -388,4 +400,5 @@ export default connect(mapStateToProps, {
   addGatewayRoute: gateWayAction.addGatewayRoute,
   updateGatewayRoute: gateWayAction.updateGatewayRoute,
   checkRouteName: gateWayAction.checkRouteName,
+  checkRoutePath: gateWayAction.checkRoutePath,
 })(Form.create()(RoutingRuleModal))
