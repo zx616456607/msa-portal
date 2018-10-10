@@ -25,21 +25,24 @@ export default class GatewayCard extends React.Component {
       <p>Content</p>
     </div>
   )
+  getOutAddress = () => {
+    const { ingressData, data } = this.props
+    const id = data.spec.selector['istio-ingressgateway']
+    if (!ingressData[id] || !ingressData[id].exposedIPs) return '--'
+    return ingressData[id].exposedIPs.join(',') || '--'
+  }
   render() {
-    const { onDelete } = this.props
+    const { onDelete, data } = this.props
     return (
       <div className="mesh-gateway-card">
         <div className="top">
           <TenxIcon type="routing-manage" className="top-icon"/>
           <span
             className="card-right">
-            <div className="title">网关 xxx</div>
-            <div className="out-address">出口地址: http://192.168.5.223</div>
+            <div className="title">{`网关 ${data.metadata.name}`}</div>
+            <div className="out-address">{`出口地址: ${this.getOutAddress()}`}</div>
             <Popover content={this.popoverContent()} placement="right">
-              <Ellipsis lines={2} tooltip={false}>
-                关联灰度发布规则: xxx, bbbdsdsdsd,xcxdsdsdsds, ffffff, zzz=zzz+77777,
-                xcxdsdsdsds, ffffff, zzz=zzz+77777, xcxdsdsdsds, ffffff,
-                zzz=zzz+77777, xcxdsdsdsds, ffffff, zzz=zzz+77777</Ellipsis>
+              <Ellipsis lines={2} tooltip={false}>{`关联路由规则: ${data.referencedVirtualServices.join(',') || '--'}`}</Ellipsis>
             </Popover>
           </span>
         </div>

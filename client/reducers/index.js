@@ -27,6 +27,7 @@ import eventManage from './eventManage'
 import springCloudAndApm from './globalConfig'
 import zipkin from './callLinkTrack'
 import serviceMesh from './serviceMesh'
+import meshGateway from './meshGateway'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -82,6 +83,7 @@ const rootReducer = combineReducers({
   eventManage,
   zipkin,
   serviceMesh,
+  meshGateway,
 })
 
 export default rootReducer
