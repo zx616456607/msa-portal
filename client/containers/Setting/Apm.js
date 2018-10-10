@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/Apm.less'
-import { Row, Col, Select, Button, Tooltip, Modal, Icon, Card } from 'antd'
+import { Row, Col, Select, Button, Modal, Icon, Card, Spin } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import { getUserProjects, getProjectClusters } from '../../actions/current'
 import ProjectCluster from '../../components/ProjectCluster'
@@ -30,6 +30,7 @@ class ApmSetting extends React.Component {
     apmState: false,
     uninstall: false,
     project: '',
+    isLoading: true,
     projectNames: [],
     projectsData: [],
     serviceData: [],
@@ -47,47 +48,57 @@ class ApmSetting extends React.Component {
     }
     // this.projectList()
   }
-  componentWillMount() {
-    this.load()
-  }
+  // componentWillMount() {
+  //   this.load()
+  // }
 
-  load = () => {
-    this.fetchapmsId()
+  // load = () => {
+  //   this.fetchapmsId()
 
-  }
+  // }
 
   fetchapmsId = () => {
-    const { loadApms, clusterID, projectConfig } = this.props
-    const { namespace } = projectConfig.project
-    loadApms(clusterID, namespace).then(res => {
+    const { loadApms, clusterID } = this.props
+    this.setState({
+      isLoading: true,
+    })
+    loadApms(clusterID).then(res => {
       if (res.error) return
       this.assemblyState(res.response.result.data.apms[0])
     })
   }
 
   assemblyState = apmId => {
-    const { getApmState, apmList, clusterID, projectConfig } = this.props
+    const { getApmState, apmList, clusterID } = this.props
     const { configDetail } = apmList || {}
     if (apmId) {
       const query = {
         id: apmId,
         cluster: clusterID,
       }
-      const { namespace } = projectConfig.project
-      getApmState(query, namespace).then(res => {
+      getApmState(query).then(res => {
         if (res.error) return
         // TODO: use the status code to show the actual status
         if (res.response.result.data.status === 1) {
           this.setState({
             isHealthy: true,
+            isLoading: false,
             componentState: true,
             version: configDetail && JSON.parse(configDetail).version,
+          })
+        } else {
+          this.setState({
+            version: '',
+            isLoading: false,
+            isHealthy: false,
+            componentState: false,
           })
         }
       })
     } else {
       this.setState({
         version: '',
+        isLoading: false,
         isHealthy: false,
         componentState: false,
       })
@@ -180,8 +191,7 @@ class ApmSetting extends React.Component {
    * 安装
    */
   handleInstall = () => {
-    const { clusterID, postApm, projectConfig } = this.props
-    const { namespace } = projectConfig.project
+    const { clusterID, postApm } = this.props
     // if (isProject === false) return
     this.setState({
       installSate: true,
@@ -192,7 +202,7 @@ class ApmSetting extends React.Component {
       scope: 'namespace',
       displayName: '',
     }
-    postApm(body, clusterID, namespace).then(res => {
+    postApm(body, clusterID).then(res => {
       if (res.error) return
       // this.apmService()
       // this.projectList()
@@ -206,14 +216,12 @@ class ApmSetting extends React.Component {
     })
   }
   handleDel = () => {
-    const { removeApmRow, apmList, clusterID, projectConfig } = this.props
+    const { removeApmRow, apmList, clusterID } = this.props
     const body = {
       id: apmList.id,
       cluster: clusterID,
     }
-    // const projectName = project.namespace === 'default' ? defaultName : project.namespace
-    const { namespace } = projectConfig.project
-    removeApmRow(body, namespace).then(res => {
+    removeApmRow(body).then(res => {
       if (res.error) return
       // this.apmService()
       // this.projectList()
@@ -262,16 +270,17 @@ class ApmSetting extends React.Component {
   }
 
   render() {
-
-    const { springCloudAndApm } = this.props
-    let pinpoint = false
-    if (springCloudAndApm.configDetail) {
-      const data = JSON.parse(springCloudAndApm.configDetail)
-      if (data.canDeployPersonalServer) {
-        pinpoint = data.canDeployPersonalServer.pinpoint
-      }
-    }
-    const { isHealthy, componentState } = this.state
+    // const { springCloudAndApm } = this.props
+    // let pinpoint = false
+    // if (springCloudAndApm.configDetail) {
+    //   const data = JSON.parse(springCloudAndApm.configDetail)
+    //   if (data.canDeployPersonalServer) {
+    //     pinpoint = data.canDeployPersonalServer.pinpoint
+    //   }
+    // }
+    const { clusterName, projectConfig } = this.props
+    const { isHealthy, componentState, isLoading } = this.state
+    const { namespace } = projectConfig.project
     let healthy = null
     if (componentState) {
       healthy = isHealthy ? <span className="desc"><font color="#5cb85c">健康</font></span> :
@@ -279,77 +288,74 @@ class ApmSetting extends React.Component {
     } else {
       healthy = <span className="descs">未安装</span>
     }
-
+    const clutser_name = clusterName && clusterName.replace(/[\u4e00-\u9fa5]/g, '')
+    const title_extra =
+      <span className="apm-project">
+        ( 项目：{namespace} 集群：{clutser_name})
+      </span>
     return (
       <QueueAnim>
-        <div key="layout-content-btns">
-          <ProjectCluster callback={this.load} />
-          <Card
-            title="APM配置"
-            className="apm_config_style"
-          >
-            <Row className="contents">
-              <Col className="left">
-                <Row className="apms">
-                  <Col span={5}>基础服务</Col>
-                  <Col span={19}>
-                    <Select className="select" defaultValue="Pinpoint">
-                      <Option value="pinpoint">Pinpoint</Option>
-                    </Select>
-                  </Col>
-                </Row>
-                <Row className="apms">
-                  <Col span={5}>安装情况</Col>
-                  <Col span={19}>
-                    {
-                      isHealthy ?
-                        <Row className="install">
-                          <Icon className="ico" type="check-circle-o" />&nbsp;
-                          <span className="existence" >已安装</span>
-                          <span className="unload" onClick={this.handleUnload}>卸载</span>
-                        </Row> :
-                        <div>
-                          {
-                            !pinpoint ?
-                              <Tooltip title= "个人项目已禁止安装 APM组件，请使用共享项目">
-                                <Button type="primary" disabled >安装</Button>
-                              </Tooltip>
-                              :
-                              <Button type="primary" onClick={this.handleInstall}>安装</Button>
-
-                          }
-                        </div>
-                    }
-                  </Col>
-                </Row>
-                <Row className="apms">
-                  <Col span={5}>组件状态</Col>
-                  <Col span={19}>
-                    {healthy}
-                  </Col>
-                </Row>
-                <Row className="apms">
-                  <Col span={5}>组件版本</Col>
-                  <Col span={19}>
-                    <span className="version">{this.state.version}</span>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
-              footer={[
-                <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
-                <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
-              ]}>
-              <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后该项目内应用将, 无法继续使用 APM 部分功能</span>
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
-              </div>
-            </Modal>
-          </Card>
-        </div>
+        <Spin spinning={isLoading}>
+          <div key="layout-content-btns">
+            <ProjectCluster callback={this.fetchapmsId} />
+            <Card
+              title="APM配置"
+              extra={title_extra}
+              className="apm_config_style"
+            >
+              <Row className="contents">
+                <Col className="left">
+                  <Row className="apms">
+                    <Col span={5}>基础服务</Col>
+                    <Col span={19}>
+                      <Select className="select" defaultValue="Pinpoint">
+                        <Option value="pinpoint">Pinpoint</Option>
+                      </Select>
+                    </Col>
+                  </Row>
+                  <Row className="apms">
+                    <Col span={5}>安装情况</Col>
+                    <Col span={19}>
+                      {
+                        isHealthy ?
+                          <Row className="install">
+                            <Icon className="ico" type="check-circle-o" />&nbsp;
+                            <span className="existence" >已安装</span>
+                            <span className="unload" onClick={this.handleUnload}>卸载</span>
+                          </Row> :
+                          <Button type="primary" onClick={this.handleInstall}>安装</Button>
+                      }
+                    </Col>
+                  </Row>
+                  <Row className="apms">
+                    <Col span={5}>组件状态</Col>
+                    <Col span={19}>
+                      {healthy}
+                    </Col>
+                  </Row>
+                  <Row className="apms">
+                    <Col span={5}>组件版本</Col>
+                    <Col span={19}>
+                      <span className="version">{this.state.version}</span>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Modal title="卸载" visible={this.state.uninstall} onCancel={this.handleCancel}
+                footer={[
+                  <Button key="back" type="ghost" onClick={this.handleCancel}>  取 消 </Button>,
+                  <Button key="submit" type="primary" onClick={this.handleDel}> 继续卸载 </Button>,
+                ]}>
+                <div className="prompt" style={{ height: 55, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+                  <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后该项目内应用将, 无法继续使用 APM 部分功能</span>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+                </div>
+              </Modal>
+            </Card>
+          </div>
+        </Spin>
       </QueueAnim>
     )
   }
@@ -360,7 +366,7 @@ const mapStateToProps = state => {
   const aryApmID = []
   const { current, entities, queryApms, springCloudAndApm } = state
   const { cluster, project } = current.config
-  const { projectsList, apms } = entities
+  const { projectsList, clusters, apms } = entities
   const userProjectsList = current.projectsList && current.projectsList.ids || []
   const projectID = current.projects.ids
   const clusterID = cluster.id
@@ -376,6 +382,7 @@ const mapStateToProps = state => {
   const userId = info.userID
   const { projectConfig } = current
   const apmList = apms && apms[apmID]
+  const clusterName = clusters && clusters[clusterID].clusterName
   return {
     apmID,
     userId,
@@ -387,6 +394,7 @@ const mapStateToProps = state => {
     clusterID,
     projectID,
     aryApmID,
+    clusterName,
     defaultName,
     pinpointName,
     springCloudAndApm,

@@ -14,7 +14,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Row, Col, Select, notification } from 'antd'
 import './style/index.less'
-import confirm from '../../components/Modal/confirm'
 import { USER_CURRENT_CONFIG } from '../../constants'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import { setProjectConfig, getProjectClusters, getDefaultClusters, getProjectList } from '../../actions/current'
@@ -27,7 +26,7 @@ class ProjectCluster extends React.Component {
   }
 
   async componentDidMount() {
-    const { getProjectList, setProjectConfig } = this.props
+    const { getProjectList, projectsList, setProjectConfig } = this.props
     await getProjectList().then(res => {
       if (res.error) {
         notification.error({
@@ -35,79 +34,97 @@ class ProjectCluster extends React.Component {
         })
         return
       }
-      let namespace
+
       let clusterID
       if (localStorage) {
         const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
         if (currentConfig) {
           const configArray = currentConfig.split(',')
-          namespace = configArray[0]
+          // namespace = configArray[0]
           clusterID = configArray[1]
-          setProjectConfig({
-            project: { namespace },
-            cluster: { id: clusterID },
-          })
         }
+        const projectItems = projectsList.filter(item =>
+          !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+        )
+        setProjectConfig({
+          project: { namespace: projectItems[0].namespace },
+          cluster: { id: clusterID },
+        })
       }
     })
-    const { current, projectsList, projectClusters, setProjectAndClusterStatus } = this.props
-    const currentConfig = current.config || {}
-    const project = currentConfig.project || {}
-    const clusters = projectClusters[project.namespace] || []
-    const projectItems = projectsList.filter(item =>
-      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
-    )
-    const disabledProjectSelect = projectItems.length === 0;
-    const disabledClusters = clusters.length === 0;
-    setProjectAndClusterStatus({
-      noClustersFlag: disabledClusters,
-      noProjectsFlag: disabledProjectSelect,
-    })
+    // const { current, projectsList, projectClusters, setProjectAndClusterStatus } = this.props
+    // const currentConfig = current.config || {}
+    // const project = currentConfig.project || {}
+    // const clusters = projectClusters[project.namespace] || []
+    // const projectItems = projectsList.filter(item =>
+    //   !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+    // )
+    // const disabledProjectSelect = projectItems.length === 0;
+    // const disabledClusters = clusters.length === 0;
+    // setProjectAndClusterStatus({
+    //   noClustersFlag: disabledClusters,
+    //   noProjectsFlag: disabledProjectSelect,
+    // })
   }
 
   handleProject = e => {
-    const { projectsList, callback, clusterID, setProjectConfig, fetchSpingCloud,
-      namespaces } = this.props
-    fetchSpingCloud(clusterID).then(res => {
-      let isDeployed = false
-      const space = e === 'default' ? namespaces : e
-      res.response.result.data.forEach(item => {
-        if (item.namespace === space) {
-          isDeployed = true
-        }
-      })
-
-      if (isDeployed) {
-        projectsList.forEach(item => {
-          if (item.projectName === e || e === 'default') {
-            if (!item.outlineRoles.includes('no-participator')) {
-              if (item.outlineRoles.includes('manager')) {
-                setProjectConfig({
-                  project: {
-                    namespace: e,
-                  },
-                })
-                setTimeout(() => {
-                  callback()
-                }, 500)
-                return
-              }
-            }
+    const { projectsList, callback, setProjectConfig } = this.props
+    projectsList.forEach(item => {
+      if (item.projectName === e) {
+        if (!item.outlineRoles.includes('no-participator')) {
+          if (item.outlineRoles.includes('manager')) {
+            setProjectConfig({
+              project: {
+                namespace: e,
+              },
+            })
+            setTimeout(() => {
+              callback()
+            }, 500)
+            return
           }
-        })
-      } else {
-        confirm({
-          modalTitle: '提示',
-          title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
-          content: '请联系项目管理员安装',
-          okText: '知道了',
-          hideCancelButton: true,
-          cancelText: '返回首页',
-          onOk: () => { },
-          onCancel: () => { },
-        })
+        }
       }
     })
+    // fetchSpingCloud(clusterID).then(res => {
+    //   let isDeployed = false
+    //   const space = e === 'default' ? namespaces : e
+    //   res.response.result.data.forEach(item => {
+    //     if (item.namespace === space) {
+    //       isDeployed = true
+    //     }
+    //   })
+    //   if (isDeployed) {
+    //     projectsList.forEach(item => {
+    //       if (item.projectName === e || e === 'default') {
+    //         if (!item.outlineRoles.includes('no-participator')) {
+    //           if (item.outlineRoles.includes('manager')) {
+    //             setProjectConfig({
+    //               project: {
+    //                 namespace: e,
+    //               },
+    //             })
+    //             setTimeout(() => {
+    //               callback()
+    //             }, 500)
+    //             return
+    //           }
+    //         }
+    //       }
+    //     })
+    //   } else {
+    //     confirm({
+    //       modalTitle: '提示',
+    //       title: '当前项目 & 集群：SpringCloud 基础服务组件未安装',
+    //       content: '请联系项目管理员安装',
+    //       okText: '知道了',
+    //       hideCancelButton: true,
+    //       cancelText: '返回首页',
+    //       onOk: () => { },
+    //       onCancel: () => { },
+    //     })
+    //   }
+    // })
   }
 
   handleCluster = () => { }
@@ -161,6 +178,7 @@ const mapStateToProps = state => {
   const { entities, current } = state
   const { user } = current
   const { projectsList, clusters } = entities
+  const { projectConfig } = current
   const userProjectsList = current.projectsList && current.projectsList.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
@@ -174,6 +192,7 @@ const mapStateToProps = state => {
     current,
     clusterID,
     namespaces,
+    projectConfig,
     projectClusters,
     projectsList: userProjectsList.map(namespace => projectsList[namespace]),
   }

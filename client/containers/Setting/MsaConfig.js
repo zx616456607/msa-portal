@@ -15,10 +15,10 @@ import { connect } from 'react-redux'
 import './style/MsaConfig.less'
 import isEmpty from 'lodash/isEmpty'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
-import { getGlobalConfigByType } from '../../actions/globalConfig'
 import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card, Form, Tooltip, Spin } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import ProjectCluster from '../../components/ProjectCluster'
+import { getGlobalConfigByType } from '../../actions/globalConfig'
 const Option = Select.Option
 const FormItem = Form.Item
 
@@ -241,14 +241,14 @@ class MsaConfig extends React.Component {
 
     const { configDetail, version } = gitLab && Object.keys(gitLab).length > 0 && JSON.parse(gitLab)
     const { gitUrl, gitUser, gitPassword, gitToken } = configDetail || {}
-    const { form, clusterName, projectConfig, springCloudAndApm } = this.props
-    let springcloud = false
-    if (springCloudAndApm.configDetail) {
-      const data = JSON.parse(springCloudAndApm.configDetail)
-      if (data.canDeployPersonalServer) {
-        springcloud = data.canDeployPersonalServer.springcloud
-      }
-    }
+    const { form, clusterName, projectConfig } = this.props
+    // let springcloud = false
+    // if (springCloudAndApm.configDetail) {
+    //   const data = JSON.parse(springCloudAndApm.configDetail)
+    //   if (data.canDeployPersonalServer) {
+    //     springcloud = data.canDeployPersonalServer.springcloud
+    //   }
+    // }
 
     const { getFieldDecorator } = form
     const { namespace } = projectConfig.project
@@ -268,7 +268,7 @@ class MsaConfig extends React.Component {
     const clutser_name = clusterName && clusterName.replace(/[\u4e00-\u9fa5]/g, '')
     const title_extra =
       <span className="msa-project">
-        ( 项目：{namespace === 'default' ? '个人项目' : namespace} 集群：{clutser_name})
+        ( 项目：{namespace} 集群：{clutser_name})
       </span>
     return (
       <QueueAnim>
@@ -390,11 +390,10 @@ class MsaConfig extends React.Component {
                             <Button className="save" type="primary" onClick={this.handleSave}>保存</Button>
                           </div> :
                           <Tooltip
-                            title={!springcloud ? '个人项目已禁止安装Spring Cloud 组件，请使用共享项目' : '编辑配置即可安装'}
-                            placement={'right'} defaultVisible={true}
+                            title={'编辑配置即可安装'} placement={'right'} defaultVisible={true}
                             getTooltipContainer={() => document.getElementsByClassName('btn_edit')[0]}
                           >
-                            <Button className="btn_edit" type="primary" disabled={!springcloud} onClick={this.handleEdit}>编辑</Button>
+                            <Button className="btn_edit" type="primary" onClick={this.handleEdit}>编辑</Button>
                           </Tooltip>
                       }
                     </Col>

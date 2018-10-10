@@ -61,8 +61,12 @@ import SubscriptionServices from './containers/CSB/InstanceDetail/SubscriptionSe
 import ConsumerVouchers from './containers/CSB/InstanceDetail/ConsumerVouchers'
 import PublishService from './containers/CSB/InstanceDetail/PublishService'
 import PublicServices from './containers/CSB/InstanceDetail/PublicService'
+import ServiceMesh from './containers/ServiceMesh'
 import ServiceMeshGraph from './containers/ServiceMesh/Graph'
 import MeshGateway from './containers/ServiceMesh/MeshGateway'
+import ComponentManagement from './containers/ServiceMesh/ComponentManagement'
+import CreateComponent from './containers/ServiceMesh/ComponentManagement/CreateComponent'
+import ComponentDetail from './containers/ServiceMesh/ComponentManagement/ComponentDetail'
 
 export const appChildRoutes = [
   {
@@ -79,7 +83,7 @@ export const appChildRoutes = [
   },
   {
     path: '/service-mesh',
-    component: ServiceMeshGraph,
+    component: ServiceMesh,
     key: 'service-mesh',
   },
   {
@@ -106,6 +110,39 @@ export const appChildRoutes = [
     path: '/setting',
     component: Setting,
     key: 'setting',
+  },
+]
+
+export const serviceMeshChildRoutes = [
+  {
+    path: '/service-mesh',
+    exact: true,
+    component: ServiceMeshGraph,
+    key: 'index',
+  },
+  {
+    path: '/service-mesh/component-management',
+    exact: true,
+    component: ComponentManagement,
+    key: 'component-management',
+  },
+  {
+    path: '/service-mesh/component-management/component/create',
+    exact: true,
+    component: CreateComponent,
+    key: 'create-component',
+  },
+  {
+    path: '/service-mesh/component-management/:id',
+    component: CreateComponent,
+    exact: true,
+    key: 'update-component',
+  },
+  {
+    path: '/service-mesh/component-management/component/detail',
+    component: ComponentDetail,
+    exact: true,
+    key: 'component-detail',
   },
 ]
 
@@ -221,7 +258,7 @@ export const msaManageChildRoutes = [
   {
     path: '/msa-manage/event-manage',
     exact: true,
-    render: () => <Redirect to="/msa-manage/event-manage/event" component={Event}/>,
+    render: () => <Redirect to="/msa-manage/event-manage/event" component={Event} />,
     key: 'certification-manage',
   },
   {
