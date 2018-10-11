@@ -153,8 +153,12 @@ class SubscriptServiceModal extends React.Component {
       wrapperCol: { span: 18 },
     }
     // 消费凭证选项列表
-    const consumerVouchersOptions = content.length !== 0 && content.filter(
-      v => v.subscribedServiceNames && v.subscribedServiceNames.indexOf(serviceName) < 0)
+    const consumerVouchersOptions = content.length !== 0 && content.filter(v => {
+      if (!v.subscribedServiceNames) {
+        return true
+      }
+      return v.subscribedServiceNames.indexOf(serviceName) < 0
+    })
     return <Modal
       title="订阅服务"
       visible={visible}
