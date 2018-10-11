@@ -38,4 +38,61 @@
       }
     }
   }
+  .route-type-wrapper {
+    .route-type-tip {
+      margin: @padding-base 0;
+      background: #fffbf5;
+      border: 1px dashed #fcdca1;
+      border-radius: @border-radius-base;
+      padding: 4px @padding-base;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      i {
+        color: #faa238;
+        font-size: 14px;
+        margin-right: @padding-base;
+        &:nth-child(2) {
+          padding: @padding-base 0 @padding-base @padding-base;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .route-type-item {
+    border: 1px dashed @border-color-base;
+    border-radius: @border-radius-medium;
+    padding: @padding-medium;
+    position: relative;
+    .remove-route-item {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      right: -64px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: @border-radius-base;
+      font-size: 16px;
+      text-align: center;
+      border: 1px dashed @border-color-base;
+      cursor: pointer;
+    }
+    .condition-item {
+      display: flex;
+      justify-content: flex-start;
+      .ant-form-item {
+        margin-right: @padding-base;
+      }
+    }
+  }
+  .add-new-route {
+    color: @primary-color;
+    padding: @padding-base @padding-base @padding-base 0;
+    cursor: pointer;
+    i {
+      margin-right: @padding-base;
+    }
+  }
 }

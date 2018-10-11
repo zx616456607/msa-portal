@@ -30,8 +30,19 @@ const formItemLayout = {
     sm: { span: 10, push: 1 },
   },
 }
+const dynamicFormItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 2 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 10, push: 1 },
+  },
+};
 let hostUuid = 1;
 let routeUuid = 10000;
+let routeConditionUuid = 30000
 const mapStateToProps = state => {
   return {
     meshGatewayList: state.meshGateway.meshGatewayList,
@@ -74,6 +85,45 @@ class NewRouteComponent extends React.Component {
       trigger: 'onChange',
     })
   }
+  addItem = key => {
+    const { form } = this.props;
+    const keys = form.getFieldValue(key);
+    let uid
+    switch (key) {
+      case 'hostKeys':
+        hostUuid++;
+        uid = hostUuid
+        break
+      case 'routeKeys':
+        routeUuid++;
+        uid = routeUuid
+        break
+      case 'routeConditionkeys':
+        routeConditionUuid++
+        uid = routeConditionUuid
+        break
+      default:
+        break
+    }
+    const nextKeys = keys.concat(uid);
+    form.setFieldsValue({
+      [key]: nextKeys,
+    });
+  }
+  removeItem = (k, key) => {
+    const { form } = this.props;
+    // can use data-binding to get
+    const keys = form.getFieldValue(key);
+    // We need at least one passenger
+    if (keys.length === 1) {
+      return;
+    }
+    // can use data-binding to set
+    form.setFieldsValue({
+      [key]: keys.filter(keyItem => keyItem !== k),
+    });
+
+  }
   visitTypeProps = () => {
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('visitType', {
@@ -82,16 +132,6 @@ class NewRouteComponent extends React.Component {
     })
   }
   renderHosts = () => {
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 2 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 10, push: 1 },
-      },
-    };
     const formItemLayoutWithOutLabel = {
       wrapperCol: {
         xs: { span: 24, offset: 0 },
@@ -99,35 +139,12 @@ class NewRouteComponent extends React.Component {
       },
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const remove = k => {
-      const { form } = this.props;
-      // can use data-binding to get
-      const keys = form.getFieldValue('hostKeys');
-      // We need at least one passenger
-      if (keys.length === 1) {
-        return;
-      }
-
-      // can use data-binding to set
-      form.setFieldsValue({
-        hostKeys: keys.filter(key => key !== k),
-      });
-    }
-    const add = () => {
-      const { form } = this.props;
-      const keys = form.getFieldValue('hostKeys');
-      const nextKeys = keys.concat(hostUuid);
-      hostUuid++;
-      form.setFieldsValue({
-        hostKeys: nextKeys,
-      });
-    }
     getFieldDecorator('hostKeys', { initialValue: [ 0 ] });
-    const keys = getFieldValue('hostKeys');
-    const hostItems = keys.map((k, index) => {
+    const hostList = getFieldValue('hostKeys');
+    const hostItems = hostList.map((k, index) => {
       return (
         <FormItem
-          {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+          {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
           label={index === 0 ? <span>服务域名
             <Tooltip title= "服务对外访问地址，用户需自行申请，并确保所填域名能解析到所选网关的服务地址（在选择的网关中添加该域名）">
               <Icon style={{ marginLeft: 8 }} type="question-circle" theme="outlined" />
@@ -136,7 +153,7 @@ class NewRouteComponent extends React.Component {
           required={false}
           key={k}
         >
-          {getFieldDecorator(`names[${k}]`, {
+          {getFieldDecorator(`host[${k}]`, {
             validateTrigger: [ 'onChange', 'onBlur' ],
             rules: [{
               required: true,
@@ -145,16 +162,16 @@ class NewRouteComponent extends React.Component {
             }],
           })(
             <Input
-              addonAfter={<Icon type="plus" onClick={() => add()}/>}
+              addonAfter={<Icon type="plus" onClick={() => this.addItem('hostKeys')}/>}
               placeholder="passenger name"
               style={{ width: '200px', marginRight: 8 }} />
           )}
-          {keys.length > 1 ? (
+          {hostList.length > 1 ? (
             <Button
               icon="minus"
               style={{ marginLeft: 16 }}
-              disabled={keys.length === 1}
-              onClick={() => remove(k)}
+              disabled={hostList.length === 1}
+              onClick={() => this.removeItem(k, 'hostKeys')}
             />
           ) : null}
         </FormItem>
@@ -163,67 +180,100 @@ class NewRouteComponent extends React.Component {
     return hostItems
   }
   renderRouteItem = () => {
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 2 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 10, push: 1 },
-      },
-    };
     const formItemLayoutWithOutLabel = {
       wrapperCol: {
         xs: { span: 24, offset: 0 },
-        sm: { span: 20, offset: 3 },
+        sm: { span: 10, offset: 3 },
       },
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const remove = k => {
-      const { form } = this.props;
-      // can use data-binding to get
-      const keys = form.getFieldValue('routeKeys');
-      // We need at least one passenger
-      if (keys.length === 1) {
-        return;
-      }
-
-      // can use data-binding to set
-      form.setFieldsValue({
-        routeKeys: keys.filter(key => key !== k),
-      });
-    }
-    const add = () => {
-      const { form } = this.props;
-      const keys = form.getFieldValue('routeKeys');
-      const nextKeys = keys.concat(routeUuid);
-      routeUuid++;
-      form.setFieldsValue({
-        routeKeys: nextKeys,
-      });
-    }
     getFieldDecorator('routeKeys', { initialValue: [ 9999 ] });
-    const keys = getFieldValue('routeKeys');
-    const routesBasedReqContent = keys.map((k, index) => {
+    const routeList = getFieldValue('routeKeys');
+    const routeConditionsItem = () => {
+      getFieldDecorator('routeConditionkeys', { initialValue: [ 29999 ] });
+      const routeConditionList = getFieldValue('routeConditionkeys');
+      const rules = [ '=', '!=', '<', '<=', '>=', '>', '包含', '不包含' ]
+      const routeConditionsDomList = routeConditionList.map((k, index) => {
+        return (
+          <FormItem
+            label={index === 0 ? '路由条件' : ''}
+            key={k}
+          >
+            <div className="condition-item">
+              <FormItem>
+                {getFieldDecorator(`condition[${k}]`, {
+                  initialValue: 'Header',
+                })(
+                  <Select
+                    style={{ width: 100 }}
+                  >
+                    <Option value="Header">Header</Option>
+                    <Option value="Url">Url</Option>
+                  </Select>
+                )}
+              </FormItem>
+              <FormItem>
+                {getFieldDecorator(`paramName[${k}]`, {
+                  initialValue: '',
+                })(
+                  <Input style={{ width: 100 }} placeholder="请输入参数名"/>
+                )}
+              </FormItem>
+              <FormItem>
+                {getFieldDecorator(`rule[${k}]`, {
+                  initialValue: '=',
+                })(
+                  <Select style={{ width: 100 }}>
+                    {
+                      rules.map(v => <Option value={v} key={v}>{v}</Option>)
+                    }
+                  </Select>
+                )}
+              </FormItem>
+            </div>
+
+          </FormItem>
+        )
+      })
+      return routeConditionsDomList
+
+    }
+    const routesBasedReqContent = routeList.map((k, index) => {
       return (
         <FormItem
-          {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+          {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
           label={index === 0 ? '路由类型' : ''}
           required={false}
           key={k}
         >
           {
-            index === 0 && <div>
+            index === 0 && <div className="route-type-wrapper">
               <RadioGroup
                 value={this.state.routeType}
                 onChange={e => this.setState({ routeType: e.target.value })}>
                 <Radio value="content">基于请求内容</Radio>
                 <Radio value="traffic" disabled>基于流量比例</Radio>
               </RadioGroup>
+              <div className="route-type-tip">
+                <span>
+                  <Icon type="question"/>
+                  选择“基于请求内容类型”，您以前配置的【基于流量比例规则】将全部删除
+                </span>
+                <Icon type="close"/>
+              </div>
+              添加路由项
             </div>
           }
-          {getFieldDecorator(`names[${k}]`, {
+          <div className="route-type-item">
+            <div className="remove-route-item" onClick={() => this.removeItem(k, 'routeKeys')}>
+              <Icon type="delete" theme="outlined" />
+            </div>
+            <div>{routeConditionsItem()}</div>
+          </div>
+          {
+            index === routeList.length - 1 && <div className="add-new-route" onClick={() => this.addItem('routeKeys')}><Icon type="plus"/>添加一个路由项</div>
+          }
+          {/*          {getFieldDecorator(`routeRuleItem[${k}]`, {
             validateTrigger: [ 'onChange', 'onBlur' ],
             rules: [{
               required: true,
@@ -243,7 +293,7 @@ class NewRouteComponent extends React.Component {
               disabled={keys.length === 1}
               onClick={() => remove(k)}
             />
-          ) : null}
+          ) : null}*/}
         </FormItem>
       );
     });
