@@ -67,6 +67,8 @@ import MeshGateway from './containers/ServiceMesh/MeshGateway'
 import ComponentManagement from './containers/ServiceMesh/ComponentManagement'
 import CreateComponent from './containers/ServiceMesh/ComponentManagement/CreateComponent'
 import ComponentDetail from './containers/ServiceMesh/ComponentManagement/ComponentDetail'
+import RoutesManagement from './containers/ServiceMesh/RoutesManagement'
+import NewRoute from './containers/ServiceMesh/RoutesManagement/NewRoute'
 
 export const appChildRoutes = [
   {
@@ -144,6 +146,19 @@ export const serviceMeshChildRoutes = [
     exact: true,
     key: 'component-detail',
   },
+  {
+    path: '/service-mesh/routes-management',
+    exact: true,
+    component: RoutesManagement,
+    key: 'component-management',
+  },
+  {
+    path: '/service-mesh/routes-management/new-route/:id',
+    exact: true,
+    component: NewRoute,
+    key: 'new-route',
+  },
+
 ]
 
 export const msaManageChildRoutes = [

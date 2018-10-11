@@ -1,0 +1,41 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * NewRoute style
+ *
+ * 2018-10-10
+ * @author zhouhaitao
+ */
+
+@import '../../../../assets/style/core/index.less';
+
+#new-route {
+  .top {
+    display: flex;
+    align-items: center;
+    margin-bottom: @padding-medium;
+    & > span:last-child {
+      margin-left: 32px;
+      position: relative;
+      &:before {
+        content: "";
+        display: block;
+        width: 5px;
+        height: 18px;
+        background: @primary-color;
+        position: absolute;
+        left: -10px;
+      }
+    }
+  }
+  .visit-type-inner {
+    .pub-content {
+      button {
+        margin: 0 @padding-medium;
+      }
+    }
+  }
+}

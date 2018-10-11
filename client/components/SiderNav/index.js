@@ -121,6 +121,11 @@ const menus = [
         to: '/service-mesh/component-management',
         icon: 'question',
         name: '组件管理',
+      }, {
+        key: 'k3',
+        to: '/service-mesh/routes-management',
+        icon: 'question',
+        name: '路由管理',
       },
     ],
   },
