@@ -12,10 +12,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Form, Input, Select, Icon, notification } from 'antd'
+import { Modal, Form, Input, Select, Icon, notification, Button } from 'antd'
 import './style/GatewayModal.less'
 import * as actions from '../../../actions/meshGateway'
-import { APP_NAME_REG, APP_NAME_REG_NOTICE, HOSTNAME_REG, IP_REG } from '../../../constants'
+import { HOSTNAME_REG, IP_REG } from '../../../constants'
+import { getDeepValue } from '../../../common/utils'
 
 const { Option } = Select
 const FormItem = Form.Item
@@ -43,7 +44,9 @@ const mapStateToProps = state => {
 
 @connect(mapStateToProps, {
   getMeshIngressGateway: actions.getMeshIngressGateway,
+  getMeshGateway: actions.getMeshGateway,
   postMeshGateway: actions.postMeshGateway,
+  putMeshGateway: actions.putMeshGateway,
 })
 class GatewayModal extends React.Component {
   static propTypes = {
@@ -53,15 +56,40 @@ class GatewayModal extends React.Component {
     closeModal: PropTypes.func.isRequired,
   }
   state = {
-    uuid: 0,
+    uuid: 1,
     isFetching: false,
   }
-  componentDidMount() {
-    const { getMeshIngressGateway, clusterID } = this.props
-    getMeshIngressGateway && getMeshIngressGateway(clusterID)
+  getFormInitialValue = () => {
+    const { entities } = this.props
+    const data = this.props.data || {}
+    let out
+    if (entities.meshIngressGatewayList) {
+      const outId = getDeepValue(data, [ 'metadata', 'labels', 'ownerreferences/ingressgateway' ])
+      entities.meshIngressGatewayList[outId] && (out = outId)
+    }
+    const domain = getDeepValue(data, [ 'spec', 'servers', 0, 'hosts' ]) || []
+    const keys = []
+    const domainValue = []
+    domain.map((host, index) => {
+      const i = 1000 - index
+      domainValue[i] = host
+      keys.push(i)
+      return null
+    })
+    if (!keys.length) {
+      keys.push(0)
+    }
+    return {
+      name: getDeepValue(data, [ 'metadata', 'name' ]) || undefined,
+      out,
+      domain: domainValue,
+      keys,
+    }
   }
   handleConfirm = async () => {
-    const { form, postMeshGateway, clusterID } = this.props
+    const {
+      form, postMeshGateway, putMeshGateway,
+      clusterID, getMeshGateway, type, data } = this.props
     const { validateFields } = form
     validateFields(async (errors, values) => {
       if (errors) {
@@ -70,56 +98,76 @@ class GatewayModal extends React.Component {
       this.setState({
         isFetching: true,
       })
-      const data = {
-        apiVersion: 'networking.istio.io/v1alpha3',
-        kind: 'Gateway',
-        metadata: {
-          name: values.name,
-          annotations: {
-            displayName: values.name,
-          },
-          labels: {
-            'ownerreferences/ingressgateway': values.out,
-          },
-        },
-        spec: {
-          selector: {
-            istio: 'ingressgateway',
-            'istio-ingressgateway': values.out,
-          },
-          servers: [
-            {
-              hosts: values.domain,
-              port: {
-                name: 'http',
-                number: 80,
-                protocol: 'HTTP',
-              },
+      // 创建
+      if (type === 'create') {
+        const finalData = {
+          apiVersion: 'networking.istio.io/v1alpha3',
+          kind: 'Gateway',
+          metadata: {
+            name: values.name,
+            annotations: {
+              displayName: values.name,
             },
-          ],
-        },
+            labels: {
+              'ownerreferences/ingressgateway': values.out,
+            },
+          },
+          spec: {
+            selector: {
+              istio: 'ingressgateway',
+              'istio-ingressgateway': values.out,
+            },
+            servers: [
+              {
+                hosts: values.domain,
+                port: {
+                  name: 'http',
+                  number: 80,
+                  protocol: 'HTTP',
+                },
+              },
+            ],
+          },
+        }
+        const res = await postMeshGateway(clusterID, finalData)
+        if (res && res.response && res.response.result) {
+          notification.success({
+            message: '创建网关成功',
+          })
+          this.cancelModal()
+        }
       }
-      const res = await postMeshGateway(clusterID, data)
+      // 编辑
+      if (type === 'edit') {
+        const finalData = data
+        finalData.metadata.name = values.name
+        finalData.metadata.annotations.displayName = values.name
+        finalData.metadata.labels['ownerreferences/ingressgateway'] = values.out
+        finalData.spec.selector['istio-ingressgateway'] = values.out
+        finalData.spec.servers[0].hosts = values.domain.filter(host => host)
+        const res = await putMeshGateway(clusterID, finalData)
+        if (res && res.response && res.response.result) {
+          notification.success({
+            message: '更新网关成功',
+          })
+          this.cancelModal()
+        }
+      }
       this.setState({
         isFetching: false,
       })
-      if (res && res.response && res.response.result) {
-        notification.success({
-          message: '创建网关成功',
-        })
-        this.cancelModal()
-      }
+      getMeshGateway && getMeshGateway(clusterID)
     })
   }
   addItems = () => {
     const { form } = this.props
     const { uuid } = this.state
     const keys = form.getFieldValue('keys')
+    form.setFieldsValue({
+      keys: keys.concat(uuid + 1),
+    })
     this.setState({
       uuid: uuid + 1,
-    })
-    form.setFieldsValue({
-      keys: keys.concat(uuid),
     })
   }
   removeItems = k => {
@@ -147,9 +195,9 @@ class GatewayModal extends React.Component {
     }
     cb('请填写正确的服务域名')
   }
-  renderItems = () => {
+  renderItems = (init, onlyLook) => {
     const { form: { getFieldValue, getFieldDecorator } } = this.props
-    getFieldDecorator('keys', { initialValue: [] })
+    getFieldDecorator('keys', { initialValue: init.keys })
     const keys = getFieldValue('keys')
     return (
       <React.Fragment>
@@ -159,10 +207,11 @@ class GatewayModal extends React.Component {
               <FormItem
                 {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
                 label={index === 0 ? '解析服务域名' : ''}
-                required={false}
+                required
                 key={k}
               >
                 {getFieldDecorator(`domain[${k}]`, {
+                  initialValue: init.domain[k],
                   validateTrigger: [ 'onChange', 'onBlur' ],
                   rules: [{
                     required: true,
@@ -172,21 +221,25 @@ class GatewayModal extends React.Component {
                     validator: this.domainValidator,
                   }],
                 })(
-                  <Input className={'domainInput'} placeholder="请输入服务域名" />
+                  <Input disabled={onlyLook} className={'domainInput'} placeholder="请输入服务域名" />
                 )}
-                {keys.length > 1 ? (
+                {
+                  keys.length > 1 && !onlyLook &&
                   <Icon
                     type="minus-circle-o"
                     disabled={keys.length === 1}
                     onClick={() => this.removeItems(k)}
                     className="remove"
                   />
-                ) : null}
+                }
               </FormItem>
             )
           })
         }
-        <div onClick={this.addItems} className="add"><Icon type="plus-circle" theme="outlined" /> 添加服务域名</div>
+        {
+          !onlyLook &&
+          <div onClick={this.addItems} className="add"><Icon type="plus-circle" theme="outlined" /> 添加服务域名</div>
+        }
       </React.Fragment>
     )
   }
@@ -195,43 +248,70 @@ class GatewayModal extends React.Component {
     closeModal && closeModal()
     form.resetFields()
   }
+  renderFooter = onlyLook => {
+    if (onlyLook) {
+      return (
+        <Button type="primary" onClick={this.cancelModal}>知道了</Button>
+      )
+    }
+    return (
+      <React.Fragment>
+        <Button onClick={this.cancelModal}>取消</Button>
+        <Button type="primary" loading={this.state.isFetching} onClick={this.handleConfirm}>
+          {
+            this.props.type === 'edit' ? '更新' : '确定'
+          }
+        </Button>
+      </React.Fragment>
+    )
+  }
   render() {
-    const { form, visible, meshIngressGatewayList, entities } = this.props
+    const init = this.getFormInitialValue()
+    const { form, visible, meshIngressGatewayList, entities, type } = this.props
     const ingressList = entities.meshIngressGatewayList || []
     const { getFieldDecorator } = form
+    const onlyLook = type !== 'edit' && type !== 'create'
     return (
       <Modal
         className={'mesh-gateway-modal'}
         title={this.modalTitle()}
-        onCancel={this.cancelModal}
-        onOk={this.handleConfirm}
+        footer={this.renderFooter(onlyLook)}
         visible={visible}
-        confirmLoading={meshIngressGatewayList.isFetching}
         maskClosable={false}
       >
         <Form>
           <FormItem {...formItemLayout} label="网关名称">
             {
               getFieldDecorator('name', {
-                initialValue: '',
+                initialValue: init.name,
                 rules: [{
                   required: true,
                   message: '请输入网关名称',
                 }, {
-                  pattern: APP_NAME_REG,
-                  message: APP_NAME_REG_NOTICE,
+                  pattern: /[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/,
+                  message: '网关名称由数字和小写字母组成',
                 }],
               })(
-                <Input className="inputNSelect" type="text" placeholder="请输入网关名称"/>
+                <Input
+                  disabled={type !== 'create'}
+                  className="inputNSelect"
+                  type="text"
+                  placeholder="请输入网关名称"
+                />
               )
             }
           </FormItem>
           <FormItem {...formItemLayout} label="服务网格出口">
             {
               getFieldDecorator('out', {
-                initialValue: undefined,
+                initialValue: init.out,
+                rules: [{
+                  required: true,
+                  message: '请选择服务网格出口',
+                }],
               })(
                 <Select
+                  disabled={onlyLook}
                   className="inputNSelect"
                   placeholder={'请选择服务网格出口'}
                 >
@@ -245,7 +325,7 @@ class GatewayModal extends React.Component {
             }
           </FormItem>
           {
-            this.renderItems()
+            this.renderItems(init, onlyLook)
           }
         </Form>
       </Modal>
