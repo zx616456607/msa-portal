@@ -16,7 +16,12 @@ import * as meshAction from '../../../actions/serviceMesh'
 import { findDOMNode } from 'react-dom';
 import serviceImg from '../../../assets/img/serviceMesh/serviceMesh.jpg'
 // import { Icon } from 'antd'
-import './styles/RelationChartComponent.less'
+import './styles/RelationChartComponent.less' // 默认relation-chart 配置
+// const TenxNodeFactory = (icon, name, v) => () => <div className="TenxNode" >
+//   <Icon type={icon} theme="outlined" />
+//   <div>{name}</div>
+//   <div>{v}</div>
+// </div>
 const config = {
   rankdir: 'LR',
   nodesep: 50,
@@ -24,12 +29,7 @@ const config = {
   ranksep: 150,
   marginx: 30,
   marginy: 30,
-} // 默认relation-chart 配置
-// const TenxNodeFactory = (icon, name, v) => () => <div className="TenxNode" >
-//   <Icon type={icon} theme="outlined" />
-//   <div>{name}</div>
-//   <div>{v}</div>
-// </div>
+}
 
 const ServiceMeshNode = () => {
   return (
@@ -55,23 +55,25 @@ export default class RelationChartComponent extends React.Component {
   }
   componentDidMount() {
   }
-  componentWillReceiveProps(nextProps = {}) {
+  async componentWillReceiveProps(nextProps = {}) {
     // 当用户修改任何的检索条件时, 在这里检查搜索条件是否合法并且是否和上次的不一样, 如果同时满足这两个情况,
     // 就向后台重新请求新的拓扑图数据
     // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
     // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
     // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
-    const { app, cluster, item } = nextProps.searchQuery
-    const { app: capp, cluster: ccluster, item: citem,
+    const { app, cluster, item, timeRange } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange,
     } = this.props.searchQuery
-    // const { begin, end } = timeRange
-    // const { begin: cbegin, end: cend } = ctimeRange
+    const { begin, end } = timeRange || {}
+    const { begin: cbegin, end: cend } = ctimeRange || {}
     const { loadServiceMeshGraph } = this.props
     const check = typeof app === 'string' && typeof cluster === 'string' && typeof item === 'string'
-    const diff = app !== capp || cluster !== ccluster || item !== citem
+    && typeof timeRange === 'object'
+    const diff = app !== capp || cluster !== ccluster || item !== citem || begin !== cbegin
+    || end !== cend
     if (check && diff) {
-      loadServiceMeshGraph(cluster, { project: item },
-        { service: app, begin: 0, end: 1000 })
+      await loadServiceMeshGraph(cluster, item,
+        { service: app, begin, end })
     }
     const { graphDataList = {} } = nextProps
     const { graphDataList: thisGraphDataList = {} } = this.props

@@ -94,20 +94,19 @@ export function loadAllServices(cluster, query, callback) {
 }
 
 // 获取拓扑图信息
-// TODO: 后台目前还处于摸索期, 这个url的参数目前只能写死
 export const SERVICE_MESH_GRAPH_REQUEST = 'SERVICE_MESH_GRAPH_REQUEST'
 export const SERVICE_MESH_GRAPH_SUCCESS = 'SERVICE_MESH_GRAPH_SUCCESS'
 export const SERVICE_MESH_GRAPH_FAILURE = 'SERVICE_MESH_GRAPH_FAILURE'
 function fetchServiceMeshGraph(cluster, headers, query, callback) {
-  cluster = 'CID-88553dfba3c8'
   return {
     [CALL_API]: {
       types: [ SERVICE_MESH_GRAPH_REQUEST, SERVICE_MESH_GRAPH_SUCCESS, SERVICE_MESH_GRAPH_FAILURE ],
-      endpoint: `http://192.168.1.225:38574/api/v3/servicemesh/clusters/${cluster}/telemetry/servicegraph?service=productpage`,
-      // ${toQuerystring(query)}`,
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${cluster}/telemetry/servicegraph?${toQuerystring(query)}`,
       schema: {},
       options: {
-        // headers,
+        headers: {
+          project: headers,
+        },
       },
     },
     callback,
@@ -267,4 +266,29 @@ const fetchEditComponent = clusterID => {
 
 export const editComponent = clusterID => dispatch => {
   return dispatch(fetchEditComponent(clusterID))
+}
+
+// 项目集群列表
+export const PROJECT_CLUSTER_LIST_REQUEST = 'PROJECT_CLUSTER_LIST_REQUEST'
+export const PROJECT_CLUSTER_LIST_SUCCESS = 'PROJECT_CLUSTER_LIST_SUCCESS'
+export const PROJECT_CLUSTER_LIST_FAILURE = 'PROJECT_CLUSTER_LIST_FAILURE'
+function getProjectClusterList(callback) {
+  return {
+    [CALL_API]: {
+      types: [ PROJECT_CLUSTER_LIST_REQUEST,
+        PROJECT_CLUSTER_LIST_SUCCESS,
+        PROJECT_CLUSTER_LIST_FAILURE ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/paas`,
+      schema: {},
+      options: {
+      },
+    },
+    callback,
+  }
+}
+
+export function loadProjectClusterList(callback) {
+  return dispatch => {
+    return dispatch(getProjectClusterList(callback))
+  }
 }
