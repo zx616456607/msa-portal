@@ -9,12 +9,10 @@
  */
 import React from 'react'
 import { Select, Button, Icon, DatePicker, Radio, TimePicker, notification } from 'antd'
-import Page from '@tenx-ui/page'
 import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import './styles/index.less'
 import { connect } from 'react-redux'
-import { DEFAULT } from '../../../constants'
 import * as current from '../../../actions/current'
 import * as meshAction from '../../../actions/serviceMesh'
 import { getDeepValue } from '../../../../client/common/utils'
@@ -49,58 +47,81 @@ class ServiceMeshGraph extends React.Component {
   state = {
     searchQuery: {}, // 搜索条件
     isTimeRange: false, // 显示
+    projects: [], // 当前服务列表
+    clusters: {}, // 当前所有集群信息
+    currentClusters: [], // 当前选中的项目的集群
   }
   node = null
   appNode = null
   async componentDidMount() {
-    const { current, loadAppList, getProjectClusters, getDefaultClusters,
-    } = this.props
-    const currentConfig = current.config || {}
-    const project = currentConfig.project || {}
-    if (project.namespace === DEFAULT) {
-      await getDefaultClusters()
-    } else {
-      await getProjectClusters(project.namespace)
-    }
+    // const { current,
+    // loadAppList, getProjectClusters, getDefaultClusters,
+    // } = this.props
+    // const currentConfig = current.config || {}
+    // const project = currentConfig.project || {}
+    // if (project.namespace === DEFAULT) {
+    //   await getDefaultClusters()
+    // } else {
+    //   await getProjectClusters(project.namespace)
+    // }
     // 这里必须要重新从this.props中重新拿一下projectClusters.
     // 因为当代码跑到上一个await的时候, async被暂停, 转而去执行redux相关的操作
     // 如果在async最前面就去this.props中去拿projectClusters的话
     // await返回后执行下面的同步代码,实际上相当于拿的还是上一次的projectClusters, 因为我的代码中写的
     // 每次都会返回一个新的projectClusters, 所以它的引用不同. 所以只能拿到之前的projectClusters
     // 而如果在使用的时候, 重新从this.porps中拿一下, 就能拿到最新的数据了.
-    const { projectClusters } = this.props
-    const currentProjectClusters = projectClusters[project.namespace] || []
-    if (currentProjectClusters.length === 0) {
-      this.setState({ searchQuery: {
-        item: project.namespace,
-      },
-      })
-      return
-    }
+    // const { projectClusters } = this.props
+    // const currentProjectClusters = projectClusters[project.namespace] || []
+    // if (currentProjectClusters.length === 0) {
+    //   this.setState({ searchQuery: {
+    //     item: project.namespace,
+    //   },
+    //   })
+    //   return
+    // }
+    const { loadAppList } = this.props
+    const projectCluster = await this.props.loadProjectClusterList()
+    const { clusters = {}, projects = [] } = projectCluster.response.result
+    const projectsList = projects
+      .filter(({ istioEnabledClusterIds }) => istioEnabledClusterIds.length !== 0)
+    this.setState({ clusters, projects: projectsList })
+    if (projectsList.length === 0) { return }
+
+    const { name: namespace, istioEnabledClusterIds: [ cluster ], istioEnabledClusterIds = [],
+    } = projectsList[0]
     const data = await loadAppList(
-      currentProjectClusters[0].clusterID,
-      { headers: project.namespace, from: 0, size: 10 }
+      cluster,
+      { headers: namespace, from: 0, size: 10 }
     )
+    // const clusterName = Object.entries(this.state.clusters).filter(([ key ]) => key === cluster) || []
+    // const { name } = clusterName[0][1] || {}
     this.setState({ searchQuery: {
-      item: project.namespace,
-      cluster: currentProjectClusters[0].clusterID,
+      item: namespace,
+      cluster,
       app: getDeepValue(data, [ 'response', 'result', 'data', 'services', 0, 'deployment', 'metadata', 'name' ]),
-      timeRange: 5 },
-    })
+    } })
+    const currentClusterList = Object.entries(this.state.clusters)
+      .filter(([ key ]) => istioEnabledClusterIds.includes(key))
+    this.setState({ currentClusters: currentClusterList })
   }
   handleChange = (itemType, value) => {
     const { searchQuery } = this.state
     this.setState({ searchQuery: Object.assign({}, searchQuery, { [itemType]: value }) })
   }
   handleSelectChange = (itemType, value) => {
-    const { getDefaultClusters, getProjectClusters } = this.props
+    // const { getDefaultClusters, getProjectClusters } = this.props
     const { searchQuery } = this.state
     // console.log('value', value)
-    if (value === DEFAULT) {
-      getDefaultClusters()
-    } else {
-      getProjectClusters(value)
-    }
+    // if (value === DEFAULT) {
+    //   getDefaultClusters()
+    // } else {
+    //   getProjectClusters(value)
+    // }
+    const currentClusterName = this.state.projects.filter(({ namespace }) => namespace === value)[0]
+      .istioEnabledClusterIds || []
+    const currentClusterList = Object.entries(this.state.clusters)
+      .filter(([ key ]) => currentClusterName.includes(key))
+    this.setState({ currentClusters: currentClusterList })
     const newSearchQuert = { ...searchQuery }
     newSearchQuert.cluster = undefined
     newSearchQuert.app = undefined
@@ -162,151 +183,151 @@ class ServiceMeshGraph extends React.Component {
   }
   loadGraph = () => {
     const { loadServiceMeshGraph } = this.props
-    const { app, cluster, item } = this.state.searchQuery
-    const check = [ app, cluster, item ].every(item => ![ undefined, null ].includes(item))
-    check && loadServiceMeshGraph(cluster, { project: item },
-      { service: app, begin: 0, end: 1000 })
+    const { app, cluster, item, timeRange } = this.state.searchQuery
+    const check = [ app, cluster, item, timeRange ]
+      .every(item => ![ undefined, null ].includes(item))
+    if (!check) {
+      return notification.info({
+        message: '筛选信息未填全,请填写后重试',
+      })
+    }
+
+    loadServiceMeshGraph(cluster, item,
+      { service: app, begin: timeRange.begin, end: timeRange.end })
   }
   render() {
-    const { current, projects, projectClusters, appsList } = this.props
-    const { searchQuery: { item, cluster, app, timeRange }, isTimeRange } = this.state
-    const currentConfig = current.config || {}
-    const project = currentConfig.project || {}
-    let currentProjectClusters
-    if (!item) {
-      currentProjectClusters = projectClusters[project.namespace] || []
-    } else {
-      currentProjectClusters = projectClusters[item] || []
-    }
+    const { appsList } = this.props
+    const { searchQuery: { item, cluster, app }, isTimeRange, projects,
+      currentClusters,
+    } = this.state
     return (
-      <Page>
-        <QueueAnim>
-          <div className="ServiceMeshGraph" key="body">
-            <div className="searchBar">
-              <Select
-                showSearch
-                style={{ width: 120 }}
-                optionFilterProp="children"
-                placeholder="选择项目"
-                onChange={value => this.handleSelectChange('item', value)}
-                filterOption={
-                  (input, option) =>
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }
-                value={item}
-              >
-                {/* <Option value="default">我的个人项目</Option> */}
-                {
-                  projects.map(p => (
-                    <Option key={p.namespace}>
-                      {p.projectName}
-                    </Option>
-                  ))
-                }
-                {
-                  projects.length === 0 && (
-                    <Option key="no-project" disabled>
+      <QueueAnim>
+        <div className="ServiceMeshGraph" key="body">
+          <div className="searchBar">
+            <Select
+              showSearch
+              style={{ width: 120 }}
+              optionFilterProp="children"
+              placeholder="选择项目"
+              onChange={value => this.handleSelectChange('item', value)}
+              filterOption={
+                (input, option) =>
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              value={item}
+            >
+              {/* <Option value="default">我的个人项目</Option> */}
+              {
+                projects.map(p => (
+                  <Option key={p.namespace}>
+                    {p.namespace}
+                  </Option>
+                ))
+              }
+              {
+                projects.length === 0 && (
+                  <Option key="no-project" disabled>
                         暂无项目
-                    </Option>
-                  )
-                }
-              </Select>
-              <Select
-                showSearch
-                style={{ width: 120 }}
-                optionFilterProp="children"
-                placeholder="选择集群"
-                onChange={value => this.handleClusterChange('cluster', value)}
-                filterOption={
-                  (input, option) =>
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }
-                ref = { relnode => { this.node = relnode } }
-                value={cluster}
-              >
-                {
-                  item && currentProjectClusters.map(cluster => (
-                    <Option key={cluster.clusterID} >
-                      {cluster.clusterName}
-                    </Option>
-                  ))
-                }
-                {
-                  currentProjectClusters.length === 0 && (
-                    <Option key="no-cluster" disabled>
+                  </Option>
+                )
+              }
+            </Select>
+            <Select
+              showSearch
+              style={{ width: 120 }}
+              optionFilterProp="children"
+              placeholder="选择集群"
+              onChange={value => this.handleClusterChange('cluster', value)}
+              filterOption={
+                (input, option) =>
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              ref = { relnode => { this.node = relnode } }
+              value={cluster}
+            >
+              {
+                currentClusters.map(clusters => {
+                  const value = clusters[1]
+                  return <Option key={value.id} value={value.id} >
+                    {value.name}
+                  </Option>
+                })
+              }
+              {
+                currentClusters.length === 0 && (
+                  <Option key="no-cluster" disabled>
                       暂无集群
+                  </Option>
+                )
+              }
+            </Select>
+            <Select
+              showSearch={true}
+              onSearch={this.debounceSearchApp}
+              style={{ width: 120 }}
+              optionFilterProp="children"
+              placeholder="选择服务"
+              onChange={value => this.handleChange('app', value)}
+              value={app}
+              ref={ relnode => { this.appNode = relnode } }
+              filterOption={false}
+            >
+              {
+                cluster && appsList.map(apps => {
+                  return (
+                    <Option
+                      key={apps.deployment.metadata.name}
+                      value={apps.deployment.metadata.name}>
+                      { apps.deployment.metadata.name }
                     </Option>
                   )
-                }
-              </Select>
-              <Select
-                showSearch={true}
-                onSearch={this.debounceSearchApp}
-                style={{ width: 120 }}
-                optionFilterProp="children"
-                placeholder="选择服务"
-                onChange={value => this.handleChange('app', value)}
-                value={app}
-                ref={ relnode => { this.appNode = relnode } }
-                filterOption={false}
-              >
-                {
-                  cluster && appsList.map(apps => {
-                    return (
-                      <Option
-                        key={apps.deployment.metadata.name}
-                        value={apps.deployment.metadata.name}>
-                        { apps.deployment.metadata.name }
-                      </Option>
-                    )
-                  })
-                }
-              </Select>
-              <div
-                className="operationButton"
-              >
-                <Button className="TimePickerButton"
-                  type="primary"
-                  onClick={this.toogleTimePicker}
-                  icon="calendar">
+                })
+              }
+            </Select>
+            <div
+              className="operationButton"
+            >
+              <Button className="TimePickerButton"
+                type="primary"
+                onClick={this.toogleTimePicker}
+                icon="calendar">
                 自定义时间
-                </Button>
-                {
-                  isTimeRange === false ?
-                    <Radio.Group value = {timeRange}
-                      onChange={ e => this.timeRangeSelect('singleTime', e.target.value)}
-                    >
-                      <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
-                      <Radio.Button value={30}>最近30分钟</Radio.Button>
-                      <Radio.Button value={60}>最近1小时</Radio.Button>
-                    </Radio.Group>
-                    :
-                    <span >
-                      <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
-                      <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
-                      <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
-                    </span>
-                }
-              </div>
+              </Button>
+              {
+                isTimeRange === false ?
+                  <Radio.Group
+                    onChange={ e => this.timeRangeSelect('singleTime', e.target.value)}
+                  >
+                    <Radio.Button className="fiveButton" value={5}>最近5分钟</Radio.Button>
+                    <Radio.Button value={30}>最近30分钟</Radio.Button>
+                    <Radio.Button value={60}>最近1小时</Radio.Button>
+                  </Radio.Group>
+                  :
+                  <span >
+                    <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
+                    <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
+                    <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
+                  </span>
+              }
             </div>
-            <div className="infoBar">
-              {/*
+          </div>
+          <div className="infoBar">
+            {/*
               //TODO: 后端目前没有, 有了再加
                <span className="meshInfo">{`应用: ${'x'}个`}</span>
               <span className="meshInfo">{`服务: ${'t'}个`}</span>
               <span className="meshInfo">{`调用: ${'y'}个`}</span> */}
-              <span className="graphInfo"> 展示满足以上筛选条件的, 所有启用 service Mesh 的微服务拓扑 </span>
-              <Button onClick={this.loadGraph}><Icon type="sync"/>刷新</Button>
-            </div>
-            <div className="SvgContainer">
-              <RelationChartComponent
-                searchQuery={this.state.searchQuery}
-                graphDataList={this.props.graphDataList}
-              />
-            </div>
+            <span className="graphInfo"> 展示满足以上筛选条件的, 所有启用 service Mesh 的微服务拓扑 </span>
+            <Button onClick={this.loadGraph}><Icon type="sync"/>刷新</Button>
           </div>
-        </QueueAnim>
-      </Page>
+          <div className="SvgContainer">
+            <RelationChartComponent
+              searchQuery={this.state.searchQuery}
+              graphDataList={this.props.graphDataList}
+            />
+          </div>
+        </div>
+      </QueueAnim>
     )
   }
 }
@@ -316,5 +337,6 @@ export default connect(mapStateToProps, {
   getProjectClusters: current.getProjectClusters,
   loadAppList: meshAction.loadAllServices,
   loadServiceMeshGraph: meshAction.loadServiceMeshGraph,
+  loadProjectClusterList: meshAction.loadProjectClusterList,
 })(ServiceMeshGraph)
 
