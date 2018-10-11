@@ -15,15 +15,35 @@
 import React from 'react'
 import './style/index.less'
 import QueueAnim from 'rc-queue-anim'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
 import GatewayCard from './Card'
 import GatewayModal from './GatewayModal'
 import confirm from '../../../components/Modal/confirm'
+import * as actions from '../../../actions/meshGateway'
+import { connect } from 'react-redux'
 
+const mapStateToProps = state => {
+  const { current, meshGateway: { meshGatewayList }, entities } = state
+  const { cluster } = current.config
+  const clusterID = cluster.id
+  return {
+    clusterID,
+    meshGatewayList,
+    entities,
+  }
+}
+
+@connect(mapStateToProps, {
+  getMeshGateway: actions.getMeshGateway,
+})
 export default class MeshGateway extends React.Component {
   state = {
     addModal: false,
     modalType: 'create',
+  }
+  componentDidMount() {
+    const { getMeshGateway, clusterID } = this.props
+    getMeshGateway && getMeshGateway(clusterID)
   }
   onCreateBtnClick = () => this.setState({
     addModal: true,
@@ -55,21 +75,30 @@ export default class MeshGateway extends React.Component {
   }
   render() {
     const { addModal, modalType } = this.state
+    const {
+      meshGatewayList,
+      entities: { meshGatewayList: gatewayData, meshIngressGatewayList: ingressData },
+    } = this.props
     return (
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
           <Button onClick={this.onCreateBtnClick} icon="plus" type="primary">创建网关</Button>
         </div>
-        <div className="content">
-          {
-            [ 1, 2, 3, 4, 5, 6, 7, 8 ].map(i =>
-              <GatewayCard
-                key={i}
-                onDelete={this.deleteGateway}
-              />
-            )
-          }
-        </div>
+        <Spin spinning={meshGatewayList.isFetching} key="content">
+          <div className="content">
+            {
+              (meshGatewayList.data || []).map(id =>
+                <GatewayCard
+                  key={gatewayData[id].metadata.name}
+                  onDelete={this.deleteGateway}
+                  data={gatewayData[id]}
+                  ingressData={ingressData}
+                  id={id}
+                />
+              )
+            }
+          </div>
+        </Spin>
         <GatewayModal visible={addModal} type={modalType} closeModal={this.closeAddModal}/>
       </QueueAnim>
     )
