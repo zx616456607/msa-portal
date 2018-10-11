@@ -15,7 +15,7 @@
 import React from 'react'
 import './style/index.less'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Spin } from 'antd'
+import { Button, notification, Spin } from 'antd'
 import GatewayCard from './Card'
 import GatewayModal from './GatewayModal'
 import confirm from '../../../components/Modal/confirm'
@@ -35,15 +35,19 @@ const mapStateToProps = state => {
 
 @connect(mapStateToProps, {
   getMeshGateway: actions.getMeshGateway,
+  deleteMeshGateway: actions.deleteMeshGateway,
+  getMeshIngressGateway: actions.getMeshIngressGateway,
 })
 export default class MeshGateway extends React.Component {
   state = {
     addModal: false,
     modalType: 'create',
+    modalData: {},
   }
   componentDidMount() {
-    const { getMeshGateway, clusterID } = this.props
+    const { getMeshGateway, getMeshIngressGateway, clusterID } = this.props
     getMeshGateway && getMeshGateway(clusterID)
+    getMeshIngressGateway && getMeshIngressGateway(clusterID)
   }
   onCreateBtnClick = () => this.setState({
     addModal: true,
@@ -51,30 +55,48 @@ export default class MeshGateway extends React.Component {
   })
   closeAddModal = () => this.setState({
     addModal: false,
+    modalData: {},
   })
-  deleteGateway = () => {
+  deleteGateway = id => {
+    const { deleteMeshGateway, clusterID, getMeshGateway } = this.props
     confirm({
       modalTitle: '删除操作',
-      title: '确定删除 xxx 网关?',
+      title: `确定删除 ${id} 网关?`,
       content: <div>删除该网关后，已使用此网关的路由策略中的服务将不能通过此网关出口被访问</div>,
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
-        // return deleteClient().then(() => {
-        //   notification.success({
-        //     message: '删除成功',
-        //   })
-        //   this.loadClientList()
-        // }).catch(() => {
-        //   notification.warn({
-        //     message: '删除失败',
-        //   })
-        // })
+        return new Promise((resolve, reject) => {
+          deleteMeshGateway(clusterID, id).then(res => {
+            if (res.error) {
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: `删除网关 ${id} 成功`,
+            })
+            getMeshGateway(clusterID)
+          })
+        })
       },
     })
   }
+  showDetail = data => {
+    this.setState({
+      modalType: 'detail',
+      modalData: data,
+      addModal: true,
+    })
+  }
+  editGateway = data => {
+    this.setState({
+      modalType: 'edit',
+      modalData: data,
+      addModal: true,
+    })
+  }
   render() {
-    const { addModal, modalType } = this.state
+    const { addModal, modalType, modalData } = this.state
     const {
       meshGatewayList,
       entities: { meshGatewayList: gatewayData, meshIngressGatewayList: ingressData },
@@ -91,6 +113,8 @@ export default class MeshGateway extends React.Component {
                 <GatewayCard
                   key={gatewayData[id].metadata.name}
                   onDelete={this.deleteGateway}
+                  onEdit={this.editGateway}
+                  showDetail={this.showDetail}
                   data={gatewayData[id]}
                   ingressData={ingressData}
                   id={id}
@@ -99,7 +123,15 @@ export default class MeshGateway extends React.Component {
             }
           </div>
         </Spin>
-        <GatewayModal visible={addModal} type={modalType} closeModal={this.closeAddModal}/>
+        {
+          addModal &&
+          <GatewayModal
+            visible={addModal}
+            data={modalData}
+            type={modalType}
+            closeModal={this.closeAddModal}
+          />
+        }
       </QueueAnim>
     )
   }

@@ -20,6 +20,11 @@
       .title {
         font-size: 14px;
         margin-bottom: 4px;
+        .warning-no-out {
+          color: @warning-color;
+          cursor: pointer;
+          margin-left: @padding-base;
+        }
       }
       .out-address {
         margin-bottom: 4px;
@@ -47,5 +52,20 @@
       height: 20px;
       background: @border-color-base;
     }
+  }
+}
+.mesh-gateway-popover-content {
+  width: 260px;
+  padding: @padding-base;
+  display: flex;
+  flex-wrap: wrap;
+  .rule {
+    width: 100px;
+    margin: @padding-base @padding-small @padding-base 0;
+  }
+  .title {
+    width: 200px;
+    color: @primary-color;
+    font-size: @font-size-medium;
   }
 }

@@ -99,3 +99,60 @@ export function postMeshGateway(clusterId, body) {
     return dispatch(createMeshGateway(clusterId, body))
   }
 }
+
+// 更新 meshGateway
+export const UPDATE_MESH_GATEWAY_REQUEST = 'UPDATE_MESH_GATEWAY_REQUEST'
+export const UPDATE_MESH_GATEWAY_SUCCESS = 'UPDATE_MESH_GATEWAY_SUCCESS'
+export const UPDATE_MESH_GATEWAY_FAILURE = 'UPDATE_MESH_GATEWAY_FAILURE'
+
+function fetchPutMeshGateway(clusterId, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_MESH_GATEWAY_REQUEST,
+        UPDATE_MESH_GATEWAY_SUCCESS,
+        UPDATE_MESH_GATEWAY_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/networking/gateway`,
+      schema: {},
+      options: {
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export function putMeshGateway(clusterId, body) {
+  return dispatch => {
+    return dispatch(fetchPutMeshGateway(clusterId, body))
+  }
+}
+
+// 删除 meshGateway
+export const DELETE_MESH_GATEWAY_REQUEST = 'DELETE_MESH_GATEWAY_REQUEST'
+export const DELETE_MESH_GATEWAY_SUCCESS = 'DELETE_MESH_GATEWAY_SUCCESS'
+export const DELETE_MESH_GATEWAY_FAILURE = 'DELETE_MESH_GATEWAY_FAILURE'
+
+function fetchDeleteMeshGateway(clusterId, name) {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_MESH_GATEWAY_REQUEST,
+        DELETE_MESH_GATEWAY_SUCCESS,
+        DELETE_MESH_GATEWAY_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/networking/gateway/${name}`,
+      schema: {},
+      options: {
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export function deleteMeshGateway(clusterId, name) {
+  return dispatch => {
+    return dispatch(fetchDeleteMeshGateway(clusterId, name))
+  }
+}
