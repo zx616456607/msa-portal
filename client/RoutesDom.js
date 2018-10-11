@@ -89,11 +89,6 @@ export const appChildRoutes = [
     key: 'service-mesh',
   },
   {
-    path: '/mesh-gateway',
-    component: MeshGateway,
-    key: 'mesh-gateway',
-  },
-  {
     path: '/csb-instances',
     component: CSBInstances,
     key: 'csb-instances',
@@ -127,6 +122,12 @@ export const serviceMeshChildRoutes = [
     exact: true,
     component: ComponentManagement,
     key: 'component-management',
+  },
+  {
+    path: '/service-mesh/mesh-gateway',
+    exact: true,
+    component: MeshGateway,
+    key: 'mesh-gateway',
   },
   {
     path: '/service-mesh/component-management/component/create',
