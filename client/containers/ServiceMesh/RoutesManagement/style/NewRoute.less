@@ -33,8 +33,11 @@
   }
   .visit-type-inner {
     .pub-content {
+      .selection {
+        display: flex;
+      }
       button {
-        margin: 0 @padding-medium;
+        margin: 4px @padding-medium;
       }
     }
   }
@@ -79,12 +82,21 @@
       border: 1px dashed @border-color-base;
       cursor: pointer;
     }
-    .condition-item {
+    .condition-input {
+      margin-top: -@padding-medium;
       display: flex;
       justify-content: flex-start;
-      .ant-form-item {
+      .ant-form-item, button {
         margin-right: @padding-base;
       }
+      button {
+        margin-top: 3px;
+      }
+    }
+    .route-item-tip {
+      margin-top: @padding-base;
+      color: @font-color-3;
+      line-height: 20px;
     }
   }
   .add-new-route {
@@ -93,6 +105,14 @@
     cursor: pointer;
     i {
       margin-right: @padding-base;
+    }
+  }
+  .new-route-footer {
+    padding-left: 200px;
+    padding-top: @padding-medium;
+    border-top: 1px solid @border-color-base;
+    button {
+      margin-right: @padding-medium;
     }
   }
 }
