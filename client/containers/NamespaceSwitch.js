@@ -40,7 +40,7 @@ class NamespaceSwitch extends React.Component {
       setCurrentConfig,
       getProjectClusters,
     } = this.props
-    await getProjectList()
+    await getProjectList({ size: 0 })
     getUserProjects(userID).then(res => {
       if (res.error) {
         notification.error({
@@ -241,7 +241,10 @@ class NamespaceSwitch extends React.Component {
         <div className={'divider'} />
         <Dropdown
           overlay={
-            <Menu selectable onSelect={this.handleProjectChange}>
+            <Menu style={{
+              maxHeight: '150px',
+              overflowY: 'auto',
+            }} selectable onSelect={this.handleProjectChange}>
               {
                 projectsList.length > 0 && projectsList.map(item => {
                   if (!item.outlineRoles.includes('no-participator')) {
