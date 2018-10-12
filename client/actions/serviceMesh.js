@@ -292,3 +292,52 @@ export function loadProjectClusterList(callback) {
     return dispatch(getProjectClusterList(callback))
   }
 }
+
+// 路由策略
+export const VIRTUAL_SERVICE_LIST_REQUEST = 'VIRTUAL_SERVICE_LIST_REQUEST'
+export const VIRTUAL_SERVICE_LIST_SUCCESS = 'VIRTUAL_SERVICE_LIST_SUCCESS'
+export const VIRTUAL_SERVICE_LIST_FAILURE = 'VIRTUAL_SERVICE_LIST_FAILURE'
+function getVirtualServiceList(query, callback) {
+  return {
+    [CALL_API]: {
+      types: [ VIRTUAL_SERVICE_LIST_REQUEST,
+        VIRTUAL_SERVICE_LIST_SUCCESS,
+        VIRTUAL_SERVICE_LIST_FAILURE ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${query.clusterId}/networking/virtualservice`,
+      schema: {},
+      // schema: Schemas.MESH_GATEWAY_LIST_DATA,
+    },
+    callback,
+  }
+}
+
+export function loadVirtualServiceList(query, callback) {
+  return dispatch => {
+    return dispatch(getVirtualServiceList(query, callback))
+  }
+}
+
+export const VIRTUAL_SERVICE_DEL_REQUEST = 'VIRTUAL_SERVICE_DEL_REQUEST'
+export const VIRTUAL_SERVICE_DEL_SUCCESS = 'VIRTUAL_SERVICE_DEL_SUCCESS'
+export const VIRTUAL_SERVICE_DEL_FAILURE = 'VIRTUAL_SERVICE_DEL_FAILURE'
+
+const fetchDelVirtualService = (clusterId, name) => {
+  return {
+    [CALL_API]: {
+      types: [
+        VIRTUAL_SERVICE_DEL_REQUEST,
+        VIRTUAL_SERVICE_DEL_SUCCESS,
+        VIRTUAL_SERVICE_DEL_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/networking/virtualservice/${name}`,
+      schema: {},
+      options: {
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteVirtualService = (clusterId, name) => dispatch => {
+  return dispatch(fetchDelVirtualService(clusterId, name))
+}

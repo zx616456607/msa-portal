@@ -40,7 +40,8 @@ const errorMessageCloseObj = {}
 const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
   /^\/setting/, /^\/msa-om/,
-  /^\/msa-om\/log/, /^\/service-mesh/,
+  /^\/msa-om\/log/,
+  // /^\/service-mesh/,
 ]
 
 class App extends React.Component {
