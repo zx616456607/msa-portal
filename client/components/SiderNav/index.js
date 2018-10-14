@@ -124,7 +124,7 @@ const menus = [
       }, {
         key: 'k2',
         to: '/service-mesh/component-management',
-        icon: 'question',
+        tenxIcon: 'question',
         name: '组件管理',
       }, {
         key: 'k3',

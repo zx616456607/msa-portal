@@ -13,24 +13,212 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Input, Card, Form, Row, Col, Icon, Select } from 'antd'
+import { Button, Input, Card, Form, Row, Col, Icon, Select, notification } from 'antd'
 import './style/index.less'
-const FormItem = Form.Item;
+import { AddComponent, fetchServiceList, loadComponent, fetchComponent } from '../../../../actions/serviceMesh'
+
+const FormItem = Form.Item
+const { TextArea } = Input
+const Option = Select.Option
+let uuid = 1
 
 class CreateComponent extends React.Component {
-  state = {}
+  state = {
+    isAdd: true,
+    serviceAry: [],
+    componentList: [],
+  }
+
+  componentDidMount() {
+    const isAdd = this.props.location.search.split('=')[1]
+    this.fetchServiceList()
+    if (isAdd === 'false') {
+      const componentName = this.props.location.pathname.split('/')[3]
+      this.fetchList(componentName)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const isAdd = nextProps.location.search.split('=')[1]
+    if (isAdd === 'true') {
+      this.setState({
+        isAdd: true,
+      })
+    } else {
+      this.setState({
+        isAdd: false,
+      })
+    }
+  }
+
+  fetchList = name => {
+    const { clusterID, fetchComponent } = this.props
+    const query = {
+      name,
+      project: 'kaifacloud',
+    }
+    fetchComponent(clusterID, query).then(res => {
+      this.setState({
+        componentList: res.response.result,
+      })
+    })
+  }
+
+  fetchServiceList = () => {
+    const { clusterID, fetchServiceList } = this.props
+    fetchServiceList(clusterID, 'kaifacloud')
+  }
 
   handleBack = () => {
   }
 
-  render() {
+  handleAdd = () => {
     const { form } = this.props
-    const { getFieldDecorator } = form
+    const keys = form.getFieldValue('keys')
+    const nextKeys = keys.concat(uuid)
+    uuid++
+    form.setFieldsValue({
+      keys: nextKeys,
+    })
+  }
+
+  handleRemove = k => {
+    const { form } = this.props
+    const keys = form.getFieldValue('keys')
+    form.setFieldsValue({
+      keys: keys.filter(key => key !== k),
+    })
+  }
+
+  filterServiceName = () => {
+    const { form } = this.props
+    const { getFieldValue } = form
+    const keys = getFieldValue('keys')
+    const query = {}
+    keys.forEach(key => {
+      query[`svcName/${getFieldValue(`serviceName-${key}`)}`] = `${getFieldValue(`version-${key}`)}`
+    })
+    return query
+  }
+
+  filterSubsets = () => {
+    const { form } = this.props
+    const { getFieldValue } = form
+    const keys = getFieldValue('keys')
+    const subAry = []
+    keys.forEach(key => {
+      const query = {
+        labels: {
+          version: `${getFieldValue(`version-${key}`)}`,
+        },
+        name: `${getFieldValue(`version-${key}`)}`,
+      }
+      subAry.push(query)
+    })
+    return subAry
+  }
+
+  handleSubmit = () => {
+    const { form, clusterID, AddComponent } = this.props
+    form.validateFields((err, value) => {
+      if (err) {
+        return
+      }
+      const query = {
+        apiVersion: 'networking.istio.io/v1alpha3',
+        kind: 'DestinationRule',
+        metadata: {
+          annotations: this.filterServiceName(),
+          name: value.componentName,
+        },
+        spec: {
+          host: value.componentName,
+          subsets: this.filterSubsets(),
+          trafficPolicy: {
+            tls: {
+              mode: 'ISTIO_MUTUAL',
+            },
+          },
+        },
+      }
+      AddComponent(clusterID, query, 'kaifacloud').then(res => {
+        if (res.error) {
+          notification.error({
+            message: '添加组件失败',
+          })
+          return
+        }
+        notification.success({
+          message: '添加组件成功',
+        })
+      })
+    })
+  }
+
+  filterService = list => {
+    if (list.length !== 0) {
+      const serviceAry = []
+      Object.keys(list.metadata.annotations).forEach(item => {
+        const query = {
+          name: item,
+          version: list.metadata.annotations[item],
+        }
+        serviceAry.push(query)
+      })
+    }
+  }
+
+  render() {
+    const { isAdd, componentList } = this.state
+    const { form, serviceList } = this.props
+    const { getFieldDecorator, getFieldValue } = form
     const formItemLayout = {
       labelCol: { span: 5 },
       wrapperCol: { span: 10 },
     }
-
+    getFieldDecorator('keys', { initialValue: [ 0 ] })
+    const keys = getFieldValue('keys')
+    // if (componentList.length !== 0) {
+    //   this.filterService(componentList)
+    // }
+    const serviceLists = keys.map((res, index) => {
+      return (
+        <Row className="serviceList" key={index}>
+          <Col span={6}>
+            <FormItem
+              {...formItemLayout}
+            >
+              {getFieldDecorator(`serviceName-${index}`, {
+                initialValue: undefined,
+              })(
+                <Select placeholder="请选择服务" style={{ width: 120 }}>
+                  {
+                    serviceList && Object.keys(serviceList).map((item, index) => {
+                      if (serviceList[item].istioEnabled === true) {
+                        return <Option value={`${Object.keys(serviceList)[index]}`}>
+                          {Object.keys(serviceList)[index]}</Option>
+                      }
+                      return null
+                    })
+                  }
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col span={8}>
+            <FormItem>
+              <Input placeholder="如：1.0.0" style={{ width: '100%' }}
+                {...getFieldDecorator(`version-${index}`, {
+                  initialValue: 1,
+                })} />
+            </FormItem>
+          </Col>
+          <Col span={6}>
+            <Button onClick={() => this.handleRemove(index)}>删除</Button>
+          </Col>
+        </Row>
+      )
+    })
     return (
       <QueueAnim className="create-component">
         <div className="create-component-btn layout-content-btns" keys="btn">
@@ -40,17 +228,17 @@ class CreateComponent extends React.Component {
               this.props.history.push('/service-mesh/component-management')
             }>返回</span>
           </div>
-          <div className="title">编辑组件</div>
+          <div className="title">{isAdd ? '添加组件' : '编辑组件'}</div>
         </div>
         <Card className="create-component-body">
           <div>
             <Row>
               <FormItem {...formItemLayout} label="组件名">
                 {getFieldDecorator('componentName', {
-                  initialValue: undefined,
-                  rules: [{ pattern: '', whitespace: true, message: '' }],
+                  initialValue: componentList.length !== 0 ?
+                    componentList.metadata.name : undefined,
                 })(
-                  <Input className="selects" placeholder="请输入组件名称" />
+                  <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
                 )}
               </FormItem>
             </Row>
@@ -60,7 +248,7 @@ class CreateComponent extends React.Component {
                   initialValue: undefined,
                   rules: [{ pattern: '', whitespace: true, message: '' }],
                 })(
-                  <Input className="selects" placeholder="请输入描述" />
+                  <TextArea rows={4} />
                 )}
               </FormItem>
             </Row>
@@ -70,35 +258,24 @@ class CreateComponent extends React.Component {
             <div className="form-title">
               <Row>
                 <span className="service">选择服务</span>
-                <Button><Icon type="link" />关联后端服务</Button>
-                <span><Icon type="info-circle-o" />解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效</span>
+                <Button onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
+                <span className="service-desc">
+                  <Icon type="info-circle-o" />
+                  解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效
+                </span>
               </Row>
               <Row className="serviceHeader">
                 <Col span={6}>服务</Col>
                 <Col span={7}>组件服务版本</Col>
                 <Col span={3} offset={1}>操作</Col>
               </Row>
-              <Row className="serviceList" type="flex" align="middle">
-                <Col span={6}>
-                  <Select placeholder="请选择国家">
-                  </Select>
-                </Col>
-                <Col span={6}>
-                  <FormItem>
-                    <Input
-                      style={{ width: '100%' }}
-                      {...getFieldDecorator('weight', {
-                        initialValue: 1,
-                      })}
-                    />
-                  </FormItem>
-                </Col>
-              </Row>
+              {serviceLists}
             </div>
             <div className="dotted" />
             <div className="btn-bottom">
-              <Button className="cancel">取消</Button>
-              <Button type="primary">确定</Button>
+              <Button className="cancel" onClick={
+                () => this.props.history.push('/service-mesh/component-management')}>取消</Button>
+              <Button type="primary" onClick={() => this.handleSubmit()}>确定</Button>
             </div>
           </div>
         </Card>
@@ -108,13 +285,20 @@ class CreateComponent extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, serviceMesh } = state
   const { cluster } = current.config
   const clusterID = cluster.id
+  const { componentServiceList } = serviceMesh
+  const serviceList = componentServiceList && componentServiceList.data || []
   return {
     clusterID,
+    serviceList,
   }
 }
 
 export default connect(mapStateToProps, {
+  AddComponent,
+  loadComponent,
+  fetchComponent,
+  fetchServiceList,
 })(Form.create()(CreateComponent))
