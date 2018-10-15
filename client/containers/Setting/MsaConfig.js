@@ -463,7 +463,7 @@ const mapStateToProps = state => {
   const namespace = info.namespace
   const { project, cluster } = current.config
   const { projectConfig } = current
-  const clusterName = clusters && clusters[cluster.id].clusterName
+  const clusterName = clusters && (clusters[cluster.id] || {}).clusterName
   return {
     project,
     cluster,
