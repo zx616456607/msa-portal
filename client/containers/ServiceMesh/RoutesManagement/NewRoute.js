@@ -16,7 +16,9 @@ import { Card, Form, Input, Select, Radio, Button, Tag, Icon, Tooltip, Checkbox 
 import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
+import { createNewRoute } from '../../../actions/meshRouteManagement'
 import './style/NewRoute.less'
+import { MESH_ROUTE_RULE_NAME_REG, MESH_ROUTE_RULE_NAME_REG_NOTICE } from '../../../constants';
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -55,6 +57,7 @@ const mapStateToProps = state => {
 @connect(mapStateToProps, {
   getMeshGateway,
   loadComponent,
+  createNewRoute,
 })
 class NewRouteComponent extends React.Component {
   state = {
@@ -73,13 +76,23 @@ class NewRouteComponent extends React.Component {
     loadComponent(clusterID)// 获取组件
   }
   // 表单校验相关
+  routeNameCheck = (rules, value, callback) => {
+    if (!value) {
+      return callback()
+    }
+    if (!MESH_ROUTE_RULE_NAME_REG.test(value)) {
+      return callback(MESH_ROUTE_RULE_NAME_REG_NOTICE)
+    }
+  }
   nameProps = () => {
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('ruleName', {
       onChange: e => this.setState({ ruleName: e.target.value }),
       rules: [
         { required: true, message: '请输入规则名称' },
-      ],
+        {
+          validator: this.routeNameCheck,
+        }],
       trigger: 'onChange',
     })
   }
@@ -204,7 +217,7 @@ class NewRouteComponent extends React.Component {
           })(
             <Input
               addonAfter={<Icon type="plus" onClick={() => this.addItem('hostKeys')}/>}
-              placeholder="passenger name"
+              placeholder="请输入服务域名"
               style={{ width: '200px', marginRight: 8 }} />
           )}
           {hostList.length > 1 ? (
@@ -255,8 +268,8 @@ class NewRouteComponent extends React.Component {
           >
             <div className="condition-item">
               <div>
-                {
-                  index === 0 &&
+                { // 匹配规则暂时隐藏
+                  false &&
                   <FormItem>
                     {
                       getFieldDecorator(`matchValue[${k}]`, {
@@ -275,13 +288,13 @@ class NewRouteComponent extends React.Component {
               <div className="condition-input">
                 <FormItem>
                   {getFieldDecorator(`condition[${k}]`, {
-                    initialValue: 'Header',
+                    initialValue: 'uri',
                   })(
                     <Select
                       style={{ width: 100 }}
                     >
-                      <Option value="Header">Header</Option>
-                      <Option value="Url">Url</Option>
+                      {/* <Option value="Header">Header</Option>*/}
+                      <Option value="uri">uri</Option>
                     </Select>
                   )}
                 </FormItem>
@@ -304,10 +317,12 @@ class NewRouteComponent extends React.Component {
                     <Input style={{ width: 100 }} placeholder="请输入规则"/>
                   )}
                 </FormItem>
+                {/* 暂时不需要添加和删除按钮
                 <Button icon="plus" onClick={() => {
                   this.addItem('routeConditionkeys', uniqueKey)
                 }}/>
                 <Button type="danger" icon="close" onClick={() => this.removeItem(k, `routeConditionkeys[${uniqueKey}]`)} />
+                */}
               </div>
             </div>
           </FormItem>
@@ -370,6 +385,7 @@ class NewRouteComponent extends React.Component {
     </div>
   }
   handleSubmit = () => {
+    const { clusterID, createNewRoute } = this.props
     const { validateFields } = this.props.form
     validateFields((err, values) => {
       if (!err) {
@@ -409,11 +425,14 @@ class NewRouteComponent extends React.Component {
               [matchRuleData[i][k]]: rulesData[i][k],
             },
           })
-          route.push({
-            destination: {
-              host: componentSelected,
-              subset: Object.values(version)[i][k],
-            },
+          const versionSelected = Object.values(version)[i]
+          versionSelected.forEach(item => {
+            route.push({
+              destination: {
+                host: componentSelected,
+                subset: item,
+              },
+            })
           })
         })
         http.push({ match, route })
@@ -432,6 +451,18 @@ class NewRouteComponent extends React.Component {
       if (this.state.visitType === 'pub') {
         postData.spec.gateways = values.gateways
       }
+      createNewRoute(clusterID, postData, {
+        success: {
+          func: () => {
+            // console.log(res);
+          },
+        },
+        failed: {
+          func: () => {
+            // console.log(err);
+          },
+        },
+      })
     })
   }
   componentSelection = () => {

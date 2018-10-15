@@ -92,6 +92,8 @@ export const ROLE_USER = 0
 export const ROLE_PLATFORM_ADMIN = 3 // 平台管理员
 export const ROLE_BASE_ADMIN = 4 // 基础设施管理员
 // RegExp
+export const MESH_ROUTE_RULE_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,58}[a-zA-Z0-9]$/
+export const MESH_ROUTE_RULE_NAME_REG_NOTICE = '由 3~60 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
 export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const APP_NAME_REG_NOTICE = '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
 export const IP_REG = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/
