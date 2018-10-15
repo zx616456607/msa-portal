@@ -94,20 +94,19 @@ export function loadAllServices(cluster, query, callback) {
 }
 
 // 获取拓扑图信息
-// TODO: 后台目前还处于摸索期, 这个url的参数目前只能写死
 export const SERVICE_MESH_GRAPH_REQUEST = 'SERVICE_MESH_GRAPH_REQUEST'
 export const SERVICE_MESH_GRAPH_SUCCESS = 'SERVICE_MESH_GRAPH_SUCCESS'
 export const SERVICE_MESH_GRAPH_FAILURE = 'SERVICE_MESH_GRAPH_FAILURE'
 function fetchServiceMeshGraph(cluster, headers, query, callback) {
-  cluster = 'CID-88553dfba3c8'
   return {
     [CALL_API]: {
       types: [ SERVICE_MESH_GRAPH_REQUEST, SERVICE_MESH_GRAPH_SUCCESS, SERVICE_MESH_GRAPH_FAILURE ],
-      endpoint: `http://192.168.1.225:38574/api/v3/servicemesh/clusters/${cluster}/telemetry/servicegraph?service=productpage`,
-      // ${toQuerystring(query)}`,
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${cluster}/telemetry/servicegraph?${toQuerystring(query)}`,
       schema: {},
       options: {
-        // headers,
+        headers: {
+          project: headers,
+        },
       },
     },
     callback,
@@ -127,7 +126,11 @@ export const COMPONENT_LIST_SUCCESS = 'COMPONENT_LIST_SUCCESS'
 export const COMPONENT_LIST_FAILURE = 'COMPONENT_LIST_FAILURE'
 
 // Fetches component list from API.
-const fetchComponentList = clusterID => {
+const fetchComponentList = (clusterID, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = project
+  }
   return {
     [CALL_API]: {
       types: [ COMPONENT_LIST_REQUEST, COMPONENT_LIST_SUCCESS, COMPONENT_LIST_FAILURE ],
@@ -135,20 +138,27 @@ const fetchComponentList = clusterID => {
       schema: {},
       options: {
         method: 'GET',
+        headers: {
+          project: headers,
+        },
       },
     },
   }
 }
 
-export const loadComponent = clusterID => dispatch => {
-  return dispatch(fetchComponentList(clusterID))
+export const loadComponent = (clusterID, project) => dispatch => {
+  return dispatch(fetchComponentList(clusterID, project))
 }
 
 export const COMPONENT_ADD_REQUEST = 'COMPONENT_ADD_REQUEST'
 export const COMPONENT_ADD_SUCCESS = 'COMPONENT_ADD_SUCCESS'
 export const COMPONENT_ADD_FAILURE = 'COMPONENT_ADD_FAILURE'
 
-const PostComponent = (clusterID, body) => {
+const PostComponent = (clusterID, body, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = project
+  }
   return {
     body,
     [CALL_API]: {
@@ -158,45 +168,28 @@ const PostComponent = (clusterID, body) => {
       options: {
         body,
         method: 'POST',
+        headers: {
+          project: headers,
+        },
       },
     },
   }
 }
 
-export const AddComponent = (clusterID, body) => dispatch => {
-  return dispatch(PostComponent(clusterID, body))
-}
-
-export const COMPONENT_COMPONENT_REQUEST = 'COMPONENT_COMPONENT_REQUEST'
-export const COMPONENT_COMPONENT_SUCCESS = 'COMPONENT_COMPONENT_SUCCESS'
-export const COMPONENT_COMPONENT_FAILURE = 'COMPONENT_COMPONENT_FAILURE'
-
-const fetchComponent = (clusterID, name) => {
-  return {
-    [CALL_API]: {
-      types: [
-        COMPONENT_COMPONENT_REQUEST,
-        COMPONENT_COMPONENT_SUCCESS,
-        COMPONENT_COMPONENT_FAILURE,
-      ],
-      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule/${name}`,
-      schema: {},
-      options: {
-        method: 'GET',
-      },
-    },
-  }
-}
-
-export const getComponent = (clusterID, name) => dispatch => {
-  return dispatch(fetchComponent(clusterID, name))
+export const AddComponent = (clusterID, body, project) => dispatch => {
+  return dispatch(PostComponent(clusterID, body, project))
 }
 
 export const COMPONENT_DETAIL_REQUEST = 'COMPONENT_DETAIL_REQUEST'
 export const COMPONENT_DETAIL_SUCCESS = 'COMPONENT_DETAIL_SUCCESS'
 export const COMPONENT_DETAIL_FAILURE = 'COMPONENT_DETAIL_FAILURE'
 
-const fetchComponentDetail = (clusterID, name) => {
+const getComponent = (clusterID, query) => {
+  const { name, project } = query
+  let headers
+  if (project && project !== 'default') {
+    headers = project
+  }
   return {
     [CALL_API]: {
       types: [
@@ -204,18 +197,20 @@ const fetchComponentDetail = (clusterID, name) => {
         COMPONENT_DETAIL_SUCCESS,
         COMPONENT_DETAIL_FAILURE,
       ],
-      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking
-        /destinationrule/${name}`,
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule/${name}`,
       schema: {},
       options: {
         method: 'GET',
+        headers: {
+          project: headers,
+        },
       },
     },
   }
 }
 
-export const componentDetail = (clusterID, name) => dispatch => {
-  return dispatch(fetchComponentDetail(clusterID, name))
+export const fetchComponent = (clusterID, query) => dispatch => {
+  return dispatch(getComponent(clusterID, query))
 }
 
 export const COMPONENT_DEL_REQUEST = 'COMPONENT_DEL_REQUEST'
@@ -230,8 +225,7 @@ const fetchDelComponent = (clusterID, name) => {
         COMPONENT_DEL_SUCCESS,
         COMPONENT_DEL_FAILURE,
       ],
-      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking
-        /destinationrule/${name}`,
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule/${name}`,
       schema: {},
       options: {
         method: 'DELETE',
@@ -267,4 +261,109 @@ const fetchEditComponent = clusterID => {
 
 export const editComponent = clusterID => dispatch => {
   return dispatch(fetchEditComponent(clusterID))
+}
+
+export const SERVICES_LIST_REQUEST = 'SERVICES_LIST_REQUEST'
+export const SERVICES_LIST_SUCCESS = 'SERVICES_LIST_SUCCESS'
+export const SERVICES_LIST_FAILURE = 'SERVICES_LIST_FAILURE'
+
+const fetchtServices = (clusterID, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = project
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        SERVICES_LIST_REQUEST,
+        SERVICES_LIST_SUCCESS,
+        SERVICES_LIST_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/paas/services`,
+      schema: {},
+      options: {
+        method: 'GET',
+        headers: {
+          project: headers,
+        },
+      },
+    },
+  }
+}
+export const fetchServiceList = (clusterID, project) => dispatch => {
+  return dispatch(fetchtServices(clusterID, project))
+}
+
+// 项目集群列表
+export const PROJECT_CLUSTER_LIST_REQUEST = 'PROJECT_CLUSTER_LIST_REQUEST'
+export const PROJECT_CLUSTER_LIST_SUCCESS = 'PROJECT_CLUSTER_LIST_SUCCESS'
+export const PROJECT_CLUSTER_LIST_FAILURE = 'PROJECT_CLUSTER_LIST_FAILURE'
+function getProjectClusterList(callback) {
+  return {
+    [CALL_API]: {
+      types: [ PROJECT_CLUSTER_LIST_REQUEST,
+        PROJECT_CLUSTER_LIST_SUCCESS,
+        PROJECT_CLUSTER_LIST_FAILURE ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/paas`,
+      schema: {},
+      options: {
+      },
+    },
+    callback,
+  }
+}
+
+export function loadProjectClusterList(callback) {
+  return dispatch => {
+    return dispatch(getProjectClusterList(callback))
+  }
+}
+
+// 路由策略
+export const VIRTUAL_SERVICE_LIST_REQUEST = 'VIRTUAL_SERVICE_LIST_REQUEST'
+export const VIRTUAL_SERVICE_LIST_SUCCESS = 'VIRTUAL_SERVICE_LIST_SUCCESS'
+export const VIRTUAL_SERVICE_LIST_FAILURE = 'VIRTUAL_SERVICE_LIST_FAILURE'
+function getVirtualServiceList(query, callback) {
+  return {
+    [CALL_API]: {
+      types: [ VIRTUAL_SERVICE_LIST_REQUEST,
+        VIRTUAL_SERVICE_LIST_SUCCESS,
+        VIRTUAL_SERVICE_LIST_FAILURE ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${query.clusterId}/networking/virtualservice`,
+      schema: {},
+      // schema: Schemas.MESH_GATEWAY_LIST_DATA,
+    },
+    callback,
+  }
+}
+
+export function loadVirtualServiceList(query, callback) {
+  return dispatch => {
+    return dispatch(getVirtualServiceList(query, callback))
+  }
+}
+
+export const VIRTUAL_SERVICE_DEL_REQUEST = 'VIRTUAL_SERVICE_DEL_REQUEST'
+export const VIRTUAL_SERVICE_DEL_SUCCESS = 'VIRTUAL_SERVICE_DEL_SUCCESS'
+export const VIRTUAL_SERVICE_DEL_FAILURE = 'VIRTUAL_SERVICE_DEL_FAILURE'
+
+const fetchDelVirtualService = (clusterId, name) => {
+  return {
+    [CALL_API]: {
+      types: [
+        VIRTUAL_SERVICE_DEL_REQUEST,
+        VIRTUAL_SERVICE_DEL_SUCCESS,
+        VIRTUAL_SERVICE_DEL_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/networking/virtualservice/${name}`,
+      schema: {},
+      options: {
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteVirtualService = (clusterId, name) => dispatch => {
+  return dispatch(fetchDelVirtualService(clusterId, name))
 }

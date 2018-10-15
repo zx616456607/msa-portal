@@ -14,14 +14,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Link } from 'react-router-dom'
-import { loadComponent, getComponent, deleteComponent } from '../../../actions/serviceMesh'
-import { Button, Input, Table, Card, Modal, Pagination } from 'antd'
+import { formatDate } from '../../../common/utils'
+import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
+import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
 import './style/index.less'
 
 const Search = Input.Search
 
 class ComponentManagement extends React.Component {
   state = {
+    name: '',
+    componentList: [],
     componentName: '',
     deleteVisible: false,
   }
@@ -32,7 +35,7 @@ class ComponentManagement extends React.Component {
 
   load = () => {
     const { clusterID, loadComponent } = this.props
-    loadComponent(clusterID)
+    loadComponent(clusterID, 'kaifacloud')
   }
 
   handleRefresh = () => {
@@ -40,22 +43,49 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    const { getComponent } = this.props
+    const { clusterID, fetchComponent } = this.props
     const { componentName } = this.state
-    getComponent(componentName)
+    const query = {
+      name: componentName,
+      project: 'kaifacloud',
+    }
+    fetchComponent(clusterID, query).then(res => {
+      if (res.error) {
+        return
+      }
+      this.setState({
+        componentList: res.response.result,
+      })
+    })
   }
 
-  handleEdit = () => {
-    this.props.history.push('/service-mesh/component-management/name?detail=false&id=')
+  handleEdit = name => {
+    this.props.history.push(`/service-mesh/component-management/${name}?isAdd=false`)
   }
 
-  handleDelete = () => {
+  handleDelete = name => {
     this.setState({
+      name,
       deleteVisible: true,
     })
   }
 
-  handleDel = () => {}
+  handleDel = () => {
+    const { name } = this.state
+    const { clusterID, deleteComponent } = this.props
+    deleteComponent(clusterID, name).then(res => {
+      if (res.error) {
+        notification.success({
+          message: `删除组件 ${name} 失败`,
+        })
+        return
+      }
+      notification.success({
+        message: `删除组件 ${name} 成功`,
+      })
+      this.load()
+    })
+  }
 
   handleCancel = () => {
     this.setState({
@@ -63,25 +93,36 @@ class ComponentManagement extends React.Component {
     })
   }
 
+  filterData = data => {
+    if (data.length > 0) {
+      const dataAry = []
+      data.forEach(item => {
+        const column = {
+          name: item.metadata.name,
+          servicecount: item.spec.subsets.length,
+          startTime: item.metadata.creationTimestamp,
+        }
+        dataAry.push(column)
+      })
+      return dataAry
+    }
+  }
+
   render() {
+    const { componentList } = this.state
+    const { dataList, isFetching } = this.props
     const pagination = {
       simple: true,
       total: 1,
       defaultCurrent: 1,
     }
-    const data = [{
-      name: '张安',
-      servicecount: '1',
-      router: '1',
-      start: '2018-09-20 12:00',
-    }]
     const columns = [{
       id: 'id',
       title: '组件名称',
       width: '15%',
       dataIndex: 'name',
       render: text =>
-        <Link to={'/service-mesh/component-management/component/detail'}>{text}</Link>,
+        <Link to={`/service-mesh/component-management/component/detail?name=${text}`}>{text}</Link>,
     }, {
       title: '关联服务数量',
       dataIndex: 'servicecount',
@@ -94,19 +135,21 @@ class ComponentManagement extends React.Component {
       dataIndex: 'router',
     }, {
       title: '创建时间',
-      dataIndex: 'start',
+      dataIndex: 'startTime',
+      render: text => formatDate(text),
     }, {
       title: '操作',
       render: record => <div>
-        <Button type="primary" className="edit" onClick={() => this.handleEdit(record)}>编辑</Button>
-        <Button onClick={() => this.handleDelete()}>删除</Button>
+        <Button type="primary" className="edit" onClick={() => this.handleEdit(record.name)}>编辑</Button>
+        <Button onClick={() => this.handleDelete(record.name)}>删除</Button>
       </div>,
     }]
+
     return (
       <QueueAnim className="component-management">
         <div className="component-management-btn layout-content-btns" key="btn">
           <Button icon="plus" type="primary" onClick={() =>
-            this.props.history.push('/service-mesh/component-management/component/create')}>创建组件</Button>
+            this.props.history.push('/service-mesh/component-management/component/create?isAdd=true')}>创建组件</Button>
           <Button icon="sync" onClick={() => this.handleRefresh()}> 刷新</Button>
           <Search
             placeholder="请输入组件名称搜索"
@@ -115,15 +158,15 @@ class ComponentManagement extends React.Component {
             onSearch={this.onSearch}
           />
           <div className="pages">
-            <span className="total">共计0条</span>
+            <span className="total">共计 条</span>
             <Pagination {...pagination} />
           </div>
         </div>
         <Card>
           <Table
             pagination={false}
-            loading={false}
-            dataSource={data}
+            loading={isFetching}
+            dataSource={this.filterData(componentList.length > 0 ? componentList : dataList)}
             columns={columns}
             rowKey={row => row.id}
           />
@@ -144,16 +187,25 @@ class ComponentManagement extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, serviceMesh } = state
   const { cluster } = current.config
   const clusterID = cluster.id
+  const { componentList } = serviceMesh
+  const { data, isFetching } = componentList
+  const dataAry = data || {}
+  const dataList = []
+  Object.keys(dataAry).forEach(key => {
+    dataList.push(dataAry[key])
+  })
   return {
+    dataList,
     clusterID,
+    isFetching,
   }
 }
 
 export default connect(mapStateToProps, {
-  getComponent,
   loadComponent,
   deleteComponent,
+  fetchComponent,
 })(ComponentManagement)

@@ -117,9 +117,14 @@ const menus = [
         icon: 'question',
         name: '微服务拓扑',
       }, {
+        key: 'k-mesh-gateway',
+        to: '/service-mesh/mesh-gateway',
+        icon: 'question',
+        name: '网关',
+      }, {
         key: 'k2',
         to: '/service-mesh/component-management',
-        icon: 'question',
+        tenxIcon: 'question',
         name: '组件管理',
       }, {
         key: 'k3',

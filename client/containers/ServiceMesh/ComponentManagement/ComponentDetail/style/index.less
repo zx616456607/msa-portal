@@ -9,6 +9,7 @@
  * 2018-10-08
  * @author zhaoyb
  */
+ @import "../../../../../assets/style/core/index.less";
 
  .component-detail {
   .component-detail-title {
@@ -75,4 +76,31 @@
       }
     }
   }
+  .component-detail-body {
+    .sync {
+      margin-left: 20px;
+    }
+  }
  }
+ .serviceHeader {
+  & > div {
+    padding: 15px 25px;
+  }
+  border-bottom: none;
+}
+.serviceList {
+  & > div {
+    padding: 0 0 15px 25px;
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+  }
+  &:not(:last-of-type) {
+    border-bottom: none;
+  }
+}
+.ico {
+  cursor: pointer;
+  margin-left: 25px;
+  padding-right: 2px;
+}

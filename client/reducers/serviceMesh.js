@@ -99,10 +99,34 @@ const componentList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        // data: action.response.result.data,
         data: componentData,
+        // data: action.response.result,
       }
     case ActionTypes.COMPONENT_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
+const componentServiceList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.SERVICES_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.SERVICES_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: action.response.result,
+      }
+    case ActionTypes.SERVICES_LIST_FAILURE:
       return {
         ...state,
         isFetching: false,
@@ -120,6 +144,7 @@ const serviceMesh = (state = {
     serviceList: serviceList(state.serviceList, action),
     componentList: componentList(state.componentList, action),
     graphDataList: graphDataList(state.graphDataList, action),
+    componentServiceList: componentServiceList(state.componentServiceList, action),
   }
 }
 
