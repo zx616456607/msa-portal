@@ -242,7 +242,11 @@ export const COMPONENT_EDIT_REQUEST = 'COMPONENT_EDIT_REQUEST'
 export const COMPONENT_EDIT_SUCCESS = 'COMPONENT_EDIT_SUCCESS'
 export const COMPONENT_EDIT_FAILURE = 'COMPONENT_EDIT_FAILURE'
 
-const fetchEditComponent = clusterID => {
+const fetchEditComponent = (clusterID, body, project) => {
+  let headers
+  if (project && project !== 'default') {
+    headers = project
+  }
   return {
     [CALL_API]: {
       types: [
@@ -253,14 +257,18 @@ const fetchEditComponent = clusterID => {
       endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule`,
       schema: {},
       options: {
+        body,
         method: 'PUT',
+        headers: {
+          project: headers,
+        },
       },
     },
   }
 }
 
-export const editComponent = clusterID => dispatch => {
-  return dispatch(fetchEditComponent(clusterID))
+export const editComponent = (clusterID, body, project) => dispatch => {
+  return dispatch(fetchEditComponent(clusterID, body, project))
 }
 
 export const SERVICES_LIST_REQUEST = 'SERVICES_LIST_REQUEST'

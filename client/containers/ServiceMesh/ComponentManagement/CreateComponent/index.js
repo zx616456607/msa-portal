@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Input, Card, Form, Row, Col, Icon, Select, notification } from 'antd'
 import './style/index.less'
-import { AddComponent, fetchServiceList, loadComponent, fetchComponent } from '../../../../actions/serviceMesh'
+import { AddComponent, fetchServiceList, loadComponent, fetchComponent, editComponent } from '../../../../actions/serviceMesh'
 
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -119,7 +119,9 @@ class CreateComponent extends React.Component {
   }
 
   handleSubmit = () => {
-    const { form, clusterID, AddComponent } = this.props
+    const { componentList } = this.state
+    const isAdd = this.props.location.search.split('=')[1]
+    const { form, clusterID, AddComponent, editComponent } = this.props
     form.validateFields((err, value) => {
       if (err) {
         return
@@ -130,6 +132,7 @@ class CreateComponent extends React.Component {
         metadata: {
           annotations: this.filterServiceName(),
           name: value.componentName,
+          resourceVersion: isAdd === 'false' ? componentList.metadata.resourceVersion : '',
         },
         spec: {
           host: value.componentName,
@@ -141,17 +144,33 @@ class CreateComponent extends React.Component {
           },
         },
       }
-      AddComponent(clusterID, query, 'kaifacloud').then(res => {
-        if (res.error) {
-          notification.error({
-            message: '添加组件失败',
+      if (isAdd === 'true') {
+        AddComponent(clusterID, query, 'kaifacloud').then(res => {
+          if (res.error) {
+            notification.error({
+              message: '添加组件失败',
+            })
+            return
+          }
+          notification.success({
+            message: '添加组件成功',
           })
-          return
-        }
-        notification.success({
-          message: '添加组件成功',
+          this.props.history.push('/service-mesh/component-management')
         })
-      })
+      } else {
+        editComponent(clusterID, query, 'kaifacloud').then(res => {
+          if (res.error) {
+            notification.error({
+              message: '修改组件失败',
+            })
+            return
+          }
+          notification.success({
+            message: '修改组件成功',
+          })
+          this.props.history.push('/service-mesh/component-management')
+        })
+      }
     })
   }
 
@@ -166,6 +185,26 @@ class CreateComponent extends React.Component {
         serviceAry.push(query)
       })
     }
+  }
+
+  nameCheck = (rules, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    if (!/^[a-z_\-\*]{1,15}$/.test(value)) {
+      return cb('可由 1~ 15 位字母、数字、中划线组成，以字母开头，字母或者数字结尾')
+    }
+    cb()
+  }
+
+  versionCheck = (rules, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    if (!/^[a-zA-Z0-9_\-\*]{1,46}$/.test(value)) {
+      return cb('支持1-46个字符，可以字母、数字、中划线组成，字母或数字开头和结尾')
+    }
+    cb()
   }
 
   render() {
@@ -207,10 +246,14 @@ class CreateComponent extends React.Component {
           </Col>
           <Col span={8}>
             <FormItem>
-              <Input placeholder="如：1.0.0" style={{ width: '100%' }}
-                {...getFieldDecorator(`version-${index}`, {
-                  initialValue: 1,
-                })} />
+              {getFieldDecorator(`version-${index}`, {
+                rules: [{
+                  // validator: this.versionCheck,
+                }],
+                initialValue: undefined,
+              })(
+                <Input placeholder="如：v1, abc" style={{ width: '100%' }} />
+              )}
             </FormItem>
           </Col>
           <Col span={6}>
@@ -235,10 +278,17 @@ class CreateComponent extends React.Component {
             <Row>
               <FormItem {...formItemLayout} label="组件名">
                 {getFieldDecorator('componentName', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入路由名称',
+                    }, {
+                      validator: this.nameCheck,
+                    }],
                   initialValue: componentList.length !== 0 ?
                     componentList.metadata.name : undefined,
                 })(
-                  <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
+                  <Input className="selects" placeholder="" disabled={!isAdd} />
                 )}
               </FormItem>
             </Row>
@@ -299,6 +349,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   AddComponent,
   loadComponent,
+  editComponent,
   fetchComponent,
   fetchServiceList,
 })(Form.create()(CreateComponent))
