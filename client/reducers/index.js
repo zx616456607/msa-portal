@@ -28,6 +28,7 @@ import springCloudAndApm from './globalConfig'
 import zipkin from './callLinkTrack'
 import serviceMesh from './serviceMesh'
 import meshGateway from './meshGateway'
+import meshRouteManagement from './meshRouteManagement'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -77,6 +78,7 @@ const rootReducer = combineReducers({
   ...sringcloudComponent,
   msa,
   gateway,
+  meshRouteManagement,
   ...configCenter,
   CSB,
   certification,
