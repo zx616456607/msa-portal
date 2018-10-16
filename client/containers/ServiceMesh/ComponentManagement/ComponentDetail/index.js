@@ -37,13 +37,16 @@ class ComponentDetail extends React.Component {
 
   loadDetail = () => {
     const c_name = this.props.location.search.split('=')[1]
-    const { clusterID, fetchComponent, fetchServiceList } = this.props
-    fetchServiceList(clusterID, 'kaifacloud')
+    const { clusterID, namespace, fetchComponent, fetchServiceList } = this.props
+    fetchServiceList(clusterID, namespace)
     const query = {
       name: c_name,
-      project: 'kaifacloud',
+      project: namespace,
     }
     fetchComponent(clusterID, query).then(res => {
+      if (res.error) {
+        return
+      }
       this.setState({
         isLoading: false,
         detailList: res.response.result,
@@ -81,6 +84,7 @@ class ComponentDetail extends React.Component {
   handleDelete = list => {
     this.setState({
       isAdd: false,
+      isLoading: true,
     }, () => {
       this.handleService(list)
     })
@@ -104,7 +108,7 @@ class ComponentDetail extends React.Component {
   }
 
   handleService = list => {
-    const { clusterID, editComponent } = this.props
+    const { clusterID, namespace, editComponent } = this.props
     const { isAdd, detailList } = this.state
     const { form } = this.props
     const { getFieldValue } = form
@@ -136,10 +140,14 @@ class ComponentDetail extends React.Component {
         }
       })
     }
-    editComponent(clusterID, detailList, 'kaifacloud').then(res => {
+    editComponent(clusterID, detailList, namespace).then(res => {
       if (res.error) {
         return
       }
+      this.setState({
+        visible: false,
+        isLoading: false,
+      })
       this.loadDetail()
     })
   }
@@ -201,14 +209,14 @@ class ComponentDetail extends React.Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 10 },
     }
-    const serviceLists = keys.map((res, index) => {
+    const serviceLists = keys.map(key => {
       return (
-        <Row className="serviceList" key={index}>
+        <Row className="serviceList" key={key}>
           <Col span={9}>
             <FormItem
               {...formItemLayout}
             >
-              {getFieldDecorator(`serviceName-${index}`, {
+              {getFieldDecorator(`serviceName-${key}`, {
                 initialValue: undefined,
               })(
                 <Select placeholder="请选择服务" style={{ width: 120 }}>
@@ -227,7 +235,7 @@ class ComponentDetail extends React.Component {
           </Col>
           <Col span={10}>
             <FormItem>
-              {getFieldDecorator(`version-${index}`, {
+              {getFieldDecorator(`version-${key}`, {
                 initialValue: undefined,
               })(
                 <Input placeholder="如：1.0.0" style={{ width: '100%' }} />
@@ -235,7 +243,7 @@ class ComponentDetail extends React.Component {
             </FormItem>
           </Col>
           <Col span={3}>
-            <Button type="dashed" icon="delete" onClick={() => this.handleRemove(index)}></Button>
+            <Button type="dashed" icon="delete" onClick={() => this.handleRemove(key)}></Button>
           </Col>
         </Row>
       )
@@ -311,12 +319,15 @@ class ComponentDetail extends React.Component {
 
 const mapStateToProps = state => {
   const { current, serviceMesh } = state
-  const { cluster } = current.config
+  const { config } = current
+  const { cluster, project } = config
+  const namespace = project.namespace
   const clusterID = cluster.id
   const { componentServiceList } = serviceMesh
   const serviceList = componentServiceList && componentServiceList.data || []
   return {
     clusterID,
+    namespace,
     serviceList,
   }
 }

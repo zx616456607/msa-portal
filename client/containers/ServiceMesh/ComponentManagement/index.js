@@ -24,7 +24,7 @@ const Search = Input.Search
 class ComponentManagement extends React.Component {
   state = {
     name: '',
-    componentList: [],
+    searchList: [],
     componentName: '',
     deleteVisible: false,
   }
@@ -34,8 +34,8 @@ class ComponentManagement extends React.Component {
   }
 
   load = () => {
-    const { clusterID, loadComponent } = this.props
-    loadComponent(clusterID, 'kaifacloud')
+    const { namespace, clusterID, loadComponent } = this.props
+    loadComponent(clusterID, namespace)
   }
 
   handleRefresh = () => {
@@ -43,20 +43,28 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    const { clusterID, fetchComponent } = this.props
+    const { clusterID, namespace, fetchComponent } = this.props
     const { componentName } = this.state
     const query = {
       name: componentName,
-      project: 'kaifacloud',
+      project: namespace,
     }
-    fetchComponent(clusterID, query).then(res => {
-      if (res.error) {
-        return
-      }
-      this.setState({
-        componentList: res.response.result,
+    if (componentName) {
+      fetchComponent(clusterID, query).then(res => {
+        if (res.error) {
+          return
+        }
+        const listAry = []
+        listAry.push(res.response.result)
+        this.setState({
+          searchList: listAry,
+        })
       })
-    })
+    } else {
+      this.setState({
+        searchList: [],
+      })
+    }
   }
 
   handleEdit = name => {
@@ -80,6 +88,9 @@ class ComponentManagement extends React.Component {
         })
         return
       }
+      this.setState({
+        deleteVisible: false,
+      })
       notification.success({
         message: `删除组件 ${name} 成功`,
       })
@@ -93,10 +104,13 @@ class ComponentManagement extends React.Component {
     })
   }
 
-  filterData = data => {
-    if (data.length > 0) {
+  filterData = () => {
+    const { dataList } = this.props
+    const { searchList } = this.state
+    const dataSource = searchList.length > 0 ? searchList : dataList
+    if (dataSource.length > 0) {
       const dataAry = []
-      data.forEach(item => {
+      dataSource.forEach(item => {
         const column = {
           name: item.metadata.name,
           servicecount: item.spec.subsets.length,
@@ -109,7 +123,6 @@ class ComponentManagement extends React.Component {
   }
 
   render() {
-    const { componentList } = this.state
     const { dataList, isFetching } = this.props
     const pagination = {
       simple: true,
@@ -144,7 +157,6 @@ class ComponentManagement extends React.Component {
         <Button onClick={() => this.handleDelete(record.name)}>删除</Button>
       </div>,
     }]
-
     return (
       <QueueAnim className="component-management">
         <div className="component-management-btn layout-content-btns" key="btn">
@@ -158,7 +170,7 @@ class ComponentManagement extends React.Component {
             onSearch={this.onSearch}
           />
           <div className="pages">
-            <span className="total">共计 条</span>
+            <span className="total">共计 {dataList.length} 条</span>
             <Pagination {...pagination} />
           </div>
         </div>
@@ -166,7 +178,7 @@ class ComponentManagement extends React.Component {
           <Table
             pagination={false}
             loading={isFetching}
-            dataSource={this.filterData(componentList.length > 0 ? componentList : dataList)}
+            dataSource={this.filterData()}
             columns={columns}
             rowKey={row => row.id}
           />
@@ -188,7 +200,9 @@ class ComponentManagement extends React.Component {
 
 const mapStateToProps = state => {
   const { current, serviceMesh } = state
-  const { cluster } = current.config
+  const { config } = current
+  const { cluster, project } = config
+  const namespace = project.namespace
   const clusterID = cluster.id
   const { componentList } = serviceMesh
   const { data, isFetching } = componentList
@@ -199,6 +213,7 @@ const mapStateToProps = state => {
   })
   return {
     dataList,
+    namespace,
     clusterID,
     isFetching,
   }
