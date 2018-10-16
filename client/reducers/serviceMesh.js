@@ -12,8 +12,6 @@
 import * as ActionTypes from '../actions/serviceMesh'
 // import { toQuerystring } from '../common/utils'
 
-// 临时测试数据用
-import { componentData } from './mock'
 const appsList = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -99,8 +97,7 @@ const componentList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        data: componentData,
-        // data: action.response.result,
+        data: action.response.result,
       }
     case ActionTypes.COMPONENT_LIST_FAILURE:
       return {
