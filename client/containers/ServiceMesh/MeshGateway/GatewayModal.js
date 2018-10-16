@@ -275,6 +275,7 @@ class GatewayModal extends React.Component {
       <Modal
         className={'mesh-gateway-modal'}
         title={this.modalTitle()}
+        onCancel={this.cancelModal}
         footer={this.renderFooter(onlyLook)}
         visible={visible}
         maskClosable={false}

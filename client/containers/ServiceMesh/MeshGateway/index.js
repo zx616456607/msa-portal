@@ -15,13 +15,14 @@
 import React from 'react'
 import './style/index.less'
 import QueueAnim from 'rc-queue-anim'
-import { Button, notification, Spin } from 'antd'
+import { Button, Input, notification, Spin } from 'antd'
 import GatewayCard from './Card'
 import GatewayModal from './GatewayModal'
 import confirm from '../../../components/Modal/confirm'
 import * as actions from '../../../actions/meshGateway'
 import { connect } from 'react-redux'
 
+const Search = Input.Search
 const mapStateToProps = state => {
   const { current, meshGateway: { meshGatewayList }, entities } = state
   const { cluster } = current.config
@@ -43,11 +44,28 @@ export default class MeshGateway extends React.Component {
     addModal: false,
     modalType: 'create',
     modalData: {},
+    gatewayName: '',
+    searchName: '',
   }
   componentDidMount() {
+    this.fetchGateway()
+  }
+  fetchGateway = () => {
     const { getMeshGateway, getMeshIngressGateway, clusterID } = this.props
     getMeshGateway && getMeshGateway(clusterID)
     getMeshIngressGateway && getMeshIngressGateway(clusterID)
+  }
+  onSearch = () => {
+    this.setState({
+      searchName: this.state.gatewayName,
+    })
+  }
+  onRefresh = () => {
+    this.setState({
+      gatewayName: '',
+      searchName: '',
+    })
+    this.fetchGateway()
   }
   onCreateBtnClick = () => this.setState({
     addModal: true,
@@ -105,11 +123,20 @@ export default class MeshGateway extends React.Component {
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
           <Button onClick={this.onCreateBtnClick} icon="plus" type="primary">创建网关</Button>
+          <Button onClick={this.onRefresh} icon="sync">刷新</Button>
+          <Search
+            placeholder="请输入网关名称搜索"
+            style={{ width: 200 }}
+            onChange={e => this.setState({ gatewayName: e.target.value })}
+            onSearch={this.onSearch}
+          />
         </div>
         <Spin spinning={meshGatewayList.isFetching} key="content">
           <div className="content">
             {
-              (meshGatewayList.data || []).map(id =>
+              (meshGatewayList.data || []).filter(gate =>
+                gate.indexOf(this.state.searchName) > -1
+              ).map(id =>
                 <GatewayCard
                   key={gatewayData[id].metadata.name}
                   onDelete={this.deleteGateway}
