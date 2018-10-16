@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import ClassNames from 'classnames'
-import { Menu, Dropdown, Icon, notification } from 'antd'
+import { Menu, Dropdown, Icon, notification, Input } from 'antd'
 import { USER_CURRENT_CONFIG } from '../constants'
 import './style/NamespaceSwitch.less'
 import {
@@ -24,12 +24,16 @@ import {
 } from '../actions/current'
 import TenxIcon from '@tenx-ui/icon/lib/index.js'
 
+const Search = Input.Search
+const MenuItemGroup = Menu.ItemGroup;
+
 
 class NamespaceSwitch extends React.Component {
   state = {
     projectsText: '请选择项目',
     clustersText: '请选择集群',
     clustersDropdownVisible: false,
+    searchKey: undefined, // 当前搜索关键词
   }
 
   async componentDidMount() {
@@ -226,7 +230,10 @@ class NamespaceSwitch extends React.Component {
       space: { noClustersFlag: false },
     })
   }
-
+  onProjectSearch = value => {
+    value = typeof value === 'string' ? value : value.target.value
+    this.setState({ searchKey: value })
+  }
   render() {
     const {
       current,
@@ -256,28 +263,49 @@ class NamespaceSwitch extends React.Component {
           <Dropdown
             getPopupContainer={() => document.getElementById('msa-portal-header-project')}
             overlay={
-              <Menu style={{
-                maxHeight: '150px',
-                overflowY: 'auto',
-              }} selectable onSelect={this.handleProjectChange}>
-                {
-                  projectsList.length > 0 && projectsList.map(item => {
-                    if (!item.outlineRoles.includes('no-participator')) {
-                      return (
-                        <Menu.Item key={item.namespace}>
-                          {item.projectName}
-                        </Menu.Item>)
-                    }
-                    return null
-                  })
-                }
-                {
-                  projectsList.length === 0 && (
-                    <Menu.Item key="no-project" disabled>
+              <Menu
+                // style={{
+                //   maxHeight: '200px',
+                //   overflowY: 'auto',
+                // }}
+                selectable onSelect={this.handleProjectChange}>
+                <Menu.Item key="Search" disabled>
+                  <Search
+                    placeholder="请输入项目名"
+                    onSearch={this.onProjectSearch}
+                    onChange={this.onProjectSearch}
+                  />
+                </Menu.Item>
+                <MenuItemGroup
+                  style={{
+                    maxHeight: '150px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {
+                    projectsList.length > 0 &&
+                  projectsList
+                    .filter(({ projectName }) =>
+                      (this.state.searchKey ? projectName.includes(this.state.searchKey)
+                        : true))
+                    .map(item => {
+                      if (!item.outlineRoles.includes('no-participator')) {
+                        return (
+                          <Menu.Item key={item.namespace}>
+                            {item.projectName}
+                          </Menu.Item>)
+                      }
+                      return null
+                    })
+                  }
+                  {
+                    projectsList.length === 0 && (
+                      <Menu.Item key="no-project" disabled>
                       暂无项目
-                    </Menu.Item>
-                  )
-                }
+                      </Menu.Item>
+                    )
+                  }
+                </MenuItemGroup>
                 {/* </SubMenu> */}
               </Menu>
             }
