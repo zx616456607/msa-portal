@@ -108,28 +108,28 @@ const menus = [
   {
     key: 'service-mesh',
     to: '/service-mesh',
-    icon: 'share-alt',
+    tenxIcon: 'lift-card',
     name: '治理-服务网格',
     children: [
       {
         key: 'k1',
         to: '/service-mesh',
-        icon: 'question',
+        tenxIcon: 'topology',
         name: '微服务拓扑',
       }, {
         key: 'k-mesh-gateway',
         to: '/service-mesh/mesh-gateway',
-        icon: 'question',
+        tenxIcon: 'gateway-o',
         name: '网关',
       }, {
         key: 'k2',
         to: '/service-mesh/component-management',
-        tenxIcon: 'question',
+        icon: 'bars',
         name: '组件管理',
       }, {
         key: 'k3',
         to: '/service-mesh/routes-management',
-        icon: 'question',
+        tenxIcon: 'routing-manage',
         name: '路由管理',
       },
     ],
