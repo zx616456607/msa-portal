@@ -16,7 +16,7 @@ import QueueAnim from 'rc-queue-anim'
 import { Card, Form, Row, Col, Tabs, Button, Table, Modal, Select, Input, Icon } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import componentImg from '../../../../assets/img/serviceMesh/component.png'
-import { fetchComponent } from '../../../../actions/serviceMesh'
+import { fetchComponent, editComponent, fetchServiceList } from '../../../../actions/serviceMesh'
 import './style/index.less'
 
 const TabPane = Tabs.TabPane
@@ -25,6 +25,7 @@ const Option = Select.Option
 let uuid = 1
 class ComponentDetail extends React.Component {
   state = {
+    isAdd: false,
     visible: false,
     detailList: [],
     isLoading: true,
@@ -36,7 +37,8 @@ class ComponentDetail extends React.Component {
 
   loadDetail = () => {
     const c_name = this.props.location.search.split('=')[1]
-    const { clusterID, fetchComponent } = this.props
+    const { clusterID, fetchComponent, fetchServiceList } = this.props
+    fetchServiceList(clusterID, 'kaifacloud')
     const query = {
       name: c_name,
       project: 'kaifacloud',
@@ -54,10 +56,6 @@ class ComponentDetail extends React.Component {
       isLoading: true,
     })
     this.loadDetail()
-  }
-
-  handleDelete = () => {
-
   }
 
   filterService = list => {
@@ -80,8 +78,75 @@ class ComponentDetail extends React.Component {
     })
   }
 
+  handleDelete = list => {
+    this.setState({
+      isAdd: false,
+    }, () => {
+      this.handleService(list)
+    })
+  }
+
+  filterSubsets = () => {
+    const { form } = this.props
+    const { getFieldValue } = form
+    const keys = getFieldValue('keys')
+    const subAry = []
+    keys.forEach(key => {
+      const query = {
+        labels: {
+          version: `${getFieldValue(`version-${key}`)}`,
+        },
+        name: `${getFieldValue(`version-${key}`)}`,
+      }
+      subAry.push(query)
+    })
+    return subAry
+  }
+
+  handleService = list => {
+    const { clusterID, editComponent } = this.props
+    const { isAdd, detailList } = this.state
+    const { form } = this.props
+    const { getFieldValue } = form
+    const keys = getFieldValue('keys')
+    if (isAdd) {
+      keys.forEach(key => {
+        const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
+        const value = `${getFieldValue(`version-${key}`)}`
+        detailList.metadata.annotations[`${nameKey}`] = value
+        const query = {
+          labels: {
+            version: value,
+          },
+          name: value,
+        }
+        detailList.spec.subsets.push(query)
+      })
+    } else {
+      const { name, version } = list
+      Object.keys(detailList.metadata.annotations).forEach(item => {
+        if (item === name) {
+          delete detailList.metadata.annotations[item]
+        }
+      })
+      Object.keys(detailList.spec.subsets).forEach(item => {
+        const key = detailList.spec.subsets[item].name
+        if (key === version) {
+          detailList.spec.subsets.splice(item, 1)
+        }
+      })
+    }
+    editComponent(clusterID, detailList, 'kaifacloud').then(res => {
+      if (res.error) {
+        return
+      }
+      this.loadDetail()
+    })
+  }
+
   handleAdd = () => {
     this.setState({
+      isAdd: true,
       visible: true,
     })
   }
@@ -124,8 +189,8 @@ class ComponentDetail extends React.Component {
       dataIndex: '',
     }, {
       title: '操作',
-      render: () => <div>
-        <Button onClick={() => this.handleDelete()}>删除</Button>
+      render: record => <div>
+        <Button onClick={() => this.handleDelete(record)}>删除</Button>
       </div>,
     }]
     const { metadata } = detailList
@@ -162,10 +227,11 @@ class ComponentDetail extends React.Component {
           </Col>
           <Col span={10}>
             <FormItem>
-              <Input placeholder="如：1.0.0" style={{ width: '100%' }}
-                {...getFieldDecorator(`version-${index}`, {
-                  initialValue: 1,
-                })} />
+              {getFieldDecorator(`version-${index}`, {
+                initialValue: undefined,
+              })(
+                <Input placeholder="如：1.0.0" style={{ width: '100%' }} />
+              )}
             </FormItem>
           </Col>
           <Col span={3}>
@@ -225,7 +291,7 @@ class ComponentDetail extends React.Component {
           onCancel={this.handleClose}
           footer={[
             <Button key="back" type="ghost" onClick={this.handleClose}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleClose}>确 定</Button>,
+            <Button key="submit" type="primary" onClick={this.handleService}>确 定</Button>,
           ]}>
           <Row className="serviceHeader">
             <Col span={9}>服务名称</Col>
@@ -256,6 +322,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
+  editComponent,
   fetchComponent,
+  fetchServiceList,
 })(Form.create()(ComponentDetail))
 
