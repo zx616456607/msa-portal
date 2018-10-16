@@ -57,21 +57,21 @@ export const componentData = [
       subsets: [
         {
           labels: {
-            version: 'v0.1',
+            version: 'v0-1',
           },
-          name: 'v0.1',
+          name: 'v0-1',
         },
         {
           labels: {
-            version: 'v0.2',
+            version: 'v0-2',
           },
-          name: 'v0.2',
+          name: 'v0-2',
         },
         {
           labels: {
-            version: 'v0.3',
+            version: 'v0-3',
           },
-          name: 'v0.3',
+          name: 'v0-3',
         },
       ],
       trafficPolicy: {

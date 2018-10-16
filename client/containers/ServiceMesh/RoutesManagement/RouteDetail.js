@@ -16,7 +16,7 @@ import { Card, Form, Input, Select, Radio, Button, Tag, Icon, Tooltip, Checkbox 
 import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
-import { createNewRoute } from '../../../actions/meshRouteManagement'
+import { createNewRoute, getMeshRouteDetail, updateMeshRoute } from '../../../actions/meshRouteManagement'
 import './style/NewRoute.less'
 import { MESH_ROUTE_RULE_NAME_REG, MESH_ROUTE_RULE_NAME_REG_NOTICE } from '../../../constants';
 
@@ -49,6 +49,7 @@ let routeUuid = 9999;
 let routeConditionUuid = 30000
 const mapStateToProps = state => {
   return {
+    meshRouteDetail: state.meshRouteManagement.meshRouteDetail,
     meshGatewayList: state.meshGateway.meshGatewayList,
     clusterID: state.current && state.current.config.cluster.id,
     componentList: state.serviceMesh.componentList,
@@ -58,6 +59,8 @@ const mapStateToProps = state => {
   getMeshGateway,
   loadComponent,
   createNewRoute,
+  getMeshRouteDetail,
+  updateMeshRoute,
 })
 class NewRouteComponent extends React.Component {
   state = {
@@ -71,9 +74,80 @@ class NewRouteComponent extends React.Component {
     ],
   }
   componentDidMount() {
-    const { clusterID, getMeshGateway, loadComponent } = this.props
-    getMeshGateway(clusterID)// 获取网关
-    loadComponent(clusterID)// 获取组件
+    const { clusterID, getMeshGateway, loadComponent, getMeshRouteDetail, match } = this.props
+    const promises = [ getMeshGateway(clusterID), loadComponent(clusterID) ]
+    if (match.params.name) {
+      promises.push(getMeshRouteDetail(clusterID, match.params.name))
+    }
+    Promise.all(promises).then(() => {
+      this.setInitialValue()
+      const { meshRouteDetail } = this.props
+      const data = meshRouteDetail.data
+      data && this.setActionVersion(data.spec.http[0].route[0].destination.host)
+    })
+  }
+  setInitialValue = () => {
+    const { meshRouteDetail } = this.props
+    const initialValues = {
+      defaultHostList: [ 0 ],
+      host: [ '' ],
+      defaultRouteKeys: [ 9999 ],
+      defaltGateways: [],
+      defaultVisitType: 'sub',
+      routeConditionkeys: [
+        {
+          matchRule: 'prefix',
+          rule: '',
+          version: [],
+        },
+      ],
+    }
+
+    if (meshRouteDetail.data) {
+      const { spec } = meshRouteDetail.data
+      initialValues.defaultHostList = []
+      initialValues.host = []
+      initialValues.defaultRouteKeys = []
+      initialValues.routeConditionkeys = []
+      initialValues.defaltGateways = spec.gateways || []
+      initialValues.defaultVisitType = spec.gateways ? 'pub' : 'inner'
+      spec.hosts.forEach((v, i) => {
+        const hostIndex = 1000 - i
+        initialValues.defaultHostList.push(hostIndex)
+        initialValues.host[hostIndex] = v
+      })
+      spec.http.forEach((k, j) => {
+        const routeIndex = 9999 - j
+        const { route } = k
+        const defaultVersion = []
+        route.forEach(item => defaultVersion.push(item.destination.subset))
+        initialValues.defaultRouteKeys.push(routeIndex)
+        initialValues.routeConditionkeys[routeIndex] = {
+          matchRule: Object.keys(k.match[0].uri)[0],
+          rule: k.match[0].uri[Object.keys(k.match[0].uri)[0]],
+          version: defaultVersion,
+        }
+      })
+    }
+    return initialValues
+  }
+
+  // 设置作用版本
+  setActionVersion = val => {
+    const { componentList } = this.props
+    const actionVersionArr = []
+    componentList.data && componentList.data.forEach(v => {
+      if (v.spec.host === val) {
+        for (const k of v.spec.subsets) {
+          actionVersionArr.push({
+            label: k.name,
+            value: k.labels.version,
+          })
+        }
+      }
+    })
+    this.setState({ actionVersionOptions: actionVersionArr })
+
   }
   // 表单校验相关
   routeNameCheck = (rules, value, callback) => {
@@ -83,10 +157,12 @@ class NewRouteComponent extends React.Component {
     if (!MESH_ROUTE_RULE_NAME_REG.test(value)) {
       return callback(MESH_ROUTE_RULE_NAME_REG_NOTICE)
     }
+    callback()
   }
   nameProps = () => {
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('ruleName', {
+      initialValue: this.props.match.params.name || '',
       onChange: e => this.setState({ ruleName: e.target.value }),
       rules: [
         { required: true, message: '请输入规则名称' },
@@ -98,22 +174,16 @@ class NewRouteComponent extends React.Component {
   }
   componentProps = () => {
     const { getFieldDecorator } = this.props.form
-    const { componentList } = this.props
+    const { meshRouteDetail } = this.props
+    let defaultComponent = []
+    if (meshRouteDetail.data) {
+      const { spec } = meshRouteDetail.data
+      defaultComponent = [ spec.http[0].route[0].destination.host ]
+    }
     return getFieldDecorator('componentSelected', {
+      initialValue: defaultComponent,
       onChange: val => {
-        // 选择组件时，动态设置路由类型 -> 作用版本中选项
-        const actionVersionArr = []
-        componentList.data.forEach(v => {
-          if (v.spec.host === val) {
-            for (const k of v.spec.subsets) {
-              actionVersionArr.push({
-                label: k.name,
-                value: k.labels.version,
-              })
-            }
-          }
-        })
-        this.setState({ actionVersionOptions: actionVersionArr })
+        this.setActionVersion(val)
       },
       rules: [
         { required: true, message: '请选择组件' },
@@ -124,15 +194,14 @@ class NewRouteComponent extends React.Component {
   visitTypeProps = () => {
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('visitType', {
-      initialValue: this.state.visitType,
+      initialValue: this.setInitialValue().defaultVisitType,
       onChange: e => this.setState({ visitType: e.target.value }),
     })
   }
   gatewayProps = () => {
     const { getFieldDecorator } = this.props.form
-    const defaultGateways = [ 'ssz-test23', 'ssz12d' ] // 回显时根据props设置
     return getFieldDecorator('gateways', {
-      initialValue: defaultGateways,
+      initialValue: this.setInitialValue().defaltGateways,
       // onChange: e => this.setState({ visitType: e.target.value }),
     })
   }
@@ -193,7 +262,7 @@ class NewRouteComponent extends React.Component {
       },
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    getFieldDecorator('hostKeys', { initialValue: [ 0 ] });
+    getFieldDecorator('hostKeys', { initialValue: this.setInitialValue().defaultHostList });
     const hostList = getFieldValue('hostKeys');
     const hostItems = hostList.map((k, index) => {
       return (
@@ -209,6 +278,7 @@ class NewRouteComponent extends React.Component {
         >
           {getFieldDecorator(`host[${k}]`, {
             validateTrigger: [ 'onChange', 'onBlur' ],
+            initialValue: this.setInitialValue().host[k],
             rules: [{
               required: true,
               whitespace: true,
@@ -241,8 +311,9 @@ class NewRouteComponent extends React.Component {
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { actionVersionOptions } = this.state;
-    getFieldDecorator('routeKeys', { initialValue: [ 9999 ] });
+    getFieldDecorator('routeKeys', { initialValue: this.setInitialValue().defaultRouteKeys });
     const routeList = getFieldValue('routeKeys');
+    const routeConditionkeys = this.setInitialValue().routeConditionkeys
     const routeConditionsItem = uniqueKey => {
       getFieldDecorator(`routeConditionkeys[${uniqueKey}]`, { initialValue: [ uniqueKey ] });
       const routeConditionList = getFieldValue(`routeConditionkeys[${uniqueKey}]`);
@@ -300,7 +371,8 @@ class NewRouteComponent extends React.Component {
                 </FormItem>
                 <FormItem>
                   {getFieldDecorator(`matchRule[${k}]`, {
-                    initialValue: 'prefix',
+                    initialValue: routeConditionkeys[uniqueKey] &&
+                    routeConditionkeys[uniqueKey].matchRule,
                   })(
                     <Select
                       style={{ width: 100 }}
@@ -310,9 +382,11 @@ class NewRouteComponent extends React.Component {
                     </Select>
                   )}
                 </FormItem>
+
                 <FormItem>
                   {getFieldDecorator(`rule[${k}]`, {
-                    initialValue: '',
+                    initialValue: routeConditionkeys[uniqueKey] &&
+                    routeConditionkeys[uniqueKey].rule,
                   })(
                     <Input style={{ width: 100 }} placeholder="请输入规则"/>
                   )}
@@ -367,6 +441,8 @@ class NewRouteComponent extends React.Component {
               {...dynamicFormItemLayout}
             >
               {actionVersionOptions.length === 0 ? '请选择组件' : getFieldDecorator(`version[${k}]`, {
+                initialValue: routeConditionkeys[k] &&
+                routeConditionkeys[k].version,
               })(<CheckboxGroup options={actionVersionOptions}/>)}
               <div className="route-item-tip">
                 当HTTP Header“User-Agent”包含“Chrome”且“User-Agent”包含“Nexus 6P”时，
@@ -385,84 +461,108 @@ class NewRouteComponent extends React.Component {
     </div>
   }
   handleSubmit = () => {
-    const { clusterID, createNewRoute } = this.props
+    const { clusterID, createNewRoute, match, meshRouteDetail, updateMeshRoute } = this.props
     const { validateFields } = this.props.form
     validateFields((err, values) => {
       if (!err) {
         // console.log(values);
-      }
+        const { routeConditionkeys,
+          matchRule, condition, rule, version, componentSelected } = values
+        // 分割数据方法
+        const chunk = (arr, anotherArr) => {
+          if (anotherArr.length === 0) {
+            return arr
+          }
+          const arr2 = [];
+          let start = 0
+          for (let i = 0; i < anotherArr.length; i++) {
 
-      // 根据作用版本来判断添加了多少个路由项
-      const { routeConditionkeys, matchRule, condition, rule, version, componentSelected } = values
-      // 分割数据方法
-      const chunk = (arr, anotherArr) => {
-        if (anotherArr.length === 0) {
-          return arr
-        }
-        const arr2 = [];
-        for (let i = 0; i < anotherArr.length; i++) {
-          if (i === 0) {
-            const tempArr = arr.slice(0, anotherArr[i].length)
-            arr2.push(tempArr)
-          } else {
-            const newTempArr = arr.slice(anotherArr[i - 1].length,
-              anotherArr[i].length + anotherArr[i - 1].length)
+            const newTempArr = arr.slice(start, start + anotherArr[i].length)
+            start += anotherArr[i].length
             arr2.push(newTempArr)
           }
+          return arr2;
         }
-        return arr2;
-      }
-      const matchRuleData = chunk(Object.values(matchRule), Object.values(routeConditionkeys));
-      const conditionData = chunk(Object.values(condition), Object.values(routeConditionkeys));
-      const rulesData = chunk(Object.values(rule), Object.values(routeConditionkeys));
-      const http = []
-      rulesData.forEach((v, i) => {
-        const match = []
-        const route = []
-        v.forEach((j, k) => {
-          match.push({
-            [conditionData[i][k]]: {
-              [matchRuleData[i][k]]: rulesData[i][k],
+        const matchRuleData = chunk(Object.values(matchRule), Object.values(routeConditionkeys));
+        const conditionData = chunk(Object.values(condition), Object.values(routeConditionkeys));
+        const rulesData = chunk(Object.values(rule), Object.values(routeConditionkeys));
+
+        const http = []
+        const weightArr = []
+        const filteredVersion = version.filter(v => v)
+        rulesData.forEach((v, i) => {
+          const match = []
+          const route = []
+          if (v.length !== 0) {
+            v.forEach((j, k) => {
+              match.push({
+                [conditionData[i][k]]: {
+                  [matchRuleData[i][k]]: rulesData[i][k],
+                },
+              })
+              const versionSelected = Object.values(filteredVersion)[i]
+              const weightItem = []
+              const remainder = versionSelected ? 100 % versionSelected.length : 0
+              weightArr.push(weightItem)
+              versionSelected && versionSelected.forEach((item, n) => {
+                if (remainder !== 0) {
+                  if (n === versionSelected.length - 1) {
+                    weightItem.push(Math.floor(100 / versionSelected.length) + remainder)
+                  } else {
+                    weightItem.push(Math.floor(100 / versionSelected.length))
+                  }
+                } else {
+                  weightItem.push(100 / versionSelected.length)
+                }
+                route.push({
+                  destination: {
+                    host: componentSelected[0] ? componentSelected[0] : componentSelected,
+                    subset: item,
+                  },
+                  weight: weightArr[i][n],
+                })
+              })
+            })
+            http.push({ match, route })
+          }
+
+        })
+
+        const postData = {
+          apiVersion: 'networking.istio.io/v1alpha3',
+          kind: 'VirtualService',
+          metadata: {
+            name: values.ruleName,
+          },
+          spec: {
+            hosts: values.host.filter(v => typeof v === 'string'),
+            http,
+          },
+        }
+        if (this.state.visitType === 'pub') {
+          postData.spec.gateways = values.gateways
+        }
+
+        if (match.params.name) {
+          const meshRouteDetailData = meshRouteDetail.data
+          postData.metadata = meshRouteDetailData.metadata
+          postData.referencedGateways = meshRouteDetailData.referencedGateways
+          updateMeshRoute(clusterID, postData)
+        } else {
+          createNewRoute(clusterID, postData, {
+            success: {
+              func: () => {
+                // console.log(res);
+              },
+            },
+            failed: {
+              func: () => {
+                // console.log(err);
+              },
             },
           })
-          const versionSelected = Object.values(version)[i]
-          versionSelected.forEach(item => {
-            route.push({
-              destination: {
-                host: componentSelected,
-                subset: item,
-              },
-            })
-          })
-        })
-        http.push({ match, route })
-      })
-      const postData = {
-        apiVersion: 'networking.istio.io/v1alpha3',
-        kind: 'VirtualService',
-        metadata: {
-          name: values.ruleName,
-        },
-        spec: {
-          hosts: values.host,
-          http,
-        },
+        }
       }
-      if (this.state.visitType === 'pub') {
-        postData.spec.gateways = values.gateways
-      }
-      createNewRoute(clusterID, postData, {
-        success: {
-          func: () => {
-            // console.log(res);
-          },
-        },
-        failed: {
-          func: () => {
-            // console.log(err);
-          },
-        },
-      })
     })
   }
   componentSelection = () => {
@@ -478,8 +578,14 @@ class NewRouteComponent extends React.Component {
     }
     return selections
   }
+  componentWillUnmount = () => {
+    this.setState = () => {
+      return;
+    };
+  }
   render() {
     const { meshGatewayList } = this.props
+
     const { nameProps, visitTypeProps, componentProps, gatewayProps } = this
     const { gateways } = this.state
     const { visitType } = this.state
@@ -502,7 +608,7 @@ class NewRouteComponent extends React.Component {
             label="规则名称"
             {...formItemLayout}
           >
-            {nameProps()(<Input placeholder="请输入规则名称"/>)}
+            {nameProps()(<Input placeholder="请输入规则名称" disabled={!!this.props.match.params.name}/>)}
           </FormItem>
           <FormItem
             label="选择组件"
@@ -581,5 +687,5 @@ class NewRouteComponent extends React.Component {
   }
 }
 
-const NewRoute = Form.create()(NewRouteComponent)
-export default NewRoute
+const RouteDetail = Form.create()(NewRouteComponent)
+export default RouteDetail
