@@ -12,7 +12,7 @@
 
 import React from 'react'
 import ReturnButton from '@tenx-ui/return-button'
-import { Card, Form, Input, Select, Radio, Button, Tag, Icon, Tooltip, Checkbox } from 'antd'
+import { Card, Form, Input, Select, Radio, Button, Tag, Icon, Tooltip, notification, Checkbox } from 'antd'
 import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
@@ -52,6 +52,7 @@ const mapStateToProps = state => {
     meshRouteDetail: state.meshRouteManagement.meshRouteDetail,
     meshGatewayList: state.meshGateway.meshGatewayList,
     clusterID: state.current && state.current.config.cluster.id,
+    project: state.current && state.current.config.project.namespace,
     componentList: state.serviceMesh.componentList,
   }
 }
@@ -74,8 +75,13 @@ class NewRouteComponent extends React.Component {
     ],
   }
   componentDidMount() {
-    const { clusterID, getMeshGateway, loadComponent, getMeshRouteDetail, match } = this.props
-    const promises = [ getMeshGateway(clusterID), loadComponent(clusterID, 'kaifacloud') ]
+    const { clusterID,
+      getMeshGateway,
+      loadComponent,
+      getMeshRouteDetail,
+      match,
+      project } = this.props
+    const promises = [ getMeshGateway(clusterID), loadComponent(clusterID, project) ]
     if (match.params.name) {
       promises.push(getMeshRouteDetail(clusterID, match.params.name))
     }
@@ -83,27 +89,17 @@ class NewRouteComponent extends React.Component {
       this.setInitialValue()
       const { meshRouteDetail } = this.props
       const data = meshRouteDetail.data
-      data && this.setActionVersion(data.spec.http[0].route[0].destination.host)
+      if (data && match.params.name) {
+        const { spec } = data
+        this.setActionVersion(data.spec.http[0].route[0].destination.host)
+        this.setState({ visitType: spec.gateways ? 'pub' : 'inner' })
+      }
     })
   }
   setInitialValue = () => {
-    const { meshRouteDetail } = this.props
-    const initialValues = {
-      defaultHostList: [ 0 ],
-      host: [ '' ],
-      defaultRouteKeys: [ 9999 ],
-      defaltGateways: [],
-      defaultVisitType: 'sub',
-      routeConditionkeys: [
-        {
-          matchRule: 'prefix',
-          rule: '',
-          version: [],
-        },
-      ],
-    }
-
-    if (meshRouteDetail.data) {
+    const { meshRouteDetail, match } = this.props
+    let initialValues = {}
+    if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
       initialValues.defaultHostList = []
       initialValues.host = []
@@ -128,6 +124,21 @@ class NewRouteComponent extends React.Component {
           version: defaultVersion,
         }
       })
+    } else {
+      initialValues = {
+        defaultHostList: [ 0 ],
+        host: [ '' ],
+        defaultRouteKeys: [ 9999 ],
+        defaltGateways: [],
+        defaultVisitType: 'pub',
+        routeConditionkeys: [
+          {
+            matchRule: 'prefix',
+            rule: '',
+            version: [],
+          },
+        ],
+      }
     }
     return initialValues
   }
@@ -175,9 +186,9 @@ class NewRouteComponent extends React.Component {
   }
   componentProps = () => {
     const { getFieldDecorator } = this.props.form
-    const { meshRouteDetail } = this.props
+    const { meshRouteDetail, match } = this.props
     let defaultComponent = []
-    if (meshRouteDetail.data) {
+    if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
       defaultComponent = [ spec.http[0].route[0].destination.host ]
     }
@@ -312,6 +323,7 @@ class NewRouteComponent extends React.Component {
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const { actionVersionOptions } = this.state;
+    const { name } = this.props.match.params
     getFieldDecorator('routeKeys', { initialValue: this.setInitialValue().defaultRouteKeys });
     const routeList = getFieldValue('routeKeys');
     const routeConditionkeys = this.setInitialValue().routeConditionkeys
@@ -372,8 +384,7 @@ class NewRouteComponent extends React.Component {
                 </FormItem>
                 <FormItem>
                   {getFieldDecorator(`matchRule[${k}]`, {
-                    initialValue: routeConditionkeys[uniqueKey] &&
-                    routeConditionkeys[uniqueKey].matchRule,
+                    initialValue: name ? (routeConditionkeys[uniqueKey] && routeConditionkeys[uniqueKey].matchRule) : 'prefix',
                   })(
                     <Select
                       style={{ width: 100 }}
@@ -466,7 +477,6 @@ class NewRouteComponent extends React.Component {
     const { validateFields } = this.props.form
     validateFields((err, values) => {
       if (!err) {
-        // console.log(values);
         const { routeConditionkeys,
           matchRule, condition, rule, version, componentSelected } = values
         // 分割数据方法
@@ -517,7 +527,7 @@ class NewRouteComponent extends React.Component {
                 }
                 route.push({
                   destination: {
-                    host: componentSelected[0] ? componentSelected[0] : componentSelected,
+                    host: typeof componentSelected === 'object' ? componentSelected[0] : componentSelected,
                     subset: item,
                   },
                   weight: weightArr[i][n],
@@ -526,7 +536,6 @@ class NewRouteComponent extends React.Component {
             })
             http.push({ match, route })
           }
-
         })
 
         const postData = {
@@ -548,19 +557,25 @@ class NewRouteComponent extends React.Component {
           const meshRouteDetailData = meshRouteDetail.data
           postData.metadata = meshRouteDetailData.metadata
           postData.referencedGateways = meshRouteDetailData.referencedGateways
-          updateMeshRoute(clusterID, postData)
+          updateMeshRoute(clusterID, postData).then(res => {
+            if (res.error) {
+              notification.warn({ message: '修改失败' })
+              return
+            }
+            notification.success({ message: '修改成功' })
+            this.props.history.push('/service-mesh/routes-management')
+
+          })
         } else {
-          createNewRoute(clusterID, postData, {
-            success: {
-              func: () => {
-                // console.log(res);
-              },
-            },
-            failed: {
-              func: () => {
-                // console.log(err);
-              },
-            },
+          createNewRoute(clusterID, postData).then(res => {
+            if (res.status === 409) {
+              notification.warn({
+                message: '规则名称已存在',
+              })
+              return
+            }
+            notification.success({ message: '创建成功' })
+            this.props.history.push('/service-mesh/routes-management')
           })
         }
       }
@@ -584,7 +599,7 @@ class NewRouteComponent extends React.Component {
     };
   }
   render() {
-    const { meshGatewayList } = this.props
+    const { meshGatewayList, getMeshGateway, clusterID } = this.props
 
     const { nameProps, visitTypeProps, componentProps, gatewayProps } = this
     const { gateways } = this.state
@@ -618,6 +633,7 @@ class NewRouteComponent extends React.Component {
               placeholder="请选择组件"
               style={{ width: 200 }}
             >
+
               {
                 this.componentSelection().map(v => <Option value={v.host} key={v.host}>{`${v.host} (${v.versionNum})`}</Option>)
               }
@@ -658,7 +674,7 @@ class NewRouteComponent extends React.Component {
                           )
                         }
                       </FormItem>
-                      <Button icon="sync"/>
+                      <Button icon="sync" onClick={() => getMeshGateway(clusterID)}/>
                       <a href="/service-mesh/mesh-gateway" target="_blank">去创建网关 >></a>
                       <div>
                         {
