@@ -27,7 +27,8 @@ class ProjectCluster extends React.Component {
 
   async componentDidMount() {
     const { getProjectList, projectsList, setProjectConfig } = this.props
-    await getProjectList().then(res => {
+    // get all projects
+    await getProjectList({ size: 0 }).then(res => {
       if (res.error) {
         notification.error({
           message: '获取用户项目失败，请刷新页面重试',

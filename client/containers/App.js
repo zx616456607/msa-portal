@@ -224,8 +224,18 @@ class App extends React.Component {
     }
     const noHeadernoShow = HIDE_NAMESPACE_SWITCH_ROUTES
       .some(regExp => regExp.test(location.pathname))
+    if (noHeadernoShow) {
+      return [
+        children,
+        <Switch key="switch">
+          {
+            appChildRoutes.map(routeProps => <Route {...routeProps} />)
+          }
+        </Switch>,
+      ]
+    }
     // 当没有可用项目时
-    if (noProjectsFlag && !noHeadernoShow) {
+    if (noProjectsFlag) {
       return (
         <div className="noclustersOrPrjects">
           <div className="noclustersOrPrjectsinfoWrap">
@@ -238,7 +248,7 @@ class App extends React.Component {
         </div>)
     }
     // 当没有可用集群时
-    if (noClustersFlag && !noHeadernoShow) {
+    if (noClustersFlag) {
       return (
         <div className="noclustersOrPrjects">
           <div className="noclustersOrPrjectsinfoWrap">
