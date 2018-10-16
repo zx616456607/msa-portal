@@ -41,7 +41,11 @@ export default class GatewayCard extends React.Component {
   render() {
     const { onDelete, showDetail, onEdit, data, id } = this.props
     const out = this.outAddress()
-    const rules = data.referencedVirtualServices || []
+    const rules = []
+    ;(data.referencedVirtualServices || []).map(item => {
+      const name = getDeepValue(item, [ 'metadata', 'name' ])
+      return name && rules.push(name)
+    })
     return (
       <div className="mesh-gateway-card">
         <div className="top">
