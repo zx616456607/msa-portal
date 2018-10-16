@@ -75,7 +75,7 @@ class NewRouteComponent extends React.Component {
   }
   componentDidMount() {
     const { clusterID, getMeshGateway, loadComponent, getMeshRouteDetail, match } = this.props
-    const promises = [ getMeshGateway(clusterID), loadComponent(clusterID) ]
+    const promises = [ getMeshGateway(clusterID), loadComponent(clusterID, 'kaifacloud') ]
     if (match.params.name) {
       promises.push(getMeshRouteDetail(clusterID, match.params.name))
     }
@@ -136,9 +136,10 @@ class NewRouteComponent extends React.Component {
   setActionVersion = val => {
     const { componentList } = this.props
     const actionVersionArr = []
-    componentList.data && componentList.data.forEach(v => {
-      if (v.spec.host === val) {
-        for (const k of v.spec.subsets) {
+    const dataAry = componentList.data || {}
+    Object.keys(dataAry).forEach(v => {
+      if (dataAry[v].spec.host === val) {
+        for (const k of dataAry[v].spec.subsets) {
           actionVersionArr.push({
             label: k.name,
             value: k.labels.version,
@@ -568,14 +569,13 @@ class NewRouteComponent extends React.Component {
   componentSelection = () => {
     const { componentList } = this.props
     const selections = []
-    if (componentList.data && componentList.data.length !== 0) {
-      for (const v of componentList.data) {
-        selections.push({
-          host: v.spec.host,
-          versionNum: v.spec.subsets.length,
-        })
-      }
-    }
+    const dataAry = componentList.data || {}
+    Object.keys(dataAry).forEach(key => {
+      selections.push({
+        host: dataAry[key].spec.host,
+        versionNum: dataAry[key].spec.subsets.length,
+      })
+    })
     return selections
   }
   componentWillUnmount = () => {
