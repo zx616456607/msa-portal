@@ -87,9 +87,9 @@ import { ROLE_SYS_ADMIN } from '../../constants'
 class MsaOm extends React.Component {
   componentDidMount() {
     const { current, history } = this.props
-    if (current.user.info && current.user.info.role !== ROLE_SYS_ADMIN) {
-      history.replace('/')
-    }
+    // if (current.user.info && current.user.info.role !== ROLE_SYS_ADMIN) {
+    //   history.replace('/')
+    // }
   }
 
   renderChildren = () => {
