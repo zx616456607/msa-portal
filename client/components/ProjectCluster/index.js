@@ -26,7 +26,7 @@ class ProjectCluster extends React.Component {
   }
 
   async componentDidMount() {
-    const { getProjectList, projectsList, setProjectConfig } = this.props
+    const { getProjectList, projectConfig, setProjectConfig } = this.props
     // get all projects
     await getProjectList({ size: 0 }).then(res => {
       if (res.error) {
@@ -37,18 +37,21 @@ class ProjectCluster extends React.Component {
       }
 
       let clusterID
+      let defaltNamespace
       if (localStorage) {
         const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
         if (currentConfig) {
           const configArray = currentConfig.split(',')
-          // namespace = configArray[0]
+          defaltNamespace = configArray[0]
           clusterID = configArray[1]
         }
-        const projectItems = projectsList.filter(item =>
-          !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
-        )
+        // const projectItems = projectsList.filter(item =>
+        //   !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+        // )
+        const { namespace } = projectConfig.project
+        const projects = namespace || defaltNamespace
         setProjectConfig({
-          project: { namespace: projectItems[0].namespace },
+          project: { namespace: projects },
           cluster: { id: clusterID },
         })
       }
@@ -139,8 +142,7 @@ class ProjectCluster extends React.Component {
       !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
     )
     const disabledProjectSelect = projectItems.length === 0;
-    const defaultProject = disabledProjectSelect ? undefined : projectItems[0].namespace
-
+    const defaultProject = project ? project.namespace : projectItems[0].namespace
     const disabledClusters = clusters.length === 0;
     return (
       <div id="project-cluster">

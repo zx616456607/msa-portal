@@ -58,25 +58,27 @@ class ApmSetting extends React.Component {
   // }
 
   fetchapmsId = () => {
-    const { loadApms, clusterID } = this.props
+    const { loadApms, clusterID, projectConfig } = this.props
     this.setState({
       isLoading: true,
     })
-    loadApms(clusterID).then(res => {
+    const { namespace } = projectConfig.project
+    loadApms(clusterID, namespace).then(res => {
       if (res.error) return
       this.assemblyState(res.response.result.data.apms[0])
     })
   }
 
   assemblyState = apmId => {
-    const { getApmState, apmList, clusterID } = this.props
+    const { getApmState, apmList, clusterID, projectConfig } = this.props
+    const { namespace } = projectConfig.project
     const { configDetail } = apmList || {}
     if (apmId) {
       const query = {
         id: apmId,
         cluster: clusterID,
       }
-      getApmState(query).then(res => {
+      getApmState(query, namespace).then(res => {
         if (res.error) return
         // TODO: use the status code to show the actual status
         if (res.response.result.data.status === 1) {
@@ -191,8 +193,9 @@ class ApmSetting extends React.Component {
    * 安装
    */
   handleInstall = () => {
-    const { clusterID, postApm } = this.props
+    const { clusterID, postApm, projectConfig } = this.props
     // if (isProject === false) return
+    const { namespace } = projectConfig.project
     this.setState({
       installSate: true,
     })
@@ -202,7 +205,7 @@ class ApmSetting extends React.Component {
       scope: 'namespace',
       displayName: '',
     }
-    postApm(body, clusterID).then(res => {
+    postApm(body, clusterID, namespace).then(res => {
       if (res.error) return
       // this.apmService()
       // this.projectList()
@@ -216,12 +219,13 @@ class ApmSetting extends React.Component {
     })
   }
   handleDel = () => {
-    const { removeApmRow, apmList, clusterID } = this.props
+    const { removeApmRow, apmList, clusterID, projectConfig } = this.props
+    const { namespace } = projectConfig.project
     const body = {
       id: apmList.id,
       cluster: clusterID,
     }
-    removeApmRow(body).then(res => {
+    removeApmRow(body, namespace).then(res => {
       if (res.error) return
       // this.apmService()
       // this.projectList()
