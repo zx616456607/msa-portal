@@ -12,10 +12,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Modal, Form, Input, Select, Icon, notification, Button } from 'antd'
+import { Modal, Form, Input, Select, Icon, notification, Button, Tooltip } from 'antd'
 import './style/GatewayModal.less'
 import * as actions from '../../../actions/meshGateway'
-import { HOSTNAME_REG, IP_REG } from '../../../constants'
+import { IP_REG } from '../../../constants'
 import { getDeepValue } from '../../../common/utils'
 
 const { Option } = Select
@@ -190,7 +190,8 @@ class GatewayModal extends React.Component {
   }
   domainValidator = (rule, value, cb) => {
     if (!value) return cb()
-    if (HOSTNAME_REG.test(value) || IP_REG.test(value)) {
+    const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+    if (domainReg.test(value) || IP_REG.test(value)) {
       return cb()
     }
     cb('请填写正确的服务域名')
@@ -287,10 +288,11 @@ class GatewayModal extends React.Component {
                 initialValue: init.name,
                 rules: [{
                   required: true,
+                  whitespace: true,
                   message: '请输入网关名称',
                 }, {
-                  pattern: /[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/,
-                  message: '网关名称由数字和小写字母组成',
+                  pattern: /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/,
+                  message: '由 3~60 位小写字母、数字、中划线组成，以小写字母开头，小写字母或者数字结尾',
                 }],
               })(
                 <Input
@@ -302,7 +304,14 @@ class GatewayModal extends React.Component {
               )
             }
           </FormItem>
-          <FormItem {...formItemLayout} label="服务网格出口">
+          <FormItem {...formItemLayout} label={
+            <span>
+              服务网格出口
+              <Tooltip title="路由规则对外访问地址（用户自行申请的），为确保路由规则中所填域名能解析到该网关，需在该网关处添加此地址，否则将无法通过该网关对外暴露服务">
+                <Icon type="question-circle" className="outTip" theme="outlined" />
+              </Tooltip>
+            </span>
+          }>
             {
               getFieldDecorator('out', {
                 initialValue: init.out,

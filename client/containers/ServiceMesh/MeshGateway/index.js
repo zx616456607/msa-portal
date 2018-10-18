@@ -21,6 +21,7 @@ import GatewayModal from './GatewayModal'
 import confirm from '../../../components/Modal/confirm'
 import * as actions from '../../../actions/meshGateway'
 import { connect } from 'react-redux'
+import emptyImg from '../../../assets/img/serviceMesh/gatewayEmpty.png'
 
 const Search = Input.Search
 const mapStateToProps = state => {
@@ -119,6 +120,7 @@ export default class MeshGateway extends React.Component {
       meshGatewayList,
       entities: { meshGatewayList: gatewayData, meshIngressGatewayList: ingressData },
     } = this.props
+    const listData = meshGatewayList.data || []
     return (
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
@@ -134,7 +136,7 @@ export default class MeshGateway extends React.Component {
         <Spin spinning={meshGatewayList.isFetching} key="content">
           <div className="content">
             {
-              (meshGatewayList.data || []).filter(gate =>
+              listData.length ? listData.filter(gate =>
                 gate.indexOf(this.state.searchName) > -1
               ).map(id =>
                 <GatewayCard
@@ -146,7 +148,10 @@ export default class MeshGateway extends React.Component {
                   ingressData={ingressData}
                   id={id}
                 />
-              )
+              ) : <div className={'noneIcon'}>
+                <img className={'gateway'} src={emptyImg}/>
+                <div>暂无网关</div>
+              </div>
             }
           </div>
         </Spin>

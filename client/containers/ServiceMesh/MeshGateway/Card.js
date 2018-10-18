@@ -49,7 +49,7 @@ export default class GatewayCard extends React.Component {
     return (
       <div className="mesh-gateway-card">
         <div className="top">
-          <TenxIcon type="routing-manage" className="top-icon"/>
+          <TenxIcon type="gateway-o" className="top-icon"/>
           <span className="card-right">
             <div className="title">
               {`网关 ${data.metadata.name}`}
