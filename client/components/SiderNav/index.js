@@ -422,12 +422,18 @@ class SiderNav extends React.Component {
   }
 
   render() {
-    const { collapsed, currentUser } = this.props
-    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ?
-      // menu.key !== 'msa-om'
-      menus.filter(menu => {
-        return menu.key !== 'k1' && menu.key !== 'k5'
-      }) : menus
+    const { collapsed, currentUser, managedProjects } = this.props
+    const finalMenus = menus.filter(({ key }) => {
+      // filter 系统管理员
+      if (key === 'k1' || key === 'k5') {
+        return currentUser.role === ROLE_SYS_ADMIN
+      }
+      // filter 项目管理员
+      if (key === 'k4' || key === 'msa-om') {
+        return managedProjects.length > 0
+      }
+      return true
+    })
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}
