@@ -40,7 +40,7 @@ export default function confirm(config) {
   iconType = iconType || 'question-circle'
   okType = okType || 'primary'
 
-  const prefixCls = 'ant-confirm'
+  const prefixCls = 'ant-modal-confirm'
   const div = document.createElement('div')
   document.body.appendChild(div)
 
