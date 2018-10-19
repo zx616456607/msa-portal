@@ -138,7 +138,7 @@ export default class MeshGateway extends React.Component {
   }
   render() {
     const {
-      addModal, modalType, modalData, searchName, size, currentPage, gatewayName
+      addModal, modalType, modalData, searchName, size, currentPage, gatewayName,
     } = this.state
     const {
       meshGatewayList,

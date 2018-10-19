@@ -39,7 +39,7 @@ const mapStateToProps = state => {
     clusterID,
     entities,
     meshIngressGatewayList,
-    gatewayLabelList: (meshGatewayList || {}).data || []
+    gatewayLabelList: (meshGatewayList || {}).data || [],
   }
 }
 
