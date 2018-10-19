@@ -81,7 +81,9 @@ class ServiceMeshGraph extends React.Component {
     // }
     const { loadAppList } = this.props
     const projectCluster = await this.props.loadProjectClusterList()
-    const { clusters = {}, projects = [] } = projectCluster.response.result
+    const {
+      clusters = {}, projects = [],
+    } = projectCluster.response && projectCluster.response.result || {}
     const projectsList = projects
       .filter(({ istioEnabledClusterIds }) => istioEnabledClusterIds.length !== 0)
     this.setState({ clusters, projects: projectsList })
