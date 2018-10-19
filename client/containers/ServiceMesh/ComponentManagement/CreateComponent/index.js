@@ -20,7 +20,7 @@ import { AddComponent, fetchServiceList, loadComponent, fetchComponent, editComp
 const FormItem = Form.Item
 const { TextArea } = Input
 const Option = Select.Option
-let uuid = 1
+let uuid = 0
 
 class CreateComponent extends React.Component {
   state = {
@@ -29,12 +29,41 @@ class CreateComponent extends React.Component {
     componentList: [],
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const isAdd = this.props.location.search.split('=')[1]
     this.fetchServiceList()
     if (isAdd === 'false') {
       const componentName = this.props.location.pathname.split('/')[3]
       this.fetchList(componentName)
+    }
+  }
+
+  componentWillUnmount() {
+    uuid = 0
+  }
+
+  setFrom = () => {
+    const keys = []
+    const { componentList } = this.state
+    const { form } = this.props
+    if (componentList) {
+      const obj = {}
+      Object.keys(componentList.metadata.annotations).forEach((item, index) => {
+        keys.push(uuid++)
+        Object.assign(obj, {
+          [`serviceName-${index}`]: item.split('/')[1],
+          [`version-${index}`]: componentList.spec.subsets[index].name,
+        })
+        this.setState({
+          [`service${index}`]: true,
+        })
+      })
+      form.setFieldsValue({
+        keys,
+      })
+      setTimeout(() => {
+        form.setFieldsValue(obj)
+      }, 1000)
     }
   }
 
@@ -52,24 +81,26 @@ class CreateComponent extends React.Component {
   }
 
   fetchList = name => {
-    const { clusterID, fetchComponent } = this.props
+    const { clusterID, namespace, fetchComponent } = this.props
     const query = {
       name,
-      project: 'kaifacloud',
+      project: namespace,
     }
     fetchComponent(clusterID, query).then(res => {
+      if (res.error) {
+        return
+      }
       this.setState({
         componentList: res.response.result,
+      }, () => {
+        this.setFrom()
       })
     })
   }
 
   fetchServiceList = () => {
-    const { clusterID, fetchServiceList } = this.props
-    fetchServiceList(clusterID, 'kaifacloud')
-  }
-
-  handleBack = () => {
+    const { clusterID, namespace, fetchServiceList } = this.props
+    fetchServiceList(clusterID, namespace)
   }
 
   handleAdd = () => {
@@ -96,7 +127,9 @@ class CreateComponent extends React.Component {
     const keys = getFieldValue('keys')
     const query = {}
     keys.forEach(key => {
-      query[`svcName/${getFieldValue(`serviceName-${key}`)}`] = `${getFieldValue(`version-${key}`)}`
+      const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
+      const valueKey = `${getFieldValue(`version-${key}`)}`
+      query[nameKey] = valueKey
     })
     return query
   }
@@ -121,7 +154,7 @@ class CreateComponent extends React.Component {
   handleSubmit = () => {
     const { componentList } = this.state
     const isAdd = this.props.location.search.split('=')[1]
-    const { form, clusterID, AddComponent, editComponent } = this.props
+    const { form, clusterID, namespace, AddComponent, editComponent } = this.props
     form.validateFields((err, value) => {
       if (err) {
         return
@@ -145,7 +178,7 @@ class CreateComponent extends React.Component {
         },
       }
       if (isAdd === 'true') {
-        AddComponent(clusterID, query, 'kaifacloud').then(res => {
+        AddComponent(clusterID, query, namespace).then(res => {
           if (res.error) {
             notification.error({
               message: '添加组件失败',
@@ -158,7 +191,7 @@ class CreateComponent extends React.Component {
           this.props.history.push('/service-mesh/component-management')
         })
       } else {
-        editComponent(clusterID, query, 'kaifacloud').then(res => {
+        editComponent(clusterID, query, namespace).then(res => {
           if (res.error) {
             notification.error({
               message: '修改组件失败',
@@ -184,6 +217,7 @@ class CreateComponent extends React.Component {
         }
         serviceAry.push(query)
       })
+      return serviceAry
     }
   }
 
@@ -215,26 +249,25 @@ class CreateComponent extends React.Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 10 },
     }
-    getFieldDecorator('keys', { initialValue: [ 0 ] })
+    getFieldDecorator('keys', { initialValue: [] })
     const keys = getFieldValue('keys')
-    // if (componentList.length !== 0) {
-    //   this.filterService(componentList)
-    // }
-    const serviceLists = keys.map((res, index) => {
+    const serviceLists = keys.length > 0 ? keys.map(key => {
       return (
-        <Row className="serviceList" key={index}>
+        <Row className="serviceList" key={key}>
           <Col span={6}>
             <FormItem
               {...formItemLayout}
             >
-              {getFieldDecorator(`serviceName-${index}`, {
-                initialValue: undefined,
+              {getFieldDecorator(`serviceName-${key}`, {
               })(
-                <Select placeholder="请选择服务" style={{ width: 120 }}>
+                <Select
+                  placeholder="请选择服务"
+                  style={{ width: 120 }}
+                  disabled={this.state[`service${key}`]}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
                       if (serviceList[item].istioEnabled === true) {
-                        return <Option value={`${Object.keys(serviceList)[index]}`}>
+                        return <Option key={index} value={`${Object.keys(serviceList)[index]}`}>
                           {Object.keys(serviceList)[index]}</Option>
                       }
                       return null
@@ -246,22 +279,32 @@ class CreateComponent extends React.Component {
           </Col>
           <Col span={8}>
             <FormItem>
-              {getFieldDecorator(`version-${index}`, {
+              {getFieldDecorator(`version-${key}`, {
                 rules: [{
-                  // validator: this.versionCheck,
+                  validator: this.versionCheck,
                 }],
-                initialValue: undefined,
               })(
-                <Input placeholder="如：v1, abc" style={{ width: '100%' }} />
+                <Input
+                  placeholder="如：v1, abc"
+                  disabled={this.state[`service${key}`]}
+                  style={{ width: '100%' }} />
               )}
             </FormItem>
           </Col>
           <Col span={6}>
-            <Button onClick={() => this.handleRemove(index)}>删除</Button>
+            <Button
+              type="dashed"
+              icon="delete"
+              disabled={this.state[`service${key}`]}
+              onClick={() => this.handleRemove(key)}></Button>
           </Col>
         </Row>
       )
-    })
+    }) :
+      <Row className="serviceList hintColor noneService" type="flex" align="middle" justify="center">
+        暂无服务
+      </Row>
+
     return (
       <QueueAnim className="create-component">
         <div className="create-component-btn layout-content-btns" keys="btn">
@@ -336,12 +379,15 @@ class CreateComponent extends React.Component {
 
 const mapStateToProps = state => {
   const { current, serviceMesh } = state
-  const { cluster } = current.config
+  const { config } = current
+  const { cluster, project } = config
+  const namespace = project.namespace
   const clusterID = cluster.id
   const { componentServiceList } = serviceMesh
   const serviceList = componentServiceList && componentServiceList.data || []
   return {
     clusterID,
+    namespace,
     serviceList,
   }
 }

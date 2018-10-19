@@ -114,28 +114,28 @@ const menus = [
   {
     key: 'service-mesh',
     to: '/service-mesh',
-    icon: 'share-alt',
+    tenxIcon: 'lift-card',
     name: '治理-服务网格',
     children: [
       {
         key: 'k1',
         to: '/service-mesh',
-        icon: 'question',
+        tenxIcon: 'topology',
         name: '微服务拓扑',
       }, {
         key: 'k-mesh-gateway',
         to: '/service-mesh/mesh-gateway',
-        icon: 'question',
+        tenxIcon: 'gateway-o',
         name: '网关',
       }, {
         key: 'k2',
         to: '/service-mesh/component-management',
-        tenxIcon: 'question',
+        icon: 'bars',
         name: '组件管理',
       }, {
         key: 'k3',
         to: '/service-mesh/routes-management',
-        icon: 'question',
+        tenxIcon: 'routing-manage',
         name: '路由管理',
       },
     ],
@@ -428,12 +428,18 @@ class SiderNav extends React.Component {
   }
 
   render() {
-    const { collapsed, currentUser } = this.props
-    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ?
-      // menu.key !== 'msa-om'
-      menus.filter(menu => {
-        return menu.key !== 'k1' && menu.key !== 'k5'
-      }) : menus
+    const { collapsed, currentUser, managedProjects } = this.props
+    const finalMenus = menus.filter(({ key }) => {
+      // filter 系统管理员
+      if (key === 'k1' || key === 'k5') {
+        return currentUser.role === ROLE_SYS_ADMIN
+      }
+      // filter 项目管理员
+      if (key === 'k4' || key === 'msa-om') {
+        return managedProjects.length > 0
+      }
+      return true
+    })
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}

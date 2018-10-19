@@ -13,7 +13,8 @@
 import React from 'react'
 import QueueAnim from 'rc-queue-anim'
 import { connect } from 'react-redux'
-import { Button, Input, Table, Card, Pagination, Dropdown, Menu, notification } from 'antd'
+import { Button, Input, Table, Card, Pagination, Dropdown, Menu, notification,
+  Tooltip, Icon } from 'antd'
 import { loadVirtualServiceList, deleteVirtualService } from '../../../actions/meshRouteManagement'
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
@@ -27,7 +28,7 @@ class RoutesManagement extends React.Component {
     allList: [],
     searchValue: '',
     loading: false,
-    currentPage: 0,
+    currentPage: 1,
   }
   componentDidMount() {
     this.loadData()
@@ -101,24 +102,43 @@ class RoutesManagement extends React.Component {
         dataIndex: 'name',
         rowKey: 'name',
         title: '路由规则名称',
+        width: '10%',
         render: (text, row) => row.metadata.name,
       },
       {
         dataIndex: 'visitType',
         rowKey: 'visitType',
         title: '访问方式',
+        width: '10%',
         render: (text, row) => (row.spec.gateways ? '公网' : '仅集群内'),
       },
       {
         dataIndex: 'net',
         rowKey: 'net',
         title: '网关',
-        render: (text, row) => (row.spec.gateways ? (row.spec.gateways.join(' / ')) : '-'),
+        render: (text, row) => (row.referencedGateways && row.referencedGateways.length ?
+          (row.referencedGateways.map(item => <div>
+            {item.metadata.name} {
+              item.deleted === true && <Tooltip
+                placement="right"
+                className="warnIcon"
+                title={`该路由规则关联的网关${item.metadata.name}已被删除，请编辑路由规则移除该网关或重新选择其他网关`}>
+                <Icon type="info-circle-o" />
+              </Tooltip>
+            }
+          </div>)) : '-'),
+        // <Tooltip
+        //   placement="right"
+        //   className="warnIcon"
+        //   title="该路由规则关联的网关有变动或某个网关已被删除，请知晓">
+        //   <Icon type="info-circle-o" />
+        // </Tooltip>
       },
       {
         dataIndex: 'type',
         rowKey: 'type',
         title: '路由类型',
+        width: '15%',
         render: (text, row) => {
           let res = '-'
           if (row.spec.http && row.spec.http[0]) {
@@ -135,26 +155,33 @@ class RoutesManagement extends React.Component {
         dataIndex: 'plugins',
         rowKey: 'plugins',
         title: '组件',
+        width: '10%',
         render: (text, record) => {
           return record.spec.http.map(item => {
-            return item.route[0].destination.host
-          }).join(' / ')
+            return <div>
+              {item.route[0].destination.host}
+            </div>
+          })
         },
       },
-      {
-        dataIndex: 'version',
-        rowKey: 'version',
-        title: '作用版本',
-        render: (text, record) => {
-          return record.spec.http.map(item => {
-            return item.route[0].destination.subset
-          }).join(' / ')
-        },
-      },
+      // {
+      //   dataIndex: 'version',
+      //   rowKey: 'version',
+      //   title: '作用版本',
+      //   render: (text, record) => {
+      //     return record.spec.http.map(item => {
+      //       return item.route[0].destination.subset
+      //     }).join(' / ')
+      //   },
+      // },
       {
         dataIndex: 'creationTime',
         rowKey: 'creationTime',
         title: '创建时间',
+        sorter: (a, b) =>
+          new Date(a.metadata.creationTimestamp)
+          <
+          new Date(b.metadata.creationTimestamp),
         render: (text, row) => formatDate(row.metadata.creationTimestamp),
       },
       {
@@ -170,7 +197,7 @@ class RoutesManagement extends React.Component {
         </div>,
       },
     ]
-    const { tempList, searchValue, currentPage } = this.state
+    const { tempList, searchValue, currentPage, loading } = this.state
     const pagination = {
       defaultCurrent: 1,
       total: tempList.length || 0,
@@ -193,14 +220,17 @@ class RoutesManagement extends React.Component {
             onSearch={() => this.filterData()}
           />
         </div>
-        <div className="right">
-          <Pagination simple {...pagination}/>
+        <div className="page-box">
+          <span className="total">共 {tempList.length} 条</span>
+          <Pagination simple {...pagination} />
         </div>
       </div>
       <Card key="table-wrapper">
         <Table
           columns={columns}
           dataSource={tempList}
+          loading={loading}
+          pagination={false}
         />
       </Card>
     </QueueAnim>
