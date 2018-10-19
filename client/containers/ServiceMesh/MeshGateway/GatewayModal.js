@@ -32,13 +32,14 @@ const formItemLayoutWithOutLabel = {
 }
 
 const mapStateToProps = state => {
-  const { current, meshGateway: { meshIngressGatewayList }, entities } = state
+  const { current, meshGateway: { meshIngressGatewayList, meshGatewayList }, entities } = state
   const { cluster } = current.config
   const clusterID = cluster.id
   return {
     clusterID,
     entities,
     meshIngressGatewayList,
+    gatewayLabelList: (meshGatewayList || {}).data || []
   }
 }
 
@@ -196,6 +197,19 @@ class GatewayModal extends React.Component {
     }
     cb('请填写正确的服务域名')
   }
+  validateName = (rule, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    const reg = /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/
+    if (!reg.test(value)) {
+      return cb('由 3~60 位小写字母、数字、中划线组成，以小写字母开头，小写字母或者数字结尾')
+    }
+    if (this.props.gatewayLabelList.includes(value)) {
+      return cb('该名称已存在')
+    }
+    cb()
+  }
   renderItems = (init, onlyLook) => {
     const { form: { getFieldValue, getFieldDecorator } } = this.props
     getFieldDecorator('keys', { initialValue: init.keys })
@@ -291,8 +305,7 @@ class GatewayModal extends React.Component {
                   whitespace: true,
                   message: '请输入网关名称',
                 }, {
-                  pattern: /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/,
-                  message: '由 3~60 位小写字母、数字、中划线组成，以小写字母开头，小写字母或者数字结尾',
+                  validator: this.validateName,
                 }],
               })(
                 <Input
