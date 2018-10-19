@@ -19,7 +19,8 @@ import msaIcon from '../../assets/img/msa-manage/msa.svg'
 import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
 import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
 import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
-import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCallRank, getAllServiceCall } from '../../actions/indexPage'
+import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } from '../../actions/indexPage'
+import { formatDate } from '../../common/utils'
 import './style/index.less'
 
 // const Option = Select.Option
@@ -59,14 +60,13 @@ class IndexPage extends React.Component {
     height: 450,
   }
   componentDidMount() {
-    const { clusterID, getServiceCallRank, getAllServiceCall } = this.props
-    const startTime = new Date() - 7 * 86400
+    const { clusterID, getServiceCall } = this.props
+    const startTime = new Date().getTime() - 7 * 86400000
     const endTime = new Date().getTime()
     this.loadLimitAndRoutesData()
     this.loadMicroservice(startTime, endTime)
     this.loadRpcService()
-    getServiceCallRank(clusterID, { startTime, endTime })
-    getAllServiceCall(clusterID, { startTime, endTime, scaleSize: 7 })
+    getServiceCall(clusterID, { startTime, endTime, scaleSize: 7 })
   }
   loadLimitAndRoutesData = () => {
     const { clusterID, getLimitAndRoutes } = this.props
@@ -81,64 +81,27 @@ class IndexPage extends React.Component {
     getRpcService(clusterID)
   }
 
-
   render() {
     const columns = [
       {
         title: '服务名称',
         dataIndex: 'name',
         key: 'name',
+        width: 100,
       },
       {
         title: '次数',
         dataIndex: 'count',
         key: 'count',
+        width: 100,
       },
     ]
-    const data1 = [
-      {
-        key: 1,
-        name: 'service#1',
-        count: 33,
-      },
-      {
-        key: 2,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 3,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 4,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 5,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 6,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 7,
-        name: 'service#2',
-        count: 33,
-      },
-      {
-        key: 8,
-        name: 'service#2',
-        count: 33,
-      },
-    ]
-
-    const { limitsAndRoutes, microservice, rpcService } = this.props.overView
+    const { periodCallData } = this.props
+    const { limitsAndRoutes,
+      microservice,
+      rpcService,
+      sortedCallService,
+      sortedErrorService, numberOfServiceCall } = this.props.overView
     return (
       <QueueAnim className="index-page">
         <div className="index-page-time-picker">
@@ -479,35 +442,58 @@ class IndexPage extends React.Component {
               <Row gutter={16}>
                 <Col span={12} className="index-page-top-call">
                   <div className="index-page-top-call-success">成功最多服务</div>
-                  <Table
-                    columns={columns}
-                    dataSource={data1}
-                    bordered={true}
-                    size="small"
-                    pagination={false}
-                  />
+                  {
+                    numberOfServiceCall.isFetching ?
+                      <div className="index-page-spinning service-call-spinning">
+                        <Spin/>
+                      </div>
+                      :
+                      <Table
+                        columns={columns}
+                        dataSource={sortedCallService}
+                        bordered={true}
+                        size="small"
+                        pagination={false}
+                        scroll={{ y: 340 }}
+                      />
+                  }
                 </Col>
                 <Col span={12}>
                   <div className="index-page-top-call-failed">失败最多服务</div>
-                  <Table
-                    columns={columns}
-                    dataSource={data1}
-                    bordered={true}
-                    size="small"
-                    pagination={false}
-                  />
+                  {
+                    numberOfServiceCall.isFetching ?
+                      <div className="index-page-spinning service-call-spinning">
+                        <Spin/>
+                      </div>
+                      :
+                      <Table
+                        columns={columns}
+                        dataSource={sortedErrorService}
+                        bordered={true}
+                        size="small"
+                        pagination={false}
+                        scroll={{ y: 340 }}
+                      />
+                  }
                 </Col>
               </Row>
             </Card>
           </Col>
           <Col span={12}>
             <Card hoverable={true} title="所有微服务调用次数" style={{ height: 560 }}>
-              <Chart
-                data={this.state.data}
-                width={this.state.width}
-                height={this.state.height}
-                forceFit={this.state.forceFit}
-              />
+              {
+                numberOfServiceCall.isFetching ?
+                  <div className="index-page-spinning service-call-spinning">
+                    <Spin/>
+                  </div>
+                  :
+                  <Chart
+                    data={periodCallData}
+                    width={this.state.width}
+                    height={this.state.height}
+                    forceFit={this.state.forceFit}
+                  />
+              }
             </Card>
           </Col>
         </Row>
@@ -521,11 +507,33 @@ const mapStateToProps = state => {
   const { cluster } = current.config
   const clusterID = cluster.id
   const { overView } = state
+  const { numberOfServiceCall } = overView
+  let periodCallData = []
+  let sortedCallService = []
+  let sortedErrorService = []
+  if (numberOfServiceCall.data) {
+    sortedCallService = numberOfServiceCall.data.periodCallData
+    sortedErrorService = numberOfServiceCall.data.periodCallData
+    periodCallData = numberOfServiceCall.data.periodCallData
+    sortedErrorService.map(() => {
+      return null
+    })
+    sortedCallService.map(() => {
+      return null
+    })
+    periodCallData.map(item => {
+      item.dateTime = formatDate(item.startTime, 'MM-DD')
+      return null
+    })
+  }
   return {
     errorObject: state.errorObject,
     auth: state.entities.auth,
     clusterID,
     overView,
+    periodCallData,
+    sortedCallService,
+    sortedErrorService,
   }
 }
 
@@ -533,6 +541,5 @@ export default connect(mapStateToProps, {
   getLimitAndRoutes,
   getMicroservice,
   getRpcService,
-  getServiceCallRank,
-  getAllServiceCall,
+  getServiceCall,
 })(IndexPage)

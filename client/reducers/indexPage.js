@@ -81,43 +81,20 @@ const rpcService = (state, action) => {
   }
 }
 
-const callRank = (state, action) => {
+const numberOfServiceCall = (state, action) => {
   switch (action.type) {
-    case ActionTypes.SERVICE_CALL_REQUEST_RANK:
+    case ActionTypes.SERVICE_CALL_REQUEST:
       return {
         ...state,
         isFetching: true,
       }
-    case ActionTypes.SERVICE_CALL_SUCCESS_RANK:
+    case ActionTypes.SERVICE_CALL_SUCCESS:
       return {
         ...state,
         isFetching: false,
         data: action.response.result.data,
       }
-    case ActionTypes.SERVICE_CALL_FAILURE_RANK:
-      return {
-        isFetching: false,
-        ...state,
-      }
-    default:
-      return state
-  }
-}
-
-const allMicroServiceCall = (state, action) => {
-  switch (action.type) {
-    case ActionTypes.ALL_SERVICE_CALL_REQUEST:
-      return {
-        ...state,
-        isFetching: true,
-      }
-    case ActionTypes.ALL_SERVICE_CALL_SUCCESS:
-      return {
-        ...state,
-        isFetching: false,
-        data: action.response.result.data,
-      }
-    case ActionTypes.ALL_SERVICE_CALL_FAILURE:
+    case ActionTypes.SERVICE_CALL_FAILURE:
       return {
         isFetching: false,
         ...state,
@@ -131,15 +108,13 @@ const overView = (state = {
   limitsAndRoutes: { isFetching: true },
   microservice: { isFetching: true },
   rpcService: { isFetching: true },
-  callRank: { isFetching: true },
-  allMicroServiceCall: { isFetching: true },
+  numberOfServiceCall: { isFetching: true },
 }, action) => {
   return {
     limitsAndRoutes: limitsAndRoutes(state.limitsAndRoutes, action),
     microservice: microservice(state.microservice, action),
     rpcService: rpcService(state.rpcService, action),
-    callRank: callRank(state.callRank, action),
-    allMicroServiceCall: allMicroServiceCall(state.allMicroServiceCall, action),
+    numberOfServiceCall: numberOfServiceCall(state.numberOfServiceCall, action),
   }
 }
 

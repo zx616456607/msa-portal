@@ -80,47 +80,24 @@ export const getRpcService = clusterId => {
   return dispatch => dispatch(fetchRpcService(clusterId))
 }
 
-// 服务调用排行
-export const SERVICE_CALL_REQUEST_RANK = 'SERVICE_CALL_REQUEST_RANK'
-export const SERVICE_CALL_SUCCESS_RANK = 'SERVICE_CALL_SUCCESS_RANK'
-export const SERVICE_CALL_FAILURE_RANK = 'SERVICE_CALL_FAILURE_RANK'
-const fetchServiceCallRank = (clusterId, query) => {
+// 服务调用数据
+export const SERVICE_CALL_REQUEST = 'SERVICE_CALL_REQUEST'
+export const SERVICE_CALL_SUCCESS = 'SERVICE_CALL_SUCCESS'
+export const SERVICE_CALL_FAILURE = 'SERVICE_CALL_FAILURE'
+const fetchServiceCall = (clusterId, query) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterId}/overview/call?${toQuerystring(query)}`
   return {
     [CALL_API]: {
       types: [
-        SERVICE_CALL_REQUEST_RANK,
-        SERVICE_CALL_SUCCESS_RANK,
-        SERVICE_CALL_FAILURE_RANK,
+        SERVICE_CALL_REQUEST,
+        SERVICE_CALL_SUCCESS,
+        SERVICE_CALL_FAILURE,
       ],
       endpoint,
       schema: {},
     },
   }
 }
-export const getServiceCallRank = (clusterId, query) => {
-  return dispatch => dispatch(fetchServiceCallRank(clusterId, query))
-}
-
-// 所有微服务调用次数
-export const ALL_SERVICE_CALL_REQUEST = 'ALL_SERVICE_CALL_REQUEST'
-export const ALL_SERVICE_CALL_SUCCESS = 'ALL_SERVICE_CALL_SUCCESS'
-export const ALL_SERVICE_CALL_FAILURE = 'ALL_SERVICE_CALL_FAILURE'
-const fetchAllServiceCall = (clusterId, query) => {
-  const { startTime, endTime, scaleSize } = query
-  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/overview/call?startTime=${startTime}&endTime=${endTime}&scaleSize=${scaleSize}`
-  return {
-    [CALL_API]: {
-      types: [
-        ALL_SERVICE_CALL_REQUEST,
-        ALL_SERVICE_CALL_SUCCESS,
-        ALL_SERVICE_CALL_FAILURE,
-      ],
-      endpoint,
-      schema: {},
-    },
-  }
-}
-export const getAllServiceCall = (clusterId, query) => {
-  return dispatch => dispatch(fetchAllServiceCall(clusterId, query))
+export const getServiceCall = (clusterId, query) => {
+  return dispatch => dispatch(fetchServiceCall(clusterId, query))
 }
