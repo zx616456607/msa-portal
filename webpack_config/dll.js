@@ -12,6 +12,7 @@
 
 const path = require('path')
 const webpack = require('webpack')
+const postcssConfig = require('./postcss')
 
 console.warn('Build webpack dll ...')
 const vendors = [
@@ -39,6 +40,18 @@ const vendors = [
   'redux-thunk',
   'reselect',
   'sockjs-client',
+  '@antv/data-set',
+  '@tenx-ui/ellipsis',
+  '@tenx-ui/icon',
+  '@tenx-ui/loader',
+  '@tenx-ui/modal',
+  '@tenx-ui/page',
+  '@tenx-ui/relation-chart',
+  '@tenx-ui/return-button',
+  '@tenx-ui/select-with-checkbox',
+  '@tenx-ui/webSocket',
+  'react-virtualized',
+  'socket.io-client',
   // ...其它库
 ]
 
@@ -52,6 +65,33 @@ module.exports = {
   mode: 'production',
   entry: {
     lib: vendors,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader',
+          {
+            loader: 'postcss-loader',
+            options: postcssConfig,
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new webpack.DllPlugin({

@@ -60,28 +60,28 @@ function user(state, action) {
   }
 }
 
-function projects(state = {}, action) {
-  switch (action.type) {
-    case ActionTypes.USER_PROJECTS_REQUEST:
-      return {
-        ...state,
-        isFetching: true,
-      }
-    case ActionTypes.USER_PROJECTS_SUCCESS:
-      return {
-        ...state,
-        isFetching: false,
-        ids: action.response.result.data,
-      }
-    case ActionTypes.USER_PROJECTS_FAILURE:
-      return {
-        ...state,
-        isFetching: false,
-      }
-    default:
-      return state
-  }
-}
+// function projects(state = {}, action) {
+//   switch (action.type) {
+//     case ActionTypes.USER_PROJECTS_REQUEST:
+//       return {
+//         ...state,
+//         isFetching: true,
+//       }
+//     case ActionTypes.USER_PROJECTS_SUCCESS:
+//       return {
+//         ...state,
+//         isFetching: false,
+//         ids: action.response.result.data,
+//       }
+//     case ActionTypes.USER_PROJECTS_FAILURE:
+//       return {
+//         ...state,
+//         isFetching: false,
+//       }
+//     default:
+//       return state
+//   }
+// }
 
 function projectsList(state = {}, action) {
   switch (action.type) {
@@ -188,7 +188,7 @@ const current = (state = {
   projectConfig: { project: {}, cluster: {} },
   user: {},
   projects: {},
-  projectsList: {},
+  // projectsList: {},
   clusters: {},
   ui: { collapsed: false },
 }, action) => {
@@ -196,9 +196,10 @@ const current = (state = {
     config: config(state.config, action),
     projectConfig: projectConfig(state.projectConfig, action),
     user: user(state.user, action),
-    projects: projects(state.projects, action),
+    // projects: projects(state.projects, action),
     clusters: clusters(state.clusters, action),
-    projectsList: projectsList(state.projectsList, action),
+    // projectsList: projectsList(state.projectsList, action),
+    projects: projectsList(state.projects, action),
     allClusters: allClusters(state.allClusters, action),
     ui: ui(state.ui, action),
   }

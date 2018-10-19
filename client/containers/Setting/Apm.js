@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import './style/Apm.less'
 import { Row, Col, Select, Button, Modal, Icon, Card, Spin } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import { getUserProjects, getProjectClusters } from '../../actions/current'
+import { getProjectList, getProjectClusters } from '../../actions/current'
 import ProjectCluster from '../../components/ProjectCluster'
 import { postApm, loadApms, getApmState, removeApmRow, getApms, getApmService } from '../../actions/apm'
 import { getGlobalConfigByType } from '../../actions/globalConfig'
@@ -122,8 +122,9 @@ class ApmSetting extends React.Component {
     })
   }
   projectList = () => {
-    const { userId, getUserProjects } = this.props
-    getUserProjects(userId).then(res => {
+    const { getUserProjects } = this.props
+    getUserProjects().then(res => {
+      // console.log('res', res)
       if (res.error) return
       if (res.response.result.code === 200) {
         const projects = []
@@ -366,8 +367,9 @@ const mapStateToProps = state => {
   const aryApmID = []
   const { current, entities, queryApms, springCloudAndApm } = state
   const { cluster, project } = current.config
-  const { projectsList, clusters, apms } = entities
-  const userProjectsList = current.projectsList && current.projectsList.ids || []
+  const { projects: projectsList, clusters, apms } = entities
+  const { projects: { ids: userProjectsList = [] } = {} } = current
+  // const userProjectsList = current.projectsList && current.projectsList.ids || []
   const projectID = current.projects.ids
   const clusterID = cluster.id
   // const clusters = entities.clusters ? entities.clusters[clusterID] : ''
@@ -410,7 +412,7 @@ export default connect(mapStateToProps, {
   getApmState,
   removeApmRow,
   getApmService,
-  getUserProjects,
+  getUserProjects: getProjectList,
   getProjectClusters,
   getGlobalConfigByType,
 })(ApmSetting)
