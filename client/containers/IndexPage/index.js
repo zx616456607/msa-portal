@@ -14,11 +14,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Card, Icon, Table, Spin } from 'antd'
+import TenxIcon from '@tenx-ui/icon'
 import CreateG2 from '../../components/CreateG2'
-import msaIcon from '../../assets/img/msa-manage/msa.svg'
-import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
-import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
-import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
 import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } from '../../actions/indexPage'
 import { formatDate } from '../../common/utils'
 import './style/index.less'
@@ -41,20 +38,6 @@ const Chart = CreateG2(chart => {
 
 class IndexPage extends React.Component {
   state = {
-    data: [
-      { dateTime: '09:59:00', count: 12 },
-      { dateTime: '10:00:00', count: 56 },
-      { dateTime: '10:01:00', count: 78 },
-      { dateTime: '10:02:00', count: 144 },
-      { dateTime: '10:03:00', count: 345 },
-      { dateTime: '10:04:00', count: 567 },
-      { dateTime: '10:05:00', count: 456 },
-      { dateTime: '10:06:00', count: 333 },
-      { dateTime: '10:07:00', count: 233 },
-      { dateTime: '10:08:00', count: 123 },
-      { dateTime: '10:09:00', count: 56 },
-      { dateTime: '10:10:00', count: 35 },
-    ],
     forceFit: true,
     width: 500,
     height: 450,
@@ -121,9 +104,9 @@ class IndexPage extends React.Component {
                         <Row gutter={16}>
                           <Col span={15}>
                             <div className="index-page-overview-left">
-                              <svg>
-                                <use xlinkHref={`#${msaIcon.id}`} />
-                              </svg>
+                              <div className="icon-box">
+                                <TenxIcon type="msa"/>
+                              </div>
                               <div className="index-page-overview-left-title">
                                 REST服务数量
                               </div>
@@ -175,9 +158,9 @@ class IndexPage extends React.Component {
                         <Row gutter={16}>
                           <Col span={15}>
                             <div className="index-page-overview-left">
-                              <svg>
-                                <use xlinkHref={`#${configCenterIcon.id}`} />
-                              </svg>
+                              <div className="icon-box">
+                                <TenxIcon type="config-center"/>
+                              </div>
                               <div className="index-page-overview-left-title">
                                 RPC服务数量
                               </div>
@@ -285,9 +268,9 @@ class IndexPage extends React.Component {
                         <Row gutter={16}>
                           <Col span={15}>
                             <div className="index-page-overview-left">
-                              <svg>
-                                <use xlinkHref={`#${apiGatewayIcon.id}`} />
-                              </svg>
+                              <div className="icon-box">
+                                <TenxIcon type="gateway"/>
+                              </div>
                               <div className="index-page-overview-left-title">
                                 限流规则
                               </div>
@@ -339,9 +322,9 @@ class IndexPage extends React.Component {
                         <Row gutter={16}>
                           <Col span={15}>
                             <div className="index-page-overview-left">
-                              <svg>
-                                <use xlinkHref={`#${routingManageIcon.id}`} />
-                              </svg>
+                              <div className="icon-box">
+                                <TenxIcon type="routing-manage"/>
+                              </div>
                               <div className="index-page-overview-left-title">
                                 路由数量
                               </div>
