@@ -15,12 +15,14 @@
 import React from 'react'
 import './style/index.less'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Input, notification, Spin } from 'antd'
+import { Button, Input, notification, Spin, Pagination } from 'antd'
 import GatewayCard from './Card'
 import GatewayModal from './GatewayModal'
-import confirm from '../../../components/Modal/confirm'
+import '@tenx-ui/modal/assets/index.css'
+import * as modal from '@tenx-ui/modal'
 import * as actions from '../../../actions/meshGateway'
 import { connect } from 'react-redux'
+import emptyImg from '../../../assets/img/serviceMesh/gatewayEmpty.png'
 
 const Search = Input.Search
 const mapStateToProps = state => {
@@ -46,6 +48,8 @@ export default class MeshGateway extends React.Component {
     modalData: {},
     gatewayName: '',
     searchName: '',
+    currentPage: 1,
+    size: 5,
   }
   componentDidMount() {
     this.fetchGateway()
@@ -58,12 +62,14 @@ export default class MeshGateway extends React.Component {
   onSearch = () => {
     this.setState({
       searchName: this.state.gatewayName,
+      currentPage: 1,
     })
   }
   onRefresh = () => {
     this.setState({
       gatewayName: '',
       searchName: '',
+      currentPage: 1,
     })
     this.fetchGateway()
   }
@@ -77,7 +83,7 @@ export default class MeshGateway extends React.Component {
   })
   deleteGateway = id => {
     const { deleteMeshGateway, clusterID, getMeshGateway } = this.props
-    confirm({
+    modal.confirm({
       modalTitle: '删除操作',
       title: `确定删除 ${id} 网关?`,
       content: <div>删除该网关后，已使用此网关的路由策略中的服务将不能通过此网关出口被访问</div>,
@@ -113,12 +119,41 @@ export default class MeshGateway extends React.Component {
       addModal: true,
     })
   }
+  renderCard = (listData, gatewayData, ingressData) => {
+    const { currentPage, size } = this.state
+    return listData.map((id, index) => {
+      if (index >= (currentPage - 1) * size && index < currentPage * size) {
+        return <GatewayCard
+          key={gatewayData[id].metadata.name}
+          onDelete={this.deleteGateway}
+          onEdit={this.editGateway}
+          showDetail={this.showDetail}
+          data={gatewayData[id]}
+          ingressData={ingressData}
+          id={id}
+        />
+      }
+      return null
+    })
+  }
   render() {
-    const { addModal, modalType, modalData } = this.state
+    const {
+      addModal, modalType, modalData, searchName, size, currentPage, gatewayName,
+    } = this.state
     const {
       meshGatewayList,
       entities: { meshGatewayList: gatewayData, meshIngressGatewayList: ingressData },
     } = this.props
+    const listData = (meshGatewayList.data || []).filter(gate =>
+      gate.indexOf(searchName) > -1
+    )
+    const paginationProps = {
+      simple: true,
+      total: listData.length || 0,
+      pageSize: size,
+      current: currentPage,
+      onChange: page => this.setState({ currentPage: page }),
+    }
     return (
       <QueueAnim className="mesh-gateway">
         <div className="layout-content-btns" key="btns">
@@ -129,24 +164,20 @@ export default class MeshGateway extends React.Component {
             style={{ width: 200 }}
             onChange={e => this.setState({ gatewayName: e.target.value })}
             onSearch={this.onSearch}
+            value={gatewayName}
           />
+          <div className="page-box mesh-page">
+            <span className="total">共 {listData.length || 0} 条</span>
+            <Pagination {...paginationProps}/>
+          </div>
         </div>
         <Spin spinning={meshGatewayList.isFetching} key="content">
           <div className="content">
             {
-              (meshGatewayList.data || []).filter(gate =>
-                gate.indexOf(this.state.searchName) > -1
-              ).map(id =>
-                <GatewayCard
-                  key={gatewayData[id].metadata.name}
-                  onDelete={this.deleteGateway}
-                  onEdit={this.editGateway}
-                  showDetail={this.showDetail}
-                  data={gatewayData[id]}
-                  ingressData={ingressData}
-                  id={id}
-                />
-              )
+              listData.length ? this.renderCard(listData, gatewayData, ingressData) : <div className={'noneIcon'}>
+                <img className={'gateway'} src={emptyImg}/>
+                <div>暂无网关</div>
+              </div>
             }
           </div>
         </Spin>
