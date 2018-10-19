@@ -19,6 +19,7 @@ import { loadVirtualServiceList, deleteVirtualService } from '../../../actions/m
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import './style/index.less'
+import { getDeepValue } from '../../../../client/common/utils'
 
 const Search = Input.Search
 
@@ -157,11 +158,13 @@ class RoutesManagement extends React.Component {
         title: '组件',
         width: '10%',
         render: (text, record) => {
-          return record.spec.http.map(item => {
-            return <div>
-              {item.route[0].destination.host}
-            </div>
-          })
+          return getDeepValue(record, [ 'spec', 'http', 0, 'route', 0, 'destination', 'host' ])
+            || '-'
+          // return record.spec.http.map(item => {
+          //   return <div>
+          //     {item.route[0].destination.host}
+          //   </div>
+          // })
         },
       },
       // {
