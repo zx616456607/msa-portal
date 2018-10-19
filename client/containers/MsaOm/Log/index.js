@@ -249,7 +249,7 @@ class Logs extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { clusters, projectsList } = entities
+  const { clusters, projects: projectsList } = entities
   const { cluster } = current.config
   const clusterID = cluster.id
   const projectList = current.projects.ids || []
@@ -260,7 +260,8 @@ const mapStateToProps = state => {
     projectClusters[namespace] = clusterList.map(id => clusters[id])
   })
   const { projectConfig } = current
-  const userProjectsList = current.projectsList && current.projectsList.ids || []
+  const { projects: { ids: userProjectsList = [] } = {} } = current
+  // const userProjectsList = current.projectsList && current.projectsList.ids || []
   return {
     clusterID,
     current: current || {},

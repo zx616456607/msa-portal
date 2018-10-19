@@ -78,27 +78,27 @@ export const getCurrentUser = userID => dispatch => {
   return dispatch(fetchCurrentUser(userID))
 }
 
-export const USER_PROJECTS_REQUEST = 'USER_PROJECTS_REQUEST'
-export const USER_PROJECTS_SUCCESS = 'USER_PROJECTS_SUCCESS'
-export const USER_PROJECTS_FAILURE = 'USER_PROJECTS_FAILURE'
+// export const USER_PROJECTS_REQUEST = 'USER_PROJECTS_REQUEST'
+// export const USER_PROJECTS_SUCCESS = 'USER_PROJECTS_SUCCESS'
+// export const USER_PROJECTS_FAILURE = 'USER_PROJECTS_FAILURE'
 
-// Get projects of user.
-// Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchUserProjects = (userID, query) => {
-  return {
-    [CALL_API]: {
-      types: [ USER_PROJECTS_REQUEST, USER_PROJECTS_SUCCESS, USER_PROJECTS_FAILURE ],
-      endpoint: `/users/${userID}/projects?${toQuerystring(query)}`,
-      schema: Schemas.PROJECT_ARRAY_DATA,
-    },
-  }
-}
+// // Get projects of user.
+// // Relies on the custom API middleware defined in ../middleware/api.js.
+// const fetchUserProjects = (userID, query) => {
+//   return {
+//     [CALL_API]: {
+//       types: [ USER_PROJECTS_REQUEST, USER_PROJECTS_SUCCESS, USER_PROJECTS_FAILURE ],
+//       endpoint: `/users/${userID}/projects?${toQuerystring(query)}`,
+//       schema: Schemas.PROJECT_ARRAY_DATA,
+//     },
+//   }
+// }
 
-// Fetches projects of user.
-// Relies on Redux Thunk middleware.
-export const getUserProjects = (userID, query) => dispatch => {
-  return dispatch(fetchUserProjects(userID, query))
-}
+// // Fetches projects of user.
+// // Relies on Redux Thunk middleware.
+// export const getUserProjects = (userID, query) => dispatch => {
+//   return dispatch(fetchUserProjects(userID, query))
+// }
 
 export const PROJECT_CLUSTERS_REQUEST = 'PROJECT_CLUSTERS_REQUEST'
 export const PROJECT_CLUSTERS_SUCCESS = 'PROJECT_CLUSTERS_SUCCESS'
