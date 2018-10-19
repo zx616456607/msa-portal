@@ -183,7 +183,9 @@ const fetchProjectList = query => {
   return {
     [CALL_API]: {
       types: [ FETCH_PROJECT_LIST_REQUEST, FETCH_PROJECT_LIST_SUCCESS, FETCH_PROJECT_LIST_FAILURE ],
-      endpoint: `/projects/list?${toQuerystring(query)}`,
+      // 使用新的api, 老的api查询速度特别慢
+      // endpoint: `/projects/list?${toQuerystring(query)}`,
+      endpoint: `/projects/listwithoutstatistic?${toQuerystring(query)}`,
       schema: Schemas.PROJECTLIST_ARRAY_DATA,
     },
   }
