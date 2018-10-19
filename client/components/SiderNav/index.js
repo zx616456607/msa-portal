@@ -22,6 +22,12 @@ const SubMenu = Menu.SubMenu
 
 const menus = [
   {
+    to: '/',
+    key: 'overview',
+    name: '微服务总览',
+    icon: 'bar-chart',
+  },
+  {
     to: '/msa-manage',
     key: 'msa-manage',
     name: '治理-SpringCloud',
