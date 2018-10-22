@@ -108,10 +108,11 @@ class NewRouteComponent extends React.Component {
     })
   }
   setInitialValue = () => {
-    const { meshRouteDetail, match } = this.props
+    const { meshRouteDetail, match, componentList } = this.props
     let initialValues = {}
     if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
+      const selectedCom = spec.http[0].route[0].destination.host
       initialValues.defaultHostList = []
       initialValues.host = []
       initialValues.defaultRouteKeys = []
@@ -128,6 +129,10 @@ class NewRouteComponent extends React.Component {
         const { route } = k
         const defaultVersion = []
         route.forEach(item => defaultVersion.push(item.destination.subset))
+        // 当选择的组件被删除的时候，默认选择的作用版本被置空
+        if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) < 0) {
+          defaultVersion.splice(0)
+        }
         initialValues.defaultRouteKeys.push(routeIndex)
         initialValues.routeConditionkeys[routeIndex] = {
           matchRule: Object.keys(k.match[0].uri)[0],
@@ -197,11 +202,14 @@ class NewRouteComponent extends React.Component {
   }
   componentProps = () => {
     const { getFieldDecorator } = this.props.form
-    const { meshRouteDetail, match } = this.props
+    const { meshRouteDetail, match, componentList } = this.props
     let defaultComponent = []
     if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
-      defaultComponent = [ spec.http[0].route[0].destination.host ]
+      const selectedCom = spec.http[0].route[0].destination.host
+      if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) >= 0) {
+        defaultComponent = [ selectedCom ]
+      }
     }
     return getFieldDecorator('componentSelected', {
       initialValue: defaultComponent,
@@ -226,6 +234,7 @@ class NewRouteComponent extends React.Component {
     return getFieldDecorator('gateways', {
       initialValue: this.setInitialValue().defaltGateways,
       // onChange: e => this.setState({ visitType: e.target.value }),
+      rules: [{ required: true, message: '请选择网关' }],
     })
   }
   domainValidator = (rule, value, cb) => {
@@ -250,9 +259,10 @@ class NewRouteComponent extends React.Component {
     cb()
   }
   versionValidator = (rule, value, cb) => {
-    if (value.length === 0) {
-      cb('请选择作用版本')
+    if (!value || value.length === 0) {
+      cb('请至少选择一个版本')
     }
+    cb()
   }
   // 页面渲染相关
   addItem = (key, thisKey) => {
@@ -312,12 +322,17 @@ class NewRouteComponent extends React.Component {
     const { getFieldDecorator, getFieldValue } = this.props.form;
     getFieldDecorator('hostKeys', { initialValue: this.setInitialValue().defaultHostList });
     const hostList = getFieldValue('hostKeys');
+    const { visitType } = this.state
+    const hostTip = visitType === 'pub' ? `服务对外访问地址，用户需自行申请，
+    并确保所填域名或主机名能解析到所选网关的出口ip地址
+    （在选择的网关中添加该域名或主机名）` : '服务集群内访问地址，请填写不冲突的服务名或域名'
     const hostItems = hostList.map((k, index) => {
       return (
         <FormItem
           {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
+          className="host-wrapper"
           label={index === 0 ? <span>服务域名
-            <Tooltip title= "服务对外访问地址，用户需自行申请，并确保所填域名能解析到所选网关的服务地址（在选择的网关中添加该域名）">
+            <Tooltip title= {hostTip}>
               <Icon style={{ marginLeft: 8 }} type="question-circle" theme="outlined" />
             </Tooltip>
           </span> : ''}
@@ -373,7 +388,14 @@ class NewRouteComponent extends React.Component {
           sm: { span: 10, offset: 3 },
         },
       };
+      let matchPrefix,
+        matchWay,
+        matchRule
       const routeConditionsDomList = routeConditionList.map((k, index) => {
+        matchPrefix = getFieldValue(`condition[${k}]`) || 'uri';
+        matchWay = getFieldValue(`matchRule[${k}]`) === 'exact' ? '完全匹配' : '前缀匹配';
+        matchRule = getFieldValue(`rule[${k}]`) || '-';
+
         return (
           <div className="route-item">
             <FormItem
@@ -445,13 +467,16 @@ class NewRouteComponent extends React.Component {
                 </div>
               </div>
             </FormItem>
-
           </div>
         )
       })
-      return routeConditionsDomList
+      return { routeConditionsDomList, matchPrefix, matchWay, matchRule }
     }
     const routesBasedReqContent = routeList.map((k, index) => {
+      const componentSelected = getFieldValue('componentSelected')
+      const versions = componentSelected.length !== 0 ? getFieldValue(`version[${k}]`) || '-' : '-'
+      const tip = `当${routeConditionsItem(k).matchPrefix}${routeConditionsItem(k).matchWay}
+              <${routeConditionsItem(k).matchRule}>，请求将被均衡的发送到 ${JSON.stringify(versions)}`
       return (
         <FormItem
           {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
@@ -481,8 +506,7 @@ class NewRouteComponent extends React.Component {
             <div className="remove-route-item" onClick={() => this.removeItem(k, 'routeKeys')}>
               <Icon type="delete" theme="outlined" />
             </div>
-
-            <div>{routeConditionsItem(k)}</div>
+            <div>{routeConditionsItem(k).routeConditionsDomList}</div>
             <div className="action-version">
               <FormItem
                 label="作用版本"
@@ -500,8 +524,7 @@ class NewRouteComponent extends React.Component {
               <Col span={3}></Col>
               <Col span={20}>
                 <div className="route-item-tip">
-                  当HTTP Header“User-Agent”包含“Chrome”且“User-Agent”包含“Nexus 6P”时，
-                  所有请求将被发送到 ["1.0.1（service1）"]
+                  {tip}
                 </div>
               </Col>
             </Row>
@@ -618,8 +641,10 @@ class NewRouteComponent extends React.Component {
               })
               return
             }
-            notification.success({ message: '创建成功' })
-            this.props.history.push('/service-mesh/routes-management')
+            if (res.type === 'NEW_MESH_ROUTE_SUCCESS') {
+              notification.success({ message: '创建成功' })
+              this.props.history.push('/service-mesh/routes-management')
+            }
           })
         }
       }
@@ -728,18 +753,18 @@ class NewRouteComponent extends React.Component {
                     </div>
                   </div>
                   :
-                  <div className="inner-content">
+                  <div className="tip">
                     该规则中的服务仅提供给集群内其他服务访问
                   </div>
               }
             </div>
           </FormItem>
-          {this.state.visitType === 'pub' && this.renderHosts()}
+          {this.renderHosts()}
           {this.renderRouteItem()}
 
         </Form>
         <div className="new-route-footer">
-          <Button>取消</Button>
+          <Button onClick={() => this.props.history.push('/service-mesh/routes-management')}>取消</Button>
           <Button type="primary" onClick={this.handleSubmit}>确定</Button>
         </div>
       </Card>

@@ -16,6 +16,7 @@ import { connect } from 'react-redux'
 import { Button, Input, Table, Card, Pagination, Dropdown, Menu, notification,
   Tooltip, Icon } from 'antd'
 import { loadVirtualServiceList, deleteVirtualService } from '../../../actions/meshRouteManagement'
+import { loadComponent } from '../../../actions/serviceMesh'
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import './style/index.less'
@@ -37,7 +38,8 @@ class RoutesManagement extends React.Component {
     this.setState({
       loading: true,
     }, () => {
-      const { loadVirtualServiceList, clusterId } = this.props
+      const { loadVirtualServiceList, clusterId, namespace, loadComponent } = this.props
+      loadComponent(clusterId, namespace)
       const query = {
         clusterId,
       }
@@ -157,6 +159,13 @@ class RoutesManagement extends React.Component {
         title: '组件',
         width: '10%',
         render: (text, record) => {
+          const { components } = this.props
+          const { host } = record.spec.http[0].route[0].destination
+          const componentDel = components.findIndex(v => v.metadata.name === host)
+
+          if (componentDel < 0) {
+            return '-'
+          }
           return record.spec.http.map(item => {
             return <div>
               {item.route[0].destination.host}
@@ -239,13 +248,27 @@ class RoutesManagement extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current } = state
+  const { current, serviceMesh } = state
+  const { config } = current
+  const { project } = config
+  const namespace = project.namespace
+  const { componentList } = serviceMesh
+  const { data } = componentList
+  const dataAry = data || {}
+  const components = []
+  Object.keys(dataAry).forEach(key => {
+    components.push(dataAry[key])
+  })
+
   return {
     clusterId: current.config.cluster.id,
+    namespace,
+    components,
   }
 }
 
 export default connect(mapStateToProps, {
+  loadComponent,
   loadVirtualServiceList,
   deleteVirtualService,
 })(RoutesManagement)

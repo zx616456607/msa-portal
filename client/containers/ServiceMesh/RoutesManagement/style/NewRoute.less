@@ -36,7 +36,28 @@
       }
     }
   }
+  .ant-form-horizontal > .ant-form-item {
+    &:nth-child(3) {
+      margin-bottom: 0;
+    }
+  }
+  .host-wrapper {
+    .ant-form-item-label {
+      overflow: visible;
+      span {
+        position: relative;
+        i {
+          position: absolute;
+          top: 2px;
+          right: -21px;
+        }
+      }
+    }
+  }
   .visit-type-inner {
+    .tip {
+      color: @font-color-4;
+    }
     .pub-content {
       .selection {
         display: flex;
