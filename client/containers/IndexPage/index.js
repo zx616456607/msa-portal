@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Row, Col, Card, Icon, Table, Spin, Tooltip } from 'antd'
+import { Row, Col, Card, Icon, Table, Spin } from 'antd'
 import TenxIcon from '@tenx-ui/icon'
 import CreateG2 from '../../components/CreateG2'
 import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } from '../../actions/indexPage'
@@ -118,21 +118,19 @@ class IndexPage extends React.Component {
                           </Col>
                           <Col xl={6} xxl={9}>
                             <Row className="index-page-overview-right-row">
-                              <Tooltip title="可被发现">
-                                <Col span={20} className="over-long">
+                              <Col span={20} className="over-long">
+                                <Ellipsis>
                                   可被发现
-                                </Col>
-                              </Tooltip>
+                                </Ellipsis>
+                              </Col>
                               <Col span={4}>
                                 {microservice.data.discoverableCount}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
-                              <Tooltip title="不可被发现">
-                                <Col span={20} className="over-long">
-                                  不可被发现
-                                </Col>
-                              </Tooltip>
+                              <Col span={20} className="over-long">
+                                <Ellipsis>不可被发现</Ellipsis>
+                              </Col>
                               <Col span={4}>
                                 {microservice.data.undiscoverableCount}
                               </Col>
@@ -383,14 +381,14 @@ class IndexPage extends React.Component {
                         <Row gutter={16}>
                           <Col xl={17} xxl={15}>
                             <Row className="index-page-overview-left">
-                              <div className="icon-box">
+                              <div className="icon-box event-num-icon">
                                 <Icon type="desktop" />
                               </div>
                               <div span={6} className="index-page-overview-left-title">
                                 事件数量
                               </div>
-                              <div className="index-page-overview-left-num">
-                                <Ellipsis length={6}>
+                              <div className="index-page-overview-left-num event-num-text">
+                                <Ellipsis>
                                   {`${microservice.data.eurekaEventLogCount}`}
                                 </Ellipsis>
                               </div>
