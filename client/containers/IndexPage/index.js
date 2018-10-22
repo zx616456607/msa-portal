@@ -13,11 +13,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Row, Col, Card, Icon, Table, Spin } from 'antd'
+import { Row, Col, Card, Icon, Table, Spin, Tooltip } from 'antd'
 import TenxIcon from '@tenx-ui/icon'
 import CreateG2 from '../../components/CreateG2'
 import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } from '../../actions/indexPage'
 import { formatDate } from '../../common/utils'
+import Ellipsis from '@tenx-ui/ellipsis'
 import './style/index.less'
 
 // const Option = Select.Option
@@ -102,7 +103,7 @@ class IndexPage extends React.Component {
                     {
                       microservice.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
+                          <Col xl={18} xxl={15}>
                             <div className="index-page-overview-left">
                               <div className="icon-box">
                                 <TenxIcon type="msa"/>
@@ -115,20 +116,24 @@ class IndexPage extends React.Component {
                               </div>
                             </div>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={6} xxl={9}>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
-                                可被发现
-                              </Col>
-                              <Col span={8}>
+                              <Tooltip title="可被发现">
+                                <Col span={20} className="over-long">
+                                  可被发现
+                                </Col>
+                              </Tooltip>
+                              <Col span={4}>
                                 {microservice.data.discoverableCount}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
-                                不可被发现
-                              </Col>
-                              <Col span={8}>
+                              <Tooltip title="不可被发现">
+                                <Col span={20} className="over-long">
+                                  不可被发现
+                                </Col>
+                              </Tooltip>
+                              <Col span={4}>
                                 {microservice.data.undiscoverableCount}
                               </Col>
                             </Row>
@@ -156,7 +161,7 @@ class IndexPage extends React.Component {
                     {
                       rpcService.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
+                          <Col xl={17} xxl={15}>
                             <div className="index-page-overview-left">
                               <div className="icon-box">
                                 <TenxIcon type="config-center"/>
@@ -169,20 +174,20 @@ class IndexPage extends React.Component {
                               </div>
                             </div>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={7} xxl={9}>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
+                              <Col span={20}>
                                 提供者
                               </Col>
-                              <Col span={8}>
+                              <Col span={4}>
                                 {rpcService.data.providerCount}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
+                              <Col span={20}>
                                 消费者
                               </Col>
-                              <Col span={8}>
+                              <Col span={4}>
                                 {rpcService.data.consumerCount}
                               </Col>
                             </Row>
@@ -376,20 +381,22 @@ class IndexPage extends React.Component {
                     {
                       microservice.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
-                            <div className="index-page-overview-left">
+                          <Col xl={17} xxl={15}>
+                            <Row className="index-page-overview-left">
                               <div className="icon-box">
                                 <Icon type="desktop" />
                               </div>
-                              <div className="index-page-overview-left-title">
+                              <div span={6} className="index-page-overview-left-title">
                                 事件数量
                               </div>
                               <div className="index-page-overview-left-num">
-                                {microservice.data.eurekaEventLogCount}
+                                <Ellipsis length={6}>
+                                  {`${microservice.data.eurekaEventLogCount}`}
+                                </Ellipsis>
                               </div>
-                            </div>
+                            </Row>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={7} xxl={9} className="index-page-overview-right-row-more-padding">
                             <Row className="index-page-overview-right-row">
                               <Col span={16}>
                                 <span className="level critical">严重</span>
