@@ -200,14 +200,7 @@ const menus = [
         name: '调用链路跟踪',
       },
     ],
-  },
-  /* {
-    key: 'k4',
-    to: '/management',
-    icon: 'user',
-    name: '项目管理员',
-  }, */
-  {
+  }, {
     declare: {
       key: 'projectConfig',
       spread: <Tooltip title="作为某项目的管理员,有权限配置项目相关"><span>项目管理员</span></Tooltip>, // 说明文字 | react Node 展开时渲染
@@ -240,14 +233,7 @@ const menus = [
         icon: 'file-text',
       },
     ],
-  },
-  /* {
-    key: 'k5',
-    to: '/management',
-    icon: 'user',
-    name: '系统管理员',
-  }, */
-  {
+  }, {
     declare: {
       key: 'systemConfig',
       spread: <Tooltip title="作为系统管理员,有权限配置系统相关"><span>系统管理员</span></Tooltip>, // 说明文字 | react Node
@@ -459,11 +445,11 @@ class SiderNav extends React.Component {
     const { collapsed, currentUser, managedProjects } = this.props
     const finalMenus = menus.filter(({ key }) => {
       // filter 系统管理员
-      if (key === 'k1' || key === 'k5') {
+      if (key === 'k1') {
         return currentUser.role === ROLE_SYS_ADMIN
       }
       // filter 项目管理员
-      if (key === 'k4' || key === 'msa-om') {
+      if (key === 'msa-om') {
         return managedProjects.length > 0
       }
       return true
