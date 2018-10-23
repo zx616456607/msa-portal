@@ -24,7 +24,7 @@ class MsaDetailConfig extends React.Component {
     refreshConfigLoading: false,
   }
 
-  handleChange = () => {}
+  handleChange = () => { }
 
   loadMsaConfig = () => {
     const { getMsaConfig, clusterID, name, instances } = this.props
@@ -46,11 +46,14 @@ class MsaDetailConfig extends React.Component {
     this.setState({
       refreshConfigLoading: true,
     })
-    refreshMsaConfig(clusterID, `${name}:${instances[0].port}`).then(res => {
+    refreshMsaConfig(clusterID, `${name}:${instances[0].port}`, { isHandleError: true }).then(res => {
       this.setState({
         refreshConfigLoading: false,
       })
-      if (res.error) {
+      if (res.status === 404) {
+        notification.warn({
+          message: '没有相关配置',
+        })
         return
       }
       notification.success({
@@ -89,14 +92,14 @@ class MsaDetailConfig extends React.Component {
       <div className="msaDetailConfig">
         <div className="layout-content-btns">
           <Button type="primary" icon="sync" onClick={this.loadMsaConfig}>
-          刷新
+            刷新
           </Button>
           <Button
             icon="reload"
             onClick={this.refreshConfig}
             loading={this.state.refreshConfigLoading}
           >
-          更新配置
+            更新配置
           </Button>
         </div>
         <Table
