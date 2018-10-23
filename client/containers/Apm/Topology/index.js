@@ -17,7 +17,7 @@ import QueueAnim from 'rc-queue-anim'
 import './style/topology.less'
 import { loadApms } from '../../../actions/apm'
 import { loadPinpointMap, loadPPApps, loadScatterData, fetchAgentData } from '../../../actions/pinpoint'
-import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR } from '../../../constants'
+import { PINPOINT_LIMIT, X_GROUP_UNIT, Y_GROUP_UNIT, TIMES_WITHOUT_YEAR, TOPOLOGY_INTERVAL } from '../../../constants'
 import { formatDate } from '../../../common/utils'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import createG2 from '../../../components/CreateG2'
@@ -168,6 +168,7 @@ const Chart3 = createG2(chart => {
     .size(9)
   chart.render()
 })
+let fetchDataInterval
 class Topology extends React.Component {
   constructor() {
     super()
@@ -466,6 +467,7 @@ class Topology extends React.Component {
     })
   }
   getData = () => {
+    clearInterval(fetchDataInterval)
     const { application, rangeDateTime } = this.state
     if (!application) {
       message.warning('请选择服务')
@@ -475,14 +477,16 @@ class Topology extends React.Component {
       message.warning('请选择开始跟结束时间')
       return
     }
-    this.setState({
-      nodeDataArray: [],
-      linkDataArray: [],
-      topologyLoading: true,
-    })
-    this.loadScatter()
-    this.getPinpointMap()
-    this.getAgentListWithStatus()
+    fetchDataInterval = setInterval(() => {
+      this.setState({
+        nodeDataArray: [],
+        linkDataArray: [],
+        topologyLoading: true,
+      })
+      this.loadScatter()
+      this.getPinpointMap()
+      this.getAgentListWithStatus()
+    }, TOPOLOGY_INTERVAL)
   }
   getAgentListWithStatus = () => {
     const { fetchAgentData, apmID, clusterID } = this.props
@@ -582,6 +586,9 @@ class Topology extends React.Component {
     this.state.topologyData.nodes.forEach(v => {
       v.active = false
     })
+  }
+  componentWillUnmount() {
+    clearInterval(fetchDataInterval)
   }
   render() {
     const {
