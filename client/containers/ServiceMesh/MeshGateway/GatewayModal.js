@@ -198,7 +198,8 @@ class GatewayModal extends React.Component {
     cb('请填写正确的服务域名')
   }
   validateName = (rule, value, cb) => {
-    if (!value) {
+    // 编辑网关名称不可编辑, 不用校验
+    if (this.props.type === 'edit' || !value) {
       return cb()
     }
     const reg = /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/
