@@ -18,6 +18,7 @@ import TenxIcon from '@tenx-ui/icon'
 import CreateG2 from '../../components/CreateG2'
 import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } from '../../actions/indexPage'
 import { formatDate } from '../../common/utils'
+import Ellipsis from '@tenx-ui/ellipsis'
 import './style/index.less'
 
 // const Option = Select.Option
@@ -85,6 +86,7 @@ class IndexPage extends React.Component {
       rpcService,
       sortedCallService,
       sortedErrorService, numberOfServiceCall } = this.props.overView
+    const ellipsisComponent = num => <Ellipsis>{num.toString()}</Ellipsis>
     return (
       <QueueAnim className="index-page">
         <div className="index-page-time-picker">
@@ -102,7 +104,7 @@ class IndexPage extends React.Component {
                     {
                       microservice.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
+                          <Col xl={18} xxl={15}>
                             <div className="index-page-overview-left">
                               <div className="icon-box">
                                 <TenxIcon type="msa"/>
@@ -111,25 +113,27 @@ class IndexPage extends React.Component {
                                 REST服务数量
                               </div>
                               <div className="index-page-overview-left-num">
-                                {microservice.data.restServiceCount}
+                                {ellipsisComponent(microservice.data.restServiceCount)}
                               </div>
                             </div>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={6} xxl={9}>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
-                                可被发现
+                              <Col span={17} className="over-long">
+                                <Ellipsis>
+                                  可被发现
+                                </Ellipsis>
                               </Col>
-                              <Col span={8}>
-                                {microservice.data.discoverableCount}
+                              <Col span={7}>
+                                {ellipsisComponent(microservice.data.discoverableCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
-                                不可被发现
+                              <Col span={17} className="over-long">
+                                <Ellipsis>不可被发现</Ellipsis>
                               </Col>
-                              <Col span={8}>
-                                {microservice.data.undiscoverableCount}
+                              <Col span={7}>
+                                {ellipsisComponent(microservice.data.undiscoverableCount)}
                               </Col>
                             </Row>
                           </Col>
@@ -156,7 +160,7 @@ class IndexPage extends React.Component {
                     {
                       rpcService.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
+                          <Col xl={17} xxl={15}>
                             <div className="index-page-overview-left">
                               <div className="icon-box">
                                 <TenxIcon type="config-center"/>
@@ -165,25 +169,25 @@ class IndexPage extends React.Component {
                                 RPC服务数量
                               </div>
                               <div className="index-page-overview-left-num">
-                                {rpcService.data.rpcServiceCount}
+                                {ellipsisComponent(rpcService.data.rpcServiceCount)}
                               </div>
                             </div>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={7} xxl={9}>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
+                              <Col span={17}>
                                 提供者
                               </Col>
-                              <Col span={8}>
-                                {rpcService.data.providerCount}
+                              <Col span={7}>
+                                {ellipsisComponent(rpcService.data.providerCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
-                              <Col span={16}>
+                              <Col span={17}>
                                 消费者
                               </Col>
-                              <Col span={8}>
-                                {rpcService.data.consumerCount}
+                              <Col span={7}>
+                                {ellipsisComponent(rpcService.data.consumerCount)}
                               </Col>
                             </Row>
                           </Col>
@@ -219,7 +223,7 @@ class IndexPage extends React.Component {
                                 实例数量
                               </div>
                               <div className="index-page-overview-left-num">
-                                {microservice.data.instanceCount}
+                                {ellipsisComponent(microservice.data.instanceCount)}
                               </div>
                             </div>
                           </Col>
@@ -229,7 +233,7 @@ class IndexPage extends React.Component {
                                 up 实例
                               </Col>
                               <Col span={8}>
-                                {microservice.data.upCount}
+                                {ellipsisComponent(microservice.data.upCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
@@ -237,7 +241,7 @@ class IndexPage extends React.Component {
                                 down 实例
                               </Col>
                               <Col span={8}>
-                                {microservice.data.downCount}
+                                {ellipsisComponent(microservice.data.downCount)}
                               </Col>
                             </Row>
                           </Col>
@@ -275,7 +279,7 @@ class IndexPage extends React.Component {
                                 限流规则
                               </div>
                               <div className="index-page-overview-left-num">
-                                {limitsAndRoutes.data.ratelimitCount}
+                                {ellipsisComponent(limitsAndRoutes.data.ratelimitCount)}
                               </div>
                             </div>
                           </Col>
@@ -285,7 +289,7 @@ class IndexPage extends React.Component {
                                 启用规则
                               </Col>
                               <Col span={8}>
-                                {limitsAndRoutes.data.runningRatelimitCount}
+                                {ellipsisComponent(limitsAndRoutes.data.runningRatelimitCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
@@ -293,7 +297,7 @@ class IndexPage extends React.Component {
                                 停用规则
                               </Col>
                               <Col span={8}>
-                                {limitsAndRoutes.data.stoppedRatelimitCount}
+                                {ellipsisComponent(limitsAndRoutes.data.stoppedRatelimitCount)}
                               </Col>
                             </Row>
                           </Col>
@@ -329,7 +333,7 @@ class IndexPage extends React.Component {
                                 路由数量
                               </div>
                               <div className="index-page-overview-left-num">
-                                {limitsAndRoutes.data.routeCount}
+                                {ellipsisComponent(limitsAndRoutes.data.routeCount)}
                               </div>
                             </div>
                           </Col>
@@ -339,7 +343,7 @@ class IndexPage extends React.Component {
                                 running
                               </Col>
                               <Col span={8}>
-                                {limitsAndRoutes.data.runningRouteCount}
+                                {ellipsisComponent(limitsAndRoutes.data.runningRouteCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
@@ -347,7 +351,7 @@ class IndexPage extends React.Component {
                                 stop
                               </Col>
                               <Col span={8}>
-                                {limitsAndRoutes.data.stoppedRouteCount}
+                                {ellipsisComponent(limitsAndRoutes.data.stoppedRouteCount)}
                               </Col>
                             </Row>
                           </Col>
@@ -376,26 +380,26 @@ class IndexPage extends React.Component {
                     {
                       microservice.data ?
                         <Row gutter={16}>
-                          <Col span={15}>
-                            <div className="index-page-overview-left">
-                              <div className="icon-box">
+                          <Col xl={17} xxl={15}>
+                            <Row className="index-page-overview-left">
+                              <div className="icon-box event-num-icon">
                                 <Icon type="desktop" />
                               </div>
-                              <div className="index-page-overview-left-title">
+                              <div span={6} className="index-page-overview-left-title">
                                 事件数量
                               </div>
-                              <div className="index-page-overview-left-num">
-                                {microservice.data.eurekaEventLogCount}
+                              <div className="index-page-overview-left-num event-num-text">
+                                {ellipsisComponent(microservice.data.eurekaEventLogCount)}
                               </div>
-                            </div>
+                            </Row>
                           </Col>
-                          <Col span={9}>
+                          <Col xl={7} xxl={9} className="index-page-overview-right-row-more-padding">
                             <Row className="index-page-overview-right-row">
                               <Col span={16}>
                                 <span className="level critical">严重</span>
                               </Col>
                               <Col span={8}>
-                                {microservice.data.criticalCount}
+                                {ellipsisComponent(microservice.data.criticalCount)}
                               </Col>
                             </Row>
                             <Row className="index-page-overview-right-row">
@@ -403,7 +407,7 @@ class IndexPage extends React.Component {
                                 <span className="level importance">重要</span>
                               </Col>
                               <Col span={8}>
-                                {microservice.data.majorCount}
+                                {ellipsisComponent(microservice.data.majorCount)}
                               </Col>
                             </Row>
                           </Col>

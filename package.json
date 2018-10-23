@@ -23,6 +23,8 @@
     "lint-fix:style": "stylelint \"client/{containers,components,assets}/**/*.less\" --syntax less --fix",
     "pro": "cross-env NODE_ENV=production npm start",
     "start": "node server/index.js | bunyan -o short",
+    "postinstall": "npm run build:dll",
+    "postuninstall": "npm run build:dll",
     "test": "cross-env BABEL_ENV=commonjs jest"
   },
   "repository": {
