@@ -342,10 +342,10 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
   const { entities } = state
-  const { auth, projectsList } = entities
+  const { auth, projects } = entities
   const current = state.current || {}
-  const userProjects = current.projectsList && current.projectsList.ids || []
-  const managedProjects = userProjects.map(namespace => projectsList[namespace])
+  const userProjects = current.projects && current.projects.ids || []
+  const managedProjects = userProjects.map(namespace => projects[namespace])
     .filter(({ outlineRoles }) => !outlineRoles.includes('no-participator') && outlineRoles.includes('manager'))
   return {
     errorObject: state.errorObject,

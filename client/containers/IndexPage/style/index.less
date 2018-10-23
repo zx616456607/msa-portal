@@ -22,26 +22,38 @@
       border-right: 1px solid @border-color-base;
       position: relative;
       clear: both;
-      svg, .icon-box {
+      .icon-box {
         float: left;
-        width: 60px;
         height: 60px;
-        fill: @primary-color;
+        line-height: 60px;
+        i {
+          font-size: 60px;
+          color: @primary-color;
+        }
       }
-      i {
-        font-size: 60px;
-        color: @primary-color;
-      }
+
       &-title {
         margin-left: 16px;
         float: left;
       }
       &-num {
+        width: 15%;
+        height: 60px;
         font-size: 20px;
         margin-right: 16px;
         float: right;
+        text-align: right;
+      }
+      .event-num-text {
+        width: 27%;
       }
     }
+    .over-long {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     &-right-row {
       height: 30px;
       line-height: 30px;
@@ -69,6 +81,9 @@
         &:after {
           background: @warning-color;
         }
+      }
+      &-more-padding {
+        padding-left: 16px !important;
       }
     }
   }

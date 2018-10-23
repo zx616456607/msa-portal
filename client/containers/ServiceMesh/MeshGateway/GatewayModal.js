@@ -198,7 +198,8 @@ class GatewayModal extends React.Component {
     cb('请填写正确的服务域名')
   }
   validateName = (rule, value, cb) => {
-    if (!value) {
+    // 编辑网关名称不可编辑, 不用校验
+    if (this.props.type === 'edit' || !value) {
       return cb()
     }
     const reg = /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/
@@ -221,7 +222,12 @@ class GatewayModal extends React.Component {
             return (
               <FormItem
                 {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-                label={index === 0 ? '解析服务域名' : ''}
+                label={index === 0 ?
+                  <span>解析服务域名
+                    <Tooltip title="路由规则对外访问地址（用户自行申请的），为确保路由规则中所填域名能解析到该网关，需在该网关处添加此地址，否则将无法通过该网关对外暴露服务">
+                      <Icon type="question-circle" className="outTip" theme="outlined" />
+                    </Tooltip>
+                  </span> : ''}
                 required
                 key={k}
               >
@@ -317,14 +323,7 @@ class GatewayModal extends React.Component {
               )
             }
           </FormItem>
-          <FormItem {...formItemLayout} label={
-            <span>
-              服务网格出口
-              <Tooltip title="路由规则对外访问地址（用户自行申请的），为确保路由规则中所填域名能解析到该网关，需在该网关处添加此地址，否则将无法通过该网关对外暴露服务">
-                <Icon type="question-circle" className="outTip" theme="outlined" />
-              </Tooltip>
-            </span>
-          }>
+          <FormItem {...formItemLayout} label="服务网格出口">
             {
               getFieldDecorator('out', {
                 initialValue: init.out,

@@ -180,9 +180,10 @@ class ProjectCluster extends React.Component {
 const mapStateToProps = state => {
   const { entities, current } = state
   const { user } = current
-  const { projectsList, clusters } = entities
+  const { projects: projectsList, clusters } = entities
   const { projectConfig } = current
-  const userProjectsList = current.projectsList && current.projectsList.ids || []
+  const { projects: { ids: userProjectsList = [] } = {} } = current
+  // const userProjectsList = current.projectsList && current.projectsList.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
   const clusterID = current.config.cluster.id

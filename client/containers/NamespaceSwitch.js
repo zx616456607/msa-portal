@@ -38,128 +38,136 @@ class NamespaceSwitch extends React.Component {
 
   async componentDidMount() {
     const {
-      userID,
+      // userID,
       getProjectList,
-      getUserProjects,
+      // getUserProjects,
       setCurrentConfig,
       getProjectClusters,
     } = this.props
-    await getProjectList({ size: 0 })
-    getUserProjects(userID).then(res => {
+    await getProjectList({ size: 0 }).then(res => {
       if (res.error) {
         notification.error({
           message: '获取用户项目失败，请刷新页面重试',
         })
         return
       }
-      // 当非首次登录, 或刷新页面的时候, 从localStorage中读取当前设置namespace和clusterID
-      // 类似一个保存上次设置的功能
-      let namespace
-      let clusterID
-      // let setCurrentConfigFlag
-      let currentNamespace
-      let currentClusterID
-      const myProjectList = this.props.projectsList.
-        filter(({ outlineRoles }) => !outlineRoles.includes('no-participator'))
-      const namespaceList = myProjectList.map(({ namespace }) => namespace)
-      if (localStorage) {
-        const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
-        if (currentConfig) {
-          const configArray = currentConfig.split(',')
-          namespace = configArray[0]
-          clusterID = configArray[1]
-          currentNamespace = namespace
-          currentClusterID = clusterID
-          if (!namespaceList.includes(namespace)) {
+      // console.log('用户信息', this.props.projectsList)
+    })
+    // getUserProjects(userID).then(res => {
+    //   console.log('resProject', res)
+    //   if (res.error) {
+    //     notification.error({
+    //       message: '获取用户项目失败，请刷新页面重试',
+    //     })
+    //     return
+    //   }
+    // })
+    // 当非首次登录, 或刷新页面的时候, 从localStorage中读取当前设置namespace和clusterID
+    // 类似一个保存上次设置的功能
+    let namespace
+    let clusterID
+    let currentNamespace
+    let currentClusterID
+    const myProjectList = this.props.projects.
+      filter(({ outlineRoles }) => !outlineRoles.includes('no-participator'))
+    const namespaceList = myProjectList.map(({ namespace }) => namespace)
+    if (localStorage) {
+      const currentConfig = localStorage.getItem(USER_CURRENT_CONFIG)
+      if (currentConfig) {
+        const configArray = currentConfig.split(',')
+        namespace = configArray[0]
+        clusterID = configArray[1]
+        currentNamespace = namespace
+        currentClusterID = clusterID
+        if (!namespaceList.includes(namespace)) {
+          setCurrentConfig({
+            project: { },
+            cluster: { },
+          })
+        } else {
+          if (clusterID === '') {
             setCurrentConfig({
-              project: { },
+              project: { namespace },
               cluster: { },
             })
           } else {
-            if (clusterID === '') {
-              setCurrentConfig({
-                project: { namespace },
-                cluster: { },
-              })
-            } else {
-              setCurrentConfig({
-                project: { namespace },
-                cluster: { id: clusterID },
-              })
-            }
+            setCurrentConfig({
+              project: { namespace },
+              cluster: { id: clusterID },
+            })
           }
         }
       }
-      const projects = res.response.entities.projects || {}
-      let projectsText
-      let clustersText
-      const handleProjectClusters = (clusters, clustersObj) => {
-        if (!clusters || clusters.length === 0) {
-          this.setState({
-            clustersText: '...',
-          })
-          setCurrentConfig({ space: { noClustersFlag: true },
-          })
-          return
-        }
-        let currentCluster
-        // 判断localStorage 中的clusterID 是否真的还存在, 如果真的存在就使用, 如果
-        // 不存在的了, 就默认使用第一个
-        clusters.every(id => {
-          const cluster = clustersObj[id]
-          if (id === clusterID) {
-            currentCluster = cluster
-            return false
-          }
-          return true
-        })
-        if (!currentCluster) {
-          currentCluster = clustersObj[clusters[0]]
-        }
-        clusterID = currentCluster.clusterID
-        clustersText = currentCluster.clusterName
+    }
+    // const projects = res.response.entities.projects || {}
+    let projectsText
+    let clustersText
+    const handleProjectClusters = (clusters, clustersObj) => {
+      if (!clusters || clusters.length === 0) {
         this.setState({
-          projectsText,
-          clustersText,
-        })
-        if (namespace !== currentNamespace || clusterID !== currentClusterID) {
-          setCurrentConfig({
-            project: { namespace },
-            cluster: { id: clusterID },
-          })
-        }
-      }
-      if (myProjectList.length === 0) { // 如果当前账户没有可用项目,则显示对应页面
-        this.setState({
-          projectsText: '...',
           clustersText: '...',
         })
-        setCurrentConfig({ space: { noProjectsFlag: true } })
+        setCurrentConfig({ space: { noClustersFlag: true } })
         return
       }
-      // 如果上次保存中没有此次登录中的集群,或者localStorage中并没有保存上次的namespace 默认使用第一个
-      if (!namespace || !namespaceList.includes(namespace)) {
-        namespace = myProjectList[0].namespace
-        setCurrentConfig({
-          project: { namespace },
-          cluster: { },
-        })
+      let currentCluster
+      // 判断localStorage 中的clusterID 是否真的还存在, 如果真的存在就使用, 如果
+      // 不存在的了, 就默认使用第一个
+      clusters.every(id => {
+        const cluster = clustersObj[id]
+        if (id === clusterID) {
+          currentCluster = cluster
+          return false
+        }
+        return true
+      })
+      if (!currentCluster) {
+        currentCluster = clustersObj[clusters[0]]
       }
-      projectsText = projects && projects[namespace] && projects[namespace].projectName
+      clusterID = currentCluster.clusterID
+      clustersText = currentCluster.clusterName
       this.setState({
         projectsText,
+        clustersText,
       })
-      getProjectClusters(namespace).then(res => {
-        if (res.error) {
-          notification.error({
-            message: '获取集群失败，请刷新页面重试',
-          })
-          return
-        }
-        const clustersObj = res.response.entities.clusters
-        const clusters = res.response.result.data.clusters
-        handleProjectClusters(clusters, clustersObj)
+      if (namespace !== currentNamespace || clusterID !== currentClusterID) {
+        setCurrentConfig({
+          project: { namespace },
+          cluster: { id: clusterID },
+        })
+      }
+    }
+    if (myProjectList.length === 0) { // 如果当前账户没有可用项目,则显示对应页面
+      this.setState({
+        projectsText: '...',
+        clustersText: '...',
       })
+      setCurrentConfig({ space: { noProjectsFlag: true } })
+      return
+    }
+    // 如果上次保存中没有此次登录中的集群,或者localStorage中并没有保存上次的namespace 默认使用第一个
+    if (!namespace || !namespaceList.includes(namespace)) {
+      namespace = myProjectList[0].namespace
+      setCurrentConfig({
+        project: { namespace },
+        cluster: { },
+      })
+    }
+    projectsText = myProjectList
+      .filter(({ namespace: innernamespace }) => namespace === innernamespace)[0].projectName || '...'
+    this.setState({
+      projectsText,
+    })
+    getProjectClusters(namespace).then(res => {
+      if (res.error) {
+        notification.error({
+          message: '获取集群失败，请刷新页面重试',
+        })
+        return
+      }
+      const clustersObj = res.response.entities.clusters
+      const clusters = res.response.result.data.clusters
+      handleProjectClusters(clusters, clustersObj)
     })
   }
 
@@ -240,7 +248,7 @@ class NamespaceSwitch extends React.Component {
       projectClusters,
       className,
       noSelfClassName,
-      projectsList,
+      projects: projectsList,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -360,9 +368,9 @@ class NamespaceSwitch extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { projects, projectsList, clusters } = entities
+  const { projects, clusters } = entities
   const userProjects = current.projects && current.projects.ids || []
-  const userProjectsList = current.projectsList && current.projectsList.ids || []
+  // const userProjectsList = current.projectsList && current.projectsList.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
   Object.keys(currentClusters).forEach(namespace => {
@@ -373,7 +381,7 @@ const mapStateToProps = state => {
   return {
     current: current || {},
     projects: userProjects.map(namespace => projects[namespace]),
-    projectsList: userProjectsList.map(namespace => projectsList[namespace]),
+    // projectsList: userProjectsList.map(namespace => projectsList[namespace]),
     projectClusters,
   }
 }
