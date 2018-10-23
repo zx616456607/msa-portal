@@ -246,7 +246,11 @@ class CreateComponent extends React.Component {
     const { form, serviceList } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const formItemLayout = {
-      labelCol: { span: 5 },
+      labelCol: { span: 2 },
+      wrapperCol: { span: 13 },
+    }
+    const serviceLayout = {
+      labelCol: { span: 2 },
       wrapperCol: { span: 10 },
     }
     getFieldDecorator('keys', { initialValue: [] })
@@ -254,15 +258,15 @@ class CreateComponent extends React.Component {
     const serviceLists = keys.length > 0 ? keys.map(key => {
       return (
         <Row className="serviceList" key={key}>
-          <Col span={6}>
+          <Col span={9} className="service">
             <FormItem
-              {...formItemLayout}
+              {...serviceLayout}
             >
               {getFieldDecorator(`serviceName-${key}`, {
               })(
                 <Select
                   placeholder="请选择服务"
-                  style={{ width: 120 }}
+                  style={{ width: '250%' }}
                   disabled={this.state[`service${key}`]}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
@@ -277,13 +281,15 @@ class CreateComponent extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={8}>
-            <FormItem>
+          <Col span={9}>
+            <FormItem
+            >
               {getFieldDecorator(`version-${key}`, {
                 rules: [{
                   validator: this.versionCheck,
                 }],
-              })(
+              }
+              )(
                 <Input
                   placeholder="如：v1, abc"
                   disabled={this.state[`service${key}`]}
@@ -291,12 +297,12 @@ class CreateComponent extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <Button
               type="dashed"
-              icon="delete"
-              disabled={this.state[`service${key}`]}
-              onClick={() => this.handleRemove(key)}></Button>
+              // icon="delete"
+              // disabled={this.state[`service${key}`]}
+              onClick={() => this.handleRemove(key)}><Icon type="delete" /></Button>
           </Col>
         </Row>
       )
@@ -312,9 +318,9 @@ class CreateComponent extends React.Component {
             <span className="backjia"></span>
             <span className="btn-back" onClick={() =>
               this.props.history.push('/service-mesh/component-management')
-            }>返回</span>
+            }>返回组件管理列表</span>
           </div>
-          <div className="title">{isAdd ? '添加组件' : '编辑组件'}</div>
+          <div className="title">{isAdd ? '创建组件' : '编辑组件'}</div>
         </div>
         <Card className="create-component-body">
           <div>
@@ -324,14 +330,14 @@ class CreateComponent extends React.Component {
                   rules: [
                     {
                       required: true,
-                      message: '请输入路由名称',
+                      message: '请输入组件名称',
                     }, {
                       validator: this.nameCheck,
                     }],
                   initialValue: componentList.length !== 0 ?
                     componentList.metadata.name : undefined,
                 })(
-                  <Input className="selects" placeholder="" disabled={!isAdd} />
+                  <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
                 )}
               </FormItem>
             </Row>
@@ -341,26 +347,26 @@ class CreateComponent extends React.Component {
                   initialValue: undefined,
                   rules: [{ pattern: '', whitespace: true, message: '' }],
                 })(
-                  <TextArea rows={4} />
+                  <TextArea className="area" rows={4} placeholder="请输入描述" />
                 )}
               </FormItem>
             </Row>
-            <div className="dotted" />
+            <div className="dotted"><span>关联服务</span></div>
           </div>
           <div>
             <div className="form-title">
               <Row>
                 <span className="service">选择服务</span>
-                <Button onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
+                <Button type="primary" ghost onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
                 <span className="service-desc">
                   <Icon type="info-circle-o" />
                   解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效
                 </span>
               </Row>
               <Row className="serviceHeader">
-                <Col span={6}>服务</Col>
-                <Col span={7}>组件服务版本</Col>
-                <Col span={3} offset={1}>操作</Col>
+                <Col span={9}>服务</Col>
+                <Col span={9}>组件服务版本</Col>
+                <Col span={6}>操作</Col>
               </Row>
               {serviceLists}
             </div>

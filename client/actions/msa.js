@@ -308,9 +308,10 @@ export const MSA_CONFIG_REFRESH_REQUEST = 'MSA_CONFIG_REFRESH_REQUEST'
 export const MSA_CONFIG_REFRESH_SUCCESS = 'MSA_CONFIG_REFRESH_SUCCESS'
 export const MSA_CONFIG_REFRESH_FAILURE = 'MSA_CONFIG_REFRESH_FAILURE'
 
-const fetchRefreshMsaConfig = (clusterID, serviceInfo) => {
+const fetchRefreshMsaConfig = (clusterID, serviceInfo, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/bus/refresh`
   return {
+    options,
     [CALL_API]: {
       types: [ MSA_CONFIG_REFRESH_REQUEST, MSA_CONFIG_REFRESH_SUCCESS, MSA_CONFIG_REFRESH_FAILURE ],
       endpoint,
@@ -322,9 +323,9 @@ const fetchRefreshMsaConfig = (clusterID, serviceInfo) => {
   }
 }
 
-export function refreshMsaConfig(clusterID, serviceInfo) {
+export function refreshMsaConfig(clusterID, serviceInfo, options) {
   return dispatch => {
-    return dispatch(fetchRefreshMsaConfig(clusterID, serviceInfo))
+    return dispatch(fetchRefreshMsaConfig(clusterID, serviceInfo, options))
   }
 }
 

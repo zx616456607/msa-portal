@@ -198,7 +198,7 @@ class ComponentDetail extends React.Component {
     }, {
       title: '操作',
       render: record => <div>
-        <Button onClick={() => this.handleDelete(record)}>删除</Button>
+        <Button onClick={() => this.handleDelete(record)}>移除</Button>
       </div>,
     }]
     const { metadata } = detailList
@@ -266,7 +266,7 @@ class ComponentDetail extends React.Component {
               <img src={componentImg} />
             </div>
             <div className="desc">
-              <h2>实例名称：{metadata && metadata.name}</h2>
+              <h2>组件名称：{metadata && metadata.name}</h2>
               <div className="descs">
                 <div>创建时间：{formatDate(metadata && metadata.creationTimestamp)}</div>
                 <div>描述：</div>
