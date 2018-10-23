@@ -16,6 +16,8 @@ const isProd = process.env.NODE_ENV === 'production'
 // dev api config
 const PAAS_API_PROTOCOL = isProd ? 'http:' : 'http:'
 const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.230:48000'
+// const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.59:9001'
+
 const PAAS_API_PREFIX = '/api/v2'
 const PAAS_SPI_PREFIX = '/spi/v2'
 const SERVICEMESH_API_PREFIX = '/api/v3'
@@ -173,6 +175,7 @@ export const METRICS_DISK_READ = 'disk/readio'
 export const METRICS_DISK_WRITE = 'disk/writeio'
 export const UPDATE_INTERVAL = 1000 * 60
 export const REALTIME_INTERVAL = 1000 * 10 // 实时监控
+export const TOPOLOGY_INTERVAL = 1000 * 60 // 微服务拓补图自动刷新间隔时间
 export const FRESH_FREQUENCY = {
   1: {
     freshInterval: '1分钟',
