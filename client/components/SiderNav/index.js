@@ -142,6 +142,20 @@ const menus = [
     ],
   },
   {
+    key: 'dubbo',
+    to: '/dubbo',
+    tenxIcon: 'lift-card',
+    name: '治理-Dubbo',
+    children: [
+      {
+        key: 'dubbo-list',
+        to: '/dubbo/dubbo-manage',
+        tenxIcon: 'topology',
+        name: 'Dubbo 服务列表',
+      },
+    ],
+  },
+  {
     key: 'k3',
     to: '/csb-instances',
     icon: 'fork',
