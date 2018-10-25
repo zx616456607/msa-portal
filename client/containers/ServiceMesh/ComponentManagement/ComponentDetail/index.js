@@ -18,6 +18,7 @@ import { formatDate } from '../../../../common/utils'
 import componentImg from '../../../../assets/img/serviceMesh/component.png'
 import { fetchComponent, editComponent, fetchServiceList } from '../../../../actions/serviceMesh'
 import './style/index.less'
+import { ServiceAddressTip } from '../AddressTip'
 
 const TabPane = Tabs.TabPane
 const FormItem = Form.Item
@@ -191,6 +192,15 @@ class ComponentDetail extends React.Component {
     }, {
       title: '组件服务版本',
       dataIndex: 'version',
+    }, {
+      title: '服务地址',
+      dataIndex: 'address',
+      render: (text, record) => {
+        const serviceName = record.name.split('/')[1]
+        return <div className="AddressTipWrape">
+          <ServiceAddressTip dataList={[ serviceName ]}
+            parentNode={'AddressTipWrape'}/></div>
+      },
     }, {
       title: '路由规则',
       width: '25%',

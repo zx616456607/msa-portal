@@ -41,7 +41,7 @@ const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   /^\/csb/, /msa-om\/csb-/,
   /^\/setting/, /^\/msa-om/,
   /^\/msa-om\/log/,
-  // /^\/service-mesh/,
+  /^\/service-mesh$/,
 ]
 
 class App extends React.Component {
@@ -59,7 +59,7 @@ class App extends React.Component {
     toggleCollapsed: PropTypes.func.isRequired,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const {
       getAuth,
       getCurrentUser,
@@ -68,8 +68,9 @@ class App extends React.Component {
     } = this.props
     const { pathname, search, hash } = location
     const query = parse(search)
-    const { username, token, jwt, authUrl, ...otherQuery } = query
-    getAuth({ username, token, jwt }).then(res => {
+    const { username, token, jwt, authUrl, redirectclusterID, redirectNamespace,
+      ...otherQuery } = query
+    await getAuth({ username, token, jwt }).then(res => {
       if (res.type === indexActions.AUTH_FAILURE) {
         Modal.error({
           title: '认证失败',
@@ -91,6 +92,14 @@ class App extends React.Component {
       // Get user detail info
       return getCurrentUser(userID)
     })
+    if (!!redirectclusterID && !!redirectNamespace) {
+      this.props.setCurrentConfig({
+        project: {
+          namespace: redirectNamespace,
+        },
+        cluster: { id: redirectclusterID },
+      })
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -361,4 +370,5 @@ export default connect(mapStateToProps, {
   getAuth: indexActions.getAuth,
   getCurrentUser: currentActions.getCurrentUser,
   toggleCollapsed: currentActions.toggleCollapsed,
+  setCurrentConfig: currentActions.setCurrentConfig,
 })(App)
