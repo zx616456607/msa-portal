@@ -1,0 +1,74 @@
+@import "../../../../../assets/style/core/index.less";
+.AddressTip {
+  .checkAddress {
+    cursor: pointer;
+    color: @primary-color;
+    &:hover {
+      color: @a-hover-color;
+    }
+  }
+}
+
+.Tip {
+  position: relative;
+  .line {
+    position: absolute;
+    left: 0;
+    bottom: 25px;
+    height: 1px;
+    width: 100%;
+    border-top: 1px dashed @border-color-base;
+  }
+  &:last-child {
+  .line {
+    border: 0;
+  }
+  }
+  .ant-timeline-item-head-custom {
+    margin-top: 0;
+    padding: 0;
+  }
+  .ant-timeline-item-tail {
+    border-left: 1px solid @primary-color;
+    height: 36px !important;
+    top: 3px;
+  }
+  .ant-timeline-item-content {
+    // padding: 0 0 10px 5px;
+    // overflow: hidden;
+    border-left: 1px solid #2db7f5;
+    margin-left: 4px;
+    top: -16px;
+  }
+  .ant-timeline-item-last .ant-timeline-item-content {
+    min-height: inherit;
+    border-left: 0;
+  }
+  .branchSvg {
+    width: 23px;
+    height: 9px;
+    margin-right: 8px;
+    font-size: 12px;
+    transform: scale(0.68);
+    margin-left: -3px;
+    color: @primary-color;
+  }
+  .primary {
+    color: @primary-color;
+  }
+  .ant-timeline-item.ant-timeline-item-last {
+    background-color: white;
+  }
+  .routerAddress {
+    padding-left: 27px;
+  }
+  .marginCopy {
+    margin-left: @padding-base;
+  }
+  .noRouterAddress {
+    color: @font-color-4;
+    padding-top: @padding-base;
+    padding-left: 20px;
+    font-size: @font-size-base;
+  }
+}
