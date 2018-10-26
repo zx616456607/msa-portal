@@ -16,7 +16,7 @@ import { Row, Col, Steps, Icon, Tooltip } from 'antd'
 import './style/ExpandRowSteps.less'
 import classNames from 'classnames'
 import cloneDeep from 'lodash/cloneDeep'
-import TenxIcon from '@tenx-ui/icon/lib/index.js'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const Step = Steps.Step
 const STEP_SIZE = 5

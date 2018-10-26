@@ -10,7 +10,7 @@
 import * as React from 'react'
 import { Popover, Timeline, Spin, Tooltip } from 'antd'
 import './styles/index.less'
-import TenxIcon from '@tenx-ui/icon'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 import { connect } from 'react-redux';
 import * as serviceMeshActions from '../../../../actions/serviceMesh'
 import { getDeepValue } from '../../../../common/utils';
@@ -132,7 +132,7 @@ class Tip extends React.Component<TipProps, TipState> {
           </Timeline.Item>)
         }
         <Timeline.Item dot={<div></div>}>
-            <TenxIcon type="branch"  className='branchSvg'/>
+            <TenxIcon type="branch"  className='branchSvg' />
             <span className="primary">路由地址</span>
             <div className="primary">
               <div>
@@ -153,7 +153,7 @@ class Tip extends React.Component<TipProps, TipState> {
                 {
                   matchType === 'prefix' &&
                 <Tooltip title='匹配前缀'>
-                  <TenxIcon type="copy" className="marginCopy"/>
+                  <TenxIcon type="match" className="marginCopy"/>
                 </Tooltip>
                 }
                 </div>) : <div className="noRouterAddress">未设置路由规则暂无地址</div>

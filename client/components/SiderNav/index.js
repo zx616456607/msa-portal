@@ -15,7 +15,7 @@ import { Link, withRouter } from 'react-router-dom'
 import './style/index.less'
 import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
-import TenxIcon from '@tenx-ui/icon'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu

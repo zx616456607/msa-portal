@@ -1,7 +1,7 @@
 /**
  * Licensed Materials - Property of tenxcloud.com
  * (C) Copyright 2018 TenxCloud. All Rights Reserved.
-*/
+ */
 
 /**
  *
@@ -15,7 +15,7 @@
 import React from 'react'
 import './style/Card.less'
 import { Icon, Popover, Tooltip } from 'antd'
-import TenxIcon from '@tenx-ui/icon'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { getDeepValue } from '../../../common/utils'
 
