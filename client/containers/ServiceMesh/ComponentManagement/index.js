@@ -44,22 +44,13 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    const { clusterID, namespace, fetchComponent } = this.props
+    const { clusterID, namespace } = this.props
     const { componentName } = this.state
-    const query = {
-      name: componentName,
-      project: namespace,
-    }
     if (componentName) {
-      fetchComponent(clusterID, query).then(res => {
-        if (res.error) {
-          return
-        }
-        const listAry = []
-        listAry.push(res.response.result)
-        this.setState({
-          searchList: listAry,
-        })
+      const dataList = this.filterData()
+      const filterList = dataList.filter(item => item.name === componentName)
+      this.setState({
+        searchList: filterList,
       })
     } else {
       this.setState({
