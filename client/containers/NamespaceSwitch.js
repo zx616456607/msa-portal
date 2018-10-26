@@ -18,7 +18,7 @@ import { USER_CURRENT_CONFIG } from '../constants'
 import './style/NamespaceSwitch.less'
 import {
   setCurrentConfig,
-  getUserProjects,
+  // getUserProjects,
   getProjectList,
   getProjectClusters,
 } from '../actions/current'
@@ -389,6 +389,6 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   setCurrentConfig,
   getProjectList,
-  getUserProjects,
+  // getUserProjects,
   getProjectClusters,
 })(NamespaceSwitch)

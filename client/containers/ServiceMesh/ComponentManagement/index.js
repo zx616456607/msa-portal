@@ -18,6 +18,7 @@ import { formatDate } from '../../../common/utils'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
 import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
 import './style/index.less'
+import AddressTip from './AddressTip';
 
 const Search = Input.Search
 
@@ -43,22 +44,13 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    const { clusterID, namespace, fetchComponent } = this.props
+    // const { clusterID, namespace } = this.props
     const { componentName } = this.state
-    const query = {
-      name: componentName,
-      project: namespace,
-    }
     if (componentName) {
-      fetchComponent(clusterID, query).then(res => {
-        if (res.error) {
-          return
-        }
-        const listAry = []
-        listAry.push(res.response.result)
-        this.setState({
-          searchList: listAry,
-        })
+      const dataList = this.filterData()
+      const filterList = dataList.filter(item => item.name === componentName)
+      this.setState({
+        searchList: filterList,
       })
     } else {
       this.setState({
@@ -141,8 +133,16 @@ class ComponentManagement extends React.Component {
       dataIndex: 'servicecount',
     }, {
       title: '描述',
-      width: '25%',
+      // width: '25%',
       dataIndex: '',
+    }, {
+      title: '服务地址',
+      dataIndex: 'address',
+      render: (text, record) =>
+        <div className="AddressTipWrape">
+          <AddressTip dataList={dataList} componentName={record.name}
+            parentNode={'AddressTipWrape'}/>
+        </div>,
     }, {
       title: '路由规则',
       dataIndex: 'router',

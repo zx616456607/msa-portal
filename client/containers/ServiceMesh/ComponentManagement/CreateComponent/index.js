@@ -178,8 +178,14 @@ class CreateComponent extends React.Component {
         },
       }
       if (isAdd === 'true') {
-        AddComponent(clusterID, query, namespace).then(res => {
+        AddComponent(clusterID, query, namespace, { isHandleError: true }).then(res => {
           if (res.error) {
+            if (res.status === 400) {
+              notification.warn({
+                message: '请至少关联一个后端服务',
+              })
+              return
+            }
             notification.error({
               message: '添加组件失败',
             })
@@ -225,7 +231,7 @@ class CreateComponent extends React.Component {
     if (!value) {
       return cb()
     }
-    if (!/^[a-z_\-\*]{1,15}$/.test(value)) {
+    if (!/^[a-z0-9_\-\*]{1,15}$/.test(value)) {
       return cb('可由 1~ 15 位字母、数字、中划线组成，以字母开头，字母或者数字结尾')
     }
     cb()
@@ -239,6 +245,21 @@ class CreateComponent extends React.Component {
       return cb('支持1-46个字符，可以字母、数字、中划线组成，字母或数字开头和结尾')
     }
     cb()
+  }
+
+  validateToNextService = (rule, value, callback) => {
+    const form = this.props.form
+    const keys = form.getFieldValue('keys')
+    if (value && keys.length > 1) {
+      keys.forEach(key => {
+        const service = form.getFieldValue(`serviceName-${key - 1}`)
+        if (value === service) {
+          callback('服务名称重复')
+        }
+      })
+    } else {
+      callback()
+    }
   }
 
   render() {
@@ -258,11 +279,14 @@ class CreateComponent extends React.Component {
     const serviceLists = keys.length > 0 ? keys.map(key => {
       return (
         <Row className="serviceList" key={key}>
-          <Col span={9} className="service">
+          <Col span={8} className="service">
             <FormItem
               {...serviceLayout}
             >
               {getFieldDecorator(`serviceName-${key}`, {
+                rules: [{
+                  validator: this.validateToNextService,
+                }],
               })(
                 <Select
                   placeholder="请选择服务"
@@ -281,7 +305,7 @@ class CreateComponent extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={9}>
+          <Col span={8}>
             <FormItem
             >
               {getFieldDecorator(`version-${key}`, {
@@ -300,6 +324,7 @@ class CreateComponent extends React.Component {
           <Col span={5}>
             <Button
               type="dashed"
+              className="delete"
               // icon="delete"
               // disabled={this.state[`service${key}`]}
               onClick={() => this.handleRemove(key)}><Icon type="delete" /></Button>
@@ -313,71 +338,75 @@ class CreateComponent extends React.Component {
 
     return (
       <QueueAnim className="create-component">
-        <div className="create-component-btn layout-content-btns" keys="btn">
-          <div className="back">
-            <span className="backjia"></span>
-            <span className="btn-back" onClick={() =>
-              this.props.history.push('/service-mesh/component-management')
-            }>返回组件管理列表</span>
-          </div>
-          <div className="title">{isAdd ? '创建组件' : '编辑组件'}</div>
-        </div>
-        <Card className="create-component-body">
-          <div>
-            <Row>
-              <FormItem {...formItemLayout} label="组件名">
-                {getFieldDecorator('componentName', {
-                  rules: [
-                    {
-                      required: true,
-                      message: '请输入组件名称',
-                    }, {
-                      validator: this.nameCheck,
-                    }],
-                  initialValue: componentList.length !== 0 ?
-                    componentList.metadata.name : undefined,
-                })(
-                  <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
-                )}
-              </FormItem>
-            </Row>
-            <Row>
-              <FormItem {...formItemLayout} label="描述">
-                {getFieldDecorator('desc', {
-                  initialValue: undefined,
-                  rules: [{ pattern: '', whitespace: true, message: '' }],
-                })(
-                  <TextArea className="area" rows={4} placeholder="请输入描述" />
-                )}
-              </FormItem>
-            </Row>
-            <div className="dotted"><span>关联服务</span></div>
-          </div>
-          <div>
-            <div className="form-title">
-              <Row>
-                <span className="service">选择服务</span>
-                <Button type="primary" ghost onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
-                <span className="service-desc">
-                  <Icon type="info-circle-o" />
-                  解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效
-                </span>
-              </Row>
-              <Row className="serviceHeader">
-                <Col span={9}>服务</Col>
-                <Col span={9}>组件服务版本</Col>
-                <Col span={6}>操作</Col>
-              </Row>
-              {serviceLists}
+        <Card>
+          <div className="create-component-top">
+            <div className="create-component-btn layout-content-btns" keys="btn">
+              <div className="back">
+                <span className="backjia"></span>
+                <span className="btn-back" onClick={() =>
+                  this.props.history.push('/service-mesh/component-management')
+                }>返回组件管理列表</span>
+              </div>
+              <div className="title">{isAdd ? '创建组件' : '编辑组件'}</div>
             </div>
-            <div className="dotted" />
-            <div className="btn-bottom">
-              <Button className="cancel" onClick={
-                () => this.props.history.push('/service-mesh/component-management')}>取消</Button>
-              <Button type="primary" onClick={() => this.handleSubmit()}>确定</Button>
+            <div className="create-component-body">
+              <div>
+                <Row>
+                  <FormItem {...formItemLayout} label="组件名">
+                    {getFieldDecorator('componentName', {
+                      rules: [
+                        {
+                          required: true,
+                          message: '请输入组件名称',
+                        }, {
+                          validator: this.nameCheck,
+                        }],
+                      initialValue: componentList.length !== 0 ?
+                        componentList.metadata.name : undefined,
+                    })(
+                      <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
+                    )}
+                  </FormItem>
+                </Row>
+                <Row>
+                  <FormItem {...formItemLayout} label="描述">
+                    {getFieldDecorator('desc', {
+                      initialValue: undefined,
+                      rules: [{ pattern: '', whitespace: true, message: '' }],
+                    })(
+                      <TextArea className="area" rows={4} placeholder="请输入描述" />
+                    )}
+                  </FormItem>
+                </Row>
+                <div className="dotted"><span>关联服务</span></div>
+              </div>
+              <div>
+                <div className="form-title">
+                  <Row>
+                    <span className="service">选择服务</span>
+                    <Button type="primary" ghost onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
+                    <span className="service-desc">
+                      <Icon type="info-circle-o" />
+                      解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效
+                    </span>
+                  </Row>
+                  <Row className="serviceHeader">
+                    <Col span={9}>服务</Col>
+                    <Col span={9}>组件服务版本</Col>
+                    <Col span={6}>操作</Col>
+                  </Row>
+                  {serviceLists}
+                </div>
+              </div>
             </div>
+          </div>
+          <div className="btn-bottom">
+            <Button className="cancel" onClick={
+              () => this.props.history.push('/service-mesh/component-management')}>取消</Button>
+            <Button type="primary" onClick={() => this.handleSubmit()}>确定</Button>
           </div>
         </Card>
+        <div className="bottom-soild"></div>
       </QueueAnim>
     )
   }
