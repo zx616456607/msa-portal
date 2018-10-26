@@ -30,17 +30,19 @@
   }
   .ant-timeline-item-tail {
     border-left: 1px solid @primary-color;
-    height: 24px !important;
+    height: 36px !important;
+    top: 3px;
   }
   .ant-timeline-item-content {
     // padding: 0 0 10px 5px;
     // overflow: hidden;
+    border-left: 1px solid #2db7f5;
     margin-left: 4px;
     top: -16px;
-    // height: 4px;
   }
   .ant-timeline-item-last .ant-timeline-item-content {
     min-height: inherit;
+    border-left: 0;
   }
   .branchSvg {
     width: 23px;
@@ -66,5 +68,7 @@
   .noRouterAddress {
     color: @font-color-4;
     padding-top: @padding-base;
+    padding-left: 20px;
+    font-size: @font-size-base;
   }
 }

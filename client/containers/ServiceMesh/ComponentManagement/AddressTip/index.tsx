@@ -73,7 +73,7 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
 interface TipProps {
   config: {
     name:string;
-    routerAddress?: { address: string, matchType: string}[];
+    routerAddress?: { address: string, matchType: string, netType: string}[];
     innerAddress: { containerPort:number, domain: string }[];
   };
 }
@@ -131,7 +131,6 @@ class Tip extends React.Component<TipProps, TipState> {
             </span>
           </Timeline.Item>)
         }
-        {
         <Timeline.Item dot={<div></div>}>
             <TenxIcon type="branch"  className='branchSvg'/>
             <span className="primary">路由地址</span>
@@ -139,8 +138,9 @@ class Tip extends React.Component<TipProps, TipState> {
               <div>
                 {
                   routerAddress.length !== 0 ?
-                routerAddress.map(({address,matchType }) =>
+                routerAddress.map(({address,matchType, netType }) =>
                 <div className="routerAddress">
+                { `${netType}:`}
                 {address}
                 <Tooltip title={this.state.copyStatus === false ? '点击复制': '复制成功'} >
                 <TenxIcon type="copy"
@@ -161,7 +161,6 @@ class Tip extends React.Component<TipProps, TipState> {
               </div>
             </div>
           </Timeline.Item>
-        }
       </Timeline>
       <div className="line"></div>
       </div>
@@ -213,11 +212,12 @@ class Tips extends React.Component<TipsProps, TipsState> {
       .map(({ hosts, match }) => {
         const Exact = match.uri.MatchType.Exact;
         const Prefix = match.uri.MatchType.Prefix;
+        const netType = (hosts[0].ips || []).length === 0 ? '集群内' : '公网'
         if (Exact) {
-          return { address: `${hosts[0].host}${Exact}`, matchType: 'exact' }
+          return { address: `${hosts[0].host}${Exact}`, matchType: 'exact', netType }
         }
         if (Prefix) {
-          return {address: `${hosts[0].host}${Prefix}`, matchType: 'prefix' }
+          return {address: `${hosts[0].host}${Prefix}`, matchType: 'prefix', netType }
         }
         return {}
       })
@@ -233,7 +233,7 @@ class Tips extends React.Component<TipsProps, TipsState> {
         />
         { this.state.addressMessage === undefined && <Spin/> }
         { this.state.addressMessage !== undefined &&
-          this.state.addressMessage.map((config) => <Tip config={config}/>)
+          (this.state.addressMessage || []).map((config) => <Tip config={config}/>)
         }
       </div>
     )
