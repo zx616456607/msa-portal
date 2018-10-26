@@ -19,6 +19,7 @@ import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
 import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
 import './style/index.less'
+import AddressTip from './AddressTip';
 
 const Search = Input.Search
 
@@ -134,6 +135,14 @@ class ComponentManagement extends React.Component {
       title: '描述',
       width: '25%',
       dataIndex: 'description',
+    }, {
+      title: '服务地址',
+      dataIndex: 'address',
+      render: (text, record) =>
+        <div className="AddressTipWrape">
+          <AddressTip dataList={dataList} componentName={record.name}
+            parentNode={'AddressTipWrape'}/>
+        </div>,
     }, {
       title: '路由规则',
       dataIndex: 'router',

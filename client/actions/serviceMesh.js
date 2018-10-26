@@ -328,3 +328,34 @@ export function loadProjectClusterList(callback) {
     return dispatch(getProjectClusterList(callback))
   }
 }
+
+// 获取服务列表的istio状态
+export const GET_SERVICE_LIST_SERVICE_MESH_REQUEST = 'GET_SERVICE_LIST_SERVICE_MESH_REQUEST'
+export const GET_SERVICE_LIST_SERVICE_MESH_SUCCESS = 'GET_SERVICE_LIST_SERVICE_MESH_SUCCESS'
+export const GET_SERVICE_LIST_SERVICE_MESH_FAILURE = 'GET_SERVICE_LIST_SERVICE_MESH_FAILURE'
+function checkServiceListServiceMeshStatus(clusterId, serviceList, query = {}, callback) {
+  const newQuery = toQuerystring({
+    name: serviceList,
+    ...query,
+  })
+  let endpoint = `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/paas/services`
+  endpoint += `?${newQuery}`
+  return {
+    [CALL_API]: {
+      types: [ GET_SERVICE_LIST_SERVICE_MESH_REQUEST, GET_SERVICE_LIST_SERVICE_MESH_SUCCESS,
+        GET_SERVICE_LIST_SERVICE_MESH_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'GET',
+      },
+    },
+    callback,
+  }
+}
+
+export function getServiceListServiceMeshStatus(clusterId, serviceList, query, callback) {
+  return dispatch => {
+    return dispatch(checkServiceListServiceMeshStatus(clusterId, serviceList, query, callback))
+  }
+}
