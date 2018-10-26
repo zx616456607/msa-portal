@@ -212,6 +212,7 @@ class ServiceMeshGraph extends React.Component {
               optionFilterProp="children"
               placeholder="选择项目"
               onChange={value => this.handleSelectChange('item', value)}
+              dropdownMatchSelectWidth={false}
               filterOption={
                 (input, option) =>
                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -240,6 +241,7 @@ class ServiceMeshGraph extends React.Component {
               optionFilterProp="children"
               placeholder="选择集群"
               onChange={value => this.handleClusterChange('cluster', value)}
+              dropdownMatchSelectWidth={false}
               filterOption={
                 (input, option) =>
                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -273,6 +275,7 @@ class ServiceMeshGraph extends React.Component {
               value={app}
               ref={ relnode => { this.appNode = relnode } }
               filterOption={false}
+              dropdownMatchSelectWidth={false}
             >
               {
                 cluster && appsList.map(apps => {
