@@ -306,7 +306,7 @@ export const dubboChildRoutes = [
     key: 'dubbo-manage',
   },
   {
-    path: '/dubbo/dubbo-manage/dubbo-detail/:id',
+    path: '/dubbo/dubbo-manage/dubbo-detail/:name/:groupVersion',
     component: DubboDetail,
     exact: true,
     key: 'dubbo-detail',

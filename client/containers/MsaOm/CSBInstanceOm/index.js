@@ -419,6 +419,7 @@ class CSBInstanceOm extends React.Component {
             rowKey={row => row.id}
           />
         </div>
+
         {instanceDetailVisible && <InstanceDetailDock
           detail={currentInstance}
           callback={this.handerConfirm}

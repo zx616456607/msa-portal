@@ -10,36 +10,47 @@
 
 import * as ActionTypes from '../actions/dubbo'
 
-const dubboListData = [
+
+const supplierListData = [
   {
-    serviceName: 'service1',
-    version: '1.0.1',
-    group: 'def',
+    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
+    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
     belong: 'app1',
     status: '0',
-    time: '2018-10-15T07:59:27Z',
-    id: '25',
+    type: '1',
+    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
+    id: '234',
   },
   {
-    serviceName: 'service1',
-    version: '1.0.1',
-    group: 'def',
+    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
+    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
     belong: 'app1',
-    status: '0',
-    time: '2018-10-15T07:59:27Z',
-    id: '58',
-  },
-  {
-    serviceName: 'service1',
-    version: '1.0.1',
-    group: 'def',
-    belong: 'app1',
-    status: '0',
-    time: '2018-10-15T07:59:27Z',
-    id: '23',
+    status: '1',
+    type: '0',
+    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
+    id: '546',
   },
 ]
-
+const consumerListData = [
+  {
+    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
+    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
+    belong: 'app1',
+    status: '0',
+    type: '1',
+    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
+    id: '234',
+  },
+  {
+    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
+    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
+    belong: 'app1',
+    status: '1',
+    type: '0',
+    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
+    id: '546',
+  },
+]
 
 const dubboList = (state = {}, action) => {
   const { type } = action
@@ -53,7 +64,8 @@ const dubboList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        data: dubboListData || [],
+        total: action.response.result.data.total,
+        data: action.response.result.data.items || [],
       }
     case ActionTypes.FETCH_DUBBO_LIST_FAILURE:
       return {
@@ -67,10 +79,75 @@ const dubboList = (state = {}, action) => {
 const dubboDetail = (state = {}, action) => {
   const { type } = action
   switch (type) {
+    case ActionTypes.GET_DUBBO_DETAIL_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
     case ActionTypes.GET_DUBBO_DETAIL_SUCCESS:
       return {
         ...state,
-        ...action.payload,
+        data: action.response.result.data,
+        dataBackup: action.response.result.data,
+      }
+    case ActionTypes.GET_DUBBO_DETAIL_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    case ActionTypes.SEARCH_DUBBO_CONSUMER_OR_PROVIDER:
+      return {
+        ...state,
+        data: action.payload,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+const supplierList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.FETCH_SUPPLIER_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.FETCH_SUPPLIER_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: supplierListData || [],
+        dataBackup: supplierListData || [],
+      }
+    case ActionTypes.FETCH_SUPPLIER_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+const consumerList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.FETCH_CONSUMER_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.FETCH_CONSUMER_LIST_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        data: supplierListData || [],
+        dataBackup: consumerListData || [],
+      }
+    case ActionTypes.FETCH_CONSUMER_LIST_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
       }
     default:
       return state
@@ -82,10 +159,26 @@ const dubbo = (state = {
     isFetching: false,
     data: [],
   },
-  dubboDetail: {},
+  dubboDetail: {
+    isFetching: false,
+    data: '',
+    dataBackup: '',
+  },
+  supplierList: {
+    data: [],
+    dataBackup: [],
+    isFetching: false,
+  },
+  consumerList: {
+    data: [],
+    dataBackup: [],
+    isFetching: false,
+  },
 }, action) => ({
   dubboList: dubboList(state.dubboList, action),
   dubboDetail: dubboDetail(state.dubboDetail, action),
+  supplierList: supplierList(state.supplierList, action),
+  consumerList: consumerList(state.consumerList, action),
 })
 
 export default dubbo
