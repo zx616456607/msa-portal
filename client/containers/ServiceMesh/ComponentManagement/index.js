@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../../../common/utils'
+import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
 import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
 import './style/index.less'
@@ -25,8 +26,8 @@ class ComponentManagement extends React.Component {
   state = {
     name: '',
     searchList: [],
+    isSearch: false,
     componentName: '',
-    deleteVisible: false,
   }
 
   componentDidMount() {
@@ -45,15 +46,19 @@ class ComponentManagement extends React.Component {
   onSearch = () => {
     const { clusterID, namespace } = this.props
     const { componentName } = this.state
+    let filterList = []
     if (componentName) {
       const dataList = this.filterData()
-      const filterList = dataList.filter(item => item.name === componentName)
+      filterList = dataList.filter(item => item.name === componentName)
       this.setState({
+        isSearch: true,
         searchList: filterList,
       })
     } else {
       this.setState({
-        searchList: [],
+        isSearch: false,
+      }, () => {
+        this.load()
       })
     }
   }
@@ -63,47 +68,41 @@ class ComponentManagement extends React.Component {
   }
 
   handleDelete = name => {
-    this.setState({
-      name,
-      deleteVisible: true,
-    })
-  }
-
-  handleDel = () => {
-    const { name } = this.state
     const { clusterID, deleteComponent } = this.props
-    deleteComponent(clusterID, name).then(res => {
-      if (res.error) {
-        notification.success({
-          message: `删除组件 ${name} 失败`,
+    confirm({
+      modalTitle: '删除操作',
+      title: '删除组件后，该组件关联的服务在路由规则中设置的规则和对外访问方式同时被删除',
+      content: `确定是否删除该组件 ${name} ？`,
+      onOk: () => {
+        return new Promise((resolve, reject) => {
+          deleteComponent(clusterID, name).then(res => {
+            if (res.error) {
+              notification.success({
+                message: `删除组件 ${name} 失败`,
+              })
+              return reject()
+            }
+            resolve()
+            notification.success({
+              message: `删除组件 ${name} 成功`,
+            })
+            this.load()
+          })
         })
-        return
-      }
-      this.setState({
-        deleteVisible: false,
-      })
-      notification.success({
-        message: `删除组件 ${name} 成功`,
-      })
-      this.load()
-    })
-  }
-
-  handleCancel = () => {
-    this.setState({
-      deleteVisible: false,
+      },
     })
   }
 
   filterData = () => {
     const { dataList } = this.props
-    const { searchList } = this.state
-    const dataSource = searchList.length > 0 ? searchList : dataList
+    const { searchList, isSearch } = this.state
+    const dataAry = []
+    const dataSource = isSearch ? searchList : dataList
     if (dataSource.length > 0) {
-      const dataAry = []
       dataSource.forEach(item => {
         const column = {
           name: item.metadata.name,
+          description: item.metadata.description,
           servicecount: item.spec.subsets.length,
           startTime: item.metadata.creationTimestamp,
         }
@@ -111,6 +110,7 @@ class ComponentManagement extends React.Component {
       })
       return dataAry
     }
+    return dataAry
   }
 
   render() {
@@ -133,7 +133,7 @@ class ComponentManagement extends React.Component {
     }, {
       title: '描述',
       width: '25%',
-      dataIndex: '',
+      dataIndex: 'description',
     }, {
       title: '路由规则',
       dataIndex: 'router',
@@ -161,7 +161,7 @@ class ComponentManagement extends React.Component {
             onSearch={this.onSearch}
           />
           <div className="pages">
-            <span className="total">共计 {dataList.length} 条</span>
+            <span className="total">共计 {this.filterData().length} 条</span>
             <Pagination {...pagination} />
           </div>
         </div>
@@ -174,16 +174,6 @@ class ComponentManagement extends React.Component {
             rowKey={row => row.id}
           />
         </Card>
-        <Modal title="删除操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDel}>确 定</Button>,
-          ]}>
-          <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-            <span>删除组件后，该组件关联的服务在路由规则中设置的规则和对外访问方式将失效</span>
-            <span>确定是否删除该组件 ？</span>
-          </div>
-        </Modal>
       </QueueAnim>
     )
   }

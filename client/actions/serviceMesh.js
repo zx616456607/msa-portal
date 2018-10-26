@@ -154,13 +154,14 @@ export const COMPONENT_ADD_REQUEST = 'COMPONENT_ADD_REQUEST'
 export const COMPONENT_ADD_SUCCESS = 'COMPONENT_ADD_SUCCESS'
 export const COMPONENT_ADD_FAILURE = 'COMPONENT_ADD_FAILURE'
 
-const PostComponent = (clusterID, body, project) => {
+const PostComponent = (clusterID, body, project, options) => {
   let headers
   if (project && project !== 'default') {
     headers = project
   }
   return {
     body,
+    options,
     [CALL_API]: {
       types: [ COMPONENT_ADD_REQUEST, COMPONENT_ADD_SUCCESS, COMPONENT_ADD_FAILURE ],
       endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule`,
@@ -176,8 +177,8 @@ const PostComponent = (clusterID, body, project) => {
   }
 }
 
-export const AddComponent = (clusterID, body, project) => dispatch => {
-  return dispatch(PostComponent(clusterID, body, project))
+export const AddComponent = (clusterID, body, project, options) => dispatch => {
+  return dispatch(PostComponent(clusterID, body, project, options))
 }
 
 export const COMPONENT_DETAIL_REQUEST = 'COMPONENT_DETAIL_REQUEST'
@@ -242,12 +243,13 @@ export const COMPONENT_EDIT_REQUEST = 'COMPONENT_EDIT_REQUEST'
 export const COMPONENT_EDIT_SUCCESS = 'COMPONENT_EDIT_SUCCESS'
 export const COMPONENT_EDIT_FAILURE = 'COMPONENT_EDIT_FAILURE'
 
-const fetchEditComponent = (clusterID, body, project) => {
+const fetchEditComponent = (clusterID, body, project, options) => {
   let headers
   if (project && project !== 'default') {
     headers = project
   }
   return {
+    options,
     [CALL_API]: {
       types: [
         COMPONENT_EDIT_REQUEST,
@@ -267,8 +269,8 @@ const fetchEditComponent = (clusterID, body, project) => {
   }
 }
 
-export const editComponent = (clusterID, body, project) => dispatch => {
-  return dispatch(fetchEditComponent(clusterID, body, project))
+export const editComponent = (clusterID, body, project, options) => dispatch => {
+  return dispatch(fetchEditComponent(clusterID, body, project, options))
 }
 
 export const SERVICES_LIST_REQUEST = 'SERVICES_LIST_REQUEST'
