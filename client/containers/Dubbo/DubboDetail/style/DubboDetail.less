@@ -1,0 +1,73 @@
+@import "../../../../assets/style/core/index.less";
+.dubbo-detail {
+  .top {
+    margin-bottom: @padding-medium;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    .title {
+      margin-left: @padding-medium;
+      position: relative;
+      &:before {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 14px;
+        background: @primary-color;
+        position: absolute;
+        top: 50%;
+        left: -8px;
+        margin-top: -7px;
+      }
+    }
+  }
+  .base-info-wrapper {
+    .ant-card-body {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      .icon {
+        i {
+          font-size: 80px;
+        }
+        margin-right: 32px;
+      }
+      .right {
+        width: 80%;
+        margin-right: 64px;
+        h2 {
+          font-size: 20px;
+        }
+        .base-info {
+          display: flex;
+          justify-content: space-between;
+          .version {
+            margin-bottom: 4px;
+          }
+        }
+      }
+    }
+  }
+  .dubbo-detail-tabs {
+    margin-top: @padding-large;
+  }
+  .table-operation {
+    margin: @padding-base 0;
+    button {
+      margin-right: @padding-medium;
+    }
+  }
+  .container-name {
+    width: 200px;
+    .container-name-inner {
+      color: @primary-color;
+      cursor: pointer;
+    }
+  }
+  .container-address {
+    width: 300px;
+  }
+  .service-address {
+    width: 200px;
+  }
+}

@@ -69,6 +69,9 @@ import CreateComponent from './containers/ServiceMesh/ComponentManagement/Create
 import ComponentDetail from './containers/ServiceMesh/ComponentManagement/ComponentDetail'
 import RoutesManagement from './containers/ServiceMesh/RoutesManagement'
 import RouteDetail from './containers/ServiceMesh/RoutesManagement/RouteDetail'
+import Dubbo from './containers/Dubbo/'
+import DubboList from './containers/Dubbo/DubboList/DubboList'
+import DubboDetail from './containers/Dubbo/DubboDetail/DubboDetail'
 
 export const appChildRoutes = [
   {
@@ -85,7 +88,12 @@ export const appChildRoutes = [
   {
     path: '/service-mesh',
     component: ServiceMesh,
-    key: 'service-mesh',
+    key: ServiceMesh,
+  },
+  {
+    path: '/dubbo',
+    component: Dubbo,
+    key: 'dubbo',
   },
   {
     path: '/csb-instances',
@@ -287,6 +295,21 @@ export const msaManageChildRoutes = [
     exact: true,
     component: Event,
     key: 'event-manage',
+  },
+]
+
+export const dubboChildRoutes = [
+  {
+    path: '/dubbo/dubbo-manage',
+    component: DubboList,
+    exact: true,
+    key: 'dubbo-manage',
+  },
+  {
+    path: '/dubbo/dubbo-manage/dubbo-detail/:name/:groupVersion',
+    component: DubboDetail,
+    exact: true,
+    key: 'dubbo-detail',
   },
 ]
 
