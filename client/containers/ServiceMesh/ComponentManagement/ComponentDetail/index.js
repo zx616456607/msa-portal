@@ -25,10 +25,12 @@ const Option = Select.Option
 let uuid = 1
 class ComponentDetail extends React.Component {
   state = {
+    delList: [],
+    detailList: [],
     isAdd: false,
     visible: false,
-    detailList: [],
     isLoading: true,
+    delVisible: false,
   }
 
   componentDidMount() {
@@ -66,7 +68,7 @@ class ComponentDetail extends React.Component {
       const serviceAry = []
       Object.keys(list.metadata.annotations).forEach(item => {
         const query = {
-          name: item,
+          name: item.split('/')[1],
           version: list.metadata.annotations[item],
         }
         serviceAry.push(query)
@@ -83,10 +85,10 @@ class ComponentDetail extends React.Component {
 
   handleDelete = list => {
     this.setState({
+      delList: list,
       isAdd: false,
       isLoading: true,
-    }, () => {
-      this.handleService(list)
+      delVisible: true,
     })
   }
 
@@ -180,6 +182,35 @@ class ComponentDetail extends React.Component {
     })
   }
 
+  handleDelClose = () => {
+    this.setState({
+      isLoading: false,
+      delVisible: false,
+    })
+  }
+
+  handleDelService = () => {
+    const { delList } = this.state
+    if (delList) {
+      this.handleService()
+    }
+  }
+
+  validateToNextService = (rule, value, callback) => {
+    const form = this.props.form
+    const keys = form.getFieldValue('keys')
+    if (value && keys.length > 1) {
+      keys.forEach(key => {
+        const service = form.getFieldValue(`serviceName-${key - 1}`)
+        if (value === service) {
+          callback('服务名称重复')
+        }
+      })
+    } else {
+      callback()
+    }
+  }
+
   render() {
     const { form, serviceList } = this.props
     const { detailList, isLoading } = this.state
@@ -212,14 +243,17 @@ class ComponentDetail extends React.Component {
     const serviceLists = keys.map(key => {
       return (
         <Row className="serviceList" key={key}>
-          <Col span={9}>
+          <Col span={10}>
             <FormItem
               {...formItemLayout}
             >
               {getFieldDecorator(`serviceName-${key}`, {
                 initialValue: undefined,
+                rules: [{
+                  validator: this.validateToNextService,
+                }],
               })(
-                <Select placeholder="请选择服务" style={{ width: 120 }}>
+                <Select placeholder="请选择服务" style={{ width: 180 }}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
                       if (serviceList[item].istioEnabled === true) {
@@ -303,7 +337,7 @@ class ComponentDetail extends React.Component {
           ]}>
           <Row className="serviceHeader">
             <Col span={9}>服务名称</Col>
-            <Col span={10}>组件服务版本</Col>
+            <Col span={9}>组件服务版本</Col>
             <Col span={3}></Col>
           </Row>
           {serviceLists}
@@ -311,6 +345,17 @@ class ComponentDetail extends React.Component {
             <Icon type="plus-circle-o" theme="outlined" className="ico" />
             添加一个服务
           </span>
+        </Modal>
+        <Modal title="删除服务"
+          visible={this.state.delVisible}
+          onCancel={this.handleDelClose}
+          footer={[
+            <Button key="back" type="ghost" onClick={this.handleDelClose}>取 消</Button>,
+            <Button key="submit" type="primary" onClick={this.handleDelService}>确 定</Button>,
+          ]}>
+          <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+            <span>移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务？</span>
+          </div>
         </Modal>
       </QueueAnim>
     )
