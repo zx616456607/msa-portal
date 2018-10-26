@@ -33,11 +33,11 @@ const authSchema = new schema.Entity('auth', {}, {
   idAttribute: () => JWT,
 })
 
-const projectSchema = new schema.Entity('projects', {}, {
-  idAttribute: 'namespace',
-})
+// const projectSchema = new schema.Entity('projects', {}, {
+//   idAttribute: 'namespace',
+// })
 
-const projectListSchema = new schema.Entity('projectsList', {}, {
+const projectListSchema = new schema.Entity('projects', {}, {
   idAttribute: 'namespace',
 })
 
@@ -177,9 +177,9 @@ export const Schemas = {
       springcloud: [ springcloudSchema ],
     },
   },
-  PROJECT_ARRAY_DATA: {
-    data: [ projectSchema ],
-  },
+  // PROJECT_ARRAY_DATA: {
+  //   data: [ projectSchema ],
+  // },
   PROJECTLIST_ARRAY_DATA: {
     data: {
       projects: [ projectListSchema ],

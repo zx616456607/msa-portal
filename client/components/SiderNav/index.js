@@ -19,8 +19,15 @@ import TenxIcon from '@tenx-ui/icon'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
+const MenuItemGroup = Menu.ItemGroup;
 
 const menus = [
+  {
+    to: '/',
+    key: 'overview',
+    name: '微服务总览',
+    icon: 'bar-chart',
+  },
   {
     to: '/msa-manage',
     key: 'msa-manage',
@@ -194,11 +201,11 @@ const menus = [
       },
     ],
   }, {
-    key: 'k4',
-    to: '/management',
-    icon: 'user',
-    name: '项目管理员',
-  }, {
+    declare: {
+      key: 'projectConfig',
+      spread: <Tooltip title="作为某项目的管理员,有权限配置项目相关"><span>项目管理员</span></Tooltip>, // 说明文字 | react Node 展开时渲染
+      collapsed: <span className="line"></span>, // 关闭时渲染
+    },
     key: 'msa-om',
     to: '/msa-om',
     name: '项目基础安装与运维',
@@ -227,11 +234,11 @@ const menus = [
       },
     ],
   }, {
-    key: 'k5',
-    to: '/management',
-    icon: 'user',
-    name: '系统管理员',
-  }, {
+    declare: {
+      key: 'systemConfig',
+      spread: <Tooltip title="作为系统管理员,有权限配置系统相关"><span>系统管理员</span></Tooltip>, // 说明文字 | react Node
+      collapsed: <span className="line"></span>,
+    },
     key: 'k1',
     to: '/setting',
     name: '系统设置',
@@ -306,7 +313,7 @@ class SiderNav extends React.Component {
   }
   renderMenuItem = data => {
     const { collapsed } = this.state
-    const { children, name, icon, key, to, tenxIcon, ...otherProps } = data
+    const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
@@ -318,7 +325,7 @@ class SiderNav extends React.Component {
           fontSize: 12,
         }} />
     }
-    if (children) {
+    if (children && !declare) {
       return (
         <SubMenu
           key={key}
@@ -331,7 +338,22 @@ class SiderNav extends React.Component {
         </SubMenu>
       )
     }
-    let menuItems
+    if (children && declare) {
+      return (
+        <MenuItemGroup title={!collapsed ? declare.spread : declare.collapsed} key={declare.key} >
+          <SubMenu
+            key={key}
+            title={<span>{iconDOM}<span>{name}</span></span>}
+            {...otherProps}
+          >
+            {
+              children.map(item => this.renderMenuItem(item))
+            }
+          </SubMenu>
+        </MenuItemGroup>
+      )
+    }
+    /* let menuItems
     // if (collapsed && to === '') {
     //   menuItems = <Icon type="user" />
     // } else
@@ -344,19 +366,17 @@ class SiderNav extends React.Component {
           <span className="nav-text navFont">{name}</span>
         </Tooltip>
     } else {
-      menuItems = <Icon type="user" />// <span className="navSolid">{name}</span>
-    }
+      menuItems = <Icon type="user" className="nav-text navFont"/>// <span className="navSolid">{name}</span>
+    } */
 
-    return (
-      <Menu.Item key={key} {...otherProps} >
-        {
-          // collapsed && to === '' ?
-          //   <Icon type="user" /> :
-          //   <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
-          menuItems
-        }
-      </Menu.Item>
-    )
+    return <Menu.Item key={key} {...otherProps}>
+      {
+        // collapsed && to === '' ?
+        //   <Icon type="user" /> :
+        <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+        // menuItems
+      }
+    </Menu.Item>
   }
   findSelectedNOpenKeys = () => {
     const { location, collapsed } = this.props
@@ -422,12 +442,18 @@ class SiderNav extends React.Component {
   }
 
   render() {
-    const { collapsed, currentUser } = this.props
-    const finalMenus = currentUser.role !== ROLE_SYS_ADMIN ?
-      // menu.key !== 'msa-om'
-      menus.filter(menu => {
-        return menu.key !== 'k1' && menu.key !== 'k5'
-      }) : menus
+    const { collapsed, currentUser, managedProjects } = this.props
+    const finalMenus = menus.filter(({ key }) => {
+      // filter 系统管理员
+      if (key === 'k1') {
+        return currentUser.role === ROLE_SYS_ADMIN
+      }
+      // filter 项目管理员
+      if (key === 'msa-om') {
+        return managedProjects.length > 0
+      }
+      return true
+    })
     return (
       <Sider
         style={{ overflow: 'auto', height: '100vh', position: 'fixed' }}

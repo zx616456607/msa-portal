@@ -32,6 +32,7 @@ class MsaConfig extends React.Component {
     installSate: false,
     notCurAry: [],
     isLoading: true,
+    clusterText: '',
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -45,13 +46,19 @@ class MsaConfig extends React.Component {
   }
 
   load = () => {
-    const { loadSpringCloud, cluster, projectConfig } = this.props
+    const { loadSpringCloud, cluster, clusterName, projectConfig } = this.props
     const { namespace } = projectConfig.project
     this.setState({
       isLoading: true,
+      clusterText: clusterName,
     })
     loadSpringCloud(cluster.id, namespace).then(res => {
-      if (res.error) return
+      if (res.error) {
+        this.setState({
+          isLoading: false,
+        })
+        return
+      }
       if (res.response.result.code === 200) {
         this.setState({
           springcloudID: res.response.result.data.springclouds,
@@ -103,7 +110,6 @@ class MsaConfig extends React.Component {
     const { springcloudID } = this.state
     const { uninstallMsaConfig, cluster, projectConfig } = this.props
     const { namespace } = projectConfig.project
-    // const projects = project.namespace === 'default' ? namespace : project.namespace
     let filterSpring = springcloudID.filter(item => item.namespace === namespace)
     if (isEmpty(filterSpring)) {
       return
@@ -241,16 +247,9 @@ class MsaConfig extends React.Component {
 
     const { configDetail, version } = gitLab && Object.keys(gitLab).length > 0 && JSON.parse(gitLab)
     const { gitUrl, gitUser, gitPassword, gitToken } = configDetail || {}
-    const { form, clusterName, projectConfig } = this.props
-    // let springcloud = false
-    // if (springCloudAndApm.configDetail) {
-    //   const data = JSON.parse(springCloudAndApm.configDetail)
-    //   if (data.canDeployPersonalServer) {
-    //     springcloud = data.canDeployPersonalServer.springcloud
-    //   }
-    // }
-
+    const { form, projects, clusters, clusterList, projectConfig } = this.props
     const { getFieldDecorator } = form
+    const { cluster } = projectConfig
     const { namespace } = projectConfig.project
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -265,10 +264,27 @@ class MsaConfig extends React.Component {
     } else {
       healthy = <span className="descs">未安装</span>
     }
-    const clutser_name = clusterName && clusterName.replace(/[\u4e00-\u9fa5]/g, '')
+    const projectItems = projects.filter(item =>
+      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
+    )
+    let clusterName = ''
+    if (cluster) {
+      if (namespace) {
+        Object.keys(clusters).forEach(() => {
+          if (namespace) {
+            clusterName = clusters[namespace] && clusters[namespace].ids
+          }
+        })
+      }
+    }
+
+    const clusterText = clusterName && clusterName.length > 0 ?
+      clusterList[clusterName[0]].clusterName : ''
+    const projectName = namespace ? namespace : projectItems.length > 0 &&
+      projectItems[0].projectName
     const title_extra =
       <span className="msa-project">
-        ( 项目：{namespace} 集群：{clutser_name})
+        ( 项目：{projectName} 集群：{clusterText})
       </span>
     return (
       <QueueAnim>
@@ -457,22 +473,24 @@ class MsaConfig extends React.Component {
 
 const mapStateToProps = state => {
   const { current, entities, springCloudAndApm } = state
-  const { projects, clusters } = entities
+  const { projects } = entities
   const { info } = current.user
   const projectID = current.projects.ids || []
   const namespace = info.namespace
-  const { project, cluster } = current.config
-  const { projectConfig } = current
-  const clusterName = clusters && (clusters[cluster.id] || {}).clusterName
+  const { projectConfig, clusters } = current
+  const clusterList = entities.clusters
+  const { cluster } = projectConfig
+  const userProjects = current.projects && current.projects.ids || []
   return {
-    project,
+    current,
     cluster,
-    projects,
+    clusters,
     projectID,
     namespace,
+    clusterList,
     springCloudAndApm,
-    clusterName,
     projectConfig,
+    projects: userProjects.map(namespace => projects[namespace]),
   }
 }
 

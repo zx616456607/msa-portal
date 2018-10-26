@@ -12,13 +12,16 @@
 
 import React from 'react'
 import ReturnButton from '@tenx-ui/return-button'
-import { Card, Form, Input, Select, Radio, Button, Tag, Icon, Tooltip, notification, Checkbox } from 'antd'
+import { Card, Form, Input, Select, Row, Col, Radio, Button, Tag, Icon, Tooltip, notification, Checkbox } from 'antd'
 import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
 import { createNewRoute, getMeshRouteDetail, updateMeshRoute } from '../../../actions/meshRouteManagement'
 import './style/NewRoute.less'
-import { MESH_ROUTE_RULE_NAME_REG, MESH_ROUTE_RULE_NAME_REG_NOTICE } from '../../../constants';
+import { MESH_ROUTE_RULE_NAME_REG,
+  MESH_ROUTE_RULE_NAME_REG_NOTICE,
+  IP_REG,
+  ROUTE_REG } from '../../../constants';
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -34,6 +37,14 @@ const formItemLayout = {
     sm: { span: 10, push: 1 },
   },
 }
+const routeItemInnerLayout = {
+  labelCol: {
+    sm: { span: 2 },
+  },
+  wrapperCol: {
+    sm: { span: 20, push: 1 },
+  },
+};
 const dynamicFormItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -97,10 +108,11 @@ class NewRouteComponent extends React.Component {
     })
   }
   setInitialValue = () => {
-    const { meshRouteDetail, match } = this.props
+    const { meshRouteDetail, match, componentList } = this.props
     let initialValues = {}
     if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
+      const selectedCom = spec.http[0].route[0].destination.host
       initialValues.defaultHostList = []
       initialValues.host = []
       initialValues.defaultRouteKeys = []
@@ -117,6 +129,10 @@ class NewRouteComponent extends React.Component {
         const { route } = k
         const defaultVersion = []
         route.forEach(item => defaultVersion.push(item.destination.subset))
+        // 当选择的组件被删除的时候，默认选择的作用版本被置空
+        if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) < 0) {
+          defaultVersion.splice(0)
+        }
         initialValues.defaultRouteKeys.push(routeIndex)
         initialValues.routeConditionkeys[routeIndex] = {
           matchRule: Object.keys(k.match[0].uri)[0],
@@ -186,11 +202,14 @@ class NewRouteComponent extends React.Component {
   }
   componentProps = () => {
     const { getFieldDecorator } = this.props.form
-    const { meshRouteDetail, match } = this.props
+    const { meshRouteDetail, match, componentList } = this.props
     let defaultComponent = []
     if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
-      defaultComponent = [ spec.http[0].route[0].destination.host ]
+      const selectedCom = spec.http[0].route[0].destination.host
+      if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) >= 0) {
+        defaultComponent = [ selectedCom ]
+      }
     }
     return getFieldDecorator('componentSelected', {
       initialValue: defaultComponent,
@@ -215,9 +234,36 @@ class NewRouteComponent extends React.Component {
     return getFieldDecorator('gateways', {
       initialValue: this.setInitialValue().defaltGateways,
       // onChange: e => this.setState({ visitType: e.target.value }),
+      rules: [{ required: true, message: '请选择网关' }],
     })
   }
-
+  domainValidator = (rule, value, cb) => {
+    if (!value) return cb()
+    const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+    if (domainReg.test(value) || IP_REG.test(value)) {
+      return cb()
+    }
+    cb('请填写正确的服务域名')
+  }
+  ruleOfRouteValidator = (rule, value, cb) => {
+    const values = this.props.form.getFieldsValue()
+    const routeRules = values.rule.filter(v => typeof v === 'string')
+    if (routeRules.length > 1) {
+      const existRouteRules = routeRules.slice(0, routeRules.length - 1)
+      if (existRouteRules.includes(routeRules[routeRules.length - 1])) {
+        cb('路由规则不能重复')
+      }
+    }
+    if (!value) cb('请填写路由规则')
+    if (!ROUTE_REG.test(value)) cb('请填写正确的路由规则')
+    cb()
+  }
+  versionValidator = (rule, value, cb) => {
+    if (!value || value.length === 0) {
+      cb('请至少选择一个版本')
+    }
+    cb()
+  }
   // 页面渲染相关
   addItem = (key, thisKey) => {
     const { form } = this.props;
@@ -276,12 +322,17 @@ class NewRouteComponent extends React.Component {
     const { getFieldDecorator, getFieldValue } = this.props.form;
     getFieldDecorator('hostKeys', { initialValue: this.setInitialValue().defaultHostList });
     const hostList = getFieldValue('hostKeys');
+    const { visitType } = this.state
+    const hostTip = visitType === 'pub' ? `服务对外访问地址，用户需自行申请，
+    并确保所填域名或主机名能解析到所选网关的出口ip地址
+    （在选择的网关中添加该域名或主机名）` : '服务集群内访问地址，请填写不冲突的服务名或域名'
     const hostItems = hostList.map((k, index) => {
       return (
         <FormItem
           {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
+          className="host-wrapper"
           label={index === 0 ? <span>服务域名
-            <Tooltip title= "服务对外访问地址，用户需自行申请，并确保所填域名能解析到所选网关的服务地址（在选择的网关中添加该域名）">
+            <Tooltip title= {hostTip}>
               <Icon style={{ marginLeft: 8 }} type="question-circle" theme="outlined" />
             </Tooltip>
           </span> : ''}
@@ -295,6 +346,8 @@ class NewRouteComponent extends React.Component {
               required: true,
               whitespace: true,
               message: '请输入服务域名',
+            }, {
+              validator: this.domainValidator,
             }],
           })(
             <Input
@@ -330,93 +383,100 @@ class NewRouteComponent extends React.Component {
     const routeConditionsItem = uniqueKey => {
       getFieldDecorator(`routeConditionkeys[${uniqueKey}]`, { initialValue: [ uniqueKey ] });
       const routeConditionList = getFieldValue(`routeConditionkeys[${uniqueKey}]`);
-      const conditionFormItemLayout = {
-        labelCol: {
-          sm: { span: 2 },
-        },
-        wrapperCol: {
-          sm: { span: 20, push: 1 },
-        },
-      };
       const conditionFormItemLayoutWithoutLabel = {
         wrapperCol: {
           sm: { span: 10, offset: 3 },
         },
       };
+      let matchPrefix,
+        matchWay,
+        matchRule
       const routeConditionsDomList = routeConditionList.map((k, index) => {
-        return (
-          <FormItem
-            label= { index === 0 ? '路由条件' : ''}
-            key={k}
-            {...(index === 0 ? conditionFormItemLayout : conditionFormItemLayoutWithoutLabel)}
-          >
-            <div className="condition-item">
-              <div>
-                { // 匹配规则暂时隐藏
-                  false &&
-                  <FormItem>
-                    {
-                      getFieldDecorator(`matchValue[${k}]`, {
-                        initialValue: 'all',
-                      })(
-                        <RadioGroup>
-                          <Radio value="all">全部</Radio>
-                          <Radio value="any">任何</Radio>
-                        </RadioGroup>
-                      )
-                    }
-                    <span>以下条件</span>
-                  </FormItem>
-                }
-              </div>
-              <div className="condition-input">
-                <FormItem>
-                  {getFieldDecorator(`condition[${k}]`, {
-                    initialValue: 'uri',
-                  })(
-                    <Select
-                      style={{ width: 100 }}
-                    >
-                      {/* <Option value="Header">Header</Option>*/}
-                      <Option value="uri">uri</Option>
-                    </Select>
-                  )}
-                </FormItem>
-                <FormItem>
-                  {getFieldDecorator(`matchRule[${k}]`, {
-                    initialValue: name ? (routeConditionkeys[uniqueKey] && routeConditionkeys[uniqueKey].matchRule) : 'prefix',
-                  })(
-                    <Select
-                      style={{ width: 100 }}
-                    >
-                      <Option value="prefix">前缀匹配</Option>
-                      <Option value="exact">完全匹配</Option>
-                    </Select>
-                  )}
-                </FormItem>
+        matchPrefix = getFieldValue(`condition[${k}]`) || 'uri';
+        matchWay = getFieldValue(`matchRule[${k}]`) === 'exact' ? '完全匹配' : '前缀匹配';
+        matchRule = getFieldValue(`rule[${k}]`) || '-';
 
-                <FormItem>
-                  {getFieldDecorator(`rule[${k}]`, {
-                    initialValue: routeConditionkeys[uniqueKey] &&
-                    routeConditionkeys[uniqueKey].rule,
-                  })(
-                    <Input style={{ width: 100 }} placeholder="请输入规则"/>
-                  )}
-                </FormItem>
-                {/* 暂时不需要添加和删除按钮
+        return (
+          <div className="route-item">
+            <FormItem
+              label= { index === 0 ? '路由条件' : ''}
+              key={k}
+              {...(index === 0 ? routeItemInnerLayout : conditionFormItemLayoutWithoutLabel)}
+            >
+              <div className="condition-item">
+                <div>
+                  { // 匹配规则暂时隐藏
+                    false &&
+                    <FormItem>
+                      {
+                        getFieldDecorator(`matchValue[${k}]`, {
+                          initialValue: 'all',
+                        })(
+                          <RadioGroup>
+                            <Radio value="all">全部</Radio>
+                            <Radio value="any">任何</Radio>
+                          </RadioGroup>
+                        )
+                      }
+                      <span>以下条件</span>
+                    </FormItem>
+                  }
+                </div>
+                <div className="condition-input">
+                  <FormItem>
+                    {getFieldDecorator(`condition[${k}]`, {
+                      initialValue: 'uri',
+                    })(
+                      <Select
+                        style={{ width: 100 }}
+                      >
+                        {/* <Option value="Header">Header</Option>*/}
+                        <Option value="uri">uri</Option>
+                      </Select>
+                    )}
+                  </FormItem>
+                  <FormItem>
+                    {getFieldDecorator(`matchRule[${k}]`, {
+                      initialValue: name ? (routeConditionkeys[uniqueKey] && routeConditionkeys[uniqueKey].matchRule) : 'prefix',
+                    })(
+                      <Select
+                        style={{ width: 100 }}
+                      >
+                        <Option value="prefix">前缀匹配</Option>
+                        <Option value="exact">完全匹配</Option>
+                      </Select>
+                    )}
+                  </FormItem>
+
+                  <FormItem>
+                    {getFieldDecorator(`rule[${k}]`, {
+                      initialValue: routeConditionkeys[uniqueKey] &&
+                      routeConditionkeys[uniqueKey].rule,
+                      validateTrigger: [ 'onChange', 'onBlur' ],
+                      rules: [{ validator: this.ruleOfRouteValidator }],
+                    })(
+                      <Input style={{ width: 100 }} placeholder="请输入规则"/>
+                    )}
+                  </FormItem>
+                  {/* 暂时不需要添加和删除按钮
                 <Button icon="plus" onClick={() => {
                   this.addItem('routeConditionkeys', uniqueKey)
                 }}/>
                 <Button type="danger" icon="close" onClick={() => this.removeItem(k, `routeConditionkeys[${uniqueKey}]`)} />
                 */}
+                </div>
               </div>
-            </div>
-          </FormItem>
+            </FormItem>
+          </div>
         )
       })
-      return routeConditionsDomList
+      return { routeConditionsDomList, matchPrefix, matchWay, matchRule }
     }
     const routesBasedReqContent = routeList.map((k, index) => {
+      const componentSelected = getFieldValue('componentSelected')
+      const versions = componentSelected.length !== 0 ? getFieldValue(`version[${k}]`) || '-' : '-'
+      const tip = `当${routeConditionsItem(k).matchPrefix}${routeConditionsItem(k).matchWay}
+              <${routeConditionsItem(k).matchRule}>，请求将被均衡的发送到 ${JSON.stringify(versions)}`
       return (
         <FormItem
           {...(index === 0 ? dynamicFormItemLayout : formItemLayoutWithOutLabel)}
@@ -432,35 +492,42 @@ class NewRouteComponent extends React.Component {
                 <Radio value="content">基于请求内容</Radio>
                 <Radio value="traffic" disabled>基于流量比例</Radio>
               </RadioGroup>
-              <div className="route-type-tip">
+              {/* <div className="route-type-tip">
                 <span>
                   <Icon type="question"/>
                   选择“基于请求内容类型”，您以前配置的【基于流量比例规则】将全部删除
                 </span>
                 <Icon type="close"/>
-              </div>
-              添加路由项
+              </div>*/}
+              <div>添加路由项</div>
             </div>
           }
           <div className="route-type-item">
             <div className="remove-route-item" onClick={() => this.removeItem(k, 'routeKeys')}>
               <Icon type="delete" theme="outlined" />
             </div>
-
-            <div>{routeConditionsItem(k)}</div>
-            <FormItem
-              label="作用版本"
-              {...dynamicFormItemLayout}
-            >
-              {actionVersionOptions.length === 0 ? '请选择组件' : getFieldDecorator(`version[${k}]`, {
-                initialValue: routeConditionkeys[k] &&
-                routeConditionkeys[k].version,
-              })(<CheckboxGroup options={actionVersionOptions}/>)}
-              <div className="route-item-tip">
-                当HTTP Header“User-Agent”包含“Chrome”且“User-Agent”包含“Nexus 6P”时，
-                所有请求将被发送到 ["1.0.1（service1）"]
-              </div>
-            </FormItem>
+            <div>{routeConditionsItem(k).routeConditionsDomList}</div>
+            <div className="action-version">
+              <FormItem
+                label="作用版本"
+                {...routeItemInnerLayout}
+              >
+                {actionVersionOptions.length === 0 ? '请选择组件' : getFieldDecorator(`version[${k}]`, {
+                  initialValue: routeConditionkeys[k] &&
+                  routeConditionkeys[k].version,
+                  validateTrigger: [ 'onChange' ],
+                  rules: [{ validator: this.versionValidator }],
+                })(<CheckboxGroup options={actionVersionOptions}/>)}
+              </FormItem>
+            </div>
+            <Row>
+              <Col span={3}></Col>
+              <Col span={20}>
+                <div className="route-item-tip">
+                  {tip}
+                </div>
+              </Col>
+            </Row>
           </div>
           {
             index === routeList.length - 1 && <div className="add-new-route" onClick={() => this.addItem('routeKeys')}><Icon type="plus-circle"/>添加一个路由项</div>
@@ -574,8 +641,10 @@ class NewRouteComponent extends React.Component {
               })
               return
             }
-            notification.success({ message: '创建成功' })
-            this.props.history.push('/service-mesh/routes-management')
+            if (res.type === 'NEW_MESH_ROUTE_SUCCESS') {
+              notification.success({ message: '创建成功' })
+              this.props.history.push('/service-mesh/routes-management')
+            }
           })
         }
       }
@@ -684,7 +753,7 @@ class NewRouteComponent extends React.Component {
                     </div>
                   </div>
                   :
-                  <div className="inner-content">
+                  <div className="tip">
                     该规则中的服务仅提供给集群内其他服务访问
                   </div>
               }
@@ -695,7 +764,7 @@ class NewRouteComponent extends React.Component {
 
         </Form>
         <div className="new-route-footer">
-          <Button>取消</Button>
+          <Button onClick={() => this.props.history.push('/service-mesh/routes-management')}>取消</Button>
           <Button type="primary" onClick={this.handleSubmit}>确定</Button>
         </div>
       </Card>

@@ -8,9 +8,17 @@
  * @date 2018-10-10
  */
 
-// import union from 'lodash/union'
 import * as ActionTypes from '../actions/meshGateway'
-// import { toQuerystring } from '../common/utils'
+import moment from 'moment'
+import sortBy from 'lodash/sortBy'
+import { getDeepValue } from '../common/utils'
+
+const sortByCreateTime = res => {
+  const { entities, result } = res || {}
+  return sortBy(result || [], r => -moment(
+    getDeepValue(entities || {}, [ 'meshGatewayList', r, 'metadata', 'creationTimestamp' ])
+  ).unix())
+}
 
 const meshIngressGatewayList = (state = {}, action) => {
   const { type } = action
@@ -48,7 +56,7 @@ const meshGatewayList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        data: action.response && action.response.result || [],
+        data: sortByCreateTime(action.response),
       }
     case ActionTypes.MESH_GATEWAY_FAILURE:
       return {

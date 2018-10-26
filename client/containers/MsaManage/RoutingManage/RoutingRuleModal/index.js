@@ -190,7 +190,11 @@ class RoutingRuleModal extends React.Component {
     }, ASYNC_VALIDATOR_TIMEOUT)
   }
   routePathCheck = (rules, value, cb) => {
+    const { checkRoutePath, clusterID, currentRoute } = this.props
     clearTimeout(this.routePathTimeout)
+    if (currentRoute && (currentRoute.path === value)) {
+      return cb()
+    }
     if (!value) {
       return cb()
     }
@@ -200,7 +204,6 @@ class RoutingRuleModal extends React.Component {
     if (/^\/[*]+(\/.+)?$/.test(value)) {
       return cb('一级路由路径不能以*结尾')
     }
-    const { checkRoutePath, clusterID } = this.props
     this.routePathTimeout = setTimeout(() => {
       checkRoutePath(clusterID, value).then(res => {
         if (res.response.result.data.has) {

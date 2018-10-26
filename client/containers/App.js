@@ -286,6 +286,7 @@ class App extends React.Component {
       location,
       current,
       toggleCollapsed,
+      managedProjects,
     } = this.props
     const jwt = auth[JWT] || {}
     if (!jwt.token) {
@@ -313,6 +314,7 @@ class App extends React.Component {
           currentUser={current.user.info || {}}
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
+          managedProjects={managedProjects}
         />
         <Layout id="app" className={appStyle} >
           {this.renderErrorMessage()}
@@ -340,13 +342,17 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
   const { entities } = state
-  const { auth } = entities
+  const { auth, projects } = entities
   const current = state.current || {}
+  const userProjects = current.projects && current.projects.ids || []
+  const managedProjects = userProjects.map(namespace => projects[namespace])
+    .filter(({ outlineRoles }) => !outlineRoles.includes('no-participator') && outlineRoles.includes('manager'))
   return {
     errorObject: state.errorObject,
     auth,
     current,
     currentConfig: current.config || {},
+    managedProjects,
   }
 }
 

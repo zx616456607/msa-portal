@@ -29,13 +29,14 @@ import zipkin from './callLinkTrack'
 import serviceMesh from './serviceMesh'
 import meshGateway from './meshGateway'
 import meshRouteManagement from './meshRouteManagement'
+import overView from './indexPage'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
   auth: {},
   apms: {},
   projects: {},
-  projectsList: {},
+  // projectsList: {},
   ppApps: {},
   msaList: {},
   gatewayPolicies: {},
@@ -86,6 +87,7 @@ const rootReducer = combineReducers({
   zipkin,
   serviceMesh,
   meshGateway,
+  overView,
 })
 
 export default rootReducer

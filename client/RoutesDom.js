@@ -13,7 +13,7 @@
 import React from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import App from './containers/App'
-// import IndexPage from './containers/IndexPage'
+import IndexPage from './containers/IndexPage'
 import MsaManage from './containers/MsaManage'
 import RegisterMsa from './containers/MsaManage/MsaList/RegisterMsa'
 import MsaList from './containers/MsaManage/MsaList/index'
@@ -73,9 +73,8 @@ import RouteDetail from './containers/ServiceMesh/RoutesManagement/RouteDetail'
 export const appChildRoutes = [
   {
     path: '/',
-    // component: IndexPage,
+    component: IndexPage,
     exact: true,
-    render: () => <Redirect to="/msa-manage" component={MsaManage} />,
     key: 'index',
   },
   {

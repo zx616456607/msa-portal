@@ -9,11 +9,12 @@
  */
 const path = require('path')
 const webpack = require('webpack')
+const tsImportPluginFactory = require('ts-import-plugin')
 const siteConfig = require('../config')
 const { site } = siteConfig
 const env = process.env
 const analyze = !!process.env.ANALYZE_ENV
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
+// const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const configBase = {
@@ -25,6 +26,7 @@ const configBase = {
     alias: {
       '@': path.join(__dirname, '..', 'client'),
     },
+    extensions: [ '.js', '.jsx', '.json', '.ts', '.tsx' ],
   },
   output: {
     publicPath: '/public/',
@@ -35,7 +37,29 @@ const configBase = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-      }, {
+      },
+      {
+        test: /\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+            getCustomTransformers: () => ({
+              before: [
+                tsImportPluginFactory({
+                  libraryName: 'antd',
+                  libraryDirectory: 'lib',
+                }),
+              ],
+            }),
+            compilerOptions: {
+              module: 'es2015',
+            },
+          },
+        },
+        exclude: /node_modules/,
+      },
+      {
         test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2|svg)$/,
         loader: 'url-loader',
         options: {
@@ -51,7 +75,7 @@ const configBase = {
         NODE_ENV: JSON.stringify(env.NODE_ENV),
       },
     }),
-    new SpriteLoaderPlugin(),
+    // new SpriteLoaderPlugin(),
     new webpack.BannerPlugin({
       banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
       exclude: /\.svg$/,
