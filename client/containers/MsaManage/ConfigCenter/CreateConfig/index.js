@@ -108,7 +108,7 @@ class CreateConfig extends React.Component {
       project_url: encodeURIComponent(configGitUrl),
     }
     const yamls = currentYaml === '' ? yaml : currentYaml
-    if (yaml && currentYaml === '') {
+    if (yaml === '' && currentYaml === '') {
       notification.warn({
         message: '请填写配置内容',
       })

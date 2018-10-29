@@ -39,76 +39,84 @@
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
         cursor: pointer;
-        font-size: 14px;
       }
     }
     .title {
       vertical-align: middle;
-      line-height: 25px;
+      line-height: 30px;
       padding-left: 10px;
-      font-size: 16px;
       border-left: 5px solid #00a0e9;
-      margin-left: 15%;
       margin-right: 50px;
     }
   }
-  .create-component-body {
-    .form-title {
-      padding-left: 2%;
-      .service-desc {
-        color: #ccc;
-        margin-left: 20px;
-      }
-    }
-    .service {
-      margin-left: 22px;
-      margin-right: 30px;
-    }
-    .selects {
-      margin-left: 22px;
-    }
-    .area {
-      margin-left: 22px;
-    }
-    .dotted {
-      border-bottom: 1px dashed @border-color-base;
-      margin: 20px 0;
-      span {
-        margin-left: 3%;
-        font-size: 15px;
-        color: #2db7f5;
-      }
-    }
-    .serviceHeader {
-      width: 64%;
-      margin-left: 8.5%;
-      background-color: #f2f2f2;
-      margin-top: 15px;
-      & > div {
-        padding: 15px 25px;
-      }
-      border: @border-width-base @border-style-base @border-color-base;
-      border-bottom: none;
-    }
-    .serviceList {
-      width: 64%;
-      margin-left: 8.5%;
-      & > div {
-        padding: 15px 0 15px 25px;
-        .ant-form-item {
-          margin-bottom: 0;
+  .create-component-top {
+    .create-component-body {
+      .form-title {
+        padding-left: 2%;
+        margin-bottom: 30px;
+        .service-desc {
+          color: #ccc;
+          margin-left: 20px;
         }
       }
-      border: @border-width-base @border-style-base @border-color-base;
-      &:not(:last-of-type) {
+      .service {
+        margin-left: 22px;
+        margin-right: 30px;
+      }
+      .selects {
+        margin-left: 22px;
+      }
+      .area {
+        margin-left: 22px;
+      }
+      .dotted {
+        border-bottom: 1px dashed @border-color-base;
+        margin-bottom: 20px;
+        span {
+          margin-left: 3%;
+          font-size: 15px;
+          color: #2db7f5;
+        }
+      }
+      .serviceHeader {
+        width: 64%;
+        margin-left: 8.5%;
+        background-color: #f2f2f2;
+        margin-top: 15px;
+        & > div {
+          padding: 15px 25px;
+        }
+        border: @border-width-base @border-style-base @border-color-base;
         border-bottom: none;
       }
-    }
-    .btn-bottom {
-      margin-left: 10.5%;
-      .cancel {
-        margin-right: 20px;
+      .serviceList {
+        width: 64%;
+        margin-left: 8.5%;
+        & > div {
+          padding: 15px 0 15px 0;
+          .ant-form-item {
+            margin-bottom: 0;
+          }
+        }
+        border: @border-width-base @border-style-base @border-color-base;
+        &:not(:last-of-type) {
+          border-bottom: none;
+        }
+        .delete {
+          margin-left: 25px;
+        }
       }
     }
+  }
+  .btn-bottom {
+    margin-left: 10.5%;
+    .cancel {
+      margin-right: 20px;
+    }
+  }
+  .bottom-soild {
+    border-top: 1px solid #ccc;
+    position: relative;
+    top: -67px;
   }
 }

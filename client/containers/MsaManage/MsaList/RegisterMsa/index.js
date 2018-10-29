@@ -315,7 +315,11 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 type: 'integer',
-                message: '请填写端口',
+                validator: (rule, value, cb) => {
+                  if (!value) return cb(new Error('请填写端口'))
+                  if (value < 1 || value > 65535) return cb(new Error('请输入正确的端口号'))
+                  cb()
+                },
               }],
             })(
               <InputNumber placeholder="如 8080, 输入范围 0~65535" min={1} max={65535} style={{ width: '30%' }} />
