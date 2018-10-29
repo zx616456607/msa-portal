@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Select, Button, Form, Input, DatePicker } from 'antd'
 import LogComponent from './LogsDetail'
-import TenxIcon from '@tenx-ui/icon'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 import { getClusterOfQueryLog, getServiceOfQueryLog, getQueryLogList,
   loadServiceContainerList } from '../../../actions/logs'
 import './style/index.less'

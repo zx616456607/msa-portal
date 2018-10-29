@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom'
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
-import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
+import { Button, Input, Table, Card, Pagination, notification } from 'antd'
 import './style/index.less'
 import AddressTip from './AddressTip';
 
@@ -91,7 +91,7 @@ class ComponentManagement extends React.Component {
             this.load()
           })
         })
-      }
+      },
     })
   }
 

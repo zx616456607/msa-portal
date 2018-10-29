@@ -308,7 +308,7 @@ class CreateComponent extends React.Component {
                     })
                   }
                 </Select>
-                )}
+              )}
             </FormItem>
           </Col>
           <Col span={8}>
@@ -324,7 +324,7 @@ class CreateComponent extends React.Component {
                   placeholder="如：v1, abc"
                   disabled={this.state[`service${key}`]}
                   style={{ width: '100%' }} />
-                )}
+              )}
             </FormItem>
           </Col>
           <Col span={5}>
@@ -371,7 +371,7 @@ class CreateComponent extends React.Component {
                         componentList.metadata.name : undefined,
                     })(
                       <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
-                      )}
+                    )}
                   </FormItem>
                 </Row>
                 <Row>
@@ -381,7 +381,7 @@ class CreateComponent extends React.Component {
                       rules: [{ pattern: '', whitespace: true, message: '' }],
                     })(
                       <TextArea className="area" rows={4} placeholder="请输入描述" />
-                      )}
+                    )}
                   </FormItem>
                 </Row>
                 <div className="dotted"><span>关联服务</span></div>

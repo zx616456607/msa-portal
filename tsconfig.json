@@ -24,7 +24,7 @@
     "skipDefaultLibCheck": true,
     "importHelpers": true,
     "lib": [
-      "es2015",
+      "es2018",
       "dom"
     ]
   },

@@ -22,7 +22,7 @@ import {
 } from '../../../../selectors/event'
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
-import TenxIcon from '@tenx-ui/icon'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const { RangePicker } = DatePicker
 const Option = Select.Option

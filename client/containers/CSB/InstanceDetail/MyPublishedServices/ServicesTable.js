@@ -28,7 +28,7 @@ import {
   getCascadedDetail,
 } from '../../../../actions/CSB/instanceService'
 import './style/ServiceTable.less'
-import TenxIcon from '@tenx-ui/icon/lib/index.js'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const modalTooptip = [
   {
