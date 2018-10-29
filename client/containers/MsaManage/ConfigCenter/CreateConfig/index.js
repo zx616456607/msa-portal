@@ -275,7 +275,7 @@ class CreateConfig extends React.Component {
                 initialValue: detail !== 'false' ? projectName : undefined,
                 rules: [{ required: true, pattern: REPOSITORY_REGEXP, whitespace: true, message: '配置名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头' }],
               })(
-                <Input className="selects" placeholder="请输入配置名称" disabled={detail === 'true'} onChange={this.handleInput} />
+                <Input disabled={detail === 'update' || detail === 'true'} className="selects" placeholder="请输入配置名称" onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
