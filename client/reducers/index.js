@@ -30,6 +30,7 @@ import serviceMesh from './serviceMesh'
 import meshGateway from './meshGateway'
 import meshRouteManagement from './meshRouteManagement'
 import overView from './indexPage'
+import dubbo from './dubbo'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -80,6 +81,7 @@ const rootReducer = combineReducers({
   msa,
   gateway,
   meshRouteManagement,
+  dubbo,
   ...configCenter,
   CSB,
   certification,

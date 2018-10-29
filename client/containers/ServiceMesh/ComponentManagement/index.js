@@ -45,7 +45,7 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    const { clusterID, namespace } = this.props
+    // const { clusterID, namespace } = this.props
     const { componentName } = this.state
     let filterList = []
     if (componentName) {
