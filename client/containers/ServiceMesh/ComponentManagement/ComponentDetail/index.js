@@ -302,7 +302,7 @@ class ComponentDetail extends React.Component {
               this.props.history.push('/service-mesh/component-management')
             }>返回组件管理列表</span>
           </div>
-          <div className="title">组件详情</div>
+          <span className="title">组件详情</span>
         </div>
         <Card className="component-detail-top" key="desc">
           <div className="topLeft">

@@ -154,13 +154,14 @@ export const COMPONENT_ADD_REQUEST = 'COMPONENT_ADD_REQUEST'
 export const COMPONENT_ADD_SUCCESS = 'COMPONENT_ADD_SUCCESS'
 export const COMPONENT_ADD_FAILURE = 'COMPONENT_ADD_FAILURE'
 
-const PostComponent = (clusterID, body, project) => {
+const PostComponent = (clusterID, body, project, options) => {
   let headers
   if (project && project !== 'default') {
     headers = project
   }
   return {
     body,
+    options,
     [CALL_API]: {
       types: [ COMPONENT_ADD_REQUEST, COMPONENT_ADD_SUCCESS, COMPONENT_ADD_FAILURE ],
       endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule`,
@@ -176,8 +177,8 @@ const PostComponent = (clusterID, body, project) => {
   }
 }
 
-export const AddComponent = (clusterID, body, project) => dispatch => {
-  return dispatch(PostComponent(clusterID, body, project))
+export const AddComponent = (clusterID, body, project, options) => dispatch => {
+  return dispatch(PostComponent(clusterID, body, project, options))
 }
 
 export const COMPONENT_DETAIL_REQUEST = 'COMPONENT_DETAIL_REQUEST'

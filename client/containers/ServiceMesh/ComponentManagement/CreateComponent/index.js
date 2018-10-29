@@ -197,8 +197,14 @@ class CreateComponent extends React.Component {
           this.props.history.push('/service-mesh/component-management')
         })
       } else {
-        editComponent(clusterID, query, namespace).then(res => {
+        editComponent(clusterID, query, namespace, { isHandleError: true }).then(res => {
           if (res.error) {
+            if (res.status === 400) {
+              notification.warn({
+                message: '请至少关联一个后端服务',
+              })
+              return
+            }
             notification.error({
               message: '修改组件失败',
             })
@@ -302,7 +308,7 @@ class CreateComponent extends React.Component {
                     })
                   }
                 </Select>
-              )}
+                )}
             </FormItem>
           </Col>
           <Col span={8}>
@@ -318,7 +324,7 @@ class CreateComponent extends React.Component {
                   placeholder="如：v1, abc"
                   disabled={this.state[`service${key}`]}
                   style={{ width: '100%' }} />
-              )}
+                )}
             </FormItem>
           </Col>
           <Col span={5}>
@@ -338,17 +344,17 @@ class CreateComponent extends React.Component {
 
     return (
       <QueueAnim className="create-component">
+        <div className="create-component-btn layout-content-btns" keys="btn">
+          <div className="back">
+            <span className="backjia"></span>
+            <span className="btn-back" onClick={() =>
+              this.props.history.push('/service-mesh/component-management')
+            }>返回组件管理列表</span>
+          </div>
+          <span className="title">{isAdd ? '创建组件' : '编辑组件'}</span>
+        </div>
         <Card>
           <div className="create-component-top">
-            <div className="create-component-btn layout-content-btns" keys="btn">
-              <div className="back">
-                <span className="backjia"></span>
-                <span className="btn-back" onClick={() =>
-                  this.props.history.push('/service-mesh/component-management')
-                }>返回组件管理列表</span>
-              </div>
-              <div className="title">{isAdd ? '创建组件' : '编辑组件'}</div>
-            </div>
             <div className="create-component-body">
               <div>
                 <Row>
@@ -365,7 +371,7 @@ class CreateComponent extends React.Component {
                         componentList.metadata.name : undefined,
                     })(
                       <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
-                    )}
+                      )}
                   </FormItem>
                 </Row>
                 <Row>
@@ -375,7 +381,7 @@ class CreateComponent extends React.Component {
                       rules: [{ pattern: '', whitespace: true, message: '' }],
                     })(
                       <TextArea className="area" rows={4} placeholder="请输入描述" />
-                    )}
+                      )}
                   </FormItem>
                 </Row>
                 <div className="dotted"><span>关联服务</span></div>
