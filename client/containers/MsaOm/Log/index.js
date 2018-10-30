@@ -106,7 +106,7 @@ class Logs extends React.Component {
       const state = !!value.example
       getQueryLogList(clusterID, query, state, body, namespace).then(res => {
         this.setState({
-          logs: res.response.result.data,
+          logs: res.response.result.data && res.response.result.data.logs,
         })
       })
     })
