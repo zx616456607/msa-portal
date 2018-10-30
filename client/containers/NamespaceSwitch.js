@@ -22,7 +22,7 @@ import {
   getProjectList,
   getProjectClusters,
 } from '../actions/current'
-import TenxIcon from '@tenx-ui/icon/lib/index.js'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const Search = Input.Search
 const MenuItemGroup = Menu.ItemGroup;

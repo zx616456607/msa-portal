@@ -30,7 +30,7 @@ import {
 } from '../../../constants'
 import { instancesSltMaker } from '../../../selectors/CSB/instance'
 import { parse as parseQuerystring } from 'query-string'
-import TenxIcon from '@tenx-ui/icon/lib/index.js'
+import TenxIcon from '@tenx-ui/icon/es/_old'
 
 const FormItem = Form.Item
 const Option = Select.Option

@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom'
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
-import { Button, Input, Table, Card, Modal, Pagination, notification } from 'antd'
+import { Button, Input, Table, Card, Pagination, notification } from 'antd'
 import './style/index.less'
 import AddressTip from './AddressTip';
 
@@ -57,6 +57,7 @@ class ComponentManagement extends React.Component {
       })
     } else {
       this.setState({
+        searchList: [],
         isSearch: false,
       }, () => {
         this.load()
@@ -91,6 +92,12 @@ class ComponentManagement extends React.Component {
           })
         })
       },
+    })
+  }
+
+  handleCancel = () => {
+    this.setState({
+      deleteVisible: false,
     })
   }
 
@@ -141,7 +148,7 @@ class ComponentManagement extends React.Component {
       render: (text, record) =>
         <div className="AddressTipWrape">
           <AddressTip dataList={dataList} componentName={record.name}
-            parentNode={'AddressTipWrape'}/>
+            parentNode={'AddressTipWrape'} />
         </div>,
     }, {
       title: '路由规则',
