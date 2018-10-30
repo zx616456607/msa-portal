@@ -139,8 +139,8 @@ class ComponentManagement extends React.Component {
       dataIndex: 'servicecount',
     }, {
       title: '描述',
-      // width: '25%',
-      dataIndex: '',
+      width: '25%',
+      dataIndex: 'description',
     }, {
       title: '服务地址',
       dataIndex: 'address',
