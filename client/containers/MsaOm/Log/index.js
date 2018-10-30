@@ -221,7 +221,7 @@ class Logs extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={4} style={{ lineHeight: '3.5' }}>
+            <Col span={12} style={{ lineHeight: '3.5' }}>
               <Button type="primary" onClick={() => this.handleSearch()}>
                 <TenxIcon
                   type="search"
