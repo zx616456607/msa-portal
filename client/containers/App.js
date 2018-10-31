@@ -153,7 +153,8 @@ class App extends React.Component {
       return null
     }
     const { message, status, options } = errorObject
-    if (message === 'Failed to fetch') {
+    if (message === 'Failed to fetch' ||
+    (status === 503 && message === '503 Service Unavailable')) {
       messageTip.warn('网络或服务暂时不可用，请稍后重试')
       resetErrorMessage()
       return
@@ -188,16 +189,6 @@ class App extends React.Component {
       && pathname.includes('/publish-service')) {
       notification.warn({
         message: '该实例中已存在同名称同版本的服务',
-        onClose: () => {
-          resetErrorMessage()
-          errorMessageCloseObj[errorMessageBeforeDateTime] = true
-        },
-      })
-      return
-    }
-    if (status === 503 && message === '503 Service Unavailable') {
-      notification.warn({
-        message: '服务不可用',
         onClose: () => {
           resetErrorMessage()
           errorMessageCloseObj[errorMessageBeforeDateTime] = true
