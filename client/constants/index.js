@@ -15,7 +15,7 @@ const isProd = process.env.NODE_ENV === 'production'
 /* api config */
 // dev api config
 const PAAS_API_PROTOCOL = isProd ? 'http:' : 'http:'
-const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.242:8000'
+const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.230:48000'
 // const PAAS_API_HOST = isProd ? '192.168.1.103:48000' : '192.168.1.59:9001'
 
 const PAAS_API_PREFIX = '/api/v2'
