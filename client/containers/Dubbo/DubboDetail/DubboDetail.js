@@ -63,7 +63,6 @@ class DubboDetail extends React.Component {
       {
         dataIndex: 'serviceAddress',
         title: '服务地址',
-        width: 100,
         render: text => <div className="service-address">
           <Ellipsis>{text}</Ellipsis>
         </div>,
