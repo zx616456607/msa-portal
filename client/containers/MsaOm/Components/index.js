@@ -135,8 +135,7 @@ class MsaComponents extends React.Component {
           id: item.deployment.metadata.uid,
           name: this.nameList(item.deployment.metadata.name),
           component: item.deployment.metadata.name,
-          status: this.filterState(item.deployment.spec.replicas,
-            item.deployment.status.availableReplicas),
+          status: this.filterState(item),
           count: item.deployment.spec.replicas,
           time: this.filterTimer(item.deployment.metadata.creationTimestamp),
         }
@@ -155,16 +154,45 @@ class MsaComponents extends React.Component {
     return formatFromnow(start)
   }
 
-  filterState = (replicas, available) => {
-    if (replicas > 0 || available > 0) {
-      return 1
-    } if (replicas === 0 || available > 0) {
-      return 3
-    } if (replicas === 0 || available === 0) {
-      return 0
-    } if (replicas > 0 || available <= 0) {
-      return 2
+  filterState = item => {
+    let res
+    const { deployment, metadata, status } = item
+    const replicas = deployment.spec.replicas
+    const available = deployment.status.availableReplicas
+    const {
+      updatedReplicas,
+      unavailableReplicas,
+      observedGeneration,
+      readyReplicas,
+    } = status
+    if (replicas === 0 && available > 0) {
+      res = 3 // 'Stopping'
     }
+    if (observedGeneration >= metadata.generation &&
+      replicas === updatedReplicas && readyReplicas > 0) {
+      status.available = readyReplicas
+      res = 1 // 'Running'
+    }
+    if (replicas > 0 && available < 1) {
+      status.unavailableReplicas = replicas
+      res = 2 // 'Pending'
+    }
+    if (updatedReplicas && unavailableReplicas) {
+      res = 4 // 'Deploying'
+    }
+    if (available < 1) {
+      res = 0 // 'Stopped'
+    }
+    return res
+    // if (replicas > 0 || available > 0) {
+    //   return 1
+    // } if (replicas === 0 || available > 0) {
+    //   return 3
+    // } if (replicas === 0 || available === 0) {
+    //   return 0
+    // } if (replicas > 0 || available <= 0) {
+    //   return 2
+    // }
   }
 
   handleButtonClick = record => {
