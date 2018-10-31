@@ -1,5 +1,121 @@
-.service-detail {
+
+@import "../../../../../assets/style/core/index.less";
+.instance-detail {
   background: white;
+  &-header {
+    height: 160px;
+    background-color: #fff;
+    padding: @padding-large;
+    &-icon {
+      float: left;
+      height: 100px;
+      width: 100px;
+      padding: 10px;
+      border: 1px @border-style-base @border-color-split;
+      border-radius: @border-radius-medium;
+    }
+    &-right {
+      float: left;
+      width: calc(~"100% - 100px - 24px");
+      margin-left: 24px;
+    }
+    &-btns {
+      text-align: right;
+    }
+  }
+  &-body {
+    padding: @padding-medium;
+    .ant-tabs {
+      height: 100%;
+      &.ant-tabs-vertical.ant-tabs-left > .ant-tabs-bar {
+        margin-right: @padding-small;
+        border-right: none;
+        .ant-tabs-nav {
+          background-color: #fff;
+          border: 1px @border-style-base @border-color-split;
+          border-radius: @border-radius-base;
+          .ant-tabs-tab {
+            margin-bottom: 0;
+            padding: @padding-base @padding-large;
+            &:not(:last-child) {
+              border-bottom: 1px @border-style-base @border-color-split;
+            }
+          }
+        }
+        .ant-tabs-ink-bar {
+          right: -1px;
+          width: 3px;
+          top: -1px;
+        }
+      }
+      .ant-tabs-content {
+        height: 100%;
+        background-color: #fff;
+        padding-top: @padding-medium;
+        padding-right: @padding-medium;
+        border: 1px @border-style-base @border-color-split;
+        border-radius: @border-radius-base;
+      }
+    }
+    .service-statistics {
+      &-body {
+        padding: 12px @padding-small @padding-large;
+        & > .ant-row:first-child {
+          border-bottom: 1px dashed @border-color-base;
+          padding-bottom: @padding-small;
+        }
+        & > .ant-row:not(:first-child) {
+          margin-top: @padding-small;
+        }
+      }
+      &-item {
+        & > div + div {
+          & > span + span {
+            color: @font-color-3;
+          }
+          & > span:first-child {
+            font-size: 24px;
+            margin-right: @padding-base;
+          }
+        }
+        & > div:first-child {
+          color: @font-color-3;
+        }
+      }
+      &-and-monitor {
+        .ant-calendar-picker {
+          float: right;
+        }
+        & > div:first-child {
+          font-size: 14px;
+        }
+      }
+      .service-detail-body-monitor {
+        padding-top: @padding-small;
+        & > .ant-row:first-child {
+          & > div + div {
+            text-align: right;
+          }
+        }
+      }
+    }
+    .service-protocols {
+      margin-bottom: @padding-medium;
+    }
+    .service-parameters {
+      margin-bottom: @padding-medium;
+      .error-code {
+        & > * {
+          margin-bottom: @padding-small;
+        }
+        .ant-table {
+          .ant-table-thead, .ant-table-thead > tr > th {
+            background-color: rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
   .item-wrapper {
     display: flex;
     div {

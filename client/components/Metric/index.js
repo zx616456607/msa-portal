@@ -102,7 +102,7 @@ export default class Metric extends React.PureComponent {
       .map(_item => {
         const [ currentMetric ] = Object.entries(_item)
         const [ metricType, value ] = currentMetric
-        const filterMetricData = value.data
+        const filterMetricData = value && value.data
           .filter(_data => checkedKeys.includes(_data.container_name))
         return {
           [metricType]: {

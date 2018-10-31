@@ -11,43 +11,48 @@
  */
 
 import React from 'react'
-import { loadInstanceLogs } from '../../../../actions/CSB/instance'
+import { loadDubboInstanceLogs } from '../../../../actions/dubbo'
 import { connect } from 'react-redux'
 import LogTemplate from '../../../../components/Log'
+import { formatDate } from '../../../../common/utils';
 
 class Log extends React.Component {
   static propTypes = {}
 
   componentDidMount() {
-    this.loadData()
+    const query = {
+      date_start: formatDate(new Date(), 'YYYY-MM-DD'),
+      date_end: formatDate(new Date(), 'YYYY-MM-DD'),
+    }
+
+    this.loadData(query)
   }
 
-  loadData = (query = {}) => {
-    const { loadInstanceLogs, instance, clusterID } = this.props
-    const { namespace } = instance
-    query = Object.assign({}, query)
-    loadInstanceLogs(clusterID, namespace, query)
+  loadData = query => {
+    const { loadDubboInstanceLogs, instance, namespace, clusterID } = this.props
+    loadDubboInstanceLogs(clusterID, namespace, instance.serviceName, query)
   }
 
   render() {
-    const { instanceLogs, instance } = this.props
-    const { namespace } = instance
-    const logs = instanceLogs[namespace] || { isFetching: true }
-    const { isFetching, data = [] } = logs
+    const { dubboInstanceLogs, instance } = this.props
+    const logsData = dubboInstanceLogs[instance.serviceName] || { isFetching: true }
+    const { isFetching, data = { logs: [] } } = logsData
     return <div>
-      <LogTemplate loadData={this.loadData} data={data} isFetching={isFetching}/>
+      <LogTemplate loadData={this.loadData} data={data.logs} isFetching={isFetching}/>
     </div>
   }
 }
 
 const mapStateToProps = state => {
-  const { CSB } = state
-  const { instanceLogs } = CSB
+  const { dubbo } = state
+  const { dubboInstanceLogs } = dubbo
+  const { namespace } = state.current.config.project
   return {
-    instanceLogs,
+    namespace,
+    dubboInstanceLogs,
   }
 }
 
 export default connect(mapStateToProps, {
-  loadInstanceLogs,
+  loadDubboInstanceLogs,
 })(Log)

@@ -10,6 +10,9 @@
  * @author zhouhaitao
  */
 import { CALL_API } from '../middleware/api'
+import { toQuerystring } from '../common/utils'
+import { METRICS_DEFAULT_SOURCE, API_CONFIG } from '../constants';
+const { PAAS_API_URL } = API_CONFIG
 
 export const FETCH_DUBBO_LIST_REQUEST = 'FETCH_DUBBO_LIST_REQUEST'
 export const FETCH_DUBBO_LIST_SUCCESS = 'FETCH_DUBBO_LIST_SUCCESS'
@@ -98,3 +101,124 @@ const fetchConsumerList = () => {
 }
 export const getConsumerList = () => dispatch => dispatch(fetchConsumerList())
 
+
+export const GET_ALL_METRICS_SERVICE_REQUEST = 'GET_ALL_METRICS_SERVICE_REQUEST'
+export const GET_ALL_METRICS_SERVICE_SUCCESS = 'GET_ALL_METRICS_SERVICE_SUCCESS'
+export const GET_ALL_METRICS_SERVICE_FAILURE = 'GET_ALL_METRICS_SERVICE_FAILURE'
+
+function fetchServiceAllOfMetrics(cluster, serviceName, query = {}, callback) {
+  let endpoint = `/clusters/${cluster}/services/${serviceName}`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    cluster,
+    serviceName,
+    [CALL_API]: {
+      types: [
+        GET_ALL_METRICS_SERVICE_REQUEST,
+        GET_ALL_METRICS_SERVICE_SUCCESS,
+        GET_ALL_METRICS_SERVICE_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+    callback,
+  }
+}
+export function loadServiceAllOfMetrics(cluster, serviceName, query, callback) {
+  return dispatch => {
+    return dispatch(fetchServiceAllOfMetrics(cluster, serviceName, query, callback))
+  }
+}
+
+// 实例监控
+export const GET_DUBBO_INSTANCE_MONITOR_REQUEST = 'GET_DUBBO_INSTANCE_MONITOR_REQUEST'
+export const GET_DUBBO_INSTANCE_MONITOR_SUCCESS = 'GET_DUBBO_INSTANCE_MONITOR_SUCCESS'
+export const GET_DUBBO_INSTANCE_MONITOR_FAILURE = 'GET_DUBBO_INSTANCE_MONITOR_FAILURE'
+
+const fetchDubboInstanceMonitor = (clusterID, serviceName, project, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_DUBBO_INSTANCE_MONITOR_REQUEST,
+        GET_DUBBO_INSTANCE_MONITOR_SUCCESS,
+        GET_DUBBO_INSTANCE_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterID}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers: {
+          project,
+        },
+      },
+    },
+  }
+}
+
+export const dubboInstanceMonitor = (clusterID, serviceName, project, query) =>
+  dispatch => dispatch(fetchDubboInstanceMonitor(clusterID, serviceName, project, query))
+
+// 实例实时监控
+export const GET_DUBBO_INSTANCE_REALTIME_MONITOR_REQUEST = 'GET_DUBBO_INSTANCE_REALTIME_MONITOR_REQUEST'
+export const GET_DUBBO_INSTANCE_REALTIME_MONITOR_SUCCESS = 'GET_DUBBO_INSTANCE_REALTIME_MONITOR_SUCCESS'
+export const GET_DUBBO_INSTANCE_REALTIME_MONITOR_FAILURE = 'GET_DUBBO_INSTANCE_REALTIME_MONITOR_FAILURE'
+
+const fetchDubboInstanceRealTimeMonitor = (clusterID, serviceName, project, query) => {
+  query = Object.assign({}, query, { source: METRICS_DEFAULT_SOURCE })
+  const { type } = query
+  return {
+    metricType: type,
+    [CALL_API]: {
+      types: [
+        GET_DUBBO_INSTANCE_REALTIME_MONITOR_REQUEST,
+        GET_DUBBO_INSTANCE_REALTIME_MONITOR_SUCCESS,
+        GET_DUBBO_INSTANCE_REALTIME_MONITOR_FAILURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterID}/metric/services/${serviceName}/metrics?${toQuerystring(query)}`,
+      schema: {},
+      options: {
+        headers: {
+          project,
+        },
+      },
+    },
+  }
+}
+
+export const dubboInstanceRealTimeMonitor = (clusterID, serviceName, project, query) =>
+  dispatch => dispatch(fetchDubboInstanceRealTimeMonitor(clusterID, serviceName, project, query))
+
+// 获取当前实例的日志
+export const GET_DUBBO_INSTANCE_LOGS_REQUEST = 'GET_DUBBO_INSTANCE_LOGS_REQUEST'
+export const GET_DUBBO_INSTANCE_LOGS_SUCCESS = 'GET_DUBBO_INSTANCE_LOGS_SUCCESS'
+export const GET_DUBBO_INSTANCE_LOGS_FALIURE = 'GET_DUBBO_INSTANCE_LOGS_FALIURE'
+
+function fetchDubboInstanceLogs(clusterId, project, serviceName, body) {
+  body.log_type = 'stdout'
+  body.kind = 'service'
+  return {
+    serviceName,
+    [CALL_API]: {
+      types: [
+        GET_DUBBO_INSTANCE_LOGS_REQUEST,
+        GET_DUBBO_INSTANCE_LOGS_SUCCESS,
+        GET_DUBBO_INSTANCE_LOGS_FALIURE,
+      ],
+      endpoint: `${PAAS_API_URL}/clusters/${clusterId}/logs/instances/${serviceName}/logs`,
+      options: {
+        method: 'POST',
+        body,
+        headers: {
+          teamspace: project,
+        },
+      },
+      schema: {},
+    },
+  }
+}
+
+export const loadDubboInstanceLogs = (clusterId, project, serviceName, body) =>
+  dispatch => dispatch(fetchDubboInstanceLogs(clusterId, project, serviceName, body))
