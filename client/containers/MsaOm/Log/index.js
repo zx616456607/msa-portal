@@ -106,7 +106,7 @@ class Logs extends React.Component {
       const state = !!value.example
       getQueryLogList(clusterID, query, state, body, namespace).then(res => {
         this.setState({
-          logs: res.response.result.data,
+          logs: res.response.result.data && res.response.result.data.logs,
         })
       })
     })
@@ -221,7 +221,7 @@ class Logs extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={4} style={{ lineHeight: '3.5' }}>
+            <Col span={12} style={{ lineHeight: '3.5' }}>
               <Button type="primary" onClick={() => this.handleSearch()}>
                 <TenxIcon
                   type="search"

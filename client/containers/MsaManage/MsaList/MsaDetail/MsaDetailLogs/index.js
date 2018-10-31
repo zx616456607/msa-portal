@@ -31,7 +31,7 @@ class MsaDetailLogs extends React.Component {
 
   render() {
     const { msaLogs, registryType } = this.props
-    const { data = [], isFetching } = msaLogs
+    const { data = {}, isFetching } = msaLogs
     const locale = {
       emptyText: '暂无日志',
     };
@@ -42,7 +42,7 @@ class MsaDetailLogs extends React.Component {
       <div>
         <LogTemplate
           loadData={this.loadData}
-          data={data}
+          data={data && data.logs || []}
           isFetching={isFetching}
           locale={locale}
         />

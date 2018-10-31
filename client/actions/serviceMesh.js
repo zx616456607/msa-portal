@@ -243,12 +243,13 @@ export const COMPONENT_EDIT_REQUEST = 'COMPONENT_EDIT_REQUEST'
 export const COMPONENT_EDIT_SUCCESS = 'COMPONENT_EDIT_SUCCESS'
 export const COMPONENT_EDIT_FAILURE = 'COMPONENT_EDIT_FAILURE'
 
-const fetchEditComponent = (clusterID, body, project) => {
+const fetchEditComponent = (clusterID, body, project, options) => {
   let headers
   if (project && project !== 'default') {
     headers = project
   }
   return {
+    options,
     [CALL_API]: {
       types: [
         COMPONENT_EDIT_REQUEST,
@@ -268,8 +269,8 @@ const fetchEditComponent = (clusterID, body, project) => {
   }
 }
 
-export const editComponent = (clusterID, body, project) => dispatch => {
-  return dispatch(fetchEditComponent(clusterID, body, project))
+export const editComponent = (clusterID, body, project, options) => dispatch => {
+  return dispatch(fetchEditComponent(clusterID, body, project, options))
 }
 
 export const SERVICES_LIST_REQUEST = 'SERVICES_LIST_REQUEST'
