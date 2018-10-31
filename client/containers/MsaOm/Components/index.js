@@ -135,7 +135,7 @@ class MsaComponents extends React.Component {
           id: item.deployment.metadata.uid,
           name: this.nameList(item.deployment.metadata.name),
           component: item.deployment.metadata.name,
-          status: this.filterState(item),
+          status: this.filterState(item.deployment),
           count: item.deployment.spec.replicas,
           time: this.filterTimer(item.deployment.metadata.creationTimestamp),
         }
@@ -156,9 +156,9 @@ class MsaComponents extends React.Component {
 
   filterState = item => {
     let res
-    const { deployment, metadata, status } = item
-    const replicas = deployment.spec.replicas
-    const available = deployment.status.availableReplicas
+    const { metadata, status, spec } = item
+    const replicas = spec.replicas
+    const available = status.availableReplicas
     const {
       updatedReplicas,
       unavailableReplicas,
