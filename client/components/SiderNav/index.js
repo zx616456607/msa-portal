@@ -131,7 +131,7 @@ const menus = [
       }, {
         key: 'k2',
         to: '/service-mesh/component-management',
-        icon: 'bars',
+        tenxIcon: 'puzzle-o',
         name: '组件管理',
       }, {
         key: 'k3',
