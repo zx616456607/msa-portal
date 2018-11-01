@@ -305,15 +305,15 @@ export const fetchServiceList = (clusterID, project) => dispatch => {
 }
 
 // 项目集群列表
-export const PROJECT_CLUSTER_LIST_REQUEST = 'PROJECT_CLUSTER_LIST_REQUEST'
-export const PROJECT_CLUSTER_LIST_SUCCESS = 'PROJECT_CLUSTER_LIST_SUCCESS'
-export const PROJECT_CLUSTER_LIST_FAILURE = 'PROJECT_CLUSTER_LIST_FAILURE'
-function getProjectClusterList(callback) {
+export const GET_ISTIO_ENABLED_PROJECTS_REQUEST = 'GET_ISTIO_ENABLED_PROJECTS_REQUEST'
+export const GET_ISTIO_ENABLED_PROJECTS_SUCCESS = 'GET_ISTIO_ENABLED_PROJECTS_SUCCESS'
+export const GET_ISTIO_ENABLED_PROJECTS_FAILURE = 'GET_ISTIO_ENABLED_PROJECTS_FAILURE'
+function getIstioEnabledProjects(callback) {
   return {
     [CALL_API]: {
-      types: [ PROJECT_CLUSTER_LIST_REQUEST,
-        PROJECT_CLUSTER_LIST_SUCCESS,
-        PROJECT_CLUSTER_LIST_FAILURE ],
+      types: [ GET_ISTIO_ENABLED_PROJECTS_REQUEST,
+        GET_ISTIO_ENABLED_PROJECTS_SUCCESS,
+        GET_ISTIO_ENABLED_PROJECTS_FAILURE ],
       endpoint: `${SERVICEMESH_API_URL}/servicemesh/paas`,
       schema: {},
       options: {
@@ -323,9 +323,9 @@ function getProjectClusterList(callback) {
   }
 }
 
-export function loadProjectClusterList(callback) {
+export function loadIstioEnabledProjects(callback) {
   return dispatch => {
-    return dispatch(getProjectClusterList(callback))
+    return dispatch(getIstioEnabledProjects(callback))
   }
 }
 

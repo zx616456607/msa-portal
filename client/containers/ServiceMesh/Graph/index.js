@@ -13,7 +13,7 @@ import '@tenx-ui/page/assets/index.css'
 import QueueAnim from 'rc-queue-anim'
 import './styles/index.less'
 import { connect } from 'react-redux'
-import * as current from '../../../actions/current'
+import * as currentActions from '../../../actions/current'
 import * as meshAction from '../../../actions/serviceMesh'
 import { getDeepValue } from '../../../../client/common/utils'
 import RelationChartComponent from './RelationChartComponent'
@@ -24,6 +24,8 @@ const { Option } = Select
 function mapStateToProps(state) {
   const { entities, current, serviceMesh } = state
   const { projects, clusters } = entities
+  const { cluster, project } = current.config
+  const clusterID = cluster.id
   const userProjects = current.projects && current.projects.ids || []
   const currentClusters = current.clusters || {}
   const projectClusters = {}
@@ -41,18 +43,20 @@ function mapStateToProps(state) {
     projectClusters,
     appsList,
     graphDataList,
+    clusterID,
+    project: project.namespace,
   }
 }
 class ServiceMeshGraph extends React.Component {
   state = {
     searchQuery: {}, // 搜索条件
     isTimeRange: false, // 显示
-    projects: [], // 当前服务列表
-    clusters: {}, // 当前所有集群信息
-    currentClusters: [], // 当前选中的项目的集群
+    // projects: [], // 当前服务列表
+    // clusters: {}, // 当前所有集群信息
+    // currentClusters: [], // 当前选中的项目的集群
   }
-  node = null
-  appNode = null
+  // node = null
+  serviceNode = null
   async componentDidMount() {
     // const { current,
     // loadAppList, getProjectClusters, getDefaultClusters,
@@ -79,8 +83,8 @@ class ServiceMeshGraph extends React.Component {
     //   })
     //   return
     // }
-    const { loadAppList } = this.props
-    const projectCluster = await this.props.loadProjectClusterList()
+    const { loadAppList, clusterID, project } = this.props
+    /* const projectCluster = await this.props.loadProjectClusterList()
     const {
       clusters = {}, projects = [],
     } = projectCluster.response && projectCluster.response.result || {}
@@ -90,27 +94,27 @@ class ServiceMeshGraph extends React.Component {
     if (projectsList.length === 0) { return }
 
     const { name: namespace, istioEnabledClusterIds: [ cluster ], istioEnabledClusterIds = [],
-    } = projectsList[0]
+    } = projectsList[0] */
     const data = await loadAppList(
-      cluster,
-      { headers: namespace, from: 0, size: 10 }
+      clusterID,
+      { headers: project, from: 0, size: 10 }
     )
     // const clusterName = Object.entries(this.state.clusters).filter(([ key ]) => key === cluster) || []
     // const { name } = clusterName[0][1] || {}
     this.setState({ searchQuery: {
-      item: namespace,
-      cluster,
+      // item: project,
+      // cluster: clusterID,
       app: getDeepValue(data, [ 'response', 'result', 'data', 'services', 0, 'deployment', 'metadata', 'name' ]),
     } })
-    const currentClusterList = Object.entries(this.state.clusters)
-      .filter(([ key ]) => istioEnabledClusterIds.includes(key))
-    this.setState({ currentClusters: currentClusterList })
+    // const currentClusterList = Object.entries(this.state.clusters)
+    //   .filter(([ key ]) => istioEnabledClusterIds.includes(key))
+    // this.setState({ currentClusters: currentClusterList })
   }
   handleChange = (itemType, value) => {
     const { searchQuery } = this.state
     this.setState({ searchQuery: Object.assign({}, searchQuery, { [itemType]: value }) })
   }
-  handleSelectChange = (itemType, value) => {
+  /* handleSelectChange = (itemType, value) => {
     // const { getDefaultClusters, getProjectClusters } = this.props
     const { searchQuery } = this.state
     // console.log('value', value)
@@ -128,7 +132,7 @@ class ServiceMeshGraph extends React.Component {
     newSearchQuert.cluster = undefined
     newSearchQuert.app = undefined
     newSearchQuert.item = value
-    this.node.focus() // 默认重新选中集群
+    this.serviceNode.focus() // 默认选中服务
     this.setState({ searchQuery: newSearchQuert })
   }
   handleClusterChange = (itemType, value) => {
@@ -138,12 +142,12 @@ class ServiceMeshGraph extends React.Component {
     if (searchQuery.item) {
       loadAppList(value, { headers: searchQuery.item, from: 0, size: 10 })
     }
-    this.appNode.focus()
+    this.serviceNode.focus()
     const newSearchQuert = { ...searchQuery }
     newSearchQuert.app = undefined
     newSearchQuert.cluster = value
     this.setState({ searchQuery: newSearchQuert })
-  }
+  } */
   toogleTimePicker = () => {
     const { isTimeRange } = this.state
     this.setState({ isTimeRange: !isTimeRange })
@@ -168,7 +172,7 @@ class ServiceMeshGraph extends React.Component {
         end: moment(`${day[0]},${second[1]}`, 'MMMM Do YYYY, h:mm:ss a').valueOf() }
       if (timeRange.begin >= timeRange.end) {
         notification.warn({
-          message: '起始时间不能大于结束时间',
+          message: '开始时间不能大于结束时间',
         })
         return
       }
@@ -176,37 +180,36 @@ class ServiceMeshGraph extends React.Component {
     }
   }
   debounceSearchApp = value => {
-    const { loadAppList } = this.props
+    const { loadAppList, clusterID } = this.props
     const { searchQuery = {} } = this.state
     const searchApp = () => {
-      loadAppList(searchQuery.cluster, { headers: searchQuery.item, from: 0, size: 100, filter: `name ${value}` })
+      loadAppList(clusterID, { headers: searchQuery.item, from: 0, size: 100, filter: `name ${value}` })
     }
     debounce(searchApp, 800)()
   }
   loadGraph = () => {
-    const { loadServiceMeshGraph } = this.props
-    const { app, cluster, item, timeRange } = this.state.searchQuery
-    const check = [ app, cluster, item, timeRange ]
-      .every(item => ![ undefined, null ].includes(item))
-    if (!check) {
+    const { loadServiceMeshGraph, clusterID, project } = this.props
+    const { app, timeRange } = this.state.searchQuery
+    if (!app) {
       return notification.info({
-        message: '筛选信息未填全,请填写后重试',
+        message: '请选择服务后重试',
       })
     }
 
-    loadServiceMeshGraph(cluster, item,
+    loadServiceMeshGraph(clusterID, project,
       { service: app, begin: timeRange.begin, end: timeRange.end })
   }
   render() {
-    const { appsList } = this.props
-    const { searchQuery: { item, cluster, app }, isTimeRange, projects,
-      currentClusters,
+    const { appsList, clusterID, project } = this.props
+    const {
+      searchQuery: { app }, isTimeRange,
+      // projects, currentClusters,
     } = this.state
     return (
       <QueueAnim>
         <div className="ServiceMeshGraph" key="body">
           <div className="searchBar">
-            <Select
+            {/* <Select
               showSearch
               style={{ width: 120 }}
               optionFilterProp="children"
@@ -219,7 +222,6 @@ class ServiceMeshGraph extends React.Component {
               }
               value={item}
             >
-              {/* <Option value="default">我的个人项目</Option> */}
               {
                 projects.map(p => (
                   <Option key={p.namespace}>
@@ -264,7 +266,7 @@ class ServiceMeshGraph extends React.Component {
                   </Option>
                 )
               }
-            </Select>
+            </Select> */}
             <Select
               showSearch={true}
               onSearch={this.debounceSearchApp}
@@ -273,12 +275,12 @@ class ServiceMeshGraph extends React.Component {
               placeholder="选择服务"
               onChange={value => this.handleChange('app', value)}
               value={app}
-              ref={ relnode => { this.appNode = relnode } }
+              ref={ relnode => { this.serviceNode = relnode } }
               filterOption={false}
               dropdownMatchSelectWidth={false}
             >
               {
-                cluster && appsList.map(apps => {
+                appsList.map(apps => {
                   return (
                     <Option
                       key={apps.deployment.metadata.name}
@@ -310,8 +312,16 @@ class ServiceMeshGraph extends React.Component {
                   :
                   <span >
                     <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
-                    <TimePicker className="firstTimeSelect" onChange={ value => this.timeRangeSelect('first', value)} />
-                    <TimePicker className="secondTimeSelect" onChange={ value => this.timeRangeSelect('second', value)} />
+                    <TimePicker
+                      className="firstTimeSelect"
+                      placeholder="开始时间"
+                      onChange={ value => this.timeRangeSelect('first', value)}
+                    />
+                    <TimePicker
+                      className="secondTimeSelect"
+                      placeholder="结束时间"
+                      onChange={ value => this.timeRangeSelect('second', value)}
+                    />
                   </span>
               }
             </div>
@@ -327,7 +337,11 @@ class ServiceMeshGraph extends React.Component {
           </div>
           <div className="SvgContainer">
             <RelationChartComponent
-              searchQuery={this.state.searchQuery}
+              searchQuery={{
+                ...this.state.searchQuery,
+                cluster: clusterID,
+                item: project,
+              }}
               graphDataList={this.props.graphDataList}
             />
           </div>
@@ -338,10 +352,9 @@ class ServiceMeshGraph extends React.Component {
 }
 
 export default connect(mapStateToProps, {
-  getDefaultClusters: current.getDefaultClusters,
-  getProjectClusters: current.getProjectClusters,
+  getDefaultClusters: currentActions.getDefaultClusters,
+  getProjectClusters: currentActions.getProjectClusters,
   loadAppList: meshAction.loadAllServices,
   loadServiceMeshGraph: meshAction.loadServiceMeshGraph,
-  loadProjectClusterList: meshAction.loadProjectClusterList,
 })(ServiceMeshGraph)
 
