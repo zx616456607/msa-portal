@@ -134,6 +134,10 @@ export function renderCSBInstanceStatus(instanceStatus) {
       text = '停止中'
       status = 'error'
       break
+    case 4:
+      text = '部署中'
+      status = 'processing'
+      break
     default:
       text = '未知'
       status = 'default'
