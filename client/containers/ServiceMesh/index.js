@@ -40,7 +40,6 @@ class ServiceMesh extends React.Component {
       loading: false,
       ...res.response.result,
     })
-    console.warn('res', res)
   }
 
   renderChildren = () => {
