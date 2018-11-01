@@ -69,7 +69,6 @@ class ServiceDetail extends React.Component {
     const detail = this.renderCurrentService()
     callback(detail, key)
   }
-
   render() {
     const { instanceId } = this.props
     const detail = this.renderCurrentService()
