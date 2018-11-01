@@ -66,6 +66,7 @@
     "@tenx-ui/ellipsis": "0.0.2",
     "@tenx-ui/icon": "^2.1.5",
     "@tenx-ui/loader": "^0.0.3",
+    "@tenx-ui/logs": "^1.2.2",
     "@tenx-ui/modal": "^1.0.9",
     "@tenx-ui/page": "^1.0.2",
     "@tenx-ui/relation-chart": "^0.2.7",

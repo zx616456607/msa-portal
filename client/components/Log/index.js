@@ -15,18 +15,16 @@ import propTypes from 'prop-types'
 import { Icon } from 'antd'
 import moment from 'moment'
 import './style/LogTemplate.less'
-import LogList from './LogList'
-import classNames from 'classnames'
 import { DatePicker } from 'antd'
+import TenxLogs from '@tenx-ui/logs'
+import '@tenx-ui/logs/assets/index.css'
 
 const dateFormat = 'YYYY-MM-DD'
-
 class LogTemplate extends React.Component {
   static propTypes = {
     loadData: propTypes.func.isRequired,
   }
   state = {
-    size: 'small',
     date_start: null,
   }
 
@@ -46,41 +44,45 @@ class LogTemplate extends React.Component {
     loadData(query)
   }
 
-  toggleContainerSize = () => {
-    this.setState(preState => {
-      return { size: preState.size === 'small' ? 'big' : 'small' }
-    })
-  }
-
   disabledDate = current => {
     // Can not select days before today and today
     return current && current > moment().endOf('day')
   }
-
-  render() {
-    const { size } = this.state
+  logs = () => {
     const { data, isFetching } = this.props
-    const logContaierClass = classNames({
-      'big-container-style': size === 'big',
-      'small-container-style': size === 'small',
-    })
+    const logsArr = []
+    if (data !== null && data.length !== 0) {
+      data.forEach(v => {
+        const item = `<div class="log-item">
+          <span class="log-name">${v.name}</span>
+          <span class="log">${v.log}</span>
+        </div>`
+        logsArr.push(item)
+      })
+    } else if (isFetching) {
+      logsArr.push('<span>加载中...</span>')
+    } else if (isFetching && data.length === 0) {
+      logsArr.push('<span>暂无日志</span>')
+    }
+    return logsArr
+  }
+  render() {
     return (
-      <div id="log-template" className={logContaierClass}>
-        <div className="operaBox">
-          <DatePicker
-            defaultValue={moment(new Date(), dateFormat)}
-            format={dateFormat}
-            disabledDate={this.disabledDate}
-            onChange={(data, dataString) => this.changeDate(data, dataString)}
-            showToday={true}
-          />
-          <Icon type="reload" onClick={() => this.loadData()}/>
-          <Icon
-            type={size === 'small' ? 'arrows-alt' : 'shrink'}
-            onClick={() => this.toggleContainerSize()}
-          />
-        </div>
-        <LogList data={data} size={size} isFetching={isFetching} />
+      <div id="log-template">
+        <TenxLogs
+          header={<div className="operaBox">
+            <DatePicker
+              defaultValue={moment(new Date(), dateFormat)}
+              format={dateFormat}
+              disabledDate={this.disabledDate}
+              onChange={(data, dataString) => this.changeDate(data, dataString)}
+              showToday={true}
+            />
+            <Icon type="reload" onClick={() => this.loadData()}/>
+          </div>}
+          isDangerouslySetInnerHTML={true}
+          logs={this.logs()}
+        />
       </div>
     )
   }
