@@ -18,7 +18,7 @@ import { Route, Switch } from 'react-router-dom'
 import { serviceMeshChildRoutes } from '../../RoutesDom'
 import * as meshAction from '../../actions/serviceMesh'
 import { renderLoading } from '../../components/utils'
-import spingCloud from '../../assets/img/apm/Sringcloud.png'
+import serviceMesh from '../../assets/img/serviceMesh/serviceMeshEmpty.png'
 
 class ServiceMesh extends React.Component {
   state = {
@@ -58,7 +58,7 @@ class ServiceMesh extends React.Component {
     })
     if (!isIstioEnabled) {
       return <div className="loading">
-        <img alt="istio-not-enabled" src={spingCloud}/>
+        <img alt="istio-not-enabled" src={serviceMesh}/>
         <div>该项目对应的集群没有开启服务网格</div>
         <div>请先在『项目详情』中开启服务网格</div>
       </div>
