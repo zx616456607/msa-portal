@@ -9,9 +9,19 @@
  * 2018-2-1
  * @author zhangcz
  */
-
+@import "../../../assets/style/core/index.less";
 #log-template {
   //background: #000;
+  .tenx-ui-logs-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .log-item {
+    margin-bottom: @padding-base;
+  }
+  .log-name {
+    color: @warning-color;
+  }
   .operaBox {
     //position: absolute;
     //top: 0;
@@ -38,18 +48,4 @@
     //top: 40px;
     width: 100%;
   }
-}
-
-.big-container-style {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-
-.small-container-style {
-  position: relative;
-  height: 500px;
 }
