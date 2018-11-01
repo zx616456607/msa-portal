@@ -227,7 +227,7 @@ class ComponentDetail extends React.Component {
       title: '服务地址',
       dataIndex: 'address',
       render: (text, record) => {
-        const serviceName = record.name.split('/')[1]
+        const serviceName = record.name
         return <div className="AddressTipWrape">
           <ServiceAddressTip dataList={[ serviceName ]}
             parentNode={'AddressTipWrape'}/></div>

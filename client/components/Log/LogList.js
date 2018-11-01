@@ -29,7 +29,7 @@ class LogList extends React.Component {
     return (
       <div
         key={data[index].id}
-        style={style}
+        style={ style }
         className="log-item-style"
       >
         {data[index].mark && <span className="markSpan">[{data[index].mark}]</span>}
@@ -41,7 +41,7 @@ class LogList extends React.Component {
   }
 
   render() {
-    const { size, data, isFetching, locale } = this.props
+    const { size, data, isFetching } = this.props
     const logListClass = classNames({
       'normal-style': true,
       'small-style': size === 'small',
@@ -51,7 +51,7 @@ class LogList extends React.Component {
       <div className={logListClass}>
         {
           !data || !data.length
-            ? <div className="no-log-style">{ isFetching ? '获取中。。。' : locale.emptyText }</div>
+            ? <div className="no-log-style">{ isFetching ? '获取中。。。' : '暂无数据' }</div>
             : <AutoSizer>
               {({ height, width }) => (
                 <List

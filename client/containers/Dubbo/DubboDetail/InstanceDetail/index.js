@@ -36,12 +36,12 @@ class InstanceDetail extends React.Component {
   render() {
     const { detail, clusterId } = this.props
     return (
-      <div className="service-detail">
-        <div className="service-detail-header ant-row">
-          <div className="service-detail-header-icon">
+      <div className="instance-detail">
+        <div className="instance-detail-header ant-row">
+          <div className="instance-detail-header-icon">
             <img width="80" height="80" src={serviceIcon} alt="service" />
           </div>
-          <div className="service-detail-header-right">
+          <div className="instance-detail-header-right">
             <div>
               <h2 className="txt-of-ellipsis">
                 实例名称：{detail.containerName}
@@ -52,13 +52,13 @@ class InstanceDetail extends React.Component {
                 <div className="item-wrapper">
                   <div>容器实例地址：</div>
                   <div className="ellipsis-wrapper">
-                    <Ellipsis>{detail.containerAddress}</Ellipsis>
+                    <Ellipsis>{detail.podIp}</Ellipsis>
                   </div>
                 </div>
                 <div className="item-wrapper">
                   <div>所属服务：</div>
                   <div className="ellipsis-wrapper">
-                    <Ellipsis>{detail.belong}</Ellipsis>
+                    <Ellipsis>{detail.serviceName}</Ellipsis>
                   </div>
                 </div>
                 <div className="item-wrapper">
@@ -71,7 +71,7 @@ class InstanceDetail extends React.Component {
             </Row>
           </div>
         </div>
-        <div className="service-detail-body">
+        <div className="instance-detail-body">
           <Tabs tabPosition="left">
             <TabPane tab="监控" key="monitor">
               <Monitor clusterID={clusterId} instance={detail}/>
