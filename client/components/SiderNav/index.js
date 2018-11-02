@@ -14,6 +14,7 @@ import { Layout, Menu, Icon, Tooltip } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { loadApply } from '../../actions/CSB/myApplication'
+import { getQueryKey } from '../../common/utils'
 
 import './style/index.less'
 import find from 'lodash/find'
@@ -558,7 +559,9 @@ class SiderNav extends React.Component {
 const mapStateToProps = state => {
   const { current } = state
   const { user } = current
-  const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', 'filter=status-eq-1&flag=1&page=1&size=10' ])
+  const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+  const key = getQueryKey(query)
+  const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', key ])
   return {
     csbApply,
     user: user.info,
