@@ -19,6 +19,7 @@ import './style/index.less'
 import { parse as parseQuerystring } from 'query-string'
 import CSBApplyStatus from '../../../../components/CSBApplyStatus'
 import { UNUSED_CLUSTER_ID, CSB_APPLY_FLAG } from '../../../../constants'
+import { ROLE_SYS_ADMIN } from '../../../../constants'
 import {
   renderInstanceRole,
   toQuerystring,
@@ -102,7 +103,7 @@ class MyApplication extends React.Component {
   }
 
   handleDelcancel = () => {
-    const { removeApply } = this.props
+    const { removeApply, loadApply, user } = this.props
     const { id, textName } = this.state
     removeApply(UNUSED_CLUSTER_ID, id).then(res => {
       if (res.error) {
@@ -114,6 +115,10 @@ class MyApplication extends React.Component {
           message: `撤销申请实例${textName}成功`,
         })
         this.loadData()
+        if (user.role === ROLE_SYS_ADMIN) {
+          const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+          loadApply(UNUSED_CLUSTER_ID, query)
+        }
       }
       this.setState({
         delVisible: false,
@@ -449,10 +454,12 @@ class MyApplication extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const { current, entities } = state
   const { clusters } = entities
-  const userID = current.user.info.userID
+  const { user } = current
+  const userID = user.info.userID
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
   return {
+    user,
     userID,
     clusters,
     location,
