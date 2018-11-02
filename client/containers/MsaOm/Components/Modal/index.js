@@ -55,17 +55,23 @@ class MsaModal extends React.Component {
 
   handleConfirm = async () => {
     const { inputValue } = this.state
-    const { manualScaleComponent, clusterId, currentComponent, closeModal, loadData } = this.props
+    const { manualScaleComponent,
+      clusterId,
+      currentComponent,
+      closeModal,
+      loadData,
+      namespace } = this.props
     this.setState({
       loading: true,
     })
     const body = {
       number: parseInt(inputValue, 10),
+      namespace,
     }
     const finalClusterId = currentComponent.clusterId || clusterId
     const name = currentComponent.component || 'dsb-server'
     if (name === 'dsb-server') {
-      Object.assign(body, { namespace: currentComponent.namespace })
+      body.namespace = currentComponent.namespace
     }
     const result = await manualScaleComponent(finalClusterId, name, body)
     if (result.error) {
@@ -145,6 +151,8 @@ class MsaModal extends React.Component {
   }
 }
 
-export default connect(null, {
+export default connect(state => {
+  return { namespace: state.current.config.project.namespace }
+}, {
   manualScaleComponent,
 })(MsaModal)

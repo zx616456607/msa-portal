@@ -66,7 +66,7 @@ class ConfigCenter extends React.Component {
         }
         getBranchList(clusterID, branchQuery).then(res => {
           if (res.error) return
-          if (res.response.result.code === 200) {
+          if (res.response.result.code === 200 && res.response.result.data.length !== 0) {
             this.setState({
               branchData: res.response.result.data,
               value: res.response.result.data[0].name,
