@@ -12,10 +12,14 @@
 import React from 'react'
 import { Layout, Menu, Icon, Tooltip } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { loadApply } from '../../actions/CSB/myApplication'
+
 import './style/index.less'
 import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import { UNUSED_CLUSTER_ID } from '../../constants'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
@@ -309,11 +313,29 @@ class SiderNav extends React.Component {
   state = {
     collapsed: false,
     openKeys: [],
+    isShowPoint: false,
   };
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({
       openKeys: this.findSelectedNOpenKeys().openKeys,
     })
+    const { loadApply } = this.props
+    const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+    await loadApply(UNUSED_CLUSTER_ID, query)
+    const { csbApply } = this.props
+    let b = false
+    Object.values(csbApply).map(item => {
+      if (item.status === 1) {
+        b = true
+      }
+      return item
+    })
+    if (b) {
+      this.setState({
+        isShowPoint: true,
+      })
+    }
+
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
@@ -326,11 +348,12 @@ class SiderNav extends React.Component {
     toggleCollapsed && toggleCollapsed(collapsed)
   }
   renderMenuItem = data => {
-    const { collapsed } = this.state
+    const { collapsed, isShowPoint } = this.state
     const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
+
     if (tenxIcon && (typeof tenxIcon === 'string')) {
       iconDOM = <TenxIcon
         type={tenxIcon}
@@ -343,7 +366,16 @@ class SiderNav extends React.Component {
       return (
         <SubMenu
           key={key}
-          title={<span>{iconDOM}<span>{name}</span></span>}
+          title={<span>{iconDOM}
+            <span>{name}
+            </span>
+            {
+              data.key === 'k11' && isShowPoint ?
+                <span className="topRightPoint"><strong>●</strong></span>
+                :
+                null
+            }
+          </span>}
           {...otherProps}
         >
           {
@@ -357,7 +389,15 @@ class SiderNav extends React.Component {
         <MenuItemGroup title={!collapsed ? declare.spread : declare.collapsed} key={declare.key} >
           <SubMenu
             key={key}
-            title={<span>{iconDOM}<span>{name}</span></span>}
+            title={<span>{iconDOM}
+              <span>{name}</span>
+              {
+                data.key === 'k1' && isShowPoint ?
+                  <span className="topRightPoint"><strong>●</strong></span>
+                  :
+                  null
+              }
+            </span>}
             {...otherProps}
           >
             {
@@ -387,7 +427,15 @@ class SiderNav extends React.Component {
       {
         // collapsed && to === '' ?
         //   <Icon type="user" /> :
-        <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+        <Link to={to}>{iconDOM}
+          <span className="nav-text">{name}</span>
+          {
+            data.key === 'k011' && isShowPoint ?
+              <span className="topRightPoint"><strong>●</strong></span>
+              :
+              null
+          }
+        </Link>
         // menuItems
       }
     </Menu.Item>
@@ -505,4 +553,12 @@ class SiderNav extends React.Component {
   }
 }
 
-export default SiderNav
+const mapStateToProps = state => {
+  return {
+    csbApply: state.entities.csbApply,
+  }
+}
+
+export default connect(mapStateToProps, {
+  loadApply,
+})(SiderNav)
