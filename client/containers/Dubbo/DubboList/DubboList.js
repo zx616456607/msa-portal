@@ -94,11 +94,11 @@ class DubboList extends React.Component {
     getDubboList(clusterId)
   }
   render() {
-    const { dubboList } = this.props
+    const { dubboList, getDubboList, clusterId } = this.props
     return <div className="dubbo-list">
       <div className="dubbo-list-top">
         <div>
-          <Button icon="sync">刷新</Button>
+          <Button icon="sync" onClick={() => getDubboList(clusterId)}>刷新</Button>
           <Input style={{ width: 200, marginLeft: 16 }} placeholder="请输入服务名称搜索"/>
         </div>
         <div className="pagination">
