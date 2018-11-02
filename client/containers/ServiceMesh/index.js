@@ -16,17 +16,52 @@ import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { serviceMeshChildRoutes } from '../../RoutesDom'
+import * as meshAction from '../../actions/serviceMesh'
+import { renderLoading } from '../../components/utils'
+import serviceMesh from '../../assets/img/serviceMesh/serviceMeshEmpty.png'
 
 class ServiceMesh extends React.Component {
-  componentDidMount() {
-    //
+  state = {
+    loading: true,
+    projects: [],
+    clusters: {},
+  }
+
+  async componentDidMount() {
+    const { loadIstioEnabledProjects } = this.props
+    const res = await loadIstioEnabledProjects()
+    if (res.error) {
+      this.setState({
+        loading: false,
+      })
+      return
+    }
+    this.setState({
+      loading: false,
+      ...res.response.result,
+    })
   }
 
   renderChildren = () => {
-    const { children } = this.props
-    // if (!apms || !apms.ids) {
-    //   return renderLoading('加载 APM 中 ...')
-    // }
+    const { children, clusterID, project } = this.props
+    const { loading, projects } = this.state
+    if (loading) {
+      return renderLoading('加载服务网格配置中 ...')
+    }
+    // istioEnabledClusterIds
+    let isIstioEnabled
+    projects.forEach(({ name, istioEnabledClusterIds }) => {
+      if (name === project && istioEnabledClusterIds.includes(clusterID)) {
+        isIstioEnabled = true
+      }
+    })
+    if (!isIstioEnabled) {
+      return <div className="loading">
+        <img alt="istio-not-enabled" src={serviceMesh}/>
+        <div>该项目对应的集群没有开启服务网格</div>
+        <div>请先在『项目详情』中开启服务网格</div>
+      </div>
+    }
     return [
       children,
       <Switch key="switch">
@@ -49,10 +84,14 @@ class ServiceMesh extends React.Component {
   }
 }
 
-const mapStateToProps = () => ({
-  //
-})
+const mapStateToProps = state => {
+  const { cluster, project } = state.current.config
+  return {
+    clusterID: cluster.id,
+    project: project.namespace,
+  }
+}
 
 export default connect(mapStateToProps, {
-  //
+  loadIstioEnabledProjects: meshAction.loadIstioEnabledProjects,
 })(ServiceMesh)

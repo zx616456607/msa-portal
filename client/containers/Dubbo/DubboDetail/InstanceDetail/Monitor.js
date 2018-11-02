@@ -16,7 +16,7 @@ import PropTypes from 'prop-types'
 import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
 import isEmpty from 'lodash/isEmpty'
-import { instanceMonitor, instanceRealTimeMonitor } from '../../../../actions/CSB/instance'
+import { dubboInstanceMonitor, dubboInstanceRealTimeMonitor } from '../../../../actions/dubbo'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
   METRICS_NETWORK_TRANSMITTED, METRICS_DISK_READ, METRICS_DISK_WRITE,
@@ -75,14 +75,15 @@ class Monitor extends React.Component {
   }
 
   getInstanceMetricsByType = type => {
-    const { instanceMonitor, clusterID, instance } = this.props
+    const { dubboInstanceMonitor, clusterID, instance, namespace } = this.props
     const { currentValue } = this.state
+
     const query = {
       type,
       start: this.changeTime(currentValue),
       end: new Date().toISOString(),
     }
-    return instanceMonitor(clusterID, instance, query)
+    return dubboInstanceMonitor(clusterID, instance.serviceName, namespace, query)
   }
 
   changeTime = hours => {
@@ -103,7 +104,7 @@ class Monitor extends React.Component {
   }
 
   getNetworkMonitor = async () => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { dubboInstanceRealTimeMonitor, clusterID, instance, namespace } = this.props
     const now = new Date()
     const receivedQuery = {
       type: METRICS_NETWORK_RECEIVED,
@@ -116,14 +117,14 @@ class Monitor extends React.Component {
       end: new Date().toISOString(),
     }
     const networkPromiseArray = [
-      instanceRealTimeMonitor(clusterID, instance, receivedQuery),
-      instanceRealTimeMonitor(clusterID, instance, metricsQuery),
+      dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, receivedQuery),
+      dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, metricsQuery),
     ]
     await Promise.all(networkPromiseArray)
   }
 
   getDiskMonitor = async () => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { dubboInstanceRealTimeMonitor, clusterID, instance, namespace } = this.props
     const now = new Date()
     const readQuery = {
       type: METRICS_DISK_READ,
@@ -136,26 +137,26 @@ class Monitor extends React.Component {
       end: new Date().toISOString(),
     }
     const diskPromiseArray = [
-      instanceRealTimeMonitor(clusterID, instance, readQuery),
-      instanceRealTimeMonitor(clusterID, instance, writeQuery),
+      dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, readQuery),
+      dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, writeQuery),
     ]
     await Promise.all(diskPromiseArray)
   }
 
   getMonitor = async type => {
-    const { instanceRealTimeMonitor, clusterID, instance } = this.props
+    const { dubboInstanceRealTimeMonitor, clusterID, instance, namespace } = this.props
     const now = new Date()
     now.setHours(now.getHours() - 1)
     switch (type) {
       case 'cpu':
-        await instanceRealTimeMonitor(clusterID, instance, {
+        await dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, {
           type: METRICS_CPU,
           start: now.toISOString(),
           end: new Date().toISOString(),
         })
         break
       case 'memory':
-        await instanceRealTimeMonitor(clusterID, instance, {
+        await dubboInstanceRealTimeMonitor(clusterID, instance.serviceName, namespace, {
           type: METRICS_MEMORY,
           start: now.toISOString(),
           end: new Date().toISOString(),
@@ -225,14 +226,16 @@ class Monitor extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { instanceMonitor: instanceMetrics, instanceRealTimeMonitor } = state.CSB
+  const { dubboInstanceMonitor: instanceMetrics, dubboInstanceRealTimeMonitor } = state.dubbo
+  const { namespace } = state.current.config.project
   return {
+    namespace,
     instanceMetrics,
-    realTimeMonitor: instanceRealTimeMonitor,
+    realTimeMonitor: dubboInstanceRealTimeMonitor,
   }
 }
 
 export default connect(mapStateToProps, {
-  instanceMonitor,
-  instanceRealTimeMonitor,
+  dubboInstanceMonitor,
+  dubboInstanceRealTimeMonitor,
 })(Monitor)

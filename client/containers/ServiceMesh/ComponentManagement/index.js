@@ -110,6 +110,7 @@ class ComponentManagement extends React.Component {
       dataSource.forEach(item => {
         const column = {
           name: item.metadata.name,
+          description: item.metadata.description,
           servicecount: item.spec.subsets.length,
           startTime: item.metadata.creationTimestamp,
         }
