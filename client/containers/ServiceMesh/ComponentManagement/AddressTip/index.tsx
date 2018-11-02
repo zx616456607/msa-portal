@@ -107,7 +107,7 @@ class Tip extends React.Component<TipProps, TipState> {
     const { name = '-', routerAddress=[], innerAddress=[] } = this.props.config
     return (
       <div className="Tip">
-      <div className="primary">name</div>
+      <div className="primary">{name}</div>
       <Timeline>
         <Timeline.Item
           dot={<div style={{ height: 5, width: 5, backgroundColor: '#2db7f5', margin: '0 auto' }}>

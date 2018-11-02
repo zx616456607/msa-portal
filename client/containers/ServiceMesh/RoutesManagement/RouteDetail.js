@@ -39,7 +39,7 @@ const formItemLayout = {
 }
 const routeItemInnerLayout = {
   labelCol: {
-    sm: { span: 2 },
+    sm: { span: 3 },
   },
   wrapperCol: {
     sm: { span: 20, push: 1 },
@@ -522,7 +522,7 @@ class NewRouteComponent extends React.Component {
             </div>
             <Row>
               <Col span={3}></Col>
-              <Col span={20}>
+              <Col span={20} push={1}>
                 <div className="route-item-tip">
                   {tip}
                 </div>
