@@ -10,7 +10,6 @@
  * @author zhaoyb
  */
 
-import union from 'lodash/union'
 import * as ActionTypes from '../../actions/CSB/myApplication'
 import { getQueryKey } from '../../common/utils'
 
@@ -30,10 +29,7 @@ export const myApplication = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: key === 'filter=status-eq-1&flag=1&page=1&size=10' ?
-            action.response.result.data.content
-            :
-            union(state.ids, action.response.result.data.content),
+          ids: action.response.result.data.content,
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },
