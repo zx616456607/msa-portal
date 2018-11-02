@@ -110,7 +110,7 @@ class ComponentManagement extends React.Component {
       dataSource.forEach(item => {
         const column = {
           name: item.metadata.name,
-          description: item.metadata.description,
+          description: item.metadata.annotations.description,
           servicecount: item.spec.subsets.length,
           startTime: item.metadata.creationTimestamp,
         }
@@ -142,6 +142,7 @@ class ComponentManagement extends React.Component {
       title: '描述',
       width: '25%',
       dataIndex: 'description',
+      render: text => text ? text : <span>--</span>
     }, {
       title: '服务地址',
       dataIndex: 'address',
@@ -150,9 +151,6 @@ class ComponentManagement extends React.Component {
           <AddressTip dataList={dataList} componentName={record.name}
             parentNode={'AddressTipWrape'} />
         </div>,
-    }, {
-      title: '路由规则',
-      dataIndex: 'router',
     }, {
       title: '创建时间',
       dataIndex: 'startTime',
