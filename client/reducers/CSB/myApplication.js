@@ -30,7 +30,10 @@ export const myApplication = (state = {}, action) => {
         ...state,
         [key]: {
           isFetching: false,
-          ids: union(state.ids, action.response.result.data.content),
+          ids: key === 'filter=status-eq-1&flag=1&page=1&size=10' ?
+            action.response.result.data.content
+            :
+            union(state.ids, action.response.result.data.content),
           totalElements: action.response.result.data.totalElements,
           size: action.response.result.data.size,
         },

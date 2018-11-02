@@ -20,6 +20,7 @@ import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { UNUSED_CLUSTER_ID } from '../../constants'
+import { getDeepValue } from '../../common/utils';
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
@@ -315,6 +316,9 @@ class SiderNav extends React.Component {
     openKeys: [],
     isShowPoint: false,
   };
+  componentWillReceiveProps(next) {
+    this.setIsShowPoint(next)
+  }
   async componentDidMount() {
     this.setState({
       openKeys: this.findSelectedNOpenKeys().openKeys,
@@ -322,20 +326,15 @@ class SiderNav extends React.Component {
     const { loadApply } = this.props
     const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
     await loadApply(UNUSED_CLUSTER_ID, query)
-    const { csbApply } = this.props
-    let b = false
-    Object.values(csbApply).map(item => {
-      if (item.status === 1) {
-        b = true
-      }
-      return item
+    this.setIsShowPoint(this.props)
+  }
+  setIsShowPoint = props => {
+    const { csbApply } = props
+    if (!csbApply) return
+    const { ids } = csbApply
+    ids && this.setState({
+      isShowPoint: ids.length > 0,
     })
-    if (b) {
-      this.setState({
-        isShowPoint: true,
-      })
-    }
-
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
@@ -554,8 +553,9 @@ class SiderNav extends React.Component {
 }
 
 const mapStateToProps = state => {
+  const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', 'filter=status-eq-1&flag=1&page=1&size=10' ])
   return {
-    csbApply: state.entities.csbApply,
+    csbApply,
   }
 }
 
