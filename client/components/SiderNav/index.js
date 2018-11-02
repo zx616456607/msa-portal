@@ -329,12 +329,15 @@ class SiderNav extends React.Component {
     this.setIsShowPoint(this.props)
   }
   setIsShowPoint = props => {
-    const { csbApply } = props
-    if (!csbApply) return
-    const { ids } = csbApply
-    ids && this.setState({
-      isShowPoint: ids.length > 0,
-    })
+    const { user } = props
+    if (user.role === ROLE_SYS_ADMIN) {
+      const { csbApply } = props
+      if (!csbApply) return
+      const { ids } = csbApply
+      ids && this.setState({
+        isShowPoint: ids.length > 0,
+      })
+    }
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
@@ -553,9 +556,12 @@ class SiderNav extends React.Component {
 }
 
 const mapStateToProps = state => {
+  const { current } = state
+  const { user } = current
   const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', 'filter=status-eq-1&flag=1&page=1&size=10' ])
   return {
     csbApply,
+    user: user.info,
   }
 }
 
