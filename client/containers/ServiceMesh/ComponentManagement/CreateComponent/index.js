@@ -48,11 +48,11 @@ class CreateComponent extends React.Component {
     const { form } = this.props
     if (componentList) {
       const obj = {}
-      Object.keys(componentList.metadata.annotations).forEach((item, index) => {
+      componentList.spec.subsets.forEach((item, index) => {
         keys.push(uuid++)
         Object.assign(obj, {
-          [`serviceName-${index}`]: item.split('/')[1],
-          [`version-${index}`]: componentList.spec.subsets[index].name,
+          [`serviceName-${index}`]: item.name,
+          [`version-${index}`]: item.labels.version,
         })
         this.setState({
           [`service${index}`]: true,
@@ -121,7 +121,7 @@ class CreateComponent extends React.Component {
     })
   }
 
-  filterServiceName = () => {
+  filterServiceName = desc => {
     const { form } = this.props
     const { getFieldValue } = form
     const keys = getFieldValue('keys')
@@ -130,6 +130,7 @@ class CreateComponent extends React.Component {
       const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
       const valueKey = `${getFieldValue(`version-${key}`)}`
       query[nameKey] = valueKey
+      query.description = desc
     })
     return query
   }
@@ -163,7 +164,7 @@ class CreateComponent extends React.Component {
         apiVersion: 'networking.istio.io/v1alpha3',
         kind: 'DestinationRule',
         metadata: {
-          annotations: this.filterServiceName(),
+          annotations: this.filterServiceName(value.description),
           name: value.componentName,
           resourceVersion: isAdd === 'false' ? componentList.metadata.resourceVersion : '',
         },
@@ -255,17 +256,19 @@ class CreateComponent extends React.Component {
 
   validateToNextService = (rule, value, callback) => {
     const form = this.props.form
+    const serviceKey = rule.field
     const keys = form.getFieldValue('keys')
     if (value && keys.length > 1) {
       keys.forEach(key => {
-        const service = form.getFieldValue(`serviceName-${key - 1}`)
-        if (value === service) {
-          callback('服务名称重复')
+        const service = form.getFieldValue(`serviceName-${key}`)
+        if (serviceKey !== `serviceName-${key}`) {
+          if (value === service) {
+            callback('服务名称重复')
+          }
         }
       })
-    } else {
-      callback()
     }
+    callback()
   }
 
   render() {
@@ -376,7 +379,7 @@ class CreateComponent extends React.Component {
                 </Row>
                 <Row>
                   <FormItem {...formItemLayout} label="描述">
-                    {getFieldDecorator('desc', {
+                    {getFieldDecorator('description', {
                       initialValue: undefined,
                       rules: [{ pattern: '', whitespace: true, message: '' }],
                     })(
