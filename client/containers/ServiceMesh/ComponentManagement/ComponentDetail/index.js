@@ -67,9 +67,9 @@ class ComponentDetail extends React.Component {
   filterService = list => {
     if (list.length !== 0) {
       const serviceAry = []
-      Object.keys(list.metadata.annotations).forEach(item => {
+      list.spec.subsets.forEach(item => {
         const query = {
-          name: item.split('/')[1],
+          name: item.name,
           version: list.metadata.annotations[item],
         }
         serviceAry.push(query)
@@ -131,15 +131,16 @@ class ComponentDetail extends React.Component {
       })
     } else {
       const { name, version } = list
-      Object.keys(detailList.metadata.annotations).forEach(item => {
-        if (item === name) {
-          delete detailList.metadata.annotations[item]
+      detailList.spec.subsets.forEach(item => {
+        if (item.name === name) {
+          delete detailList.metadata.annotations[item.name]
         }
       })
-      Object.keys(detailList.spec.subsets).forEach(item => {
-        const key = detailList.spec.subsets[item].name
+      detailList.spec.subset.forEach((item, index) => {
+        // const key = detailList.spec.subsets[item].name
+        const key = item.labels.version
         if (key === version) {
-          detailList.spec.subsets.splice(item, 1)
+          detailList.spec.subsets.splice(index, 1)
         }
       })
     }
@@ -193,7 +194,7 @@ class ComponentDetail extends React.Component {
   handleDelService = () => {
     const { delList } = this.state
     if (delList) {
-      this.handleService()
+      this.handleService(delList)
     }
   }
 
@@ -235,7 +236,8 @@ class ComponentDetail extends React.Component {
     }, {
       title: '路由规则',
       width: '25%',
-      dataIndex: '',
+      dataIndex: 'router',
+      render: () => <span>--</span>,
     }, {
       title: '操作',
       render: record => <div>
@@ -292,7 +294,6 @@ class ComponentDetail extends React.Component {
         </Row>
       )
     })
-
     return (
       <QueueAnim className="component-detail">
         <div className="component-detail-title layout-content-btns" keys="btn">
@@ -313,7 +314,7 @@ class ComponentDetail extends React.Component {
               <h2>组件名称：{metadata && metadata.name}</h2>
               <div className="descs">
                 <div>创建时间：{formatDate(metadata && metadata.creationTimestamp)}</div>
-                <div>描述：</div>
+                <div>描述：{metadata && metadata.annotations.description}</div>
               </div>
             </div>
           </div>
