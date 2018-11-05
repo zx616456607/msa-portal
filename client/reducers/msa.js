@@ -326,6 +326,38 @@ const msaBlownMonitor = (state = {}, action) => {
   }
 }
 
+const msaBlownStrategy = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_BLOWN_STRATEGY_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        data: {},
+      }
+    case ActionTypes.GET_MSA_BLOWN_STRATEGY_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.payload,
+      })
+    case ActionTypes.GET_MSA_BLOWN_STRATEGY_FAILURE:
+      return {
+        isFetching: false,
+        data: {},
+      }
+    case ActionTypes.SET_BLOWN_MONITOR:
+      return {
+        data: JSON.parse(action.data),
+      }
+    case ActionTypes.CLEAR_BLOWN_MONITOR:
+      return {
+        data: {},
+      }
+    default:
+      return state
+  }
+}
+
 const msa = (state = {
   msaNameList: {},
   rpcList: {},
@@ -338,6 +370,7 @@ const msa = (state = {
   msaRealTimeMonitor: {},
   msaBlownClusters: {},
   msaBlownMonitor: {},
+  msaBlownStrategy: {},
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
@@ -351,6 +384,7 @@ const msa = (state = {
     msaRealTimeMonitor: msaRealTimeMonitor(state.msaRealTimeMonitor, action),
     msaBlownClusters: msaBlownClusters(state.msaBlownClusters, action),
     msaBlownMonitor: msaBlownMonitor(state.msaBlownMonitor, action),
+    msaBlownStrategy: msaBlownStrategy(state.msaBlownStrategy, action),
   }
 }
 
