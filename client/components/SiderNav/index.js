@@ -331,6 +331,9 @@ class SiderNav extends React.Component {
   }
   setIsShowPoint = props => {
     const { user } = props
+    if (!user || !user.userName) {
+      return
+    }
     if (user.role === ROLE_SYS_ADMIN) {
       const { csbApply } = props
       if (!csbApply) return
@@ -564,7 +567,7 @@ const mapStateToProps = state => {
   const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', key ])
   return {
     csbApply,
-    user: user.info,
+    user: user.info || {},
   }
 }
 
