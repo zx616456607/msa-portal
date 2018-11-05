@@ -142,7 +142,7 @@ class ComponentManagement extends React.Component {
       title: '描述',
       width: '25%',
       dataIndex: 'description',
-      render: text => text ? text : <span>--</span>
+      render: text => (text ? text : <span>--</span>),
     }, {
       title: '服务地址',
       dataIndex: 'address',

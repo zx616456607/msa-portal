@@ -21,6 +21,8 @@ import MsaDetailList from './MsaDetailList'
 import MsaDetailEnv from './MsaDetailEnv'
 import MsaDetailConfig from './MsadetailConfig'
 import MsaDetailLogs from './MsaDetailLogs'
+// import MsaDetailBlownStrategy from './MsaDetailBlownStrategy'
+// import MsaDetailDemote from './MsaDetailDemote'
 import './style/index.less'
 import Monitor from './MsaMonitor'
 import BlownMonitor from './MsaBlownMonitor'
@@ -120,6 +122,14 @@ class MsaDetail extends React.Component {
                 {...{ name, clusterID }}
               />
             </TabPane>
+            {/*
+            <TabPane tab="熔断" key="fusing">
+              <MsaDetailBlownStrategy/>
+            </TabPane>
+            <TabPane tab="降级" key="demotion">
+              <MsaDetailDemote/>
+            </TabPane>
+*/}
           </Tabs>
         </div>
       </QueueAnim>

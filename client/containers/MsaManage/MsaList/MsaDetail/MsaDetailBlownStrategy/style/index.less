@@ -1,0 +1,79 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * MsaDetailFusing style
+ *
+ * 2018-11-05
+ * @author zhouhaitao
+ */
+
+@import '~assets/style/core/index.less';
+.msa-detail-fusing {
+  .alert {
+    border: 1px dashed @primary-color;
+    padding: @padding-base;
+    margin-bottom: @padding-medium;
+    border-radius: @border-radius-base;
+    background: #e6f7ff;
+    color: @primary-color;
+    i {
+      margin-right: 4px;
+      font-size: 14px;
+    }
+  }
+  .strategy-wrapper {
+    .btns {
+      button {
+        margin-right: @padding-small;
+      }
+      margin-bottom: @padding-medium;
+    }
+    table {
+      width: 100%;
+      td {
+        padding: @padding-small;
+        border: 1px solid @border-color-base;
+        &:nth-child(1) {
+          background: #fcfcfc;
+          width: 30%;
+        }
+      }
+    }
+  }
+}
+.msa-detail-blown-rules {
+  .switch-tip {
+    line-height: 18px;
+  }
+  .split {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: @padding-small;
+    span {
+      color: @primary-color;
+      margin-right: @padding-small;
+    }
+    a {
+      border-top: 1px dashed @border-color-split;
+      width: 58%;
+    }
+  }
+  .second {
+    a {
+      width: 83%;
+    }
+  }
+}
+.msa-detail-blown-rules-del {
+  display: flex;
+  align-items: center;
+  i {
+    margin-right: @padding-small;
+    font-size: 24px;
+    color: @warning-color;
+  }
+}
