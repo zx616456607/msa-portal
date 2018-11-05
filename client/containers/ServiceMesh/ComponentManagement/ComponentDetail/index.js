@@ -13,11 +13,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Form, Row, Col, Tabs, Button, Table, Modal, Select, Input, Icon } from 'antd'
+import { Card, Form, Row, Col, Tabs, Button, Table, Modal, Select, Input, Icon, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import componentImg from '../../../../assets/img/serviceMesh/component.png'
-import { fetchComponent, editComponent, fetchServiceList } from '../../../../actions/serviceMesh'
+import { fetchComponent, editComponent, fetchServiceList, deleteComponent } from '../../../../actions/serviceMesh'
 import './style/index.less'
+import confirm from '../../../../components/Modal/confirm'
 import { ServiceAddressTip } from '../AddressTip'
 
 const TabPane = Tabs.TabPane
@@ -28,6 +29,7 @@ class ComponentDetail extends React.Component {
   state = {
     delList: [],
     detailList: [],
+    serviceList: [],
     isAdd: false,
     visible: false,
     isLoading: true,
@@ -41,7 +43,19 @@ class ComponentDetail extends React.Component {
   loadDetail = () => {
     const c_name = this.props.location.search.split('=')[1]
     const { clusterID, namespace, fetchComponent, fetchServiceList } = this.props
-    fetchServiceList(clusterID, namespace)
+    fetchServiceList(clusterID, namespace).then(res => {
+      const aryList = []
+      const list = res.response.result
+      Object.keys(list).forEach(item => {
+        const moduleValue = list[item].metadata.labels['servicemesh/app-module']
+        if (moduleValue) {
+          aryList.push(item)
+        }
+      })
+      this.setState({
+        serviceList: aryList
+      })
+    })
     const query = {
       name: c_name,
       project: namespace,
@@ -70,7 +84,7 @@ class ComponentDetail extends React.Component {
       list.spec.subsets.forEach(item => {
         const query = {
           name: item.name,
-          version: list.metadata.annotations[item],
+          version: item.labels.version,
         }
         serviceAry.push(query)
       })
@@ -79,17 +93,48 @@ class ComponentDetail extends React.Component {
   }
 
   handleClose = () => {
+    const { form } = this.props
+    const { setFieldsValue } = form
     this.setState({
       visible: false,
     })
+    setFieldsValue({ keys: [] })
   }
 
   handleDelete = list => {
+    const { detailList } = this.state
+    const { metadata } = detailList
+    const { clusterID, deleteComponent } = this.props
     this.setState({
-      delList: list,
       isAdd: false,
-      isLoading: true,
-      delVisible: true,
+      // isLoading: true,
+    })
+    const specFlag = detailList.spec.subsets.length <= 1 ? true : false
+    const tip = detailList && specFlag ? `组件中唯一服务移除后，组件也将被移除` : ''
+    confirm({
+      modalTitle: '删除操作',
+      title: '移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务',
+      content: tip,
+      onOk: () => {
+        if (list) {
+          if (specFlag) {
+            deleteComponent(clusterID, metadata.name).then(res => {
+              if (res.error) {
+                notification.success({
+                  message: `删除组件 ${metadata.name} 失败`,
+                })
+                return
+              }
+              notification.success({
+                message: `删除组件 ${metadata.name} 成功`,
+              })
+              this.props.history.push('/service-mesh/component-management')
+            })
+          } else {
+            this.handleService(list)
+          }
+        }
+      },
     })
   }
 
@@ -111,10 +156,9 @@ class ComponentDetail extends React.Component {
   }
 
   handleService = list => {
-    const { clusterID, namespace, editComponent } = this.props
+    const { form, clusterID, namespace, editComponent } = this.props
+    const { setFieldsValue, getFieldValue } = form
     const { isAdd, detailList } = this.state
-    const { form } = this.props
-    const { getFieldValue } = form
     const keys = getFieldValue('keys')
     if (isAdd) {
       keys.forEach(key => {
@@ -133,10 +177,10 @@ class ComponentDetail extends React.Component {
       const { name, version } = list
       detailList.spec.subsets.forEach(item => {
         if (item.name === name) {
-          delete detailList.metadata.annotations[item.name]
+          delete detailList.metadata.annotations[`svcName/${item.name}`]
         }
       })
-      detailList.spec.subset.forEach((item, index) => {
+      detailList.spec.subsets.forEach((item, index) => {
         // const key = detailList.spec.subsets[item].name
         const key = item.labels.version
         if (key === version) {
@@ -149,11 +193,12 @@ class ComponentDetail extends React.Component {
         return
       }
       this.setState({
-        visible: false,
+        delVisible: false,
         isLoading: false,
       })
       this.loadDetail()
     })
+    setFieldsValue({ keys: [] })
   }
 
   handleAdd = () => {
@@ -198,19 +243,32 @@ class ComponentDetail extends React.Component {
     }
   }
 
+  filterServicelist = key => {
+    const { serviceList } = this.state
+    if (serviceList.indexOf(key) !== -1) {
+      return true
+    }
+    return false
+  }
+
   validateToNextService = (rule, value, callback) => {
     const form = this.props.form
+    const serviceKey = rule.field
     const keys = form.getFieldValue('keys')
-    if (value && keys.length > 1) {
+    if (value) {
       keys.forEach(key => {
-        const service = form.getFieldValue(`serviceName-${key - 1}`)
-        if (value === service) {
+        const service = form.getFieldValue(`serviceName-${key}`)
+        if (this.filterServicelist(service)) {
           callback('服务名称重复')
         }
+        if (serviceKey !== `serviceName-${key}`) {
+          if (value === service || this.filterServicelist(service)) {
+            callback('服务名称重复')
+          }
+        }
       })
-    } else {
-      callback()
     }
+    callback()
   }
 
   render() {
@@ -230,8 +288,8 @@ class ComponentDetail extends React.Component {
       render: (text, record) => {
         const serviceName = record.name
         return <div className="AddressTipWrape">
-          <ServiceAddressTip dataList={[ serviceName ]}
-            parentNode={'AddressTipWrape'}/></div>
+          <ServiceAddressTip dataList={[serviceName]}
+            parentNode={'AddressTipWrape'} /></div>
       },
     }, {
       title: '路由规则',
@@ -246,7 +304,7 @@ class ComponentDetail extends React.Component {
     }]
     const { metadata } = detailList
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('keys', { initialValue: [ 0 ] })
+    getFieldDecorator('keys', { initialValue: [0] })
     const keys = getFieldValue('keys')
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -276,7 +334,7 @@ class ComponentDetail extends React.Component {
                     })
                   }
                 </Select>
-              )}
+                )}
             </FormItem>
           </Col>
           <Col span={10}>
@@ -285,7 +343,7 @@ class ComponentDetail extends React.Component {
                 initialValue: undefined,
               })(
                 <Input placeholder="如：1.0.0" style={{ width: '100%' }} />
-              )}
+                )}
             </FormItem>
           </Col>
           <Col span={3}>
@@ -391,6 +449,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   editComponent,
   fetchComponent,
+  deleteComponent,
   fetchServiceList,
 })(Form.create()(ComponentDetail))
 
