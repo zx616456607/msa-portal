@@ -17,6 +17,7 @@ import {
   Button, Input, Pagination, Table,
   Card, notification,
 } from 'antd'
+import { ROLE_SYS_ADMIN } from '../../../../constants'
 import { parse as parseQuerystring } from 'query-string'
 import ApplyforCSBInstanceModal from './ApplyforCSBInstanceModal'
 import { getInstances, applyforInstance } from '../../../../actions/CSB/instance'
@@ -24,6 +25,7 @@ import {
   instancesSltMaker,
   getQueryAndFuncs,
 } from '../../../../selectors/CSB/instance'
+import { loadApply } from '../../../../actions/CSB/myApplication'
 import { connect } from 'react-redux'
 import { formatDate, handleHistoryForLoadData } from '../../../../common/utils'
 import { CSB_PUBLIC_INSTANCES_FLAG, UNUSED_CLUSTER_ID } from '../../../../constants/index'
@@ -95,7 +97,7 @@ class PublicInstances extends React.Component {
   }
 
   confirmApplyforCSBInstance = (values, self) => {
-    const { applyforInstance, userId } = this.props
+    const { applyforInstance, userId, user, loadApply } = this.props
     const { currentRecord } = this.state
     const body = {
       instance: {
@@ -117,6 +119,10 @@ class PublicInstances extends React.Component {
       self.setState({
         isApplyfor: true,
       })
+      if (user.role === ROLE_SYS_ADMIN) {
+        const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+        loadApply(UNUSED_CLUSTER_ID, query)
+      }
       this.setState({
         // applyforCSBInstanceModalVisible: false,
         confirmLoading: false,
@@ -254,6 +260,7 @@ const mapStateToProps = (state, props) => {
   location.query = parseQuerystring(location.search)
   return {
     userId: userID,
+    user: user.info,
     publicInstances: pubInstancesSlt(state, props),
   }
 }
@@ -261,4 +268,5 @@ const mapStateToProps = (state, props) => {
 export default connect(mapStateToProps, {
   getInstances,
   applyforInstance,
+  loadApply,
 })(PublicInstances)

@@ -12,10 +12,16 @@
 import React from 'react'
 import { Layout, Menu, Icon, Tooltip } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { loadApply } from '../../actions/CSB/myApplication'
+import { getQueryKey } from '../../common/utils'
+
 import './style/index.less'
 import find from 'lodash/find'
 import { ROLE_SYS_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import { UNUSED_CLUSTER_ID } from '../../constants'
+import { getDeepValue } from '../../common/utils';
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
@@ -309,11 +315,15 @@ class SiderNav extends React.Component {
   state = {
     collapsed: false,
     openKeys: [],
+    isShowPoint: false,
   };
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({
       openKeys: this.findSelectedNOpenKeys().openKeys,
     })
+    const { loadApply } = this.props
+    const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+    await loadApply(UNUSED_CLUSTER_ID, query)
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
@@ -327,10 +337,15 @@ class SiderNav extends React.Component {
   }
   renderMenuItem = data => {
     const { collapsed } = this.state
+    const { user, csbApply } = this.props
     const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
+    const isShowPoint = !!user &&
+      user.role === ROLE_SYS_ADMIN &&
+      !!csbApply && csbApply.ids && csbApply.ids.length > 0
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
+
     if (tenxIcon && (typeof tenxIcon === 'string')) {
       iconDOM = <TenxIcon
         type={tenxIcon}
@@ -343,7 +358,16 @@ class SiderNav extends React.Component {
       return (
         <SubMenu
           key={key}
-          title={<span>{iconDOM}<span>{name}</span></span>}
+          title={<span>{iconDOM}
+            <span>{name}
+            </span>
+            {
+              data.key === 'k11' && isShowPoint ?
+                <span className="topRightPoint"><strong>●</strong></span>
+                :
+                null
+            }
+          </span>}
           {...otherProps}
         >
           {
@@ -357,7 +381,15 @@ class SiderNav extends React.Component {
         <MenuItemGroup title={!collapsed ? declare.spread : declare.collapsed} key={declare.key} >
           <SubMenu
             key={key}
-            title={<span>{iconDOM}<span>{name}</span></span>}
+            title={<span>{iconDOM}
+              <span>{name}</span>
+              {
+                data.key === 'k1' && isShowPoint ?
+                  <span className="topRightPoint"><strong>●</strong></span>
+                  :
+                  null
+              }
+            </span>}
             {...otherProps}
           >
             {
@@ -387,7 +419,15 @@ class SiderNav extends React.Component {
       {
         // collapsed && to === '' ?
         //   <Icon type="user" /> :
-        <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+        <Link to={to}>{iconDOM}
+          <span className="nav-text">{name}</span>
+          {
+            data.key === 'k011' && isShowPoint ?
+              <span className="topRightPoint"><strong>●</strong></span>
+              :
+              null
+          }
+        </Link>
         // menuItems
       }
     </Menu.Item>
@@ -505,4 +545,18 @@ class SiderNav extends React.Component {
   }
 }
 
-export default SiderNav
+const mapStateToProps = state => {
+  const { current } = state
+  const { user } = current
+  const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+  const key = getQueryKey(query)
+  const csbApply = getDeepValue(state, [ 'CSB', 'myApplication', key ])
+  return {
+    csbApply,
+    user: user.info || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  loadApply,
+})(SiderNav)
