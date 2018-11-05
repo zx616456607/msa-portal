@@ -317,9 +317,6 @@ class SiderNav extends React.Component {
     openKeys: [],
     isShowPoint: false,
   };
-  componentWillReceiveProps(next) {
-    this.setIsShowPoint(next)
-  }
   async componentDidMount() {
     this.setState({
       openKeys: this.findSelectedNOpenKeys().openKeys,
@@ -327,21 +324,6 @@ class SiderNav extends React.Component {
     const { loadApply } = this.props
     const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
     await loadApply(UNUSED_CLUSTER_ID, query)
-    this.setIsShowPoint(this.props)
-  }
-  setIsShowPoint = props => {
-    const { user } = props
-    if (!user || !user.userName) {
-      return
-    }
-    if (user.role === ROLE_SYS_ADMIN) {
-      const { csbApply } = props
-      if (!csbApply) return
-      const { ids } = csbApply
-      ids && this.setState({
-        isShowPoint: ids.length > 0,
-      })
-    }
   }
   onCollapse = collapsed => {
     this.setState({ collapsed })
@@ -354,8 +336,12 @@ class SiderNav extends React.Component {
     toggleCollapsed && toggleCollapsed(collapsed)
   }
   renderMenuItem = data => {
-    const { collapsed, isShowPoint } = this.state
+    const { collapsed } = this.state
+    const { user, csbApply } = this.props
     const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
+    const isShowPoint = !!user &&
+      user.role === ROLE_SYS_ADMIN &&
+      !!csbApply && csbApply.ids && csbApply.ids.length > 0
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
