@@ -341,7 +341,7 @@ class SiderNav extends React.Component {
     const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
     const isShowPoint = !!user &&
       user.role === ROLE_SYS_ADMIN &&
-      !!csbApply && csbApply.ids.length > 0
+      !!csbApply && csbApply.ids && csbApply.ids.length > 0
     let iconDOM
     if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
     if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
