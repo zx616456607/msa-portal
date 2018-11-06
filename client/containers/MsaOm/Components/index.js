@@ -257,6 +257,10 @@ class MsaComponents extends React.Component {
     })
   }
 
+  // getApmID = apmIDs => {
+  //   apmIDs = apmIDs || this.state.apmID
+  // }
+
   handleCommit = () => {
     const { componentName, tooltipTitle, apmID } = this.state
     const { clusterId, getStart, getStop, getRedeploy } = this.props

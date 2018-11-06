@@ -4,10 +4,10 @@
  */
 
 /**
- * Wrapper of ProjectsClusters
- * 高阶组件，保证组件在加载完项目和集群后才渲染，以及在切换项目和集群时组件会卸载后再挂载
+ * 高阶组件: Wrapper of ProjectsClusters
+ * 保证组件在加载完项目和集群后才渲染，以及在切换项目和集群时组件会卸载后再挂载
  *
- * 2017-09-06
+ * 2018-11-06
  * @author zhangpc
  */
 
@@ -37,16 +37,16 @@ class ProjectsClusters extends React.Component {
       return
     }
     const { projects } = this.props
-    const project = projects[0].namespace
-    form.setFieldsValue({ project })
-    this.onProjectChange(project)
+    const projectNamespace = projects[0].namespace
+    form.setFieldsValue({ projectNamespace })
+    this.onProjectChange(projectNamespace)
   }
 
-  onProjectChange = async project => {
+  onProjectChange = async projectNamespace => {
     const { getProjectClusters, form } = this.props
     const { setFieldsValue, resetFields } = form
-    resetFields([ 'cluster' ])
-    const clustersRes = await getProjectClusters(project)
+    resetFields([ 'clusterID' ])
+    const clustersRes = await getProjectClusters(projectNamespace)
     if (clustersRes.error) {
       notification.warn({
         message: '获取项目集群失败，请刷新页面重试',
@@ -54,19 +54,23 @@ class ProjectsClusters extends React.Component {
       return
     }
     const { projectClusters } = this.props
-    if (projectClusters[project] && projectClusters[project][0]) {
+    if (projectClusters[projectNamespace] && projectClusters[projectNamespace][0]) {
       setFieldsValue({
-        cluster: projectClusters[project][0].clusterID,
+        clusterID: projectClusters[projectNamespace][0].clusterID,
       })
     }
   }
 
   renderComponent = () => {
-    const { Component, projectsLoading, projectClustersLoading, form } = this.props
+    const {
+      Component, projectsLoading, projectClustersLoading, form,
+      projects, projectClusters,
+    } = this.props
     const { clusterChange } = this.state
     const { getFieldsValue } = form
-    const { project, cluster } = getFieldsValue()
-    let clustersLoading = projectClustersLoading[project]
+    const { projectNamespace, clusterID } = getFieldsValue()
+    const clusters = projectClusters[projectNamespace] || []
+    let clustersLoading = projectClustersLoading[projectNamespace]
     if (clustersLoading === undefined) {
       clustersLoading = true
     }
@@ -76,7 +80,7 @@ class ProjectsClusters extends React.Component {
       }
       return renderLoading('加载项目集群中 ...')
     }
-    if (!cluster) {
+    if (!clusterID) {
       return (
         <div className="noclustersOrPrjects">
           <div className="noclustersOrPrjectsinfoWrap">
@@ -89,20 +93,20 @@ class ProjectsClusters extends React.Component {
         </div>
       )
     }
-    return <Component project={project} cluster={cluster} />
+    return <Component {...{ projectNamespace, clusterID, projects, clusters }} />
   }
 
   render() {
     const { form, projectsLoading, projects, projectClusters } = this.props
     const { getFieldDecorator, getFieldValue } = form
-    const clusters = projectClusters[getFieldValue('project')] || []
+    const clusters = projectClusters[getFieldValue('projectNamespace')] || []
     return (
       <React.Fragment>
         <Form className="select-project-cluster-form" hideRequiredMark>
           <Row gutter={24}>
             <Col span={6} style={{ display: 'block' }}>
               <FormItem label="项目">
-                {getFieldDecorator('project', {
+                {getFieldDecorator('projectNamespace', {
                   rules: [{
                     required: true,
                     message: '请选择项目',
@@ -123,7 +127,7 @@ class ProjectsClusters extends React.Component {
             </Col>
             <Col span={6} style={{ display: 'block' }}>
               <FormItem label="集群">
-                {getFieldDecorator('cluster', {
+                {getFieldDecorator('clusterID', {
                   rules: [{
                     required: true,
                     message: '请选择集群',
@@ -131,9 +135,7 @@ class ProjectsClusters extends React.Component {
                 })(
                   <Select
                     placeholder="请选择集群"
-                    onChange={() => {
-                      this.setState({ clusterChange: true })
-                    }}
+                    onChange={() => this.setState({ clusterChange: true })}
                   >
                     {
                       clusters.map(
@@ -148,7 +150,12 @@ class ProjectsClusters extends React.Component {
             </Col>
             <Col span={12}>
               <FormItem>
-                <Button type="primary">刷新</Button>
+                <Button
+                  type="primary"
+                  onClick={() => this.setState({ clusterChange: true })}
+                >
+                刷新
+                </Button>
               </FormItem>
             </Col>
           </Row>
