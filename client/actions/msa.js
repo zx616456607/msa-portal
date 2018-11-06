@@ -517,6 +517,55 @@ export const clearBlownMonitor = () => {
   }
 }
 
+// 查看服务是否设置熔断
+export const GET_MSA_BLOWN_OPEN_REQUEST = 'GET_MSA_BLOWN_OPEN_REQUEST'
+export const GET_MSA_BLOWN_OPEN_SUCCESS = 'GET_MSA_BLOWN_OPEN_SUCCESS'
+export const GET_MSA_BLOWN_OPEN_FAILURE = 'GET_MSA_BLOWN_OPEN_FAILURE'
+
+const fetchMsaBlownOpen = (clusterId, serviceName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_OPEN_REQUEST,
+        GET_MSA_BLOWN_OPEN_SUCCESS,
+        GET_MSA_BLOWN_OPEN_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/services/${serviceName}/check/hystrix`,
+      schema: {},
+    },
+  }
+}
+
+export const getMsaBlownOpenStatus = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchMsaBlownOpen(clusterId, serviceName))
+
+// 设置熔断规则
+export const SET_MSA_BLOWN_STRATEGY_REQUEST = 'SET_MSA_BLOWN_STRATEGY_REQUEST'
+export const SET_MSA_BLOWN_STRATEGY_SUCCESS = 'SET_MSA_BLOWN_STRATEGY_SUCCESS'
+export const SET_MSA_BLOWN_STRATEGY_FAILURE = 'SET_MSA_BLOWN_STRATEGY_FAILURE'
+
+const postMsaBlownStrategy = (clusterId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        SET_MSA_BLOWN_STRATEGY_REQUEST,
+        SET_MSA_BLOWN_STRATEGY_SUCCESS,
+        SET_MSA_BLOWN_STRATEGY_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const setMsaBlownStrategy = (clusterId, body) =>
+  dispatch => dispatch(postMsaBlownStrategy(clusterId, body))
+
+
 // 获取微服务熔断策略
 export const GET_MSA_BLOWN_STRATEGY_REQUEST = 'GET_MSA_BLOWN_STRATEGY_REQUEST'
 export const GET_MSA_BLOWN_STRATEGY_SUCCESS = 'GET_MSA_BLOWN_STRATEGY_SUCCESS'

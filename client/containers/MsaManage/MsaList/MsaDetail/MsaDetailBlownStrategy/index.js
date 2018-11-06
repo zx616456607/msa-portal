@@ -13,7 +13,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, Switch, Icon, Tooltip, Input } from 'antd'
 import TenxIcon from '@tenx-ui/icon/es/_old'
-import { getMsaBlownStrategy } from '../../../../../actions/msa'
+import { getMsaBlownStrategy, getMsaBlownOpenStatus, setMsaBlownStrategy } from '../../../../../actions/msa'
 import './style/index.less'
 
 const FormItem = Form.Item
@@ -30,20 +30,31 @@ const formItemLayout = {
   }
 }, {
   getMsaBlownStrategy,
+  getMsaBlownOpenStatus,
+  setMsaBlownStrategy,
 })
 class MsaDetailBlownStrategyComponent extends React.Component {
   state = {
     modalShow: false,
     delModal: false,
+    blownOpen: false,
   }
   componentDidMount() {
     const { getMsaBlownStrategy } = this.props
+    // const { getMsaBlownStrategy,
+    //   serviceName,
+    //   clusterID,
+    //   getMsaBlownOpenStatus } = this.props
+    // getMsaBlownOpenStatus(clusterID, serviceName)
+    this.setState({ blownOpen: true })
     getMsaBlownStrategy()
   }
   setBlownRules = () => {
+    // const { setMsaBlownStrategy, serviceName } = this.props
     const { validateFields } = this.props.form
     validateFields(err => {
       if (!err) {
+        // const body = {}
         this.setState({
           modalShow: false,
         })
@@ -58,9 +69,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       initialValue: false,
     })
   }
-  reqNumsValidate = () => {
+  requestVolumeThresholdValidate = () => {
+    // const { blownStrategy } = this.props
+    // const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
-    return getFieldDecorator('reqNums', {
+    return getFieldDecorator('requestVolumeThreshold', {
       initialValue: '',
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
@@ -77,9 +90,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       ],
     })
   }
-  failureRateValidate = () => {
+  errorThresholdPercentageValidate = () => {
+    // const { blownStrategy } = this.props
+    // const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
-    return getFieldDecorator('failureRate', {
+    return getFieldDecorator('errorThresholdPercentage', {
       initialValue: '',
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
@@ -97,9 +112,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
 
     })
   }
-  timeWindowValidate = () => {
+  sleepWindowInMillisecondsValidate = () => {
+    // const { blownStrategy } = this.props
+    // const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
-    return getFieldDecorator('timeWindow', {
+    return getFieldDecorator('sleepWindowInMilliseconds', {
       initialValue: '',
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
@@ -121,17 +138,25 @@ class MsaDetailBlownStrategyComponent extends React.Component {
   }
   render() {
     const { blownStrategy } = this.props
-    const { modalShow, delModal } = this.state
+    const { modalShow, delModal, blownOpen } = this.state
     const { data } = blownStrategy
     const title = data && Object.keys(data).length !== 0 ? '编辑熔断规则' : '设置熔断规则'
     return <div className="msa-detail-fusing">
-      <div className="alert">
-        <TenxIcon type="tips"/>
-        添加熔断策略，支持设置开启或关闭熔断策略
-      </div>
+      {
+        blownOpen ?
+          <div className="alert">
+            <TenxIcon type="tips"/>
+            添加熔断策略，支持设置开启或关闭熔断策略
+          </div>
+          :
+          <div className="alert warning">
+            <TenxIcon type="warning"/>
+            服务未配置熔断功能，暂不支持熔断策略
+          </div>
+      }
       {
         data && Object.keys(data).length !== 0 ?
-          <div className="strategy-wrapper">
+          blownOpen && <div className="strategy-wrapper">
             <div className="btns">
               <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>编辑熔断策略</Button>
               <Button type="default" icon="delete" onClick={() => this.setState({ delModal: true })}>删除</Button>
@@ -158,7 +183,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
             </table>
           </div>
           :
-          <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>添加熔断策略</Button>
+          blownOpen && <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>添加熔断策略</Button>
       }
       <Modal
         title={title}
@@ -194,7 +219,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
                 </Tooltip>
               </span>}>
               {
-                this.reqNumsValidate()(<Input type="text" placeholder="请输入1-10000之间的整数"/>)
+                this.requestVolumeThresholdValidate()(<Input type="text" placeholder="请输入1-10000之间的整数"/>)
               }
             </FormItem>
             <FormItem
@@ -205,7 +230,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
                 </Tooltip>
               </span>}>
               {
-                this.failureRateValidate()(<Input type="text" placeholder="请输入0-100之间的整数"/>)
+                this.errorThresholdPercentageValidate()(<Input type="text" placeholder="请输入0-100之间的整数"/>)
               }
             </FormItem>
             <div className="split second">
@@ -220,7 +245,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
                 </Tooltip>
               </span>}>
               {
-                this.timeWindowValidate()(<Input type="text" placeholder="请输入0-3,600,000之间的整数"/>)
+                this.sleepWindowInMillisecondsValidate()(<Input type="text" placeholder="请输入0-3,600,000之间的整数"/>)
               }
             </FormItem>
           </Form>
