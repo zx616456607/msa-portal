@@ -44,6 +44,9 @@ class ComponentDetail extends React.Component {
     const c_name = this.props.location.search.split('=')[1]
     const { clusterID, namespace, fetchComponent, fetchServiceList } = this.props
     fetchServiceList(clusterID, namespace).then(res => {
+      if(res.error) {
+        return
+      }
       const aryList = []
       const list = res.response.result
       Object.keys(list).forEach(item => {
@@ -109,7 +112,7 @@ class ComponentDetail extends React.Component {
       isAdd: false,
       // isLoading: true,
     })
-    const specFlag = detailList.spec.subsets.length <= 1 ? true : false
+    const specFlag = detailLis && tdetailList.spec.subsets.length <= 1 ? true : false
     const tip = detailList && specFlag ? `组件中唯一服务移除后，组件也将被移除` : ''
     confirm({
       modalTitle: '删除操作',
@@ -118,7 +121,8 @@ class ComponentDetail extends React.Component {
       onOk: () => {
         if (list) {
           if (specFlag) {
-            deleteComponent(clusterID, metadata.name).then(res => {
+            if(metadata && metadata.name) {
+              deleteComponent(clusterID, metadata.name).then(res => {
               if (res.error) {
                 notification.success({
                   message: `删除组件 ${metadata.name} 失败`,
@@ -130,6 +134,7 @@ class ComponentDetail extends React.Component {
               })
               this.props.history.push('/service-mesh/component-management')
             })
+            }
           } else {
             this.handleService(list)
           }
@@ -175,18 +180,20 @@ class ComponentDetail extends React.Component {
       })
     } else {
       const { name, version } = list
-      detailList.spec.subsets.forEach(item => {
+      if(name && version) {
+        detailList && detailList.spec.subsets.forEach(item => {
         if (item.name === name) {
           delete detailList.metadata.annotations[`svcName/${item.name}`]
         }
       })
-      detailList.spec.subsets.forEach((item, index) => {
+      detailList && detailList.spec.subsets.forEach((item, index) => {
         // const key = detailList.spec.subsets[item].name
         const key = item.labels.version
         if (key === version) {
           detailList.spec.subsets.splice(index, 1)
         }
       })
+      }
     }
     editComponent(clusterID, detailList, namespace).then(res => {
       if (res.error) {
