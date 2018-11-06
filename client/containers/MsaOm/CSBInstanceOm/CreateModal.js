@@ -56,17 +56,15 @@ class InstanceModal extends React.Component {
       }
       if (currentInstance) {
         editInstance(cluster, currentInstance.id, body).then(res => {
-          if (res.status === 409 && res.error) {
+          if (res.error) {
             this.setState({
               confirmLoading: false,
             })
-            return notification.warn({
-              message: '实例出口地址重复,请重新填写',
-            })
-          } else if (res.error) {
-            this.setState({
-              confirmLoading: false,
-            })
+            if (res.status === 409) {
+              return notification.warn({
+                message: '实例出口地址重复,请重新填写',
+              })
+            }
             notification.warn({
               message: '修改实例失败',
             })
@@ -84,19 +82,17 @@ class InstanceModal extends React.Component {
         return
       }
       createInstance(cluster, null, body).then(res => {
-        if (res.status === 409 && res.error) {
+        if (res.error) {
           this.setState({
             confirmLoading: false,
           })
-          return notification.warn({
-            message: '实例出口地址重复,请重新填写',
-          })
-        } else if (res.error) {
+          if (res.status === 409) {
+            return notification.warn({
+              message: '实例出口地址重复,请重新填写',
+            })
+          }
           notification.warn({
             message: '创建实例失败',
-          })
-          this.setState({
-            confirmLoading: false,
           })
           return
         }
