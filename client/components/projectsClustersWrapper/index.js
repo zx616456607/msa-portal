@@ -93,7 +93,27 @@ class ProjectsClusters extends React.Component {
         </div>
       )
     }
-    return <Component {...{ projectNamespace, clusterID, projects, clusters }} />
+    let currentProject
+    let currentCluster
+    projects.every(item => {
+      if (item.namespace === projectNamespace) {
+        currentProject = item
+        return false
+      }
+      return true
+    })
+    clusters.every(item => {
+      if (item.clusterID === clusterID) {
+        currentCluster = item
+        return false
+      }
+      return true
+    })
+    const props = {
+      projectNamespace, clusterID, projects, clusters, currentProject,
+      currentCluster,
+    }
+    return <Component {...props} />
   }
 
   render() {

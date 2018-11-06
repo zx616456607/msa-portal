@@ -32,7 +32,6 @@ class MsaConfig extends React.Component {
     installSate: false,
     notCurAry: [],
     isLoading: true,
-    clusterText: '',
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -46,10 +45,9 @@ class MsaConfig extends React.Component {
   }
 
   load = () => {
-    const { loadSpringCloud, clusterID, clusterName, projectNamespace } = this.props
+    const { loadSpringCloud, clusterID, projectNamespace } = this.props
     this.setState({
       isLoading: true,
-      clusterText: clusterName,
     })
     loadSpringCloud(clusterID, projectNamespace).then(res => {
       if (res.error) {
@@ -446,36 +444,11 @@ class MsaConfig extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = state => {
   const { current, springCloudAndApm } = state
-  const { info } = current.user
-  const projectID = current.projects.ids || []
-  const namespace = info.namespace
-  const { projects, clusters, projectNamespace, clusterID } = props
-  let currentProject
-  let currentCluster
-  projects.every(item => {
-    if (item.namespace === projectNamespace) {
-      currentProject = item
-      return false
-    }
-    return true
-  })
-  clusters.every(item => {
-    if (item.clusterID === clusterID) {
-      currentCluster = item
-      return false
-    }
-    return true
-  })
   return {
     current,
-    clusters,
-    projectID,
-    namespace,
     springCloudAndApm,
-    currentProject,
-    currentCluster,
   }
 }
 
