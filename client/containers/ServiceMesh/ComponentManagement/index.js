@@ -26,9 +26,9 @@ const Search = Input.Search
 class ComponentManagement extends React.Component {
   state = {
     name: '',
-    searchList: [],
     isSearch: false,
     componentName: '',
+    sourceList: [],
   }
 
   componentDidMount() {
@@ -45,19 +45,17 @@ class ComponentManagement extends React.Component {
   }
 
   onSearch = () => {
-    // const { clusterID, namespace } = this.props
+    const { dataList } = this.props
     const { componentName } = this.state
     let filterList = []
     if (componentName) {
-      const dataList = this.filterData()
       filterList = dataList.filter(item => item.name === componentName)
       this.setState({
         isSearch: true,
-        searchList: filterList,
+        sourceList: filterList,
       })
     } else {
       this.setState({
-        searchList: [],
         isSearch: false,
       }, () => {
         this.load()
@@ -101,28 +99,29 @@ class ComponentManagement extends React.Component {
     })
   }
 
-  filterData = () => {
-    const { dataList } = this.props
-    const { searchList, isSearch } = this.state
-    const dataAry = []
-    const dataSource = isSearch ? searchList : dataList
-    if (dataSource.length > 0) {
-      dataSource.forEach(item => {
-        const column = {
-          name: item.metadata.name,
-          description: item.metadata.annotations.description,
-          servicecount: item.spec.subsets.length,
-          startTime: item.metadata.creationTimestamp,
-        }
-        dataAry.push(column)
-      })
-      return dataAry
-    }
-    return dataAry
-  }
+  // filterData = () => {
+  //   const { dataList } = this.props
+  //   const { isSearch } = this.state
+  //   const dataAry = []
+  //   if (dataList && dataList.length > 0) {
+  //     dataList.forEach(item => {
+  //       const column = {
+  //         name: item.metadata.name,
+  //         description: item.metadata.annotations.description,
+  //         servicecount: item.spec.subsets.length,
+  //         startTime: item.metadata.creationTimestamp,
+  //       }
+  //       dataAry.push(column)
+  //     })
+  //   }
+  //   this.setState({
+  //     sourceList: dataAry,
+  //   })
+  // }
 
   render() {
-    const { dataList, isFetching } = this.props
+    const { tipList, dataList, isFetching } = this.props
+    const { isSearch, sourceList } = this.state
     const pagination = {
       simple: true,
       total: 1,
@@ -147,10 +146,11 @@ class ComponentManagement extends React.Component {
       title: '服务地址',
       dataIndex: 'address',
       render: (text, record) =>
-        <div className="AddressTipWrape">
-          <AddressTip dataList={dataList} componentName={record.name}
-            parentNode={'AddressTipWrape'} />
-        </div>,
+        (record.servicecount > 0 ?
+          <div className="AddressTipWrape">
+            <AddressTip dataList={tipList} componentName={record.name}
+              parentNode={'AddressTipWrape'} />
+          </div> : <span>--</span>),
     }, {
       title: '创建时间',
       dataIndex: 'startTime',
@@ -162,6 +162,8 @@ class ComponentManagement extends React.Component {
         <Button onClick={() => this.handleDelete(record.name)}>删除</Button>
       </div>,
     }]
+    const source = isSearch ? sourceList : dataList
+
     return (
       <QueueAnim className="component-management">
         <div className="component-management-btn layout-content-btns" key="btn">
@@ -175,7 +177,7 @@ class ComponentManagement extends React.Component {
             onSearch={this.onSearch}
           />
           <div className="pages">
-            <span className="total">共计 {this.filterData().length} 条</span>
+            <span className="total">共计 {sourceList.length} 条</span>
             <Pagination {...pagination} />
           </div>
         </div>
@@ -183,7 +185,7 @@ class ComponentManagement extends React.Component {
           <Table
             pagination={false}
             loading={isFetching}
-            dataSource={this.filterData()}
+            dataSource={source}
             columns={columns}
             rowKey={row => row.id}
           />
@@ -202,11 +204,21 @@ const mapStateToProps = state => {
   const { componentList } = serviceMesh
   const { data, isFetching } = componentList
   const dataAry = data || {}
+  const tipList = []
   const dataList = []
   Object.keys(dataAry).forEach(key => {
-    dataList.push(dataAry[key])
+    tipList.push(dataAry[key])
+    const dataFlag = dataAry && dataAry[key]
+    const column = {
+      name: dataFlag.metadata.name,
+      description: dataFlag.metadata.annotations && dataFlag.metadata.annotations.description,
+      servicecount: dataFlag.spec.subsets && dataFlag.spec.subsets.length,
+      startTime: dataFlag.metadata.creationTimestamp,
+    }
+    dataList.push(column)
   })
   return {
+    tipList,
     dataList,
     namespace,
     clusterID,
