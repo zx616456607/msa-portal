@@ -123,10 +123,10 @@ class MsaDetail extends React.Component {
               />
             </TabPane>
             <TabPane tab="熔断" key="fusing">
-              <MsaDetailBlownStrategy serviceName={name}/>
+              <MsaDetailBlownStrategy instances={instances} serviceName={name}/>
             </TabPane>
             <TabPane tab="降级" key="demotion">
-              <MsaDetailDemote/>
+              <MsaDetailDemote instances={instances} serviceName={name}/>
             </TabPane>
           </Tabs>
         </div>

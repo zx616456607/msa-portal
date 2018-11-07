@@ -11,9 +11,14 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, Switch, Icon, Tooltip, Input } from 'antd'
+import { Button, Modal, Form, Switch, Icon, Tooltip, Input, notification, Spin } from 'antd'
 import TenxIcon from '@tenx-ui/icon/es/_old'
-import { getMsaBlownStrategy, getMsaBlownOpenStatus, setMsaBlownStrategy } from '../../../../../actions/msa'
+import { getMsaBlownStrategy,
+  getMsaBlownOpenStatus,
+  setMsaBlownStrategy,
+  msaBlownOpen,
+  delMsaBlownStrategy,
+} from '../../../../../actions/msa'
 import './style/index.less'
 
 const FormItem = Form.Item
@@ -32,49 +37,69 @@ const formItemLayout = {
   getMsaBlownStrategy,
   getMsaBlownOpenStatus,
   setMsaBlownStrategy,
+  msaBlownOpen,
+  delMsaBlownStrategy,
 })
 class MsaDetailBlownStrategyComponent extends React.Component {
   state = {
     modalShow: false,
     delModal: false,
     blownOpen: false,
+    blownOpenLoading: false,
+    confirmLoading: false,
+    delLoading: false,
+    switchChecked: false,
+    switchLoading: false,
   }
   componentDidMount() {
-    const { getMsaBlownStrategy } = this.props
-    // const { getMsaBlownStrategy,
-    //   serviceName,
-    //   clusterID,
-    //   getMsaBlownOpenStatus } = this.props
-    // getMsaBlownOpenStatus(clusterID, serviceName)
-    this.setState({ blownOpen: true })
-    getMsaBlownStrategy()
-  }
-  setBlownRules = () => {
-    // const { setMsaBlownStrategy, serviceName } = this.props
-    const { validateFields } = this.props.form
-    validateFields(err => {
-      if (!err) {
-        // const body = {}
+    const { getMsaBlownStrategy,
+      serviceName,
+      instances,
+      clusterID,
+      getMsaBlownOpenStatus } = this.props
+    this.setState({ blownOpenLoading: true })
+    getMsaBlownOpenStatus(clusterID, `${serviceName}:${instances[0].port}`).then(res => {
+      if (res.response) {
         this.setState({
-          modalShow: false,
+          blownOpen: res.response.result.data,
+          blownOpenLoading: false,
+        })
+      }
+    })
+    getMsaBlownStrategy(clusterID, serviceName).then(res => {
+      if (res.response) {
+        this.setState({
+          switchChecked: res.response.result.data.hystrixOpen,
         })
       }
     })
   }
-
-  switchValidate = () => {
-    const { getFieldDecorator } = this.props.form
-    return getFieldDecorator('switch', {
-      valuePropName: 'checked',
-      initialValue: false,
+  setBlownRules = () => {
+    const { getMsaBlownStrategy, setMsaBlownStrategy, serviceName, clusterID } = this.props
+    const { validateFields } = this.props.form
+    validateFields(async (err, values) => {
+      if (!err) {
+        this.setState({ confirmLoading: true })
+        const body = Object.assign({}, values)
+        body.microServer = serviceName
+        const result = await setMsaBlownStrategy(clusterID, body)
+        this.setState({ confirmLoading: false })
+        if (!result.error) {
+          notification.success({ message: '设置熔断规则成功' })
+          getMsaBlownStrategy(clusterID, serviceName)
+          this.setState({
+            modalShow: false,
+          })
+        }
+      }
     })
   }
   requestVolumeThresholdValidate = () => {
-    // const { blownStrategy } = this.props
-    // const { data } = blownStrategy
+    const { blownStrategy } = this.props
+    const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('requestVolumeThreshold', {
-      initialValue: '',
+      initialValue: data && data.requestVolumeThreshold || 20,
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
         { validator: (rule, value, callback) => {
@@ -91,11 +116,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   errorThresholdPercentageValidate = () => {
-    // const { blownStrategy } = this.props
-    // const { data } = blownStrategy
+    const { blownStrategy } = this.props
+    const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('errorThresholdPercentage', {
-      initialValue: '',
+      initialValue: data && data.errorThresholdPercentage || 50,
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
         { validator: (rule, value, callback) => {
@@ -113,11 +138,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   sleepWindowInMillisecondsValidate = () => {
-    // const { blownStrategy } = this.props
-    // const { data } = blownStrategy
+    const { blownStrategy } = this.props
+    const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('sleepWindowInMilliseconds', {
-      initialValue: '',
+      initialValue: data && data.sleepWindowInMilliseconds || 1500,
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
         { validator: (rule, value, callback) => {
@@ -133,78 +158,117 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       ],
     })
   }
-  delBlownRules = () => {
-    this.setState({ delModal: false })
+  delBlownRules = async () => {
+    const { delMsaBlownStrategy, getMsaBlownStrategy, clusterID, serviceName } = this.props
+    this.setState({ delLoading: true })
+    const result = await delMsaBlownStrategy(clusterID, serviceName)
+    if (!result.error) {
+      notification.success({ message: '删除熔断规则成功' })
+      this.setState({ delModal: false })
+      getMsaBlownStrategy(clusterID, serviceName)
+    }
+    this.setState({ delLoading: false })
+  }
+  switchChange = async val => {
+    const { msaBlownOpen, getMsaBlownStrategy, serviceName, clusterID } = this.props
+    this.setState({ switchLoading: true })
+    const result = await msaBlownOpen(clusterID, { open: val, microServer: serviceName })
+    this.setState({ switchLoading: false })
+    if (!result.error) {
+      getMsaBlownStrategy(clusterID, serviceName)
+      this.setState({
+        switchChecked: val,
+      })
+    }
   }
   render() {
     const { blownStrategy } = this.props
-    const { modalShow, delModal, blownOpen } = this.state
+    const { modalShow,
+      delModal,
+      blownOpen,
+      confirmLoading,
+      switchChecked,
+      switchLoading,
+      blownOpenLoading,
+      delLoading,
+    } = this.state
     const { data } = blownStrategy
     const title = data && Object.keys(data).length !== 0 ? '编辑熔断规则' : '设置熔断规则'
     return <div className="msa-detail-fusing">
       {
-        blownOpen ?
-          <div className="alert">
-            <TenxIcon type="tips"/>
-            添加熔断策略，支持设置开启或关闭熔断策略
+        blownOpenLoading ?
+          <div className="loading">
+            <Spin />
           </div>
           :
-          <div className="alert warning">
-            <TenxIcon type="warning"/>
-            服务未配置熔断功能，暂不支持熔断策略
+          <div>
+            {
+              blownOpen ?
+                <div className="alert">
+                  <TenxIcon type="tips"/>
+                  添加熔断策略，支持设置开启或关闭熔断策略
+                </div>
+                :
+                <div className="alert warning">
+                  <TenxIcon type="warning"/>
+                  服务未配置熔断功能，暂不支持熔断策略
+                </div>
+            }
+            {
+              data && Object.keys(data).length !== 0 ?
+                blownOpen && <div className="strategy-wrapper">
+                  <div className="btns">
+                    <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>编辑熔断策略</Button>
+                    <Button type="default" icon="delete" onClick={() => this.setState({ delModal: true })}>删除</Button>
+                  </div>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>状态</td>
+                        <td style={{ color: data.hystrixOpen ? '#5cb85c' : '#f85a5a' }}>{data.hystrixOpen ? '已开启' : '已关闭'}</td>
+                      </tr>
+                      <tr>
+                        <td>窗口请求数</td>
+                        <td>{data.requestVolumeThreshold}次</td>
+                      </tr>
+                      <tr>
+                        <td>失败率</td>
+                        <td>{data.errorThresholdPercentage}%</td>
+                      </tr>
+                      <tr>
+                        <td>熔断时间窗</td>
+                        <td>{data.sleepWindowInMilliseconds}ms</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                :
+                blownOpen && <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>添加熔断策略</Button>
+            }
+
           </div>
-      }
-      {
-        data && Object.keys(data).length !== 0 ?
-          blownOpen && <div className="strategy-wrapper">
-            <div className="btns">
-              <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>编辑熔断策略</Button>
-              <Button type="default" icon="delete" onClick={() => this.setState({ delModal: true })}>删除</Button>
-            </div>
-            <table>
-              <tbody>
-                <tr>
-                  <td>状态</td>
-                  <td style={{ color: '#5cb85c' }}>{data.status === '0' ? '已关闭' : '已开启'}</td>
-                </tr>
-                <tr>
-                  <td>窗口请求数</td>
-                  <td>{data.reqNums}次</td>
-                </tr>
-                <tr>
-                  <td>失败率</td>
-                  <td>{data.failureRate}%</td>
-                </tr>
-                <tr>
-                  <td>熔断时间窗</td>
-                  <td>{data.time}ms</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          :
-          blownOpen && <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>添加熔断策略</Button>
       }
       <Modal
         title={title}
         visible={ modalShow }
         onOk={this.setBlownRules}
         onCancel={() => this.setState({ modalShow: false })}
+        confirmLoading={ confirmLoading }
       >
         <div className="msa-detail-blown-rules">
           <Form>
             <FormItem
               {...formItemLayout}
               label="默认开启">
-              {
-                this.switchValidate()(<Switch
-                  checkedChildren="开"
-                  unCheckedChildren="关"
-                />)
-              }
-
+              <Switch
+                checkedChildren="开"
+                unCheckedChildren="关"
+                checked={switchChecked}
+                loading={switchLoading}
+                onChange={this.switchChange}
+              />
               <div className="switch-tip">
-                开启后，服务本身的降级策略生效，直到关闭策略；若服务本身未设置降级策略，开关不生效
+                开启后，服务本身的熔断策略生效，直到关闭策略。
               </div>
             </FormItem>
             <div className="split">
@@ -213,7 +277,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
             </div>
             <FormItem
               {...formItemLayout}
-              label={<span>窗口请求数
+              label={<span>窗口请求数(次)
                 <Tooltip title="窗口收到的请求数">
                   <Icon style={{ marginLeft: 4 }} type="question-circle" theme="outlined" />
                 </Tooltip>
@@ -239,7 +303,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
             </div>
             <FormItem
               {...formItemLayout}
-              label={<span>熔断时间窗
+              label={<span>熔断时间窗(ms)
                 <Tooltip title="熔断的持续时间（该时间内不再响应请求）">
                   <Icon style={{ marginLeft: 4 }} type="question-circle" theme="outlined" />
                 </Tooltip>
@@ -254,6 +318,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       <Modal
         title="删除熔断策略"
         visible={delModal}
+        confirmLoading={delLoading}
         onOk={this.delBlownRules}
         onCancel={() => this.setState({ delModal: false })}
       >
