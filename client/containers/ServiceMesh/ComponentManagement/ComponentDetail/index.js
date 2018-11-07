@@ -112,7 +112,7 @@ class ComponentDetail extends React.Component {
       isAdd: false,
       // isLoading: true,
     })
-    const specFlag = detailLis && tdetailList.spec.subsets.length <= 1 ? true : false
+    const specFlag = detailList && detailList.spec.subsets.length <= 1 ? true : false
     const tip = detailList && specFlag ? `组件中唯一服务移除后，组件也将被移除` : ''
     confirm({
       modalTitle: '删除操作',
