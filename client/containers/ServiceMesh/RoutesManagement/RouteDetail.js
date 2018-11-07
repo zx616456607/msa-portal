@@ -60,6 +60,7 @@ let routeUuid = 9999;
 let routeConditionUuid = 30000
 const mapStateToProps = state => {
   return {
+    originalMeshGatewayList: state.entities.meshGatewayList,
     meshRouteDetail: state.meshRouteManagement.meshRouteDetail,
     meshGatewayList: state.meshGateway.meshGatewayList,
     clusterID: state.current && state.current.config.cluster.id,
@@ -79,6 +80,7 @@ class NewRouteComponent extends React.Component {
     ruleName: '',
     visitType: 'pub',
     routeType: 'content',
+    serviceHost: [],
     gateways: [],
     actionVersionOptions: [],
     hosts: [
@@ -98,8 +100,10 @@ class NewRouteComponent extends React.Component {
     }
     Promise.all(promises).then(() => {
       this.setInitialValue()
+      const selectedGateways = this.setInitialValue().defaltGateways
       const { meshRouteDetail } = this.props
       const data = meshRouteDetail.data
+      this.setSelectableHosts(selectedGateways)
       if (data && match.params.name) {
         const { spec } = data
         this.setActionVersion(data.spec.http[0].route[0].destination.host)
@@ -130,7 +134,8 @@ class NewRouteComponent extends React.Component {
         const defaultVersion = []
         route.forEach(item => defaultVersion.push(item.destination.subset))
         // 当选择的组件被删除的时候，默认选择的作用版本被置空
-        if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) < 0) {
+        if (componentList.data &&
+          Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) < 0) {
           defaultVersion.splice(0)
         }
         initialValues.defaultRouteKeys.push(routeIndex)
@@ -158,7 +163,24 @@ class NewRouteComponent extends React.Component {
     }
     return initialValues
   }
+  setSelectableHosts = currentHosts => {
+    const { originalMeshGatewayList } = this.props
+    const serviceHost = []
+    for (const k in originalMeshGatewayList) {
+      currentHosts.forEach(v => {
+        if (v === k) {
+          const currentServers = originalMeshGatewayList[k].spec.servers[0]
+          currentServers.hosts.forEach(j => {
+            if (!serviceHost.includes(j)) {
+              serviceHost.push({ host: j, parent: k })
+            }
+          })
+        }
+      })
+    }
+    this.setState({ serviceHost })
 
+  }
   // 设置作用版本
   setActionVersion = val => {
     const { componentList } = this.props
@@ -207,8 +229,11 @@ class NewRouteComponent extends React.Component {
     if (match.params.name && meshRouteDetail.data) {
       const { spec } = meshRouteDetail.data
       const selectedCom = spec.http[0].route[0].destination.host
-      if (Object.values(componentList.data).findIndex(v => v.metadata.name === selectedCom) >= 0) {
-        defaultComponent = [ selectedCom ]
+      if (componentList.data) {
+        if (Object.values(componentList.data)
+          .findIndex(v => v.metadata.name === selectedCom) >= 0) {
+          defaultComponent = [ selectedCom ]
+        }
       }
     }
     return getFieldDecorator('componentSelected', {
@@ -223,27 +248,50 @@ class NewRouteComponent extends React.Component {
     })
   }
   visitTypeProps = () => {
-    const { getFieldDecorator } = this.props.form
+    const { getFieldDecorator, resetFields, setFieldsValue } = this.props.form
     return getFieldDecorator('visitType', {
       initialValue: this.setInitialValue().defaultVisitType,
-      onChange: e => this.setState({ visitType: e.target.value }),
+      onChange: e => {
+        resetFields([ 'host' ])
+        setFieldsValue({ hostKeys: [ 1 ] })
+        this.setState({
+          visitType: e.target.value,
+          serviceHost: [],
+        })
+      },
     })
   }
   gatewayProps = () => {
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('gateways', {
       initialValue: this.setInitialValue().defaltGateways,
-      // onChange: e => this.setState({ visitType: e.target.value }),
+      onChange: gateways => {
+        this.setSelectableHosts(gateways)
+      },
       rules: [{ required: true, message: '请选择网关' }],
     })
   }
   domainValidator = (rule, value, cb) => {
+    const { visitType } = this.state
+    const { getFieldValue } = this.props.form
     if (!value) return cb()
     const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
-    if (domainReg.test(value) || IP_REG.test(value)) {
-      return cb()
+    if (visitType !== 'pub') {
+      if (!(domainReg.test(value) || IP_REG.test(value))) {
+        cb('请填写正确的服务域名')
+      }
     }
-    cb('请填写正确的服务域名')
+    let hostList = getFieldValue('host')
+    hostList = hostList.filter(v => typeof v === 'string')
+    if (hostList.length > 1) {
+      const existHostList = hostList.slice(0, hostList.length - 1)
+      if (existHostList.includes(hostList[hostList.length - 1])) {
+        cb('服务域名不能重复')
+      }
+    }
+
+    cb()
+
   }
   ruleOfRouteValidator = (rule, value, cb) => {
     const values = this.props.form.getFieldsValue()
@@ -322,7 +370,7 @@ class NewRouteComponent extends React.Component {
     const { getFieldDecorator, getFieldValue } = this.props.form;
     getFieldDecorator('hostKeys', { initialValue: this.setInitialValue().defaultHostList });
     const hostList = getFieldValue('hostKeys');
-    const { visitType } = this.state
+    const { visitType, serviceHost } = this.state
     const hostTip = visitType === 'pub' ? `服务对外访问地址，用户需自行申请，
     并确保所填域名或主机名能解析到所选网关的出口ip地址
     （在选择的网关中添加该域名或主机名）` : '服务集群内访问地址，请填写不冲突的服务名或域名'
@@ -339,22 +387,54 @@ class NewRouteComponent extends React.Component {
           required={false}
           key={k}
         >
-          {getFieldDecorator(`host[${k}]`, {
-            validateTrigger: [ 'onChange', 'onBlur' ],
-            initialValue: this.setInitialValue().host[k],
-            rules: [{
-              required: true,
-              whitespace: true,
-              message: '请输入服务域名',
-            }, {
-              validator: this.domainValidator,
-            }],
-          })(
-            <Input
-              addonAfter={<Icon type="plus" onClick={() => this.addItem('hostKeys')}/>}
-              placeholder="请输入服务域名"
-              style={{ width: '200px', marginRight: 8 }} />
-          )}
+          {
+            visitType === 'pub' ?
+              <span>
+                {getFieldDecorator(`host[${k}]`, {
+                  validateTrigger: [ 'onChange', 'onBlur' ],
+                  initialValue: this.setInitialValue().host[k],
+                  rules: [{
+                    required: true,
+                    whitespace: true,
+                    message: '请选择服务域名',
+                  }, {
+                    validator: this.domainValidator,
+                  }],
+                })(
+                  <Select
+                    placeholder="请选择服务域名"
+                    style={{ width: '200px', marginRight: 16 }}
+                  >
+                    {
+                      serviceHost.map(v => <Select className="Option" value={v.host} key={v.parent}>
+                        {`${v.host} (${v.parent})`}
+                      </Select>)
+                    }
+                  </Select>
+                )}
+                <Button icon="plus" onClick={() => this.addItem('hostKeys')}/>
+
+              </span>
+              :
+              <span>
+                {getFieldDecorator(`host[${k}]`, {
+                  validateTrigger: [ 'onChange', 'onBlur' ],
+                  initialValue: this.setInitialValue().host[k],
+                  rules: [{
+                    required: true,
+                    whitespace: true,
+                    message: '请输入服务域名',
+                  }, {
+                    validator: this.domainValidator,
+                  }],
+                })(
+                  <Input
+                    addonAfter={<Icon type="plus" onClick={() => this.addItem('hostKeys')}/>}
+                    placeholder="请输入服务域名"
+                    style={{ width: '200px', marginRight: 8 }} />
+                )}
+              </span>
+          }
           {hostList.length > 1 ? (
             <Button
               icon="minus"
@@ -604,7 +684,6 @@ class NewRouteComponent extends React.Component {
             http.push({ match, route })
           }
         })
-
         const postData = {
           apiVersion: 'networking.istio.io/v1alpha3',
           kind: 'VirtualService',
@@ -702,7 +781,6 @@ class NewRouteComponent extends React.Component {
               placeholder="请选择组件"
               style={{ width: 200 }}
             >
-
               {
                 this.componentSelection().map(v => <Option value={v.host} key={v.host}>{`${v.host} (${v.versionNum})`}</Option>)
               }
