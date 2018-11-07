@@ -84,7 +84,7 @@ class ComponentDetail extends React.Component {
   filterService = list => {
     if (list.length !== 0) {
       const serviceAry = []
-      list.spec.subsets.forEach(item => {
+      list.spec.subsets && list.spec.subsets.forEach(item => {
         const query = {
           name: item.name,
           version: item.labels.version,
@@ -187,7 +187,7 @@ class ComponentDetail extends React.Component {
           }
         })
         detailList && detailList.spec.subsets.forEach((item, index) => {
-        // const key = detailList.spec.subsets[item].name
+          // const key = detailList.spec.subsets[item].name
           const key = item.labels.version
           if (key === version) {
             detailList.spec.subsets.splice(index, 1)
@@ -200,7 +200,7 @@ class ComponentDetail extends React.Component {
         return
       }
       this.setState({
-        delVisible: false,
+        visible: false,
         isLoading: false,
       })
       this.loadDetail()
@@ -379,7 +379,7 @@ class ComponentDetail extends React.Component {
               <h2>组件名称：{metadata && metadata.name}</h2>
               <div className="descs">
                 <div>创建时间：{formatDate(metadata && metadata.creationTimestamp)}</div>
-                <div>描述：{metadata && metadata.annotations.description}</div>
+                <div>描述：{metadata && metadata.annotations && metadata.annotations.description}</div>
               </div>
             </div>
           </div>
@@ -421,17 +421,6 @@ class ComponentDetail extends React.Component {
             <Icon type="plus-circle-o" theme="outlined" className="ico" />
             添加一个服务
           </span>
-        </Modal>
-        <Modal title="删除服务"
-          visible={this.state.delVisible}
-          onCancel={this.handleDelClose}
-          footer={[
-            <Button key="back" type="ghost" onClick={this.handleDelClose}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleDelService}>确 定</Button>,
-          ]}>
-          <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-            <span>移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务？</span>
-          </div>
         </Modal>
       </QueueAnim>
     )

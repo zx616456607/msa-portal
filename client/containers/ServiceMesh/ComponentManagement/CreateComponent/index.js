@@ -27,6 +27,7 @@ class CreateComponent extends React.Component {
     isAdd: true,
     serviceAry: [],
     componentList: [],
+    moduleServiceList: [],
   }
 
   componentWillMount() {
@@ -48,22 +49,25 @@ class CreateComponent extends React.Component {
     const { form } = this.props
     if (componentList) {
       const obj = {}
-      componentList.spec.subsets.forEach((item, index) => {
-        keys.push(uuid++)
-        Object.assign(obj, {
-          [`serviceName-${index}`]: item.name,
-          [`version-${index}`]: item.labels.version,
+      const { subsets } = componentList.spec
+      if (subsets) {
+        subsets.forEach((item, index) => {
+          keys.push(uuid++)
+          Object.assign(obj, {
+            [`serviceName-${index}`]: item.name,
+            [`version-${index}`]: item.labels.version,
+          })
+          this.setState({
+            [`service${index}`]: true,
+          })
         })
-        this.setState({
-          [`service${index}`]: true,
+        form.setFieldsValue({
+          keys,
         })
-      })
-      form.setFieldsValue({
-        keys,
-      })
-      setTimeout(() => {
-        form.setFieldsValue(obj)
-      }, 1000)
+        setTimeout(() => {
+          form.setFieldsValue(obj)
+        }, 1000)
+      }
     }
   }
 
@@ -100,7 +104,22 @@ class CreateComponent extends React.Component {
 
   fetchServiceList = () => {
     const { clusterID, namespace, fetchServiceList } = this.props
-    fetchServiceList(clusterID, namespace)
+    fetchServiceList(clusterID, namespace).then(res => {
+      if (res.error) {
+        return
+      }
+      const aryList = []
+      const list = res.response.result
+      Object.keys(list).forEach(item => {
+        const moduleValue = list[item].metadata.labels['servicemesh/app-module']
+        if (moduleValue) {
+          aryList.push(item)
+        }
+      })
+      this.setState({
+        moduleServiceList: aryList,
+      })
+    })
   }
 
   handleAdd = () => {
@@ -187,6 +206,12 @@ class CreateComponent extends React.Component {
               })
               return
             }
+            if (res.status === 409) {
+              notification.warn({
+                message: `${value.componentName} 已经存在`,
+              })
+              return
+            }
             notification.error({
               message: '添加组件失败',
             })
@@ -255,8 +280,8 @@ class CreateComponent extends React.Component {
   }
 
   filterServicelist = key => {
-    const { serviceList } = this.state
-    if (serviceList.indexOf(key) !== -1) {
+    const { moduleServiceList } = this.state
+    if (moduleServiceList.indexOf(key) !== -1) {
       return true
     }
     return false
@@ -269,12 +294,15 @@ class CreateComponent extends React.Component {
     if (value) {
       keys.forEach(key => {
         const service = form.getFieldValue(`serviceName-${key}`)
-        if (this.filterServicelist(service)) {
-          callback('服务名称重复')
-        }
-        if (serviceKey !== `serviceName-${key}`) {
-          if (value === service || this.filterServicelist(service)) {
+        const serviceState = this.state[`service${key}`]
+        if (!serviceState) {
+          if (this.filterServicelist(service)) {
             callback('服务名称重复')
+          }
+          if (serviceKey !== `serviceName-${key}`) {
+            if (value === service || this.filterServicelist(service)) {
+              callback('服务名称重复')
+            }
           }
         }
       })

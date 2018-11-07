@@ -118,7 +118,7 @@ export const CREATE_INSTANCE_FAILURE = 'CREATE_INSTANCE_FAILURE'
 
 // Create an instance
 // Relies on the custom API middleware defined in ../middleware/api.js.
-const fetchCreateInstance = (clusterID, query, body) => {
+const fetchCreateInstance = (clusterID, query, body, options) => {
   return {
     [CALL_API]: {
       types: [ CREATE_INSTANCE_REQUEST, CREATE_INSTANCE_SUCCESS, CREATE_INSTANCE_FAILURE ],
@@ -129,11 +129,12 @@ const fetchCreateInstance = (clusterID, query, body) => {
       },
       schema: {},
     },
+    options,
   }
 }
 
-export const createInstance = (clusterID, query, body) =>
-  dispatch => dispatch(fetchCreateInstance(clusterID, query, body))
+export const createInstance = (clusterID, query, body, options) =>
+  dispatch => dispatch(fetchCreateInstance(clusterID, query, body, options))
 
 // 申请实例
 export const APPLY_FOR_INSTANCES_REQUEST = 'APPLY_FOR_INSTANCES_REQUEST'
@@ -215,7 +216,7 @@ export const EDIT_CSB_INSTANCE_REQUEST = 'EDIT_CSB_INSTANCE_REQUEST'
 export const EDIT_CSB_INSTANCE_SUCCESS = 'EDIT_CSB_INSTANCE_SUCCESS'
 export const EDIT_CSB_INSTANCE_FAILURE = 'EDIT_CSB_INSTANCE_FAILURE'
 
-const fetchEditInstance = (clusterID, instanceID, body) => {
+const fetchEditInstance = (clusterID, instanceID, body, options) => {
   return {
     [CALL_API]: {
       types: [
@@ -230,11 +231,12 @@ const fetchEditInstance = (clusterID, instanceID, body) => {
       },
       schema: {},
     },
+    options,
   }
 }
 
-export const editInstance = (clusterID, instanceID, body) =>
-  dispatch => dispatch(fetchEditInstance(clusterID, instanceID, body))
+export const editInstance = (clusterID, instanceID, body, options) =>
+  dispatch => dispatch(fetchEditInstance(clusterID, instanceID, body, options))
 
 // 获取实例概览
 export const GET_CSB_INSTANCE_OVERVIEW_REQUEST = 'GET_CSB_INSTANCE_OVERVIEW_REQUEST'

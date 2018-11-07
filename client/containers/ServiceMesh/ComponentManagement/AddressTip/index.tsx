@@ -33,37 +33,39 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
   async componentDidMount() {
     const { dataList = [], componentName } = this.props;
     const addressList = dataList
-    .filter(({metadata}) => metadata.name === componentName)
-    .map(({ metadata }) => Object.keys(metadata.annotations).map(name => name.split('/')[1]))[0]
+      .filter(({ metadata }) => metadata.name === componentName)
+      .map(({ metadata }) => metadata.annotations && Object.keys(metadata.annotations).
+        map(name => name.split('/')[1]))[0]
     this.setState({ addressList })
   }
   showPop = () => {
-    const {show} = this.state
+    const { show } = this.state
     this.setState({
       show: !show
     })
   }
   render() {
+    const { addressList } = this.state
     return (
       <div className="AddressTip">
         {
-          this.state.addressList.length === 0 ?
-          <span>-</span> :
-          <Popover
-          placement='right'
-          content={
-          <CTips
-            addressList={this.state.addressList}
-          />
-          }
-          trigger='click'
-          onVisibleChange={this.showPop}
-          arrowPointAtCenter={true}
-          // getTooltipContainer=
-          // {(triggerNode) => triggerNode}
-          >
-          <span className="checkAddress">查看访问地址</span>
-        </Popover>
+          addressList && addressList.length === 0 ?
+            <span>-</span> :
+            <Popover
+              placement='right'
+              content={
+                <CTips
+                  addressList={this.state.addressList}
+                />
+              }
+              trigger='click'
+              onVisibleChange={this.showPop}
+              arrowPointAtCenter={true}
+            // getTooltipContainer=
+            // {(triggerNode) => triggerNode}
+            >
+              <span className="checkAddress">查看访问地址</span>
+            </Popover>
         }
       </div>
     )
@@ -72,9 +74,9 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
 
 interface TipProps {
   config: {
-    name:string;
-    routerAddress?: { address: string, matchType: string, netType: string}[];
-    innerAddress: { containerPort:number, domain: string }[];
+    name: string;
+    routerAddress?: { address: string, matchType: string, netType: string }[];
+    innerAddress: { containerPort: number, domain: string }[];
   };
 }
 interface TipState {
@@ -104,65 +106,65 @@ class Tip extends React.Component<TipProps, TipState> {
     )
   }
   render() {
-    const { name = '-', routerAddress=[], innerAddress=[] } = this.props.config
+    const { name = '-', routerAddress = [], innerAddress = [] } = this.props.config
     return (
       <div className="Tip">
-      <div className="primary">{name}</div>
-      <Timeline>
-        <Timeline.Item
-          dot={<div style={{ height: 5, width: 5, backgroundColor: '#2db7f5', margin: '0 auto' }}>
-              </div>}
-        >
-        </Timeline.Item>
-        {
-          innerAddress.map(({ containerPort, domain }) =>
+        <div className="primary">{name}</div>
+        <Timeline>
+          <Timeline.Item
+            dot={<div style={{ height: 5, width: 5, backgroundColor: '#2db7f5', margin: '0 auto' }}>
+            </div>}
+          >
+          </Timeline.Item>
+          {
+            innerAddress.map(({ containerPort, domain }) =>
+              <Timeline.Item dot={<div></div>}>
+                <TenxIcon type="branch" className='branchSvg' />
+                <span className="primary">
+                  {`容器端口:${containerPort} 集群内:${domain}:${containerPort}`}
+                  <Tooltip title={this.state.copyStatus === false ? '点击复制' : '复制成功'} >
+                    <TenxIcon type="copy"
+                      className="marginCopy"
+                      onClick={this.copyCode}
+                      onMouseEnter={() => this.startCopyCode(`${domain}:${containerPort}`)}
+                      onMouseLeave={this.returnDefaultTooltip}
+                    />
+                  </Tooltip>
+                </span>
+              </Timeline.Item>)
+          }
           <Timeline.Item dot={<div></div>}>
-            <TenxIcon type="branch"  className='branchSvg'/>
-            <span className="primary">
-              {`容器端口:${containerPort} 集群内:${domain}:${containerPort}`}
-              <Tooltip title={this.state.copyStatus === false ? '点击复制': '复制成功'} >
-              <TenxIcon type="copy"
-                  className="marginCopy"
-                  onClick={this.copyCode}
-                  onMouseEnter={() => this.startCopyCode(`${domain}:${containerPort}`)}
-                  onMouseLeave={this.returnDefaultTooltip}
-                />
-              </Tooltip>
-            </span>
-          </Timeline.Item>)
-        }
-        <Timeline.Item dot={<div></div>}>
-            <TenxIcon type="branch"  className='branchSvg' />
+            <TenxIcon type="branch" className='branchSvg' />
             <span className="primary">路由地址</span>
             <div className="primary">
               <div>
                 {
                   routerAddress.length !== 0 ?
-                routerAddress.map(({address,matchType, netType }) =>
-                <div className="routerAddress">
-                { `${netType}:`}
-                {address}
-                <Tooltip title={this.state.copyStatus === false ? '点击复制': '复制成功'} >
-                <TenxIcon type="copy"
-                  className="marginCopy"
-                  onClick={this.copyCode}
-                  onMouseEnter={() => this.startCopyCode(address)}
-                  onMouseLeave={this.returnDefaultTooltip}
-                />
-                </Tooltip>
-                {
-                  matchType === 'prefix' &&
-                <Tooltip title='匹配前缀'>
-                  <TenxIcon type="match" className="marginCopy"/>
-                </Tooltip>
-                }
-                </div>) : <div className="noRouterAddress">未设置路由规则暂无地址</div>
+                    routerAddress.map(({ address, matchType, netType }) =>
+                      <div className="routerAddress">
+                        {`${netType}:`}
+                        {address}
+                        <Tooltip title={this.state.copyStatus === false ? '点击复制' : '复制成功'} >
+                          <TenxIcon type="copy"
+                            className="marginCopy"
+                            onClick={this.copyCode}
+                            onMouseEnter={() => this.startCopyCode(address)}
+                            onMouseLeave={this.returnDefaultTooltip}
+                          />
+                        </Tooltip>
+                        {
+                          matchType === 'prefix' &&
+                          <Tooltip title='匹配前缀'>
+                            <TenxIcon type="match" className="marginCopy" />
+                          </Tooltip>
+                        }
+                      </div>) : <div className="noRouterAddress">未设置路由规则暂无地址</div>
                 }
               </div>
             </div>
           </Timeline.Item>
-      </Timeline>
-      <div className="line"></div>
+        </Timeline>
+        <div className="line"></div>
       </div>
     )
   }
@@ -177,63 +179,63 @@ interface TipsProps {
 interface TipsState {
   addressMessage:
   {
-    name:string;
-    routerAddress?: { address: string, matchType: string}[];
-    innerAddress: { containerPort:number, domain: string }[];
+    name: string;
+    routerAddress?: { address: string, matchType: string }[];
+    innerAddress: { containerPort: number, domain: string }[];
   }[] | undefined;
 }
 function mapStateToProps(state) {
-  const { current: { config: { cluster: { id:clusterId = '' } = {}} = {}} = {}} = state
+  const { current: { config: { cluster: { id: clusterId = '' } = {} } = {} } = {} } = state
   return { clusterId }
 }
 
 class Tips extends React.Component<TipsProps, TipsState> {
   state = {
-    addressMessage:undefined,
+    addressMessage: undefined,
   }
   async componentDidMount() {
-    const {getServiceListServiceMeshStatus, clusterId, addressList} = this.props
+    const { getServiceListServiceMeshStatus, clusterId, addressList } = this.props
     const addressInfo =
-    await getServiceListServiceMeshStatus(clusterId, addressList, { withAccessPoints:'something' })
+      await getServiceListServiceMeshStatus(clusterId, addressList, { withAccessPoints: 'something' })
     const { result = {} } = addressInfo.response
     const addressMessage = Object.entries(result)
-    .map(([name, value]) => {
-      // 获取内网地址
-      const domain = getDeepValue(value, [ 'metadata','labels', 'tenxcloud.com/svcName' ])
-      const portArray =
-       getDeepValue(value, ['spec', 'template', 'spec', 'containers', 0, 'ports' ]) || []
-      const innerAddress = portArray.map(({containerPort}) => ({ domain, containerPort }))
-      const returnMessage = {name, innerAddress}
-      // 获取服务网格相关的地址
-      if(!value.accessPoints) {
-        return returnMessage
-      }
-      const accessPointsAddress = value.accessPoints
-      .map(({ hosts, match }) => {
-        const Exact = match.uri.MatchType.Exact;
-        const Prefix = match.uri.MatchType.Prefix;
-        const netType = (hosts[0].ips || []).length === 0 ? '集群内' : '公网'
-        if (Exact) {
-          return { address: `${hosts[0].host}${Exact}`, matchType: 'exact', netType }
+      .map(([name, value]) => {
+        // 获取内网地址
+        const domain = getDeepValue(value, ['metadata', 'labels', 'tenxcloud.com/svcName'])
+        const portArray =
+          getDeepValue(value, ['spec', 'template', 'spec', 'containers', 0, 'ports']) || []
+        const innerAddress = portArray.map(({ containerPort }) => ({ domain, containerPort }))
+        const returnMessage = { name, innerAddress }
+        // 获取服务网格相关的地址
+        if (!value.accessPoints) {
+          return returnMessage
         }
-        if (Prefix) {
-          return {address: `${hosts[0].host}${Prefix}`, matchType: 'prefix', netType }
-        }
-        return {}
+        const accessPointsAddress = value.accessPoints
+          .map(({ hosts, match }) => {
+            const Exact = match.uri.MatchType.Exact;
+            const Prefix = match.uri.MatchType.Prefix;
+            const netType = (hosts[0].ips || []).length === 0 ? '集群内' : '公网'
+            if (Exact) {
+              return { address: `${hosts[0].host}${Exact}`, matchType: 'exact', netType }
+            }
+            if (Prefix) {
+              return { address: `${hosts[0].host}${Prefix}`, matchType: 'prefix', netType }
+            }
+            return {}
+          })
+        return { ...returnMessage, routerAddress: accessPointsAddress }
       })
-      return {...returnMessage, routerAddress:accessPointsAddress}
-    })
-    this.setState({addressMessage})
+    this.setState({ addressMessage })
   }
   render() {
-    return(
+    return (
       <div className="Tips">
         <input id="ServiceMeshTipsRouterAddress"
-          style={{ position:'absolute', opacity:0 }}
+          style={{ position: 'absolute', opacity: 0 }}
         />
-        { this.state.addressMessage === undefined && <Spin/> }
-        { this.state.addressMessage !== undefined &&
-          (this.state.addressMessage || []).map((config) => <Tip config={config}/>)
+        {this.state.addressMessage === undefined && <Spin />}
+        {this.state.addressMessage !== undefined &&
+          (this.state.addressMessage || []).map((config) => <Tip config={config} />)
         }
       </div>
     )
@@ -256,7 +258,7 @@ export class ServiceAddressTip extends React.Component<ServiceTipprops, ServiceT
     show: false,
   }
   showPop = () => {
-    const {show} = this.state
+    const { show } = this.state
     this.setState({
       show: !show
     })
@@ -264,19 +266,19 @@ export class ServiceAddressTip extends React.Component<ServiceTipprops, ServiceT
   render() {
     return (
       <div className="AddressTip">
-          <Popover
+        <Popover
           placement='right'
           content={
-          <CTips
-            addressList={this.props.dataList}
-          />
+            <CTips
+              addressList={this.props.dataList}
+            />
           }
           trigger='click'
           onVisibleChange={this.showPop}
           arrowPointAtCenter={true}
-          // getTooltipContainer=
-          // {(triggerNode) => triggerNode}
-          >
+        // getTooltipContainer=
+        // {(triggerNode) => triggerNode}
+        >
           <span className="checkAddress">查看访问地址</span>
         </Popover>
       </div>
