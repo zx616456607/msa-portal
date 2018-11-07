@@ -17,8 +17,8 @@ import isEmpty from 'lodash/isEmpty'
 import { getMsaState, installMsaConfig, uninstallMsaConfig, loadSpringCloud, fetchSpingCloud } from '../../actions/msaConfig'
 import { Row, Col, Select, Button, Icon, Modal, Input, notification, Card, Form, Tooltip, Spin } from 'antd'
 import QueueAnim from 'rc-queue-anim'
-import ProjectCluster from '../../components/ProjectCluster'
 import { getGlobalConfigByType } from '../../actions/globalConfig'
+import projectsClustersWrapper from '../../components/projectsClustersWrapper'
 const Option = Select.Option
 const FormItem = Form.Item
 
@@ -32,7 +32,6 @@ class MsaConfig extends React.Component {
     installSate: false,
     notCurAry: [],
     isLoading: true,
-    clusterText: '',
     springcloudID: [],
     springclouds: [],
     springcloudState: '',
@@ -41,18 +40,16 @@ class MsaConfig extends React.Component {
 
   componentDidMount() {
     this.load()
-    const { getGlobalConfigByType, cluster } = this.props
-    getGlobalConfigByType(cluster.id, 'msa')
+    const { getGlobalConfigByType, clusterID } = this.props
+    getGlobalConfigByType(clusterID, 'msa')
   }
 
   load = () => {
-    const { loadSpringCloud, cluster, clusterName, projectConfig } = this.props
-    const { namespace } = projectConfig.project
+    const { loadSpringCloud, clusterID, projectNamespace } = this.props
     this.setState({
       isLoading: true,
-      clusterText: clusterName,
     })
-    loadSpringCloud(cluster.id, namespace).then(res => {
+    loadSpringCloud(clusterID, projectNamespace).then(res => {
       if (res.error) {
         this.setState({
           isLoading: false,
@@ -73,9 +70,7 @@ class MsaConfig extends React.Component {
    */
 
   fetchState = list => {
-    const { getMsaState, cluster, projectConfig } = this.props
-    // const projectName = project.namespace === 'default' ? namespace : project.namespace
-    const { namespace } = projectConfig.project
+    const { getMsaState, clusterID, projectNamespace } = this.props
     if (list.length === 0) {
       return this.setState({
         gitLab: {},
@@ -84,7 +79,7 @@ class MsaConfig extends React.Component {
         springcloudState: '',
       })
     }
-    getMsaState(cluster.id, list[0].id, namespace).then(res => {
+    getMsaState(clusterID, list[0].id, projectNamespace).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
         const { status } = res.response.result.data
@@ -108,9 +103,8 @@ class MsaConfig extends React.Component {
   }
   handleDel = () => {
     const { springcloudID } = this.state
-    const { uninstallMsaConfig, cluster, projectConfig } = this.props
-    const { namespace } = projectConfig.project
-    let filterSpring = springcloudID.filter(item => item.namespace === namespace)
+    const { uninstallMsaConfig, clusterID, projectNamespace } = this.props
+    let filterSpring = springcloudID.filter(item => item.namespace === projectNamespace)
     if (isEmpty(filterSpring)) {
       return
     }
@@ -121,7 +115,7 @@ class MsaConfig extends React.Component {
     const query = {
       id: filterSpring.id,
     }
-    uninstallMsaConfig(cluster.id, namespace, query).then(res => {
+    uninstallMsaConfig(clusterID, projectNamespace, query).then(res => {
       if (res.error) {
         this.setState({
           delLoading: false,
@@ -142,8 +136,7 @@ class MsaConfig extends React.Component {
    * 安装 Spring Cloud
    */
   handleInstall = () => {
-    const { installMsaConfig, cluster, projectConfig, form } = this.props
-    const { namespace } = projectConfig.project
+    const { installMsaConfig, clusterID, projectNamespace, form } = this.props
     const { validateFields } = form
     validateFields((errors, values) => {
       if (errors) {
@@ -164,7 +157,7 @@ class MsaConfig extends React.Component {
         type: 'springcloud',
         configDetail,
       }
-      installMsaConfig(body, cluster.id, namespace).then(res => {
+      installMsaConfig(body, clusterID, projectNamespace).then(res => {
         if (res.error) {
           this.setState({
             installLoading: false,
@@ -247,10 +240,8 @@ class MsaConfig extends React.Component {
 
     const { configDetail, version } = gitLab && Object.keys(gitLab).length > 0 && JSON.parse(gitLab)
     const { gitUrl, gitUser, gitPassword, gitToken } = configDetail || {}
-    const { form, projects, clusters, clusterList, projectConfig } = this.props
+    const { form, projectNamespace, currentCluster } = this.props
     const { getFieldDecorator } = form
-    const { cluster } = projectConfig
-    const { namespace } = projectConfig.project
     const formItemLayout = {
       labelCol: { span: 5 },
       wrapperCol: { span: 19 },
@@ -264,33 +255,15 @@ class MsaConfig extends React.Component {
     } else {
       healthy = <span className="descs">未安装</span>
     }
-    const projectItems = projects.filter(item =>
-      !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
-    )
-    let clusterName = ''
-    if (cluster) {
-      if (namespace) {
-        Object.keys(clusters).forEach(() => {
-          if (namespace) {
-            clusterName = clusters[namespace] && clusters[namespace].ids
-          }
-        })
-      }
-    }
-
-    const clusterText = clusterName && clusterName.length > 0 ?
-      clusterList[clusterName[0]].clusterName : ''
-    const projectName = namespace ? namespace : projectItems.length > 0 &&
-      projectItems[0].projectName
     const title_extra =
       <span className="msa-project">
-        ( 项目：{projectName} 集群：{clusterText})
+        ( 项目：{projectNamespace} 集群：{currentCluster.clusterName})
       </span>
     return (
       <QueueAnim>
         <Spin spinning={this.state.isLoading}>
           <div key="layout-content-btns">
-            <ProjectCluster callback={() => this.load()} />
+            {/* <ProjectCluster callback={() => this.load()} /> */}
             <Card
               title="微服务配置"
               extra={title_extra}
@@ -472,33 +445,18 @@ class MsaConfig extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { current, entities, springCloudAndApm } = state
-  const { projects } = entities
-  const { info } = current.user
-  const projectID = current.projects.ids || []
-  const namespace = info.namespace
-  const { projectConfig, clusters } = current
-  const clusterList = entities.clusters
-  const { cluster } = projectConfig
-  const userProjects = current.projects && current.projects.ids || []
+  const { current, springCloudAndApm } = state
   return {
     current,
-    cluster,
-    clusters,
-    projectID,
-    namespace,
-    clusterList,
     springCloudAndApm,
-    projectConfig,
-    projects: userProjects.map(namespace => projects[namespace]),
   }
 }
 
-export default connect(mapStateToProps, {
+export default projectsClustersWrapper(connect(mapStateToProps, {
   getMsaState,
   loadSpringCloud,
   fetchSpingCloud,
   installMsaConfig,
   uninstallMsaConfig,
   getGlobalConfigByType,
-})(Form.create()(MsaConfig))
+})(Form.create()(MsaConfig)))

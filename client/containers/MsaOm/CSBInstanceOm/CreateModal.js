@@ -60,6 +60,11 @@ class InstanceModal extends React.Component {
             this.setState({
               confirmLoading: false,
             })
+            if (res.status === 409) {
+              return notification.warn({
+                message: '实例出口地址重复,请重新填写',
+              })
+            }
             notification.warn({
               message: '修改实例失败',
             })
@@ -78,11 +83,16 @@ class InstanceModal extends React.Component {
       }
       createInstance(cluster, null, body).then(res => {
         if (res.error) {
-          notification.warn({
-            message: '创建实例失败',
-          })
           this.setState({
             confirmLoading: false,
+          })
+          if (res.status === 409) {
+            return notification.warn({
+              message: '实例出口地址重复,请重新填写',
+            })
+          }
+          notification.warn({
+            message: '创建实例失败',
           })
           return
         }

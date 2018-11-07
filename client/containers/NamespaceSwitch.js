@@ -376,7 +376,6 @@ const mapStateToProps = state => {
   Object.keys(currentClusters).forEach(namespace => {
     const clusterList = currentClusters[namespace].ids || []
     projectClusters[namespace] = clusterList.map(id => clusters[id])
-    projectClusters[namespace] = clusterList.map(id => clusters[id])
   })
   return {
     current: current || {},
