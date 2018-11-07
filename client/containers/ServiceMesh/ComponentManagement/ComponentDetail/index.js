@@ -44,7 +44,7 @@ class ComponentDetail extends React.Component {
     const c_name = this.props.location.search.split('=')[1]
     const { clusterID, namespace, fetchComponent, fetchServiceList } = this.props
     fetchServiceList(clusterID, namespace).then(res => {
-      if(res.error) {
+      if (res.error) {
         return
       }
       const aryList = []
@@ -56,7 +56,7 @@ class ComponentDetail extends React.Component {
         }
       })
       this.setState({
-        serviceList: aryList
+        serviceList: aryList,
       })
     })
     const query = {
@@ -112,8 +112,8 @@ class ComponentDetail extends React.Component {
       isAdd: false,
       // isLoading: true,
     })
-    const specFlag = detailList && detailList.spec.subsets.length <= 1 ? true : false
-    const tip = detailList && specFlag ? `组件中唯一服务移除后，组件也将被移除` : ''
+    const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
+    const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
     confirm({
       modalTitle: '删除操作',
       title: '移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务',
@@ -121,19 +121,19 @@ class ComponentDetail extends React.Component {
       onOk: () => {
         if (list) {
           if (specFlag) {
-            if(metadata && metadata.name) {
+            if (metadata && metadata.name) {
               deleteComponent(clusterID, metadata.name).then(res => {
-              if (res.error) {
+                if (res.error) {
+                  notification.success({
+                    message: `删除组件 ${metadata.name} 失败`,
+                  })
+                  return
+                }
                 notification.success({
-                  message: `删除组件 ${metadata.name} 失败`,
+                  message: `删除组件 ${metadata.name} 成功`,
                 })
-                return
-              }
-              notification.success({
-                message: `删除组件 ${metadata.name} 成功`,
+                this.props.history.push('/service-mesh/component-management')
               })
-              this.props.history.push('/service-mesh/component-management')
-            })
             }
           } else {
             this.handleService(list)
@@ -180,19 +180,19 @@ class ComponentDetail extends React.Component {
       })
     } else {
       const { name, version } = list
-      if(name && version) {
+      if (name && version) {
         detailList && detailList.spec.subsets.forEach(item => {
-        if (item.name === name) {
-          delete detailList.metadata.annotations[`svcName/${item.name}`]
-        }
-      })
-      detailList && detailList.spec.subsets.forEach((item, index) => {
+          if (item.name === name) {
+            delete detailList.metadata.annotations[`svcName/${item.name}`]
+          }
+        })
+        detailList && detailList.spec.subsets.forEach((item, index) => {
         // const key = detailList.spec.subsets[item].name
-        const key = item.labels.version
-        if (key === version) {
-          detailList.spec.subsets.splice(index, 1)
-        }
-      })
+          const key = item.labels.version
+          if (key === version) {
+            detailList.spec.subsets.splice(index, 1)
+          }
+        })
       }
     }
     editComponent(clusterID, detailList, namespace).then(res => {
@@ -295,7 +295,7 @@ class ComponentDetail extends React.Component {
       render: (text, record) => {
         const serviceName = record.name
         return <div className="AddressTipWrape">
-          <ServiceAddressTip dataList={[serviceName]}
+          <ServiceAddressTip dataList={[ serviceName ]}
             parentNode={'AddressTipWrape'} /></div>
       },
     }, {
@@ -311,7 +311,7 @@ class ComponentDetail extends React.Component {
     }]
     const { metadata } = detailList
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('keys', { initialValue: [0] })
+    getFieldDecorator('keys', { initialValue: [ 0 ] })
     const keys = getFieldValue('keys')
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -341,7 +341,7 @@ class ComponentDetail extends React.Component {
                     })
                   }
                 </Select>
-                )}
+              )}
             </FormItem>
           </Col>
           <Col span={10}>
@@ -350,7 +350,7 @@ class ComponentDetail extends React.Component {
                 initialValue: undefined,
               })(
                 <Input placeholder="如：1.0.0" style={{ width: '100%' }} />
-                )}
+              )}
             </FormItem>
           </Col>
           <Col span={3}>
