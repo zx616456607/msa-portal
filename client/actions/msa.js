@@ -516,3 +516,33 @@ export const clearBlownMonitor = () => {
     type: CLEAR_BLOWN_MONITOR,
   }
 }
+
+// 获取微服务熔断策略
+export const GET_MSA_BLOWN_STRATEGY_REQUEST = 'GET_MSA_BLOWN_STRATEGY_REQUEST'
+export const GET_MSA_BLOWN_STRATEGY_SUCCESS = 'GET_MSA_BLOWN_STRATEGY_SUCCESS'
+export const GET_MSA_BLOWN_STRATEGY_FAILURE = 'GET_MSA_BLOWN_STRATEGY_FAILURE'
+
+const fetchMsaBlownStrategy = () => {
+  return {
+    type: 'GET_MSA_BLOWN_STRATEGY_SUCCESS',
+    payload: {
+      status: '1',
+      reqNums: 20,
+      failureRate: 30,
+      time: 70,
+    },
+    // [CALL_API]: {
+    //   types: [
+    //     GET_MSA_BLOWN_STRATEGY_REQUEST,
+    //     GET_MSA_BLOWN_STRATEGY_SUCCESS,
+    //     GET_MSA_BLOWN_STRATEGY_FAILURE,
+    //   ],
+    //   endpoint: `${MSA_API_URL}/clusters/${clusterId}/`,
+    //   schema: {},
+    // },
+  }
+}
+
+export const getMsaBlownStrategy = () =>
+  dispatch => dispatch(fetchMsaBlownStrategy())
+

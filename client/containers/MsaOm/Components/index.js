@@ -19,9 +19,9 @@ import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
 import { formatFromnow } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
-import ProjectCluster from '../../../components/ProjectCluster'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Table, Dropdown, Menu, Modal, Icon, notification } from 'antd'
+import projectsClustersWrapper from '../../../components/projectsClustersWrapper'
 
 const tooltip = [{
   id: 'restart',
@@ -74,14 +74,13 @@ class MsaComponents extends React.Component {
   }
 
   fetchApmId = () => {
-    const { fetchSpingCloud, clusterId, projectConfig } = this.props
-    const { namespace } = projectConfig.project
-    fetchSpingCloud(clusterId, namespace).then(res => {
+    const { fetchSpingCloud, clusterID, projectNamespace } = this.props
+    fetchSpingCloud(clusterID, projectNamespace).then(res => {
       if (res.error) return
       if (res.response.result.code === 200) {
         this.setState({
           loading: true,
-          apmID: res.response.result.data,
+          apmID: res.response.result.data.filter(item => item.namespace === projectNamespace),
         }, () => {
           this.load()
         })
@@ -91,13 +90,16 @@ class MsaComponents extends React.Component {
 
   load = () => {
     const { apmID } = this.state
-    const { fetchMsaComponentList, clusterId, projectConfig } = this.props
-    const { namespace } = projectConfig.project
+    const { fetchMsaComponentList, clusterID, projectNamespace } = this.props
     if (!isEmpty(apmID)) {
       const query = {
         id: apmID[0].id,
       }
-      fetchMsaComponentList(clusterId, query, namespace)
+      fetchMsaComponentList(clusterID, query, projectNamespace)
+      this.setState({
+        loading: false,
+      })
+    } else {
       this.setState({
         loading: false,
       })
@@ -257,15 +259,19 @@ class MsaComponents extends React.Component {
     })
   }
 
+  // getApmID = apmIDs => {
+  //   apmIDs = apmIDs || this.state.apmID
+  // }
+
   handleCommit = () => {
     const { componentName, tooltipTitle, apmID } = this.state
-    const { clusterId, getStart, getStop, getRedeploy } = this.props
+    const { clusterID, getStart, getStop, getRedeploy } = this.props
     if (tooltipTitle.id === 'restart' || tooltipTitle.id === 'start') {
       const query = {
         apmID: apmID[0].id,
         componentName,
       }
-      getStart(clusterId, query).then(res => {
+      getStart(clusterID, query).then(res => {
         if (res.error) {
           notification.error({
             message: `${tooltipTitle.title} ${componentName} 失败`,
@@ -289,7 +295,7 @@ class MsaComponents extends React.Component {
         apmID: apmID[0].id,
         componentName,
       }
-      getStop(clusterId, query).then(res => {
+      getStop(clusterID, query).then(res => {
         if (res.error) {
           notification.error({
             message: `停止组件 ${componentName} 失败`,
@@ -311,7 +317,7 @@ class MsaComponents extends React.Component {
         apmID: apmID[0].id,
         componentName,
       }
-      getRedeploy(clusterId, query).then(res => {
+      getRedeploy(clusterID, query).then(res => {
         if (res.error) {
           notification.error({
             message: `重新部署 ${componentName} 失败`,
@@ -345,7 +351,7 @@ class MsaComponents extends React.Component {
   render() {
     const { loading, tooltipContent, tooltipTitle, visible, toopVisible,
       tipsName, metaData, currentComponent } = this.state
-    const { clusterId } = this.props
+    const { clusterID } = this.props
     const columns = [{
       key: 'component',
       title: '组件',
@@ -385,19 +391,12 @@ class MsaComponents extends React.Component {
     }]
     return (
       <QueueAnim className="info">
-        <div className="nav" key="nav">
-          <div className="info-project"><ProjectCluster callback={this.fetchApmId}/></div>
-          <Button type="primary" className="info-btn" onClick={this.handleRefresh}><Icon type="sync" />刷 新</Button>
-          <div className="pages">
-            <span className="total">共计 {metaData.length} 条&nbsp;&nbsp;</span>
-          </div>
-        </div>
         <Card key="body">
           <div className="body">
             <Table
               columns={columns}
               dataSource={metaData}
-              pagination={false}
+              pagination={ { position: 'top' } }
               loading={loading}
               rowKey={row => row.id} />
           </div>
@@ -422,7 +421,7 @@ class MsaComponents extends React.Component {
           <MsaModal
             visible={visible}
             tipsType={tipsName}
-            clusterId={clusterId}
+            clusterId={clusterID}
             currentComponent={currentComponent}
             closeModal={this.closeMsaModal}
             loadData={this.load}
@@ -433,29 +432,20 @@ class MsaComponents extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  const { current, sringcloudComponent } = state
-  const { cluster, project } = current.config
-  const meta = sringcloudComponent[cluster.id]
-  const { info } = current.user
-  const nameSpace = project.namespace
-  const clusterId = cluster.id
-  const { projectConfig } = current
+const mapStateToProps = (state, props) => {
+  const { sringcloudComponent } = state
+  const meta = sringcloudComponent[props.clusterID]
 
   return {
     meta,
-    info,
-    nameSpace,
-    clusterId,
-    projectConfig,
   }
 }
 
-export default connect(mapStateToProps, {
+export default projectsClustersWrapper(connect(mapStateToProps, {
   getStop,
   getStart,
   getRedeploy,
   fetchSpingCloud,
   fetchMsaComponentList,
-})(MsaComponents)
+})(MsaComponents))
 
