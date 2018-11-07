@@ -333,12 +333,11 @@ const msaBlownStrategy = (state = {}, action) => {
       return {
         ...state,
         isFetching: true,
-        data: {},
       }
     case ActionTypes.GET_MSA_BLOWN_STRATEGY_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.payload,
+        data: action.response.result.data,
       })
     case ActionTypes.GET_MSA_BLOWN_STRATEGY_FAILURE:
       return {

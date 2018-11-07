@@ -517,32 +517,193 @@ export const clearBlownMonitor = () => {
   }
 }
 
+// 查看服务是否设置熔断
+export const GET_MSA_BLOWN_OPEN_REQUEST = 'GET_MSA_BLOWN_OPEN_REQUEST'
+export const GET_MSA_BLOWN_OPEN_SUCCESS = 'GET_MSA_BLOWN_OPEN_SUCCESS'
+export const GET_MSA_BLOWN_OPEN_FAILURE = 'GET_MSA_BLOWN_OPEN_FAILURE'
+
+const fetchMsaBlownOpen = (clusterId, serviceName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_OPEN_REQUEST,
+        GET_MSA_BLOWN_OPEN_SUCCESS,
+        GET_MSA_BLOWN_OPEN_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/services/${serviceName}/check/hystrix`,
+      schema: {},
+    },
+  }
+}
+
+export const getMsaBlownOpenStatus = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchMsaBlownOpen(clusterId, serviceName))
+
+// 熔断开启、关闭接口
+export const MSA_BLOWN_OPEN_REQUEST = 'MSA_BLOWN_OPEN_REQUEST'
+export const MSA_BLOWN_OPEN_SUCCESS = 'MSA_BLOWN_OPEN_SUCCESS'
+export const MSA_BLOWN_OPEN_FAILURE = 'MSA_BLOWN_OPEN_FAILURE'
+
+const postMsaBlownOpen = (clusterId, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        MSA_BLOWN_OPEN_REQUEST,
+        MSA_BLOWN_OPEN_SUCCESS,
+        MSA_BLOWN_OPEN_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/open?${toQuerystring(query)}`,
+      options: {
+        method: 'POST',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownOpen = (clusterId, query) =>
+  dispatch => dispatch(postMsaBlownOpen(clusterId, query))
+
+// 设置熔断规则
+export const SET_MSA_BLOWN_STRATEGY_REQUEST = 'SET_MSA_BLOWN_STRATEGY_REQUEST'
+export const SET_MSA_BLOWN_STRATEGY_SUCCESS = 'SET_MSA_BLOWN_STRATEGY_SUCCESS'
+export const SET_MSA_BLOWN_STRATEGY_FAILURE = 'SET_MSA_BLOWN_STRATEGY_FAILURE'
+
+const postMsaBlownStrategy = (clusterId, body) => {
+  return {
+    [CALL_API]: {
+      types: [
+        SET_MSA_BLOWN_STRATEGY_REQUEST,
+        SET_MSA_BLOWN_STRATEGY_SUCCESS,
+        SET_MSA_BLOWN_STRATEGY_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export const setMsaBlownStrategy = (clusterId, body) =>
+  dispatch => dispatch(postMsaBlownStrategy(clusterId, body))
+
+// 删除熔断规则
+export const DEL_MSA_BLOWN_STRATEGY_REQUEST = 'DEL_MSA_BLOWN_STRATEGY_REQUEST'
+export const DEL_MSA_BLOWN_STRATEGY_SUCCESS = 'DEL_MSA_BLOWN_STRATEGY_SUCCESS'
+export const DEL_MSA_BLOWN_STRATEGY_FAILURE = 'DEL_MSA_BLOWN_STRATEGY_FAILURE'
+
+const delMsaBlownStrategyRequest = (clusterId, microServer) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DEL_MSA_BLOWN_STRATEGY_REQUEST,
+        DEL_MSA_BLOWN_STRATEGY_SUCCESS,
+        DEL_MSA_BLOWN_STRATEGY_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/property?microServer=${microServer}`,
+      options: {
+        method: 'PUT',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const delMsaBlownStrategy = (clusterId, microServer) =>
+  dispatch => dispatch(delMsaBlownStrategyRequest(clusterId, microServer))
+
+
 // 获取微服务熔断策略
 export const GET_MSA_BLOWN_STRATEGY_REQUEST = 'GET_MSA_BLOWN_STRATEGY_REQUEST'
 export const GET_MSA_BLOWN_STRATEGY_SUCCESS = 'GET_MSA_BLOWN_STRATEGY_SUCCESS'
 export const GET_MSA_BLOWN_STRATEGY_FAILURE = 'GET_MSA_BLOWN_STRATEGY_FAILURE'
 
-const fetchMsaBlownStrategy = () => {
+const fetchMsaBlownStrategy = (clusterId, microServer) => {
   return {
-    type: 'GET_MSA_BLOWN_STRATEGY_SUCCESS',
-    payload: {
-      status: '1',
-      reqNums: 20,
-      failureRate: 30,
-      time: 70,
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_STRATEGY_REQUEST,
+        GET_MSA_BLOWN_STRATEGY_SUCCESS,
+        GET_MSA_BLOWN_STRATEGY_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule?microServer=${microServer}`,
+      schema: {},
     },
-    // [CALL_API]: {
-    //   types: [
-    //     GET_MSA_BLOWN_STRATEGY_REQUEST,
-    //     GET_MSA_BLOWN_STRATEGY_SUCCESS,
-    //     GET_MSA_BLOWN_STRATEGY_FAILURE,
-    //   ],
-    //   endpoint: `${MSA_API_URL}/clusters/${clusterId}/`,
-    //   schema: {},
-    // },
   }
 }
 
-export const getMsaBlownStrategy = () =>
-  dispatch => dispatch(fetchMsaBlownStrategy())
+export const getMsaBlownStrategy = (clusterId, microServer) =>
+  dispatch => dispatch(fetchMsaBlownStrategy(clusterId, microServer))
+
+// 检查服务是否可以开启降级
+export const GET_SERVICE_DEMOTE_STATUS_REQUEST = 'GET_SERVICE_DEMOTE_STATUS_REQUEST'
+export const GET_SERVICE_DEMOTE_STATUS_SUCCESS = 'GET_SERVICE_DEMOTE_STATUS_SUCCESS'
+export const GET_SERVICE_DEMOTE_STATUS_FAILURE = 'GET_SERVICE_DEMOTE_STATUS_FAILURE'
+
+const fetchServiceDemoteStatus = (clusterId, serviceName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_SERVICE_DEMOTE_STATUS_REQUEST,
+        GET_SERVICE_DEMOTE_STATUS_SUCCESS,
+        GET_SERVICE_DEMOTE_STATUS_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/services/${serviceName}/check/hystrix?`,
+      schema: {},
+    },
+  }
+}
+
+export const getServiceDemoteStatus = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchServiceDemoteStatus(clusterId, serviceName))
+
+// 获取降级按钮开关状态
+export const GET_DEMOTE_STATUS_REQUEST = 'GET_DEMOTE_STATUS_REQUEST'
+export const GET_DEMOTE_STATUS_SUCCESS = 'GET_DEMOTE_STATUS_SUCCESS'
+export const GET_DEMOTE_STATUS_FAILURE = 'GET_DEMOTE_STATUS_FAILURE'
+
+const fetchDemoteStatus = (clusterId, serviceName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_DEMOTE_STATUS_REQUEST,
+        GET_DEMOTE_STATUS_SUCCESS,
+        GET_DEMOTE_STATUS_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/status?microServer=${serviceName}`,
+      schema: {},
+    },
+  }
+}
+
+export const getDemoteStatus = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchDemoteStatus(clusterId, serviceName))
+
+// 降级开启/关闭
+export const DEMOTE_SWITCH_REQUEST = 'POST_DEMOTE_SWITCH_REQUEST'
+export const DEMOTE_SWITCH_SUCCESS = 'POST_DEMOTE_SWITCH_SUCCESS'
+export const DEMOTE_SWITCH_FAILURE = 'POST_DEMOTE_SWITCH_FAILURE'
+
+const demoteSwitchRequest = (clusterId, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        DEMOTE_SWITCH_REQUEST,
+        DEMOTE_SWITCH_SUCCESS,
+        DEMOTE_SWITCH_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/open?${toQuerystring(query)}`,
+      options: {
+        method: 'POST',
+      },
+      schema: {},
+    },
+  }
+}
+
+export const demoteSwitch = (clusterId, query) =>
+  dispatch => dispatch(demoteSwitchRequest(clusterId, query))
 
