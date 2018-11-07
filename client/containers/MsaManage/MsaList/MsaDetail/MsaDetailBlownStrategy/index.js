@@ -193,7 +193,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       delLoading,
     } = this.state
     const { data } = blownStrategy
-    const title = data && Object.keys(data).length !== 0 ? '编辑熔断规则' : '设置熔断规则'
+    const title = data && data.hasRule ? '编辑熔断规则' : '设置熔断规则'
     return <div className="msa-detail-fusing">
       {
         blownOpenLoading ?
@@ -215,7 +215,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
                 </div>
             }
             {
-              data && Object.keys(data).length !== 0 ?
+              data && data.hasRule ?
                 blownOpen && <div className="strategy-wrapper">
                   <div className="btns">
                     <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>编辑熔断策略</Button>
