@@ -294,7 +294,8 @@ class CreateComponent extends React.Component {
     if (value) {
       keys.forEach(key => {
         const service = form.getFieldValue(`serviceName-${key}`)
-        if (!`service${key}`) {
+        const serviceState = this.state[`service${key}`]
+        if (!serviceState) {
           if (this.filterServicelist(service)) {
             callback('服务名称重复')
           }

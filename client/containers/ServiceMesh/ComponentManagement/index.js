@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
+import { deleteVirtualService } from '../../../actions/meshRouteManagement'
 import { Button, Input, Table, Card, Pagination, notification } from 'antd'
 import './style/index.less'
 import AddressTip from './AddressTip';
@@ -68,7 +69,14 @@ class ComponentManagement extends React.Component {
   }
 
   handleDelete = name => {
-    const { clusterID, deleteComponent } = this.props
+    const { tipList, clusterID, deleteComponent, deleteVirtualService } = this.props
+    let routerList = []
+    tipList.length > 0 && tipList.forEach(item => {
+      if (item.metadata.name === name) {
+        routerList = item.referencedVirtualServices
+      }
+    })
+
     confirm({
       modalTitle: '删除操作',
       title: '删除组件后，该组件关联的服务在路由规则中设置的规则和对外访问方式同时被删除',
@@ -81,6 +89,19 @@ class ComponentManagement extends React.Component {
                 message: `删除组件 ${name} 失败`,
               })
               return reject()
+            }
+            if (routerList.length > 0) {
+              routerList.forEach(item => {
+                const routerName = item.metadata.name
+                deleteVirtualService(clusterID, routerName).then(res => {
+                  if (res.error) {
+                    notification.success({
+                      message: `删除路由规则 ${routerName} 失败`,
+                    })
+                    return reject()
+                  }
+                })
+              })
             }
             resolve()
             notification.success({
@@ -230,4 +251,5 @@ export default connect(mapStateToProps, {
   loadComponent,
   deleteComponent,
   fetchComponent,
+  deleteVirtualService,
 })(ComponentManagement)
