@@ -175,7 +175,7 @@ class ComponentManagement extends React.Component {
     }, {
       title: '创建时间',
       dataIndex: 'startTime',
-      render: text => formatDate(text),
+      render: text => (text ? formatDate(text) : <span>--</span>),
     }, {
       title: '操作',
       render: record => <div>
@@ -198,7 +198,7 @@ class ComponentManagement extends React.Component {
             onSearch={this.onSearch}
           />
           <div className="pages">
-            <span className="total">共计 {sourceList.length} 条</span>
+            <span className="total">共计 {source.length} 条</span>
             <Pagination {...pagination} />
           </div>
         </div>
