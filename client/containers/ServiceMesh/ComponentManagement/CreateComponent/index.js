@@ -282,9 +282,12 @@ class CreateComponent extends React.Component {
 
   filterServicelist = key => {
     const { moduleServiceList } = this.state
-    if (moduleServiceList.indexOf(key) !== -1) {
-      return true
+    if (moduleServiceList) {
+      if (moduleServiceList.indexOf(key) !== -1) {
+        return true
+      }
     }
+
     return false
   }
 
