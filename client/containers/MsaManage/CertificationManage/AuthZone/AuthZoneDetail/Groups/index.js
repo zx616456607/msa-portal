@@ -52,9 +52,10 @@ class Groups extends React.Component {
     const { inputValue } = this.state
     const { getGroupList } = this.props
     const queryInfo = {}
+    const special = /[@#$%^&*{}:""()+=`;!<>?][\u4E00-\u9FA5]|[\uFE30-\uFFA0]/g
     if (inputValue) {
       Object.assign(queryInfo, {
-        filter: `displayName+eq+\"${inputValue}\"`,
+        filter: `displayName+eq+\"${inputValue.replace(special, '')}\"`,
       })
     }
     getGroupList(queryInfo)
