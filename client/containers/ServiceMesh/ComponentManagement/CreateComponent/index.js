@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Input, Card, Form, Row, Col, Icon, Select, notification } from 'antd'
 import './style/index.less'
+import { APP_NAME_REG_NOTICE } from '../../../../constants'
 import { AddComponent, fetchServiceList, loadComponent, fetchComponent, editComponent } from '../../../../actions/serviceMesh'
 
 const FormItem = Form.Item
@@ -263,8 +264,8 @@ class CreateComponent extends React.Component {
     if (!value) {
       return cb()
     }
-    if (!/^[a-z0-9_\-\*]{1,15}$/.test(value)) {
-      return cb('可由 1~ 15 位字母、数字、中划线组成，以字母开头，字母或者数字结尾')
+    if (!/^[a-z][a-z0-9\-]{1,15}[a-z0-9]$/.test(value)) {
+      return cb(APP_NAME_REG_NOTICE)
     }
     cb()
   }
@@ -419,7 +420,8 @@ class CreateComponent extends React.Component {
                 <Row>
                   <FormItem {...formItemLayout} label="描述">
                     {getFieldDecorator('description', {
-                      initialValue: undefined,
+                      initialValue: componentList.length !== 0 ?
+                        componentList.metadata.annotations.description : undefined,
                       rules: [{ pattern: '', whitespace: true, message: '' }],
                     })(
                       <TextArea className="area" rows={4} placeholder="请输入描述" />
@@ -444,6 +446,7 @@ class CreateComponent extends React.Component {
                     <Col span={6}>操作</Col>
                   </Row>
                   {serviceLists}
+                  <p className="service-desc tip">Tips：组件创建后系统将重启该组件关联服务的所有实例。</p>
                 </div>
               </div>
             </div>
