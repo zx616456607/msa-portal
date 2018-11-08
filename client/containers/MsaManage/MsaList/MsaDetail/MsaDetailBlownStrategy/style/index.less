@@ -12,6 +12,13 @@
 
 @import '~assets/style/core/index.less';
 .msa-detail-fusing {
+  padding: @padding-medium;
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+  }
   .alert {
     border: 1px dashed @primary-color;
     padding: @padding-base;
@@ -22,6 +29,14 @@
     i {
       margin-right: 4px;
       font-size: 14px;
+    }
+  }
+  .warning {
+    border-color: @warning-color;
+    background: #fffbf5;
+    color: @font-color-2;
+    i {
+      color: @warning-color;
     }
   }
   .strategy-wrapper {

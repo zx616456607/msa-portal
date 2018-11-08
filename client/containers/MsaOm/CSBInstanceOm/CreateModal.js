@@ -55,7 +55,7 @@ class InstanceModal extends React.Component {
         description,
       }
       if (currentInstance) {
-        editInstance(cluster, currentInstance.id, body).then(res => {
+        editInstance(cluster, currentInstance.id, body, { isHandleError: true }).then(res => {
           if (res.error) {
             this.setState({
               confirmLoading: false,
@@ -81,7 +81,7 @@ class InstanceModal extends React.Component {
         })
         return
       }
-      createInstance(cluster, null, body).then(res => {
+      createInstance(cluster, null, body, { isHandleError: true }).then(res => {
         if (res.error) {
           this.setState({
             confirmLoading: false,
