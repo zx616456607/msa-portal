@@ -190,7 +190,7 @@ class NewRouteComponent extends React.Component {
       if (dataAry[v].spec.host === val) {
         for (const k of dataAry[v].spec.subsets) {
           actionVersionArr.push({
-            label: k.name,
+            label: k.labels.version,
             value: k.labels.version,
           })
         }

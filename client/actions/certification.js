@@ -673,10 +673,11 @@ export const CREATE_GROUPS_REQUEST = 'CREATE_GROUPS_REQUEST'
 export const CREATE_GROUPS_SUCCESS = 'CREATE_GROUPS_SUCCESS'
 export const CREATE_GROUPS_FAILURE = 'CREATE_GROUPS_FAILURE'
 
-const fetchCreateGroups = (token, body, zoneInfo) => {
+const fetchCreateGroups = (token, body, zoneInfo, options) => {
   const { id, subdomain } = zoneInfo
   const endpoint = `${CLIENT_API_URL}/Groups`
   return {
+    options,
     [CALL_API]: {
       types: [
         CREATE_GROUPS_REQUEST,
@@ -699,11 +700,11 @@ const fetchCreateGroups = (token, body, zoneInfo) => {
   }
 }
 
-export const createGroup = body =>
+export const createGroup = (body, options) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     const { identityZoneDetail } = getState().certification
-    return dispatch(fetchCreateGroups(access_token, body, identityZoneDetail))
+    return dispatch(fetchCreateGroups(access_token, body, identityZoneDetail, options))
   }
 
 export const GROUPS_LIST_REQUEST = 'GROUPS_LIST_REQUEST'
@@ -784,9 +785,10 @@ export const UPDATE_GROUPS_REQUEST = 'UPDATE_GROUPS_REQUEST'
 export const UPDATE_GROUPS_SUCCESS = 'UPDATE_GROUPS_SUCCESS'
 export const UPDATE_GROUPS_FAILURE = 'UPDATE_GROUPS_FAILURE'
 
-const fetchUpdateGroup = (token, query, body, zoneInfo) => {
+const fetchUpdateGroup = (token, query, body, zoneInfo, options) => {
   const { id, subdomain } = zoneInfo
   return {
+    options,
     [CALL_API]: {
       types: [
         UPDATE_GROUPS_REQUEST,
@@ -810,11 +812,11 @@ const fetchUpdateGroup = (token, query, body, zoneInfo) => {
   }
 }
 
-export const updateGroup = (query, body) =>
+export const updateGroup = (query, body, options) =>
   (dispatch, getState) => {
     const { access_token } = getState().entities.uaaAuth[UAA_JWT]
     const { identityZoneDetail } = getState().certification
-    return dispatch(fetchUpdateGroup(access_token, query, body, identityZoneDetail))
+    return dispatch(fetchUpdateGroup(access_token, query, body, identityZoneDetail, options))
   }
 
 const DELETE_GROUP_USER_REQUEST = 'DELETE_GROUP_USER_REQUEST'

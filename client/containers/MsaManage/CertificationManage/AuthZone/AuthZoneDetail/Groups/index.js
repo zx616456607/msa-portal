@@ -54,7 +54,7 @@ class Groups extends React.Component {
     const queryInfo = {}
     if (inputValue) {
       Object.assign(queryInfo, {
-        filter: `displayName+eq+\"${inputValue}\"`,
+        filter: `displayName+eq+\"${encodeURIComponent(inputValue)}\"`,
       })
     }
     getGroupList(queryInfo)
