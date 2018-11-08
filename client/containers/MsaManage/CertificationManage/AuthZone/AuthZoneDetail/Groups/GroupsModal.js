@@ -36,11 +36,17 @@ class GroupsModal extends React.Component {
           id: editData.id,
           match: editData.meta.version,
         }
-        result = await updateGroup(query, body)
+        result = await updateGroup(query, body, { isHandleError: true })
       } else {
-        result = await createGroup(body)
+        result = await createGroup(body, { isHandleError: true })
       }
       if (result.error) {
+        if (editGroup && result.error.indexOf('already exists') || result.status === 409) {
+          notification.warn({
+            message: `${value.groupName}组名称已存在`,
+          })
+          return
+        }
         notification.warn({
           message: editGroup ? `${value.groupName}组更新失败` : `${value.groupName}组添加失败`,
         })
