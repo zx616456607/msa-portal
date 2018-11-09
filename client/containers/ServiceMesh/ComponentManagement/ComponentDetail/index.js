@@ -84,9 +84,10 @@ class ComponentDetail extends React.Component {
   filterService = list => {
     if (list.length !== 0) {
       const serviceAry = []
-      list.spec.subsets && list.spec.subsets.forEach(item => {
+      const { annotations } = list.metadata
+      list.spec.subsets && list.spec.subsets.forEach((item, index) => {
         const query = {
-          name: item.name,
+          name: Object.keys(annotations)[index + 1].split('/')[1],
           version: item.labels.version,
         }
         serviceAry.push(query)
@@ -165,47 +166,55 @@ class ComponentDetail extends React.Component {
     const { setFieldsValue, getFieldValue } = form
     const { isAdd, detailList } = this.state
     const keys = getFieldValue('keys')
-    if (isAdd) {
-      keys.forEach(key => {
-        const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
-        const value = `${getFieldValue(`version-${key}`)}`
-        detailList.metadata.annotations[`${nameKey}`] = value
-        const query = {
-          labels: {
-            version: value,
-          },
-          name: value,
-        }
-        detailList.spec.subsets.push(query)
-      })
-    } else {
-      const { name, version } = list
-      if (name && version) {
-        detailList && detailList.spec.subsets.forEach(item => {
-          if (item.name === name) {
-            delete detailList.metadata.annotations[`svcName/${item.name}`]
-          }
+    form.validateFields(err => {
+      if (err) {
+        notification.warn({
+          message: '服务名称重复',
         })
-        detailList && detailList.spec.subsets.forEach((item, index) => {
-          // const key = detailList.spec.subsets[item].name
-          const key = item.labels.version
-          if (key === version) {
-            detailList.spec.subsets.splice(index, 1)
-          }
-        })
-      }
-    }
-    editComponent(clusterID, detailList, namespace).then(res => {
-      if (res.error) {
         return
       }
-      this.setState({
-        visible: false,
-        isLoading: false,
+      if (isAdd) {
+        keys.forEach(key => {
+          const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
+          const value = `${getFieldValue(`version-${key}`)}`
+          detailList.metadata.annotations[`${nameKey}`] = value
+          const query = {
+            labels: {
+              version: value,
+            },
+            name: value,
+          }
+          detailList.spec.subsets.push(query)
+        })
+      } else {
+        const { name, version } = list
+        if (name && version) {
+          detailList && detailList.spec.subsets.forEach(item => {
+            if (item.name === name) {
+              delete detailList.metadata.annotations[`svcName/${item.name}`]
+            }
+          })
+          detailList && detailList.spec.subsets.forEach((item, index) => {
+            // const key = detailList.spec.subsets[item].name
+            const key = item.labels.version
+            if (key === version) {
+              detailList.spec.subsets.splice(index, 1)
+            }
+          })
+        }
+      }
+      editComponent(clusterID, detailList, namespace).then(res => {
+        if (res.error) {
+          return
+        }
+        this.setState({
+          visible: false,
+          isLoading: false,
+        })
+        this.loadDetail()
       })
-      this.loadDetail()
+      setFieldsValue({ keys: [] })
     })
-    setFieldsValue({ keys: [] })
   }
 
   handleAdd = () => {

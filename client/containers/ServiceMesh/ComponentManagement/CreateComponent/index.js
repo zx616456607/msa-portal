@@ -51,11 +51,12 @@ class CreateComponent extends React.Component {
     if (componentList) {
       const obj = {}
       const { subsets } = componentList.spec
+      const { annotations } = componentList.metadata
       if (subsets) {
         subsets.forEach((item, index) => {
           keys.push(uuid++)
           Object.assign(obj, {
-            [`serviceName-${index}`]: item.name,
+            [`serviceName-${index}`]: Object.keys(annotations)[index + 1].split('/')[1],
             [`version-${index}`]: item.labels.version,
           })
           this.setState({
@@ -287,7 +288,6 @@ class CreateComponent extends React.Component {
         return true
       }
     }
-
     return false
   }
 
