@@ -51,11 +51,12 @@ class CreateComponent extends React.Component {
     if (componentList) {
       const obj = {}
       const { subsets } = componentList.spec
+      const { annotations } = componentList.metadata
       if (subsets) {
         subsets.forEach((item, index) => {
           keys.push(uuid++)
           Object.assign(obj, {
-            [`serviceName-${index}`]: item.name,
+            [`serviceName-${index}`]: Object.keys(annotations)[index + 1].split('/')[1],
             [`version-${index}`]: item.labels.version,
           })
           this.setState({
@@ -287,7 +288,6 @@ class CreateComponent extends React.Component {
         return true
       }
     }
-
     return false
   }
 
@@ -357,7 +357,7 @@ class CreateComponent extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={8}>
+          <Col span={9}>
             <FormItem
             >
               {getFieldDecorator(`version-${key}`, {
@@ -444,7 +444,7 @@ class CreateComponent extends React.Component {
                     </span>
                   </Row>
                   <Row className="serviceHeader">
-                    <Col span={9}>服务</Col>
+                    <Col span={8}>服务</Col>
                     <Col span={9}>组件服务版本</Col>
                     <Col span={6}>操作</Col>
                   </Row>
