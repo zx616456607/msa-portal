@@ -357,7 +357,7 @@ class CreateComponent extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={8}>
+          <Col span={9}>
             <FormItem
             >
               {getFieldDecorator(`version-${key}`, {
@@ -444,7 +444,7 @@ class CreateComponent extends React.Component {
                     </span>
                   </Row>
                   <Row className="serviceHeader">
-                    <Col span={9}>服务</Col>
+                    <Col span={8}>服务</Col>
                     <Col span={9}>组件服务版本</Col>
                     <Col span={6}>操作</Col>
                   </Row>
