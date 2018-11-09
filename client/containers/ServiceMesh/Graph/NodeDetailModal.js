@@ -22,13 +22,17 @@ function formateInOutData(inData = {}, outDetail = {}) {
     }, {
       name: 'In',
       all: inData.total,
-      success: `${parseFloat(inData[200] / inData.total).toFixed(2) * 100}%`,
-      failure: `${parseFloat((inData.total - inData[200]) / inData.total).toFixed(2) * 100}%`,
+      success: inData.total !== 0 ? `${parseFloat(inData[200] / inData.total).toFixed(2) * 100}%`
+        : '-',
+      failure: inData.total !== 0 ? `${parseFloat((inData.total - inData[200]) / inData.total)
+        .toFixed(2) * 100}%` : '-',
     }, {
       name: 'Out',
       all: outDetail.total,
-      success: `${parseFloat(outDetail[200] / outDetail.total).toFixed(2) * 100}%`,
-      failure: `${parseFloat((outDetail.total - outDetail[200]) / outDetail.total).toFixed(2) * 100}%`,
+      success: outDetail.total !== 0 ?
+        `${parseFloat(outDetail[200] / outDetail.total).toFixed(2) * 100}%` : '-',
+      failure: outDetail.total !== 0 ?
+        `${parseFloat((outDetail.total - outDetail[200]) / outDetail.total).toFixed(2) * 100}%` : '-',
     },
   ]
   return inOutData
