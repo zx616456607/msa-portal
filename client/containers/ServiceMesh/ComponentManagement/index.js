@@ -78,7 +78,7 @@ class ComponentManagement extends React.Component {
     })
 
     confirm({
-      modalTitle: '删除操作',
+      modalTitle: '删除组件',
       title: '删除组件后，该组件关联的服务在路由规则中设置的规则和对外访问方式同时被删除',
       content: `确定是否删除该组件 ${name} ？`,
       onOk: () => {

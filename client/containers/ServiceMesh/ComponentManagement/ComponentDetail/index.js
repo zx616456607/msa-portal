@@ -116,7 +116,7 @@ class ComponentDetail extends React.Component {
     const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
     const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
     confirm({
-      modalTitle: '删除操作',
+      modalTitle: '移除服务',
       title: '移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务',
       content: tip,
       onOk: () => {
@@ -126,12 +126,12 @@ class ComponentDetail extends React.Component {
               deleteComponent(clusterID, metadata.name).then(res => {
                 if (res.error) {
                   notification.success({
-                    message: `删除组件 ${metadata.name} 失败`,
+                    message: `移除组件 ${metadata.name} 失败`,
                   })
                   return
                 }
                 notification.success({
-                  message: `删除组件 ${metadata.name} 成功`,
+                  message: `移除组件 ${metadata.name} 成功`,
                 })
                 this.props.history.push('/service-mesh/component-management')
               })
@@ -421,7 +421,7 @@ class ComponentDetail extends React.Component {
             <Button key="submit" type="primary" onClick={this.handleService}>确 定</Button>,
           ]}>
           <Row className="serviceHeader">
-            <Col span={9}>服务名称</Col>
+            <Col span={10}>服务名称</Col>
             <Col span={9}>组件服务版本</Col>
             <Col span={3}></Col>
           </Row>
