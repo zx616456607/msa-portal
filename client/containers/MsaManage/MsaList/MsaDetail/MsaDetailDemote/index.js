@@ -45,7 +45,7 @@ class MsaDetailDemote extends React.Component {
     const { serviceName, clusterID, demoteSwitch } = this.props
     this.setState({ switchLoading: true })
     const result = await demoteSwitch(clusterID, {
-      open: !this.state.switchChecked, microServer: serviceName })
+      open: !this.state.switchChecked, serviceName: serviceName })
     if (!result.error) {
       this.setState({
         modalShow: false,
