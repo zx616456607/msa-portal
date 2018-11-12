@@ -31,7 +31,7 @@ class CreateComponent extends React.Component {
     moduleServiceList: [],
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const isAdd = this.props.location.search.split('=')[1]
     this.fetchServiceList()
     if (isAdd === 'false') {
@@ -55,8 +55,9 @@ class CreateComponent extends React.Component {
       if (subsets) {
         subsets.forEach((item, index) => {
           keys.push(uuid++)
+          const key = annotations.description ? index + 1 : index
           Object.assign(obj, {
-            [`serviceName-${index}`]: Object.keys(annotations)[index + 1].split('/')[1],
+            [`serviceName-${index}`]: Object.keys(annotations)[key].split('/')[1],
             [`version-${index}`]: item.labels.version,
           })
           this.setState({
@@ -328,6 +329,7 @@ class CreateComponent extends React.Component {
     }
     getFieldDecorator('keys', { initialValue: [] })
     const keys = getFieldValue('keys')
+    const { metadata } = componentList
     const serviceLists = keys.length > 0 ? keys.map(key => {
       return (
         <Row className="serviceList" key={key}>
@@ -413,8 +415,7 @@ class CreateComponent extends React.Component {
                         }, {
                           validator: this.nameCheck,
                         }],
-                      initialValue: componentList.length !== 0 ?
-                        componentList.metadata.name : undefined,
+                      initialValue: metadata && metadata.name,
                     })(
                       <Input className="selects" placeholder="请输入组件名称" disabled={!isAdd} />
                     )}
@@ -423,8 +424,8 @@ class CreateComponent extends React.Component {
                 <Row>
                   <FormItem {...formItemLayout} label="描述">
                     {getFieldDecorator('description', {
-                      initialValue: componentList.length !== 0 ?
-                        componentList.metadata.annotations.description : undefined,
+                      initialValue: metadata && metadata.annotations &&
+                        metadata.annotations.description,
                       rules: [{ pattern: '', whitespace: true, message: '' }],
                     })(
                       <TextArea className="area" rows={4} placeholder="请输入描述" />
