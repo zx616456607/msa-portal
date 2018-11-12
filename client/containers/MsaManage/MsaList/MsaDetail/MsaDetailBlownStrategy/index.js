@@ -81,7 +81,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       if (!err) {
         this.setState({ confirmLoading: true })
         const body = Object.assign({}, values)
-        body.microServer = serviceName
+        body.serviceName = serviceName
         const result = await setMsaBlownStrategy(clusterID, body)
         this.setState({ confirmLoading: false })
         if (!result.error) {
@@ -172,7 +172,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
   switchChange = async val => {
     const { msaBlownOpen, getMsaBlownStrategy, serviceName, clusterID } = this.props
     this.setState({ switchLoading: true })
-    const result = await msaBlownOpen(clusterID, { open: val, microServer: serviceName })
+    const result = await msaBlownOpen(clusterID, { open: val, serviceName: serviceName })
     this.setState({ switchLoading: false })
     if (!result.error) {
       getMsaBlownStrategy(clusterID, serviceName)
