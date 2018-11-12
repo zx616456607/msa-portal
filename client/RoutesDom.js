@@ -72,6 +72,8 @@ import RouteDetail from './containers/ServiceMesh/RoutesManagement/RouteDetail'
 import Dubbo from './containers/Dubbo/'
 import DubboList from './containers/Dubbo/DubboList/DubboList'
 import DubboDetail from './containers/Dubbo/DubboDetail/DubboDetail'
+import DistributedList from './containers/MsaManage/Distributed/DistributedList'
+import ExecutionRecord from './containers/MsaManage/Distributed/ExecutionRecord'
 
 export const appChildRoutes = [
   {
@@ -295,6 +297,18 @@ export const msaManageChildRoutes = [
     exact: true,
     component: Event,
     key: 'event-manage',
+  },
+  {
+    path: '/msa-manage/distribute/list',
+    exact: true,
+    component: DistributedList,
+    key: 'distribute-list',
+  },
+  {
+    path: '/msa-manage/distribute/distribute-record',
+    exact: true,
+    component: ExecutionRecord,
+    key: 'distribute-record',
   },
 ]
 
