@@ -68,18 +68,18 @@ class DubboDetail extends React.Component {
         </div>,
       },
     ],
+    defaultDetailData: {},
   }
   componentDidMount() {
-    const { getDubboDetail, getSupplierList, match, clusterId } = this.props
+    const { getDubboDetail, match, clusterId } = this.props
     const { name, groupVersion } = match.params
-    getDubboDetail(clusterId, name, groupVersion)
-    getSupplierList()
-  }
-  tabsChange = key => {
-    const { consumerList, getConsumerList } = this.props
-    if (key === 'consumer' && consumerList.data.length === 0) {
-      getConsumerList()
-    }
+    getDubboDetail(clusterId, name, groupVersion).then(res => {
+      if (res.response) {
+        this.setState({
+          defaultDetailData: JSON.parse(JSON.stringify(res.response.result.data)),
+        })
+      }
+    })
   }
   onClose = () => {
     this.setState({ visible: false })
@@ -96,9 +96,17 @@ class DubboDetail extends React.Component {
     }
     return <span>提供者、消费者均有</span>
   }
+  search = (type, value) => {
+    const defaultDetailData = JSON.parse(JSON.stringify(this.state.defaultDetailData))
+    const { searchConsumerOrProvider } = this.props
+    if (value === '') {
+      searchConsumerOrProvider(type, value, defaultDetailData)
+    }
+    searchConsumerOrProvider(type, value)
+
+  }
   render() {
-    const { dubboDetail, supplierList, consumerList, clusterId,
-      searchConsumerOrProvider } = this.props
+    const { dubboDetail, clusterId } = this.props
     const { dubboInstanceDetailVisible, currentInstance } = this.state
     return dubboDetail.data && <div className="dubbo-detail">
       <div className="top">
@@ -122,24 +130,19 @@ class DubboDetail extends React.Component {
         </div>
       </Card>
       <Card className="dubbo-detail-tabs">
-        <Tabs onChange={this.tabsChange}>
+        <Tabs>
           <TabPane tab="提供者" key="supplier">
             <div className="table-operation">
               <Button icon="sync">刷新</Button>
               <Search
                 style={{ width: 200 }}
-                onSearch={val => {
-                  searchConsumerOrProvider('providers', val)
-                }}
-                onChange={e => {
-                  searchConsumerOrProvider('providers', e.target.value)
-                }}
+                onSearch={val => this.search('providers', val)}
+                onChange={e => this.search('providers', e.target.value)}
                 placeholder="请按容器实例名搜索"/>
             </div>
             <Table
               columns={this.state.columns}
               pagination={false}
-              loading={supplierList.isFetching}
               dataSource={dubboDetail.data.providers || []}
               locale={{ emptyText: '该服务无提供者' }}
             />
@@ -147,12 +150,15 @@ class DubboDetail extends React.Component {
           <TabPane tab="消费者" key="consumer">
             <div className="table-operation">
               <Button icon="sync">刷新</Button>
-              <Search style={{ width: 200 }} placeholder="请按主机名搜索"/>
+              <Search
+                onSearch={val => this.search('consumers', val)}
+                onChange={e => this.search('consumers', e.target.value)}
+                style={{ width: 200 }}
+                placeholder="请按容器实例名搜索"/>
             </div>
             <Table
               columns={this.state.columns}
               pagination={false}
-              loading={consumerList.isFetching}
               dataSource={dubboDetail.data.consumers || []}
               locale={{ emptyText: '该服务无消费者' }}
             />
