@@ -23,8 +23,9 @@ export const CREATE_CONSUMER_VOUCHER_REQUEST = 'CREATE_CONSUMER_VOUCHER_REQUEST'
 export const CREATE_CONSUMER_VOUCHER_SUCCESS = 'CREATE_CONSUMER_VOUCHER_SUCCESS'
 export const CREATE_CONSUMER_VOUCHER_FAILURE = 'CREATE_CONSUMER_VOUCHER_FAILURE'
 
-const fetchCreateConsumerVoucher = (instanceID, body) => {
+const fetchCreateConsumerVoucher = (instanceID, body, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         CREATE_CONSUMER_VOUCHER_REQUEST,
@@ -41,8 +42,8 @@ const fetchCreateConsumerVoucher = (instanceID, body) => {
   }
 }
 
-export const createConsumerVoucher = (instanceID, body) => {
-  return dispatch => dispatch(fetchCreateConsumerVoucher(instanceID, body))
+export const createConsumerVoucher = (instanceID, body, options) => {
+  return dispatch => dispatch(fetchCreateConsumerVoucher(instanceID, body, options))
 }
 
 // 获取消费凭证列表
