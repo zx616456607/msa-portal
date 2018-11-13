@@ -91,7 +91,7 @@ class ConsumerVouchers extends React.Component {
   loadData = (query = {}, isFirst) => {
     const { getConsumerVouchersList, instanceID, location, history } = this.props
     const { name } = this.state
-    query = Object.assign({}, location.query, { name }, query)
+    query = Object.assign({}, location.query, { name: encodeURIComponent(name) }, query)
     if (query.page && query.page === 1) {
       delete query.page
     }
