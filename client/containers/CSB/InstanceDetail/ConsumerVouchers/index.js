@@ -124,7 +124,7 @@ class ConsumerVouchers extends React.Component {
 
   createConsumerVoucher = (instanceID, values) => {
     const { createConsumerVoucher } = this.props
-    createConsumerVoucher(instanceID, values).then(res => {
+    createConsumerVoucher(instanceID, values, { isHandleError: true }).then(res => {
       this.setState({ confirmLoading: false })
       if (res.status === 409) {
         notification.warn({

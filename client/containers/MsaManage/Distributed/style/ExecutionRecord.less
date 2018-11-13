@@ -1,0 +1,22 @@
+@import '../../../../assets/style/core/index.less';
+
+.execution-record {
+  .title {
+    position: relative;
+    margin-left: @padding-small;
+    margin-bottom: @padding-small;
+    &:before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 14px;
+      background: @primary-color;
+      position: absolute;
+      left: -16px;
+      top: 2px;
+    }
+  }
+  .overview {
+    margin-bottom: @padding-medium;
+  }
+}

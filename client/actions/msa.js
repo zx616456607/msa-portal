@@ -695,7 +695,7 @@ const demoteSwitchRequest = (clusterId, query) => {
         DEMOTE_SWITCH_SUCCESS,
         DEMOTE_SWITCH_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/open?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/open?${toQuerystring(query)}`,
       options: {
         method: 'POST',
       },
