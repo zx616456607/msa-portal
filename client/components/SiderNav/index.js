@@ -115,7 +115,7 @@ const menus = [
             name: '事件',
           },
         ],
-      }, {
+      }, /* {
         key: 'distribute',
         to: '/msa-manage/distribute',
         tenxIcon: 'event-manage',
@@ -133,7 +133,7 @@ const menus = [
             name: '事务执行记录',
           },
         ],
-      },
+      },*/
     ],
   },
   {
