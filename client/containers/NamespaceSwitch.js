@@ -27,6 +27,18 @@ import TenxIcon from '@tenx-ui/icon/es/_old'
 const Search = Input.Search
 const MenuItemGroup = Menu.ItemGroup;
 
+// 通过projectName 转化为 displayName ( namespace )的形式
+function projectNameToShowText(projectName, item = []) {
+  let showText = '...'
+  if (projectName === '...' || projectName === '请选择项目') {
+    return projectName
+  }
+  const showProject = item.filter(({ projectName: innerProjectName }) =>
+    innerProjectName === projectName)[0] || {}
+  showText = !showProject.displayName ? showProject.namespace :
+    `${showProject.displayName} ( ${showProject.namespace} )`
+  return showText
+}
 
 class NamespaceSwitch extends React.Component {
   state = {
@@ -174,7 +186,8 @@ class NamespaceSwitch extends React.Component {
   handleProjectChange = async ({ item, key }) => {
     const { setCurrentConfig, getProjectClusters } = this.props
     await getProjectClusters(key)
-    const clusterArray = this.props.projectClusters[item.props.children]
+    const projectName = item.props.children.props.projectName
+    const clusterArray = this.props.projectClusters[projectName]
     if (clusterArray.length === 0) {
       setCurrentConfig({
         space: {
@@ -185,7 +198,7 @@ class NamespaceSwitch extends React.Component {
     }
     const setStateAndLoacalStorge = () => {
       this.setState({
-        projectsText: item.props.children,
+        projectsText: projectName,
         clustersDropdownVisible: true,
         clustersText: '请选择集群',
       })
@@ -215,7 +228,7 @@ class NamespaceSwitch extends React.Component {
       return
     }
     this.setState({
-      projectsText: item.props.children,
+      projectsText: projectName,
       clustersDropdownVisible: true,
     })
     setCurrentConfig({
@@ -253,12 +266,13 @@ class NamespaceSwitch extends React.Component {
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
     const currentProjectClusters = projectClusters[project.namespace] || []
-    const { projectsText, clustersText, clustersDropdownVisible } = this.state
+    const { clustersText, clustersDropdownVisible } = this.state
     const containerStyle = ClassNames({
       'namespace-switch': !noSelfClassName,
       [className]: !!className,
       container: true,
     })
+    const showProjectText = projectNameToShowText(this.state.projectsText, projectsList)
     return (
       <div className={containerStyle}>
         <TenxIcon
@@ -293,14 +307,18 @@ class NamespaceSwitch extends React.Component {
                   {
                     projectsList.length > 0 &&
                   projectsList
-                    .filter(({ projectName }) =>
-                      (this.state.searchKey ? projectName.includes(this.state.searchKey)
-                        : true))
+                    .filter(({ displayName, namespace }) => {
+                      const filterText = !displayName ? namespace : `${displayName} ( ${namespace} )`
+                      return this.state.searchKey ? filterText.includes(this.state.searchKey)
+                        : true
+                    })
                     .map(item => {
                       if (!item.outlineRoles.includes('no-participator')) {
                         return (
                           <Menu.Item key={item.namespace}>
-                            {item.projectName}
+                            <span projectName={item.projectName}>
+                              {!item.displayName ? item.namespace : `${item.displayName} ( ${item.namespace} )`}
+                            </span>
                           </Menu.Item>)
                       }
                       return null
@@ -318,10 +336,12 @@ class NamespaceSwitch extends React.Component {
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
-              {projectsText}
-              <Icon type="down" />
-            </a>
+            <div>
+              <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
+                <span>{showProjectText}</span>
+                <Icon type="down" />
+              </a>
+            </div>
           </Dropdown>
         </div>
         <div className={'bigDivider'} />

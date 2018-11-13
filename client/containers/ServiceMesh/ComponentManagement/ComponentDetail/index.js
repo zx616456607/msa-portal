@@ -86,8 +86,9 @@ class ComponentDetail extends React.Component {
       const serviceAry = []
       const { annotations } = list.metadata
       list.spec.subsets && list.spec.subsets.forEach((item, index) => {
+        const key = annotations.description ? index + 1 : index
         const query = {
-          name: Object.keys(annotations)[index + 1].split('/')[1],
+          name: Object.keys(annotations)[key].split('/')[1],
           version: item.labels.version,
         }
         serviceAry.push(query)
