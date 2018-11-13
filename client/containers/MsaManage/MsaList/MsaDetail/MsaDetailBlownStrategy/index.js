@@ -172,7 +172,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
   switchChange = async val => {
     const { msaBlownOpen, getMsaBlownStrategy, serviceName, clusterID } = this.props
     this.setState({ switchLoading: true })
-    const result = await msaBlownOpen(clusterID, { open: val, serviceName: serviceName })
+    const result = await msaBlownOpen(clusterID, { open: val, serviceName })
     this.setState({ switchLoading: false })
     if (!result.error) {
       getMsaBlownStrategy(clusterID, serviceName)
