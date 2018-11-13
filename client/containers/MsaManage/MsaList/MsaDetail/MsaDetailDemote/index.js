@@ -99,6 +99,7 @@ class MsaDetailDemote extends React.Component {
         title={this.state.title}
         onOk={this.confirmSwitch}
         onCancel={() => this.setState({ modalShow: false })}
+        confirmLoading={this.state.switchLoading}
       >
         <div className="msa-detail-demote-modal">
           <Icon type="question-circle" theme="outlined" />

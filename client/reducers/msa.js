@@ -344,14 +344,6 @@ const msaBlownStrategy = (state = {}, action) => {
         isFetching: false,
         data: {},
       }
-    case ActionTypes.SET_BLOWN_MONITOR:
-      return {
-        data: JSON.parse(action.data),
-      }
-    case ActionTypes.CLEAR_BLOWN_MONITOR:
-      return {
-        data: {},
-      }
     default:
       return state
   }
