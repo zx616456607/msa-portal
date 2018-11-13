@@ -67,8 +67,6 @@ class MyApplication extends React.Component {
     query = Object.assign({}, location.query, { name, sort, filter }, query)
     if (query.name === '') {
       delete query.name
-    } else {
-      query.name = encodeURIComponent(query.name)
     }
     if (query.page === 1) {
       delete query.page
