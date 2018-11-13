@@ -51,6 +51,7 @@ class ServiceMeshGraph extends React.Component {
   state = {
     searchQuery: {}, // 搜索条件
     isTimeRange: false, // 显示
+    loading: false, // 刷新relationChart
     // projects: [], // 当前服务列表
     // clusters: {}, // 当前所有集群信息
     // currentClusters: [], // 当前选中的项目的集群
@@ -170,14 +171,25 @@ class ServiceMeshGraph extends React.Component {
       const second = this.rangeTime.second.format('MMMM Do YYYY, h:mm:ss a').split(',')
       const timeRange = { begin: moment(`${day[0]},${first[1]}`, 'MMMM Do YYYY, h:mm:ss a').valueOf(),
         end: moment(`${day[0]},${second[1]}`, 'MMMM Do YYYY, h:mm:ss a').valueOf() }
-      if (timeRange.begin >= timeRange.end) {
-        notification.warn({
-          message: '开始时间不能大于结束时间',
-        })
-        return
-      }
+      const flag = this.verifyTime(timeRange)
+      if (flag === -1) { return }
       this.setState({ searchQuery: Object.assign({}, searchQuery, { timeRange }) })
     }
+  }
+  verifyTime = (timeRange = {}) => {
+    if (timeRange.begin >= timeRange.end) {
+      notification.warn({
+        message: '开始时间不能大于结束时间',
+      })
+      return -1
+    }
+    if (timeRange.end > Date.now()) {
+      notification.warn({
+        message: '不能选择未来时间',
+      })
+      return -1
+    }
+    return 0
   }
   debounceSearchApp = value => {
     const { loadAppList, clusterID } = this.props
@@ -187,17 +199,25 @@ class ServiceMeshGraph extends React.Component {
     }
     debounce(searchApp, 800)()
   }
-  loadGraph = () => {
+  loadGraph = async () => {
     const { loadServiceMeshGraph, clusterID, project } = this.props
-    const { app, timeRange } = this.state.searchQuery
+    const { app, timeRange = {} } = this.state.searchQuery
     if (!app) {
       return notification.info({
         message: '请选择服务后重试',
       })
     }
-
-    loadServiceMeshGraph(clusterID, project,
+    this.setState({ loading: true })
+    await loadServiceMeshGraph(clusterID, project,
       { service: app, begin: timeRange.begin, end: timeRange.end })
+    this.setState({ loading: false })
+  }
+  disabledDate = current => {
+    // Can not select days before today and today
+    return current && current > moment().endOf('day');
+  }
+  setLoading = value => {
+    this.setState({ loading: value })
   }
   render() {
     const { appsList, clusterID, project } = this.props
@@ -311,7 +331,10 @@ class ServiceMeshGraph extends React.Component {
                   </Radio.Group>
                   :
                   <span >
-                    <DatePicker className="daySelect" onChange={value => this.timeRangeSelect('day', value)} />
+                    <DatePicker
+                      className="daySelect"
+                      onChange={value => this.timeRangeSelect('day', value)}
+                      disabledDate={this.disabledDate}/>
                     <TimePicker
                       className="firstTimeSelect"
                       placeholder="开始时间"
@@ -343,6 +366,8 @@ class ServiceMeshGraph extends React.Component {
                 item: project,
               }}
               graphDataList={this.props.graphDataList}
+              setLoading= {this.setLoading}
+              loading={this.state.loading}
             />
           </div>
         </div>
