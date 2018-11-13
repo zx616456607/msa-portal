@@ -394,6 +394,9 @@ class ConsumerVouchers extends React.Component {
                 rules: [{
                   required: true,
                   message: '消费凭证名称不能为空',
+                }, {
+                  whitespace: true,
+                  message: '不能输入空格',
                 }],
               })(
                 <Input placeholder="请输入消费凭证名称" ref={input => { this.nameInput = input }} />
