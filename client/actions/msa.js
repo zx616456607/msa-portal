@@ -595,7 +595,7 @@ export const DEL_MSA_BLOWN_STRATEGY_REQUEST = 'DEL_MSA_BLOWN_STRATEGY_REQUEST'
 export const DEL_MSA_BLOWN_STRATEGY_SUCCESS = 'DEL_MSA_BLOWN_STRATEGY_SUCCESS'
 export const DEL_MSA_BLOWN_STRATEGY_FAILURE = 'DEL_MSA_BLOWN_STRATEGY_FAILURE'
 
-const delMsaBlownStrategyRequest = (clusterId, microServer) => {
+const delMsaBlownStrategyRequest = (clusterId, serviceName) => {
   return {
     [CALL_API]: {
       types: [
@@ -603,7 +603,7 @@ const delMsaBlownStrategyRequest = (clusterId, microServer) => {
         DEL_MSA_BLOWN_STRATEGY_SUCCESS,
         DEL_MSA_BLOWN_STRATEGY_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/property?microServer=${microServer}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/property?serviceName=${serviceName}`,
       options: {
         method: 'PUT',
       },
@@ -612,8 +612,8 @@ const delMsaBlownStrategyRequest = (clusterId, microServer) => {
   }
 }
 
-export const delMsaBlownStrategy = (clusterId, microServer) =>
-  dispatch => dispatch(delMsaBlownStrategyRequest(clusterId, microServer))
+export const delMsaBlownStrategy = (clusterId, serviceName) =>
+  dispatch => dispatch(delMsaBlownStrategyRequest(clusterId, serviceName))
 
 
 // 获取微服务熔断策略
@@ -621,7 +621,7 @@ export const GET_MSA_BLOWN_STRATEGY_REQUEST = 'GET_MSA_BLOWN_STRATEGY_REQUEST'
 export const GET_MSA_BLOWN_STRATEGY_SUCCESS = 'GET_MSA_BLOWN_STRATEGY_SUCCESS'
 export const GET_MSA_BLOWN_STRATEGY_FAILURE = 'GET_MSA_BLOWN_STRATEGY_FAILURE'
 
-const fetchMsaBlownStrategy = (clusterId, microServer) => {
+const fetchMsaBlownStrategy = (clusterId, serviceName) => {
   return {
     [CALL_API]: {
       types: [
@@ -629,14 +629,14 @@ const fetchMsaBlownStrategy = (clusterId, microServer) => {
         GET_MSA_BLOWN_STRATEGY_SUCCESS,
         GET_MSA_BLOWN_STRATEGY_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule?microServer=${microServer}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule?serviceName=${serviceName}`,
       schema: {},
     },
   }
 }
 
-export const getMsaBlownStrategy = (clusterId, microServer) =>
-  dispatch => dispatch(fetchMsaBlownStrategy(clusterId, microServer))
+export const getMsaBlownStrategy = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchMsaBlownStrategy(clusterId, serviceName))
 
 // 检查服务是否可以开启降级
 export const GET_SERVICE_DEMOTE_STATUS_REQUEST = 'GET_SERVICE_DEMOTE_STATUS_REQUEST'
@@ -673,7 +673,7 @@ const fetchDemoteStatus = (clusterId, serviceName) => {
         GET_DEMOTE_STATUS_SUCCESS,
         GET_DEMOTE_STATUS_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/status?microServer=${serviceName}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/status?serviceName=${serviceName}`,
       schema: {},
     },
   }
