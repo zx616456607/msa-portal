@@ -52,7 +52,6 @@ export default class RelationChartComponent extends React.Component {
     currentService: '',
     nodes: [],
     edges: [],
-    loading: false,
     fullScreenMode: false, // 默认不是全屏
   }
   componentDidMount() {
@@ -63,8 +62,8 @@ export default class RelationChartComponent extends React.Component {
     // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
     // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
     // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
-    const { app, cluster, item, timeRange } = nextProps.searchQuery
-    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange,
+    const { app, cluster, item, timeRange = {} } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange = {},
     } = this.props.searchQuery
     const { begin, end } = timeRange || {}
     const { begin: cbegin, end: cend } = ctimeRange || {}
@@ -74,13 +73,16 @@ export default class RelationChartComponent extends React.Component {
     const diff = app !== capp || cluster !== ccluster || item !== citem || begin !== cbegin
     || end !== cend
     if (check && diff) {
+      this.props.setLoading(true)
       await loadServiceMeshGraph(cluster, item,
         { service: app, begin, end })
+      this.props.setLoading(false)
     }
-    const { graphDataList = {} } = nextProps
-    // const { graphDataList: thisGraphDataList = {} } = this.props
-    // 如果两次回来的不是同一个对象
-    const { isFetching = false, data: { nodes = [], edges = [] } = {} } = graphDataList
+    const { data: { nodes = [], edges = [] } = {} } = this.props.graphDataList
+    const [ newNodes, newEdges ] = this.formateData(nodes, edges)
+    await this.setState({ nodes: newNodes, edges: newEdges })
+  }
+  formateData = (nodes, edges) => {
     const newNodes = nodes.map(node => {
       const onClick = this.onClick
       return {
@@ -118,7 +120,7 @@ export default class RelationChartComponent extends React.Component {
         color: '#5cb85c',
       }
     })
-    this.setState({ loading: isFetching, nodes: newNodes, edges: newEdges })
+    return [ newNodes, newEdges ]
   }
   onClick = (lname, e) => {
     e.stopPropagation();
@@ -177,7 +179,8 @@ export default class RelationChartComponent extends React.Component {
     this.setState({ fullScreenMode })
   }
   render() {
-    const { visible, currentService, nodes, edges, loading } = this.state
+    const { visible, currentService, nodes, edges } = this.state
+    const { loading } = this.props
     return (
       <div className="RelationChartWrap">
         <RelationChart
@@ -207,8 +210,7 @@ export default class RelationChartComponent extends React.Component {
 }
 
 function mapStateToProps(state) {
-  const { serviceMesh } = state
-  const graphDataList = serviceMesh && serviceMesh.graphDataList
+  const { serviceMesh: { graphDataList } = {} } = state
   return {
     graphDataList,
   }
