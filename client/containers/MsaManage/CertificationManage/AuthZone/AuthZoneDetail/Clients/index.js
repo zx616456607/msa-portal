@@ -211,7 +211,7 @@ class Clients extends React.Component {
             刷新
           </Button>
           <Search
-            placeholder="按 ID 搜索"
+            placeholder="只支持全名匹配"
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}
