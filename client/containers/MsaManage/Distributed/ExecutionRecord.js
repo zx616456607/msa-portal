@@ -1,9 +1,24 @@
 import React from 'react'
-import { Card, Row, Col, Table, Button } from 'antd'
+import { Card, Row, Col, Table, Button, Spin } from 'antd'
 import { Chart, Geom, Axis, Tooltip, Coord, Legend } from 'bizcharts'
+import { connect } from 'react-redux'
 import DataSet from '@antv/data-set'
-import { formatDate } from '../../../common/utils';
+import { formatDate } from '../../../common/utils'
+import { getExecuctionRecordOverview } from '../../../actions/msa'
 import './style/ExecutionRecord.less'
+
+@connect(state => {
+  const { current, msa } = state
+  const { cluster } = current.config
+  const { executionRecordOverview } = msa
+  const clusterID = cluster.id
+  return {
+    clusterID,
+    executionRecordOverview,
+  }
+}, {
+  getExecuctionRecordOverview,
+})
 class ExecutionRecord extends React.Component {
   state = {
     historyRecord: [
@@ -66,7 +81,43 @@ class ExecutionRecord extends React.Component {
       },
     ],
   }
+  componentDidMount() {
+    const { getExecuctionRecordOverview, clusterID } = this.props
+    getExecuctionRecordOverview(clusterID)
+    this.convertOverviewData()
+  }
+  convertOverviewData = () => {
+    const { executionRecordOverview } = this.props
+    const { isFetching, data } = executionRecordOverview
+    if (!isFetching && Object.keys(data).length !== 0) {
+      const history = [
+        {
+          item: '成功事务',
+          count: data.hisSuccess,
+        },
+        {
+          item: '回滚事务',
+          count: data.hisFail,
+        },
+      ]
+      const current = [
+        {
+          item: '成功事务',
+          count: data.todaySuccess,
+        },
+        {
+          item: '回滚事务',
+          count: data.todayFail,
+        },
+      ]
+      this.setState({
+        historyRecord: history,
+        currentRecord: current,
+      })
+    }
+  }
   executionChartRender = data => {
+
     for (const v of data) {
       v.item = `${v.item}：${v.count}个`
     }
@@ -158,6 +209,8 @@ class ExecutionRecord extends React.Component {
   }
   render() {
     const { historyRecord, currentRecord, columns } = this.state
+    const { executionRecordOverview } = this.props
+    const { isFetching } = executionRecordOverview
     return <div className="execution-record">
       <div className="overview">
         <div className="title">
@@ -169,7 +222,12 @@ class ExecutionRecord extends React.Component {
               className="content-card"
               title="历史事务执行概览"
             >
-              { this.executionChartRender(historyRecord) }
+              {
+                isFetching ?
+                  <div className="spinning"><Spin/></div>
+                  :
+                  this.executionChartRender(historyRecord)
+              }
             </Card>
           </Col>
           <Col span={12}>
@@ -177,7 +235,12 @@ class ExecutionRecord extends React.Component {
               className="content-card"
               title="当天事务执行概览"
             >
-              { this.executionChartRender(currentRecord) }
+              {
+                isFetching ?
+                  <div className="spinning"><Spin/></div>
+                  :
+                  this.executionChartRender(currentRecord)
+              }
             </Card>
           </Col>
         </Row>
