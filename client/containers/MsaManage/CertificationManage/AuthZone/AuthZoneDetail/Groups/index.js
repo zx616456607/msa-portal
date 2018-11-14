@@ -237,7 +237,8 @@ class Groups extends React.Component {
         key: 'displayName',
         dataIndex: 'displayName',
         width: '16%',
-        render: (text, record) => <a onClick={() => this.handleDetail(record)}>{text}</a>,
+        render: (text, record) => (isUaaDefaultGroup(text) ? text :
+          <a onClick={() => this.handleDetail(record)}>{text}</a>),
       },
       {
         title: '类型',
