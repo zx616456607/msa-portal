@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import {
   Button, Input, Table, Dropdown, Menu, Card, notification,
-  Pagination,
+  Pagination, Icon,
 } from 'antd'
 import RoutingRuleModal from './RoutingRuleModal'
 import confirm from '../../../components/Modal/confirm'
@@ -27,6 +27,7 @@ import {
   gatewayRoutesListSlt,
 } from '../../../selectors/gateway'
 import './style/index.less'
+import GlobalRuleModal from './GlobalRuleSetting'
 
 const Search = Input.Search
 
@@ -138,9 +139,14 @@ class RoutingManage extends React.Component {
     }, this.loadRoutesList)
   }
 
+  toggleGlobalVisible = () => {
+    this.setState(preState =>
+      ({ globalVisible: !preState.globalVisible }))
+  }
+
   render() {
     const { isFetching, routesList, totalElements } = this.props
-    const { ruleModal, currentRoute, currentPage } = this.state
+    const { ruleModal, currentRoute, currentPage, globalVisible } = this.state
     const columns = [{
       title: '路由名称',
       dataIndex: 'routeId',
@@ -166,13 +172,17 @@ class RoutingManage extends React.Component {
       dataIndex: 'description',
       render: desc => desc || '-',
     }, {
-      // title: '去掉路径前缀',
-      // dataIndex: 'stripPrefix',
-      // render: (text, record) => (record.stripPrefix ? '开启' : '关闭'),
+      title: '去掉路径前缀',
+      dataIndex: 'stripPrefix',
+      render: (text, record) => (record.stripPrefix ? '开启' : '关闭'),
     }, {
       title: '失败重试',
       dataIndex: 'retryable',
       render: (text, record) => (record.retryable ? '开启' : '关闭'),
+    }, {
+      title: '敏感 Header',
+      dataIndex: 'headerFlag',
+      render: text => (text === 'custom' ? '自定义' : '全局默认'),
     }, {
       title: '操作',
       render: (text, record) => {
@@ -206,6 +216,9 @@ class RoutingManage extends React.Component {
         <div className="router-manage-btn-box layout-content-btns" key="btns">
           <Button type="primary" icon="plus" onClick={this.addRoutingRule}>
           添加路由
+          </Button>
+          <Button onClick={this.toggleGlobalVisible}>
+            <Icon type="setting" /> 全局路由配置
           </Button>
           <Button icon="sync" onClick={this.loadRoutesList.bind(this, {})} loading={isFetching}>
           刷新
@@ -251,6 +264,13 @@ class RoutingManage extends React.Component {
             />
           }
         </div>
+        {
+          globalVisible &&
+          <GlobalRuleModal
+            visible={globalVisible}
+            onCancel={this.toggleGlobalVisible}
+          />
+        }
       </QueueAnim>
     )
   }
