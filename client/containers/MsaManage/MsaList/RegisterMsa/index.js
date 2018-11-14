@@ -76,6 +76,25 @@ class RegisterMsa extends React.Component {
       if (err) {
         return
       }
+      let hasRepeat = false
+      values.keys.forEach(k => {
+        values.keys.every(v => {
+          if (v === k) {
+            return false
+          }
+          if (`${values[`host-${v}`]}:${values[`port-${v}`]}` === `${values[`host-${k}`]}:${values[`port-${k}`]}`) {
+            hasRepeat = true
+            return false
+          }
+          return true
+        })
+      })
+      if (hasRepeat) {
+        notification.warn({
+          message: '服务地址:服务端口重复',
+        })
+        return
+      }
       this.setState({
         submitLoading: true,
       })
