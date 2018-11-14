@@ -69,7 +69,7 @@
     "@tenx-ui/logs": "^1.2.2",
     "@tenx-ui/modal": "^1.0.9",
     "@tenx-ui/page": "^1.0.2",
-    "@tenx-ui/relation-chart": "^0.2.8",
+    "@tenx-ui/relation-chart": "^0.2.9",
     "@tenx-ui/return-button": "^0.0.4",
     "@tenx-ui/select-with-checkbox": "0.0.6",
     "@tenx-ui/webSocket": "^1.1.2",

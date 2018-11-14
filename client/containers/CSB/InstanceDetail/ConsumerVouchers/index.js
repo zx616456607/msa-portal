@@ -91,7 +91,7 @@ class ConsumerVouchers extends React.Component {
   loadData = (query = {}, isFirst) => {
     const { getConsumerVouchersList, instanceID, location, history } = this.props
     const { name } = this.state
-    query = Object.assign({}, location.query, { name }, query)
+    query = Object.assign({}, location.query, { name: encodeURIComponent(name) }, query)
     if (query.page && query.page === 1) {
       delete query.page
     }
@@ -394,6 +394,9 @@ class ConsumerVouchers extends React.Component {
                 rules: [{
                   required: true,
                   message: '消费凭证名称不能为空',
+                }, {
+                  whitespace: true,
+                  message: '不能输入空格',
                 }],
               })(
                 <Input placeholder="请输入消费凭证名称" ref={input => { this.nameInput = input }} />
