@@ -232,6 +232,7 @@ class CallLinkTracking extends React.Component {
       title: '状态',
       dataIndex: 'success',
       width: '10%',
+      filterMultiple: false,
       filters: [{
         text: '成功', value: true,
       }, {
