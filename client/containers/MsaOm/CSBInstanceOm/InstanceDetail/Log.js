@@ -35,7 +35,7 @@ class Log extends React.Component {
     const logs = instanceLogs[namespace] || { isFetching: true }
     const { isFetching, data = [] } = logs
     return <div>
-      <LogTemplate loadData={this.loadData} data={data} isFetching={isFetching}/>
+      <LogTemplate loadData={this.loadData} data={data && data.logs || []} isFetching={isFetching}/>
     </div>
   }
 }

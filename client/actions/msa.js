@@ -695,7 +695,7 @@ const demoteSwitchRequest = (clusterId, query) => {
         DEMOTE_SWITCH_SUCCESS,
         DEMOTE_SWITCH_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/open?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/open?${toQuerystring(query)}`,
       options: {
         method: 'POST',
       },
@@ -706,4 +706,162 @@ const demoteSwitchRequest = (clusterId, query) => {
 
 export const demoteSwitch = (clusterId, query) =>
   dispatch => dispatch(demoteSwitchRequest(clusterId, query))
+
+// 查询事务列表
+export const GET_DISTRIBUTE_LIST_REQUEST = 'GET_DISTRIBUTE_LIST_REQUEST'
+export const GET_DISTRIBUTE_LIST_SUCCESS = 'GET_DISTRIBUTE_LIST_SUCCESS'
+export const GET_DISTRIBUTE_LIST_FAILURE = 'GET_DISTRIBUTE_LIST_FAILURE'
+
+const fetchDistributeList = () => {
+  const data = [
+    {
+      id: '4f5511a8fefb4c768d01f21416071671',
+      methodName: 'testDemo',
+      txName: 'NewDemoCase',
+      detailCount: '2',
+      timeout: 30,
+      firstRunTime: 1542091525758,
+      newRunTime: 1542091585546,
+    },
+    {
+      id: '4f5511a8fefb4c768re01f21416071671',
+      methodName: 'testDemo',
+      txName: 'NewDemoCase',
+      detailCount: '2',
+      timeout: 30,
+      firstRunTime: 1542091525758,
+      newRunTime: 1542091585546,
+    },
+    {
+      id: '4f5511a8fefb4c768d01fds21416071671',
+      methodName: 'testDemo',
+      txName: 'NewDemoCase',
+      detailCount: '2',
+      timeout: 30,
+      firstRunTime: 1542091525758,
+      newRunTime: 1542091585546,
+    },
+  ]
+  return {
+    type: GET_DISTRIBUTE_LIST_SUCCESS,
+    response: {
+      result: {
+        data,
+      },
+    },
+  }
+/*
+  return {
+    [CALL_API]: {
+      types: [
+        GET_DISTRIBUTE_LIST_REQUEST,
+        GET_DISTRIBUTE_LIST_SUCCESS,
+        GET_DISTRIBUTE_LIST_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/txGroup/groups?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+*/
+}
+
+export const getDistributeList = (clusterId, query) =>
+  dispatch => dispatch(fetchDistributeList(clusterId, query))
+
+// 查询子事务
+export const GET_CHILD_TRANSACTION_REQUEST = 'GET_CHILD_TRANSACTION_REQUEST'
+export const GET_CHILD_TRANSACTION_SUCCESS = 'GET_CHILD_TRANSACTION_SUCCESS'
+export const GET_CHILD_TRANSACTION_FAILURE = 'GET_CHILD_TRANSACTION_FAILURE'
+
+const fetchChildTranscation = () => {
+  const data = {
+    successCount: 2,
+    failCount: 0,
+    unknownCount: 0,
+    transLogDetails: [
+      {
+        txName: 'NewDemoOrder',
+        methodName: 'public boolean com.tenxcloud.order.service.impl.OrderServiceImpl.addOrder(java.lang.Integer,java.lang.Integer)',
+      },
+      {
+        txName: 'NewDemoAccount',
+        methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer)',
+      },
+      {
+        txName: 'NewDemoAccount',
+        methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer)',
+      },
+      {
+        txName: 'NewDemoAccount',
+        methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer)',
+      },
+      {
+        txName: 'NewDemoAccount',
+        methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer)',
+      },
+    ],
+  }
+  return {
+    type: GET_CHILD_TRANSACTION_SUCCESS,
+    response: {
+      result: {
+        data,
+      },
+    },
+  }
+/*
+  return {
+    [CALL_API]: {
+      types: [
+        GET_CHILD_TRANSACTION_REQUEST,
+        GET_CHILD_TRANSACTION_SUCCESS,
+        GET_CHILD_TRANSACTION_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/txGroup/detail/${txName}`,
+      schema: {},
+    },
+  }
+*/
+}
+
+export const getChildTranscation = (clusterId, txName) =>
+  dispatch => dispatch(fetchChildTranscation(clusterId, txName))
+
+// 查询事务执行记录概览
+export const GET_EXECUTION_RECORD_OVERVIEW_REQUEST = 'GET_EXECUTION_RECORD_OVERVIEW_REQUEST'
+export const GET_EXECUTION_RECORD_OVERVIEW_SUCCESS = 'GET_EXECUTION_RECORD_OVERVIEW_SUCCESS'
+export const GET_EXECUTION_RECORD_OVERVIEW_FAILURE = 'GET_EXECUTION_RECORD_OVERVIEW_FAILURE'
+
+const fetchExecuctionRecordOverview = () => {
+  const data = {
+    todaySuccess: 2,
+    todayFail: 0,
+    hisSuccess: 0,
+    hisFail: 0,
+  }
+  return {
+    type: GET_EXECUTION_RECORD_OVERVIEW_SUCCESS,
+    response: {
+      result: {
+        data,
+      },
+    },
+  }
+/*
+  return {
+    [CALL_API]: {
+      types: [
+        GET_EXECUTION_RECORD_OVERVIEW_REQUEST,
+        GET_EXECUTION_RECORD_OVERVIEW_SUCCESS,
+        GET_EXECUTION_RECORD_OVERVIEW_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/txGroup/overview`,
+      schema: {},
+    },
+  }
+*/
+}
+
+export const getExecuctionRecordOverview = clusterId =>
+  dispatch => dispatch(fetchExecuctionRecordOverview(clusterId))
 

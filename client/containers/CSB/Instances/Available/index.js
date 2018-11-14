@@ -57,7 +57,7 @@ class AvailableInstances extends React.Component {
     const sortOrder = this.formatSortOrder(sort)
     const filteredValue = formatRole(filter)
     this.setState({
-      name,
+      name: name || '',
       sortOrder,
       filteredValue,
     }, () => this.loadData({}, true))
@@ -70,6 +70,7 @@ class AvailableInstances extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
+    query.name = encodeURIComponent(query.name)
     handleHistoryForLoadData(history, query, location, isFirst)
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }

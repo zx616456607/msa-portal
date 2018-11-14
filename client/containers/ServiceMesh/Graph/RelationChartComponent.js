@@ -34,7 +34,9 @@ const config = {
 const ServiceMeshNode = () => {
   return (
     <div className="TenxNode">
-      <img style={{ height: 35, width: 35, marginLeft: 8 }} src={serviceImg} alt=""/>
+      <img
+        className="nodeImg"
+        src={serviceImg} alt=""/>
     </div>)
 }
 
@@ -50,7 +52,6 @@ export default class RelationChartComponent extends React.Component {
     currentService: '',
     nodes: [],
     edges: [],
-    loading: false,
     fullScreenMode: false, // 默认不是全屏
   }
   componentDidMount() {
@@ -61,8 +62,8 @@ export default class RelationChartComponent extends React.Component {
     // 新的拓扑图数据也应该在这里加工, 并设置到state上用于显示
     // 这样写的好处是, 一旦搜索条件有变化, 就可以自动发送新的请求,
     // 注意! 向后台发送数据有可能改变props, 造成死循环, 要写好处理条件
-    const { app, cluster, item, timeRange } = nextProps.searchQuery
-    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange,
+    const { app, cluster, item, timeRange = {} } = nextProps.searchQuery
+    const { app: capp, cluster: ccluster, item: citem, timeRange: ctimeRange = {},
     } = this.props.searchQuery
     const { begin, end } = timeRange || {}
     const { begin: cbegin, end: cend } = ctimeRange || {}
@@ -72,48 +73,54 @@ export default class RelationChartComponent extends React.Component {
     const diff = app !== capp || cluster !== ccluster || item !== citem || begin !== cbegin
     || end !== cend
     if (check && diff) {
+      this.props.setLoading(true)
       await loadServiceMeshGraph(cluster, item,
         { service: app, begin, end })
+      this.props.setLoading(false)
     }
-    const { graphDataList = {} } = nextProps
-    const { graphDataList: thisGraphDataList = {} } = this.props
-    if (graphDataList !== thisGraphDataList) { // 如果两次回来的不是同一个对象
-      const { isFetching = false, data: { nodes = [], edges = [] } = {} } = graphDataList
-      const newNodes = nodes.map(node => {
-        const onClick = this.onClick
-        return {
-          id: node.id,
-          label: node.name,
-          version: node.version,
-          namespace: node.namespace,
-          protocol: node.protocol,
-          width: 50,
-          height: 50,
-          shape: 'circle',
-          onClick,
-          isAnimated: true,
-          TenxNode: ServiceMeshNode,
-        }
-      })
-      const newEdges = edges.map((edge = {}) => {
-        const { detail = {} } = edge
-        const totalDenominator = Object.values(detail)
-          .reduce((total, current) => parseInt(current) + total, 0)
-        const totalMember = detail['200'] || 0
-        const lineLabel = `${totalMember} / ${totalDenominator} calls ${parseFloat(edge.latency).toFixed(6) || 0}ms`
-        const lineLabelNode = <div title={lineLabel} >{lineLabel}</div>
-        return {
-          source: edge.from,
-          target: edge.to,
-          withArrow: true,
-          arrowOffset: 10,
-          label: lineLabelNode,
-          isAnimated: true,
-          detail: edge.detail,
-        }
-      })
-      this.setState({ loading: isFetching, nodes: newNodes, edges: newEdges })
-    }
+    const { data: { nodes = [], edges = [] } = {} } = this.props.graphDataList
+    const [ newNodes, newEdges ] = this.formateData(nodes, edges)
+    await this.setState({ nodes: newNodes, edges: newEdges })
+  }
+  formateData = (nodes, edges) => {
+    const newNodes = nodes.map(node => {
+      const onClick = this.onClick
+      return {
+        id: node.id,
+        label: <span className="nodeLabel">{node.name}</span>,
+        version: node.version,
+        namespace: node.namespace,
+        protocol: node.protocol,
+        width: 50,
+        height: 50,
+        shape: 'circle',
+        onClick,
+        isAnimated: true,
+        TenxNode: ServiceMeshNode,
+      }
+    })
+    const newEdges = edges.map((edge = {}) => {
+      const { detail = {} } = edge
+      const totalDenominator = Object.values(detail)
+        .reduce((total, current) => parseInt(current) + total, 0)
+      const totalMember = detail['200'] || 0
+      const lineLabel = `/${totalDenominator} calls | ${parseFloat(edge.latency).toFixed(3) || 0}s`
+      const lineLabelNode = <div title={lineLabel} className="lineLabel">
+        <span className="red">{totalMember}</span>
+        {lineLabel}
+      </div>
+      return {
+        source: edge.from,
+        target: edge.to,
+        withArrow: true,
+        arrowOffset: 10,
+        label: lineLabelNode,
+        isAnimated: true,
+        detail: edge.detail,
+        color: '#5cb85c',
+      }
+    })
+    return [ newNodes, newEdges ]
   }
   onClick = (lname, e) => {
     e.stopPropagation();
@@ -172,9 +179,10 @@ export default class RelationChartComponent extends React.Component {
     this.setState({ fullScreenMode })
   }
   render() {
-    const { visible, currentService, nodes, edges, loading } = this.state
+    const { visible, currentService, nodes, edges } = this.state
+    const { loading } = this.props
     return (
-      <div className="wrap">
+      <div className="RelationChartWrap">
         <RelationChart
           graphConfigs={config}
           nodes={nodes}
@@ -184,6 +192,7 @@ export default class RelationChartComponent extends React.Component {
           ref = {r => { this.relationChart = r }}
           loading={loading}
           fullScreenMode={this.fullScreenMode}
+          activeArrowOffset={14}
         />
         {/* 这里要放两个相同的输入的框的原因是, 全屏和非全屏模式下, modal需要渲染在不同的节点下面, 如果
          modal虽然可以指定渲染节点,但是是一次性的, 所以必须u指定两个, 一个全屏模式下使用, 一个非全屏模式下使用,  */}
@@ -201,8 +210,7 @@ export default class RelationChartComponent extends React.Component {
 }
 
 function mapStateToProps(state) {
-  const { serviceMesh } = state
-  const graphDataList = serviceMesh && serviceMesh.graphDataList
+  const { serviceMesh: { graphDataList } = {} } = state
   return {
     graphDataList,
   }

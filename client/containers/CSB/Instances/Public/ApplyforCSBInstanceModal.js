@@ -143,6 +143,13 @@ class ApplyforCSBInstanceModal extends React.Component {
                   rules: [{
                     required: true,
                     message: '请填写申请原因',
+                  }, {
+                    validator: (rule, value, callback) => {
+                      if (value.length < 1 || value.length > 23 || /\s+/g.test(value)) {
+                        callback('长度为1-23个字符，不包含空格')
+                      }
+                      callback()
+                    },
                   }],
                 })(
                   <TextArea placeholder="必填" onChange={this.handleChange} />

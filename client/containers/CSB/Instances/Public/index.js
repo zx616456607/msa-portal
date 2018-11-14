@@ -213,10 +213,11 @@ class PublicInstances extends React.Component {
       <div className="layout-content-btns" key="layout-content-btns">
         <Button type="primary" icon="reload" onClick={() => this.loadData()}>刷新</Button>
         <Search
-          placeholder="按微服务名称搜索"
+          placeholder="按微实例名称搜索"
           className="search-style"
           onChange={e => this.setState({ name: e.target.value })}
           onPressEnter={() => this.loadData({ name, page: 1 })}
+          onSearch={() => this.loadData({ name, page: 1 })}
           value={name}
         />
         {

@@ -142,7 +142,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('sleepWindowInMilliseconds', {
-      initialValue: data && data.sleepWindowInMilliseconds || 1500,
+      initialValue: data && data.sleepWindowInMilliseconds || 15000,
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
         { validator: (rule, value, callback) => {

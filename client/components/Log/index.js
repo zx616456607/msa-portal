@@ -61,15 +61,20 @@ class LogTemplate extends React.Component {
       })
     } else if (isFetching) {
       logsArr.push('<span>加载中...</span>')
-    } else if (isFetching && data.length === 0) {
+    } else if (!isFetching && data.length === 0) {
       logsArr.push('<span>暂无日志</span>')
     }
-    return logsArr
+    if (this.logRef) {
+      this.logRef.clearLogs()
+      this.logRef.writeln(logsArr)
+    }
   }
   render() {
+    this.logs()
     return (
       <div id="log-template">
         <TenxLogs
+          ref={ref => (this.logRef = ref)}
           header={<div className="operaBox">
             <DatePicker
               defaultValue={moment(new Date(), dateFormat)}
@@ -81,7 +86,7 @@ class LogTemplate extends React.Component {
             <Icon type="reload" onClick={() => this.loadData()}/>
           </div>}
           isDangerouslySetInnerHTML={true}
-          logs={this.logs()}
+
         />
       </div>
     )
