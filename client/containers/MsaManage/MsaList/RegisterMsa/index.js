@@ -284,22 +284,6 @@ class RegisterMsa extends React.Component {
     )
   }
 
-  checkRepet = (k, value, cb) => {
-    const data = this.props.form.getFieldsValue()
-    const { keys } = data
-    const hostAndPorts = []
-    if (keys.length > 1) {
-      for (let i = 0; i <= keys.length - 2; i++) {
-        const item = `${data[`host-${keys[i]}`]}:${data[`port-${keys[i]}`]}`
-        hostAndPorts.push(item)
-      }
-    }
-    const currentAddress = `${data[`host-${k}`]}:${data[`port-${k}`]}`
-    if (hostAndPorts.includes(currentAddress)) {
-      return cb('服务地址和服务端口不能重复')
-    }
-    return cb()
-  }
   render() {
     const { form } = this.props
     const { ping, mode } = this.state
@@ -334,7 +318,7 @@ class RegisterMsa extends React.Component {
                 whitespace: true,
                 validator: (rule, value, cb) => {
                   if (HOSTNAME_REG.test(value) || IP_REG.test(value)) {
-                    return this.checkRepet(k, value, cb)
+                    return cb()
                   }
                   cb('请填写正确的服务地址')
                 },
@@ -352,7 +336,6 @@ class RegisterMsa extends React.Component {
                 validator: (rule, value, cb) => {
                   if (!value) return cb(new Error('请填写端口'))
                   if (value < 1 || value > 65535) return cb(new Error('请输入正确的端口号'))
-                  this.checkRepet(k, value, cb)
                   cb()
                 },
               }],
