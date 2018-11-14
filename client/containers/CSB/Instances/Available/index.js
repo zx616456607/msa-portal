@@ -57,7 +57,7 @@ class AvailableInstances extends React.Component {
     const sortOrder = this.formatSortOrder(sort)
     const filteredValue = formatRole(filter)
     this.setState({
-      name,
+      name: name || '',
       sortOrder,
       filteredValue,
     }, () => this.loadData({}, true))
