@@ -197,7 +197,7 @@ class Users extends React.Component {
 
   render() {
     const {
-      inputValue, current, addVisible, currentUser, detailVisible, passwordVisible 
+      inputValue, current, addVisible, currentUser, detailVisible, passwordVisible,
     } = this.state
     const { zoneUsers, usersFetching, totalResults } = this.props
     const propsFunc = {
