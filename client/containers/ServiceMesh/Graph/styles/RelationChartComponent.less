@@ -1,3 +1,4 @@
+@import "../../../../assets/style/core/index.less";
 .TenxNode {
   display: flex;
   flex-direction: column;
@@ -14,5 +15,30 @@
     &:last-child {
       margin-bottom: 4px;
     }
+  }
+  .nodeImg {
+    height: 35px;
+    width: 35px;
+    margin-left: 8px;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+.RelationChartWrap {
+  .lineLabel {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 150px;
+    position: relative;
+    left: -80px;
+    color: @font-color-2;
+  }
+  .red {
+    color: @error-color;
+  }
+  .nodeLabel {
+    color: @font-color-2;
+    background-color: white;
   }
 }

@@ -111,7 +111,6 @@ import spingCloud from '../../assets/img/apm/Sringcloud.png'
 //     ],
 //   },
 // ]
-
 class MsaManage extends React.Component {
   state = {
     isDeployed: false,
@@ -122,21 +121,10 @@ class MsaManage extends React.Component {
     const { current, fetchSpingCloud } = this.props
     const clusterID = current.config.cluster.id
     fetchSpingCloud(clusterID).then(res => {
-      let isDeployed = false
-      if (!res.error) {
-        const { config, user } = current
-        const projectNamespace = config.project.namespace
-        let namespace = config.project.namespace
-        if (projectNamespace === 'default') {
-          namespace = user.info.namespace
-        }
-        res.response.result.data.forEach(item => {
-          if (item.namespace === namespace) {
-            isDeployed = true
-          }
-        })
-      }
-      this.setState({ isDeployed, loading: false })
+      this.setState({
+        isDeployed: checkSpringCloudInstall(res, current),
+        loading: false,
+      })
     })
   }
 
@@ -147,11 +135,7 @@ class MsaManage extends React.Component {
       return renderLoading('加载 SpingCloud 中 ...')
     }
     if (!isDeployed) {
-      return <div className="loading">
-        <img alt="spingcloud-not-intall" src={spingCloud}/>
-        <div>当前项目对应的集群，未安装 SpingCloud 基础服务组件，</div>
-        <div>请『联系系统管理员』安装</div>
-      </div>
+      return notInstallSpringCloud()
     }
     return [
       children,
@@ -210,6 +194,32 @@ const mapStateToProps = state => {
     auth: state.entities.auth,
     current: current || {},
   }
+}
+
+export function notInstallSpringCloud() {
+  return <div className="loading">
+    <img alt="spingcloud-not-intall" src={spingCloud}/>
+    <div>当前项目对应的集群，未安装 SpingCloud 基础服务组件，</div>
+    <div>请『联系系统管理员』安装</div>
+  </div>
+}
+
+export function checkSpringCloudInstall(res, current) {
+  let isDeployed = false
+  if (!res.error) {
+    const { config, user } = current
+    const projectNamespace = config.project.namespace
+    let namespace = config.project.namespace
+    if (projectNamespace === 'default') {
+      namespace = user.info.namespace
+    }
+    res.response.result.data.forEach(item => {
+      if (item.namespace === namespace) {
+        isDeployed = true
+      }
+    })
+  }
+  return isDeployed
 }
 
 export default connect(mapStateToProps, {

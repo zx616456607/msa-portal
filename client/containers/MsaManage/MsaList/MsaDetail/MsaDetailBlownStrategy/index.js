@@ -62,9 +62,9 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       if (res.response) {
         this.setState({
           blownOpen: res.response.result.data,
-          blownOpenLoading: false,
         })
       }
+      this.setState({ blownOpenLoading: false })
     })
     getMsaBlownStrategy(clusterID, serviceName).then(res => {
       if (res.response) {
@@ -81,7 +81,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       if (!err) {
         this.setState({ confirmLoading: true })
         const body = Object.assign({}, values)
-        body.microServer = serviceName
+        body.serviceName = serviceName
         const result = await setMsaBlownStrategy(clusterID, body)
         this.setState({ confirmLoading: false })
         if (!result.error) {
@@ -142,7 +142,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('sleepWindowInMilliseconds', {
-      initialValue: data && data.sleepWindowInMilliseconds || 1500,
+      initialValue: data && data.sleepWindowInMilliseconds || 15000,
       trigger: [ 'onBlur', 'onChange' ],
       rules: [
         { validator: (rule, value, callback) => {
@@ -172,7 +172,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
   switchChange = async val => {
     const { msaBlownOpen, getMsaBlownStrategy, serviceName, clusterID } = this.props
     this.setState({ switchLoading: true })
-    const result = await msaBlownOpen(clusterID, { open: val, microServer: serviceName })
+    const result = await msaBlownOpen(clusterID, { open: val, serviceName })
     this.setState({ switchLoading: false })
     if (!result.error) {
       getMsaBlownStrategy(clusterID, serviceName)

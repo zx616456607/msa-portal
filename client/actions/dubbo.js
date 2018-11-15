@@ -12,14 +12,17 @@
 import { CALL_API } from '../middleware/api'
 import { toQuerystring } from '../common/utils'
 import { METRICS_DEFAULT_SOURCE, API_CONFIG } from '../constants';
+import { getDeepValue } from '../common/utils';
+
 const { PAAS_API_URL } = API_CONFIG
 
 export const FETCH_DUBBO_LIST_REQUEST = 'FETCH_DUBBO_LIST_REQUEST'
 export const FETCH_DUBBO_LIST_SUCCESS = 'FETCH_DUBBO_LIST_SUCCESS'
 export const FETCH_DUBBO_LIST_FAILURE = 'FETCH_DUBBO_LIST_FAILURE'
 
-const fetchDubboList = (clusterId, callback) => {
+const fetchDubboList = (clusterId, options, callback) => {
   return {
+    options,
     [CALL_API]: {
       types: [ FETCH_DUBBO_LIST_REQUEST,
         FETCH_DUBBO_LIST_SUCCESS,
@@ -30,8 +33,8 @@ const fetchDubboList = (clusterId, callback) => {
     callback,
   }
 }
-export const getDubboList = (clusterId, callback) => dispatch => dispatch(
-  fetchDubboList(clusterId, callback))
+export const getDubboList = (clusterId, options, callback) => dispatch => dispatch(
+  fetchDubboList(clusterId, options, callback))
 
 export const GET_DUBBO_DETAIL_REQUEST = 'GET_DUBBO_DETAIL_REQUEST'
 export const GET_DUBBO_DETAIL_SUCCESS = 'GET_DUBBO_DETAIL_SUCCESS'
@@ -56,29 +59,20 @@ export const getDubboDetail = (clusterId, name, groupversion, callback) => {
   }
 }
 export const SEARCH_DUBBO_CONSUMER_OR_PROVIDER = 'SEARCH_DUBBO_CONSUMER_OR_PROVIDER'
-export const searchConsumerOrProvider = (type, keyWord) => {
+export const searchConsumerOrProvider = (type, keyWord, data) => {
   return (dispatch, getState) => {
-    const { dubboDetail } = getState().dubbo
-    const nextDubboDetail = Object.assign({}, dubboDetail)
-    const list = nextDubboDetail.data[type]
+    // const { dubboDetail } = getState().dubbo
+    const nextDubboDetail = getDeepValue(getState().dubbo, [ 'dubboDetail' ])
+    const list = getDeepValue(nextDubboDetail.data, [ type ])
     if (!list) return
-    if (keyWord === '') {
-      dispatch({
-        type: SEARCH_DUBBO_CONSUMER_OR_PROVIDER,
-        payload: dubboDetail.dataBackup,
-      })
-      return
-    }
     const filteredData = list.filter(v => v.podName.indexOf(keyWord) >= 0)
     nextDubboDetail.data[type] = filteredData
-
     dispatch({
       type: SEARCH_DUBBO_CONSUMER_OR_PROVIDER,
-      payload: nextDubboDetail.data,
+      payload: data ? data : nextDubboDetail.data,
     })
   }
 }
-
 export const FETCH_SUPPLIER_LIST_REQUEST = 'FETCH_SUPPLIER_LIST_REQUEST'
 export const FETCH_SUPPLIER_LIST_SUCCESS = 'FETCH_SUPPLIER_LIST_SUCCESS'
 export const FETCH_SUPPLIER_LIST_FAILURE = 'FETCH_SUPPLIER_LIST_FAILURE'

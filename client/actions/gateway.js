@@ -323,3 +323,50 @@ const fetchRoutePathExitence = (clusterID, routePath) => {
 
 export const checkRoutePath = (clusterID, routePath) =>
   dispatch => dispatch(fetchRoutePathExitence(clusterID, routePath))
+
+export const GET_GLOBAL_RULE_SETTING_REQUEST = 'GET_GLOBAL_RULE_SETTING_REQUEST'
+export const GET_GLOBAL_RULE_SETTING_SUCCESS = 'GET_GLOBAL_RULE_SETTING_SUCCESS'
+export const GET_GLOBAL_RULE_SETTING_FAILURE = 'GET_GLOBAL_RULE_SETTING_FAILURE'
+
+const fetchGlobalRuleSetting = clusterID => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GLOBAL_RULE_SETTING_REQUEST,
+        GET_GLOBAL_RULE_SETTING_SUCCESS,
+        GET_GLOBAL_RULE_SETTING_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/route/global/sensitiveheaders`,
+      schema: {},
+    },
+  }
+}
+
+export const getGlobalRuleSetting = clusterID =>
+  dispatch => dispatch(fetchGlobalRuleSetting(clusterID))
+
+export const UPDATE_GLOBAL_RULE_SETTING_REQUEST = 'UPDATE_GLOBAL_RULE_SETTING_REQUEST'
+export const UPDATE_GLOBAL_RULE_SETTING_SUCCESS = 'UPDATE_GLOBAL_RULE_SETTING_SUCCESS'
+export const UPDATE_GLOBAL_RULE_SETTING_FAILURE = 'UPDATE_GLOBAL_RULE_SETTING_FAILURE'
+
+const fetchUpdateGlobalRuleSetting = (clusterID, body, options) => {
+  return {
+    options,
+    [CALL_API]: {
+      types: [
+        UPDATE_GLOBAL_RULE_SETTING_REQUEST,
+        UPDATE_GLOBAL_RULE_SETTING_SUCCESS,
+        UPDATE_GLOBAL_RULE_SETTING_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/route/global/sensitiveheaders`,
+      schema: {},
+      options: {
+        method: 'PUT',
+        body,
+      },
+    },
+  }
+}
+
+export const updateGlobalRuleSetting = (clusterID, body, options) =>
+  dispatch => dispatch(fetchUpdateGlobalRuleSetting(clusterID, body, options))

@@ -22,7 +22,8 @@ import {
   METRICS_NETWORK_TRANSMITTED, METRICS_DISK_READ, METRICS_DISK_WRITE,
   UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
 } from '../../../../constants'
-import Metric from '../../../../components/Metric'
+import Metric from '@tenx-ui/monitorChart'
+import '@tenx-ui/monitorChart/assets/index.css'
 import './style/Monitor.less'
 
 const sourceTypeArray = [

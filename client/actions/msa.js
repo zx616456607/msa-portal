@@ -595,7 +595,7 @@ export const DEL_MSA_BLOWN_STRATEGY_REQUEST = 'DEL_MSA_BLOWN_STRATEGY_REQUEST'
 export const DEL_MSA_BLOWN_STRATEGY_SUCCESS = 'DEL_MSA_BLOWN_STRATEGY_SUCCESS'
 export const DEL_MSA_BLOWN_STRATEGY_FAILURE = 'DEL_MSA_BLOWN_STRATEGY_FAILURE'
 
-const delMsaBlownStrategyRequest = (clusterId, microServer) => {
+const delMsaBlownStrategyRequest = (clusterId, serviceName) => {
   return {
     [CALL_API]: {
       types: [
@@ -603,7 +603,7 @@ const delMsaBlownStrategyRequest = (clusterId, microServer) => {
         DEL_MSA_BLOWN_STRATEGY_SUCCESS,
         DEL_MSA_BLOWN_STRATEGY_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/property?microServer=${microServer}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/property?serviceName=${serviceName}`,
       options: {
         method: 'PUT',
       },
@@ -612,8 +612,8 @@ const delMsaBlownStrategyRequest = (clusterId, microServer) => {
   }
 }
 
-export const delMsaBlownStrategy = (clusterId, microServer) =>
-  dispatch => dispatch(delMsaBlownStrategyRequest(clusterId, microServer))
+export const delMsaBlownStrategy = (clusterId, serviceName) =>
+  dispatch => dispatch(delMsaBlownStrategyRequest(clusterId, serviceName))
 
 
 // 获取微服务熔断策略
@@ -621,7 +621,7 @@ export const GET_MSA_BLOWN_STRATEGY_REQUEST = 'GET_MSA_BLOWN_STRATEGY_REQUEST'
 export const GET_MSA_BLOWN_STRATEGY_SUCCESS = 'GET_MSA_BLOWN_STRATEGY_SUCCESS'
 export const GET_MSA_BLOWN_STRATEGY_FAILURE = 'GET_MSA_BLOWN_STRATEGY_FAILURE'
 
-const fetchMsaBlownStrategy = (clusterId, microServer) => {
+const fetchMsaBlownStrategy = (clusterId, serviceName) => {
   return {
     [CALL_API]: {
       types: [
@@ -629,14 +629,14 @@ const fetchMsaBlownStrategy = (clusterId, microServer) => {
         GET_MSA_BLOWN_STRATEGY_SUCCESS,
         GET_MSA_BLOWN_STRATEGY_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule?microServer=${microServer}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/rule?serviceName=${serviceName}`,
       schema: {},
     },
   }
 }
 
-export const getMsaBlownStrategy = (clusterId, microServer) =>
-  dispatch => dispatch(fetchMsaBlownStrategy(clusterId, microServer))
+export const getMsaBlownStrategy = (clusterId, serviceName) =>
+  dispatch => dispatch(fetchMsaBlownStrategy(clusterId, serviceName))
 
 // 检查服务是否可以开启降级
 export const GET_SERVICE_DEMOTE_STATUS_REQUEST = 'GET_SERVICE_DEMOTE_STATUS_REQUEST'
@@ -673,7 +673,7 @@ const fetchDemoteStatus = (clusterId, serviceName) => {
         GET_DEMOTE_STATUS_SUCCESS,
         GET_DEMOTE_STATUS_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/status?microServer=${serviceName}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/status?serviceName=${serviceName}`,
       schema: {},
     },
   }
@@ -695,7 +695,7 @@ const demoteSwitchRequest = (clusterId, query) => {
         DEMOTE_SWITCH_SUCCESS,
         DEMOTE_SWITCH_FAILURE,
       ],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/hystrix/open?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/degrade/open?${toQuerystring(query)}`,
       options: {
         method: 'POST',
       },
@@ -706,4 +706,119 @@ const demoteSwitchRequest = (clusterId, query) => {
 
 export const demoteSwitch = (clusterId, query) =>
   dispatch => dispatch(demoteSwitchRequest(clusterId, query))
+
+// 查询事务列表
+export const GET_DISTRIBUTE_LIST_REQUEST = 'GET_DISTRIBUTE_LIST_REQUEST'
+export const GET_DISTRIBUTE_LIST_SUCCESS = 'GET_DISTRIBUTE_LIST_SUCCESS'
+export const GET_DISTRIBUTE_LIST_FAILURE = 'GET_DISTRIBUTE_LIST_FAILURE'
+
+const fetchDistributeList = (clusterId, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_DISTRIBUTE_LIST_REQUEST,
+        GET_DISTRIBUTE_LIST_SUCCESS,
+        GET_DISTRIBUTE_LIST_FAILURE,
+      ],
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/getTxList?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const getDistributeList = (clusterId, query) =>
+  dispatch => dispatch(fetchDistributeList(clusterId, query))
+
+// 查询子事务
+export const GET_CHILD_TRANSACTION_REQUEST = 'GET_CHILD_TRANSACTION_REQUEST'
+export const GET_CHILD_TRANSACTION_SUCCESS = 'GET_CHILD_TRANSACTION_SUCCESS'
+export const GET_CHILD_TRANSACTION_FAILURE = 'GET_CHILD_TRANSACTION_FAILURE'
+
+const fetchChildTranscation = (clusterId, txName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_CHILD_TRANSACTION_REQUEST,
+        GET_CHILD_TRANSACTION_SUCCESS,
+        GET_CHILD_TRANSACTION_FAILURE,
+      ],
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/queryTxDetails/${txName}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/details/${txName}`,
+      schema: {},
+    },
+  }
+}
+
+export const getChildTranscation = (clusterId, txName) =>
+  dispatch => dispatch(fetchChildTranscation(clusterId, txName))
+
+// 查询事务执行记录概览
+export const GET_EXECUTION_RECORD_OVERVIEW_REQUEST = 'GET_EXECUTION_RECORD_OVERVIEW_REQUEST'
+export const GET_EXECUTION_RECORD_OVERVIEW_SUCCESS = 'GET_EXECUTION_RECORD_OVERVIEW_SUCCESS'
+export const GET_EXECUTION_RECORD_OVERVIEW_FAILURE = 'GET_EXECUTION_RECORD_OVERVIEW_FAILURE'
+
+const fetchExecuctionRecordOverview = clusterID => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_EXECUTION_RECORD_OVERVIEW_REQUEST,
+        GET_EXECUTION_RECORD_OVERVIEW_SUCCESS,
+        GET_EXECUTION_RECORD_OVERVIEW_FAILURE,
+      ],
+      // endpoint: 'http://192.168.1.230:19073/api/v1/tx/overview',
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/overview`,
+      schema: {},
+    },
+  }
+}
+
+export const getExecuctionRecordOverview = clusterId =>
+  dispatch => dispatch(fetchExecuctionRecordOverview(clusterId))
+
+// 查询事务执行记录列表
+export const GET_EXECUTION_RECORD_LIST_REQUEST = 'GET_EXECUTION_RECORD_LIST_REQUEST'
+export const GET_EXECUTION_RECORD_LIST_SUCCESS = 'GET_EXECUTION_RECORD_LIST_SUCCESS'
+export const GET_EXECUTION_RECORD_LIST_FAILURE = 'GET_EXECUTION_RECORD_LIST_FAILURE'
+
+const fetchExecuctionRecordList = (clusterID, query) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_EXECUTION_RECORD_LIST_REQUEST,
+        GET_EXECUTION_RECORD_LIST_SUCCESS,
+        GET_EXECUTION_RECORD_LIST_FAILURE,
+      ],
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/recordList?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export const getExecuctionRecordList = (clusterId, query) =>
+  dispatch => dispatch(fetchExecuctionRecordList(clusterId, query))
+
+// 查询事务执行记录详情
+export const GET_EXECUTION_RECORD_DETAIL_REQUEST = 'GET_EXECUTION_RECORD_DETAIL_REQUEST'
+export const GET_EXECUTION_RECORD_DETAIL_SUCCESS = 'GET_EXECUTION_RECORD_DETAIL_SUCCESS'
+export const GET_EXECUTION_RECORD_DETAIL_FAILURE = 'GET_EXECUTION_RECORD_DETAIL_FAILURE'
+
+const fetchExecuctionRecordDetail = (clusterID, groupId) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_EXECUTION_RECORD_DETAIL_REQUEST,
+        GET_EXECUTION_RECORD_DETAIL_SUCCESS,
+        GET_EXECUTION_RECORD_DETAIL_FAILURE,
+      ],
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/record/${groupId}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions/${groupId}`,
+      schema: {},
+    },
+  }
+}
+
+export const getExecuctionRecordDetail = (clusterId, groupId) =>
+  dispatch => dispatch(fetchExecuctionRecordDetail(clusterId, groupId))
 

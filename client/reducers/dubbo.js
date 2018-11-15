@@ -12,48 +12,6 @@ import * as ActionTypes from '../actions/dubbo'
 import isEmpty from 'lodash/isEmpty';
 import { formatDate } from '../common/utils';
 
-
-const supplierListData = [
-  {
-    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
-    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
-    belong: 'app1',
-    status: '0',
-    type: '1',
-    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
-    id: '234',
-  },
-  {
-    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
-    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
-    belong: 'app1',
-    status: '1',
-    type: '0',
-    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
-    id: '546',
-  },
-]
-const consumerListData = [
-  {
-    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
-    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
-    belong: 'app1',
-    status: '0',
-    type: '1',
-    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
-    id: '234',
-  },
-  {
-    containerName: 'asdhjkhjkkjkllkkljfgdlkjgkldfjk',
-    containerAddress: 'www.fdsfdsrtkgfdmkhlgrjirwjgfkdmlgdfs.com',
-    belong: 'app1',
-    status: '1',
-    type: '0',
-    serviceAddress: 'https://k1lpdq.axshare.com/#g=1&p=%E6%9C%8D%E5%8A%A1%E6%B2%BB%E7%90%86-dubbo%E6%9C%8D%E5%8A%A1%E5%88%97%E8%A1%A8&hi=1',
-    id: '546',
-  },
-]
-
 const dubboList = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -73,6 +31,8 @@ const dubboList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
+        total: 0,
+        data: [],
       }
     default:
       return state
@@ -101,54 +61,6 @@ const dubboDetail = (state = {}, action) => {
       return {
         ...state,
         data: action.payload,
-        isFetching: false,
-      }
-    default:
-      return state
-  }
-}
-const supplierList = (state = {}, action) => {
-  const { type } = action
-  switch (type) {
-    case ActionTypes.FETCH_SUPPLIER_LIST_REQUEST:
-      return {
-        ...state,
-        isFetching: true,
-      }
-    case ActionTypes.FETCH_SUPPLIER_LIST_SUCCESS:
-      return {
-        ...state,
-        isFetching: false,
-        data: supplierListData || [],
-        dataBackup: supplierListData || [],
-      }
-    case ActionTypes.FETCH_SUPPLIER_LIST_FAILURE:
-      return {
-        ...state,
-        isFetching: false,
-      }
-    default:
-      return state
-  }
-}
-const consumerList = (state = {}, action) => {
-  const { type } = action
-  switch (type) {
-    case ActionTypes.FETCH_CONSUMER_LIST_REQUEST:
-      return {
-        ...state,
-        isFetching: true,
-      }
-    case ActionTypes.FETCH_CONSUMER_LIST_SUCCESS:
-      return {
-        ...state,
-        isFetching: false,
-        data: supplierListData || [],
-        dataBackup: consumerListData || [],
-      }
-    case ActionTypes.FETCH_CONSUMER_LIST_FAILURE:
-      return {
-        ...state,
         isFetching: false,
       }
     default:
@@ -288,8 +200,6 @@ const dubbo = (state = {
 }, action) => ({
   dubboList: dubboList(state.dubboList, action),
   dubboDetail: dubboDetail(state.dubboDetail, action),
-  supplierList: supplierList(state.supplierList, action),
-  consumerList: consumerList(state.consumerList, action),
   dubboInstanceMonitor: dubboInstanceMonitor(state.dubboInstanceMonitor, action),
   dubboInstanceRealTimeMonitor: dubboInstanceRealTimeMonitor(
     state.dubboInstanceRealTimeMonitor, action),

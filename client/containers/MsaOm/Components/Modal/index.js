@@ -70,9 +70,6 @@ class MsaModal extends React.Component {
     }
     const finalClusterId = currentComponent.clusterId || clusterId
     const name = currentComponent.component || 'dsb-server'
-    if (name === 'dsb-server') {
-      body.namespace = currentComponent.namespace
-    }
     const result = await manualScaleComponent(finalClusterId, name, body)
     if (result.error) {
       this.setState({

@@ -232,6 +232,7 @@ class CallLinkTracking extends React.Component {
       title: '状态',
       dataIndex: 'success',
       width: '10%',
+      filterMultiple: false,
       filters: [{
         text: '成功', value: true,
       }, {
@@ -328,7 +329,19 @@ class CallLinkTracking extends React.Component {
             </Col>
             <Col span={4}>
               <FormItem>
-                {getFieldDecorator('traceId', {})(
+                {getFieldDecorator('traceId', {
+                  rules: [
+                    {
+                      validator: (rule, value, cb) => {
+                        const reg = /[f-zA-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F\u4e00-\u9fa5]/g
+                        if (value !== '' && reg.test(value)) cb('输入的字符只能是 0-9 a-e（16进制）')
+                        if (value.length > 32) cb('长度不超过32位')
+                        cb()
+                      },
+                    },
+                  ],
+
+                })(
                   <div>
                     <Input placeholder="Trace ID，其它条件设置无效" className="trace" />
                   </div>

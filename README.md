@@ -283,10 +283,11 @@ hideService = record => {
 ```
 #### 6.请求错误时，需要在自定义错误提示信息，关闭全局错误提示
 
-在对应的action里传递一个options，内容为{ isHandleError: true }，即可关掉全局错误提示. [相关commit](http://gitlab.tenxcloud.com/enterprise-2.0/msa-portal/commit/9efdfab90287b2b370931b0f3a72b7b8cd76a6d6)
+在对应的 `action` 里传递一个 `options`，内容为 `{ isHandleError: true }`，即可关掉全局错误提示. [相关commit](http://gitlab.tenxcloud.com/enterprise-2.0/msa-portal/commit/9efdfab90287b2b370931b0f3a72b7b8cd76a6d6)
 
 * action
-```js
+
+``` js
 export const EXAMPLE_REQUEST = 'EXAMPLE_REQUEST'
 export const EXAMPLE_SUCCESS = 'EXAMPLE_SUCCESS'
 export const EXAMPLE_FAILURE = 'EXAMPLE_FAILURE'
@@ -310,8 +311,10 @@ export const exampleAction = options =>
  dispatch => dispatch(exampleFunction(options))
 
 ```
+
 * component
-```js
+
+``` js
 const { exampleAction } = this.props
 exampleAction({ isHandleError: true })
 ```

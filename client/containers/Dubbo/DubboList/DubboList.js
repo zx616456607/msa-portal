@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Card, Table, Button, Input, Pagination } from 'antd'
+import { Card, Table, Button, Input, Pagination, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { formatDate } from '../../../common/utils';
@@ -90,15 +90,24 @@ class DubboList extends React.Component {
     ],
   }
   componentDidMount() {
+    this.getData()
+  }
+  getData = async () => {
     const { getDubboList, clusterId } = this.props
-    getDubboList(clusterId)
+    const result = await getDubboList(clusterId, { isHandleError: true })
+    if (result.error) {
+      notification.warning({
+        message: '列表请求出错',
+      })
+    }
+
   }
   render() {
-    const { dubboList, getDubboList, clusterId } = this.props
+    const { dubboList } = this.props
     return <div className="dubbo-list">
       <div className="dubbo-list-top">
         <div>
-          <Button icon="sync" onClick={() => getDubboList(clusterId)}>刷新</Button>
+          <Button icon="sync" onClick={() => this.getData()}>刷新</Button>
           <Input style={{ width: 200, marginLeft: 16 }} placeholder="请输入服务名称搜索"/>
         </div>
         <div className="pagination">

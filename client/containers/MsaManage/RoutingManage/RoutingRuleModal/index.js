@@ -10,7 +10,7 @@
  * @author zhangxuan
  */
 import React from 'react'
-import { Input, Modal, Form, Switch, Radio, Select, notification, Tooltip, Icon } from 'antd'
+import { Input, Modal, Form, Switch, Radio, Select, notification, Tooltip, Icon, Row, Col } from 'antd'
 import { connect } from 'react-redux'
 import {
   APP_NAME_REG,
@@ -24,24 +24,31 @@ import * as gateWayAction from '../../../../actions/gateway'
 import {
   msaListSlt,
 } from '../../../../selectors/msa'
+import { getDeepValue, sleep } from '../../../../common/utils'
+import isEmpty from 'lodash/isEmpty';
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 const Option = Select.Option
+let uidd = 0
 
 class RoutingRuleModal extends React.Component {
   state = {
     confirmLoading: false,
+    globalData: { keys: [] },
+    diyData: { keys: [ 0 ] },
   }
 
-  componentDidMount() {
-    const { currentRoute, form } = this.props
+  async componentDidMount() {
+    const { currentRoute, form, getGlobalRuleSetting, clusterID } = this.props
     this.loadMsaList()
+    await getGlobalRuleSetting(clusterID)
+    this.initForm()
     if (currentRoute) {
       const { setFieldsValue, resetFields } = form
       resetFields()
       const {
-        routeId, path, serviceId, url, description,
+        routeId, path, serviceId, url, description, stripPrefix,
         retryable, status,
       } = currentRoute
       const msaUrlType = url ? 'url' : 'id'
@@ -50,7 +57,7 @@ class RoutingRuleModal extends React.Component {
         routeId,
         path,
         description,
-        // stripPrefix,
+        stripPrefix,
         retryable,
         status,
       }
@@ -65,6 +72,26 @@ class RoutingRuleModal extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.form.resetFields()
+  }
+
+  initForm = () => {
+    const { globalRule } = this.props
+    const headers = globalRule.split(',')
+    if (isEmpty(globalRule) || isEmpty(headers)) {
+      return
+    }
+    const globalData = { keys: [] }
+    headers.forEach((item, index) => {
+      globalData.keys.push(index)
+      globalData[`header-${index}`] = item
+    })
+    this.setState({
+      globalData,
+    })
+  }
+
   loadMsaList = () => {
     const { getMsaList, clusterID } = this.props
     getMsaList(clusterID)
@@ -73,7 +100,7 @@ class RoutingRuleModal extends React.Component {
   confirmModal = () => {
     const {
       clusterID, form, addGatewayRoute, onCancel, loadRoutesList, currentRoute,
-      updateGatewayRoute,
+      updateGatewayRoute, globalRule,
     } = this.props
     const { validateFields, getFieldValue } = form
     const validateArray = [
@@ -81,9 +108,10 @@ class RoutingRuleModal extends React.Component {
       'path',
       'msa-url-type',
       'description',
-      // 'stripPrefix',
+      'stripPrefix',
       'retryable',
       'status',
+      'headerFlag',
     ]
     const urlType = getFieldValue('msa-url-type')
     if (urlType === 'id') {
@@ -91,16 +119,45 @@ class RoutingRuleModal extends React.Component {
     } else {
       validateArray.push('url')
     }
+    const headerFlag = getFieldValue('headerFlag')
+    if (headerFlag === 'custom') {
+      validateArray.push('keys')
+      const keys = getFieldValue('keys')
+      keys.forEach(key => {
+        validateArray.push(`header-${key}`)
+      })
+    }
     validateFields(validateArray, (err, values) => {
       if (err) {
         return
       }
-      const body = Object.assign({}, values)
+      const body = Object.assign({}, {
+        routeId: values.routeId,
+        path: values.path,
+        description: values.description,
+        stripPrefix: values.stripPrefix,
+        retryable: values.retryable,
+        status: values.status,
+        url: values.url,
+        serviceId: values.serviceId,
+        headerFlag: values.headerFlag,
+        sensitiveHeaders: globalRule,
+      })
       delete body['msa-url-type']
       if (values['msa-url-type'] === 'id') {
         delete body.url
       } else {
         delete body.serviceId
+      }
+      const sensitiveHeaders = []
+      if (values.headerFlag === 'custom') {
+        const keys = values.keys
+        keys.forEach(key => {
+          sensitiveHeaders.push(values[`header-${key}`])
+        })
+        Object.assign(body, {
+          sensitiveHeaders: sensitiveHeaders.join(),
+        })
       }
       this.setState({
         confirmLoading: true,
@@ -246,9 +303,154 @@ class RoutingRuleModal extends React.Component {
     }
     cb()
   }
+
+  addHeader = () => {
+    const { getFieldValue, setFieldsValue, validateFields } = this.props.form
+    const keys = getFieldValue('keys')
+    const validateArray = []
+    if (!isEmpty(keys)) {
+      keys.forEach(key => {
+        validateArray.push(`header-${key}`)
+      })
+    }
+    validateFields(validateArray, errors => {
+      if (errors) {
+        return
+      }
+      uidd++
+      setFieldsValue({
+        keys: keys.concat(uidd),
+      })
+      this.setState(({ diyData }) => {
+        return {
+          diyData: {
+            ...diyData,
+            keys: keys.concat(uidd),
+            [`header-${uidd}`]: '',
+          },
+        }
+      })
+    })
+  }
+
+  removeHeader = key => {
+    const { getFieldValue, setFieldsValue } = this.props.form
+    const keys = getFieldValue('keys')
+    setFieldsValue({
+      keys: keys.filter(_key => _key !== key),
+    })
+    this.setState(({ diyData }) => {
+      delete diyData[`header-${key}`]
+      return {
+        diyData: {
+          ...diyData,
+          keys: keys.filter(_key => _key !== key),
+        },
+      }
+    })
+  }
+
+  checkHeader = (rules, value, callback, key) => {
+    const { getFieldValue } = this.props.form
+    const keys = getFieldValue('keys')
+    const currentHeader = getFieldValue(`header-${key}`)
+    const isExisted = keys
+      .filter(_key => key !== _key)
+      .some(_key => currentHeader === getFieldValue(`header-${_key}`))
+    if (isExisted) {
+      return callback('Header 名称重复')
+    }
+    callback()
+  }
+
+  headerChange = (value, key) => {
+    this.setState(({ diyData }) => {
+      return {
+        diyData: {
+          ...diyData,
+          [`header-${key}`]: value,
+        },
+      }
+    })
+  }
+
+  renderHeaders = () => {
+    const { globalData, diyData } = this.state
+    const { form } = this.props
+    const { getFieldValue, getFieldDecorator } = form
+    const keys = getFieldValue('keys')
+    const type = getFieldValue('headerFlag')
+    if (isEmpty(keys)) {
+      return
+    }
+    const formItemLayout = {
+      wrapperCol: { offset: 6, span: 18 },
+    }
+    return keys.map(key => {
+      return <FormItem
+        {...formItemLayout}
+      >
+        <Row gutter={8}>
+          <Col span={20}>
+            {
+              getFieldDecorator(`header-${key}`, {
+                rules: [{
+                  required: true,
+                  whitespace: true,
+                  message: 'Header 名称不能为空',
+                }, {
+                  validator: (rules, value, callback) =>
+                    this.checkHeader(rules, value, callback, key),
+                }],
+                initialValue: type === 'global' ? globalData[`header-${key}`] : diyData[`header-${key}`],
+                onChange: e => this.headerChange(e.target.value, key),
+              })(
+                <Input disabled={type === 'global'}/>
+              )
+            }
+          </Col>
+          <Col span={4}>
+            {
+              type === 'custom' &&
+              <Icon type={'delete'} className="pointer" onClick={() => this.removeHeader(key)}/>
+            }
+          </Col>
+        </Row>
+      </FormItem>
+    })
+  }
+
+  changeHeaderType = async e => {
+    const { globalData, diyData } = this.state
+    const { form } = this.props
+    const { setFieldsValue, getFieldValue, resetFields } = form
+    const { value } = e.target
+    const resetArray = [ 'keys' ]
+    const keys = getFieldValue('keys')
+    keys.forEach(key => {
+      resetArray.push(`header-${key}`)
+    })
+    resetFields(resetArray)
+    await sleep()
+    if (value === 'global') {
+      setFieldsValue({
+        ...globalData,
+      })
+      return
+    }
+    setFieldsValue({
+      ...diyData,
+    })
+  }
+
   render() {
+    const { globalData, diyData } = this.state
     const { form, msaList, visible, onCancel, currentRoute } = this.props
     const { getFieldDecorator, getFieldValue } = form
+    const headerFlag = getFieldValue('headerFlag')
+    getFieldDecorator('keys', {
+      initialValue: headerFlag === 'global' ? globalData.keys : diyData.keys,
+    })
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 16 },
@@ -260,8 +462,8 @@ class RoutingRuleModal extends React.Component {
         <Tooltip overlayClassName="routingTooltip" title={(
           <div>
             <div key="notice-1">精确匹配 (/demo): 路径必须精确匹配/demo</div>
-            <div key="notice-2">单级目录 (/demo/*): 路由路径可匹配单级目录</div>
-            <div key="notice-3">多级目录 (/demo/**): 路由路径可匹配多级目录</div>
+            <div key="notice-2">单级目录 (/demo/<span>*</span>): 路由路径可匹配单级目录</div>
+            <div key="notice-3">多级目录 (/demo/<span>**</span>): 路由路径可匹配多级目录</div>
           </div>
         )}>
           <Icon type="question-circle-o" />
@@ -354,11 +556,12 @@ class RoutingRuleModal extends React.Component {
             <Input.TextArea placeholder="请填写路由规则描述" />
           )}
         </FormItem>
-        {/* <FormItem {...formItemLayout} label="去掉路径前缀">
+        <FormItem {...formItemLayout} label="去掉路径前缀">
           {getFieldDecorator('stripPrefix', { valuePropName: 'checked' })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
           )}
-        </FormItem> */}
+          <span className="empty-text">&nbsp;&nbsp;若开启去掉前缀，请求转发时将去掉路由路径中前缀</span>
+        </FormItem>
         <FormItem {...formItemLayout} label="失败重试机制">
           {getFieldDecorator('retryable', { valuePropName: 'checked' })(
             <Switch checkedChildren="开" unCheckedChildren="关" />
@@ -384,6 +587,40 @@ class RoutingRuleModal extends React.Component {
             </Select>
           )}
         </FormItem> */}
+        <Row>
+          <Col span={6} style={{ textAlign: 'right' }}>
+            敏感 Header：
+          </Col>
+          <Col span={16} className="empty-text">不向下游的服务传递以下敏感 Header，若未添加敏 感 Header 代表向下游服务传递所有 Header</Col>
+        </Row>
+        <FormItem
+          wrapperCol={{
+            offset: formItemLayout.labelCol.span,
+            span: formItemLayout.wrapperCol.span,
+          }}
+          label={''}
+        >
+          {getFieldDecorator('headerFlag', {
+            initialValue: 'global',
+            onChange: this.changeHeaderType,
+          })(
+            <RadioGroup>
+              <Radio value="global">全局默认敏感 Header</Radio>
+              <Radio value="custom">自定义服务敏感 Header</Radio>
+            </RadioGroup>
+          )}
+        </FormItem>
+        {this.renderHeaders()}
+        {
+          headerFlag === 'custom' &&
+          <Row>
+            <Col offset={6} className="primary-color">
+              <span onClick={this.addHeader} className="pointer">
+                <Icon type="plus-circle"/> 添加 Header
+              </span>
+            </Col>
+          </Row>
+        }
       </Modal>
     )
   }
@@ -392,9 +629,11 @@ class RoutingRuleModal extends React.Component {
 const mapStateToProps = state => {
   const { current } = state
   const { id } = current.config.cluster
+  const globalRule = getDeepValue(state, [ 'gateway', 'globalRuleSetting', 'headers' ])
   return {
     clusterID: id,
     ...msaListSlt(state),
+    globalRule,
   }
 }
 
@@ -404,4 +643,5 @@ export default connect(mapStateToProps, {
   updateGatewayRoute: gateWayAction.updateGatewayRoute,
   checkRouteName: gateWayAction.checkRouteName,
   checkRoutePath: gateWayAction.checkRoutePath,
+  getGlobalRuleSetting: gateWayAction.getGlobalRuleSetting,
 })(Form.create()(RoutingRuleModal))

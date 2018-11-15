@@ -344,18 +344,131 @@ const msaBlownStrategy = (state = {}, action) => {
         isFetching: false,
         data: {},
       }
-    case ActionTypes.SET_BLOWN_MONITOR:
+    default:
+      return state
+  }
+}
+
+const distributeList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_DISTRIBUTE_LIST_REQUEST:
       return {
-        data: JSON.parse(action.data),
+        ...state,
+        isFetching: true,
       }
-    case ActionTypes.CLEAR_BLOWN_MONITOR:
+    case ActionTypes.GET_DISTRIBUTE_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.content,
+        count: action.response.result.count,
+      })
+    case ActionTypes.GET_DISTRIBUTE_LIST_FAILURE:
       return {
-        data: {},
+        isFetching: false,
+        data: [],
+        count: 0,
       }
     default:
       return state
   }
 }
+
+const childTranscation = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_CHILD_TRANSACTION_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_CHILD_TRANSACTION_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.content,
+      })
+    case ActionTypes.GET_CHILD_TRANSACTION_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+      }
+    default:
+      return state
+  }
+}
+
+const executionRecordOverview = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.content,
+      })
+    case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+      }
+    default:
+      return state
+  }
+}
+
+const executionRecordList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.content,
+        count: action.response.result.count,
+      })
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+        count: 0,
+      }
+    default:
+      return state
+  }
+}
+
+const executionRecordDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_SUCCESS:
+
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.content,
+      })
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+      }
+    default:
+      return state
+  }
+}
+
 
 const msa = (state = {
   msaNameList: {},
@@ -370,6 +483,20 @@ const msa = (state = {
   msaBlownClusters: {},
   msaBlownMonitor: {},
   msaBlownStrategy: {},
+  distributeList: {},
+  childTranscation: {},
+  executionRecordOverview: {
+    isFetching: false,
+    data: {},
+  },
+  executionRecordList: {
+    isFetching: false,
+    data: [],
+  },
+  executionRecordDetail: {
+    isFetching: false,
+    data: [],
+  },
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
@@ -384,6 +511,11 @@ const msa = (state = {
     msaBlownClusters: msaBlownClusters(state.msaBlownClusters, action),
     msaBlownMonitor: msaBlownMonitor(state.msaBlownMonitor, action),
     msaBlownStrategy: msaBlownStrategy(state.msaBlownStrategy, action),
+    distributeList: distributeList(state.distributeList, action),
+    childTranscation: childTranscation(state.childTranscation, action),
+    executionRecordOverview: executionRecordOverview(state.executionRecordOverview, action),
+    executionRecordList: executionRecordList(state.executionRecordList, action),
+    executionRecordDetail: executionRecordDetail(state.executionRecordDetail, action),
   }
 }
 
