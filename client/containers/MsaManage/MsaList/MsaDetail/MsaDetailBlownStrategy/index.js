@@ -206,7 +206,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
               blownOpen ?
                 <div className="alert">
                   <TenxIcon type="tips"/>
-                  添加熔断策略，支持设置开启或关闭熔断策略
+                  添加熔断策略，支持设置开启或关闭熔断策略, 若降级和熔断同时开启时，将执行降级策略
                 </div>
                 :
                 <div className="alert warning">

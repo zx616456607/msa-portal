@@ -68,7 +68,7 @@ class MsaDetailDemote extends React.Component {
               demoteEnabled ?
                 <div className="alert">
                   <TenxIcon type="tips"/>
-                  开启后，服务本身的降级策略生效，直到关闭策略；若服务本身未设置降级策略，开关不生效
+                  开启后，服务本身的降级策略生效，直到关闭策略；若服务本身未设置降级策略，开关不生效, 若降级和熔断同时开启时，将执行降级策略
                 </div>
                 :
                 <div className="alert warning">
