@@ -125,7 +125,7 @@ class DistributedList extends React.Component {
           <Button icon="sync" onClick={this.getData}>刷新</Button>
           <Search
             style={{ width: 200 }}
-            placeholder="请输入事务名称搜索"
+            placeholder="请输入父事务别名搜索"
             onChange={e => {
               this.setState({
                 txName: e.target.value,

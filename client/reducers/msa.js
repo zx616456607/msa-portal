@@ -360,7 +360,7 @@ const distributeList = (state = {}, action) => {
     case ActionTypes.GET_DISTRIBUTE_LIST_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.data,
+        data: action.response.result.content,
         count: action.response.result.count,
       })
     case ActionTypes.GET_DISTRIBUTE_LIST_FAILURE:
@@ -385,7 +385,7 @@ const childTranscation = (state = {}, action) => {
     case ActionTypes.GET_CHILD_TRANSACTION_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.data,
+        data: action.response.result.content,
       })
     case ActionTypes.GET_CHILD_TRANSACTION_FAILURE:
       return {
@@ -408,7 +408,7 @@ const executionRecordOverview = (state = {}, action) => {
     case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.data,
+        data: action.response.result.content,
       })
     case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_FAILURE:
       return {
@@ -431,7 +431,7 @@ const executionRecordList = (state = {}, action) => {
     case ActionTypes.GET_EXECUTION_RECORD_LIST_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.data,
+        data: action.response.result.content,
         count: action.response.result.count,
       })
     case ActionTypes.GET_EXECUTION_RECORD_LIST_FAILURE:
@@ -444,71 +444,7 @@ const executionRecordList = (state = {}, action) => {
       return state
   }
 }
-const mockData = [
-  {
-    txName: 'NewDemoOrder',
-    methodName: 'public boolean com.tenxcloud.order.service.impl.OrderServiceImpl.addOrder(java.lang.Integer,java.lang.Integer)',
-    appName: 'lcn-mybatis-order-service',
-    appIpAddress: '127.0.0.1:9002',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-  {
-    txName: 'NewDemoAccount',
-    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
-    appName: 'lcn-mybatis-account-service',
-    appIpAddress: '127.0.0.1:9001',
-    isCommit: 1,
-  },
-]
+
 const executionRecordDetail = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -521,8 +457,7 @@ const executionRecordDetail = (state = {}, action) => {
 
       return Object.assign({}, state, {
         isFetching: false,
-        data: mockData,
-        // data: action.response.result.data,
+        data: action.response.result.content,
       })
     case ActionTypes.GET_EXECUTION_RECORD_DETAIL_FAILURE:
       return {

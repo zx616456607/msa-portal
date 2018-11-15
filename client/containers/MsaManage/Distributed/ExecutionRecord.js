@@ -30,20 +30,20 @@ class ExecutionRecord extends React.Component {
     historyRecord: [
       {
         item: '成功事务',
-        count: 40,
+        count: 0,
       },
       {
         item: '回滚事务',
-        count: 60,
+        count: 0,
       }],
     currentRecord: [
       {
         item: '成功事务',
-        count: 13,
+        count: 0,
       },
       {
         item: '回滚事务',
-        count: 80,
+        count: 0,
       }],
     columns: [
       {
@@ -351,7 +351,7 @@ class ExecutionRecord extends React.Component {
             <div className="left">
               <Button type="sync" onClick={this.getListData}>刷新</Button>
               <Search
-                placeholder="请输入事务名称搜索"
+                placeholder="请输入父事务别名搜索"
                 style={{ width: 200 }}
                 onChange={e => {
                   this.setState({
