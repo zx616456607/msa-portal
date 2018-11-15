@@ -721,7 +721,7 @@ const fetchDistributeList = (clusterId, query) => {
         GET_DISTRIBUTE_LIST_FAILURE,
       ],
       // endpoint: `http://192.168.1.230:19073/api/v1/tx/getTxList?${toQuerystring(query)}`,
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/groups?${toQuerystring(query)}`,
       schema: {},
     },
   }
@@ -790,7 +790,7 @@ const fetchExecuctionRecordList = (clusterID, query) => {
         GET_EXECUTION_RECORD_LIST_FAILURE,
       ],
       // endpoint: `http://192.168.1.230:19073/api/v1/tx/recordList?${toQuerystring(query)}`,
-      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions?${toQuerystring(query)}`,
       schema: {},
     },
   }

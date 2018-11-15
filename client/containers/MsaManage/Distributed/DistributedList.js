@@ -40,6 +40,7 @@ class DistributedList extends React.Component {
       {
         title: '超时时间(ms)',
         dataIndex: 'timeout',
+        render: text => text || '-',
       },
       {
         title: '首次运行时间',
