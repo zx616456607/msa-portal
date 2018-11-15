@@ -1,23 +1,29 @@
 import React from 'react'
-import { Card, Row, Col, Table, Button, Spin } from 'antd'
+import { Card, Row, Col, Table, Button, Spin, Icon, Input, Tooltip as AntdTooltip, Pagination, Modal } from 'antd'
 import { Chart, Geom, Axis, Tooltip, Coord, Legend } from 'bizcharts'
 import { connect } from 'react-redux'
 import DataSet from '@antv/data-set'
+import Ellipsis from '@tenx-ui/ellipsis'
 import { formatDate } from '../../../common/utils'
-import { getExecuctionRecordOverview } from '../../../actions/msa'
+import { getExecuctionRecordOverview, getExecuctionRecordList, getExecuctionRecordDetail } from '../../../actions/msa'
 import './style/ExecutionRecord.less'
 
+const Search = Input.Search
 @connect(state => {
   const { current, msa } = state
   const { cluster } = current.config
-  const { executionRecordOverview } = msa
+  const { executionRecordOverview, executionRecordList, executionRecordDetail } = msa
   const clusterID = cluster.id
   return {
     clusterID,
     executionRecordOverview,
+    executionRecordList,
+    executionRecordDetail,
   }
 }, {
   getExecuctionRecordOverview,
+  getExecuctionRecordList,
+  getExecuctionRecordDetail,
 })
 class ExecutionRecord extends React.Component {
   state = {
@@ -42,28 +48,36 @@ class ExecutionRecord extends React.Component {
     columns: [
       {
         title: '事务记录ID',
-        dataIndex: 'recordId',
+        dataIndex: 'groupId',
       },
       {
-        title: <span>父事务名称</span>,
-        dataIndex: 'parentName',
+        title: <span>
+          <span style={{ marginRight: 8 }}>父事务名称</span>
+          <AntdTooltip title="事务发起者方法名">
+            <Icon type="question-circle-o"/>
+          </AntdTooltip>
+        </span>,
+        dataIndex: 'methodName',
       },
       {
         title: '父事务别名',
-        dataIndex: 'parentOtherName',
+        dataIndex: 'txName',
       },
       {
         title: '父事务地址',
-        dataIndex: 'parentAddress',
+        dataIndex: 'address',
+        render: text => <Ellipsis>{text}</Ellipsis>,
       },
       {
         title: '子事务数量',
-        dataIndex: 'subNum',
+        dataIndex: 'detailCount',
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        render: text => <span className={this.compiledStatusClassName(text)}>{text}</span>,
+        dataIndex: 'state',
+        render: text => <span className={this.transformStatusClassName(text)}>
+          {this.transformStatusText(text)}
+        </span>,
       },
       {
         title: '开始时间',
@@ -71,20 +85,70 @@ class ExecutionRecord extends React.Component {
         render: text => <span>{formatDate(text)}</span>,
       },
       {
-        title: '运行持续时间',
+        title: '运行持续时间(ms)',
         dataIndex: 'runTime',
+        render: (col, row) => {
+          return (row.endTime - row.startTime) < 0 ? '-' : (row.endTime - row.startTime)
+        },
       },
       {
         title: '操作',
         dataIndex: 'operation',
-        render: () => <Button type="primary">执行详情</Button>,
+        render: (col, row) => <Button type="primary" onClick={() => this.getRecordDetail(row)} >执行详情</Button>,
       },
     ],
+    detailColumns: [
+      {
+        title: '子事务方法名',
+        dataIndex: 'methodName',
+        render: text => this.fixedWidthContent(text),
+        width: 130,
+      },
+      {
+        title: '子事务别名',
+        dataIndex: 'txName',
+        render: text => this.fixedWidthContent(text),
+        width: 130,
+      },
+      {
+        title: '子事务地址',
+        dataIndex: 'appIpAddress',
+        render: text => this.fixedWidthContent(text),
+        width: 130,
+      },
+    ],
+    page: 1,
+    size: 20,
+    txName: '',
+    detailVisible: false,
+    transactionStatus: '',
   }
   componentDidMount() {
     const { getExecuctionRecordOverview, clusterID } = this.props
-    getExecuctionRecordOverview(clusterID)
-    this.convertOverviewData()
+    getExecuctionRecordOverview(clusterID).then(res => {
+      if (!res.error) {
+        this.convertOverviewData()
+      }
+    })
+    this.getListData()
+  }
+  fixedWidthContent = text => <div className="child-table-fixed-width">
+    <Ellipsis>{text}</Ellipsis>
+  </div>
+  getListData = () => {
+    const { txName, size, page } = this.state
+    const { clusterID, getExecuctionRecordList } = this.props
+    const query = { txName, size, page }
+    getExecuctionRecordList(clusterID, query)
+  }
+  getRecordDetail = data => {
+    const { groupId, state } = data
+    const { clusterID, getExecuctionRecordDetail } = this.props
+    this.setState({
+      transactionStatus: state,
+    })
+    getExecuctionRecordDetail(clusterID, groupId)
+    this.setState({ detailVisible: true })
   }
   convertOverviewData = () => {
     const { executionRecordOverview } = this.props
@@ -116,8 +180,9 @@ class ExecutionRecord extends React.Component {
       })
     }
   }
-  executionChartRender = data => {
-
+  executionChartRender = chartData => {
+    let data = []
+    data = JSON.parse(JSON.stringify(chartData))
     for (const v of data) {
       v.item = `${v.item}：${v.count}个`
     }
@@ -151,65 +216,97 @@ class ExecutionRecord extends React.Component {
         },
       },
     };
+    const noData = data.filter(v => v.count !== 0).length === 0
     return (
       <div>
-        <Chart
-          height={200}
-          data={dv}
-          scale={cols}
-          padding={paddings}
-          forceFit
-        >
-          <Coord type={'theta'} radius={0.65} innerRadius={0.75} />
-          <Axis name="percent" />
-          <Legend
-            position="right"
-            marker="square"
-            offsetY={legendOffsetY}
-            offsetX={legendOffsetX}
-            textStyle = { legendTextStyle }
-          />
-          <Tooltip
-            showTitle={false}
-            itemTpl="<li><span style=&quot;background-color:{color};&quot; class=&quot;g2-tooltip-marker&quot;></span>{name}</li>"
-          />
-          <Geom
-            type="intervalStack"
-            position="percent"
-            color={colors}
-            tooltip={[
-              'item*percent',
-              (item, percent) => {
-                percent = percent * 100 + '%';
-                return {
-                  name: item,
-                  value: percent,
-                };
-              },
-            ]}
-            style={{
-              lineWidth: 1,
-              stroke: '#fff',
-            }}
-          >
-          </Geom>
-        </Chart>
+        {
+          noData ?
+            <div className="no-data"><Icon type="frown-o" /> 暂无数据</div>
+            :
+            <Chart
+              height={200}
+              data={dv}
+              scale={cols}
+              padding={paddings}
+              forceFit
+            >
+              <Coord type={'theta'} radius={0.65} innerRadius={0.75} />
+              <Axis name="percent" />
+              <Legend
+                position="right"
+                marker="square"
+                offsetY={legendOffsetY}
+                offsetX={legendOffsetX}
+                textStyle = { legendTextStyle }
+              />
+              <Tooltip
+                showTitle={false}
+                itemTpl="<li><span style=&quot;background-color:{color};&quot; class=&quot;g2-tooltip-marker&quot;></span>{name}</li>"
+              />
+              <Geom
+                type="intervalStack"
+                position="percent"
+                color={colors}
+                tooltip={[
+                  'item*percent',
+                  (item, percent) => {
+                    percent = percent * 100 + '%';
+                    return {
+                      name: item,
+                      value: percent,
+                    };
+                  },
+                ]}
+                style={{
+                  lineWidth: 1,
+                  stroke: '#fff',
+                }}
+              >
+              </Geom>
+            </Chart>
+        }
       </div>
     )
   }
-  compiledStatusClassName = text => {
+  transformStatusClassName = text => {
     switch (text) {
-      case 0:
-        return 'success'
       case 1:
-        return 'failed'
+        return 'execution-record-status execution-record-success'
+      case 0:
+        return 'execution-record-status execution-record-failed'
       default:
-        return 'default'
+        return 'execution-record-status execution-record-default'
     }
   }
+  transformStatusText = text => {
+    switch (text) {
+      case 1:
+        return '成功'
+      case 0:
+        return '回滚'
+      default:
+        return '未知'
+    }
+  }
+  changePage = (page, size) => {
+    this.setState({
+      page,
+      size,
+    }, () => {
+      this.getListData()
+    })
+  }
   render() {
-    const { historyRecord, currentRecord, columns } = this.state
-    const { executionRecordOverview } = this.props
+    const {
+      historyRecord,
+      currentRecord,
+      columns,
+      size,
+      page,
+      detailVisible,
+      detailColumns,
+      transactionStatus } = this.state
+    const { executionRecordOverview, executionRecordList, executionRecordDetail } = this.props
     const { isFetching } = executionRecordOverview
     return <div className="execution-record">
       <div className="overview">
@@ -250,11 +347,62 @@ class ExecutionRecord extends React.Component {
           事务执行记录
         </div>
         <Card>
+          <div className="operation">
+            <div className="left">
+              <Button type="sync" onClick={this.getListData}>刷新</Button>
+              <Search
+                placeholder="请输入事务名称搜索"
+                style={{ width: 200 }}
+                onChange={e => {
+                  this.setState({
+                    txName: e.target.value,
+                  })
+                }}
+                onSearch={() => this.getListData()}
+              />
+            </div>
+            <div className="right">
+              <Pagination
+                simple
+                current={page}
+                onChange={this.changePage}
+                pageSize={size}
+                total={executionRecordList.count || 0}/>
+            </div>
+          </div>
           <Table
             columns={columns}
+            loading={executionRecordList.isFetching}
+            dataSource={executionRecordList.data}
+            pagination={false}
           />
         </Card>
       </div>
+      <Modal
+        title="执行详情"
+        visible={detailVisible}
+        onCancel={() => this.setState({ detailVisible: false })}
+        width={800}
+        footer={[
+          <Button type="primary" onClick={() => this.setState({ detailVisible: false })}>知道了</Button>,
+        ]}
+      >
+        <div className="execution-record-detail-modal">
+          <div className="transaction-status">
+            <span style={{ marginRight: 40 }}>事务状态</span>
+            <span className={this.transformStatusClassName(transactionStatus)}>
+              {this.transformStatusText(transactionStatus)}
+            </span>
+          </div>
+          <Table
+            columns={detailColumns}
+            loading={executionRecordDetail.isFetching}
+            dataSource={executionRecordDetail.data}
+            scroll={{ y: 300 }}
+            pagination={false}
+          />
+        </div>
+      </Modal>
     </div>
   }
 }

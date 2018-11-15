@@ -69,7 +69,8 @@ class MsaList extends React.Component {
     const { addExpulsionsManualrules, clusterID } = this.props
     const self = this
     confirm({
-      title: `确认将服务 ${record.appName} 隐藏吗？`,
+      className: 'msa-list-hide',
+      title: `确认将服务${record.appName} 隐藏吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -84,7 +85,7 @@ class MsaList extends React.Component {
             setTimeout(() => {
               resolve()
               notification.success({
-                message: '隐藏服务成功',
+                message: '已成功将该服务标记为不可被发现，稍后服务会从后台隐藏。',
               })
               self.loadMsaList()
             }, 3000)

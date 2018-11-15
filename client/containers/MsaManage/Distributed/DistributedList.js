@@ -5,6 +5,7 @@ import Ellipsis from '@tenx-ui/ellipsis'
 import { getDistributeList, getChildTranscation } from '../../../actions/msa'
 import { formatDate } from '../../../common/utils';
 import './style/DistributedList.less'
+
 const Search = Input.Search
 
 @connect(state => {
@@ -53,15 +54,15 @@ class DistributedList extends React.Component {
     ],
     page: 1,
     size: 20,
-    name: '',
+    txName: '',
   }
   componentDidMount() {
     this.getData()
   }
   getData = () => {
-    const { page, size, name } = this.state
+    const { page, size, txName } = this.state
     const { clusterID, getDistributeList } = this.props
-    const query = { page, size, name }
+    const query = { page, size, txName }
     getDistributeList(clusterID, query)
   }
   changePage = (page, size) => {
@@ -111,8 +112,8 @@ class DistributedList extends React.Component {
   onExpand = (expended, record) => {
     if (expended) {
       const { txName } = record
-      const { getChildTranscation } = this.props
-      getChildTranscation(txName);
+      const { clusterID, getChildTranscation } = this.props
+      getChildTranscation(clusterID, txName);
     }
   }
   render() {
@@ -121,10 +122,16 @@ class DistributedList extends React.Component {
     return <div className="distributed-list">
       <div className="top">
         <div className="top-left">
-          <Button icon="sync">刷新</Button>
+          <Button icon="sync" onClick={this.getData}>刷新</Button>
           <Search
             style={{ width: 200 }}
             placeholder="请输入事务名称搜索"
+            onChange={e => {
+              this.setState({
+                txName: e.target.value,
+              })
+            }}
+            onSearch={() => this.getData()}
           />
         </div>
         <div className="top-right">
@@ -133,15 +140,18 @@ class DistributedList extends React.Component {
             current={page}
             onChange={this.changePage}
             pageSize={size}
-            total={50}/>
+            total={distributeList.count || 0}/>
         </div>
       </div>
+
       <Card>
         <Table
           columns={columns}
+          loading={distributeList.isFetching}
           expandedRowRender={record => this.expandedRow(record)}
           onExpand={(expended, record) => { this.onExpand(expended, record) }}
           dataSource={distributeList.data || []}
+          pagination={false}
         />
       </Card>
     </div>

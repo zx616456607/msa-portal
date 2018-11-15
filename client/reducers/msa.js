@@ -361,11 +361,13 @@ const distributeList = (state = {}, action) => {
       return Object.assign({}, state, {
         isFetching: false,
         data: action.response.result.data,
+        count: action.response.result.count,
       })
     case ActionTypes.GET_DISTRIBUTE_LIST_FAILURE:
       return {
         isFetching: false,
-        data: {},
+        data: [],
+        count: 0,
       }
     default:
       return state
@@ -418,6 +420,121 @@ const executionRecordOverview = (state = {}, action) => {
   }
 }
 
+const executionRecordList = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+        count: action.response.result.count,
+      })
+    case ActionTypes.GET_EXECUTION_RECORD_LIST_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+        count: 0,
+      }
+    default:
+      return state
+  }
+}
+const mockData = [
+  {
+    txName: 'NewDemoOrder',
+    methodName: 'public boolean com.tenxcloud.order.service.impl.OrderServiceImpl.addOrder(java.lang.Integer,java.lang.Integer)',
+    appName: 'lcn-mybatis-order-service',
+    appIpAddress: '127.0.0.1:9002',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+  {
+    txName: 'NewDemoAccount',
+    methodName: 'public boolean com.tenxcloud.mybatis.service.impl.AccountServiceImpl.modifyAccount(java.lang.Integer,java.lang.Integer',
+    appName: 'lcn-mybatis-account-service',
+    appIpAddress: '127.0.0.1:9001',
+    isCommit: 1,
+  },
+]
+const executionRecordDetail = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_SUCCESS:
+
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: mockData,
+        // data: action.response.result.data,
+      })
+    case ActionTypes.GET_EXECUTION_RECORD_DETAIL_FAILURE:
+      return {
+        isFetching: false,
+        data: null,
+      }
+    default:
+      return state
+  }
+}
+
+
 const msa = (state = {
   msaNameList: {},
   rpcList: {},
@@ -437,6 +554,14 @@ const msa = (state = {
     isFetching: false,
     data: {},
   },
+  executionRecordList: {
+    isFetching: false,
+    data: [],
+  },
+  executionRecordDetail: {
+    isFetching: false,
+    data: [],
+  },
 }, action) => {
   return {
     msaNameList: msaNameList(state.msaNameList, action),
@@ -454,6 +579,8 @@ const msa = (state = {
     distributeList: distributeList(state.distributeList, action),
     childTranscation: childTranscation(state.childTranscation, action),
     executionRecordOverview: executionRecordOverview(state.executionRecordOverview, action),
+    executionRecordList: executionRecordList(state.executionRecordList, action),
+    executionRecordDetail: executionRecordDetail(state.executionRecordDetail, action),
   }
 }
 
