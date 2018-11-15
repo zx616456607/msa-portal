@@ -24,6 +24,7 @@ import confirm from '../../../../../../components/Modal/confirm'
 import { formatDate } from '../../../../../../common/utils'
 import AddUserModal from './AddUserModal'
 import UserDetailDock from './UserDetail/Dock'
+import PasswordModal from './UserDetail/PasswordModal'
 import './style/index.less'
 
 const Search = Input.Search
@@ -107,6 +108,9 @@ class Users extends React.Component {
         break
       case 'delete':
         this.deleteUser(record)
+        break
+      case 'password':
+        this.toggleVisible('passwordVisible', record)
         break
       default:
         break
@@ -192,7 +196,9 @@ class Users extends React.Component {
   }
 
   render() {
-    const { inputValue, current, addVisible, currentUser, detailVisible } = this.state
+    const {
+      inputValue, current, addVisible, currentUser, detailVisible, passwordVisible,
+    } = this.state
     const { zoneUsers, usersFetching, totalResults } = this.props
     const propsFunc = {
       toggleActive: this.toggleActive,
@@ -295,6 +301,7 @@ class Users extends React.Component {
             <Menu style={{ width: 90 }} onClick={e => this.handleClick(e, record)}>
               <Menu.Item key="edit">编辑</Menu.Item>
               <Menu.Item key="delete">删除</Menu.Item>
+              <Menu.Item key="password" >修改密码</Menu.Item>
             </Menu>
           )
           return (
@@ -355,6 +362,14 @@ class Users extends React.Component {
             userId={currentUser && currentUser.id}
             onVisibleChange={visible => this.setState({ detailVisible: visible })}
             propsFunc={propsFunc}
+          />
+        }
+        {
+          passwordVisible &&
+          <PasswordModal
+            detail={currentUser}
+            visible={passwordVisible}
+            closeModal={() => this.toggleVisible('passwordVisible')}
           />
         }
       </div>
