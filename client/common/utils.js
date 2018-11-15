@@ -549,3 +549,44 @@ export const isUaaDefaultGroup = group => {
   ]
   return defaultGroups.includes(group)
 }
+
+
+// js version of istio.io/istio/pilot/pkg/model/validation.go
+
+const wildcardPrefix = /^\*|(\*|\*-)?([a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?)$/
+const dns1123Label = /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/
+
+export function validateDomainName(name) {
+  if (name !== '*' && name.indexOf('.') === -1) {
+    return '请填写正确的服务域名或域名'
+  }
+  return validate(name)
+}
+
+export function validateServiceName(name) {
+  return validate(name)
+}
+
+function validate(host) {
+  if (host.length > 255) {
+    return '域名最大长度为255'
+  }
+  const parts = host.split('.')
+  if (parts[0].length > 63) {
+    return '通配符DNS (RFC1123)标签最大长度为63'
+  }
+  if (!wildcardPrefix.test(parts[0])) {
+    return '请填写正确的服务域名或域名'
+  }
+  if (parts.length > 1) {
+    for (let i = 1; i < parts.length; ++i) {
+      const label = parts[i]
+      if (label.length > 63) {
+        return '通配符DNS (RFC1123)标签最大长度为63'
+      }
+      if (!dns1123Label.test(label)) {
+        return '请填写正确的服务域名或域名'
+      }
+    }
+  }
+}

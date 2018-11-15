@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
 import { createNewRoute, getMeshRouteDetail, updateMeshRoute } from '../../../actions/meshRouteManagement'
+import { validateDomainName, validateServiceName } from '../../../common/utils'
 import './style/NewRoute.less'
 import { MESH_ROUTE_RULE_NAME_REG,
   MESH_ROUTE_RULE_NAME_REG_NOTICE,
@@ -293,6 +294,15 @@ class NewRouteComponent extends React.Component {
     cb()
 
   }
+  domainOrServiceValidator = (rule, value, cb) => {
+    if (value === '') {
+      return cb('请输入服务域名或域名')
+    }
+    cb(validateDomainName(value))
+    cb(validateServiceName(value))
+    cb()
+
+  }
   ruleOfRouteValidator = (rule, value, cb) => {
     const values = this.props.form.getFieldsValue()
     const routeRules = values.rule.filter(v => typeof v === 'string')
@@ -421,11 +431,9 @@ class NewRouteComponent extends React.Component {
                   validateTrigger: [ 'onChange', 'onBlur' ],
                   initialValue: this.setInitialValue().host[k],
                   rules: [{
-                    required: true,
                     whitespace: true,
-                    message: '请输入服务域名',
                   }, {
-                    validator: this.domainValidator,
+                    validator: this.domainOrServiceValidator,
                   }],
                 })(
                   <Input
