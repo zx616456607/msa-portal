@@ -116,7 +116,11 @@ class CreateComponent extends React.Component {
       Object.keys(list).forEach(item => {
         const moduleValue = list[item].metadata.labels['servicemesh/app-module']
         if (moduleValue) {
-          aryList.push(item)
+          const query = {
+            moduleName: moduleValue,
+            service: item,
+          }
+          aryList.push(query)
         }
       })
       this.setState({
@@ -211,7 +215,7 @@ class CreateComponent extends React.Component {
             }
             if (res.status === 409) {
               notification.warn({
-                message: `${value.componentName} 已经存在`,
+                message: `${value.componentName}已经存在, 组件名不能使用已存在的服务名`,
               })
               return
             }
@@ -284,12 +288,18 @@ class CreateComponent extends React.Component {
 
   filterServicelist = key => {
     const { moduleServiceList } = this.state
+    let query
     if (moduleServiceList) {
-      if (moduleServiceList.indexOf(key) !== -1) {
-        return true
+      const filterList = moduleServiceList.filter(item => item.service === key)[0]
+      if (filterList) {
+        if (filterList.service === key) {
+          query = Object.assign({}, query, { isTrue: true, componentName: filterList.moduleName })
+          return query
+        }
       }
+      query = Object.assign({}, query, { isTrue: false })
+      return query
     }
-    return false
   }
 
   validateToNextService = (rule, value, callback) => {
@@ -301,12 +311,14 @@ class CreateComponent extends React.Component {
         const service = form.getFieldValue(`serviceName-${key}`)
         const serviceState = this.state[`service${key}`]
         if (!serviceState) {
-          if (this.filterServicelist(service)) {
-            callback('服务名称重复')
-          }
-          if (serviceKey !== `serviceName-${key}`) {
-            if (value === service || this.filterServicelist(service)) {
-              callback('服务名称重复')
+          const { isTrue, componentName } = this.filterServicelist(service)
+          if (isTrue) {
+            callback(`该服务已被${componentName}组件关联`)
+          } else {
+            if (serviceKey !== `serviceName-${key}`) {
+              if (value === service || isTrue) {
+                callback(`该服务已被${componentName}组件关联`)
+              }
             }
           }
         }
@@ -323,10 +335,6 @@ class CreateComponent extends React.Component {
       labelCol: { span: 2 },
       wrapperCol: { span: 13 },
     }
-    const serviceLayout = {
-      labelCol: { span: 2 },
-      wrapperCol: { span: 10 },
-    }
     getFieldDecorator('keys', { initialValue: [] })
     const keys = getFieldValue('keys')
     const { metadata } = componentList
@@ -335,7 +343,6 @@ class CreateComponent extends React.Component {
         <Row className="serviceList" key={key}>
           <Col span={8} className="service">
             <FormItem
-              {...serviceLayout}
             >
               {getFieldDecorator(`serviceName-${key}`, {
                 rules: [{
@@ -344,7 +351,7 @@ class CreateComponent extends React.Component {
               })(
                 <Select
                   placeholder="请选择服务"
-                  style={{ width: '250%' }}
+                  style={{ width: '100%' }}
                   disabled={this.state[`service${key}`]}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
