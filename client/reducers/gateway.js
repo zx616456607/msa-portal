@@ -87,6 +87,29 @@ function routesList(state, action) {
   }
 }
 
+function globalRuleSetting(state, action) {
+  switch (action.type) {
+    case ActionTyps.GET_GLOBAL_RULE_SETTING_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+      }
+    case ActionTyps.GET_GLOBAL_RULE_SETTING_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        ...action.response.result.data,
+      }
+    case ActionTyps.GET_GLOBAL_RULE_SETTING_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+      }
+    default:
+      return state
+  }
+}
+
 const gateway = (state = {
   policesList: {},
   routesList: {},
@@ -96,6 +119,7 @@ const gateway = (state = {
     policesList: policesList(state.policesList, action),
     routesList: routesList(state.routesList, action),
     gatewayHasOpenPolicy: gatewayHasOpenPolicy(state.gatewayHasOpenPolicy, action),
+    globalRuleSetting: globalRuleSetting(state.globalRuleSetting, action),
   }
 }
 
