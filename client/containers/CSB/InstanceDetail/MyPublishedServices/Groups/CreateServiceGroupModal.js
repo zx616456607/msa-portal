@@ -21,6 +21,7 @@ import {
   updateGroup,
 } from '../../../../../actions/CSB/instanceService/group'
 import confirm from '../../../../../components/Modal/confirm'
+import { EMAIL_REG } from '../../../../../constants';
 
 const { TextArea } = Input
 
@@ -187,6 +188,9 @@ class CreateServiceGroupModal extends React.Component {
             getFieldDecorator('ownerEmail', {
               rules: [{
                 required: false,
+              }, {
+                pattern: EMAIL_REG,
+                message: '邮箱格式不正确',
               }],
             })(
               <Input placeholder="服务负责人邮件"/>
