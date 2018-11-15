@@ -345,7 +345,7 @@ class CreateComponent extends React.Component {
             <FormItem
             >
               {getFieldDecorator(`serviceName-${key}`, {
-                rules: [{
+                rules: [{ required: true, message: '请选择一个服务' }, {
                   validator: this.validateToNextService,
                 }],
               })(
@@ -370,7 +370,7 @@ class CreateComponent extends React.Component {
             <FormItem
             >
               {getFieldDecorator(`version-${key}`, {
-                rules: [{
+                rules: [{ required: true, message: '服务版本不能为空' }, {
                   validator: this.versionCheck,
                 }],
               }
