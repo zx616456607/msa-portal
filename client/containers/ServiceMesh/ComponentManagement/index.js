@@ -85,7 +85,7 @@ class ComponentManagement extends React.Component {
         return new Promise((resolve, reject) => {
           deleteComponent(clusterID, name).then(res => {
             if (res.error) {
-              notification.success({
+              notification.error({
                 message: `删除组件 ${name} 失败`,
               })
               return reject()
