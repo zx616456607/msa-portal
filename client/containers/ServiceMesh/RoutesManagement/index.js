@@ -162,14 +162,18 @@ class RoutesManagement extends React.Component {
           const { components } = this.props
           const { host } = record.spec.http[0].route[0].destination
           const componentDel = components.findIndex(v => v.metadata.name === host)
-
           if (componentDel < 0) {
             return '-'
           }
+          const existHost = []
           return record.spec.http.map(item => {
-            return <div>
-              {item.route[0].destination.host}
-            </div>
+            if (!existHost.includes(item.route[0].destination.host)) {
+              existHost.push(item.route[0].destination.host)
+              return <div>
+                {item.route[0].destination.host}
+              </div>
+            }
+            return null
           })
         },
       },
