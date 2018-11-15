@@ -20,6 +20,9 @@ import { getLimitAndRoutes, getMicroservice, getRpcService, getServiceCall } fro
 import { formatDate } from '../../common/utils'
 import Ellipsis from '@tenx-ui/ellipsis'
 import './style/index.less'
+import { fetchSpingCloud } from '../../actions/msaConfig'
+import { checkSpringCloudInstall, notInstallSpringCloud } from '../MsaManage';
+import { renderLoading } from '../../components/utils';
 
 // const Option = Select.Option
 const Chart = CreateG2(chart => {
@@ -42,15 +45,26 @@ class IndexPage extends React.Component {
     forceFit: true,
     width: 500,
     height: 450,
+    isDeployed: false,
+    loading: true,
   }
   componentDidMount() {
-    const { clusterID, getServiceCall } = this.props
-    const startTime = new Date().getTime() - 7 * 86400000
-    const endTime = new Date().getTime()
-    this.loadLimitAndRoutesData()
-    this.loadMicroservice(startTime, endTime)
-    this.loadRpcService()
-    getServiceCall(clusterID, { startTime, endTime, scaleSize: 7 })
+    const { clusterID, getServiceCall, fetchSpingCloud, current } = this.props
+    fetchSpingCloud(clusterID).then(res => {
+      this.setState({
+        isDeployed: checkSpringCloudInstall(res, current),
+        loading: false,
+      })
+      if (checkSpringCloudInstall(res, current)) {
+        const startTime = new Date().getTime() - 7 * 86400000
+        const endTime = new Date().getTime()
+        this.loadLimitAndRoutesData()
+        this.loadMicroservice(startTime, endTime)
+        this.loadRpcService()
+        getServiceCall(clusterID, { startTime, endTime, scaleSize: 7 })
+      }
+    })
+
   }
   loadLimitAndRoutesData = () => {
     const { clusterID, getLimitAndRoutes } = this.props
@@ -87,6 +101,14 @@ class IndexPage extends React.Component {
       sortedCallService,
       sortedErrorService, numberOfServiceCall } = this.props.overView
     const ellipsisComponent = num => <Ellipsis>{num.toString()}</Ellipsis>
+    const { isDeployed, loading } = this.state
+    if (loading) {
+      return renderLoading('加载 SpingCloud 中 ...')
+    }
+    if (!isDeployed) {
+      return notInstallSpringCloud()
+    }
+
     return (
       <QueueAnim className="index-page">
         <div className="index-page-time-picker">
@@ -516,6 +538,7 @@ const mapStateToProps = state => {
   return {
     errorObject: state.errorObject,
     auth: state.entities.auth,
+    current,
     clusterID,
     overView,
     periodCallData,
@@ -529,4 +552,5 @@ export default connect(mapStateToProps, {
   getMicroservice,
   getRpcService,
   getServiceCall,
+  fetchSpingCloud,
 })(IndexPage)
