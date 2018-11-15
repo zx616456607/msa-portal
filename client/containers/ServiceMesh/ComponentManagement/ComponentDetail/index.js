@@ -52,7 +52,11 @@ class ComponentDetail extends React.Component {
       Object.keys(list).forEach(item => {
         const moduleValue = list[item].metadata.labels['servicemesh/app-module']
         if (moduleValue) {
-          aryList.push(item)
+          const query = {
+            moduleName: moduleValue,
+            service: item,
+          }
+          aryList.push(query)
         }
       })
       this.setState({
@@ -262,10 +266,18 @@ class ComponentDetail extends React.Component {
 
   filterServicelist = key => {
     const { serviceList } = this.state
-    if (serviceList.indexOf(key) !== -1) {
-      return true
+    let query
+    if (serviceList) {
+      const filterList = serviceList.filter(item => item.service === key)[0]
+      if (filterList) {
+        if (filterList.service === key) {
+          query = Object.assign({}, query, { isTrue: true, componentName: filterList.moduleName })
+          return query
+        }
+      }
+      query = Object.assign({}, query, { isTrue: false })
+      return query
     }
-    return false
   }
 
   validateToNextService = (rule, value, callback) => {
@@ -275,12 +287,13 @@ class ComponentDetail extends React.Component {
     if (value) {
       keys.forEach(key => {
         const service = form.getFieldValue(`serviceName-${key}`)
-        if (this.filterServicelist(service)) {
-          callback('服务名称重复')
+        const { isTrue, componentName } = this.filterServicelist(service)
+        if (isTrue) {
+          callback(`该服务已被${componentName}组件关联`)
         }
         if (serviceKey !== `serviceName-${key}`) {
-          if (value === service || this.filterServicelist(service)) {
-            callback('服务名称重复')
+          if (value === service || isTrue) {
+            callback(`该服务已被${componentName}组件关联`)
           }
         }
       })
@@ -323,16 +336,11 @@ class ComponentDetail extends React.Component {
     const { getFieldDecorator, getFieldValue } = form
     getFieldDecorator('keys', { initialValue: [ 0 ] })
     const keys = getFieldValue('keys')
-    const formItemLayout = {
-      labelCol: { span: 5 },
-      wrapperCol: { span: 10 },
-    }
     const serviceLists = keys.map(key => {
       return (
         <Row className="serviceList" key={key}>
           <Col span={10}>
             <FormItem
-              {...formItemLayout}
             >
               {getFieldDecorator(`serviceName-${key}`, {
                 initialValue: undefined,
