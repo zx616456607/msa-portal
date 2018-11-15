@@ -91,7 +91,7 @@ class ConsumerVouchers extends React.Component {
   loadData = (query = {}, isFirst) => {
     const { getConsumerVouchersList, instanceID, location, history } = this.props
     const { name } = this.state
-    query = Object.assign({}, location.query, { name: encodeURIComponent(name) }, query)
+    query = Object.assign({}, location.query, { name: name ? encodeURIComponent(name) : '' }, query)
     if (query.page && query.page === 1) {
       delete query.page
     }
@@ -397,6 +397,12 @@ class ConsumerVouchers extends React.Component {
                 }, {
                   whitespace: true,
                   message: '不能输入空格',
+                }, {
+                  validator: (rule, value, callback) => {
+                    if (value.length > 64) {
+                      return callback('消费凭证名称长度不能超过 64')
+                    }
+                  },
                 }],
               })(
                 <Input placeholder="请输入消费凭证名称" ref={input => { this.nameInput = input }} />
