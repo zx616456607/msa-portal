@@ -62,9 +62,9 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       if (res.response) {
         this.setState({
           blownOpen: res.response.result.data,
-          blownOpenLoading: false,
         })
       }
+      this.setState({ blownOpenLoading: false })
     })
     getMsaBlownStrategy(clusterID, serviceName).then(res => {
       if (res.response) {

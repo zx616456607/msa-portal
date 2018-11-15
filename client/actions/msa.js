@@ -720,8 +720,8 @@ const fetchDistributeList = (clusterId, query) => {
         GET_DISTRIBUTE_LIST_SUCCESS,
         GET_DISTRIBUTE_LIST_FAILURE,
       ],
-      endpoint: `http://192.168.1.230:19073/api/v1/tx/getTxList?${toQuerystring(query)}`,
-      // endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions?${toQuerystring(query)}`,
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/getTxList?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions?${toQuerystring(query)}`,
       schema: {},
     },
   }
@@ -743,8 +743,8 @@ const fetchChildTranscation = (clusterId, txName) => {
         GET_CHILD_TRANSACTION_SUCCESS,
         GET_CHILD_TRANSACTION_FAILURE,
       ],
-      endpoint: `http://192.168.1.230:19073/api/v1/tx/queryTxDetails/${txName}`,
-      // endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/details/${txName}`,
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/queryTxDetails/${txName}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/details/${txName}`,
       schema: {},
     },
   }
@@ -758,7 +758,7 @@ export const GET_EXECUTION_RECORD_OVERVIEW_REQUEST = 'GET_EXECUTION_RECORD_OVERV
 export const GET_EXECUTION_RECORD_OVERVIEW_SUCCESS = 'GET_EXECUTION_RECORD_OVERVIEW_SUCCESS'
 export const GET_EXECUTION_RECORD_OVERVIEW_FAILURE = 'GET_EXECUTION_RECORD_OVERVIEW_FAILURE'
 
-const fetchExecuctionRecordOverview = () => {
+const fetchExecuctionRecordOverview = clusterID => {
   return {
     [CALL_API]: {
       types: [
@@ -766,8 +766,8 @@ const fetchExecuctionRecordOverview = () => {
         GET_EXECUTION_RECORD_OVERVIEW_SUCCESS,
         GET_EXECUTION_RECORD_OVERVIEW_FAILURE,
       ],
-      endpoint: 'http://192.168.1.230:19073/api/v1/tx/overview',
-      // endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/overview`,
+      // endpoint: 'http://192.168.1.230:19073/api/v1/tx/overview',
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/overview`,
       schema: {},
     },
   }
@@ -789,8 +789,8 @@ const fetchExecuctionRecordList = (clusterID, query) => {
         GET_EXECUTION_RECORD_LIST_SUCCESS,
         GET_EXECUTION_RECORD_LIST_FAILURE,
       ],
-      endpoint: `http://192.168.1.230:19073/api/v1/tx/recordList?${toQuerystring(query)}`,
-      // endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions${toQuerystring(query)}`,
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/recordList?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions${toQuerystring(query)}`,
       schema: {},
     },
   }
@@ -812,8 +812,8 @@ const fetchExecuctionRecordDetail = (clusterID, groupId) => {
         GET_EXECUTION_RECORD_DETAIL_SUCCESS,
         GET_EXECUTION_RECORD_DETAIL_FAILURE,
       ],
-      endpoint: `http://192.168.1.230:19073/api/v1/tx/record/${groupId}`,
-      // endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions/${groupId}`,
+      // endpoint: `http://192.168.1.230:19073/api/v1/tx/record/${groupId}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions/${groupId}`,
       schema: {},
     },
   }
