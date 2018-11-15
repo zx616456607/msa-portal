@@ -121,6 +121,7 @@ class RoutingRuleModal extends React.Component {
     }
     const headerFlag = getFieldValue('headerFlag')
     if (headerFlag === 'custom') {
+      validateArray.push('keys')
       const keys = getFieldValue('keys')
       keys.forEach(key => {
         validateArray.push(`header-${key}`)
