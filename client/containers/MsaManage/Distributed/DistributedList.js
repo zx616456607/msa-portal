@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Pagination, Table, Card, Spin } from 'antd'
+import { Button, Input, Pagination, Table, Card, Spin, Tooltip, Icon } from 'antd'
 import { connect } from 'react-redux'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { getDistributeList, getChildTranscation } from '../../../actions/msa'
@@ -26,30 +26,46 @@ class DistributedList extends React.Component {
   state = {
     columns: [
       {
-        title: '父事务方法名',
+        title: <span>
+          <span style={{ marginRight: 8 }}>父事务名称</span>
+          <Tooltip title="事务发起者方法名">
+            <Icon type="question-circle-o"/>
+          </Tooltip>
+        </span>,
         dataIndex: 'methodName',
+        width: 200,
       },
       {
         title: '父事务别名',
         dataIndex: 'txName',
+        width: 200,
       },
       {
         title: '子事务数量',
         dataIndex: 'detailCount',
+        sorter: (a, b) => a.detailCount - b.detailCount,
+        width: 200,
       },
       {
         title: '超时时间(ms)',
         dataIndex: 'timeout',
+        render: text => text || '-',
+        width: 200,
       },
       {
         title: '首次运行时间',
         dataIndex: 'firstRunTime',
         render: text => formatDate(text),
+        sorter: (a, b) => a.firstRunTime - b.firstRunTime,
+        defaultSortOrder: 'descend',
+        width: 200,
       },
       {
         title: '最新运行时间',
         dataIndex: 'newRunTime',
         render: text => formatDate(text),
+        sorter: (a, b) => a.newRunTime - b.newRunTime,
+        width: 200,
       },
     ],
     page: 1,
@@ -89,7 +105,6 @@ class DistributedList extends React.Component {
           <ul className="content">
             <li className="successCount">成功 {data.successCount} 个</li>
             <li className="failCount">回滚 {data.failCount} 个</li>
-            <li>未知 {data.unknownCount} 个</li>
           </ul>
         </div>
         <div className="name child-transcation-content">
@@ -97,11 +112,18 @@ class DistributedList extends React.Component {
           <ul className="content">
             {
               data.transLogDetails.map(v => <li className="tx-name">
-                <Ellipsis>{v.txName}
-                  <span style={{ marginLeft: 8 }}>
-                    ({v.methodName})
-                  </span>
+                <Ellipsis>
+                  {v.txName}
                 </Ellipsis>
+                <span className="method-name">
+                  (
+                  <Ellipsis>
+                    <span>
+                      {v.methodName}
+                    </span>
+                  </Ellipsis>
+                  )
+                </span>
               </li>)
             }
           </ul>

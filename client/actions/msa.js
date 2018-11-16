@@ -721,7 +721,7 @@ const fetchDistributeList = (clusterId, query) => {
         GET_DISTRIBUTE_LIST_FAILURE,
       ],
       // endpoint: `http://192.168.1.230:19073/api/v1/tx/getTxList?${toQuerystring(query)}`,
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/transactions?${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/transaction/groups?${toQuerystring(query)}`,
       schema: {},
     },
   }
@@ -790,7 +790,7 @@ const fetchExecuctionRecordList = (clusterID, query) => {
         GET_EXECUTION_RECORD_LIST_FAILURE,
       ],
       // endpoint: `http://192.168.1.230:19073/api/v1/tx/recordList?${toQuerystring(query)}`,
-      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions${toQuerystring(query)}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions?${toQuerystring(query)}`,
       schema: {},
     },
   }
@@ -804,7 +804,7 @@ export const GET_EXECUTION_RECORD_DETAIL_REQUEST = 'GET_EXECUTION_RECORD_DETAIL_
 export const GET_EXECUTION_RECORD_DETAIL_SUCCESS = 'GET_EXECUTION_RECORD_DETAIL_SUCCESS'
 export const GET_EXECUTION_RECORD_DETAIL_FAILURE = 'GET_EXECUTION_RECORD_DETAIL_FAILURE'
 
-const fetchExecuctionRecordDetail = (clusterID, groupId) => {
+const fetchExecuctionRecordDetail = (clusterID, id) => {
   return {
     [CALL_API]: {
       types: [
@@ -813,12 +813,12 @@ const fetchExecuctionRecordDetail = (clusterID, groupId) => {
         GET_EXECUTION_RECORD_DETAIL_FAILURE,
       ],
       // endpoint: `http://192.168.1.230:19073/api/v1/tx/record/${groupId}`,
-      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions/${groupId}`,
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/transaction/transactions/${id}`,
       schema: {},
     },
   }
 }
 
-export const getExecuctionRecordDetail = (clusterId, groupId) =>
-  dispatch => dispatch(fetchExecuctionRecordDetail(clusterId, groupId))
+export const getExecuctionRecordDetail = (clusterId, id) =>
+  dispatch => dispatch(fetchExecuctionRecordDetail(clusterId, id))
 

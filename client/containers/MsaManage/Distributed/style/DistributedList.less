@@ -16,12 +16,19 @@
     display: flex;
     justify-content: center;
   }
+  .ant-table-column-sorter {
+    right: 140px !important;
+  }
+  .ant-table-column-sort {
+    background: #fff !important;
+  }
   .child-transcation {
     .child-transcation-content {
       display: flex;
       justify-content: flex-start;
       .title {
         width: 130px;
+        flex: 0 1 auto;
       }
       .content {
         display: flex;
@@ -29,6 +36,7 @@
         list-style: none;
         padding-left: @padding-medium;
         li {
+          display: flex;
           margin-right: 40px;
           position: relative;
           &:before {
@@ -41,6 +49,16 @@
             position: absolute;
             top: 1px;
             left: -18px;
+          }
+          .method-name {
+            margin-left: 8px;
+            display: flex;
+            width: 120px;
+            overflow: hidden;
+            span {
+              display: inline-block;
+              width: 100%;
+            }
           }
         }
         .successCount:before {
@@ -58,11 +76,11 @@
     }
     .name {
       .content {
-        width: 850px;
+        width: 80%;
         flex-wrap: wrap;
         .tx-name {
-          width: 200px;
-          margin-right: 60px;
+          width: 230px;
+          margin-right: 90px;
           margin-bottom: @padding-base;
           overflow: hidden;
           &:before {

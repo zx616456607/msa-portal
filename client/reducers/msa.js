@@ -360,8 +360,8 @@ const distributeList = (state = {}, action) => {
     case ActionTypes.GET_DISTRIBUTE_LIST_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.content,
-        count: action.response.result.count,
+        data: action.response.result.data.content,
+        count: action.response.result.data.count,
       })
     case ActionTypes.GET_DISTRIBUTE_LIST_FAILURE:
       return {
@@ -385,7 +385,7 @@ const childTranscation = (state = {}, action) => {
     case ActionTypes.GET_CHILD_TRANSACTION_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.content,
+        data: action.response.result.data.content,
       })
     case ActionTypes.GET_CHILD_TRANSACTION_FAILURE:
       return {
@@ -408,7 +408,7 @@ const executionRecordOverview = (state = {}, action) => {
     case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.content,
+        data: action.response.result.data.content,
       })
     case ActionTypes.GET_EXECUTION_RECORD_OVERVIEW_FAILURE:
       return {
@@ -431,8 +431,8 @@ const executionRecordList = (state = {}, action) => {
     case ActionTypes.GET_EXECUTION_RECORD_LIST_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.content,
-        count: action.response.result.count,
+        data: action.response.result.data.content,
+        count: action.response.result.data.count,
       })
     case ActionTypes.GET_EXECUTION_RECORD_LIST_FAILURE:
       return {
@@ -457,7 +457,7 @@ const executionRecordDetail = (state = {}, action) => {
 
       return Object.assign({}, state, {
         isFetching: false,
-        data: action.response.result.content,
+        data: action.response.result.data.content,
       })
     case ActionTypes.GET_EXECUTION_RECORD_DETAIL_FAILURE:
       return {

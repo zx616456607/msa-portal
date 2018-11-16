@@ -90,11 +90,13 @@ class ExecutionRecord extends React.Component {
         render: (col, row) => {
           return (row.endTime - row.startTime) < 0 ? '-' : (row.endTime - row.startTime)
         },
+        width: 90,
       },
       {
         title: '操作',
         dataIndex: 'operation',
         render: (col, row) => <Button type="primary" onClick={() => this.getRecordDetail(row)} >执行详情</Button>,
+        width: 85,
       },
     ],
     detailColumns: [
@@ -102,19 +104,25 @@ class ExecutionRecord extends React.Component {
         title: '子事务方法名',
         dataIndex: 'methodName',
         render: text => this.fixedWidthContent(text),
-        width: 130,
+        width: 100,
       },
       {
         title: '子事务别名',
         dataIndex: 'txName',
         render: text => this.fixedWidthContent(text),
-        width: 130,
+        width: 100,
+      },
+      {
+        title: '子事务服务名',
+        dataIndex: 'txName',
+        render: text => this.fixedWidthContent(text),
+        width: 100,
       },
       {
         title: '子事务地址',
         dataIndex: 'appIpAddress',
         render: text => this.fixedWidthContent(text),
-        width: 130,
+        width: 100,
       },
     ],
     page: 1,
@@ -142,12 +150,12 @@ class ExecutionRecord extends React.Component {
     getExecuctionRecordList(clusterID, query)
   }
   getRecordDetail = data => {
-    const { groupId, state } = data
+    const { id, state } = data
     const { clusterID, getExecuctionRecordDetail } = this.props
     this.setState({
       transactionStatus: state,
     })
-    getExecuctionRecordDetail(clusterID, groupId)
+    getExecuctionRecordDetail(clusterID, id)
     this.setState({ detailVisible: true })
   }
   convertOverviewData = () => {
