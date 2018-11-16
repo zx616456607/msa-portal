@@ -94,7 +94,7 @@ export default class BlownChart extends React.PureComponent {
     const finalData = allPoint.map(item => {
       return {
         count: Number(item.count),
-        time: formatDate(Number(item.time) * 1000, 'mm:ss'),
+        time: formatDate(Number(item.time) * 1000, 'HH:mm:ss'),
       }
     })
     const circleInfo = {
@@ -145,7 +145,7 @@ export default class BlownChart extends React.PureComponent {
                     tooltip={false}
                     active={false}
                     position="time*vertical"
-                    size={[ 'radius', radius => Number(radius) * 10 ]}
+                    size={[ 'radius', [ 4, 60 ]]}
                     shape={'circle'}
                     style={{ stroke: '#fff', lineWidth: 1 }}
                     color={this.renderColor()}

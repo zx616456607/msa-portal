@@ -108,7 +108,7 @@ export default class ThreadChart extends React.PureComponent {
                 type="point"
                 position="x*y"
                 active={false}
-                size={[ 'radius', radius => Number(radius) * 10 ]}
+                size={[ 'radius', [ 4, 60 ]]}
                 shape={'circle'}
                 style={{ stroke: '#fff', lineWidth: 1 }}
                 color={this.renderColor()}
