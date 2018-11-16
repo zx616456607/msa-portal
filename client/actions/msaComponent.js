@@ -114,10 +114,11 @@ export const MANUALSCALE_COMPONENT_REQUEST = 'MANUALSCALE_COMPONENT_REQUEST'
 export const MANUALSCALE_COMPONENT_SUCCESS = 'MANUALSCALE_COMPONENT_SUCCESS'
 export const MANUALSCALE_COMPONENT_FAILURE = 'MANUALSCALE_COMPONENT_FAILURE'
 
-const fetchManualScaleComponent = (clusterID, name, body) => {
+const fetchManualScaleComponent = (clusterID, name, body, options) => {
   const { namespace } = body
   delete body.namespace
   return {
+    options,
     [CALL_API]: {
       types: [
         MANUALSCALE_COMPONENT_REQUEST,
@@ -137,5 +138,5 @@ const fetchManualScaleComponent = (clusterID, name, body) => {
   }
 }
 
-export const manualScaleComponent = (clusterID, name, body) =>
-  dispatch => dispatch(fetchManualScaleComponent(clusterID, name, body))
+export const manualScaleComponent = (clusterID, name, body, options) =>
+  dispatch => dispatch(fetchManualScaleComponent(clusterID, name, body, options))
