@@ -111,7 +111,7 @@ class MsaList extends React.Component {
             setTimeout(() => {
               resolve()
               notification.success({
-                message: '取消隐藏服务成功',
+                message: '已成功将该服务标记为可被发现，稍后服务会从后台取消隐藏',
               })
               self.loadMsaList()
             }, 3000)
