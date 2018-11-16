@@ -108,6 +108,9 @@ class MyPublishedServices extends React.Component {
     if (query.filter === '') {
       delete query.filter
     }
+    if (query.name) {
+      query.name = encodeURIComponent(query.name)
+    }
     delete query.includeDeleted
     handleHistoryForLoadData(history, query, location, isFirst)
     getInstanceService(instanceID, mergeQuery(query)).then(res => {
