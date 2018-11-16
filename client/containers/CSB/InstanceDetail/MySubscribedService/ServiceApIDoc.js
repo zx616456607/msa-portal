@@ -36,6 +36,21 @@ class ServiceApIDoc extends React.Component {
     closeModalMethod()
   }
 
+  renderSubstatus = status => {
+    switch (status) {
+      case 1:
+        return <span className="eap">待审批</span>
+      case 2:
+        return <span className="adopt">已通过</span>
+      case 3:
+        return <span className="refuse">已拒绝</span>
+      case 4:
+        return <span className="ub">已退订</span>
+      default:
+        return '未知'
+    }
+  }
+
   renderModalBody = () => {
     const { loading, currentService, serviceList } = this.props
     if (loading) {
@@ -76,7 +91,11 @@ class ServiceApIDoc extends React.Component {
         </Row>
         <Row>
           <Col span={5}>订阅状态：</Col>
-          <Col span={19}><div className="status">已授权</div></Col>
+          <Col span={19}>
+            <div className="status">
+              {this.renderSubstatus(currentService.status)}
+            </div>
+          </Col>
         </Row>
         <Row>
           <Col span={24}>
