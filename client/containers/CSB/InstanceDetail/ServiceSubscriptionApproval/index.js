@@ -210,12 +210,12 @@ class ServiceSubscriptionApproval extends React.Component {
         title: <Tooltip title="希望最大每秒访问次数">
           <span>QPS</span>
         </Tooltip>,
-        dataIndex: 'QPS',
+        dataIndex: 'limitDetail',
         width: '8%',
         render: text => <span>{text ? text : '-'}</span>,
       }, {
         title: 'IP',
-        dataIndex: 'QPH',
+        dataIndex: 'bindIps',
         width: '8%',
         filterIcon: <Icon type="smile-o" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }}/>,
         render: text => <span>{text ? text : '-'}</span>,
