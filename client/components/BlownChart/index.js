@@ -94,7 +94,7 @@ export default class BlownChart extends React.PureComponent {
     const finalData = allPoint.map(item => {
       return {
         count: Number(item.count),
-        time: formatDate(Number(item.time) * 1000, 'mm:ss'),
+        time: formatDate(Number(item.time) * 1000, 'HH:mm:ss'),
       }
     })
     const circleInfo = {
