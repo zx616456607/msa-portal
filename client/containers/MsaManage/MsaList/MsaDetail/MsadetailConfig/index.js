@@ -50,11 +50,16 @@ class MsaDetailConfig extends React.Component {
       this.setState({
         refreshConfigLoading: false,
       })
-      if (res.status === 404) {
-        notification.warn({
-          message: '没有相关配置',
+      if (res.error) {
+        if (res.status === 404) {
+          notification.warn({
+            message: '没有相关配置',
+          })
+          return
+        }
+        return notification.warn({
+          message: '更新配置失败',
         })
-        return
       }
       notification.success({
         message: '更新配置成功',
