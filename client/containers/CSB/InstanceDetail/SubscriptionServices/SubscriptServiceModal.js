@@ -237,7 +237,7 @@ class SubscriptServiceModal extends React.Component {
               rules: [{
                 validator: (rule, value, callback) => {
                   if (value && !/^(\d{1,3}(\.\d{1,3}){3})*(,\d{1,3}(\.\d{1,3}){3})*$/.test(value)) {
-                    return callback('用于限制访问该服务的 IP 地址，空表示不需要限制 IP 访问；用"，"号隔开；')
+                    return callback('请输入正确的IP地址，多个IP用 "," 隔开')
                   }
                   return callback()
                 },
