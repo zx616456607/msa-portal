@@ -70,7 +70,7 @@ class AvailableInstances extends React.Component {
     if (query.page === 1) {
       delete query.page
     }
-    query.name = encodeURIComponent(query.name)
+    query.name = query.name ? encodeURIComponent(query.name) : ''
     handleHistoryForLoadData(history, query, location, isFirst)
     getInstances(UNUSED_CLUSTER_ID, mergeQuery(query))
   }
