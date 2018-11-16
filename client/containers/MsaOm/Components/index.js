@@ -124,6 +124,10 @@ class MsaComponents extends React.Component {
         return '消息队列'
       case 'spring-cloud-tracing':
         return '服务调用链'
+      case 'spring-cloud-dtm':
+        return '分布式事务'
+      case 'spring-cloud-redis':
+        return '数据缓存'
       default:
         return
     }
