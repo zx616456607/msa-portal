@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
 import { Button, Input, Card, Form, Row, Col, Icon, Select, notification } from 'antd'
 import './style/index.less'
-import { APP_NAME_REG_NOTICE } from '../../../../constants'
+import { COMPONENT_NAME, COMPONENT_NAME_REG } from '../../../../constants'
 import { AddComponent, fetchServiceList, loadComponent, fetchComponent, editComponent } from '../../../../actions/serviceMesh'
 
 const FormItem = Form.Item
@@ -270,8 +270,8 @@ class CreateComponent extends React.Component {
     if (!value) {
       return cb()
     }
-    if (!/^[a-z][a-z0-9\-]{1,15}[a-z0-9]$/.test(value)) {
-      return cb(APP_NAME_REG_NOTICE)
+    if (!COMPONENT_NAME_REG.test(value)) {
+      return cb(COMPONENT_NAME)
     }
     cb()
   }
