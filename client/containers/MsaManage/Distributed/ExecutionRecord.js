@@ -9,6 +9,8 @@ import { getExecuctionRecordOverview, getExecuctionRecordList, getExecuctionReco
 import './style/ExecutionRecord.less'
 
 const Search = Input.Search
+const AUTO_FETCH_INTERVAL = 60 * 1000
+let autoFetch
 @connect(state => {
   const { current, msa } = state
   const { cluster } = current.config
@@ -132,17 +134,24 @@ class ExecutionRecord extends React.Component {
     transactionStatus: '',
   }
   componentDidMount() {
+    this.getOverviewData()
+    this.getListData()
+    autoFetch = setInterval(() => {
+      this.getOverviewData()
+      this.getListData()
+    }, AUTO_FETCH_INTERVAL)
+  }
+  fixedWidthContent = text => <div className="child-table-fixed-width">
+    <Ellipsis>{text}</Ellipsis>
+  </div>
+  getOverviewData = () => {
     const { getExecuctionRecordOverview, clusterID } = this.props
     getExecuctionRecordOverview(clusterID).then(res => {
       if (!res.error) {
         this.convertOverviewData()
       }
     })
-    this.getListData()
   }
-  fixedWidthContent = text => <div className="child-table-fixed-width">
-    <Ellipsis>{text}</Ellipsis>
-  </div>
   getListData = () => {
     const { txName, size, page } = this.state
     const { clusterID, getExecuctionRecordList } = this.props
@@ -304,6 +313,9 @@ class ExecutionRecord extends React.Component {
       this.getListData()
     })
   }
+  componentWillUnmount() {
+    clearInterval(autoFetch)
+  }
   render() {
     const {
       historyRecord,
@@ -319,7 +331,7 @@ class ExecutionRecord extends React.Component {
     return <div className="execution-record">
       <div className="overview">
         <div className="title">
-          事务执行记录概览
+          事务执行记录概览  <Button icon="sync" style={{ marginLeft: 16 }} onClick={this.getOverviewData}>刷新</Button>
         </div>
         <Row className="content" gutter={16}>
           <Col span={12}>
@@ -357,7 +369,7 @@ class ExecutionRecord extends React.Component {
         <Card>
           <div className="operation">
             <div className="left">
-              <Button type="sync" onClick={this.getListData}>刷新</Button>
+              <Button icon="sync" onClick={this.getListData}>刷新</Button>
               <Search
                 placeholder="请输入父事务别名搜索"
                 style={{ width: 200 }}
@@ -370,6 +382,7 @@ class ExecutionRecord extends React.Component {
               />
             </div>
             <div className="right">
+              <span>共计 {executionRecordList.count} 条</span>
               <Pagination
                 simple
                 current={page}

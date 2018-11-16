@@ -7,6 +7,8 @@ import { formatDate } from '../../../common/utils';
 import './style/DistributedList.less'
 
 const Search = Input.Search
+const AUTO_FETCH_INTERVAL = 60 * 1000
+let autoFetch
 
 @connect(state => {
   const { current, msa } = state
@@ -24,61 +26,22 @@ const Search = Input.Search
 })
 class DistributedList extends React.Component {
   state = {
-    columns: [
-      {
-        title: <span>
-          <span style={{ marginRight: 8 }}>父事务名称</span>
-          <Tooltip title="事务发起者方法名">
-            <Icon type="question-circle-o"/>
-          </Tooltip>
-        </span>,
-        dataIndex: 'methodName',
-        width: 200,
-      },
-      {
-        title: '父事务别名',
-        dataIndex: 'txName',
-        width: 200,
-      },
-      {
-        title: '子事务数量',
-        dataIndex: 'detailCount',
-        sorter: (a, b) => a.detailCount - b.detailCount,
-        width: 200,
-      },
-      {
-        title: '超时时间(ms)',
-        dataIndex: 'timeout',
-        render: text => text || '-',
-        width: 200,
-      },
-      {
-        title: '首次运行时间',
-        dataIndex: 'firstRunTime',
-        render: text => formatDate(text),
-        sorter: (a, b) => a.firstRunTime - b.firstRunTime,
-        defaultSortOrder: 'descend',
-        width: 200,
-      },
-      {
-        title: '最新运行时间',
-        dataIndex: 'newRunTime',
-        render: text => formatDate(text),
-        sorter: (a, b) => a.newRunTime - b.newRunTime,
-        width: 200,
-      },
-    ],
+    sortField: 'firstRunTime',
+    sort: 'desc',
     page: 1,
     size: 20,
     txName: '',
   }
   componentDidMount() {
     this.getData()
+    autoFetch = setInterval(() => {
+      this.getData()
+    }, AUTO_FETCH_INTERVAL)
   }
   getData = () => {
-    const { page, size, txName } = this.state
+    const { page, size, txName, sort, sortField } = this.state
     const { clusterID, getDistributeList } = this.props
-    const query = { page, size, txName }
+    const query = { page, size, txName, sort, sortField }
     getDistributeList(clusterID, query)
   }
   changePage = (page, size) => {
@@ -92,7 +55,6 @@ class DistributedList extends React.Component {
   expandedRow = () => {
     const { childTranscation } = this.props
     const { isFetching, data } = childTranscation
-    // console.log(childTranscation);
     if (isFetching) {
       return <div className="spinning">
         <Spin/>
@@ -138,9 +100,63 @@ class DistributedList extends React.Component {
       getChildTranscation(clusterID, txName);
     }
   }
+  componentWillUnmount() {
+    clearInterval(autoFetch)
+  }
+  tableChange = (pagination, filters, sorter) => {
+    const { field, order } = sorter
+    this.setState({
+      sortField: field,
+      sort: order === 'descend' ? 'desc' : 'asc',
+    }, () => {
+      this.getData()
+    })
+  }
   render() {
-    const { columns, page, size } = this.state
+    const { page, size } = this.state
     const { distributeList } = this.props
+    const columns = [
+      {
+        title: <span>
+          <span style={{ marginRight: 8 }}>父事务名称</span>
+          <Tooltip title="事务发起者方法名">
+            <Icon type="question-circle-o"/>
+          </Tooltip>
+        </span>,
+        dataIndex: 'methodName',
+      },
+      {
+        title: '父事务别名',
+        dataIndex: 'txName',
+      },
+      {
+        /*
+        title: '子事务数量',
+        dataIndex: 'detailCount',
+        sorter: (a, b) => a.detailCount - b.detailCount,
+        width: 200,
+*/
+      },
+      {
+        title: '超时时间(ms)',
+        dataIndex: 'timeout',
+        render: text => text || '-',
+      },
+      {
+        title: '首次运行时间',
+        dataIndex: 'firstRunTime',
+        render: text => formatDate(text),
+        sorter: (a, b) => a.firstRunTime - b.firstRunTime,
+        width: 200,
+      },
+      {
+        title: '最新运行时间',
+        dataIndex: 'newRunTime',
+        render: text => formatDate(text),
+        sorter: (a, b) => a.newRunTime - b.newRunTime,
+        width: 200,
+      },
+    ]
     return <div className="distributed-list">
       <div className="top">
         <div className="top-left">
@@ -157,6 +173,9 @@ class DistributedList extends React.Component {
           />
         </div>
         <div className="top-right">
+          <span>
+            共计 { distributeList.count } 条
+          </span>
           <Pagination
             simple
             current={page}
@@ -173,6 +192,7 @@ class DistributedList extends React.Component {
           expandedRowRender={record => this.expandedRow(record)}
           onExpand={(expended, record) => { this.onExpand(expended, record) }}
           dataSource={distributeList.data || []}
+          onChange={this.tableChange}
           pagination={false}
         />
       </Card>
