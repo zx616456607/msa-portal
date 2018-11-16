@@ -10,6 +10,14 @@
         margin-right: @padding-medium;
       }
     }
+    .top-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      & > span {
+        margin-right: @padding-small;
+      }
+    }
   }
   .spinning {
     width: 100%;
@@ -17,11 +25,9 @@
     justify-content: center;
   }
   .ant-table-column-sorter {
-    right: 140px !important;
+    right: 33% !important;
   }
-  .ant-table-column-sort {
-    background: #fff !important;
-  }
+
   .child-transcation {
     .child-transcation-content {
       display: flex;
