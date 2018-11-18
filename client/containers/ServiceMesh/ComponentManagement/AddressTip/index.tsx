@@ -201,7 +201,7 @@ class Tips extends React.Component<TipsProps, TipsState> {
     const addressMessage = Object.entries(result)
       .map(([name, value]) => {
         // 获取内网地址
-        const domain = getDeepValue(value, ['metadata', 'labels', 'tenxcloud.com/svcName'])
+        const domain = getDeepValue(value, ['metadata', 'labels', 'system/svcName'])
         const portArray =
           getDeepValue(value, ['spec', 'template', 'spec', 'containers', 0, 'ports']) || []
         const innerAddress = portArray.map(({ containerPort }) => ({ domain, containerPort }))
