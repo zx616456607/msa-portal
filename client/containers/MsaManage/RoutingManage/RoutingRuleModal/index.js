@@ -411,10 +411,6 @@ class RoutingRuleModal extends React.Component {
             {
               getFieldDecorator(`header-${key}`, {
                 rules: [{
-                  required: true,
-                  whitespace: true,
-                  message: 'Header 名称不能为空',
-                }, {
                   validator: (rules, value, callback) =>
                     this.checkHeader(rules, value, callback, key),
                 }],
