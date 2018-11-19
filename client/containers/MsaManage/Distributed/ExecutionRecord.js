@@ -116,7 +116,7 @@ class ExecutionRecord extends React.Component {
       },
       {
         title: '子事务服务名',
-        dataIndex: 'txName',
+        dataIndex: 'appName',
         render: text => this.fixedWidthContent(text),
         width: 100,
       },

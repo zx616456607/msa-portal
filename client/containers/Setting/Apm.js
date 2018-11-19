@@ -144,7 +144,7 @@ class ApmSetting extends React.Component {
     }
   }
   filters = () => {
-    const { projectID } = this.props
+    const projectID = JSON.parse(JSON.stringify(this.props.projectID))
     const { serviceData } = this.state
     const DataAry = []
     if (Object.keys(serviceData).length === 0) return
