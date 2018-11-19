@@ -323,7 +323,7 @@ class GatewayModal extends React.Component {
               )
             }
           </FormItem>
-          <FormItem {...formItemLayout} label="服务网格出口">
+          <FormItem className="netOutRow" {...formItemLayout} label="服务网格出口">
             {
               getFieldDecorator('out', {
                 initialValue: init.out,
@@ -344,6 +344,15 @@ class GatewayModal extends React.Component {
                   }
                 </Select>
               )
+            }
+            {
+              !(meshIngressGatewayList.data || []).length &&
+                <Tooltip title="请联系paas平台基础设施管理员创建服务网格出口">
+                  <Icon
+                    type="warning"
+                    className="noNetOutTip"
+                  />
+                </Tooltip>
             }
           </FormItem>
           {
