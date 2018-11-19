@@ -77,18 +77,34 @@ class RoutingRuleModal extends React.Component {
   }
 
   initForm = () => {
-    const { globalRule } = this.props
-    const headers = globalRule.split(',')
-    if (isEmpty(globalRule) || isEmpty(headers)) {
+    const { globalRule, currentRoute } = this.props
+    if (!currentRoute || !currentRoute.headerFlag || currentRoute.headerFlag === 'global') {
+      const headers = globalRule.split(',')
+      if (isEmpty(globalRule) || isEmpty(headers)) {
+        return
+      }
+      const globalData = { keys: [] }
+      headers.forEach((item, index) => {
+        globalData.keys.push(index)
+        globalData[`header-${index}`] = item
+      })
+      this.setState({
+        globalData,
+      })
       return
     }
-    const globalData = { keys: [] }
+    const { sensitiveHeaders } = currentRoute
+    if (!sensitiveHeaders) {
+      return
+    }
+    const headers = sensitiveHeaders.split(',')
+    const diyData = { keys: [] }
     headers.forEach((item, index) => {
-      globalData.keys.push(index)
-      globalData[`header-${index}`] = item
+      diyData.keys.push(index)
+      diyData[`header-${index}`] = item
     })
     this.setState({
-      globalData,
+      diyData,
     })
   }
 
@@ -135,7 +151,7 @@ class RoutingRuleModal extends React.Component {
         routeId: values.routeId,
         path: values.path,
         description: values.description,
-        stripPrefix: values.stripPrefix,
+        stripPrefix: !!values.stripPrefix,
         retryable: values.retryable,
         status: values.status,
         url: values.url,
@@ -163,7 +179,7 @@ class RoutingRuleModal extends React.Component {
         confirmLoading: true,
       })
       if (!currentRoute) {
-        addGatewayRoute(clusterID, values, { isHandleError: true }).then(res => {
+        addGatewayRoute(clusterID, body, { isHandleError: true }).then(res => {
           this.setState({
             confirmLoading: false,
           })
@@ -601,7 +617,7 @@ class RoutingRuleModal extends React.Component {
           label={''}
         >
           {getFieldDecorator('headerFlag', {
-            initialValue: 'global',
+            initialValue: currentRoute ? currentRoute.headerFlag : 'global',
             onChange: this.changeHeaderType,
           })(
             <RadioGroup>
