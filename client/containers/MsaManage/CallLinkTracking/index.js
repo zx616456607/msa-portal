@@ -333,8 +333,8 @@ class CallLinkTracking extends React.Component {
                   rules: [
                     {
                       validator: (rule, value, cb) => {
-                        const reg = /[f-zA-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F\u4e00-\u9fa5]/g
-                        if (reg.test(value)) cb('输入的字符只能是 0-9 a-e（16进制）')
+                        const reg = /[g-zA-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F\u4e00-\u9fa5]/g
+                        if (reg.test(value)) cb('输入的字符只能是 0-9 a-f（16进制）')
                         if (value.length > 32) cb('长度不超过32位')
                         cb()
                       },

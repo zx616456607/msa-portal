@@ -395,10 +395,8 @@ class ConsumerVouchers extends React.Component {
                   required: true,
                   message: '消费凭证名称不能为空',
                 }, {
-                  whitespace: true,
-                  message: '不能输入空格',
-                }, {
                   validator: (rule, value, callback) => {
+                    if (/\s+/g.test(value)) return callback('不能输入空格')
                     if (value.length > 64) {
                       return callback('消费凭证名称长度不能超过 64')
                     }
