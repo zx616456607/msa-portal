@@ -102,67 +102,70 @@ class ApplyforCSBInstanceModal extends React.Component {
           <Button key="submit" type="primary" onClick={() => history.push('/csb-instances/my-application')}>去查看</Button>,
       ]}
     >
-      {
-        !this.state.isApplyfor ?
-          <Row>
-            <Row className="row-style">
-              <Col span={5}>实例名称</Col>
-              <Col span={19}>{currentRecord.name}</Col>
-            </Row>
-            <Row className="row-style">
-              <Col span={5}>实例描述</Col>
-              <Col span={19}>{currentRecord.description === undefined ? '--' : currentRecord.description}</Col>
-            </Row>
-            <FormItem
-              label="申请权限"
-              key="appplyformpermission"
-              {...formItemLayout}
-            >
-              {
-                getFieldDecorator('appplyformpermission', {
-                  rules: [{
-                    required: true,
-                    message: '请选择申请权限',
-                  }],
-                })(
-                  <CheckboxGroup>
-                    <Checkbox value={2}>可发布服务</Checkbox>
-                    <Checkbox value={1}>可订阅服务</Checkbox>
-                  </CheckboxGroup>
-                )
-              }
-            </FormItem>
-            <FormItem
-              label="申请原因"
-              key="reason"
-              {...formItemLayout}
-            >
-              {
-                getFieldDecorator('reason', {
-                  initialValue: this.state.text ? this.state.text : undefined,
-                  rules: [{
-                    required: true,
-                    message: '请填写申请原因',
-                  }, {
-                    validator: (rule, value, callback) => {
-                      if (value.length < 1 || value.length > 23 || /\s+/g.test(value)) {
-                        callback('长度为1-23个字符，不包含空格')
-                      }
-                      callback()
-                    },
-                  }],
-                })(
-                  <TextArea placeholder="必填" onChange={this.handleChange} />
-                )
-              }
-            </FormItem>
-          </Row> :
-          <div className="check">
-            <Icon type="check-circle-o" />
-            <div className="desc">申请操作成功，待审批</div>
-            <div>实例名称：{currentRecord.name}</div>
-          </div>
-      }
+      <Form>
+        {
+          !this.state.isApplyfor ?
+            <Row>
+              <Row className="row-style">
+                <Col span={5}>实例名称</Col>
+                <Col span={19}>{currentRecord.name}</Col>
+              </Row>
+              <Row className="row-style">
+                <Col span={5}>实例描述</Col>
+                <Col span={19}>{currentRecord.description === undefined ? '--' : currentRecord.description}</Col>
+              </Row>
+              <FormItem
+                label="申请权限"
+                key="appplyformpermission"
+                {...formItemLayout}
+              >
+                {
+                  getFieldDecorator('appplyformpermission', {
+                    rules: [{
+                      required: true,
+                      message: '请选择申请权限',
+                    }],
+                  })(
+                    <CheckboxGroup>
+                      <Checkbox value={2}>可发布服务</Checkbox>
+                      <Checkbox value={1}>可订阅服务</Checkbox>
+                    </CheckboxGroup>
+                  )
+                }
+              </FormItem>
+              <FormItem
+                label="申请原因"
+                key="reason"
+                {...formItemLayout}
+              >
+                {
+                  getFieldDecorator('reason', {
+                    initialValue: this.state.text ? this.state.text : undefined,
+                    rules: [{
+                      required: true,
+                      message: '请填写申请原因',
+                    }, {
+                      validator: (rule, value, callback) => {
+                        if (!value) return callback('请填写申请原因')
+                        if (value.length < 1 || value.length > 23 || /\s+/g.test(value)) {
+                          return callback('长度为1-23个字符，不包含空格')
+                        }
+                        callback()
+                      },
+                    }],
+                  })(
+                    <TextArea placeholder="必填" onChange={this.handleChange} />
+                  )
+                }
+              </FormItem>
+            </Row> :
+            <div className="check">
+              <Icon type="check-circle-o" />
+              <div className="desc">申请操作成功，待审批</div>
+              <div>实例名称：{currentRecord.name}</div>
+            </div>
+        }
+      </Form>
     </Modal>
   }
 }
