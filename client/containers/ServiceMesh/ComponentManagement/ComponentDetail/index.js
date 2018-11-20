@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Card, Form, Row, Col, Tabs, Button, Table, Modal, Select, Input, Icon, notification } from 'antd'
+import { Card, Form, Row, Col, Tabs, Button, Table, Modal, Select, Input, Icon, Tooltip, notification } from 'antd'
 import { formatDate } from '../../../../common/utils'
 import componentImg from '../../../../assets/img/serviceMesh/component.png'
 import { fetchComponent, editComponent, fetchServiceList, deleteComponent } from '../../../../actions/serviceMesh'
@@ -50,7 +50,7 @@ class ComponentDetail extends React.Component {
       const aryList = []
       const list = res.response.result
       Object.keys(list).forEach(item => {
-        const moduleValue = list[item].metadata.labels['servicemesh/app-module']
+        const moduleValue = list[item].metadata.labels['system/servicemesh-module']
         if (moduleValue) {
           const query = {
             moduleName: moduleValue,
@@ -93,7 +93,7 @@ class ComponentDetail extends React.Component {
         const key = annotations.description ? index + 1 : index
         const query = {
           name: Object.keys(annotations)[key].split('/')[1],
-          version: item.labels.version,
+          version: item.labels['system/servicemesh-version'],
         }
         serviceAry.push(query)
       })
@@ -201,7 +201,7 @@ class ComponentDetail extends React.Component {
           })
           detailList && detailList.spec.subsets.forEach((item, index) => {
             // const key = detailList.spec.subsets[item].name
-            const key = item.labels.version
+            const key = item.labels['system/servicemesh-version']
             if (key === version) {
               detailList.spec.subsets.splice(index, 1)
             }
@@ -301,6 +301,35 @@ class ComponentDetail extends React.Component {
     callback()
   }
 
+  filterServices = record => {
+    const service = []
+    if (record) {
+      const serviceList = []
+      record.metadata.annotations && Object.keys(record.metadata.annotations).forEach(key => {
+        if (key.indexOf('svcName/') !== -1) {
+          serviceList.push(key.split('/')[1])
+        }
+      })
+      const services_component = record.metadata.annotations &&
+        JSON.parse(record.metadata.annotations['system/services-in-component'])
+      serviceList.forEach(keys => {
+        if (services_component.indexOf(keys) === -1) {
+          service.push(keys)
+        }
+      })
+    }
+    return service
+  }
+
+  tipService = list => {
+    const listAry = this.filterServices(list)
+    return listAry.length ?
+      <Tooltip placement="top"
+        title={`组件中的 “${listAry}” 服务已经不存在，请编辑移除该服务`}>
+        <Icon type="exclamation-circle" className="ico" />
+      </Tooltip> : ''
+  }
+
   render() {
     const { form, serviceList } = this.props
     const { detailList, isLoading } = this.state
@@ -330,6 +359,7 @@ class ComponentDetail extends React.Component {
       title: '操作',
       render: record => <div>
         <Button onClick={() => this.handleDelete(record)}>移除</Button>
+        {this.tipService(detailList)}
       </div>,
     }]
     const { metadata } = detailList
