@@ -34,7 +34,7 @@ import {
 import {
   formatDate,
   renderInstanceRole,
-  formatFilterConditions,
+  // formatFilterConditions,
   getInstanceRole,
   toQuerystring,
 } from '../../../common/utils'
@@ -132,21 +132,22 @@ class CSBApplication extends React.Component {
     })
   }
 
-  formatFilterConditions = filters => {
-    const { status } = filters
-    let statusFilter = 'status-ne-1'
-    if (status && status.length === 1) {
-      statusFilter = `status-eq-${status[0]}`
+  /*
+    formatFilterConditions = filters => {
+      const { status } = filters
+      let statusFilter = 'status-ne-1'
+      if (status && status.length === 1) {
+        statusFilter = `status-eq-${status[0]}`
+      }
+      const roleConditions = formatFilterConditions(filters)
+      roleConditions.push(statusFilter)
+      return roleConditions
     }
-    const roleConditions = formatFilterConditions(filters)
-    roleConditions.push(statusFilter)
-    return roleConditions
-  }
+  */
 
   tableOnchange = (pagination, filters, sorter) => {
     const { columnKey, order } = sorter
     const { role, status } = filters
-    const filter = this.formatFilterConditions(filters)
     this.setState({
       filteredRoleValue: role,
       filteredStatueValue: status,
@@ -176,7 +177,7 @@ class CSBApplication extends React.Component {
     }
     const query = {
       page: 1,
-      filter,
+      filter: this.state.radioValue,
       sort: order ? `${order.substring(0, 1)},${columnKey}` : null,
     }
     this.loadData(query)
