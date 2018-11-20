@@ -14,6 +14,16 @@
     width: 90%;
     margin-right: 8px;
   }
+  .netOutRow {
+    display: flex;
+    align-items: center;
+    .noNetOutTip {
+      color: @warning-color;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: @padding-base / 2;
+    }
+  }
   .add {
     color: @primary-color;
     cursor: pointer;
@@ -22,5 +32,8 @@
   .outTip {
     margin-left: @padding-base / 2;
     cursor: pointer;
+  }
+  .ant-form-explain {
+    width: 90%;
   }
 }

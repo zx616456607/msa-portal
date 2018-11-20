@@ -19,6 +19,7 @@ import * as msaActions from '../../../../../actions/msa'
 import { API_CONFIG } from '../../../../../constants'
 import './style/index.less'
 import BlownDemoModal from '../../../../../components/BlownChart/BlownDemo'
+import PoolDemoModal from '../../../../../components/BlownChart/PoolDemo'
 import EmptyBlown from '../../../../../components/BlownChart/EmptyBlown'
 import isEmpty from 'lodash/isEmpty'
 import { sleep } from '../../../../../common/utils'
@@ -46,6 +47,14 @@ class MsaBlownMonitor extends React.PureComponent {
     this.setState(({ visible }) => {
       return {
         visible: !visible,
+      }
+    })
+  }
+
+  togglePoolVisible = () => {
+    this.setState(({ poolVisible }) => {
+      return {
+        poolVisible: !poolVisible,
       }
     })
   }
@@ -96,7 +105,7 @@ class MsaBlownMonitor extends React.PureComponent {
   }
 
   render() {
-    const { visible, wsFetching } = this.state
+    const { visible, wsFetching, poolVisible } = this.state
     const { blownMonitor } = this.props
     const host = MSA_API.replace('http', 'ws')
     if (wsFetching) {
@@ -114,7 +123,16 @@ class MsaBlownMonitor extends React.PureComponent {
           <Icon type="picture" /> 查看示例图
         </span>
         <div className="layout-content-body blown-monitor-body">
-          <div className="first-title">断路器</div>
+          <div>
+            <span className="first-title">断路器</span>
+            <span
+              style={{ marginLeft: 20 }}
+              className={'primary-color pointer'}
+              onClick={this.toggleVisible}
+            >
+              <Icon type="picture" /> 查看示例图
+            </span>
+          </div>
           {
             isEmpty(blownMonitor) || isEmpty(blownMonitor.circuitBreakerData)
               ?
@@ -126,7 +144,16 @@ class MsaBlownMonitor extends React.PureComponent {
                 {this.renderBlownCharts()}
               </div>
           }
-          <div className="first-title">线程池</div>
+          <div>
+            <span className="first-title">线程池</span>
+            <span
+              style={{ marginLeft: 20 }}
+              className={'primary-color pointer'}
+              onClick={this.togglePoolVisible}
+            >
+              <Icon type="picture" /> 查看示例图
+            </span>
+          </div>
           {
             isEmpty(blownMonitor) || isEmpty(blownMonitor.poolData)
               ?
@@ -143,6 +170,11 @@ class MsaBlownMonitor extends React.PureComponent {
           visible={visible}
           onCancel={this.toggleVisible}
           onOk={this.toggleVisible}
+        />
+        <PoolDemoModal
+          visible={poolVisible}
+          onOk={this.togglePoolVisible}
+          onCancel={this.togglePoolVisible}
         />
       </div>
     )

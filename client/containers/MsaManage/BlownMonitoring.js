@@ -8,6 +8,7 @@ import './style/BlownMonitoring.less'
 import BlownChart from '../../components/BlownChart'
 import ThreadChart from '../../components/BlownChart/ThreadChart'
 import BlownDemoModal from '../../components/BlownChart/BlownDemo'
+import PoolDemoModal from '../../components/BlownChart/PoolDemo'
 import EmptyBlown from '../../components/BlownChart/EmptyBlown'
 import * as msaActions from '../../actions/msa'
 import { sleep } from '../../common/utils'
@@ -44,6 +45,14 @@ class BlownMonitoring extends React.Component {
     this.setState(({ visible }) => {
       return {
         visible: !visible,
+      }
+    })
+  }
+
+  togglePoolVisible = () => {
+    this.setState(({ poolVisible }) => {
+      return {
+        poolVisible: !poolVisible,
       }
     })
   }
@@ -118,7 +127,7 @@ class BlownMonitoring extends React.Component {
   }
 
   render() {
-    const { visible, blownCluster, wsFetching } = this.state
+    const { visible, blownCluster, wsFetching, poolVisible } = this.state
     const { clusterFetching, blownClusters, blownMonitor } = this.props
     if (clusterFetching || wsFetching) {
       return <div className="loading">
@@ -144,15 +153,18 @@ class BlownMonitoring extends React.Component {
           >
             {this.renderBlownClusters()}
           </Select>
-          <span
-            className={'primary-color pointer'}
-            onClick={this.toggleVisible}
-          >
-            <Icon type="picture" /> 查看示例图
-          </span>
         </div>
         <div className="layout-content-body" key="body">
-          <div className="first-title">断路器</div>
+          <div>
+            <span className="first-title">断路器</span>
+            <span
+              style={{ marginLeft: 20 }}
+              className={'primary-color pointer'}
+              onClick={this.toggleVisible}
+            >
+              <Icon type="picture" /> 查看示例图
+            </span>
+          </div>
           {
             (isEmpty(blownClusters) || isEmpty(blownMonitor)
               || isEmpty(blownMonitor.circuitBreakerData))
@@ -165,7 +177,16 @@ class BlownMonitoring extends React.Component {
                 {this.renderBlownCharts()}
               </div>
           }
-          <div className="first-title">线程池</div>
+          <div>
+            <span className="first-title">线程池</span>
+            <span
+              style={{ marginLeft: 20 }}
+              className={'primary-color pointer'}
+              onClick={this.togglePoolVisible}
+            >
+              <Icon type="picture" /> 查看示例图
+            </span>
+          </div>
           {
             (isEmpty(blownClusters) || isEmpty(blownMonitor)
               || isEmpty(blownMonitor.poolData))
@@ -183,6 +204,11 @@ class BlownMonitoring extends React.Component {
           visible={visible}
           onOk={this.toggleVisible}
           onCancel={this.toggleVisible}
+        />
+        <PoolDemoModal
+          visible={poolVisible}
+          onOk={this.togglePoolVisible}
+          onCancel={this.togglePoolVisible}
         />
       </QueueAnim>
     )
