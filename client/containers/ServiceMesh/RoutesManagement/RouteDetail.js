@@ -21,7 +21,6 @@ import { validateDomainName, validateServiceName } from '../../../common/utils'
 import './style/NewRoute.less'
 import { MESH_ROUTE_RULE_NAME_REG,
   MESH_ROUTE_RULE_NAME_REG_NOTICE,
-  IP_REG,
   ROUTE_REG } from '../../../constants';
 
 const FormItem = Form.Item
@@ -272,32 +271,29 @@ class NewRouteComponent extends React.Component {
       rules: [{ required: true, message: '请选择网关' }],
     })
   }
-  domainValidator = (rule, value, cb) => {
-    const { visitType } = this.state
+  testRepet = cb => {
     const { getFieldValue } = this.props.form
-    if (!value) return cb()
-    const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
-    if (visitType !== 'pub') {
-      if (!(domainReg.test(value) || IP_REG.test(value))) {
-        cb('请填写正确的服务域名')
-      }
-    }
     let hostList = getFieldValue('host')
     hostList = hostList.filter(v => typeof v === 'string')
     if (hostList.length > 1) {
       const existHostList = hostList.slice(0, hostList.length - 1)
       if (existHostList.includes(hostList[hostList.length - 1])) {
-        cb('服务域名不能重复')
+        cb('内容不能重复')
       }
     }
-
+  }
+  domainValidator = (rule, value, cb) => {
+    if (!value) return cb()
+    // const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+    this.testRepet(cb)
     cb()
 
   }
   domainOrServiceValidator = (rule, value, cb) => {
     if (value === '') {
-      return cb('请输入服务域名或域名')
+      return cb('请填写服务名或域名')
     }
+    this.testRepet(cb)
     cb(validateDomainName(value))
     cb(validateServiceName(value))
     cb()
@@ -381,9 +377,7 @@ class NewRouteComponent extends React.Component {
     getFieldDecorator('hostKeys', { initialValue: this.setInitialValue().defaultHostList });
     const hostList = getFieldValue('hostKeys');
     const { visitType, serviceHost } = this.state
-    const hostTip = visitType === 'pub' ? `服务对外访问地址，用户需自行申请，
-    并确保所填域名或主机名能解析到所选网关的出口ip地址
-    （在选择的网关中添加该域名或主机名）` : '服务集群内访问地址，请填写不冲突的服务名或域名'
+    const hostTip = visitType === 'pub' ? '服务对外访问地址，用户需自行申请， 并确保所填域名能解析到所选网关的出口ip地址 （在选择的网关中添加该域名）' : '服务集群内访问地址，请填写不冲突的服务名或域名'
     const hostItems = hostList.map((k, index) => {
       return (
         <FormItem
@@ -438,7 +432,7 @@ class NewRouteComponent extends React.Component {
                 })(
                   <Input
                     addonAfter={<Icon type="plus" onClick={() => this.addItem('hostKeys')}/>}
-                    placeholder="请输入服务域名"
+                    placeholder="请输入服务名或域名"
                     style={{ width: '200px', marginRight: 8 }} />
                 )}
               </span>
