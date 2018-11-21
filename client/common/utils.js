@@ -558,7 +558,7 @@ const dns1123Label = /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/
 
 export function validateDomainName(name) {
   if (name !== '*' && name.indexOf('.') === -1) {
-    return '请填写正确的服务域名或域名'
+    return '请填写正确的服务名或域名'
   }
   return validate(name)
 }
@@ -576,7 +576,7 @@ function validate(host) {
     return '通配符DNS (RFC1123)标签最大长度为63'
   }
   if (!wildcardPrefix.test(parts[0])) {
-    return '请填写正确的服务域名或域名'
+    return '请填写正确的服务名或域名'
   }
   if (parts.length > 1) {
     for (let i = 1; i < parts.length; ++i) {
@@ -585,7 +585,7 @@ function validate(host) {
         return '通配符DNS (RFC1123)标签最大长度为63'
       }
       if (!dns1123Label.test(label)) {
-        return '请填写正确的服务域名或域名'
+        return '请填写正确的服务名或域名'
       }
     }
   }
