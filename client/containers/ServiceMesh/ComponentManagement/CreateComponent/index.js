@@ -69,7 +69,7 @@ class CreateComponent extends React.Component {
         })
         setTimeout(() => {
           form.setFieldsValue(obj)
-        }, 1000)
+        })
       }
     }
   }
