@@ -13,7 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Button, Input, Card, Form, Row, Col, Icon, Select, notification } from 'antd'
+import { Button, Input, Card, Form, Row, Col, Icon, Select, Tooltip, notification } from 'antd'
 import './style/index.less'
 import { COMPONENT_NAME, COMPONENT_NAME_REG } from '../../../../constants'
 import { AddComponent, fetchServiceList, loadComponent, fetchComponent, editComponent } from '../../../../actions/serviceMesh'
@@ -58,7 +58,7 @@ class CreateComponent extends React.Component {
           const key = annotations.description ? index + 1 : index
           Object.assign(obj, {
             [`serviceName-${index}`]: Object.keys(annotations)[key].split('/')[1],
-            [`version-${index}`]: item.labels.version,
+            [`version-${index}`]: item.name,
           })
           this.setState({
             [`service${index}`]: true,
@@ -69,7 +69,7 @@ class CreateComponent extends React.Component {
         })
         setTimeout(() => {
           form.setFieldsValue(obj)
-        }, 1000)
+        })
       }
     }
   }
@@ -114,7 +114,7 @@ class CreateComponent extends React.Component {
       const aryList = []
       const list = res.response.result
       Object.keys(list).forEach(item => {
-        const moduleValue = list[item].metadata.labels['servicemesh/app-module']
+        const moduleValue = list[item].metadata.labels['system/servicemesh-module']
         if (moduleValue) {
           const query = {
             moduleName: moduleValue,
@@ -327,6 +327,37 @@ class CreateComponent extends React.Component {
     callback()
   }
 
+  filterService = () => {
+    const service = []
+    const { componentList } = this.state
+    const { annotations } = componentList.metadata
+    if (annotations) {
+      const serviceList = []
+      Object.keys(annotations).forEach(item => {
+        if (item.indexOf('svcName/') !== -1) {
+          serviceList.push(item.split('/')[1])
+        }
+      })
+      const services_component = annotations &&
+        JSON.parse(annotations['system/services-in-component'])
+      serviceList.forEach(keys => {
+        if (services_component.indexOf(keys) === -1) {
+          service.push(keys)
+        }
+      })
+    }
+    return service
+  }
+
+  tipService = () => {
+    const listAry = this.filterService()
+    return listAry.length ?
+      <Tooltip placement="top"
+        title={`组件中的${listAry}服务已经不存在，请编辑移除该服务`}>
+        <Icon type="exclamation-circle" className="ico" />
+      </Tooltip> : ''
+  }
+
   render() {
     const { isAdd, componentList } = this.state
     const { form, serviceList } = this.props
@@ -388,7 +419,10 @@ class CreateComponent extends React.Component {
               className="delete"
               // icon="delete"
               // disabled={this.state[`service${key}`]}
-              onClick={() => this.handleRemove(key)}><Icon type="delete" /></Button>
+              onClick={() => this.handleRemove(key)}>
+              <Icon type="delete" />
+            </Button>
+            {this.state[`service${key}`] ? this.tipService(`serviceName-${key}`) : ''}
           </Col>
         </Row>
       )

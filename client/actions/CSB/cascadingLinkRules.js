@@ -51,8 +51,9 @@ export const CREATE_CSB_CASCADING_LINK_RULE_REQUEST = 'CREATE_CSB_CASCADING_LINK
 export const CREATE_CSB_CASCADING_LINK_RULE_SUCCESS = 'CREATE_CSB_CASCADING_LINK_RULE_SUCCESS'
 export const CREATE_CSB_CASCADING_LINK_RULE_FALIURE = 'CREATE_CSB_CASCADING_LINK_RULE_FALIURE'
 
-const fetchCreateCsbCascadingLinkRules = body => {
+const fetchCreateCsbCascadingLinkRules = (body, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         CREATE_CSB_CASCADING_LINK_RULE_REQUEST,
@@ -69,8 +70,8 @@ const fetchCreateCsbCascadingLinkRules = body => {
   }
 }
 
-export const createCsbCascadingLinkRule = body => {
-  return dispatch => dispatch(fetchCreateCsbCascadingLinkRules(body))
+export const createCsbCascadingLinkRule = (body, options) => {
+  return dispatch => dispatch(fetchCreateCsbCascadingLinkRules(body, options))
 }
 
 // 删除级联链路规则
