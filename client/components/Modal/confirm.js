@@ -91,7 +91,7 @@ export default function confirm(config) {
     footer.shift()
   }
 
-  const classString = classNames(prefixCls, {
+  const classString = classNames({
     [`${prefixCls}-${type}`]: true,
     'tenx-confirm-modal': true,
   }, className)
