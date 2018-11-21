@@ -16,7 +16,7 @@ import { Card, Form, Input, Select, Row, Col, Radio, Button, Tag, Icon, Tooltip,
 import { connect } from 'react-redux'
 import { getMeshGateway } from '../../../actions/meshGateway'
 import { loadComponent } from '../../../actions/serviceMesh'
-import { createNewRoute, getMeshRouteDetail, updateMeshRoute } from '../../../actions/meshRouteManagement'
+import { createNewRoute, getMeshRouteDetail, updateMeshRoute, getAllServiceName } from '../../../actions/meshRouteManagement'
 import { validateDomainName, validateServiceName } from '../../../common/utils'
 import './style/NewRoute.less'
 import { MESH_ROUTE_RULE_NAME_REG,
@@ -74,6 +74,7 @@ const mapStateToProps = state => {
   createNewRoute,
   getMeshRouteDetail,
   updateMeshRoute,
+  getAllServiceName,
 })
 class NewRouteComponent extends React.Component {
   state = {
@@ -86,14 +87,26 @@ class NewRouteComponent extends React.Component {
     hosts: [
       {},
     ],
+    alreadyExistService: [],
   }
   componentDidMount() {
     const { clusterID,
       getMeshGateway,
       loadComponent,
       getMeshRouteDetail,
+      getAllServiceName,
       match,
       project } = this.props
+    getAllServiceName(clusterID).then(res => {
+      if (!res.error) {
+        const services = []
+        const data = res.response.result
+        for (const k in data) {
+          if (data[k] === 'service') services.push(k)
+        }
+        this.setState({ alreadyExistService: services })
+      }
+    })
     const promises = [ getMeshGateway(clusterID), loadComponent(clusterID, project) ]
     if (match.params.name) {
       promises.push(getMeshRouteDetail(clusterID, match.params.name))
@@ -282,10 +295,15 @@ class NewRouteComponent extends React.Component {
       }
     }
   }
+  testExistService = (val, cb) => {
+    const { alreadyExistService } = this.state
+    if (alreadyExistService.includes(val)) return cb('不能是已存在的服务名')
+  }
   domainValidator = (rule, value, cb) => {
     if (!value) return cb()
     // const domainReg = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
     this.testRepet(cb)
+    this.testExistService(value, cb)
     cb()
 
   }
@@ -294,6 +312,7 @@ class NewRouteComponent extends React.Component {
       return cb('请填写服务名或域名')
     }
     this.testRepet(cb)
+    this.testExistService(value, cb)
     cb(validateDomainName(value))
     cb(validateServiceName(value))
     cb()

@@ -139,3 +139,26 @@ const fetchDelVirtualService = (clusterId, name) => {
 export const deleteVirtualService = (clusterId, name) => dispatch => {
   return dispatch(fetchDelVirtualService(clusterId, name))
 }
+
+
+export const VALIDATE_SERVICE_NAME_REQUEST = 'VALIDATE_SERVICE_NAME_REQUEST'
+export const VALIDATE_SERVICE_NAME_SUCCESS = 'VALIDATE_SERVICE_NAME_SUCCESS'
+export const VALIDATE_SERVICE_NAME_FAILURE = 'VALIDATE_SERVICE_NAME_FAILURE'
+
+const alreadyExistServiceNameRequest = clusterId => {
+  return {
+    [CALL_API]: {
+      types: [
+        VALIDATE_SERVICE_NAME_REQUEST,
+        VALIDATE_SERVICE_NAME_SUCCESS,
+        VALIDATE_SERVICE_NAME_FAILURE,
+      ],
+      endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterId}/paas/discoverables`,
+      schema: {},
+    },
+  }
+}
+
+export const getAllServiceName = clusterId => dispatch => {
+  return dispatch(alreadyExistServiceNameRequest(clusterId))
+}
