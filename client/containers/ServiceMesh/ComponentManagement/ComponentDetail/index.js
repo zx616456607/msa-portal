@@ -107,7 +107,7 @@ class ComponentDetail extends React.Component {
     this.setState({
       visible: false,
     })
-    setFieldsValue({ keys: [] })
+    setFieldsValue({ keys: [ 0 ] })
   }
 
   handleDelete = list => {
