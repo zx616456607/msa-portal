@@ -98,13 +98,18 @@ class CreateLinkRules extends React.Component {
         description,
         literalPath: literalPath.substring(2, literalPath.length),
       }
-      const res = await createCsbCascadingLinkRule(body)
+      const res = await createCsbCascadingLinkRule(body, { isHandleError: true })
       this.setState({
         confirmLoading: false,
       })
       if (res.error && res.error.includes('The same order linkPath')) {
         return notification.error({
           message: '链路方向与已有级联链路完全一致，需重新添加链路实例',
+        })
+      }
+      if (res.status === 409) {
+        return notification.warn({
+          message: '链路名称重复',
         })
       }
       if (res.error) return
