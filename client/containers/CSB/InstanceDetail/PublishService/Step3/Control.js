@@ -126,7 +126,7 @@ export default class Control extends React.Component {
               {getFieldDecorator('apiGatewayLimit', {
                 initialValue: this.renderLimit(limitDetail, 'limit'),
               })(
-                <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
+                <InputNumber min={0} max={9999999} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
               )}
               次
               <Tooltip title="设置为 0 或者为空时代表不限制访问频度">
