@@ -138,7 +138,7 @@ class MyPublishedServiceGroups extends React.Component {
             notification.success({
               message: `${text}服务组成功`,
             })
-            self.loadGroupServices(record.id, {}, self.loadData)
+            self.loadGroupServices(record.id, {})
           })
         })
       },
@@ -214,7 +214,6 @@ class MyPublishedServiceGroups extends React.Component {
     return <ServicesTable
       from="group"
       loadData={this.loadGroupServices.bind(this, record.id)}
-      groupID={record.id}
       dataSource={content}
       total={totalElements}
       pageSize={size}

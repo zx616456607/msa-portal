@@ -330,7 +330,7 @@ class ServicesTable extends React.Component {
   }
 
   handleChange = (pagination, filters, sorter) => {
-    const { from, check, groupID, loadData } = this.props
+    const { check, loadData } = this.props
     let cascadedType = filters.cascadedType
     let filtersStr = ''
     let sorterStr = ''
@@ -362,8 +362,7 @@ class ServicesTable extends React.Component {
         cascadedType = [ 0, 1, 2, 5, 6, 8 ]
       }
     }
-    const group = from ? groupID : null
-    loadData(group, {
+    loadData(null, {
       status: filtersStr,
       sort: sorterStr,
       page: pagination.current,
