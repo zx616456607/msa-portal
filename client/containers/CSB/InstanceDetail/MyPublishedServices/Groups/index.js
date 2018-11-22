@@ -200,10 +200,10 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  loadGroupServices = (groupID, query = {}, loadGroup) => {
+  loadGroupServices = (groupID, query, querys) => {
     const { instanceID, getGroupServices } = this.props
-    getGroupServices(instanceID, groupID, query).then(() => {
-      loadGroup && loadGroup()
+    getGroupServices(instanceID, groupID, querys).then(() => {
+      this.loadData()
     })
   }
 
@@ -213,7 +213,8 @@ class MyPublishedServiceGroups extends React.Component {
     const { isFetching, content, totalElements, size } = currentGroupServices
     return <ServicesTable
       from="group"
-      loadData={this.loadGroupServices.bind(this, record.id, {}, this.loadData)}
+      loadData={this.loadGroupServices.bind(this, record.id)}
+      groupID={record.id}
       dataSource={content}
       total={totalElements}
       pageSize={size}
@@ -289,10 +290,10 @@ class MyPublishedServiceGroups extends React.Component {
             onClick={this.serviceGroupMenuClick.bind(this, record)}
           >
             <Menu.Item key="start" disabled={record.stoppedCount < 1}>
-            启动
+              启动
             </Menu.Item>
             <Menu.Item key="stop" disabled={record.activeCount < 1}>
-            停止
+              停止
             </Menu.Item>
             <Menu.Item key="delete">删除</Menu.Item>
           </Menu>
@@ -329,10 +330,10 @@ class MyPublishedServiceGroups extends React.Component {
       </div>
       <div key="btns" className="layout-content-btns">
         <Button onClick={this.goPublishService} type="primary" key="layout-content-btns">
-        发布服务
+          发布服务
         </Button>
         <Button icon="plus" onClick={this.openCreateServiceGroupModal.bind(this, 'create')}>
-        创建服务组
+          创建服务组
         </Button>
         <Button icon="sync" onClick={this.loadData.bind(this, null)}>刷新</Button>
         <Search

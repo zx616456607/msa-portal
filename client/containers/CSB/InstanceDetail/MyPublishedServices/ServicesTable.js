@@ -330,7 +330,7 @@ class ServicesTable extends React.Component {
   }
 
   handleChange = (pagination, filters, sorter) => {
-    const { check, loadData } = this.props
+    const { from, check, groupID, loadData } = this.props
     let cascadedType = filters.cascadedType
     let filtersStr = ''
     let sorterStr = ''
@@ -355,14 +355,15 @@ class ServicesTable extends React.Component {
     }
     if (cascadedType) {
       if (cascadedType.length === 1) {
-        if (parseInt(cascadedType[ 0 ]) === 1) {
+        if (parseInt(cascadedType[0]) === 1) {
           cascadedType = [ 1, 2, 5, 6, 8 ]
         }
       } else {
         cascadedType = [ 0, 1, 2, 5, 6, 8 ]
       }
     }
-    loadData(null, {
+    const group = from ? groupID : null
+    loadData(group, {
       status: filtersStr,
       sort: sorterStr,
       page: pagination.current,
@@ -398,15 +399,15 @@ class ServicesTable extends React.Component {
     ]
     switch (type) {
       case 1:
-        return [ svgArray[ 1 ] ]
+        return [ svgArray[1] ]
       case 2:
-        return [ svgArray[ 2 ] ]
+        return [ svgArray[2] ]
       case 5:
-        return [ svgArray[ 0 ], svgArray[ 1 ] ]
+        return [ svgArray[0], svgArray[1] ]
       case 6:
         return [ ...svgArray ]
       case 8:
-        return [ svgArray[ 1 ], svgArray[ 2 ] ]
+        return [ svgArray[1], svgArray[2] ]
       case 0:
       default:
         return null
