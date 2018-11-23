@@ -47,7 +47,7 @@ class MyPublishedServices extends React.Component {
       includeDeleted,
       showDeleted: e.target.value,
     })
-    this.loadData(this.props, { includeDeleted })
+    this.loadData({ includeDeleted })
   }
 
   componentDidMount() {
@@ -57,7 +57,7 @@ class MyPublishedServices extends React.Component {
     this.setState({
       name,
     }, () => {
-      this.loadData(this.props, { sort: 'publishTime,desc' }, true)
+      this.loadData({ sort: 'publishTime,desc' }, true)
     })
   }
 
@@ -69,7 +69,7 @@ class MyPublishedServices extends React.Component {
         includeDeleted: false,
         showDeleted: 0,
       }, () => {
-        this.loadData(nextProps, { sort: 'publishTime,desc' })
+        this.loadData({ sort: 'publishTime,desc' })
       })
     }
   }
@@ -86,10 +86,10 @@ class MyPublishedServices extends React.Component {
   }
 
   // 加载数据
-  loadData = (props, query, isFirst) => {
+  loadData = (query, isFirst) => {
     const {
       getInstanceService, history, match, location, getInstanceServiceOverview,
-    } = props || this.props
+    } = this.props
     const { instanceID } = match.params
     const { name, includeDeleted } = this.state
     query = Object.assign({}, location.query, { name, includeDeleted }, query)
@@ -97,10 +97,14 @@ class MyPublishedServices extends React.Component {
       delete query.page
     }
     if (isFirst || !query.includeDeleted) {
-      query.status = [ '1', '2' ]
+      if (query.status && query.status.length > 1) {
+        query.status = [ '1', '2' ]
+      }
     }
     if (query.includeDeleted === true) {
-      query.status = [ '1', '2', '4' ]
+      if (!query.status) {
+        query.status = [ '1', '2', '4' ]
+      }
     }
     if (query.sort === '') {
       delete query.sort
@@ -140,7 +144,7 @@ class MyPublishedServices extends React.Component {
       pageSize: size || 10,
       total: totalElements,
       current: parseInt(query.page, 10) || 1,
-      onChange: page => this.loadData(this.props, { page }),
+      onChange: page => this.loadData({ page }),
     }
     const { createServiceGroupModalVisible } = this.state
     return (
@@ -170,12 +174,12 @@ class MyPublishedServices extends React.Component {
           <Button icon="plus" onClick={this.openCreateServiceGroupModal}>
             创建服务组
           </Button>
-          <Button icon="sync" onClick={this.loadData.bind(this, this.props, null)}>刷新</Button>
+          <Button icon="sync" onClick={this.loadData.bind(this, null)}>刷新</Button>
           <Search
             placeholder="按服务名称搜索"
             className="search-input"
             onChange={e => this.setState({ name: e.target.value })}
-            onSearch={() => this.loadData(this.props, { name, page: 1 })}
+            onSearch={() => this.loadData({ name, page: 1 })}
             value={this.state.name}
           />
           {

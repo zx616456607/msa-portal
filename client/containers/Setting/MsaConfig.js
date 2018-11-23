@@ -266,9 +266,9 @@ class MsaConfig extends React.Component {
             {/* <ProjectCluster callback={() => this.load()} /> */}
             <Card
               title="微服务配置"
-              extra={title_extra}
               className="msa_config_style"
             >
+              {title_extra}
               <Row className="conten">
                 <Col className="left" span={12}>
                   <FormItem

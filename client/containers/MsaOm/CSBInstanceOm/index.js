@@ -160,6 +160,9 @@ class CSBInstanceOm extends React.Component {
       onOk: () => {
         callback && callback(clusterId, namespace, body).then(res => {
           if (res.error) {
+            notification.error({
+              message: `实例 ${name} ${modalTitle}停止失败，请稍后重试`,
+            })
             return
           }
           this.setState({
@@ -298,7 +301,8 @@ class CSBInstanceOm extends React.Component {
         width: '15%',
         render: text => text || '-',
       },
-      { title: '状态', dataIndex: 'status', width: '10%',
+      {
+        title: '状态', dataIndex: 'status', width: '10%',
         // filters: [{
         //  text: '运行中',
         //  value: 'running',
@@ -342,7 +346,8 @@ class CSBInstanceOm extends React.Component {
         sortOrder: sorterInfo.columnKey === 'creationTime' && sorterInfo.order,
         render: text => formatDate(text),
       },
-      { title: '操作', width: '15',
+      {
+        title: '操作', width: '15',
         render: (text, row) => {
           const { status } = row
           const menu = (
@@ -390,7 +395,7 @@ class CSBInstanceOm extends React.Component {
           </RadioGroup>
         </div> */}
         <div className="layout-content-btns" key="btns">
-          <Button type="primary" onClick={this.openCreateModal}><Icon type="plus"/>创建实例</Button>
+          <Button type="primary" onClick={this.openCreateModal}><Icon type="plus" />创建实例</Button>
           <Button type="primary" onClick={() => this.getInstanceList()}><Icon type="sync" /> 刷新</Button>
           <SearchInput
             addonBefore={selectBefore}
@@ -404,7 +409,7 @@ class CSBInstanceOm extends React.Component {
             totalElements > 0 &&
             <div className="page-box">
               <span className="total">共计 {totalElements} 条</span>
-              <Pagination {...pagination}/>
+              <Pagination {...pagination} />
             </div>
           }
         </div>

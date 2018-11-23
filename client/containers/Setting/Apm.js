@@ -276,9 +276,9 @@ class ApmSetting extends React.Component {
           <div key="layout-content-btns">
             <Card
               title="APM配置"
-              extra={title_extra}
               className="apm_config_style"
             >
+              {title_extra}
               <Row className="contents">
                 <Col className="left">
                   <Row className="apms">

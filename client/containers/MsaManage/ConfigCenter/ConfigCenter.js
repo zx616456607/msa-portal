@@ -184,7 +184,7 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '27%',
+      width: '20%',
       render: (text, record) =>
         <Link to={`/msa-manage/config-center/${decodeURIComponent(text)}?detail=true&id=${record.id}&branch=${branch_name}`}>
           {decodeURIComponent(text)}
