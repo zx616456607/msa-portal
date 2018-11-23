@@ -170,8 +170,8 @@ class BlackAndWhiteListModal extends React.Component {
                 const { form: { getFieldsValue, getFieldValue } } = this.props
                 const keys = Object.keys(getFieldsValue())
                 let i = 0
-                while (keys.indexOf(`${formProps}-${i}`) > -1) {
-                  if (i < item.index && value === getFieldValue(`${formProps}-${i}`)) {
+                while (keys.indexOf(`${formProps}-${i}`) > -1 && i < item.index) {
+                  if (value === getFieldValue(`${formProps}-${i}`)) {
                     return callback(new Error('IP 地址重复'))
                   }
                   i++
