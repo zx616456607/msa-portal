@@ -38,7 +38,7 @@ const Chart = CreateG2(chart => {
   chart.col('dateTime', {
     alias: '时间',
     type: 'time',
-    mask: 'hh:MM:ss',
+    mask: 'yyyy-mm-dd hh:MM:ss',
     tickCount: 20,
     // nice: false,
   })

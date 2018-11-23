@@ -107,6 +107,12 @@ class CreateConfig extends React.Component {
       commit_message: encodeURIComponent(textAreaValue === '' ? '添加一个配置' : textAreaValue),
       project_url: encodeURIComponent(configGitUrl),
     }
+    if (!currentYaml) {
+      notification.warn({
+        message: '修改配置内容，方可保存更新',
+      })
+      return
+    }
     const yamls = currentYaml === '' ? yaml : currentYaml
     if (yaml === '' && currentYaml === '') {
       notification.warn({
@@ -286,7 +292,7 @@ class CreateConfig extends React.Component {
                 initialValue: branchName || undefined,
                 rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
               })(
-                <Select className="selects" placeholder="请选择配置版本" disabled={detail === 'true'} onChange={this.handlechage}>
+                <Select className="selects" placeholder="请选择配置版本" disabled={detail === 'update' || detail === 'true'} onChange={this.handlechage}>
                   {
                     branchData ?
                       branchData.map((item, index) => (

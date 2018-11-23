@@ -16,8 +16,11 @@ import QueueAnim from 'rc-queue-anim'
 import { Row, Col, Select, Button, Form, Input, DatePicker } from 'antd'
 import LogComponent from './LogsDetail'
 import TenxIcon from '@tenx-ui/icon/es/_old'
-import { getClusterOfQueryLog, getServiceOfQueryLog, getQueryLogList,
-  loadServiceContainerList } from '../../../actions/logs'
+import {
+  getServiceOfQueryLog, getQueryLogList,
+  loadServiceContainerList,
+} from '../../../actions/logs'
+import { getProjectClusters } from '../../../actions/current'
 import './style/index.less'
 import { formatDate } from '../../../common/utils'
 const FormItem = Form.Item
@@ -34,6 +37,13 @@ class Logs extends React.Component {
     clusterList: [],
     serviceList: [],
     exampleList: [],
+  }
+
+  componentDidMount() {
+    const { projectsList } = this.props
+    if (projectsList.length > 0) {
+      this.handleProject(projectsList[0].projectName)
+    }
   }
 
   bigLog = state => {
@@ -67,11 +77,24 @@ class Logs extends React.Component {
   }
 
   handleProject = value => {
-    const { getClusterOfQueryLog } = this.props
-    getClusterOfQueryLog(value).then(res => {
+    const { form, getProjectClusters } = this.props
+    getProjectClusters(value).then(res => {
+      if (res.error) {
+        return
+      }
+      let clusterList = []
+      const clusterIDList = res.response.result.data.clusters
+      const clusterAry = res.response.entities.clusters
+      if (clusterIDList) {
+        clusterList = clusterIDList.map(item => clusterAry[item])
+      }
       this.setState({
         projectName: value,
-        clusterList: res.response.result.data.clusters,
+        clusterList,
+      }, () => {
+        form.setFieldsValue({
+          clusters: undefined,
+        })
       })
     })
   }
@@ -117,17 +140,13 @@ class Logs extends React.Component {
   }
 
   render() {
-    const { logs, bigLog, serverName, serviceList, exampleList } = this.state
-    const { current, form, projectClusters, projectsList } = this.props
-    const currentConfig = current.config || {}
-    const project = currentConfig.project || {}
-    const clusters = projectClusters[project.namespace] || []
+    const { logs, bigLog, serverName, serviceList, exampleList, clusterList } = this.state
+    const { form, projectsList } = this.props
     const { getFieldDecorator } = form
     const projectItems = projectsList.filter(item =>
       !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
     )
-    const disabledProjectSelect = projectItems.length === 0;
-    const defaultProject = disabledProjectSelect ? undefined : projectItems[0].namespace
+    const defaultProject = projectItems.length > 0 ? projectItems[0].projectName : undefined
     return (
       <QueueAnim className="log">
         <div className="form" key="from">
@@ -140,8 +159,8 @@ class Logs extends React.Component {
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择项目" size="default" showSearch>
                     {
-                      projectItems.map(({ namespace, projectName }) =>
-                        <Option key={namespace}>{projectName}</Option>)
+                      projectItems.length > 0 && projectItems.map(item =>
+                        <Option key={item.namespace}>{item.projectName}</Option>)
                     }
                   </Select>
                 )}
@@ -155,7 +174,7 @@ class Logs extends React.Component {
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择集群" size="default" showSearch>
                     {
-                      clusters && clusters.map(item => (
+                      clusterList && clusterList.map(item => (
                         <Option key={item.clusterID}>{item.clusterName}</Option>
                       ))
                     }
@@ -249,24 +268,13 @@ class Logs extends React.Component {
 
 const mapStateToProps = state => {
   const { entities, current } = state
-  const { clusters, projects: projectsList } = entities
+  const { projects: projectsList } = entities
   const { cluster } = current.config
   const clusterID = cluster.id
-  const projectList = current.projects.ids || []
-  const currentClusters = current.clusters || {}
-  const projectClusters = {}
-  Object.keys(currentClusters).forEach(namespace => {
-    const clusterList = currentClusters[namespace].ids || []
-    projectClusters[namespace] = clusterList.map(id => clusters[id])
-  })
   const { projectConfig } = current
   const { projects: { ids: userProjectsList = [] } = {} } = current
-  // const userProjectsList = current.projectsList && current.projectsList.ids || []
   return {
     clusterID,
-    current: current || {},
-    projectList,
-    projectClusters,
     projectConfig,
     projectsList: userProjectsList.map(namespace => projectsList[namespace]),
   }
@@ -274,7 +282,7 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   getQueryLogList,
-  getClusterOfQueryLog,
+  getProjectClusters,
   getServiceOfQueryLog,
   loadServiceContainerList,
 })(Form.create()(Logs))
