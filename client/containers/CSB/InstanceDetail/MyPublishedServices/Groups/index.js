@@ -200,9 +200,9 @@ class MyPublishedServiceGroups extends React.Component {
     })
   }
 
-  loadGroupServices = (groupID, query, querys) => {
+  loadGroupServices = (groupID, query) => {
     const { instanceID, getGroupServices } = this.props
-    getGroupServices(instanceID, groupID, querys).then(() => {
+    getGroupServices(instanceID, groupID, query).then(() => {
       this.loadData()
     })
   }
