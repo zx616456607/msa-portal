@@ -16,7 +16,7 @@ import { Modal, Form, Input } from 'antd'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea
-
+const IP_REG = /^(?:(?:1[0-9][0-9]\.)|(?:2[0-4][0-9]\.)|(?:25[0-5]\.)|(?:[1-9][0-9]\.)|(?:[0-9]\.)){3}(?:(?:1[0-9][0-9])|(?:2[0-4][0-9])|(?:25[0-5])|(?:[1-9][0-9])|(?:[0-9]))$/
 class EditBindIp extends React.Component {
   static propTypes = {
     // 关闭 Modal 的方法
@@ -69,7 +69,7 @@ class EditBindIp extends React.Component {
               initialValue: currentService.bindIps ? currentService.bindIps : undefined,
               rules: [{
                 validator: (rule, value, callback) => {
-                  if (value && !/^(\d{1,3}(\.\d{1,3}){3})*(,\d{1,3}(\.\d{1,3}){3})*$/.test(value)) {
+                  if (value && !IP_REG.test(value)) {
                     return callback('请输入正确的IP地址，多个IP用 "," 隔开')
                   }
                   return callback()
