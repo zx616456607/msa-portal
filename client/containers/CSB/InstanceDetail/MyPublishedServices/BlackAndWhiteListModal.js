@@ -91,7 +91,7 @@ class BlackAndWhiteListModal extends React.Component {
   addlist = (list, type) => {
     const preList = cloneDeep(list)
     const length = preList.length
-    const preIndex = length ? preList[length - 1].index : 0
+    const preIndex = length ? preList[length - 1].index : -1
     const item = {
       index: preIndex + 1,
     }
@@ -167,6 +167,15 @@ class BlackAndWhiteListModal extends React.Component {
                 if (!/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,3})?$/.test(value)) {
                   return callback('IP地址如：192.168.1.0，或IP网段如：192.168.1.0/24')
                 }
+                const { form: { getFieldsValue, getFieldValue } } = this.props
+                const keys = Object.keys(getFieldsValue())
+                let i = 0
+                while (keys.indexOf(`${formProps}-${i}`) > -1) {
+                  if (i < item.index && value === getFieldValue(`${formProps}-${i}`)) {
+                    return callback(new Error('IP 地址重复'))
+                  }
+                  i++
+                }
                 return callback()
               },
             }],
@@ -201,6 +210,11 @@ class BlackAndWhiteListModal extends React.Component {
         isFetching
           ? <div style={{ textAlign: 'center' }}><Spin/></div>
           : <div>
+            <Row>
+              <div className="alert">
+                若所填 IP 既被添加到白名单，又在黑名单里，则黑名单优先，即拒绝访问该服务
+              </div>
+            </Row>
             <Row className="row-style">
               <Col span="4">
                 黑名单
