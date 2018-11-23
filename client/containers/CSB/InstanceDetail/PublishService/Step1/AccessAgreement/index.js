@@ -213,8 +213,10 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup>
               <Radio value="route1">直接路由</Radio>
+{/*
               <Radio value="route2" disabled>基于内容的路由</Radio>
               <Radio value="route3" disabled>无条件路由</Radio>
+*/}
             </RadioGroup>
           )}
           <div className="desc-text">{this.renderServiceRoutingStrategyTips()}</div>
