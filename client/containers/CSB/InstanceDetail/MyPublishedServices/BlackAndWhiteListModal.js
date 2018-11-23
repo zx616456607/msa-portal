@@ -25,6 +25,7 @@ import {
   delInstanceServiceACL,
   getServiceBlackAndWhiteList,
 } from '../../../../actions/CSB/instanceService'
+import { IP_CIDR_REG } from '../../../../constants'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -164,7 +165,7 @@ class BlackAndWhiteListModal extends React.Component {
                 if (!value) {
                   return callback('IP地址或者IP网段不能为空')
                 }
-                if (!/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,3})?$/.test(value)) {
+                if (!IP_CIDR_REG.test(value)) {
                   return callback('IP地址如：192.168.1.0，或IP网段如：192.168.1.0/24')
                 }
                 const { form: { getFieldsValue, getFieldValue } } = this.props
