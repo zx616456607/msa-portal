@@ -93,7 +93,7 @@ class ComponentDetail extends React.Component {
         const key = annotations.description ? index + 1 : index
         const query = {
           name: Object.keys(annotations)[key].split('/')[1],
-          version: item.labels['system/servicemesh-version'],
+          'system/servicemesh-version': item.labels['system/servicemesh-version'],
         }
         serviceAry.push(query)
       })
@@ -112,11 +112,8 @@ class ComponentDetail extends React.Component {
 
   handleDelete = list => {
     const { detailList } = this.state
-    const { metadata } = detailList
-    const { clusterID, deleteComponent } = this.props
     this.setState({
       isAdd: false,
-      // isLoading: true,
     })
     const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
     const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
@@ -126,24 +123,25 @@ class ComponentDetail extends React.Component {
       content: tip,
       onOk: () => {
         if (list) {
-          if (specFlag) {
-            if (metadata && metadata.name) {
-              deleteComponent(clusterID, metadata.name).then(res => {
-                if (res.error) {
-                  notification.success({
-                    message: `移除组件 ${metadata.name} 失败`,
-                  })
-                  return
-                }
-                notification.success({
-                  message: `移除组件 ${metadata.name} 成功`,
-                })
-                this.props.history.push('/service-mesh/component-management')
-              })
-            }
-          } else {
-            this.handleService(list)
-          }
+          this.handleService(list)
+          // if (specFlag) {
+          //   if (metadata && metadata.name) {
+          //     deleteComponent(clusterID, metadata.name).then(res => {
+          //       if (res.error) {
+          //         notification.success({
+          //           message: `移除组件 ${metadata.name} 失败`,
+          //         })
+          //         return
+          //       }
+          //       notification.success({
+          //         message: `移除组件 ${metadata.name} 成功`,
+          //       })
+          //       this.props.history.push('/service-mesh/component-management')
+          //     })
+          //   }
+          // } else {
+          //   this.handleService(list)
+          // }
         }
       },
     })
@@ -182,25 +180,30 @@ class ComponentDetail extends React.Component {
         keys.forEach(key => {
           const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
           const value = `${getFieldValue(`version-${key}`)}`
-          detailList.metadata.annotations[`${nameKey}`] = value
-          const query = {
+          const queryAnnotations = {
+            [nameKey]: value,
+          }
+          const querySubsets = {
             labels: {
-              version: value,
+              'system/servicemesh-version': value,
             },
             name: value,
           }
-          detailList.spec.subsets.push(query)
+          detailList.metadata.annotations = queryAnnotations
+          detailList.spec.subsets.push(querySubsets)
         })
       } else {
-        const { name, version } = list
+        const { name } = list
+        const version = list['system/servicemesh-version']
         if (name && version) {
-          detailList && detailList.spec.subsets.forEach(item => {
-            if (item.name === name) {
-              delete detailList.metadata.annotations[`svcName/${item.name}`]
+          const annotations = detailList.metadata.annotations
+          annotations && Object.keys(annotations).forEach(item => {
+            const serviceName = item.split('/')[1]
+            if (serviceName === name) {
+              delete detailList.metadata.annotations[item]
             }
           })
           detailList && detailList.spec.subsets.forEach((item, index) => {
-            // const key = detailList.spec.subsets[item].name
             const key = item.labels['system/servicemesh-version']
             if (key === version) {
               detailList.spec.subsets.splice(index, 1)
@@ -310,13 +313,15 @@ class ComponentDetail extends React.Component {
           serviceList.push(key.split('/')[1])
         }
       })
-      const services_component = record.metadata.annotations &&
+      const services_component = record.metadata.annotations['system/services-in-component'] &&
         JSON.parse(record.metadata.annotations['system/services-in-component'])
-      serviceList.forEach(keys => {
-        if (services_component.indexOf(keys) === -1) {
-          service.push(keys)
-        }
-      })
+      if (services_component) {
+        serviceList.forEach(keys => {
+          if (services_component.indexOf(keys) === -1) {
+            service.push(keys)
+          }
+        })
+      }
     }
     return service
   }
@@ -340,7 +345,7 @@ class ComponentDetail extends React.Component {
       dataIndex: 'name',
     }, {
       title: '组件服务版本',
-      dataIndex: 'version',
+      dataIndex: 'system/servicemesh-version',
     }, {
       title: '服务地址',
       dataIndex: 'address',
