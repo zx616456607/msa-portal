@@ -169,7 +169,7 @@ class CreateComponent extends React.Component {
     keys.forEach(key => {
       const query = {
         labels: {
-          version: `${getFieldValue(`version-${key}`)}`,
+          'system/servicemesh-version': `${getFieldValue(`version-${key}`)}`,
         },
         name: `${getFieldValue(`version-${key}`)}`,
       }

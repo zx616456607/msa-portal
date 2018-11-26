@@ -125,19 +125,22 @@ class ComponentManagement extends React.Component {
     const service = []
     dataList.forEach((item, index) => {
       const serviceList = []
-      // const name = dataAry[index].metadata.name
-      Object.keys(dataAry[index].metadata.annotations).forEach(key => {
+      const annotations = dataAry[index].metadata.annotations
+      annotations && Object.keys(annotations).forEach(key => {
         if (key.indexOf('svcName/') !== -1) {
           serviceList.push(key.split('/')[1])
         }
       })
       if (name === item.name) {
-        const serviceAry = JSON.parse(item.service)
-        serviceList.forEach(keys => {
-          if (serviceAry.indexOf(keys) === -1) {
-            service.push(keys)
-          }
-        })
+        if (item.service) {
+          const serviceAry = JSON.parse(item.service)
+          serviceList.forEach(keys => {
+            if (serviceAry.indexOf(keys) === -1) {
+              service.push(keys)
+            }
+          })
+        }
+
       }
     })
     return service

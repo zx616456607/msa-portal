@@ -375,7 +375,7 @@ class MsaComponents extends React.Component {
       dataIndex: 'count',
     }, {
       key: 'time',
-      title: '启动时间',
+      title: '安装时间',
       dataIndex: 'time',
     }, {
       title: '操作',
