@@ -196,15 +196,24 @@ class NewRouteComponent extends React.Component {
   }
   // 设置作用版本
   setActionVersion = val => {
-    const { componentList } = this.props
+    const { componentList, form } = this.props
     const actionVersionArr = []
+    const { getFieldsValue, setFieldsValue } = form
+    const versions = getFieldsValue().version
     const dataAry = componentList.data || {}
+    if (versions) {
+      versions.forEach((v, i) => {
+        setFieldsValue({
+          [`version[${i}]`]: [],
+        })
+      })
+    }
     Object.keys(dataAry).forEach(v => {
       if (dataAry[v].spec.host === val) {
         for (const k of dataAry[v].spec.subsets) {
           actionVersionArr.push({
-            label: k.labels.version,
-            value: k.labels.version,
+            label: k.labels['system/servicemesh-version'],
+            value: k.labels['system/servicemesh-version'],
           })
         }
       }
