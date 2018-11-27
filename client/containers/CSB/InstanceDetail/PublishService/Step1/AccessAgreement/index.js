@@ -74,7 +74,9 @@ class AccessAgreement extends React.Component {
         }
         let pingMethod
         try {
-          pingMethod = res.response.result.body.replace('[', '').replace(']', '').split(',')
+          pingMethod = res.response.result.body &&
+            res.response.result.body.replace('[', '').replace(']', '').split(',')
+            || []
         } catch (error) {
           pingMethod = []
         }
