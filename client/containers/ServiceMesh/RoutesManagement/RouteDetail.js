@@ -322,8 +322,10 @@ class NewRouteComponent extends React.Component {
     }
     this.testRepet(cb)
     this.testExistService(value, cb)
-    cb(validateDomainName(value))
-    cb(validateServiceName(value))
+    if (validateDomainName(value) && validateServiceName(value)) {
+      cb(validateDomainName(value))
+      cb(validateServiceName(value))
+    }
     cb()
 
   }
