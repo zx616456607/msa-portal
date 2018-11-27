@@ -30,7 +30,7 @@ class LogComponent extends React.Component {
         Objlog += `[${item.name}]  ${this.timeFormat(item.timeNano)} ${item.log}`
       })
     }
-    const blob = new Blob([Objlog], { type: 'application/json' })
+    const blob = new Blob([ Objlog ], { type: 'application/json' })
     downUrl = URL.createObjectURL(blob)
     URL.revokeObjectURL(blob)
     return downUrl
