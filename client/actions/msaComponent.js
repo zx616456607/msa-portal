@@ -115,9 +115,13 @@ export const MANUALSCALE_COMPONENT_SUCCESS = 'MANUALSCALE_COMPONENT_SUCCESS'
 export const MANUALSCALE_COMPONENT_FAILURE = 'MANUALSCALE_COMPONENT_FAILURE'
 
 const fetchManualScaleComponent = (clusterID, name, body, options) => {
+  let headers
   const { namespace } = body
-  delete body.namespace
+  if (namespace) {
+    headers = { project: namespace }
+  }
   return {
+    namespace,
     options,
     [CALL_API]: {
       types: [
@@ -130,9 +134,7 @@ const fetchManualScaleComponent = (clusterID, name, body, options) => {
       options: {
         method: 'PUT',
         body,
-        headers: {
-          project: namespace || '',
-        },
+        headers,
       },
     },
   }

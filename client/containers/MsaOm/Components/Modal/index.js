@@ -64,14 +64,13 @@ class MsaModal extends React.Component {
           clusterId,
           currentComponent,
           closeModal,
-          loadData,
-          namespace } = this.props
+          loadData } = this.props
         this.setState({
           loading: true,
         })
         const body = {
           number: parseInt(inputValue, 10),
-          namespace,
+          namespace: currentComponent.namespace,
         }
         const finalClusterId = currentComponent.clusterId || clusterId
         const name = currentComponent.component || 'dsb-server'
@@ -95,7 +94,6 @@ class MsaModal extends React.Component {
         notification.success({
           message: '水平扩展成功',
         })
-
       }
     });
   }
