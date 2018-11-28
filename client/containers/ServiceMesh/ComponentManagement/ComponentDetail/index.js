@@ -108,7 +108,7 @@ class ComponentDetail extends React.Component {
     this.setState({
       visible: false,
     })
-    setFieldsValue({ keys: [ 0 ] })
+    setFieldsValue({ keys: [0] })
   }
 
   handleDelete = list => {
@@ -179,6 +179,10 @@ class ComponentDetail extends React.Component {
         keys.forEach(key => {
           const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
           const value = `${getFieldValue(`version-${key}`)}`
+          const isNull = nameKey.split('/')[1]
+          if (isNull === 'undefined') {
+            return
+          }
           const queryAnnotations = {
             [nameKey]: value,
           }
@@ -329,13 +333,14 @@ class ComponentDetail extends React.Component {
     return service
   }
 
-  tipService = list => {
+  tipService = (list, name) => {
     const listAry = this.filterServices(list)
-    return listAry.length ?
-      <Tooltip placement="top"
-        title={`组件中的 “${listAry}” 服务已经不存在，请编辑移除该服务`}>
+    if (listAry.indexOf(name) !== -1) {
+      return <Tooltip placement="top"
+        title={`组件中的 “${name}” 服务已经不存在，请编辑移除该服务`}>
         <Icon type="exclamation-circle" className="ico" />
-      </Tooltip> : ''
+      </Tooltip>
+    }
   }
 
   render() {
@@ -355,7 +360,7 @@ class ComponentDetail extends React.Component {
       render: (text, record) => {
         const serviceName = record.name
         return <div className="AddressTipWrape">
-          <ServiceAddressTip dataList={[ serviceName ]}
+          <ServiceAddressTip dataList={[serviceName]}
             parentNode={'AddressTipWrape'} /></div>
       },
     }, {
@@ -367,12 +372,12 @@ class ComponentDetail extends React.Component {
       title: '操作',
       render: record => <div>
         <Button onClick={() => this.handleDelete(record)}>移除</Button>
-        {this.tipService(detailList)}
+        {this.tipService(detailList, record.name)}
       </div>,
     }]
     const { metadata } = detailList
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('keys', { initialValue: [ 0 ] })
+    getFieldDecorator('keys', { initialValue: [0] })
     const keys = getFieldValue('keys')
     const serviceLists = keys.map(key => {
       return (
