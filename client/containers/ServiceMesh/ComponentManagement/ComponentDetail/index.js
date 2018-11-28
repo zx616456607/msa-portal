@@ -179,6 +179,10 @@ class ComponentDetail extends React.Component {
         keys.forEach(key => {
           const nameKey = `svcName/${getFieldValue(`serviceName-${key}`)}`
           const value = `${getFieldValue(`version-${key}`)}`
+          const isNull = nameKey.split('/')[1]
+          if (isNull === 'undefined') {
+            return
+          }
           const queryAnnotations = {
             [nameKey]: value,
           }
@@ -229,6 +233,8 @@ class ComponentDetail extends React.Component {
   }
 
   handleAdd = () => {
+    const { setFieldsValue } = this.props.form
+    setFieldsValue({ keys: [ 0 ] })
     this.setState({
       isAdd: true,
       visible: true,
@@ -329,13 +335,14 @@ class ComponentDetail extends React.Component {
     return service
   }
 
-  tipService = list => {
+  tipService = (list, name) => {
     const listAry = this.filterServices(list)
-    return listAry.length ?
-      <Tooltip placement="top"
-        title={`组件中的 “${listAry}” 服务已经不存在，请编辑移除该服务`}>
+    if (listAry.indexOf(name) !== -1) {
+      return <Tooltip placement="top"
+        title={`组件中的 “${name}” 服务已经不存在，请编辑移除该服务`}>
         <Icon type="exclamation-circle" className="ico" />
-      </Tooltip> : ''
+      </Tooltip>
+    }
   }
 
   render() {
@@ -367,7 +374,7 @@ class ComponentDetail extends React.Component {
       title: '操作',
       render: record => <div>
         <Button onClick={() => this.handleDelete(record)}>移除</Button>
-        {this.tipService(detailList)}
+        {this.tipService(detailList, record.name)}
       </div>,
     }]
     const { metadata } = detailList

@@ -128,6 +128,8 @@ class MsaComponents extends React.Component {
         return '分布式事务'
       case 'spring-cloud-redis':
         return '数据缓存'
+      case 'spring-cloud-degrade':
+        return '熔断降级'
       default:
         return
     }
