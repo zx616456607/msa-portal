@@ -233,6 +233,8 @@ class ComponentDetail extends React.Component {
   }
 
   handleAdd = () => {
+    const { setFieldsValue } = this.props.form
+    setFieldsValue({ keys: [ 0 ] })
     this.setState({
       isAdd: true,
       visible: true,
