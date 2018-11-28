@@ -89,13 +89,14 @@ class ComponentDetail extends React.Component {
     if (list.length !== 0) {
       const serviceAry = []
       const { annotations } = list.metadata
-      list.spec.subsets && list.spec.subsets.forEach((item, index) => {
-        const key = annotations.description ? index + 1 : index
-        const query = {
-          name: Object.keys(annotations)[key].split('/')[1],
-          'system/servicemesh-version': item.labels['system/servicemesh-version'],
+      annotations && Object.keys(annotations).forEach(item => {
+        if (item.indexOf('svcName/') !== -1) {
+          const query = {
+            name: item.split('/')[1],
+            version: annotations[item],
+          }
+          serviceAry.push(query)
         }
-        serviceAry.push(query)
       })
       return serviceAry
     }
@@ -111,16 +112,14 @@ class ComponentDetail extends React.Component {
   }
 
   handleDelete = list => {
-    const { detailList } = this.state
     this.setState({
       isAdd: false,
     })
-    const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
-    const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
+    // const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
+    // const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
     confirm({
       modalTitle: '移除服务',
       title: '移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务',
-      content: tip,
       onOk: () => {
         if (list) {
           this.handleService(list)
@@ -189,12 +188,16 @@ class ComponentDetail extends React.Component {
             },
             name: value,
           }
-          detailList.metadata.annotations = queryAnnotations
+          if (detailList.metadata.annotations) {
+            detailList.metadata.annotations =
+              Object.assign(detailList.metadata.annotations, {}, queryAnnotations)
+          } else {
+            detailList.metadata.annotations = queryAnnotations
+          }
           detailList.spec.subsets.push(querySubsets)
         })
       } else {
-        const { name } = list
-        const version = list['system/servicemesh-version']
+        const { name, version } = list
         if (name && version) {
           const annotations = detailList.metadata.annotations
           annotations && Object.keys(annotations).forEach(item => {
@@ -345,7 +348,7 @@ class ComponentDetail extends React.Component {
       dataIndex: 'name',
     }, {
       title: '组件服务版本',
-      dataIndex: 'system/servicemesh-version',
+      dataIndex: 'version',
     }, {
       title: '服务地址',
       dataIndex: 'address',
