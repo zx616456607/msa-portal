@@ -108,7 +108,7 @@ class ComponentDetail extends React.Component {
     this.setState({
       visible: false,
     })
-    setFieldsValue({ keys: [0] })
+    setFieldsValue({ keys: [ 0 ] })
   }
 
   handleDelete = list => {
@@ -360,7 +360,7 @@ class ComponentDetail extends React.Component {
       render: (text, record) => {
         const serviceName = record.name
         return <div className="AddressTipWrape">
-          <ServiceAddressTip dataList={[serviceName]}
+          <ServiceAddressTip dataList={[ serviceName ]}
             parentNode={'AddressTipWrape'} /></div>
       },
     }, {
@@ -377,7 +377,7 @@ class ComponentDetail extends React.Component {
     }]
     const { metadata } = detailList
     const { getFieldDecorator, getFieldValue } = form
-    getFieldDecorator('keys', { initialValue: [0] })
+    getFieldDecorator('keys', { initialValue: [ 0 ] })
     const keys = getFieldValue('keys')
     const serviceLists = keys.map(key => {
       return (
