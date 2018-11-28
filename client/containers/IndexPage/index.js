@@ -98,8 +98,13 @@ class IndexPage extends React.Component {
     const { limitsAndRoutes,
       microservice,
       rpcService,
-      sortedCallService,
-      sortedErrorService, numberOfServiceCall } = this.props.overView
+      numberOfServiceCall } = this.props.overView
+    let { sortedErrorService,
+      sortedCallService } = !numberOfServiceCall.isFetching && numberOfServiceCall.data
+    if (!numberOfServiceCall.isFetching) {
+      sortedErrorService = sortedErrorService.filter(v => v.count !== 0)
+      sortedCallService = sortedCallService.filter(v => v.count !== 0)
+    }
     const ellipsisComponent = num => <Ellipsis>{num.toString()}</Ellipsis>
     const { isDeployed, loading } = this.state
     if (loading) {
@@ -108,7 +113,6 @@ class IndexPage extends React.Component {
     if (!isDeployed) {
       return notInstallSpringCloud()
     }
-
     return (
       <QueueAnim className="index-page">
         <div className="index-page-time-picker">
