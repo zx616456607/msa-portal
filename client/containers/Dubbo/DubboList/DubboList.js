@@ -100,7 +100,6 @@ class DubboList extends React.Component {
         message: '列表请求出错',
       })
     }
-
   }
   render() {
     const { dubboList } = this.props
