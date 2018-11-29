@@ -75,7 +75,7 @@ class Users extends React.Component {
     confirm({
       modalTitle: '删除',
       title: `确定删除用户 ${record.userName}?`,
-      okText: '确认',
+      okText: '确定',
       cancelText: '取消',
       onOk: () => {
         return deleteZoneUser(record.id).then(res => {
@@ -126,7 +126,7 @@ class Users extends React.Component {
     confirm({
       modalTitle: text,
       title: `确定${text}用户 ${record.userName}`,
-      okText: '确认',
+      okText: '确定',
       cancelText: '取消',
       onOk: () => {
         return patchZoneUser(record, body).then(res => {

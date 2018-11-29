@@ -72,9 +72,10 @@ class CSBCascadingLinkRules extends React.Component {
   loadData = (query = {}, isFirst) => {
     const { getCascadingLinkRulesList, location, history } = this.props
     const { name, flag } = this.state
-    query = Object.assign({}, location.query, { name: encodeURIComponent(name), flag }, query)
+    query = Object.assign({}, location.query, { name: name, flag }, query)
     if (!name) delete query.flag
     if (query.page && query.page === 1) delete query.page
+    query.name = encodeURIComponent(query.name)
     handleHistoryForLoadData(history, query, location, isFirst)
     getCascadingLinkRulesList(query)
   }
