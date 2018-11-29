@@ -209,6 +209,8 @@ class Topology extends React.Component {
   componentDidMount() {
     const { loadPPApps, clusterID, apmID } = this.props
     apmID && loadPPApps(clusterID, apmID)
+
+
   }
   loadScatter = () => {
     const { loadScatterData, clusterID, apmID, apps } = this.props
@@ -466,6 +468,17 @@ class Topology extends React.Component {
       topologyData,
     })
   }
+  loadData = () => {
+    this.setState({
+      nodeDataArray: [],
+      linkDataArray: [],
+      topologyLoading: true,
+    }, () => {
+      this.loadScatter()
+      this.getPinpointMap()
+      this.getAgentListWithStatus()
+    })
+  }
   getData = () => {
     clearInterval(fetchDataInterval)
     const { application, rangeDateTime } = this.state
@@ -477,15 +490,9 @@ class Topology extends React.Component {
       message.warning('请选择开始跟结束时间')
       return
     }
+    this.loadData()
     fetchDataInterval = setInterval(() => {
-      this.setState({
-        nodeDataArray: [],
-        linkDataArray: [],
-        topologyLoading: true,
-      })
-      this.loadScatter()
-      this.getPinpointMap()
-      this.getAgentListWithStatus()
+      this.loadData()
     }, TOPOLOGY_INTERVAL)
   }
   getAgentListWithStatus = () => {
@@ -536,6 +543,7 @@ class Topology extends React.Component {
       this.formatScatterData()
     })
   }
+
   getCurrentApp = application => {
     appName = application
     this.setState({
