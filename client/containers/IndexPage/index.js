@@ -21,6 +21,7 @@ import { formatDate } from '../../common/utils'
 import Ellipsis from '@tenx-ui/ellipsis'
 import './style/index.less'
 import { fetchSpingCloud } from '../../actions/msaConfig'
+import { getDubboList, getDubboDetail } from '../../actions/dubbo'
 import { checkSpringCloudInstall, notInstallSpringCloud } from '../MsaManage';
 import { renderLoading } from '../../components/utils';
 
@@ -47,6 +48,10 @@ class IndexPage extends React.Component {
     height: 450,
     isDeployed: false,
     loading: true,
+    rpcCount: 0,
+    consumersCount: 0,
+    providersCount: 0,
+    rpcLoading: false,
   }
   componentDidMount() {
     const { clusterID, getServiceCall, fetchSpingCloud, current } = this.props
@@ -56,6 +61,7 @@ class IndexPage extends React.Component {
         loading: false,
       })
       if (checkSpringCloudInstall(res, current)) {
+        this.generateRpcData()
         const startTime = new Date().getTime() - 7 * 86400000
         const endTime = new Date().getTime()
         this.loadLimitAndRoutesData()
@@ -64,7 +70,39 @@ class IndexPage extends React.Component {
         getServiceCall(clusterID, { startTime, endTime, scaleSize: 7 })
       }
     })
-
+  }
+  generateRpcData = async () => {
+    const { getDubboList, getDubboDetail, clusterID } = this.props
+    this.setState({ rpcLoading: true })
+    const result = await getDubboList(clusterID, { isHandleError: true })
+    if (result.response) {
+      const dubboData = result.response.result.data.items
+      this.setState({
+        rpcCount: dubboData.length,
+      })
+      let providers = []
+      let consumers = []
+      for (const v of dubboData) {
+        const dubboDetailRes = await getDubboDetail(clusterID, v.name, v.groupVersion)
+        if (dubboDetailRes.response) {
+          const data = dubboDetailRes.response.result.data
+          if (data.providers) providers = providers.concat(data.providers)
+          if (data.consumers) consumers = consumers.concat(data.consumers)
+        }
+      }
+      const uniqueArr = arr => {
+        const obj = {}
+        return arr.reduce(function(item, next) {
+          obj[next.podIp] ? '' : obj[next.podIp] = true && item.push(next);
+          return item;
+        }, []);
+      }
+      this.setState({
+        consumersCount: uniqueArr(consumers).length,
+        providersCount: uniqueArr(providers).length,
+      })
+    }
+    this.setState({ rpcLoading: false })
   }
   loadLimitAndRoutesData = () => {
     const { clusterID, getLimitAndRoutes } = this.props
@@ -95,9 +133,9 @@ class IndexPage extends React.Component {
       },
     ]
     const { periodCallData } = this.props
+    const { consumersCount, providersCount, rpcCount, rpcLoading } = this.state
     const { limitsAndRoutes,
       microservice,
-      rpcService,
       numberOfServiceCall } = this.props.overView
     let { sortedErrorService,
       sortedCallService } = !numberOfServiceCall.isFetching && numberOfServiceCall.data
@@ -177,53 +215,45 @@ class IndexPage extends React.Component {
           <Col span={8}>
             <Card hoverable={true}>
               {
-                rpcService.isFetching ?
+                rpcLoading ?
                   <div className="index-page-spinning">
                     <Spin/>
                   </div>
                   :
                   <div>
-                    {
-                      rpcService.data ?
-                        <Row gutter={16}>
-                          <Col xl={17} xxl={15}>
-                            <div className="index-page-overview-left">
-                              <div className="icon-box">
-                                <TenxIcon type="config-center"/>
-                              </div>
-                              <div className="index-page-overview-left-title">
-                                RPC服务数量
-                              </div>
-                              <div className="index-page-overview-left-num">
-                                {ellipsisComponent(rpcService.data.rpcServiceCount)}
-                              </div>
-                            </div>
+                    <Row gutter={16}>
+                      <Col xl={17} xxl={15}>
+                        <div className="index-page-overview-left">
+                          <div className="icon-box">
+                            <TenxIcon type="config-center"/>
+                          </div>
+                          <div className="index-page-overview-left-title">
+                            RPC服务数量
+                          </div>
+                          <div className="index-page-overview-left-num">
+                            {ellipsisComponent(rpcCount)}
+                          </div>
+                        </div>
+                      </Col>
+                      <Col xl={7} xxl={9}>
+                        <Row className="index-page-overview-right-row">
+                          <Col span={17}>
+                            提供者
                           </Col>
-                          <Col xl={7} xxl={9}>
-                            <Row className="index-page-overview-right-row">
-                              <Col span={17}>
-                                提供者
-                              </Col>
-                              <Col span={7}>
-                                {ellipsisComponent(rpcService.data.providerCount)}
-                              </Col>
-                            </Row>
-                            <Row className="index-page-overview-right-row">
-                              <Col span={17}>
-                                消费者
-                              </Col>
-                              <Col span={7}>
-                                {ellipsisComponent(rpcService.data.consumerCount)}
-                              </Col>
-                            </Row>
+                          <Col span={7}>
+                            {ellipsisComponent(consumersCount)}
                           </Col>
                         </Row>
-                        :
-                        <div className="index-page-spinning">
-                          <Icon type="frown-o" theme="outlined" style={{ marginRight: 8 }}/>
-                          暂无数据
-                        </div>
-                    }
+                        <Row className="index-page-overview-right-row">
+                          <Col span={17}>
+                            消费者
+                          </Col>
+                          <Col span={7}>
+                            {ellipsisComponent(providersCount)}
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
                   </div>
               }
             </Card>
@@ -557,4 +587,6 @@ export default connect(mapStateToProps, {
   getRpcService,
   getServiceCall,
   fetchSpingCloud,
+  getDubboList,
+  getDubboDetail,
 })(IndexPage)
