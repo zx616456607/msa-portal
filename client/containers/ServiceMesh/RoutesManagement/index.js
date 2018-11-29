@@ -78,7 +78,7 @@ class RoutesManagement extends React.Component {
     confirm({
       modalTitle: '删除操作',
       title: '删除路由规则后，该路由规则关联的服务仅支持集群内访问，不可对外访问',
-      content: `确定删除服务组 ${name} 吗？`,
+      content: `确定删除路由规则 ${name} 吗？`,
       onOk: () => {
         return new Promise((resolve, reject) => {
           deleteVirtualService(clusterId, name).then(res => {
