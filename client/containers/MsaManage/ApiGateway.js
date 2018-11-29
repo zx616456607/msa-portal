@@ -119,7 +119,7 @@ class ApiGateway extends React.Component {
     const self = this
     confirm({
       modalTitle: '删除操作',
-      title: `确认将微服务 ${item.service_id} 的限流规则删除吗？`,
+      title: `确定将微服务 ${item.service_id} 的限流规则删除吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -435,7 +435,7 @@ class ApiGateway extends React.Component {
       >
         <div className={'title'}>
           <Icon className={'icon'} type="question-circle" />
-          {`确认将微服务 ${service_id} 的限流规则${handlerName}吗？`}
+          {`确定将微服务 ${service_id} 的限流规则${handlerName}吗？`}
         </div>
         {
           !status && this.hasOpenPolicy() &&

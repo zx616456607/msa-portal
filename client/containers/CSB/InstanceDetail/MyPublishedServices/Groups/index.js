@@ -155,7 +155,7 @@ class MyPublishedServiceGroups extends React.Component {
     }
     confirm({
       modalTitle: '删除服务组',
-      title: `服务组一旦删除，将不可恢复，请确认是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
+      title: `服务组一旦删除，将不可恢复，请确定是否不再需要该服务组，确定删除服务组 ${record.name} 吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {

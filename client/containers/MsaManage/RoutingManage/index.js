@@ -67,7 +67,7 @@ class RoutingManage extends React.Component {
     const self = this
     if (key === 'delete') {
       confirm({
-        title: `确认将路由 ${record.routeId} 删除吗？`,
+        title: `确定将路由 ${record.routeId} 删除吗？`,
         content: '',
         onOk() {
           return new Promise((resolve, reject) => {
@@ -88,7 +88,7 @@ class RoutingManage extends React.Component {
       const status = !record.status
       const statusText = record.status ? '停用' : '启用'
       confirm({
-        title: `确认将路由 ${record.routeId} ${statusText}吗？`,
+        title: `确定将路由 ${record.routeId} ${statusText}吗？`,
         content: '',
         onOk() {
           return new Promise((resolve, reject) => {

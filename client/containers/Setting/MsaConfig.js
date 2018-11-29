@@ -433,7 +433,7 @@ class MsaConfig extends React.Component {
                   <span>即将在当前项目内卸载 SpringCloud 基础服务, 卸载后该项目内应用将无法继续使用微服务部分功能</span>
                 </div>
                 <div style={{ marginTop: 10 }}>
-                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定继续卸载 ?</span>
                 </div>
               </Modal>
             </Card>

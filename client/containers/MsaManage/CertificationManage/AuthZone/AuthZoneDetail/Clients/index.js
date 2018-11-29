@@ -93,7 +93,7 @@ class Clients extends React.Component {
     confirm({
       modalTitle: '删除',
       title: `确定删除 OAuth 应用 ${record.client_id}?`,
-      okText: '确认',
+      okText: '确定',
       cancelText: '取消',
       onOk: () => {
         return deleteClient(record.client_id).then(() => {
