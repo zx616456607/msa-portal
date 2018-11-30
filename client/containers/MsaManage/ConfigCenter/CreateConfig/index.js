@@ -80,8 +80,9 @@ class CreateConfig extends React.Component {
   fetchYaml = (branch, url) => {
     const { getCenterConfig, clusterID, location, form } = this.props
     const { id } = parse(location.search)
+    const path = parse(location.search).path
     const query = {
-      file_path: location.pathname.split('/')[3],
+      file_path: (path ? path + '/' : '') + location.pathname.split('/')[3],
       branch_name: branch,
       project_url: url,
     }
@@ -100,10 +101,11 @@ class CreateConfig extends React.Component {
   handleSaveUpdate = () => {
     const { configGitUrl, branchName, inputValue, textAreaValue, currentYaml,
       yaml } = this.state
-    const { putCenterConfig, clusterID } = this.props
+    const { putCenterConfig, clusterID, location } = this.props
+    const path = parse(location.search).path
     const query = {
       branch_name: encodeURIComponent(branchName),
-      file_path: encodeURIComponent(inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue),
+      file_path: (path ? path + '/' : '') + encodeURIComponent(inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue),
       commit_message: encodeURIComponent(textAreaValue === '' ? '添加一个配置' : textAreaValue),
       project_url: encodeURIComponent(configGitUrl),
     }
@@ -218,7 +220,7 @@ class CreateConfig extends React.Component {
     if (hasConfigName) {
       notification.warn({
         message: '提交失败',
-        description: '配置名称已存在',
+        description: '文件名称已存在',
       })
       return
     }
@@ -234,9 +236,10 @@ class CreateConfig extends React.Component {
       this.setState({
         addLoading: true,
       })
+      const path = parse(this.props.location.search).path
       const query = {
         branch_name: encodeURIComponent(branchName),
-        file_path: encodeURIComponent(inputValue),
+        file_path: (path ? path + '/' : '') + encodeURIComponent(inputValue),
         commit_message: encodeURIComponent(textAreaValue),
         project_url: encodeURIComponent(configGitUrl),
       }
@@ -259,13 +262,22 @@ class CreateConfig extends React.Component {
       })
     })
   }
-
+  onCheckName = (rule, value, callback) => {
+    const arr = value.split('/')
+    for (let i = 0; i < arr.length; i++) {
+      if (i === 0 && !arr[i]) continue
+      if (!REPOSITORY_REGEXP.test(arr[i])) return new Error('名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头')
+    }
+    callback()
+  }
   render() {
     const { detail, yaml, branchData, btnVasible, currentYaml,
       branchName, addLoading, editLoading, releaseLoading } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
-    const projectName = this.props.location.pathname.split('/')[3]
-    const { getFieldDecorator } = this.props.form
+    const { location, form } = this.props
+    const projectName = location.pathname.split('/')[3]
+    const { getFieldDecorator } = form
+    const path = parse(location.search).path
     const fromLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 20 },
@@ -277,12 +289,15 @@ class CreateConfig extends React.Component {
       <QueueAnim className="create">
         <Card className="info" key="body">
           <Row className="connent">
-            <FormItem {...fromLayout} label="配置名称">
+            <FormItem className="config-name" {...fromLayout} label="名称">
               {getFieldDecorator('configName', {
                 initialValue: detail !== 'false' ? projectName : undefined,
-                rules: [{ required: true, pattern: REPOSITORY_REGEXP, whitespace: true, message: '配置名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头' }],
+                rules: [
+                  { required: true, whitespace: true, message: '请输入文件名称' },
+                  { validator: this.onCheckName },
+                ],
               })(
-                <Input disabled={detail === 'update' || detail === 'true'} className="selects" placeholder="请输入配置名称" onChange={this.handleInput} />
+                <Input addonBefore={'./' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder="请输入文件名称" onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
@@ -315,7 +330,7 @@ class CreateConfig extends React.Component {
           </Row>
           {
             detail !== 'true' ?
-              <Row className="connents">
+              <Row className="connents connent">
                 <FormItem {...fromLayout} label="Commit">
                   {getFieldDecorator('configArea', {
                     rules: [{ required: true, whitespace: true, message: '请填写Commit' }],

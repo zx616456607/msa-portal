@@ -44,6 +44,7 @@
     "@babel/polyfill": "7.0.0-beta.37",
     "@babel/preset-env": "7.0.0-beta.37",
     "@babel/register": "7.0.0-beta.37",
+    "@tenx-ui/time-hover": "^1.1.1",
     "bluebird": "^3.4.7",
     "cross-env": "^5.2.0",
     "koa": "^2.4.1",
