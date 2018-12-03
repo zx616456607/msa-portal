@@ -44,27 +44,33 @@ class ConfigCenter extends React.Component {
     isLoadingLast: false,
     isShowAddModal: false,
     isShowDelModal: false,
+    isLoading: false, // 调用table loading 的接口前有空白期
   }
 
   componentDidMount() {
-    this.loadData()
+    const isForce = parse(this.props.location.search).from_add
+    this.loadData(Boolean(isForce))
   }
 
-  loadData = () => {
-    const { clusterID, getService } = this.props
-    getService(clusterID).then(res => {
-      if (res.error) return
-      if (res.response.result.code === 200) {
-        const configGitUrl = res.response.result.data.configGitUrl
-        this.setState({
-          configGitUrl,
-        }, () => {
-          this.getBranches()
-        })
-      }
+  loadData = isForce => {
+    this.setState({
+      isLoading: true,
+    }, () => {
+      const { clusterID, getService } = this.props
+      getService(clusterID).then(res => {
+        if (res.error) return
+        if (res.response.result.code === 200) {
+          const configGitUrl = res.response.result.data.configGitUrl
+          this.setState({
+            configGitUrl,
+          }, () => {
+            this.getBranches(isForce)
+          })
+        }
+      })
     })
   }
-  getBranches = () => {
+  getBranches = isForce => {
     const { configGitUrl } = this.state
     const { clusterID, getBranchList } = this.props
     const branchQuery = {
@@ -75,12 +81,13 @@ class ConfigCenter extends React.Component {
       if (res.response.result.code === 200 && res.response.result.data.length > 0) {
         const temp = {
           branchData: res.response.result.data,
+          isLoading: false,
         }
         if (!this.state.branchValue) {
           temp.branchValue = res.response.result.data[0].name
         }
         this.setState(temp, () => {
-          this.fetchList()
+          this.fetchList('', isForce)
         })
       }
     })
@@ -89,7 +96,7 @@ class ConfigCenter extends React.Component {
   fetchList = (new_path, isForce) => {
     const { getCenterEvn, clusterID, location } = this.props
     const temp = parse(location.search).path
-    const path = new_path !== undefined ?
+    const path = new_path !== undefined && new_path !== '' ?
       new_path : temp || ''
     const { configGitUrl, branchValue } = this.state
     const envData = this.props.envData[branchValue + '/' + (path || '')]
@@ -153,13 +160,14 @@ class ConfigCenter extends React.Component {
     })
   }
 
-  handleDel = () => {
+  handleDel = isLast => {
     const { configGitUrl, configName, message, branchValue } = this.state
-    const { delCenterConfig, clusterID } = this.props
+    const { delCenterConfig, clusterID, location } = this.props
+    const path = parse(location.search).path || ''
     const query = {
       project_url: configGitUrl,
       branch_name: branchValue,
-      file_path: configName,
+      file_path: (path ? path + '/' : '') + configName,
       commit_message: message === '' ? '删除一个配置' : message,
     }
     this.setState({
@@ -177,12 +185,16 @@ class ConfigCenter extends React.Component {
         return
       }
       if (res.response.result.code === 200) {
-        this.fetchList()
+        if (isLast && path) {
+          const arr = path.split('/')
+          const tempPath = arr.splice(arr.length - 1).join('/')
+          this.props.history.push(`/msa-manage/config-center${tempPath ? '?path=' + tempPath : ''}`)
+        }
+        this.fetchList('', true)
         notification.success({
           message: `删除配置 ${configName} 成功`,
         })
       }
-
     })
   }
 
@@ -220,6 +232,7 @@ class ConfigCenter extends React.Component {
       modalTitle: '删除分支',
       title: '删除后无法恢复',
       content: `确定删除分支 [${branchValue}]?`,
+      okText: '确定',
       onOk() {
         const query = {
           project_url: configGitUrl,
@@ -265,14 +278,14 @@ class ConfigCenter extends React.Component {
       id: 'id',
       title: '配置名称',
       dataIndex: 'name',
-      width: '20%',
+      width: '25%',
       render: (text, record) => {
         if (record.type === 'tree') {
           const temp = (path ? path + '/' : '') + text
           return <Link to={`/msa-manage/config-center?path=${temp}`}><Icon className="table-icon" type="folder" /> {text}</Link>
         } else if (record.type === 'blob') {
           return <Link to={`/msa-manage/config-center/${decodeURIComponent(text)}?detail=true&id=${record.id}&branch=${branchValue}&path=${path}`}>
-            <Icon className="table-icon" type="file" /> {decodeURIComponent(text)}
+            <Icon className="table-icon" type="file-text" /> {decodeURIComponent(text)}
           </Link>
         } else if (record.type === 'returnBack') {
           const arr = path.split('/')
@@ -309,32 +322,41 @@ class ConfigCenter extends React.Component {
         if (isLoadingLast) return ''
         return text ? decodeURIComponent(text) : ''
       },
-    }, {
-      title: '最近一次修改人',
-      dataIndex: 'user',
-      width: '20%',
-      render: (text, record) => {
-        if (record.type === 'returnBack') {
-          return ''
-        }
-        if (isLoadingLast) return ''
-        return text ? decodeURIComponent(text) : ''
-      },
-    }, {
+    },
+    // {
+    //   title: '最近一次修改人',
+    //   dataIndex: 'user',
+    //   width: '15%',
+    //   render: (text, record) => {
+    //     if (record.type === 'returnBack') {
+    //       return ''
+    //     }
+    //     if (isLoadingLast) return ''
+    //     return text ? decodeURIComponent(text) : ''
+    //   },
+    // },
+    {
       id: 'id',
       title: '操作',
       dataIndex: 'operation',
-      width: '27%',
+      width: '40%',
       render: (text, record) => {
         if (record.type === 'returnBack') {
           return ''
         }
+        let linkTo = ''
+        if (record.type === 'tree') {
+          const temp = (path ? path + '/' : '') + record.name
+          linkTo = `/msa-manage/config-center?path=${temp}`
+        } else if (record.type === 'blob') {
+          linkTo = `/msa-manage/config-center/${decodeURIComponent(record.name)}?detail=true&id=${record.id}&branch=${branchValue}&path=${path}`
+        }
         let btns = [
-          <Button key="1" className="detail" type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=true&id=${record.id}&branch=${branchValue}`)}>查看详情</Button>,
+          <Button key="1" className="detail" type="primary" onClick={() => this.props.history.push(linkTo)}>查看详情</Button>,
         ]
         if (record.type === 'blob') {
           btns = [].concat(btns, [
-            <Button key="2" className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branchValue}`)}>更新</Button>,
+            <Button key="2" className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branchValue}&path=${path}`)}>更新</Button>,
             <Button key="3"
               onClick={() => this.handleDelVisible(record.name)}
               disabled={this.state.isDelFetching && this.state.configName === record.name}>
@@ -357,13 +379,14 @@ class ConfigCenter extends React.Component {
               {data}
             </Select>
             <Tooltip title="添加分支">
-              <Button className="icon-btn" type="primary" size="default" onClick={() => this.setState({
+              <Button className="icon-btn" size="default" onClick={() => this.setState({
                 isShowAddModal: true,
               })}><Icon type="plus" /></Button>
             </Tooltip>
             <Tooltip title="删除当前分支">
               <Button className="icon-btn" size="default" onClick={this.onDelClick}><Icon type="delete" /></Button>
             </Tooltip>
+            <Button className="refresh" icon="sync" onClick={() => this.loadData(true)}>刷新</Button>
           </div>
           <Card>
             <div>
@@ -386,36 +409,46 @@ class ConfigCenter extends React.Component {
                       })()
                     }
                   </Breadcrumb>
-                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branchValue}`)}>
+                  <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branchValue}&path=${path}`)}>
                     <Icon type="plus" style={{ color: '#fff' }} />
                     <span className="font">添加配置</span>
                   </Button>
-                  <Button className="refresh" icon="sync" onClick={() => this.fetchList('', true)}>刷新</Button>
                 </div>
               </div>
               <Table
                 columns={columns}
                 dataSource={tempEnvData}
                 pagination={false}
-                loading={isFetching}
+                loading={isFetching || this.state.isLoading}
                 rowKey={row => row.name} />
             </div>
-            <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
-              footer={[
-                <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-                <Button key="submit" type="primary" onClick={this.handleDel} loading={this.state.isDelFetching}>确 定</Button>,
-              ]}>
-              <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定删除该配置 ?</span>
-                <div className="remark">
-                  <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
-                  <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
-                </div>
-              </div>
-            </Modal>
+            {
+              this.state.deleteVisible ?
+                <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
+                  footer={[
+                    <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
+                    <Button key="submit" type="primary" onClick={() => this.handleDel(tempEnvData.length === 1)} loading={this.state.isDelFetching}>确 定</Button>,
+                  ]}>
+                  <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
+                    <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
+                  </div>
+                  <div style={{ marginTop: 10 }}>
+                    {
+                      envData.length === 1 && tempEnvData.length === 2 ?
+                        <p style={{ color: '#f85a5a' }}>该配置为 {path} 目录下的唯一文件, 删除后 {path} 目录也将被删除</p>
+                        :
+                        ''
+                    }
+                    <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定删除该配置 ?</span>
+                    <div className="remark">
+                      <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
+                      <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
+                    </div>
+                  </div>
+                </Modal>
+                :
+                null
+            }
             {
               isShowAddModal ?
                 <CreateBranch

@@ -19,6 +19,8 @@ import { putCenterConfig, getCenterConfig, getService, getBranchList, getCenterE
 import YamlEditor from '../../../../components/Editor/Yaml'
 import { Row, Button, Select, Input, notification, Card, Form } from 'antd'
 import { REPOSITORY_REGEXP } from '../../../../constants'
+import filter from 'lodash/filter'
+
 const Option = Select.Option
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -49,7 +51,7 @@ class CreateConfig extends React.Component {
   }
 
   version = () => {
-    const { getService, getBranchList, clusterID, location } = this.props
+    const { getService, getBranchList, clusterID, location, getCenterEvn } = this.props
     const { branch, detail } = parse(location.search)
     getService(clusterID).then(res => {
       if (res.error) return
@@ -61,6 +63,15 @@ class CreateConfig extends React.Component {
         })
         if (detail === 'true' || detail === 'update') {
           this.fetchYaml(branch, url)
+        } else if (detail === 'false') {
+          const path = parse(location.search).path
+          // const envData = this.props.envData[branch + '/' + (path || '')]
+          const evnQuery = {
+            project_url: url,
+            branch_name: branch,
+            path,
+          }
+          getCenterEvn(clusterID, evnQuery)
         }
         const branchQuery = {
           project_url: url,
@@ -208,68 +219,126 @@ class CreateConfig extends React.Component {
 
   handleAdd = () => {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
-    const { addCenterConfig, clusterID, history, data } = this.props
-    let hasConfigName
-    data.every(item => {
-      if (item.name === inputValue) {
-        hasConfigName = true
-        return false
-      }
-      return true
-    })
-    if (hasConfigName) {
-      notification.warn({
-        message: '提交失败',
-        description: '文件名称已存在',
-      })
-      return
-    }
-    this.props.form.validateFields(err => {
-      if (err) return
-      if (currentYaml === '') {
-        notification.warn({
-          message: '提交失败',
-          description: '请填写配置内容',
-        })
-        return
-      }
-      this.setState({
-        addLoading: true,
-      })
-      const path = parse(this.props.location.search).path
-      const query = {
-        branch_name: encodeURIComponent(branchName),
-        file_path: (path ? path + '/' : '') + encodeURIComponent(inputValue),
-        commit_message: encodeURIComponent(textAreaValue),
-        project_url: encodeURIComponent(configGitUrl),
-      }
-      addCenterConfig(clusterID, currentYaml, query).then(res => {
-        if (res.error) {
-          this.setState({
-            addLoading: false,
-          })
-          notification.error({
-            message: '添加失败',
+    const { addCenterConfig, clusterID, history } = this.props
+    if (this.onCheckName(inputValue)) {
+      this.props.form.validateFields(err => {
+        if (err) return
+        if (currentYaml === '') {
+          notification.warn({
+            message: '提交失败',
+            description: '请填写配置内容',
           })
           return
         }
-        if (res.response.result.code === 200) {
-          notification.success({
-            message: '添加成功',
-          })
-          history.push('/msa-manage/config-center')
+        this.setState({
+          addLoading: true,
+        })
+        const path = parse(this.props.location.search).path
+        const query = {
+          branch_name: encodeURIComponent(branchName),
+          file_path: (path ? path + '/' : '') + inputValue,
+          commit_message: encodeURIComponent(textAreaValue),
+          project_url: configGitUrl,
         }
+        addCenterConfig(clusterID, currentYaml, query).then(res => {
+          if (res.error) {
+            this.setState({
+              addLoading: false,
+            })
+            notification.error({
+              message: '添加失败',
+            })
+            return
+          }
+          if (res.response.result.code === 200) {
+            notification.success({
+              message: '添加成功',
+            })
+            history.push('/msa-manage/config-center?from_add=true' + (path ? '&path=' + path : ''))
+          }
+        })
       })
-    })
-  }
-  onCheckName = (rule, value, callback) => {
-    const arr = value.split('/')
-    for (let i = 0; i < arr.length; i++) {
-      if (i === 0 && !arr[i]) continue
-      if (!REPOSITORY_REGEXP.test(arr[i])) return new Error('名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头')
     }
-    callback()
   }
+  onCheckName = value => {
+    notification.destroy()
+    if (!value) {
+      notification.warn({
+        message: '请输入文件名称',
+      })
+      return false
+    }
+    if (value.startsWith('/') || value.endsWith('/')) {
+      notification.warn({
+        message: '不能以 \'/\' 开头 和 结尾',
+      })
+      return false
+    }
+    const arr = value.split('/')
+    if (arr.length > 2) {
+      notification.warn({
+        message: '配置名称中最多只能添加一级目录，目前存在多级目录',
+      })
+      return false
+    }
+    for (let i = 0; i < arr.length; i++) {
+      if (i === 0) {
+        const { envData, location } = this.props
+        const { branch, path } = parse(location.search)
+        const data = envData[branch + '/' + (path || '')]
+        const temp = filter(data, { name: arr[i] })[0]
+        if (temp) {
+          notification.warn({
+            message: (arr.length > 1 ? '目录' : '文件') + '已存在',
+          })
+          return false
+        }
+      }
+      if (!REPOSITORY_REGEXP.test(arr[i])) {
+        notification.warn({
+          message: '名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头',
+        })
+        return false
+      }
+    }
+    return true
+  }
+  // onCheckName = (rule, value, callback) => {
+  //   if (!value) {
+  //     notification.warn({
+  //       message: '请输入文件名称',
+  //     })
+  //     return callback(new Error(''))
+  //   }
+  //   if (value.startsWith('/') || value.endsWith('/')) {
+  //     notification.warn({
+  //       message: '不能以 \'/\' 开头 和 结尾',
+  //     })
+  //     return callback(new Error(''))
+  //   }
+  //   const arr = value.split('/')
+  //   for (let i = 0; i < arr.length; i++) {
+  //     if (i === 0 && !arr[i]) {
+  //       const { envData, location } = this.props
+  //       const { branch, path } = parse(location.search)
+  //       const data = envData[branch + '/' + (path || '')]
+  //       const temp = filter(data, { name: arr[i] })[0]
+  //       if (temp) {
+  //         notification.warn({
+  //           message: (arr.length > 1 ? '文件夹' : '文件') + '名称已存在',
+  //         })
+  //         return callback(new Error(''))
+  //       }
+  //     }
+  //     if (!REPOSITORY_REGEXP.test(arr[i])) {
+  //       notification.warn({
+  //         message: '名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头',
+  //       })
+  //       return callback(new Error(''))
+  //     }
+  //   }
+  //   callback()
+  // }
   render() {
     const { detail, yaml, branchData, btnVasible, currentYaml,
       branchName, addLoading, editLoading, releaseLoading } = this.state
@@ -293,11 +362,12 @@ class CreateConfig extends React.Component {
               {getFieldDecorator('configName', {
                 initialValue: detail !== 'false' ? projectName : undefined,
                 rules: [
-                  { required: true, whitespace: true, message: '请输入文件名称' },
-                  { validator: this.onCheckName },
+                  // { required: true, whitespace: true, message: '请输入文件名称' },
+                  // { validator: this.onCheckName },
                 ],
+                validateTrigger: 'onSubmit',
               })(
-                <Input addonBefore={'./' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder="请输入文件名称" onChange={this.handleInput} />
+                <Input addonBefore={'.../' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder="输入文件名称, 支持输入目录, 如: /example/name" onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
@@ -378,12 +448,11 @@ class CreateConfig extends React.Component {
 
 const mapStateToProps = state => {
   const { current, configCenter } = state
-  const { data } = configCenter
   const { cluster } = current.config
   const clusterID = cluster.id
   return {
-    data: data || [],
     clusterID,
+    envData: configCenter,
   }
 }
 
