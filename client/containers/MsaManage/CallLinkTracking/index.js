@@ -350,7 +350,7 @@ class CallLinkTracking extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Col span={9}>
+            <Col span={12}>
               <ApmTimePicker
                 value={rangeDateTime}
                 resetTime={resetTime}
