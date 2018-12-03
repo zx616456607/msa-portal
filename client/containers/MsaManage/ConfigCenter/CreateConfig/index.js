@@ -187,9 +187,8 @@ class CreateConfig extends React.Component {
   }
 
   handleYamlEditor = e => {
-    const yamlContent = encodeURIComponent(e)
     this.setState({
-      currentYaml: yamlContent,
+      currentYaml: e,
     })
   }
 

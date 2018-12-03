@@ -38,7 +38,7 @@ class MsaDetailList extends React.Component {
     const { delInstanceManualRules, clusterID, loadMsaDetail, instances } = this.props
     confirm({
       modalTitle: '移除注册操作',
-      title: `确认将实例 ${record.instanceId} 移除注册吗？`,
+      title: `确定将实例 ${record.instanceId} 移除注册吗？`,
       content: instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
         return new Promise((resolve, reject) => {

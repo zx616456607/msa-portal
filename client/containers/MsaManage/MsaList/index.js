@@ -70,7 +70,7 @@ class MsaList extends React.Component {
     const self = this
     confirm({
       className: 'msa-list-hide',
-      title: `确认将服务${record.appName} 隐藏吗？`,
+      title: `确定将服务${record.appName} 隐藏吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -99,7 +99,7 @@ class MsaList extends React.Component {
     const { delExpulsionsManualrules, clusterID } = this.props
     const self = this
     confirm({
-      title: `确认将服务 ${record.appName} 取消隐藏吗？`,
+      title: `确定将服务 ${record.appName} 取消隐藏吗？`,
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -127,7 +127,7 @@ class MsaList extends React.Component {
     const self = this
     confirm({
       modalTitle: '移除注册操作',
-      title: `确认将服务 ${record.appName} 移除注册吗？`,
+      title: `确定将服务 ${record.appName} 移除注册吗？`,
       className: 'removeRegisterConfirm',
       // content: record.instances.length > 1 ? '' : <div className="hint"> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
