@@ -23,62 +23,6 @@ import { getInstanceOverview } from '../../../../actions/CSB/instance'
 import { renderCSBInstanceServiceApproveStatus, renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import { renderInstanceRole } from '../../../../common/utils'
 
-const Chart = createG2(chart => {
-  const Stat = G2.Stat
-  chart.legend(false)
-  chart.coord('theta', {
-    radius: 1,
-    inner: 0.75,
-  })
-  chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#5cb85c', '#f85a5a', '#d9d9d9' ])
-    .style({
-      lineWidth: 1,
-    })
-  chart.render()
-})
-const Chart1 = createG2(chart => {
-  const Stat = G2.Stat
-  chart.legend(false)
-  chart.coord('theta', {
-    radius: 1,
-    inner: 0.75,
-  })
-  chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#2db7f5', '#5cb85c', '#f85a5a', '#d9d9d9' ])
-    .style({
-      lineWidth: 1,
-    })
-  chart.render()
-})
-const Chart2 = createG2(chart => {
-  const Stat = G2.Stat
-  chart.legend(false)
-  chart.coord('theta', {
-    radius: 1,
-    inner: 0.75,
-  })
-  chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#5cb85c', '#f85a5a' ])
-    .style({
-      lineWidth: 1,
-    })
-  chart.render()
-})
-const Chart3 = createG2(chart => {
-  const Stat = G2.Stat
-  chart.legend(false)
-  chart.coord('theta', {
-    radius: 1,
-    inner: 0.75,
-  })
-  chart.intervalStack().position(Stat.summary.percent('count'))
-    .color('area', [ '#5cb85c', '#f85a5a', '#d9d9d9' ])
-    .style({
-      lineWidth: 1,
-    })
-  chart.render()
-})
 
 class InstanceDetailOverview extends React.Component {
   state = {
@@ -88,6 +32,10 @@ class InstanceDetailOverview extends React.Component {
       margin: [ 40, 80, 40, 40 ],
     },
   }
+  ChartColor = []
+  ChartColor1 = []
+  ChartColor2 = []
+  ChartColor3 = []
 
   componentDidMount() {
     this.loadData()
@@ -113,28 +61,28 @@ class InstanceDetailOverview extends React.Component {
   filterStatus = key => {
     switch (key) {
       case 1:
-        return '已激活'
+        return { text: '已激活', color: '#5cb85c' }
       case 2:
-        return '已停止'
+        return { text: '已停止', color: '#f85a5a' }
       case 4:
-        return '已注销'
+        return { text: '已注销', color: '#faad14' }
       default:
-        return ''
+        return {}
     }
   }
 
   filterSubscriptionState = key => {
     switch (key) {
       case 1:
-        return '待审批'
+        return { text: '待审批', color: '#2db7f5' }
       case 2:
-        return '已通过'
+        return { text: '已通过', color: '#5cb85c' }
       case 3:
-        return '已拒绝'
+        return { text: '已拒绝', color: '#f85a5a' }
       case 4:
-        return '已撤销'
+        return { text: '已退订', color: '#faad14' }
       default:
-        return ''
+        return {}
     }
   }
 
@@ -147,36 +95,48 @@ class InstanceDetailOverview extends React.Component {
     const subServiceData = []
     const cansubServiceData = []
     if (data) {
+      this.ChartColor = []
+      this.ChartColor1 = []
+      this.ChartColor2 = []
+      this.ChartColor3 = []
       myPublishedService.forEach(item => {
+        const getState = this.filterStatus(item.status)
         const publishedService = {
           status: item.status,
           count: item.count,
-          area: this.filterStatus(item.status),
+          area: getState.text,
         }
+        this.ChartColor.push(getState.color)
         publishedServiceData.push(publishedService)
       })
       mySubscribeRequest.forEach(item => {
+        const getState = this.filterSubscriptionState(item.status)
         const subscribeRequest = {
           status: item.status,
           count: item.count,
-          area: this.filterSubscriptionState(item.status),
+          area: getState.text,
         }
+        this.ChartColor1.push(getState.color)
         serviceubscribeData.push(subscribeRequest)
       })
       mySubscribedService.forEach(item => {
+        const getState = this.filterStatus(item.status)
         const subscribedService = {
           status: item.status,
           count: item.count,
-          area: this.filterStatus(item.status),
+          area: getState.text,
         }
+        this.ChartColor2.push(getState.color)
         subServiceData.push(subscribedService)
       })
       subscribableService.forEach(item => {
+        const getState = this.filterStatus(item.status)
         const canSubService = {
           status: item.status,
           count: item.count,
-          area: this.filterStatus(item.status),
+          area: getState.text,
         }
+        this.ChartColor3.push(getState.color)
         cansubServiceData.push(canSubService)
       })
       datalist = {
@@ -190,11 +150,11 @@ class InstanceDetailOverview extends React.Component {
   }
 
   getStatusDesc = (key, value, index) => {
-    return <div key={index}>{renderCSBInstanceServiceApproveStatus(key)}<span className="status-desc">{value}个</span></div>
+    return <div className="status-list" key={index}>{renderCSBInstanceServiceApproveStatus(key)}<span className="status-desc">{value}个</span></div>
   }
 
   getServiceStatusDesc = (key, value, index) => {
-    return <div key={index}>{renderCSBInstanceServiceStatus(key)}<span className="status-desc">{value}个</span></div>
+    return <div className="status-list" key={index}>{renderCSBInstanceServiceStatus(key)}<span className="status-desc">{value}个</span></div>
   }
 
   filterStateType() {
@@ -226,6 +186,63 @@ class InstanceDetailOverview extends React.Component {
     const OverviewData = this.getOverviewData(instanceOverview)
     const { publishedServiceData, serviceubscribeData, subServiceData, cansubServiceData } =
       OverviewData && OverviewData || []
+    const Chart = createG2(chart => {
+      const Stat = G2.Stat
+      chart.legend(false)
+      chart.coord('theta', {
+        radius: 1,
+        inner: 0.75,
+      })
+      chart.intervalStack().position(Stat.summary.percent('count'))
+        .color('area', this.ChartColor)
+        .style({
+          lineWidth: 1,
+        })
+      chart.render()
+    })
+
+    const Chart1 = createG2(chart => {
+      const Stat = G2.Stat
+      chart.legend(false)
+      chart.coord('theta', {
+        radius: 1,
+        inner: 0.75,
+      })
+      chart.intervalStack().position(Stat.summary.percent('count'))
+        .color('area', this.ChartColor1)
+        .style({
+          lineWidth: 1,
+        })
+      chart.render()
+    })
+    const Chart2 = createG2(chart => {
+      const Stat = G2.Stat
+      chart.legend(false)
+      chart.coord('theta', {
+        radius: 1,
+        inner: 0.75,
+      })
+      chart.intervalStack().position(Stat.summary.percent('count'))
+        .color('area', this.ChartColor2)
+        .style({
+          lineWidth: 1,
+        })
+      chart.render()
+    })
+    const Chart3 = createG2(chart => {
+      const Stat = G2.Stat
+      chart.legend(false)
+      chart.coord('theta', {
+        radius: 1,
+        inner: 0.75,
+      })
+      chart.intervalStack().position(Stat.summary.percent('count'))
+        .color('area', this.ChartColor3)
+        .style({
+          lineWidth: 1,
+        })
+      chart.render()
+    })
     return (
       <QueueAnim className="csb-overview">
         <div className="top" key="top">
