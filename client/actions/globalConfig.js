@@ -63,7 +63,7 @@ export const setZkhost = (clusterId, data) => {
   return putZkhost(clusterId, data)
 }
 
-// 获取apm配置
+// 获取配置
 export const GET_MSA_CONFIG_REQUEST = 'GET_MSA_CONFIG_REQUEST'
 export const GET_MSA_CONFIG_SUCCESS = 'GET_MSA_CONFIG_SUCCESS'
 export const GET_MSA_CONFIG_FAILURE = 'GET_MSA_CONFIG_FAILURE'
@@ -87,4 +87,58 @@ const fetchGlobalConfigByType = (clusterID, type, callback) => {
 
 export const getGlobalConfigByType = (clusterID, type, callback) => {
   return dispatch => dispatch(fetchGlobalConfigByType(clusterID, type, callback))
+}
+
+// 创建配置
+export const CREATE_MSA_CONFIG_REQUEST = 'CREATE_MSA_CONFIG_REQUEST'
+export const CREATE_MSA_CONFIG_SUCCESS = 'CREATE_MSA_CONFIG_SUCCESS'
+export const CREATE_MSA_CONFIG_FAILURE = 'CREATE_MSA_CONFIG_FAILURE'
+
+const createGlobalConfigByTypeRequest = (type, body, callback) => {
+  const endpoint = `/configs/${type}`
+  return {
+    [CALL_API]: {
+      types: [ CREATE_MSA_CONFIG_REQUEST,
+        CREATE_MSA_CONFIG_SUCCESS,
+        CREATE_MSA_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'POST',
+        body,
+      },
+    },
+    callback,
+  }
+}
+
+export const createGlobalConfigByType = (type, body, callback) => {
+  return dispatch => dispatch(createGlobalConfigByTypeRequest(type, body, callback))
+}
+
+// 更新配置
+export const UPDATE_MSA_CONFIG_REQUEST = 'UPDATEUPDATE_MSA_CONFIG_REQUEST'
+export const UPDATE_MSA_CONFIG_SUCCESS = 'UPDATEUPDATE_MSA_CONFIG_SUCCESS'
+export const UPDATE_MSA_CONFIG_FAILURE = 'UPDATEUPDATE_MSA_CONFIG_FAILURE'
+
+const updateGlobalConfigByTypeRequest = (type, body, callback) => {
+  const endpoint = `/configs/${type}`
+  return {
+    [CALL_API]: {
+      types: [ UPDATE_MSA_CONFIG_REQUEST,
+        UPDATE_MSA_CONFIG_SUCCESS,
+        UPDATE_MSA_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'PUT',
+        body,
+      },
+    },
+    callback,
+  }
+}
+
+export const updateGlobalConfigByType = (type, body, callback) => {
+  return dispatch => dispatch(updateGlobalConfigByTypeRequest(type, body, callback))
 }

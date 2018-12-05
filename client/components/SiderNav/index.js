@@ -35,6 +35,20 @@ const menus = [
     icon: 'bar-chart',
   },
   {
+    key: 'msa-develop',
+    to: '/msa-develop',
+    tenxIcon: 'develop',
+    name: '微服务开发',
+    children: [
+      {
+        key: 'local-project',
+        to: '/msa-develop/local-project',
+        tenxIcon: 'helmet',
+        name: '本地工程',
+      },
+    ],
+  },
+  {
     to: '/msa-manage',
     key: 'msa-manage',
     name: '治理-SpringCloud',
