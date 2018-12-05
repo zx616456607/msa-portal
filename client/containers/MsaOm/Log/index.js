@@ -37,6 +37,7 @@ class Logs extends React.Component {
     clusterList: [],
     serviceList: [],
     exampleList: [],
+    searchType: 'dim',
   }
 
   componentDidMount() {
@@ -119,11 +120,12 @@ class Logs extends React.Component {
         kind: value.example ? 'pod' : 'service',
         from: null,
         size: null,
-        keyword: null,
+        keyword: value.Keyword,
         date_start: value.time && formatDate(value.time[0], 'YYYY-MM-DD'),
         date_end: value.time && formatDate(value.time[1], 'YYYY-MM-DD'),
         log_type: 'stdout',
         filename: '',
+        wildcard: this.state.searchType === 'dim',
       }
       const query = value.example ? value.example : value.server
       const state = !!value.example
@@ -147,6 +149,14 @@ class Logs extends React.Component {
       !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
     )
     const defaultProject = projectItems.length > 0 ? projectItems[0].projectName : undefined
+    const selectAfter = (
+      <Select defaultValue="dim"
+        style={{ width: 85 }}
+        onChange={value => this.setState({ searchType: value })} >
+        <Option value="exact">全字匹配</Option>
+        <Option value="dim">模糊匹配</Option>
+      </Select>
+    );
     return (
       <QueueAnim className="log">
         <div className="form" key="from">
@@ -236,7 +246,13 @@ class Logs extends React.Component {
                 {getFieldDecorator('Keyword', {
                   rules: [{ message: '请填写关键词' }],
                 })(
-                  <Input placeholder="关键字" size="default" style={{ width: '90%' }} />
+                  <Input
+                    placeholder="关键字"
+                    className="selectInput"
+                    size="default"
+                    style={{ width: '90%' }}
+                    addonAfter={selectAfter}
+                  />
                 )}
               </FormItem>
             </Col>

@@ -7,7 +7,7 @@
     "analyze": "cross-env ANALYZE_ENV=true npm run build",
     "analyze:pro": "cross-env ANALYZE_ENV=true npm run build:pro",
     "build": "webpack --config webpack_config/client.js --progress --colors",
-    "build:dll": "webpack --config webpack_config/dll.js --progress --colors",
+    "build:dll": "webpack --config webpack_config/dll.js --progress --colors --scripts-prepend-node-path",
     "build:pro": "cross-env NODE_ENV=production npm run build",
     "build-server": "webpack --config webpack_config/server.js --progress --colors",
     "build-server:pro": "cross-env NODE_ENV=production npm run build-server",

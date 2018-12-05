@@ -44,7 +44,7 @@ export function renderCSBInstanceServiceStatus(serviceStatus) {
       break
     case 4:
       text = '已注销'
-      status = 'default'
+      status = 'warning'
       break
     default:
       text = '未知'
@@ -79,7 +79,7 @@ export function renderCSBInstanceServiceApproveStatus(serviceStatus) {
       break
     case 4:
       text = '已退订'
-      status = 'default'
+      status = 'warning'
       break
     default:
       text = '未知'

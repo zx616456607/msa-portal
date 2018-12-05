@@ -18,7 +18,7 @@ import { getQueryKey } from '../../common/utils'
 
 import './style/index.less'
 import find from 'lodash/find'
-import { ROLE_SYS_ADMIN } from '../../constants'
+import { ROLE_SYS_ADMIN, ROLE_PLATFORM_ADMIN, ROLE_BASE_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { UNUSED_CLUSTER_ID } from '../../constants'
 import { getDeepValue } from '../../common/utils';
@@ -288,7 +288,7 @@ const menus = [
   }, {
     declare: {
       key: 'systemConfig',
-      spread: <Tooltip title="作为系统管理员,有权限配置系统相关"><span>系统管理员</span></Tooltip>, // 说明文字 | react Node
+      spread: <Tooltip title="作为系统、平台、基础设施管理员,有权限配置系统相关"><span>系统、平台、基础设施管理员</span></Tooltip>, // 说明文字 | react Node
       collapsed: <span className="line"></span>,
     },
     key: 'k1',
@@ -532,7 +532,8 @@ class SiderNav extends React.Component {
     const finalMenus = menus.filter(({ key }) => {
       // filter 系统管理员
       if (key === 'k1') {
-        return currentUser.role === ROLE_SYS_ADMIN
+        return currentUser.role === ROLE_SYS_ADMIN || currentUser.role === ROLE_BASE_ADMIN ||
+          currentUser.role === ROLE_PLATFORM_ADMIN
       }
       // filter 项目管理员
       if (key === 'msa-om') {
