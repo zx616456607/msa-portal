@@ -47,7 +47,20 @@ class LocalProject extends React.Component {
         text: 'RPC',
       },
     ],
-    bootVersion: [ '1.4.5', '1.5.18', '2.1.1' ],
+    bootVersion: [
+      {
+        value: '1.4.5.RELEASE',
+        text: '1.4.5',
+      },
+      {
+        value: '1.5.18.RELEASE',
+        text: '1.5.18',
+      },
+      {
+        value: '2.1.1.RELEASE',
+        text: '2.1.1',
+      },
+    ],
     dependencies: [],
     expendAdvance: false,
     artifactoryUrl: '',
@@ -142,7 +155,7 @@ class LocalProject extends React.Component {
               },
               rules: [{
                 required: true,
-                message: ' ',
+                message: '请输入工程名称',
               }, {
                 validator: (rule, val, cb) => {
                   if (val && (!MSA_DEVELOP_RULE_NAME_REG.test(val) ||
@@ -230,7 +243,7 @@ class LocalProject extends React.Component {
           >
             {
               getFieldDecorator('bootVersion', {
-                initialValue: bootVersion[0],
+                initialValue: bootVersion[0].value,
                 rules: [
                   {
                     required: true,
@@ -239,10 +252,9 @@ class LocalProject extends React.Component {
                 ],
               })(<Select placeholder="请选择bootVersion">
                 {
-                  bootVersion.map(v => (
-                    <Option key={v}>
-                      {v}
-                    </Option>))
+                  bootVersion.map(v => <Option key={v.value}>
+                    {v.text}
+                  </Option>)
                 }
               </Select>
               )
@@ -278,66 +290,64 @@ class LocalProject extends React.Component {
                 </span>
               </Col>
             </Row>
-            {
-              expendAdvance && <div>
-                <FormItem
-                  label="Group ID"
-                  {...formItemLayout}
-                >
-                  {getFieldDecorator('groupId', {
-                    initialValue: 'com.example',
-                    rules: [{
-                      required: true,
-                      message: '请输入Group ID',
-                    }, {
-                      validator: (rule, val, cb) => {
-                        const str = val.replace(/\./g, '')
-                        if (specialCharacterReg.test(str)) {
-                          cb('不能包含特殊字符或中文')
-                        }
-                        cb()
-                      },
-                    }],
-                  })(<Input placeholder="请输入Group ID"/>)}
-                </FormItem>
-                <FormItem
-                  label="Version"
-                  {...formItemLayout}
-                >
-                  {getFieldDecorator('version', {
-                    initialValue: '0.0.1-SNAPSHOT',
-                    rules: [{
-                      required: true,
-                      message: '请输入Version',
-                    }],
-                  })(<Input placeholder="请输入Version"/>)}
-                </FormItem>
-                <FormItem
-                  label="Artifact ID"
-                  {...formItemLayout}
-                >
-                  {getFieldDecorator('artifactId', {
-                    initialValue: name,
-                    rules: [{
-                      required: true,
-                      message: '请输入Artifact ID',
-                    }],
-                  })(<Input placeholder="请输入Artifact ID"/>)}
-                </FormItem>
-                <FormItem
-                  label="PackageName"
-                  {...formItemLayout}
-                >
-                  {getFieldDecorator('packageName', {
-                    initialValue: name ? `com.example.${name}` : 'com.example',
-                    rules: [{
-                      required: true,
-                      message: '请输入PackageName',
-                    }],
-                  })(<Input placeholder="请输入PackageName"/>)}
-                </FormItem>
-              </div>
-            }
+            <div className={expendAdvance ? 'show' : 'hide' }>
+              <FormItem
+                label="Group ID"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('groupId', {
+                  initialValue: 'com.example',
+                  rules: [{
+                    required: true,
+                    message: '请输入Group ID',
+                  }, {
+                    validator: (rule, val, cb) => {
+                      const str = val.replace(/\./g, '')
+                      if (specialCharacterReg.test(str)) {
+                        cb('不能包含特殊字符或中文')
+                      }
+                      cb()
+                    },
+                  }],
+                })(<Input placeholder="请输入Group ID"/>)}
+              </FormItem>
+              <FormItem
+                label="Version"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('version', {
+                  initialValue: '0.0.1-SNAPSHOT',
+                  rules: [{
+                    required: true,
+                    message: '请输入Version',
+                  }],
+                })(<Input placeholder="请输入Version"/>)}
+              </FormItem>
+              <FormItem
+                label="Artifact ID"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('artifactId', {
+                  initialValue: name,
+                  rules: [{
+                    required: true,
+                    message: '请输入Artifact ID',
+                  }],
+                })(<Input placeholder="请输入Artifact ID"/>)}
+              </FormItem>
+              <FormItem
+                label="PackageName"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('packageName', {
+                  initialValue: name ? `com.example.${name}` : 'com.example',
+                  rules: [{
+                    required: true,
+                    message: '请输入PackageName',
+                  }],
+                })(<Input placeholder="请输入PackageName"/>)}
+              </FormItem>
+            </div>
           </div>
         </Form>
       </Card>
