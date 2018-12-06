@@ -105,6 +105,10 @@ module.exports = merge(common, {
     //   filename: 'styles.[chunkhash:8].css',
     //   allChunks: true,
     // }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: [ 'vendor' ],
+      minChunks: Infinity,
+    }),
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css',
       chunkFilename: '[id].[contenthash:8].css',
