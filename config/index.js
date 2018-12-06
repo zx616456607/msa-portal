@@ -13,7 +13,7 @@ const url = require('url')
 
 // get config from env for prod
 const { env } = process
-const api = env.PAAS_API || 'http://192.168.1.103:48000'
+const api = env.PAAS_API || 'http://192.168.1.230:48000'
 const {
   protocol: PAAS_API_PROTOCOL,
   host: PAAS_API_HOST,
