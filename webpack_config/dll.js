@@ -62,7 +62,7 @@ module.exports = {
     filename: '[name].js',
     library: '[name]',
   },
-  mode: 'production',
+  mode: 'development',
   entry: {
     lib: vendors,
   },
