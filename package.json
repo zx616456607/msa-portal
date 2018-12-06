@@ -65,7 +65,7 @@
     "@babel/preset-stage-0": "7.0.0-beta.37",
     "@babel/runtime": "7.0.0-beta.37",
     "@tenx-ui/ellipsis": "0.0.4",
-    "@tenx-ui/icon": "^2.1.12",
+    "@tenx-ui/icon": "^2.1.25",
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "^1.2.2",
     "@tenx-ui/modal": "^1.0.9",

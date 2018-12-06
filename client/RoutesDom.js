@@ -74,6 +74,8 @@ import DubboList from './containers/Dubbo/DubboList/DubboList'
 import DubboDetail from './containers/Dubbo/DubboDetail/DubboDetail'
 import DistributedList from './containers/MsaManage/Distributed/DistributedList'
 import ExecutionRecord from './containers/MsaManage/Distributed/ExecutionRecord'
+import MsaDevelop from './containers/MsaDevelop'
+import LocalProject from './containers/MsaDevelop/LocalProject'
 
 export const appChildRoutes = [
   {
@@ -90,7 +92,12 @@ export const appChildRoutes = [
   {
     path: '/service-mesh',
     component: ServiceMesh,
-    key: ServiceMesh,
+    key: 'ServiceMesh',
+  },
+  {
+    path: '/msa-develop',
+    component: MsaDevelop,
+    key: 'MsaDevelop',
   },
   {
     path: '/dubbo',
@@ -309,6 +316,15 @@ export const msaManageChildRoutes = [
     exact: true,
     component: ExecutionRecord,
     key: 'distribute-record',
+  },
+]
+
+export const msaDevelopChildRoutes = [
+  {
+    path: '/msa-develop/local-project',
+    component: LocalProject,
+    exact: true,
+    key: 'dubbo-manage',
   },
 ]
 
