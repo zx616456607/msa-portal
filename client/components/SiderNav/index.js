@@ -129,24 +129,6 @@ const menus = [
             name: '事件',
           },
         ],
-      }, {
-        key: 'distribute',
-        to: '/msa-manage/distribute',
-        tenxIcon: 'event-manage',
-        name: '分布式事务',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'distribute-list',
-            to: '/msa-manage/distribute/list',
-            name: '事务列表',
-          },
-          {
-            key: 'distribute-record',
-            to: '/msa-manage/distribute/distribute-record',
-            name: '事务执行记录',
-          },
-        ],
       },
     ],
   },
@@ -190,6 +172,25 @@ const menus = [
         to: '/dubbo/dubbo-manage',
         tenxIcon: 'dubbo',
         name: 'Dubbo 服务列表',
+      },
+    ],
+  },
+  {
+    key: 'distribute',
+    to: '/distribute',
+    tenxIcon: 'event-manage',
+    name: '分布式事务',
+    defaultopen: 'true',
+    children: [
+      {
+        key: 'distribute-list',
+        to: '/distribute/list',
+        name: '事务列表',
+      },
+      {
+        key: 'distribute-record',
+        to: '/distribute/distribute-record',
+        name: '事务执行记录',
       },
     ],
   },

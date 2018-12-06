@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { getDistributeList, getChildTranscation } from '../../../actions/msa'
 import { formatDate } from '../../../common/utils';
-import './style/DistributedList.less'
+import './style/index.less'
 
 const Search = Input.Search
 const AUTO_FETCH_INTERVAL = 60 * 1000
