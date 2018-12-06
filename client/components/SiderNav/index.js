@@ -289,7 +289,7 @@ const menus = [
   }, {
     declare: {
       key: 'systemConfig',
-      spread: <Tooltip title="作为系统、平台、基础设施管理员,有权限配置系统相关"><span>系统、平台、基础设施管理员</span></Tooltip>, // 说明文字 | react Node
+      spread: <Tooltip title="作为系统、平台、基础设施管理员,有权限配置系统相关"><span>帐户管理员</span></Tooltip>, // 说明文字 | react Node
       collapsed: <span className="line"></span>,
     },
     key: 'k1',
