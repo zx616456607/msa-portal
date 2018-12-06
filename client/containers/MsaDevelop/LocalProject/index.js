@@ -225,35 +225,6 @@ class LocalProject extends React.Component {
             </FormItem>
           }
           <FormItem
-            label="添加依赖"
-            {...formItemLayout}
-          >
-            {
-              getFieldDecorator('style', {
-                rules: [
-                  {
-                    required: true,
-                    message: '请选择工程中需添加的依赖组件',
-                  },
-                ],
-              })(<Select placeholder="选择工程中需添加的依赖组件" mode="multiple">
-                {
-                  Object.keys(dependencies).map(v => (
-                    <OptGroup label={this.dependencyKeys(v)} key={v}>
-                      {
-                        dependencies[v].map(k => (
-                          <Option key={k.id}>
-                            {k.name}
-                          </Option>
-                        ))
-                      }
-                    </OptGroup>))
-                }
-              </Select>
-              )
-            }
-          </FormItem>
-          <FormItem
             label="bootVersion"
             {...formItemLayout}
           >
@@ -277,10 +248,32 @@ class LocalProject extends React.Component {
               )
             }
           </FormItem>
+          <FormItem
+            label="添加依赖"
+            {...formItemLayout}
+          >
+            {
+              getFieldDecorator('style')(<Select placeholder="选择工程中需添加的依赖组件" mode="multiple">
+                {
+                  Object.keys(dependencies).map(v => (
+                    <OptGroup label={this.dependencyKeys(v)} key={v}>
+                      {
+                        dependencies[v].map(k => (
+                          <Option key={k.id}>
+                            {k.name}
+                          </Option>
+                        ))
+                      }
+                    </OptGroup>))
+                }
+              </Select>
+              )
+            }
+          </FormItem>
           <div className="advance-config">
-            <Row onClick={this.showAdvance}>
+            <Row>
               <Col span={8} pull={5} style={{ textAlign: 'right', marginLeft: -10, marginBottom: 24 }}>
-                <span>
+                <span onClick={this.showAdvance}>
                   <Icon type={expendAdvance ? 'minus-square' : 'plus-square'}/> 高级设置
                 </span>
               </Col>
