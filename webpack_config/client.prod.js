@@ -23,17 +23,7 @@ const publicPath = '/public/'
 module.exports = merge(common, {
   devtool: '#cheap-source-map',
   mode: 'production',
-  entry: {
-    main: [
-      './client/entry/index.js',
-    ],
-    vendor: [
-      '@babel/polyfill',
-      'g2',
-      'moment',
-      'codemirror',
-    ],
-  },
+  entry: './client/entry/index.js',
   output: {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].[chunkhash:8].js',
@@ -41,29 +31,6 @@ module.exports = merge(common, {
   },
   module: {
     rules: [
-      /* {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: 'svg-sprite-loader',
-            options: {
-              extract: true,
-              spriteFilename: `sprite.${svgHash}.svg`,
-              runtimeGenerator: require.resolve('./svg_runtime_generator'),
-            },
-          },
-          {
-            loader: 'svgo-loader',
-            options: {
-              plugins: [
-                { removeTitle: true },
-                { removeStyleElement: true },
-                { removeAttrs: { attrs: 'fill' } },
-              ],
-            },
-          },
-        ],
-      }, */
       {
         test: /\.css$/,
         use: [
@@ -101,14 +68,6 @@ module.exports = merge(common, {
   },
   plugins: [
     // new WebpackMd5Hash(),
-    // new ExtractTextPlugin({
-    //   filename: 'styles.[chunkhash:8].css',
-    //   allChunks: true,
-    // }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: [ 'vendor' ],
-      minChunks: Infinity,
-    }),
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css',
       chunkFilename: '[id].[contenthash:8].css',
@@ -128,12 +87,6 @@ module.exports = merge(common, {
       publicPath,
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   sourceMap: true,
-    //   comments: false,
-    //   unused: true,
-    //   dead_code: true,
-    // }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
@@ -143,6 +96,16 @@ module.exports = merge(common, {
     }),
   ],
   optimization: {
-    minimize: true,
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+          priority: 20,
+        },
+      },
+    },
   },
 })
