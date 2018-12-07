@@ -10,7 +10,7 @@ import { toQuerystring } from '../../../common/utils';
 const FormItem = Form.Item
 const { Option, OptGroup } = Select;
 const RadioGroup = Radio.Group;
-const { MSA_API } = API_CONFIG
+const { MSA_DEVELOP_API } = API_CONFIG
 const formItemLayout = {
   labelCol: {
     sm: { span: 8, pull: 5 },
@@ -113,7 +113,7 @@ class LocalProject extends React.Component {
       if (error) return
       const query = JSON.parse(JSON.stringify(values))
       query.mavenRepositoryUrl = artifactoryUrl
-      window.open(`${MSA_API}/starter.zip?${toQuerystring(query)}`)
+      window.open(`${MSA_DEVELOP_API}/starter.zip?${toQuerystring(query)}`)
       resetFields()
       this.setState({
         expendAdvance: false,
