@@ -17,7 +17,7 @@ import './style/index.less'
 import isEmpty from 'lodash/isEmpty'
 import MsaModal from './Modal'
 import { fetchSpingCloud } from '../../../actions/msaConfig'
-import { formatFromnow } from '../../../common/utils'
+import { formatFromnow, getDeploymentStatus } from '../../../common/utils'
 import { renderCSBInstanceStatus } from '../../../components/utils'
 import { fetchMsaComponentList, getStart, getStop, getRedeploy } from '../../../actions/msaComponent'
 import { Card, Button, Table, Dropdown, Menu, Modal, Icon, notification } from 'antd'
@@ -163,44 +163,22 @@ class MsaComponents extends React.Component {
   }
 
   filterState = item => {
-    let res
-    const { metadata, status, spec } = item
-    const replicas = spec.replicas
-    const available = status.availableReplicas
-    const {
-      updatedReplicas,
-      unavailableReplicas,
-      observedGeneration,
-      readyReplicas,
-    } = status
-    if (replicas === 0 && available > 0) {
-      res = 3 // 'Stopping'
+    const status = getDeploymentStatus(item)
+    switch (status.phase) {
+      case 'Stopped':
+        return 0
+      case 'Pending':
+        return 2
+      case 'Stopping':
+        return 3
+      case 'Deploying':
+      case 'ScrollRelease':
+      case 'RollingUpdate':
+        return 4
+      case 'Running':
+      default:
+        return 1
     }
-    if (observedGeneration >= metadata.generation &&
-      replicas === updatedReplicas && readyReplicas > 0) {
-      status.available = readyReplicas
-      res = 1 // 'Running'
-    }
-    if (replicas > 0 && available < 1) {
-      status.unavailableReplicas = replicas
-      res = 2 // 'Pending'
-    }
-    if (updatedReplicas && unavailableReplicas) {
-      res = 4 // 'Deploying'
-    }
-    if (available < 1) {
-      res = 0 // 'Stopped'
-    }
-    return res
-    // if (replicas > 0 || available > 0) {
-    //   return 1
-    // } if (replicas === 0 || available > 0) {
-    //   return 3
-    // } if (replicas === 0 || available === 0) {
-    //   return 0
-    // } if (replicas > 0 || available <= 0) {
-    //   return 2
-    // }
   }
 
   handleButtonClick = record => {
