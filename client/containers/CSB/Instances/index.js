@@ -16,41 +16,47 @@ import { connect } from 'react-redux'
 import { Layout } from 'antd'
 // import Sider from '../../../components/Sider'
 import Content from '../../../components/Content'
-import { Route, Switch, withRouter } from 'react-router-dom'
-import { csbInstancesChildRoutes } from '../../../RoutesDom'
+import { Route, Switch, withRouter, Redirect } from 'react-router-dom'
 import { getAllClusters } from '../../../actions/current'
 import './style/index.less'
+import AvailableInstances from './Available'
+import PublicInstances from './Public'
+import MyApplication from './MyApplication'
+import LoadableWrapper from '../../../components/LoadableWrapper'
 
-// const menus = [
-//   {
-//     type: 'SubMenu',
-//     text: '我的实例',
-//     icon: <Icon type="user" />,
-//     key: 'mine-csb-instances',
-//     children: [
-//       {
-//         to: '/csb-instances/available',
-//         text: '可用实例',
-//       },
-//       {
-//         to: '/csb-instances/my-application',
-//         text: '我的申请',
-//       },
-//     ],
-//   },
-//   {
-//     type: 'SubMenu',
-//     text: '可申请实例',
-//     icon: <Icon type="unlock" />,
-//     key: 'public-csb-instances',
-//     children: [
-//       {
-//         to: '/csb-instances/public',
-//         text: '可申请实例',
-//       },
-//     ],
-//   },
-// ]
+const csbInstancesChildRoutes = [
+  {
+    path: '/csb-instances',
+    exact: true,
+    render: () => <Redirect to="/csb-instances/available" component={AvailableInstances} />,
+    key: 'index',
+  },
+  {
+    path: '/csb-instances/available',
+    component: AvailableInstances,
+    exact: true,
+    key: 'available',
+  },
+  {
+    path: '/csb-instances/available/:instanceID',
+    component: LoadableWrapper({
+      loader: () => import('../InstanceDetail' /* webpackChunkName: "csb-instance-detail" */),
+    }),
+    key: 'csb-instances',
+  },
+  {
+    path: '/csb-instances/public',
+    component: PublicInstances,
+    exact: true,
+    key: 'public',
+  },
+  {
+    path: '/csb-instances/my-application',
+    component: MyApplication,
+    exact: true,
+    key: 'my-application',
+  },
+]
 
 class CSBInstances extends React.Component {
   componentDidMount() {

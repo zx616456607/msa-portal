@@ -16,18 +16,19 @@ const postcssConfig = require('./postcss')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 const svgHash = +new Date()
 const publicPath = '/public/'
-
+const outputPath = path.join(__dirname, '../static/public')
 module.exports = merge(common, {
   devtool: '#cheap-source-map',
   mode: 'production',
   entry: './client/entry/index.js',
   output: {
-    path: path.join(__dirname, '../static/public'),
+    path: outputPath,
     filename: '[name].[chunkhash:8].js',
-    chunkFilename: '[id].chunk.[chunkhash:8].js',
+    chunkFilename: '[name].[chunkhash:8].js',
   },
   module: {
     rules: [
@@ -68,9 +69,13 @@ module.exports = merge(common, {
   },
   plugins: [
     // new WebpackMd5Hash(),
+    new CleanWebpackPlugin([
+      '../static/public',
+      '../dist',
+    ]),
     new MiniCssExtractPlugin({
       filename: 'styles.[contenthash:8].css',
-      chunkFilename: '[id].[contenthash:8].css',
+      chunkFilename: '[name].[contenthash:8].css',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
@@ -85,6 +90,8 @@ module.exports = merge(common, {
       initialState: '<%- initialState %>',
       svgHash,
       publicPath,
+      includeSiblingChunks: true,
+      // chunksSortMode: 'none',
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new CompressionPlugin({
@@ -98,6 +105,13 @@ module.exports = merge(common, {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'commons',
+          chunks: 'all',
+          priority: 10,
+          minChunks: 2,
+        },
         styles: {
           name: 'styles',
           test: /\.css$/,

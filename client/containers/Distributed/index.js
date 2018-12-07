@@ -14,7 +14,22 @@ import React from 'react'
 import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
-import { distributeChildRoutes } from '../../RoutesDom'
+import DistributedList from './DistributedList'
+import ExecutionRecord from './ExecutionRecord'
+
+const distributeChildRoutes = [
+  {
+    path: '/distribute/list',
+    component: DistributedList,
+    key: 'distribute-list',
+  },
+  {
+    path: '/distribute/distribute-record',
+    exact: true,
+    component: ExecutionRecord,
+    key: 'distribute-record',
+  },
+]
 
 class Distributed extends React.Component {
   renderChildren = () => {

@@ -14,7 +14,16 @@ import React from 'react'
 import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
-import { msaDevelopChildRoutes } from '../../RoutesDom'
+import LocalProject from './LocalProject'
+
+const msaDevelopChildRoutes = [
+  {
+    path: '/msa-develop/local-project',
+    component: LocalProject,
+    exact: true,
+    key: 'dubbo-manage',
+  },
+]
 
 class MsaDevelop extends React.Component {
   renderChildren = () => {

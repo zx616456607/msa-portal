@@ -14,7 +14,23 @@ import React from 'react'
 import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
-import { dubboChildRoutes } from '../../RoutesDom'
+import DubboList from './DubboList/DubboList'
+import DubboDetail from './DubboDetail/DubboDetail'
+
+const dubboChildRoutes = [
+  {
+    path: '/dubbo/dubbo-manage',
+    component: DubboList,
+    exact: true,
+    key: 'dubbo-manage',
+  },
+  {
+    path: '/dubbo/dubbo-manage/dubbo-detail/:name/:groupVersion',
+    component: DubboDetail,
+    exact: true,
+    key: 'dubbo-detail',
+  },
+]
 
 class Dubbo extends React.Component {
   renderChildren = () => {

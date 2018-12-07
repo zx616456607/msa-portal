@@ -13,76 +13,60 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Layout } from 'antd'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 // import Sider from '../../components/Sider'
 import Content from '../../components/Content'
-import { msaOmChildRoutes } from '../../RoutesDom'
-// import { ROLE_SYS_ADMIN } from '../../constants'
-// import msaComponent from '../../assets/img/msa-om/msa-component.svg'
-// import csbInstancesOm from '../../assets/img/msa-om/csb-instances-om.svg'
-// import csbInstancesApproval from '../../assets/img/msa-om/csb-instances-approval.svg'
+import MsaOmLogs from './Log'
+import MsaComponents from './Components'
+import CSBInstanceOm from './CSBInstanceOm'
+import MsaOmCSBApproval from './CSBApproval'
+import CSBCascadingLinkRules from './CSBCascadingLinkRules'
+import CreateLinkRules from './CSBCascadingLinkRules/CreateLinkRules'
 
-// const menus = [
-//   {
-//     to: '/msa-om/components',
-//     text: '微服务组件',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${msaComponent.id}`} />
-//       </svg>
-//     ),
-//   },
-//   {
-//     type: 'SubMenu',
-//     text: 'CSB 运维',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${csbInstancesOm.id}`} />
-//       </svg>
-//     ),
-//     key: 'msa-om-csb',
-//     children: [
-//       {
-//         to: '/msa-om/csb-instance-om',
-//         text: '实例列表',
-//       },
-//       {
-//         to: '/msa-om/csb-instance-approval',
-//         text: '实例审批',
-//       },
-//       {
-//         to: '/msa-om/csb-cascading-link-rules',
-//         text: '级联链路规则',
-//         includePaths: [
-//           '/msa-om/csb-cascading-link-rules/create',
-//         ],
-//       },
-//     ],
-//   },
-//   /* {
-//     to: '/msa-om/csb-instance-om',
-//     text: 'CSB 实例运维',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${csbInstancesOm.id}`} />
-//       </svg>
-//     ),
-//   },
-//   {
-//     to: '/msa-om/csb-instance-approval',
-//     text: 'CSB 实例审批',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${csbInstancesApproval.id}`} />
-//       </svg>
-//     ),
-//   }, */
-//   {
-//     to: '/msa-om/log',
-//     text: '日志查询',
-//     icon: <Icon type="file-text" style={{ fontSize: 15 }} />,
-//   },
-// ]
+const msaOmChildRoutes = [
+  {
+    path: '/msa-om',
+    exact: true,
+    render: () => <Redirect to="/msa-om/components" component={MsaComponents} />,
+    key: 'index',
+  },
+  {
+    path: '/msa-om/log',
+    component: MsaOmLogs,
+    exact: true,
+    key: 'msa-om-logs',
+  },
+  {
+    path: '/msa-om/components',
+    component: MsaComponents,
+    exact: true,
+    key: 'msa-om-components',
+  },
+  {
+    path: '/msa-om/csb-instance-om',
+    component: CSBInstanceOm,
+    exact: true,
+    key: 'csb-instance-om',
+  },
+  {
+    path: '/msa-om/csb-instance-approval',
+    component: MsaOmCSBApproval,
+    exact: true,
+    key: 'csb-instance-approval',
+  },
+  {
+    path: '/msa-om/csb-cascading-link-rules',
+    component: CSBCascadingLinkRules,
+    exact: true,
+    key: 'csb-cascading-link-rules',
+  },
+  {
+    path: '/msa-om/csb-cascading-link-rules/create',
+    component: CreateLinkRules,
+    exact: true,
+    key: 'csb-cascading-link-rules-create',
+  },
+]
 
 class MsaOm extends React.Component {
   componentDidMount() {

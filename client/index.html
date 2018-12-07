@@ -13,48 +13,6 @@
 </head>
 
 <body spellcheck="false">
-  <!-- <script>
-    // load svg
-    (function loadSvg() {
-      var svgHash = '<%= htmlWebpackPlugin.options.svgHash %>';
-      var canUseLS = !!localStorage && !!localStorage.getItem && !!localStorage.setItem
-      var div = document.createElement('div');
-      div.style.display = 'none';
-      document.body.appendChild(div);
-      function xhrLoadSvg(url, cb) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('get', url);
-        xhr.onload = function() {
-          var data = xhr.responseText
-          if (data) {
-            div.innerHTML = data;
-            cb(data)
-          }
-        };
-        xhr.send(null);
-      }
-      try {
-        if (canUseLS) {
-          var _svg_hash = localStorage.getItem('_svg_hash');
-          var _svg = localStorage.getItem('_svg');
-          if (_svg && _svg_hash === svgHash) {
-            div.innerHTML = _svg;
-            return;
-          }
-        }
-        var publicPath = '<%= htmlWebpackPlugin.options.publicPath %>';
-        var svgUrl = publicPath + 'sprite.' + svgHash + '.svg';
-        xhrLoadSvg(svgUrl, function xhrLoadSvgCb(data) {
-          if (canUseLS) {
-            localStorage.setItem('_svg_hash', svgHash)
-            localStorage.setItem('_svg', data)
-          }
-        })
-      } catch (error) {
-        console.error('load svg failed', error)
-      }
-    })();
-  </script> -->
   <div id="root">
   </div>
   <script>
