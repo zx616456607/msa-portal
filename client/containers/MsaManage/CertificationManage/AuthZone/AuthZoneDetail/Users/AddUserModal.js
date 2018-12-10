@@ -120,6 +120,10 @@ class AddUserModal extends React.Component {
     if (value.length < 3 || value.length > 64) {
       return cb('用户名长度为3 ~ 64位字符')
     }
+    const reg = /[%_]/
+    if (reg.test(value)) {
+      return cb('不支持%和_')
+    }
     if (isEmpty(currentUser)) {
       let hasUserName = false
       userList.every(item => {
