@@ -334,7 +334,7 @@ class RegisterMsa extends React.Component {
                 whitespace: true,
                 type: 'integer',
                 validator: (rule, value, cb) => {
-                  if (!toString(value)) return cb(new Error('请填写端口'))
+                  if (value === undefined || !String(value)) return cb(new Error('请填写端口'))
                   if (value < 1 || value > 65535) return cb(new Error('请输入正确的端口号'))
                   cb()
                 },
