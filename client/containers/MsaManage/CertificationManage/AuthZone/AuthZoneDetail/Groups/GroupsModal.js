@@ -60,7 +60,17 @@ class GroupsModal extends React.Component {
       form.resetFields()
     })
   }
+  checkUserName = (rules, value, cb) => {
+    if (!(value.length >= 1 && value.length <= 64)) {
+      return cb('用户名长度为1 ~ 64位字符')
+    }
+    const reg = /[%_]/
+    if (reg.test(value)) {
+      return cb('不支持%和_')
+    }
+    return cb()
 
+  }
   render() {
     const { form, editGroup, editData, visible, closeModal } = this.props
     const { getFieldDecorator } = form
@@ -81,6 +91,8 @@ class GroupsModal extends React.Component {
               rules: [{
                 required: true,
                 message: '请输入组名称',
+              }, {
+                validator: this.checkUserName,
               }],
               initialValue: editGroup ? editData.displayName : '',
             })(
