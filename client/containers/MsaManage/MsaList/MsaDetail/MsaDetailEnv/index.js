@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { Button, Table } from 'antd'
+import { Button, Table, notification } from 'antd'
 import { connect } from 'react-redux'
 import {
   getMsaEnv,
@@ -20,9 +20,14 @@ import './style/index.less'
 import { MSA_TYPE_MAN } from '../../../../../constants'
 
 class MsaDetailEnv extends React.Component {
-  loadMsaEnv = () => {
+  loadMsaEnv = async () => {
     const { getMsaEnv, clusterID, name, instances } = this.props
-    getMsaEnv(clusterID, `${name}:${instances[0].port}`)
+    const res = await getMsaEnv(clusterID, `${name}:${instances[0].port}`, { isHandleError: true })
+    if (res.status === 404) {
+      notification.warn({
+        message: '暂无配置',
+      })
+    }
   }
 
   componentDidMount() {
