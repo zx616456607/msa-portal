@@ -48,9 +48,8 @@ class ConfigCenter extends React.Component {
   }
 
   componentDidMount() {
-    const isForce = Boolean(parse(this.props.location.search).from_add) ||
-      Boolean(parse(this.props.location.search).from_del)
-    this.loadData(isForce)
+    const isForce = parse(this.props.location.search).from_add
+    this.loadData(Boolean(isForce))
   }
 
   loadData = isForce => {
@@ -186,12 +185,10 @@ class ConfigCenter extends React.Component {
         return
       }
       if (res.response.result.code === 200) {
-        if (isLast) {
-        // if (isLast && path) {
-          // const arr = path.split('/')
-          // const tempPath = arr.splice(arr.length - 1).join('/')
-          // this.props.history.push(`/msa-manage/config-center${tempPath ? '?path=' + tempPath : ''}`)
-          this.props.history.push('/msa-manage/config-center?from_del=true')
+        if (isLast && path) {
+          const arr = path.split('/')
+          const tempPath = arr.splice(arr.length - 1).join('/')
+          this.props.history.push(`/msa-manage/config-center${tempPath ? '?path=' + tempPath : ''}`)
         }
         this.fetchList('', true)
         notification.success({
@@ -430,7 +427,7 @@ class ConfigCenter extends React.Component {
                 <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
                   footer={[
                     <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-                    <Button key="submit" type="primary" onClick={() => this.handleDel(envData.length === 1 && tempEnvData.length === 2)} loading={this.state.isDelFetching}>确 定</Button>,
+                    <Button key="submit" type="primary" onClick={() => this.handleDel(tempEnvData.length === 1)} loading={this.state.isDelFetching}>确 定</Button>,
                   ]}>
                   <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
                     <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
