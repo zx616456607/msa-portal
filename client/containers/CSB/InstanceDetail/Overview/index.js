@@ -309,7 +309,7 @@ class InstanceDetailOverview extends React.Component {
                 <Row type={'flex'} align={'middle'}>
                   <Col span={14}>
                     {
-                      isEmptyDada(cansubServiceData) ?
+                      isEmptyDada(publishedServiceData) ?
                         this.noDataDom()
                         :
                         <Chart
