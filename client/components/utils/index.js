@@ -119,7 +119,7 @@ export function renderCSBInstanceStatus(instanceStatus) {
   let text
   switch (instanceStatus) {
     case 0:
-      text = '停止'
+      text = '已停止'
       status = 'error'
       break
     case 1:

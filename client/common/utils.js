@@ -24,6 +24,7 @@ import { DEFAULT, DEFAULT_TIME_FORMAT,
 } from '../constants'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import cloneDeep from 'lodash/cloneDeep'
 
 moment.locale('zh-cn', {
   relativeTime: {
@@ -589,4 +590,83 @@ function validate(host) {
       }
     }
   }
+}
+
+export function getDeploymentStatus(_deployment) {
+  const deployment = cloneDeep(_deployment)
+  const { status, metadata } = deployment
+  if (!metadata.annotations) {
+    metadata.annotations = {}
+  }
+  const specReplicas = deployment.spec.replicas
+  let replicas = specReplicas
+  if (replicas === undefined) {
+    replicas = metadata.annotations['system/replicas']
+  }
+  let availableReplicas = 0
+  if (!status) {
+    return {
+      phase: 'Stopped',
+      availableReplicas: 0,
+      replicas,
+    }
+  }
+  availableReplicas = status.availableReplicas || 0
+  status.availableReplicas = availableReplicas
+  let {
+    phase,
+    updatedReplicas,
+    unavailableReplicas,
+    observedGeneration,
+    readyReplicas,
+  } = status
+  const { strategy = {} } = deployment.spec || {}
+  if (status.replicas > specReplicas && strategy.type === 'RollingUpdate') {
+    const newCount = metadata.annotations['rollingupdate/newCount']
+    if (newCount === undefined) {
+      phase = 'ScrollRelease'
+    } else {
+      phase = 'RollingUpdate'
+    }
+    return {
+      phase,
+      availableReplicas,
+      replicas,
+    }
+  }
+  status.replicas = replicas
+  if (phase && phase !== 'Running') {
+    return status
+  }
+  // For issue #CRYSTAL-2478
+  // Add spec.replicas analyzing conditions
+  if (specReplicas === 0 && availableReplicas > 0) {
+    status.phase = 'Stopping'
+    return status
+  }
+  if (observedGeneration >= metadata.generation && replicas === updatedReplicas
+    && readyReplicas > 0) {
+    status.availableReplicas = readyReplicas
+    status.phase = 'Running'
+    return status
+  }
+  /* if (unavailableReplicas > 0 && (!availableReplicas || availableReplicas < replicas)) {
+    status.phase = 'Pending'
+  } */
+  if (specReplicas > 0 && availableReplicas < 1) {
+    status.unavailableReplicas = specReplicas
+    status.phase = 'Pending'
+    return status
+  }
+  if (updatedReplicas && unavailableReplicas) {
+    status.phase = 'Deploying'
+    status.progress = { status: false }
+    return status
+  }
+  if (availableReplicas < 1) {
+    status.phase = 'Stopped'
+    return status
+  }
+  status.phase = 'Running'
+  return status
 }
