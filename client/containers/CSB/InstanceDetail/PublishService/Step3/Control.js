@@ -88,6 +88,16 @@ export default class Control extends React.Component {
     return result
   }
 
+  OAuthCheck = (rules, value, cb) => {
+    if (!value) {
+      return cb()
+    }
+    if (!URL_REG.test(value)) {
+      return cb('请输入正确的OAuth Server')
+    }
+    cb()
+  }
+
   render() {
     const { className, formItemLayout, form, data } = this.props
     const { getFieldDecorator, getFieldValue } = form
@@ -112,7 +122,7 @@ export default class Control extends React.Component {
             <Col span={18}>
               每
               {getFieldDecorator('apiGatewayLimitType', {
-                initialValue: API_GATEWAY_LIMIT_TYPES[ 0 ].key,
+                initialValue: API_GATEWAY_LIMIT_TYPES[0].key,
               })(
                 <Select className="select-time">
                   {
@@ -126,11 +136,11 @@ export default class Control extends React.Component {
               {getFieldDecorator('apiGatewayLimit', {
                 initialValue: this.renderLimit(limitDetail, 'limit'),
               })(
-                <InputNumber min={0} step={1} precision={0} placeholder="请填写整数" className="input-qps"/>
+                <InputNumber min={0} max={9999999} step={1} precision={0} placeholder="请填写整数" className="input-qps" />
               )}
               次
               <Tooltip title="设置为 0 或者为空时代表不限制访问频度">
-                <Icon type="question-circle-o" className="qps-tips"/>
+                <Icon type="question-circle-o" className="qps-tips" />
               </Tooltip>
             </Col>
           </Row>
@@ -262,11 +272,10 @@ export default class Control extends React.Component {
                   rules: [{
                     required: true,
                     whitespace: true,
-                    pattern: URL_REG,
                     message: '输入 OAuth Server!',
-                  }],
+                  }, { validator: this.OAuthCheck }],
                 })(
-                  <Input />
+                  <Input placeholder="https://gitlab.tenxcloud.com"/>
                 )}
               </FormItem>,
               /* <FormItem

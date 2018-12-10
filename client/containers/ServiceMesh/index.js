@@ -15,10 +15,73 @@ import { connect } from 'react-redux'
 import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
-import { serviceMeshChildRoutes } from '../../RoutesDom'
 import * as meshAction from '../../actions/serviceMesh'
 import { renderLoading } from '../../components/utils'
 import serviceMesh from '../../assets/img/serviceMesh/serviceMeshEmpty.png'
+import ServiceMeshGraph from './Graph'
+import MeshGateway from './MeshGateway'
+import ComponentManagement from './ComponentManagement'
+import CreateComponent from './ComponentManagement/CreateComponent'
+import ComponentDetail from './ComponentManagement/ComponentDetail'
+import RoutesManagement from './RoutesManagement'
+import RouteDetail from './RoutesManagement/RouteDetail'
+
+const serviceMeshChildRoutes = [
+  {
+    path: '/service-mesh',
+    exact: true,
+    component: ServiceMeshGraph,
+    key: 'index',
+  },
+  {
+    path: '/service-mesh/component-management',
+    exact: true,
+    component: ComponentManagement,
+    key: 'component-management',
+  },
+  {
+    path: '/service-mesh/mesh-gateway',
+    exact: true,
+    component: MeshGateway,
+    key: 'mesh-gateway',
+  },
+  {
+    path: '/service-mesh/component-management/component/create',
+    exact: true,
+    component: CreateComponent,
+    key: 'create-component',
+  },
+  {
+    path: '/service-mesh/component-management/:id',
+    component: CreateComponent,
+    exact: true,
+    key: 'update-component',
+  },
+  {
+    path: '/service-mesh/component-management/component/detail',
+    component: ComponentDetail,
+    exact: true,
+    key: 'component-detail',
+  },
+  {
+    path: '/service-mesh/routes-management',
+    exact: true,
+    component: RoutesManagement,
+    key: 'component-management',
+  },
+  {
+    path: '/service-mesh/routes-management/route-detail/:name',
+    exact: true,
+    component: RouteDetail,
+    key: 'route-detail',
+  },
+  {
+    path: '/service-mesh/routes-management/route-detail',
+    exact: true,
+    component: RouteDetail,
+    key: 'new-route',
+  },
+]
 
 class ServiceMesh extends React.Component {
   state = {

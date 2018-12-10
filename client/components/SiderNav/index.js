@@ -18,7 +18,7 @@ import { getQueryKey } from '../../common/utils'
 
 import './style/index.less'
 import find from 'lodash/find'
-import { ROLE_SYS_ADMIN } from '../../constants'
+import { ROLE_SYS_ADMIN, ROLE_PLATFORM_ADMIN, ROLE_BASE_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { UNUSED_CLUSTER_ID } from '../../constants'
 import { getDeepValue } from '../../common/utils';
@@ -33,6 +33,20 @@ const menus = [
     key: 'overview',
     name: '微服务总览',
     icon: 'bar-chart',
+  },
+  {
+    key: 'msa-develop',
+    to: '/msa-develop',
+    tenxIcon: 'develop',
+    name: '微服务开发',
+    children: [
+      {
+        key: 'local-project',
+        to: '/msa-develop/local-project',
+        tenxIcon: 'helmet',
+        name: '本地工程',
+      },
+    ],
   },
   {
     to: '/msa-manage',
@@ -115,24 +129,6 @@ const menus = [
             name: '事件',
           },
         ],
-      }, {
-        key: 'distribute',
-        to: '/msa-manage/distribute',
-        tenxIcon: 'event-manage',
-        name: '分布式事务',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'distribute-list',
-            to: '/msa-manage/distribute/list',
-            name: '事务列表',
-          },
-          {
-            key: 'distribute-record',
-            to: '/msa-manage/distribute/distribute-record',
-            name: '事务执行记录',
-          },
-        ],
       },
     ],
   },
@@ -176,6 +172,25 @@ const menus = [
         to: '/dubbo/dubbo-manage',
         tenxIcon: 'dubbo',
         name: 'Dubbo 服务列表',
+      },
+    ],
+  },
+  {
+    key: 'distribute',
+    to: '/distribute',
+    tenxIcon: 'event-manage',
+    name: '分布式事务',
+    defaultopen: 'true',
+    children: [
+      {
+        key: 'distribute-list',
+        to: '/distribute/list',
+        name: '事务列表',
+      },
+      {
+        key: 'distribute-record',
+        to: '/distribute/distribute-record',
+        name: '事务执行记录',
       },
     ],
   },
@@ -274,7 +289,7 @@ const menus = [
   }, {
     declare: {
       key: 'systemConfig',
-      spread: <Tooltip title="作为系统管理员,有权限配置系统相关"><span>系统管理员</span></Tooltip>, // 说明文字 | react Node
+      spread: <Tooltip title="作为系统、平台、基础设施管理员,有权限配置系统相关"><span>帐户管理员</span></Tooltip>, // 说明文字 | react Node
       collapsed: <span className="line"></span>,
     },
     key: 'k1',
@@ -518,7 +533,8 @@ class SiderNav extends React.Component {
     const finalMenus = menus.filter(({ key }) => {
       // filter 系统管理员
       if (key === 'k1') {
-        return currentUser.role === ROLE_SYS_ADMIN
+        return currentUser.role === ROLE_SYS_ADMIN || currentUser.role === ROLE_BASE_ADMIN ||
+          currentUser.role === ROLE_PLATFORM_ADMIN
       }
       // filter 项目管理员
       if (key === 'msa-om') {

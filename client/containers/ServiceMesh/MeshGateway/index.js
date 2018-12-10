@@ -87,7 +87,7 @@ export default class MeshGateway extends React.Component {
       modalTitle: '删除操作',
       title: `确定删除 ${id} 网关?`,
       content: <div>删除该网关后，已使用此网关的路由策略中的服务将不能通过此网关出口被访问</div>,
-      okText: '确认',
+      okText: '确定',
       cancelText: '取消',
       onOk: () => {
         return new Promise((resolve, reject) => {

@@ -18,43 +18,42 @@ import { Layout,
 // import Sider from '../../components/Sider'
 import Content from '../../components/Content'
 import { loadApms, getApmService } from '../../actions/apm'
-import { Route, Switch } from 'react-router-dom'
-import { apmChildRoutes } from '../../RoutesDom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import { renderLoading } from '../../components/utils'
 // import topologyIcon from '../../assets/img/apm/topology.svg'
 // import performanceIcon from '../../assets/img/apm/performance.svg'
 // import callLinkTrackingIcon from '../../assets/img/apm/call-link-tracking.svg'
 import pinPoint from '../../assets/img/apm/Pinpoint.png'
+import Topology from './Topology'
+import Performance from './Performance'
+import CallLinkTracking from './CallLinkTracking'
 
-// const menus = [
-//   {
-//     to: '/apms/topology',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${topologyIcon.id}`} />
-//       </svg>
-//     ),
-//     text: '微服务拓扑',
-//   },
-//   {
-//     to: '/apms/performance',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${performanceIcon.id}`} />
-//       </svg>
-//     ),
-//     text: '微服务性能',
-//   },
-//   {
-//     to: '/apms/call-link-tracking',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${callLinkTrackingIcon.id}`} />
-//       </svg>
-//     ),
-//     text: '调用链路跟踪',
-//   },
-// ]
+const apmChildRoutes = [
+  {
+    path: '/apms',
+    exact: true,
+    render: () => <Redirect to="/apms/topology" component={Topology} />,
+    key: 'index',
+  },
+  {
+    path: '/apms/topology',
+    component: Topology,
+    exact: true,
+    key: 'topology',
+  },
+  {
+    path: '/apms/performance',
+    component: Performance,
+    exact: true,
+    key: 'performance',
+  },
+  {
+    path: '/apms/call-link-tracking',
+    component: CallLinkTracking,
+    exact: true,
+    key: 'call-link-tracking',
+  },
+]
 
 class Apm extends React.Component {
   componentDidMount() {

@@ -74,7 +74,9 @@ class AccessAgreement extends React.Component {
         }
         let pingMethod
         try {
-          pingMethod = res.response.result.body.replace('[', '').replace(']', '').split(',')
+          pingMethod = res.response.result.body &&
+            res.response.result.body.replace('[', '').replace(']', '').split(',')
+            || []
         } catch (error) {
           pingMethod = []
         }
@@ -213,8 +215,10 @@ class AccessAgreement extends React.Component {
           })(
             <RadioGroup>
               <Radio value="route1">直接路由</Radio>
+              {/*
               <Radio value="route2" disabled>基于内容的路由</Radio>
               <Radio value="route3" disabled>无条件路由</Radio>
+*/}
             </RadioGroup>
           )}
           <div className="desc-text">{this.renderServiceRoutingStrategyTips()}</div>

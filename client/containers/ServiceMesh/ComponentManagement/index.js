@@ -18,7 +18,7 @@ import { formatDate } from '../../../common/utils'
 import confirm from '../../../components/Modal/confirm'
 import { loadComponent, deleteComponent, fetchComponent } from '../../../actions/serviceMesh'
 import { deleteVirtualService } from '../../../actions/meshRouteManagement'
-import { Button, Input, Table, Card, Pagination, notification } from 'antd'
+import { Button, Input, Table, Card, Icon, Tooltip, Pagination, notification } from 'antd'
 import './style/index.less'
 import AddressTip from './AddressTip';
 
@@ -120,25 +120,41 @@ class ComponentManagement extends React.Component {
     })
   }
 
-  // filterData = () => {
-  //   const { dataList } = this.props
-  //   const { isSearch } = this.state
-  //   const dataAry = []
-  //   if (dataList && dataList.length > 0) {
-  //     dataList.forEach(item => {
-  //       const column = {
-  //         name: item.metadata.name,
-  //         description: item.metadata.annotations.description,
-  //         servicecount: item.spec.subsets.length,
-  //         startTime: item.metadata.creationTimestamp,
-  //       }
-  //       dataAry.push(column)
-  //     })
-  //   }
-  //   this.setState({
-  //     sourceList: dataAry,
-  //   })
-  // }
+  filterService = name => {
+    const { dataAry, dataList } = this.props
+    const service = []
+    dataList.forEach((item, index) => {
+      const serviceList = []
+      const annotations = dataAry[index].metadata.annotations
+      annotations && Object.keys(annotations).forEach(key => {
+        if (key.indexOf('svcName/') !== -1) {
+          serviceList.push(key.split('/')[1])
+        }
+      })
+      if (name === item.name) {
+        if (item.service) {
+          const serviceAry = JSON.parse(item.service)
+          serviceList.forEach(keys => {
+            if (serviceAry.indexOf(keys) === -1) {
+              service.push(keys)
+            }
+          })
+        }
+
+      }
+    })
+    return service
+  }
+
+  tipService = (text, name) => {
+    const listAry = this.filterService(name)
+    return listAry.length ?
+      <Tooltip placement="top"
+        title={`组件中的 “${listAry}” 服务已经不存在，请编辑移除该服务`}>
+        {text}
+        <Icon type="exclamation-circle" className="ico" />
+      </Tooltip> : text
+  }
 
   render() {
     const { tipList, dataList, isFetching } = this.props
@@ -158,6 +174,7 @@ class ComponentManagement extends React.Component {
     }, {
       title: '关联服务数量',
       dataIndex: 'servicecount',
+      render: (text, record) => this.tipService(text, record.name),
     }, {
       title: '描述',
       width: '25%',
@@ -202,7 +219,7 @@ class ComponentManagement extends React.Component {
             <Pagination {...pagination} />
           </div>
         </div>
-        <Card>
+        <Card className="component-management-body">
           <Table
             pagination={false}
             loading={isFetching}
@@ -232,6 +249,8 @@ const mapStateToProps = state => {
     const dataFlag = dataAry && dataAry[key]
     const column = {
       name: dataFlag.metadata.name,
+      service: dataFlag.metadata.annotations &&
+        dataFlag.metadata.annotations['system/services-in-component'],
       description: dataFlag.metadata.annotations && dataFlag.metadata.annotations.description,
       servicecount: dataFlag.spec.subsets && dataFlag.spec.subsets.length,
       startTime: dataFlag.metadata.creationTimestamp,
@@ -239,6 +258,7 @@ const mapStateToProps = state => {
     dataList.push(column)
   })
   return {
+    dataAry,
     tipList,
     dataList,
     namespace,

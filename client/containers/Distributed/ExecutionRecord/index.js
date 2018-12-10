@@ -6,7 +6,7 @@ import DataSet from '@antv/data-set'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { formatDate } from '../../../common/utils'
 import { getExecuctionRecordOverview, getExecuctionRecordList, getExecuctionRecordDetail } from '../../../actions/msa'
-import './style/ExecutionRecord.less'
+import './style/index.less'
 
 const Search = Input.Search
 const AUTO_FETCH_INTERVAL = 60 * 1000

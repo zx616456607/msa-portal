@@ -276,9 +276,9 @@ class ApmSetting extends React.Component {
           <div key="layout-content-btns">
             <Card
               title="APM配置"
-              extra={title_extra}
               className="apm_config_style"
             >
+              {title_extra}
               <Row className="contents">
                 <Col className="left">
                   <Row className="apms">
@@ -326,7 +326,7 @@ class ApmSetting extends React.Component {
                   <span >即将在当前项目内卸载 Pinpoint 基础服务卸载后该项目内应用将, 无法继续使用 APM 部分功能</span>
                 </div>
                 <div style={{ marginTop: 10 }}>
-                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确认继续卸载 ?</span>
+                  <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定继续卸载 ?</span>
                 </div>
               </Modal>
             </Card>

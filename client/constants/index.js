@@ -25,9 +25,12 @@ const SERVICEMESH_API = 'http://192.168.1.59:65532'
 const SERVICEMESH_API_URL = `${SERVICEMESH_API}${SERVICEMESH_API_PREFIX}`
 const PAAS_API_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_API_PREFIX}`
 const PAAS_SPI_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_SPI_PREFIX}`
+// const MSA_API = 'http://192.168.1.58:8080'
 const MSA_API = 'http://192.168.1.58:8081'
+const MSA_DEVELOP_API = 'http://192.168.0.45:8080'
 const MSA_API_PREFIX = '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
+// const CSB_API = 'http://192.168.1.58:9090'
 const CSB_API = 'http://192.168.1.58:9091'
 // const CSB_API = 'http://192.168.0.19:8081'
 const CSB_API_PREFIX = '/api/v1'
@@ -45,6 +48,7 @@ let apiConfig = {
   PAAS_API_URL,
   PAAS_SPI_URL,
   MSA_API,
+  MSA_DEVELOP_API,
   MSA_API_PREFIX,
   MSA_API_URL,
   CSB_API,
@@ -96,11 +100,14 @@ export const ROLE_BASE_ADMIN = 4 // 基础设施管理员
 // RegExp
 export const MESH_ROUTE_RULE_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,58}[a-zA-Z0-9]$/
 export const MESH_ROUTE_RULE_NAME_REG_NOTICE = '由 3~60 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
+export const MSA_DEVELOP_RULE_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{0,24}/
+export const MSA_DEVELOP_RULE_NAME_REG_NOTICE = '以字母开头，大小写字母、数字组成， 1-24个字符'
 export const APP_NAME_REG = /^[a-zA-Z][a-zA-Z0-9\-]{1,48}[a-zA-Z0-9]$/
 export const APP_NAME_REG_NOTICE = '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾'
 export const COMPONENT_NAME_REG = /^[a-z][a-z0-9\-]{1,15}[a-z0-9]$/
 export const COMPONENT_NAME = '可由 3~50 位小写字母、数字、中划线组成，以小写字母开头，字母或者数字结尾'
 export const IP_REG = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/
+export const IP_CIDR_REG = /^(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}(\/(3[0-2]|[12]?[0-9]))?$/
 export const IP_WITH_PORT_REG = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{4}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/
 export const HOSTNAME_REG = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
 export const HOST_REG = /^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.]*[a-zA-Z0-9_-]+(:\d+)?[a-zA-Z0-9_\-\/\?#]*$/

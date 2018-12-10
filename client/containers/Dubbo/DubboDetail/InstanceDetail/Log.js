@@ -38,7 +38,7 @@ class Log extends React.Component {
     const logsData = dubboInstanceLogs[instance.serviceName] || { isFetching: true }
     const { isFetching, data = { logs: [] } } = logsData
     return <div>
-      <LogTemplate loadData={this.loadData} data={data.logs} isFetching={isFetching}/>
+      <LogTemplate loadData={this.loadData} data={data.logs || []} isFetching={isFetching}/>
     </div>
   }
 }

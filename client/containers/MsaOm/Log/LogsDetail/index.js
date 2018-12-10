@@ -24,7 +24,13 @@ class LogComponent extends React.Component {
   handleDown = () => {
     const { logs } = this.props
     let downUrl = ''
-    const blob = new Blob([ logs ])
+    let Objlog = ''
+    if (logs) {
+      logs.forEach(item => {
+        Objlog += `[${item.name}]  ${this.timeFormat(item.timeNano)} ${item.log}`
+      })
+    }
+    const blob = new Blob([ Objlog ], { type: 'application/json' })
     downUrl = URL.createObjectURL(blob)
     URL.revokeObjectURL(blob)
     return downUrl
@@ -45,9 +51,7 @@ class LogComponent extends React.Component {
     return formatDate(newTime)
   }
 
-  render() {
-    const { bigLog, name } = this.state
-    const { logs } = this.props
+  filterLog = logs => {
     let logItems
     if (logs) {
       logItems = logs && logs.map((item, index) => {
@@ -69,6 +73,12 @@ class LogComponent extends React.Component {
         )
       })
     }
+    return logItems
+  }
+
+  render() {
+    const { bigLog, name } = this.state
+    const { logs } = this.props
 
     return (
       <Card className="info">
@@ -90,7 +100,7 @@ class LogComponent extends React.Component {
               logs ?
                 <div className="logList">
                   <pre>
-                    {logItems}
+                    {this.filterLog(logs)}
                   </pre>
                 </div> :
                 <div className="infos">

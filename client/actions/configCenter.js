@@ -114,6 +114,80 @@ export const getCenterConfig = (clusterId, id, query) => dispatch => {
   return dispatch(fetchCenterConfig(clusterId, id, query))
 }
 
+export const DELETE_BRANCH_CENTER_CONFIG_REQUEST = 'DELETE_BRANCH_CENTER_CONFIG_REQUEST'
+export const DELETE_BRANCH_CENTER_CONFIG_SUCCESS = 'DELETE_BRANCH_CENTER_CONFIG_SUCCESS'
+export const DELETE_BRANCH_CENTER_CONFIG_FAILURE = 'DELETE_BRANCH_CENTER_CONFIG_FAILURE'
+
+const fetchDeleteBranch = (clusterId, query, options) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/branches?${toQuerystring(query)}`
+  return {
+    options,
+    query,
+    [CALL_API]: {
+      types: [ DELETE_BRANCH_CENTER_CONFIG_REQUEST,
+        DELETE_BRANCH_CENTER_CONFIG_SUCCESS, DELETE_BRANCH_CENTER_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'DELETE',
+      },
+    },
+  }
+}
+
+export const deleteBranch = (clusterId, query, options) => dispatch => {
+  return dispatch(fetchDeleteBranch(clusterId, query, options))
+}
+
+export const CREATE_BRANCH_CENTER_CONFIG_REQUEST = 'CREATE_BRANCH_CENTER_CONFIG_REQUEST'
+export const CREATE_BRANCH_CENTER_CONFIG_SUCCESS = 'CREATE_BRANCH_CENTER_CONFIG_SUCCESS'
+export const CREATE_BRANCH_CENTER_CONFIG_FAILURE = 'CREATE_BRANCH_CENTER_CONFIG_FAILURE'
+
+const fetchCreateBranch = (clusterId, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/branches?${toQuerystring(query)}`
+  return {
+    query,
+    [CALL_API]: {
+      types: [ CREATE_BRANCH_CENTER_CONFIG_REQUEST,
+        CREATE_BRANCH_CENTER_CONFIG_SUCCESS, CREATE_BRANCH_CENTER_CONFIG_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const createBranch = (clusterId, query) => dispatch => {
+  return dispatch(fetchCreateBranch(clusterId, query))
+}
+
+export const CENTER_CONFIG_COMMIT_REQUEST = 'CENTER_CONFIG_COMMIT_REQUEST'
+export const CENTER_CONFIG_COMMIT_SUCCESS = 'CENTER_CONFIG_COMMIT_SUCCESS'
+export const CENTER_CONFIG_COMMIT_FAILURE = 'CENTER_CONFIG_COMMIT_FAILURE'
+
+const fetchCommitMessages = (clusterId, body, query) => {
+  const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/commits?${toQuerystring(query)}`
+  return {
+    query,
+    [CALL_API]: {
+      types: [ CENTER_CONFIG_COMMIT_REQUEST,
+        CENTER_CONFIG_COMMIT_SUCCESS, CENTER_CONFIG_COMMIT_FAILURE ],
+      endpoint,
+      schema: {},
+      options: {
+        body,
+        method: 'POST',
+      },
+    },
+  }
+}
+
+export const getCommitMessages = (clusterId, body, query) => dispatch => {
+  return dispatch(fetchCommitMessages(clusterId, body, query))
+}
+
 export const CENTER_DELETE_REQUEST = 'CENTER_DELETE_REQUEST'
 export const CENTER_DELETE_SUCCESS = 'CENTER_DELETE_SUCCESS'
 export const CENTER_DELETE_FAILURE = 'CENTER_DELETE_FAILURE'
