@@ -43,16 +43,10 @@ class UpdateConsumerVoucher extends React.Component {
     setTimeout(() => {
       this.delayTimeInput && this.delayTimeInput.focus()
     }, 200)
-    const timeout = this.renderTimeout()
+    this.renderTimeout()
     interval = setInterval(() => {
       this.renderTimeout()
     }, 1000)
-    if (typeof timeout === 'object') {
-      this.setState({
-        delayTime: timeout.min,
-        delaySecond: timeout.sec,
-      })
-    }
   }
 
   handleOk = () => {
