@@ -124,9 +124,9 @@ class InstanceModal extends React.Component {
     if (value.length < 3 || value.length > 63) {
       return callback('实例名称需在3-63个字符之间')
     }
-    const reg = /^[a-zA-Z0-9_.-]+$/
+    const reg = /^[a-zA-Z0-9.-]+$/
     if (!reg.test(value)) {
-      return callback('支持字母、数字、下划线、中划线和 "."')
+      return callback('支持字母、数字、中划线和 "."')
     }
     clearTimeout(this.checkNameTimeout)
     this.checkNameTimeout = setTimeout(() => {
