@@ -38,6 +38,7 @@ class Logs extends React.Component {
     serviceList: [],
     exampleList: [],
     searchType: 'dim',
+    searchLoading: false,
   }
 
   componentDidMount() {
@@ -75,6 +76,10 @@ class Logs extends React.Component {
         })
       })
     }
+    this.props.form.setFieldsValue({
+      server: undefined,
+      example: undefined,
+    })
   }
 
   handleProject = value => {
@@ -101,21 +106,28 @@ class Logs extends React.Component {
   }
 
   handleServer = value => {
-    const { clusterID, loadServiceContainerList } = this.props
-    loadServiceContainerList(clusterID, value).then(item => {
-      this.setState({
-        serverName: value,
-        exampleList: item.response.result.data.instances,
+    const { loadServiceContainerList } = this.props
+    const project = this.props.form.getFieldValue('project')
+    const clusterID = this.props.form.getFieldValue('clusters')
+    this.props.form.setFieldsValue({ example: undefined })
+    if (project && clusterID) {
+      loadServiceContainerList(clusterID, value, project).then(item => {
+        this.setState({
+          serverName: value,
+          exampleList: item.response.result.data.instances,
+        })
       })
-    })
+    }
   }
 
   handleSearch = () => {
-    const { form, clusterID, getQueryLogList, projectConfig } = this.props
+    const { form, clusterID, getQueryLogList } = this.props
     const { validateFields } = form
-    const { namespace } = projectConfig.project
+    // const { namespace } = projectConfig.project
     validateFields((error, value) => {
       if (error) return
+      this.setState({ logs: [], searchLoading: true })
+      const project = this.props.form.getFieldValue('project')
       const body = {
         kind: value.example ? 'pod' : 'service',
         from: null,
@@ -129,9 +141,10 @@ class Logs extends React.Component {
       }
       const query = value.example ? value.example : value.server
       const state = !!value.example
-      getQueryLogList(clusterID, query, state, body, namespace).then(res => {
+      getQueryLogList(clusterID, query, state, body, project).then(res => {
         this.setState({
           logs: res.response.result.data && res.response.result.data.logs,
+          searchLoading: false,
         })
       })
     })
@@ -148,11 +161,12 @@ class Logs extends React.Component {
     const projectItems = projectsList.filter(item =>
       !item.outlineRoles.includes('no-participator') && item.outlineRoles.includes('manager')
     )
-    const defaultProject = projectItems.length > 0 ? projectItems[0].projectName : undefined
+    // const defaultProject = projectItems.length > 0 ? projectItems[0].projectName : undefined
     const selectAfter = (
       <Select defaultValue="dim"
         style={{ width: 85 }}
-        onChange={value => this.setState({ searchType: value })} >
+        onChange={value => this.setState({ searchType: value })}
+        dropdownMatchSelectWidth={false} >
         <Option value="exact">全字匹配</Option>
         <Option value="dim">模糊匹配</Option>
       </Select>
@@ -164,8 +178,11 @@ class Logs extends React.Component {
             <Col span={6}>
               <FormItem>
                 {getFieldDecorator('project', {
-                  initialValue: defaultProject,
+                  // initialValue: defaultProject,
                   onChange: e => this.handleProject(e),
+                  rules: [{
+                    required: true, message: '请选择项目',
+                  }],
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择项目" size="default" showSearch>
                     {
@@ -179,7 +196,7 @@ class Logs extends React.Component {
             <Col span={6}>
               <FormItem>
                 {getFieldDecorator('clusters', {
-                  rules: [{ message: '请选择集群' }],
+                  rules: [{ required: true, message: '请选择集群' }],
                   onChange: e => this.handleClusters(e),
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择集群" size="default" showSearch>
@@ -195,8 +212,9 @@ class Logs extends React.Component {
             <Col span={6}>
               <FormItem>
                 {getFieldDecorator('server', {
-                  rules: [{ message: '请选择服务' }],
+                  // rules: [{ message: '请选择服务' }],
                   onChange: e => this.handleServer(e),
+                  rules: [{ required: true, message: '请选择服务' }],
                 })(
                   <Select style={{ width: '90%' }} placeholder="选择服务" size="default" showSearch>
                     {
@@ -257,7 +275,8 @@ class Logs extends React.Component {
               </FormItem>
             </Col>
             <Col span={12} style={{ lineHeight: '3.5' }}>
-              <Button type="primary" onClick={() => this.handleSearch()}>
+              <Button type="primary" onClick={() => this.handleSearch()}
+                loading={this.state.searchLoading}>
                 <TenxIcon
                   type="search"
                   size={12}

@@ -74,7 +74,7 @@ export const SERVICE_CONTAINERS_LIST_FAILURE = 'SERVICE_CONTAINERS_LIST_FAILURE'
 
 // Fetches container list from API.
 // Relies on the custom API middleware defined in ../middleware/api.js.
-function fetchServiceContainerList(cluster, serviceName) {
+function fetchServiceContainerList(cluster, serviceName, project) {
   let endpoint
   if (serviceName === 'all') {
     endpoint = `clusters/${cluster}/instances/wanglei/instances`
@@ -91,6 +91,11 @@ function fetchServiceContainerList(cluster, serviceName) {
         SERVICE_CONTAINERS_LIST_FAILURE,
       ],
       endpoint,
+      options: {
+        headers: {
+          project,
+        },
+      },
       schema: {},
     },
   }
@@ -98,9 +103,9 @@ function fetchServiceContainerList(cluster, serviceName) {
 
 // Fetches containers list from API unless it is cached.
 // Relies on Redux Thunk middleware.
-export function loadServiceContainerList(cluster, serviceName) {
+export function loadServiceContainerList(cluster, serviceName, project) {
   return dispatch => {
-    return dispatch(fetchServiceContainerList(cluster, serviceName))
+    return dispatch(fetchServiceContainerList(cluster, serviceName, project))
   }
 }
 
@@ -137,8 +142,8 @@ function fetchQueryLogList(cluster, query, state, body, project) {
   }
 }
 
-export function getQueryLogList(cluster, query, state, body) {
+export function getQueryLogList(cluster, query, state, body, project) {
   return dispatch => {
-    return dispatch(fetchQueryLogList(cluster, query, state, body))
+    return dispatch(fetchQueryLogList(cluster, query, state, body, project))
   }
 }
