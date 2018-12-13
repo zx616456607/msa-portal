@@ -140,8 +140,8 @@ class IndexPage extends React.Component {
     let { sortedErrorService,
       sortedCallService } = !numberOfServiceCall.isFetching && numberOfServiceCall.data
     if (!numberOfServiceCall.isFetching) {
-      sortedErrorService = sortedErrorService.filter(v => v.count !== 0)
-      sortedCallService = sortedCallService.filter(v => v.count !== 0)
+      sortedErrorService = (sortedErrorService || []).filter(v => v.count !== 0)
+      sortedCallService = (sortedCallService || []).filter(v => v.count !== 0)
     }
     const ellipsisComponent = num => <Ellipsis>{num.toString()}</Ellipsis>
     const { isDeployed, loading } = this.state

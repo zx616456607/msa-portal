@@ -52,6 +52,7 @@ class ServiceMeshGraph extends React.Component {
     searchQuery: {}, // 搜索条件
     isTimeRange: false, // 显示
     loading: false, // 刷新relationChart
+    defaultLoadSize: 10,
     // projects: [], // 当前服务列表
     // clusters: {}, // 当前所有集群信息
     // currentClusters: [], // 当前选中的项目的集群
@@ -98,7 +99,7 @@ class ServiceMeshGraph extends React.Component {
     } = projectsList[0] */
     const data = await loadAppList(
       clusterID,
-      { headers: project, from: 0, size: 10 }
+      { headers: project, from: 0, size: this.state.defaultLoadSize }
     )
     // const clusterName = Object.entries(this.state.clusters).filter(([ key ]) => key === cluster) || []
     // const { name } = clusterName[0][1] || {}
@@ -193,9 +194,9 @@ class ServiceMeshGraph extends React.Component {
   }
   debounceSearchApp = value => {
     const { loadAppList, clusterID } = this.props
-    const { searchQuery = {} } = this.state
+    // const { searchQuery = {} } = this.state
     const searchApp = () => {
-      loadAppList(clusterID, { headers: searchQuery.item, from: 0, size: 100, filter: `name ${value}` })
+      loadAppList(clusterID, { headers: this.props.current.config.project.namespace, filter: `name ${value}` })
     }
     debounce(searchApp, 800)()
   }
@@ -218,6 +219,17 @@ class ServiceMeshGraph extends React.Component {
   }
   setLoading = value => {
     this.setState({ loading: value })
+  }
+  onPopupScroll = () => {
+    if (this.onPopupScrollTimer) {
+      clearTimeout(this.onPopupScrollTimer)
+    }
+    this.onPopupScrollTimer = setTimeout(() => {
+      this.setState({ defaultLoadSize: this.state.defaultLoadSize + 10 })
+      this.props.loadAppList(this.props.clusterID, {
+        headers: this.props.current.config.project.namespace,
+        from: 0, size: this.state.defaultLoadSize + 10 })
+    }, 1200)
   }
   render() {
     const { appsList, clusterID, project } = this.props
@@ -298,6 +310,7 @@ class ServiceMeshGraph extends React.Component {
               ref={ relnode => { this.serviceNode = relnode } }
               filterOption={false}
               dropdownMatchSelectWidth={false}
+              onPopupScroll={this.onPopupScroll}
             >
               {
                 appsList.map(apps => {
