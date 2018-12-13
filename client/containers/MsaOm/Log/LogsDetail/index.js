@@ -45,10 +45,7 @@ class LogComponent extends React.Component {
   }
 
   timeFormat = time => {
-    const newDate = new Date()
-    time = parseInt(time)
-    const newTime = newDate.setTime(time / 1000000)
-    return formatDate(newTime)
+    return formatDate(new Date(parseInt(parseInt(time) / 1000000)))
   }
 
   filterLog = logs => {
@@ -59,7 +56,7 @@ class LogComponent extends React.Component {
           <div className="logDetail" key={'logDetail' + index}>
             <span className="instanceSpan">{'[' + item.name + ']'}</span>
             {
-              <span className="instanceSpan">{this.timeFormat(item.timeNano)}</span>
+              <span className="instanceSpan">{this.timeFormat(item.time_nano)}</span>
             }
             <span className="logSpan">
               <span>{item.log}</span>
