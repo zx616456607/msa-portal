@@ -106,7 +106,16 @@ class AuthZoneModal extends React.Component {
     const { closeModal } = this.props
     closeModal && closeModal()
   }
-
+  checkName = (rule, value, callback) => {
+    const reg = /[%_]/
+    if (!(value.length >= 1 && value.length <= 255)) {
+      return callback('请输入1~255个字符')
+    }
+    if (reg.test(value)) {
+      return callback('不支持%和_')
+    }
+    return callback()
+  }
   render() {
     const { loading } = this.state
     const { visible, currentAuthZone, form } = this.props
@@ -133,7 +142,10 @@ class AuthZoneModal extends React.Component {
               getFieldDecorator('name', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.name : '',
                 rules: [
-                  { required: true, max: 255, message: '请输入1~255个字符' },
+                  { required: true,
+                    // max: 255, message: '请输入1~255个字符',
+                    validator: this.checkName,
+                  },
                 ],
               })(
                 <Input placeholder={'请输入认证域名称'}/>

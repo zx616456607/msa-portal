@@ -23,7 +23,6 @@ import { getInstanceOverview } from '../../../../actions/CSB/instance'
 import { renderCSBInstanceServiceApproveStatus, renderCSBInstanceServiceStatus } from '../../../../components/utils'
 import { renderInstanceRole } from '../../../../common/utils'
 
-
 class InstanceDetailOverview extends React.Component {
   state = {
     width: 260,
@@ -172,7 +171,9 @@ class InstanceDetailOverview extends React.Component {
         break
     }
   }
-
+  noDataDom = () => <div className="no-data-dom">
+    <div className="ring"></div>
+  </div>
   render() {
     const { instanceID, currentInstance } = this.props
     const images = [
@@ -243,6 +244,23 @@ class InstanceDetailOverview extends React.Component {
         })
       chart.render()
     })
+    const isEmptyDada = data => {
+      let isEmpty = true
+      if (!data || data.length === 0) {
+        isEmpty = true
+      } else {
+        isEmpty = false
+      }
+      for (const k in data) {
+        if (data[k] && data[k].count === 0) {
+          isEmpty = true
+        } else {
+          isEmpty = false
+        }
+      }
+      return isEmpty
+
+    }
     return (
       <QueueAnim className="csb-overview">
         <div className="top" key="top">
@@ -290,19 +308,26 @@ class InstanceDetailOverview extends React.Component {
               >
                 <Row type={'flex'} align={'middle'}>
                   <Col span={14}>
-                    <Chart
-                      data={publishedServiceData || []}
-                      width={this.state.width}
-                      plotCfg={this.state.plotCfg}
-                      height={this.state.height} />
+                    {
+                      isEmptyDada(publishedServiceData) ?
+                        this.noDataDom()
+                        :
+                        <Chart
+                          data={publishedServiceData || []}
+                          width={this.state.width}
+                          plotCfg={this.state.plotCfg}
+                          height={this.state.height} />
+                    }
                   </Col>
                   <Col span={10}>
                     <div>
                       {
-                        publishedServiceData ?
+                        isEmptyDada(publishedServiceData) ?
+                          <div>暂无数据</div>
+                          :
                           publishedServiceData.map((item, index) => {
                             return this.getServiceStatusDesc(item.status, item.count, index)
-                          }) : ''
+                          })
                       }
                     </div>
                   </Col>
@@ -321,19 +346,26 @@ class InstanceDetailOverview extends React.Component {
               >
                 <Row type={'flex'} align={'middle'}>
                   <Col span={14}>
-                    <Chart1
-                      data={serviceubscribeData || []}
-                      width={this.state.width}
-                      plotCfg={this.state.plotCfg}
-                      height={this.state.height} />
+                    {
+                      isEmptyDada(serviceubscribeData) ?
+                        this.noDataDom()
+                        :
+                        <Chart1
+                          data={serviceubscribeData || []}
+                          width={this.state.width}
+                          plotCfg={this.state.plotCfg}
+                          height={this.state.height} />
+                    }
                   </Col>
                   <Col span={10}>
                     <div>
                       {
-                        serviceubscribeData ?
+                        isEmptyDada(serviceubscribeData) ?
+                          <div>暂无数据</div>
+                          :
                           serviceubscribeData.map((item, index) => {
                             return this.getStatusDesc(item.status, item.count, index)
-                          }) : ''
+                          })
                       }
                     </div>
                   </Col>
@@ -369,19 +401,26 @@ class InstanceDetailOverview extends React.Component {
               >
                 <Row type={'flex'} align={'middle'}>
                   <Col span={14}>
-                    <Chart2
-                      data={subServiceData || []}
-                      width={this.state.width}
-                      plotCfg={this.state.plotCfg}
-                      height={this.state.height} />
+                    {
+                      isEmptyDada(subServiceData) ?
+                        this.noDataDom()
+                        :
+                        <Chart2
+                          data={subServiceData || []}
+                          width={this.state.width}
+                          plotCfg={this.state.plotCfg}
+                          height={this.state.height} />
+                    }
                   </Col>
                   <Col span={10}>
                     <div>
                       {
-                        subServiceData ?
+                        isEmptyDada(subServiceData) ?
+                          <div>暂无数据</div>
+                          :
                           subServiceData.map((item, index) => {
                             return this.getServiceStatusDesc(item.status, item.count, index)
-                          }) : ''
+                          })
                       }
                     </div>
                   </Col>
@@ -400,19 +439,26 @@ class InstanceDetailOverview extends React.Component {
               >
                 <Row type={'flex'} align={'middle'}>
                   <Col span={14}>
-                    <Chart3
-                      data={cansubServiceData || []}
-                      width={this.state.width}
-                      plotCfg={this.state.plotCfg}
-                      height={this.state.height} />
+                    {
+                      isEmptyDada(cansubServiceData) ?
+                        this.noDataDom()
+                        :
+                        <Chart3
+                          data={cansubServiceData || []}
+                          width={this.state.width}
+                          plotCfg={this.state.plotCfg}
+                          height={this.state.height} />
+                    }
                   </Col>
                   <Col span={10}>
                     <div>
                       {
-                        cansubServiceData ?
+                        isEmptyDada(cansubServiceData) ?
+                          <div>暂无数据</div>
+                          :
                           cansubServiceData.map((item, index) => {
                             return this.getServiceStatusDesc(item.status, item.count, index)
-                          }) : ''
+                          })
                       }
                     </div>
                   </Col>
