@@ -19,6 +19,7 @@ export const appChildRoutes = [
   {
     path: '/',
     component: LoadableWrapper({
+      path: 'IndexPage', // path 是相对于 src/containers 的一个地址，且不能以 '/' 开头
       loader: () => import('./containers/IndexPage' /* webpackChunkName: "index-page" */),
     }),
     exact: true,
@@ -27,6 +28,7 @@ export const appChildRoutes = [
   {
     path: '/msa-manage',
     component: LoadableWrapper({
+      path: 'MsaManage',
       loader: () => import('./containers/MsaManage' /* webpackChunkName: "msa-manage" */),
     }),
     key: 'msa-manage',
@@ -34,6 +36,7 @@ export const appChildRoutes = [
   {
     path: '/distribute',
     component: LoadableWrapper({
+      path: 'Distributed',
       loader: () => import('./containers/Distributed' /* webpackChunkName: "distributed" */),
     }),
     key: 'distribute',
@@ -41,6 +44,7 @@ export const appChildRoutes = [
   {
     path: '/service-mesh',
     component: LoadableWrapper({
+      path: 'ServiceMesh',
       loader: () => import('./containers/ServiceMesh' /* webpackChunkName: "servicemesh" */),
     }),
     key: 'ServiceMesh',
@@ -48,6 +52,7 @@ export const appChildRoutes = [
   {
     path: '/msa-develop',
     component: LoadableWrapper({
+      path: 'MsaDevelop',
       loader: () => import('./containers/MsaDevelop' /* webpackChunkName: "msa-develop" */),
     }),
     key: 'MsaDevelop',
@@ -55,6 +60,7 @@ export const appChildRoutes = [
   {
     path: '/dubbo',
     component: LoadableWrapper({
+      path: 'Dubbo',
       loader: () => import('./containers/Dubbo' /* webpackChunkName: "dubbo" */),
     }),
     key: 'dubbo',
@@ -62,6 +68,7 @@ export const appChildRoutes = [
   {
     path: '/csb-instances',
     component: LoadableWrapper({
+      path: 'CSB/Instances',
       loader: () => import('./containers/CSB/Instances' /* webpackChunkName: "csb-instances" */),
     }),
     key: 'csb-instances',
@@ -69,6 +76,7 @@ export const appChildRoutes = [
   {
     path: '/apms',
     component: LoadableWrapper({
+      path: 'Apm',
       loader: () => import('./containers/Apm' /* webpackChunkName: "apm" */),
     }),
     key: 'apms',
@@ -76,6 +84,7 @@ export const appChildRoutes = [
   {
     path: '/msa-om',
     component: LoadableWrapper({
+      path: 'MsaOm',
       loader: () => import('./containers/MsaOm' /* webpackChunkName: "msa-om" */),
     }),
     key: 'msa-om',
@@ -83,6 +92,7 @@ export const appChildRoutes = [
   {
     path: '/setting',
     component: LoadableWrapper({
+      path: 'Setting',
       loader: () => import('./containers/Setting' /* webpackChunkName: "setting" */),
     }),
     key: 'setting',

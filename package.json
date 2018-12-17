@@ -79,6 +79,7 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/runtime": "^7.2.0",
+    "@hot-loader/react-dom": "^16.7.0-alpha.2.3",
     "@tenx-ui/ellipsis": "0.0.4",
     "@tenx-ui/icon": "^2.1.25",
     "@tenx-ui/loader": "^0.0.3",

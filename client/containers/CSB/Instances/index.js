@@ -40,6 +40,7 @@ const csbInstancesChildRoutes = [
   {
     path: '/csb-instances/available/:instanceID',
     component: LoadableWrapper({
+      path: 'CSB/InstanceDetail',
       loader: () => import('../InstanceDetail' /* webpackChunkName: "csb-instance-detail" */),
     }),
     key: 'csb-instances',
