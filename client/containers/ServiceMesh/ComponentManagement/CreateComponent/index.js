@@ -349,9 +349,10 @@ class CreateComponent extends React.Component {
     return service
   }
 
-  tipService = () => {
+  tipService = name => {
     const listAry = this.filterService()
-    return listAry.length ?
+    const { form } = this.props
+    return listAry.length && listAry.indexOf(form.getFieldValue(name)) > -1 ?
       <Tooltip placement="top"
         title={`组件中的${listAry}服务已经不存在，请编辑移除该服务`}>
         <Icon type="exclamation-circle" className="ico" />
@@ -383,7 +384,7 @@ class CreateComponent extends React.Component {
                 <Select
                   placeholder="请选择服务"
                   style={{ width: '100%' }}
-                  disabled={this.state[`service${key}`]}>
+                  disabled={false && this.state[`service${key}`]}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
                       if (serviceList[item].istioEnabled === true) {
