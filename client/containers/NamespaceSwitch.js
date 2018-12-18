@@ -23,6 +23,7 @@ import {
   getProjectClusters,
 } from '../actions/current'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 const MenuItemGroup = Menu.ItemGroup;
@@ -40,6 +41,7 @@ function projectNameToShowText(projectName, item = []) {
   return showText
 }
 
+@withNamespaces('common')
 class NamespaceSwitch extends React.Component {
   state = {
     projectsText: '请选择项目',
@@ -262,6 +264,7 @@ class NamespaceSwitch extends React.Component {
       className,
       noSelfClassName,
       projects: projectsList,
+      t,
     } = this.props
     const currentConfig = current.config || {}
     const project = currentConfig.project || {}
@@ -279,7 +282,7 @@ class NamespaceSwitch extends React.Component {
           type="backup"
           size={14}
           style={{ marginRight: 10 }} />
-        <div>项目</div>
+        <div>{t('header.project')}</div>
         <div className={'divider'} />
         <div id="msa-portal-header-project">
           <Dropdown
@@ -349,7 +352,7 @@ class NamespaceSwitch extends React.Component {
           type="cluster"
           size={14}
           style={{ marginRight: 10 }} />
-        <div>集群</div>
+        <div>{t('header.cluster')}</div>
         <div className={'divider'} />
         <div id="msa-portal-header-cluster">
           <Dropdown
