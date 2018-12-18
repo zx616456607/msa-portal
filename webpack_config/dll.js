@@ -35,6 +35,7 @@ const vendors = [
   'react-redux',
   'react-router-dom',
   'react-router-redux',
+  '@hot-loader/react-dom',
   'redux',
   'redux-devtools-extension',
   'redux-thunk',

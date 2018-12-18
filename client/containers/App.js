@@ -70,6 +70,14 @@ class App extends React.Component {
     const query = parse(search)
     const { username, token, jwt, authUrl, redirectclusterID, redirectNamespace,
       ...otherQuery } = query
+    if (!!redirectclusterID && !!redirectNamespace) {
+      await this.props.setCurrentConfig({
+        project: {
+          namespace: redirectNamespace,
+        },
+        cluster: { id: redirectclusterID },
+      })
+    }
     await getAuth({ username, token, jwt }).then(res => {
       if (res.type === indexActions.AUTH_FAILURE) {
         Modal.error({
@@ -92,14 +100,6 @@ class App extends React.Component {
       // Get user detail info
       return getCurrentUser(userID)
     })
-    if (!!redirectclusterID && !!redirectNamespace) {
-      this.props.setCurrentConfig({
-        project: {
-          namespace: redirectNamespace,
-        },
-        cluster: { id: redirectclusterID },
-      })
-    }
   }
 
   componentDidUpdate(prevProps) {

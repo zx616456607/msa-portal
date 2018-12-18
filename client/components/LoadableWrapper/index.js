@@ -1,28 +1,19 @@
 /**
  * Licensed Materials - Property of tenxcloud.com
- * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
  */
 
 /**
  * Loadable component wrapper
+ * 由于 Code Splitting 会导致热更新失效，所以在开发模式时直接根据 path 引入
+ * module，仅在生产环境模式时才使用 Code Splitting
  *
- * 2018-12-06
+ * 2018-12-17
  * @author zhangpc
  */
-import React from 'react'
-import Loadable from 'react-loadable'
-import Loader from '@tenx-ui/loader'
 
-const LoaderWrapper = () => {
-  /* if (props.error) {
-    return <div>Error! <button onClick={ props.retry }>Retry</button></div>
-  } */
-  return <Loader spinning={true} fullScreen={true} />
+if (process.env.NODE_ENV === 'production') {
+  module.exports = require('./index.prod')
+} else {
+  module.exports = require('./index.dev')
 }
-
-const LoadableWrapper = ({ loader }) => Loadable({
-  loader,
-  loading: LoaderWrapper,
-})
-
-export default LoadableWrapper

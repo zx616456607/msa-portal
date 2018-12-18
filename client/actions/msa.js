@@ -259,12 +259,13 @@ export const MSA_ENV_REQUEST = 'MSA_ENV_REQUEST'
 export const MSA_ENV_SUCCESS = 'MSA_ENV_SUCCESS'
 export const MSA_ENV_FAILURE = 'MSA_ENV_FAILURE'
 
-const fetchMsaEnv = (clusterID, serviceInfo) => {
+const fetchMsaEnv = (clusterID, serviceInfo, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterID}/services/${serviceInfo}/env`
   /* if (query) {
     endpoint += `?${toQuerystring(query)}`
   } */
   return {
+    options,
     [CALL_API]: {
       types: [ MSA_ENV_REQUEST, MSA_ENV_SUCCESS, MSA_ENV_FAILURE ],
       endpoint,
@@ -273,9 +274,9 @@ const fetchMsaEnv = (clusterID, serviceInfo) => {
   }
 }
 
-export function getMsaEnv(clusterID, serviceInfo) {
+export function getMsaEnv(clusterID, serviceInfo, options) {
   return dispatch => {
-    return dispatch(fetchMsaEnv(clusterID, serviceInfo))
+    return dispatch(fetchMsaEnv(clusterID, serviceInfo, options))
   }
 }
 
