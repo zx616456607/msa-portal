@@ -1,6 +1,19 @@
 {
   "header": {
     "project": "项目",
-    "cluster": "集群"
+    "cluster": "集群",
+    "selectProject": "请选择项目",
+    "selectCluster": "请选择集群",
+    "loadUserProjectsFailed": "获取用户项目失败，请刷新页面重试",
+    "loadProjectClustersFailed": "获取集群失败，请刷新页面重试",
+    "inputProjectName": "请输入项目名",
+    "noProjects": "暂无项目",
+    "noClusters": "暂无集群",
+    "sysAdmin": "系统管理员",
+    "platformAdmin": "平台管理员",
+    "baseAdmin": "基础设施管理员",
+    "commonUser": "普通成员",
+    "apmConfig": "APM 配置",
+    "msaConfig": "微服务配置"
   }
 }

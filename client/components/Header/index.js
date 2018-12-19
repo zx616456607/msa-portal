@@ -67,7 +67,7 @@ export default class Header extends React.Component {
 
   render() {
     const {
-      currentUser,
+      currentUser, t,
     } = this.props
 
     const { children, collapsed } = this.props
@@ -81,13 +81,13 @@ export default class Header extends React.Component {
     const roleName = role => {
       switch (role) {
         case ROLE_SYS_ADMIN:
-          return '系统管理员'
+          return t('header.sysAdmin')
         case ROLE_PLATFORM_ADMIN:
-          return '平台管理员'
+          return t('header.platformAdmin')
         case ROLE_BASE_ADMIN:
-          return '基础设施管理员'
+          return t('header.baseAdmin')
         case ROLE_USER:
-          return '普通成员'
+          return t('header.commonUser')
         default:
           break
       }
@@ -109,12 +109,12 @@ export default class Header extends React.Component {
               <Menu>
                 <Menu.Item key="apm-setting">
                   <Link to="/setting/apms">
-                    APM 配置
+                    {t('header.apmConfig')}
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="test2">
                   <Link to="/setting/msa-config">
-                    微服务配置
+                    {t('header.msaConfig')}
                   </Link>
                 </Menu.Item>
               </Menu>

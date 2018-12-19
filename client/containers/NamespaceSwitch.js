@@ -44,8 +44,8 @@ function projectNameToShowText(projectName, item = []) {
 @withNamespaces('common')
 class NamespaceSwitch extends React.Component {
   state = {
-    projectsText: '请选择项目',
-    clustersText: '请选择集群',
+    projectsText: this.props.t('header.selectProject'),
+    clustersText: this.props.t('header.selectCluster'),
     clustersDropdownVisible: false,
     searchKey: undefined, // 当前搜索关键词
   }
@@ -57,11 +57,12 @@ class NamespaceSwitch extends React.Component {
       // getUserProjects,
       setCurrentConfig,
       getProjectClusters,
+      t,
     } = this.props
     await getProjectList({ size: 0 }).then(res => {
       if (res.error) {
         notification.error({
-          message: '获取用户项目失败，请刷新页面重试',
+          message: t('header.loadUserProjectsFailed'),
         })
         return
       }
@@ -175,7 +176,7 @@ class NamespaceSwitch extends React.Component {
     getProjectClusters(namespace).then(res => {
       if (res.error) {
         notification.error({
-          message: '获取集群失败，请刷新页面重试',
+          message: t('header.loadProjectClustersFailed'),
         })
         return
       }
@@ -186,7 +187,7 @@ class NamespaceSwitch extends React.Component {
   }
 
   handleProjectChange = async ({ item, key }) => {
-    const { setCurrentConfig, getProjectClusters } = this.props
+    const { setCurrentConfig, getProjectClusters, t } = this.props
     await getProjectClusters(key)
     const projectName = item.props.children.props.projectName
     const clusterArray = this.props.projectClusters[projectName]
@@ -202,7 +203,7 @@ class NamespaceSwitch extends React.Component {
       this.setState({
         projectsText: projectName,
         clustersDropdownVisible: true,
-        clustersText: '请选择集群',
+        clustersText: t('header.selectCluster'),
       })
       setCurrentConfig({
         project: {
@@ -296,7 +297,7 @@ class NamespaceSwitch extends React.Component {
                 selectable onSelect={this.handleProjectChange}>
                 <Menu.Item key="Search" disabled>
                   <Search
-                    placeholder="请输入项目名"
+                    placeholder={t('header.inputProjectName')}
                     onSearch={this.onProjectSearch}
                     onChange={this.onProjectSearch}
                   />
@@ -330,7 +331,7 @@ class NamespaceSwitch extends React.Component {
                   {
                     projectsList.length === 0 && (
                       <Menu.Item key="no-project" disabled>
-                      暂无项目
+                        {t('noProjects')}
                       </Menu.Item>
                     )
                   }
@@ -339,12 +340,10 @@ class NamespaceSwitch extends React.Component {
               </Menu>
             }
             trigger={[ 'click' ]}>
-            <div>
-              <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
-                <span>{showProjectText}</span>
-                <Icon type="down" />
-              </a>
-            </div>
+            <a href="javascrip:void(0)" style={{ marginRight: 40 }}>
+              <span>{showProjectText}</span>
+              <Icon type="down" />
+            </a>
           </Dropdown>
         </div>
         <div className={'bigDivider'} />
@@ -371,7 +370,7 @@ class NamespaceSwitch extends React.Component {
                 {
                   currentProjectClusters.length === 0 && (
                     <Menu.Item key="no-cluster" disabled>
-                    暂无集群
+                      {t('header.noClusters')}
                     </Menu.Item>
                   )
                 }
