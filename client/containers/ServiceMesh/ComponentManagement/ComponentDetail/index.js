@@ -18,7 +18,8 @@ import { formatDate } from '../../../../common/utils'
 import componentImg from '../../../../assets/img/serviceMesh/component.png'
 import { fetchComponent, editComponent, fetchServiceList, deleteComponent } from '../../../../actions/serviceMesh'
 import './style/index.less'
-import confirm from '../../../../components/Modal/confirm'
+// import confirm from '../../../../components/Modal/confirm'
+import * as TenxModal from '@tenx-ui/modal'
 import { ServiceAddressTip } from '../AddressTip'
 
 const TabPane = Tabs.TabPane
@@ -115,11 +116,17 @@ class ComponentDetail extends React.Component {
     this.setState({
       isAdd: false,
     })
-    // const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
-    // const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
-    confirm({
+    const { detailList } = this.state
+    const specFlag = !!(detailList && detailList.spec.subsets.length <= 1)
+    const tip = detailList && specFlag ? '组件中唯一服务移除后，组件也将被移除' : ''
+
+    TenxModal.confirm({
       modalTitle: '移除服务',
-      title: '移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务',
+      title: <div>
+        <div>移除后该服务所关联的路由规则将不再生效，是否确定移除该后端服务</div>
+      </div>,
+      content: tip ? <div><Icon type="info-circle" /> {tip}</div> : undefined,
+      okText: '确定',
       onOk: () => {
         if (list) {
           this.handleService(list)
