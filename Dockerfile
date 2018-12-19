@@ -1,4 +1,4 @@
-FROM 192.168.1.52/base_image/node:msa-base-8-alpine
+FROM 192.168.1.52/base_image/node:msa-base-10-alpine
 MAINTAINER zhangpc<zhangpc@tenxcloud.com>
 
 ENV NODE_ENV production
