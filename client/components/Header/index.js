@@ -62,6 +62,7 @@ export default class Header extends React.Component {
     this.props.i18n.changeLanguage(language)
     this.setState({ language })
     this.momentLocale(language)
+    this.props.forceUpdateApp()
   }
 
   render() {
@@ -97,20 +98,12 @@ export default class Header extends React.Component {
         {/* <div/>作为占位符, 当children不存在时, 防止name跑到左侧 */}
         <div />
         <div className="user-panel-trigger userBtn">
-          <Dropdown
-            overlay={
-              <Menu onClick={({ key }) => this.changeLanguage(key)}>
-                <Menu.Item key={ language === 'zh-CN' ? 'en' : 'zh-CN' }>
-                  { language === 'zh-CN' ? 'English' : '中文' }
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={[ 'click' ]}
+          <div
+            className="language"
+            onClick={() => this.changeLanguage(language === 'zh-CN' ? 'en' : 'zh-CN')}
           >
-            <div className="language">
-              { language === 'zh-CN' ? '中文' : 'EN' }
-            </div>
-          </Dropdown>
+            { language === 'zh-CN' ? 'EN' : '中文' }
+          </div>
           <Dropdown
             overlay={
               <Menu>

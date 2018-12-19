@@ -322,6 +322,7 @@ class App extends React.Component {
             collapsed={current.ui.collapsed}
             location={location}
             currentUser={current.user.info || {}}
+            forceUpdateApp={() => this.forceUpdate()}
           >
             <NamespaceSwitch
               noSelfClassName
