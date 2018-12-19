@@ -28,9 +28,12 @@ import {
 } from '../../../selectors/gateway'
 import './style/index.less'
 import GlobalRuleModal from './GlobalRuleSetting'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+
+@withNamespaces('springCloudRouteManage')
 class RoutingManage extends React.Component {
   state = {
     ruleModal: false,
@@ -63,11 +66,13 @@ class RoutingManage extends React.Component {
   }
 
   handleMenuClick = (record, { key }) => {
-    const { delGatewayRoute, updateGatewayRoute, clusterID } = this.props
+    const { delGatewayRoute, updateGatewayRoute, clusterID, t } = this.props
     const self = this
     if (key === 'delete') {
       confirm({
-        title: `确定将路由 ${record.routeId} 删除吗？`,
+        title: t('table.sureToDeleteRoute', {
+          replace: { routeId: record.routeId },
+        }),
         content: '',
         onOk() {
           return new Promise((resolve, reject) => {
@@ -77,7 +82,7 @@ class RoutingManage extends React.Component {
               }
               resolve()
               notification.success({
-                message: '删除路由成功',
+                message: t('table.deleteRouteSuccess'),
               })
               self.loadRoutesList()
             })
@@ -86,9 +91,11 @@ class RoutingManage extends React.Component {
       })
     } else if (key === 'disable' || key === 'enable') {
       const status = !record.status
-      const statusText = record.status ? '停用' : '启用'
+      const statusText = record.status ? t('table.stop') : t('table.start')
       confirm({
-        title: `确定将路由 ${record.routeId} ${statusText}吗？`,
+        title: t('table.sureToRoute', {
+          replace: { routeId: record.routeId, statusText },
+        }),
         content: '',
         onOk() {
           return new Promise((resolve, reject) => {
@@ -98,7 +105,9 @@ class RoutingManage extends React.Component {
               }
               resolve()
               notification.success({
-                message: `${statusText}路由成功`,
+                message: t('table.routeSuccess', {
+                  replace: { statusText },
+                }),
               })
               self.loadRoutesList()
             })
@@ -145,60 +154,60 @@ class RoutingManage extends React.Component {
   }
 
   render() {
-    const { isFetching, routesList, totalElements } = this.props
+    const { isFetching, routesList, totalElements, t } = this.props
     const { ruleModal, currentRoute, currentPage, globalVisible } = this.state
     const columns = [{
-      title: '路由名称',
+      title: t('table.name'),
       dataIndex: 'routeId',
     }, {
-      title: '路由路径',
+      title: t('table.path'),
       dataIndex: 'path',
     }, {
-      title: '路由状态',
+      title: t('table.status'),
       dataIndex: 'status',
       render: text => <span className={text ? 'success-status' : 'error-status'}>
-        {text ? '开启' : '关闭'}
+        {text ? t('table.start') : t('table.stop')}
       </span>,
     }, {
-      title: '目标服务类型',
+      title: t('table.targetType'),
       dataIndex: 'serviceID',
-      render: (text, record) => (record.serviceId ? '微服务 ID' : '路由 URL'),
+      render: (text, record) => (record.serviceId ? t('table.microId') : t('table.url')),
     }, {
-      title: '目标服务地址',
+      title: t('table.targetUrl'),
       dataIndex: 'url',
       render: (text, record) => (record.serviceId || record.url || '-'),
     }, {
-      title: '描述',
+      title: t('table.desc'),
       dataIndex: 'description',
       render: desc => desc || '-',
     }, {
-      title: '去掉路径前缀',
+      title: t('table.noPrefix'),
       dataIndex: 'stripPrefix',
-      render: (text, record) => (record.stripPrefix ? '开启' : '关闭'),
+      render: (text, record) => (record.stripPrefix ? t('table.start') : t('table.stop')),
     }, {
-      title: '失败重试',
+      title: t('table.retry'),
       dataIndex: 'retryable',
-      render: (text, record) => (record.retryable ? '开启' : '关闭'),
+      render: (text, record) => (record.retryable ? t('table.start') : t('table.stop')),
     }, {
-      title: '敏感 Header',
+      title: t('table.sensitive'),
       dataIndex: 'headerFlag',
-      render: text => (text === 'custom' ? '自定义' : '全局默认'),
+      render: text => (text === 'custom' ? t('table.customize') : t('table.globalDefault')),
     }, {
-      title: '操作',
+      title: t('table.action'),
       render: (text, record) => {
         const menu = (
           <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 81 }}>
             {
               record.status
-                ? <Menu.Item key="disable">停用</Menu.Item>
-                : <Menu.Item key="enable">启用</Menu.Item>
+                ? <Menu.Item key="disable">{t('table.stop')}</Menu.Item>
+                : <Menu.Item key="enable">{t('table.start')}</Menu.Item>
             }
-            <Menu.Item key="delete">删除</Menu.Item>
+            <Menu.Item key="delete">{t('table.delete')}</Menu.Item>
           </Menu>
         )
         return (
           <Dropdown.Button onClick={this.updateRoute.bind(this, record)} overlay={menu}>
-            修改
+            {t('table.modify')}
           </Dropdown.Button>
         )
       },
@@ -215,24 +224,28 @@ class RoutingManage extends React.Component {
       <QueueAnim className="router-manage">
         <div className="router-manage-btn-box layout-content-btns" key="btns">
           <Button type="primary" icon="plus" onClick={this.addRoutingRule}>
-          添加路由
+            {t('table.addRoute')}
           </Button>
           <Button onClick={this.toggleGlobalVisible}>
-            <Icon type="setting" /> 全局路由配置
+            <Icon type="setting" /> {t('table.globalRouteConf')}
           </Button>
           <Button icon="sync" onClick={this.loadRoutesList.bind(this, {})} loading={isFetching}>
-          刷新
+            {t('table.refresh')}
           </Button>
           {/* <Button><Icon type="delete"/>删除</Button> */}
           <Search
-            placeholder="按路由名称搜索"
+            placeholder={t('table.searchByName')}
             style={{ width: 200 }}
             onChange={e => this.setState({ routeid: e.target.value })}
             onSearch={this.onSearch}
           />
           {
             totalElements > 0 && <div className="page">
-              <span className="total">共 { totalElements } 条</span>
+              <span className="total">{
+                t('table.totalElements', {
+                  replace: { totalElements },
+                })
+              }</span>
               <Pagination
                 simple
                 current={currentPage}

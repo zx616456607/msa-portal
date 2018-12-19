@@ -15,5 +15,17 @@
     "commonUser": "普通成员",
     "apmConfig": "APM 配置",
     "msaConfig": "微服务配置"
+  },
+  "constants": {
+    "APP_NAME_REG_NOTICE": "可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾",
+    "COMPONENT_NAME": "可由 3~50 位小写字母、数字、中划线组成，以小写字母开头，字母或者数字结尾",
+    "MSA_DEVELOP_RULE_NAME_REG_NOTICE": "以字母开头，大小写字母、数字组成， 1-24个字符",
+    "MESH_ROUTE_RULE_NAME_REG_NOTICE": "由 3~60 位字母、数字、中划线组成，以字母开头，字母或者数字结尾",
+    "uselessLast": ""
+  },
+  "confirm": {
+    "confirmAction": "确定操作",
+    "cancel": "取消",
+    "confirm": "确定"
   }
 }
