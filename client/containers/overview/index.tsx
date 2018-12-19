@@ -12,7 +12,7 @@ import { Row, Col } from 'antd'
 import SpringCloudOV from './SpringCloudOV'
 import './styles/index.less'
 
-interface OverviewProps{
+interface OverviewProps {
 
 }
 interface OverviewState {
