@@ -41,7 +41,7 @@ interface SpringCloudOVState {
   PoliciesOpen: number
   PoliciesClose: number
   BlLength: number
-  ZTLDataTime:ZTLDataTimeIF[]
+  ZTLDataTime: ZTLDataTimeIF[]
 }
 
 interface ZTLDataTimeIF {
@@ -68,7 +68,7 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
   async componentDidMount() {
     const query = {
       endTs: new Date().getTime(),
-      lookback: 300 * 100
+      lookback: 300 * 100,
     }
     const defaultQuery = {
       page: 1,
@@ -80,7 +80,7 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     this.props.gatewayPagePoliciesList(this.props.clusterID),
     this.props.getService(this.props.clusterID, {}),
     this.props.getZipkinTracesList(this.props.clusterID, query),
-    this.props.eventLogList(this.props.clusterID, defaultQuery)
+    this.props.eventLogList(this.props.clusterID, defaultQuery),
     ])
     const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList'])
     const automaticNum = Object.values(msaList)
@@ -104,13 +104,13 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     .filter(({ status }) => !status)
     .length
     const projectUrl = getDeepValue(SvcRes, ['response', 'result', 'data', 'configGitUrl'])
-    const BLRes = await this.props.getBranchList(this.props.clusterID, { project_url:projectUrl })
+    const BLRes = await this.props.getBranchList(this.props.clusterID, { project_url: projectUrl })
     const BlLength = (getDeepValue(BLRes, ['response', 'result', 'data']) || []).length
 
     const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data'])
     const ZTLDataTime = ZTLData.map(({ duration, startTime }) => ({ duration, startTime }))
 
-    console.log('ELLREs', ELLREs)
+    // console.log('ELLREs', ELLREs)
     // const ELLREs = getDeepValue(ELLREs)
     this.setState({ automaticNum, manualNum, geteWayOpen, geteWayClose, PoliciesOpen,
       PoliciesClose, BlLength, ZTLDataTime })
@@ -124,7 +124,7 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
             <Col span={6}>
               <div className="dataTip">
                 <div className="title"><span>服务数量</span>
-                <span>{ `${this.state.automaticNum + this.state.manualNum} 个`}</span>
+                <span>{`${this.state.automaticNum + this.state.manualNum} 个`}</span>
                 </div>
                 <div><span><CircleIcon className="color1" />手动注册</span>
                 <span>{`${this.state.manualNum} 个`}</span>
@@ -153,10 +153,10 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
                   <span>{`${this.state.PoliciesClose + this.state.PoliciesOpen } 个`}</span>
                 </div>
                 <div><span><CircleIcon className="color2"/>开启状态</span>
-                <span>{ `${this.state.PoliciesOpen} 个` }</span>
+                <span>{`${this.state.PoliciesOpen} 个`}</span>
                 </div>
                 <div><span><CircleIcon className="color3"/>关闭状态</span>
-                <span>{ `${this.state.PoliciesClose} 个` }</span>
+                <span>{`${this.state.PoliciesClose} 个`}</span>
                 </div>
               </div>
             </Col>

@@ -14,12 +14,12 @@ import {
   Chart,
   Geom,
   Axis,
-} from "bizcharts";
+} from 'bizcharts';
 import { formatDate } from '../../common/utils'
 import { TIMES_DAY } from '../../constants/index'
 
 interface SplashesCharProps {
-  ZTLDataTime:ZTLDataTimeIF[]
+  ZTLDataTime: ZTLDataTimeIF[]
 }
 
 interface ZTLDataTimeIF {
@@ -42,13 +42,12 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
       return {
         weight: formatDate(item.startTime, TIMES_DAY),
         height: item.duration / 1000,
-        size: Math.ceil(Math.random()*6 - 3),
+        size: Math.ceil(Math.random() * 6 - 3),
       }
     })
-    console.log('data', data)
     const cols = {
       height: {
-        alias: "Daily fat intake",
+        alias: 'Daily fat intake',
         tickCount: 3,
         // 定义别名
         // tickInterval: 500,
@@ -72,8 +71,11 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
       <div className="weightInfo">耗时</div>
       <div className="heightInfo" >产生时间</div>
       <div className="SplashesChar">
-        <Chart height={160} data={data} scale={cols}
-        padding={[ 20, 30, 50, 50]}
+        <Chart
+          height={160}
+          data={data}
+          scale={cols}
+          padding={[ 20, 30, 50, 50]}
         // plotBackground={{
         //   stroke: "#ccc",
         //   // 边颜色
@@ -81,19 +83,23 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
         // }}
         // padding={"auto"}
         // padding={{ bottom: '10px', left: '10px' }}
-        forceFit
+          forceFit
         >
-          <Axis name='weight' line={{
-            stroke: "#ccc"
-          }}/>
-          <Axis name='height'
+          <Axis
+            name="weight"
+            line={{
+            stroke: '#ccc',
+          }}
+          />
+          <Axis
+            name="height"
             label={{
               formatter: val => {
                 return `${val} ms`
-              }
+              },
             }}
             line={{
-              stroke: "#666"
+              stroke: '#666',
             }}
           />
           <Geom
