@@ -20,6 +20,7 @@ import classNames from 'classnames'
 import { ROLE_USER, ROLE_SYS_ADMIN, ROLE_BASE_ADMIN, ROLE_PLATFORM_ADMIN } from '../../constants'
 import './style/index.less'
 import { withNamespaces } from 'react-i18next'
+import moment from 'moment'
 
 const LayoutHeader = Layout.Header
 
@@ -29,9 +30,38 @@ export default class Header extends React.Component {
     language: this.props.i18n.language,
   }
 
+  momentLocale = language => {
+    if (language === 'en') {
+      moment.locale('en', {
+        relativeTime: {
+          future: 'in %s',
+          past: '%s ago',
+          s: '%d s',
+          m: 'a min',
+          mm: '%d min',
+          h: '1 h',
+          hh: '%d h',
+          d: 'a day',
+          dd: '%d days',
+          M: 'a month',
+          MM: '%d months',
+          y: 'a year',
+          yy: '%d years',
+        },
+      })
+      return
+    }
+    moment.locale('zh-cn')
+  }
+
+  componentDidMount() {
+    this.momentLocale(this.state.language)
+  }
+
   changeLanguage = language => {
     this.props.i18n.changeLanguage(language)
     this.setState({ language })
+    this.momentLocale(language)
   }
 
   render() {
