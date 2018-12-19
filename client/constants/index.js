@@ -69,6 +69,7 @@ export const UAA_JWT = 'uaa_jwt'
 export const AUTH_URL = 'auth_url'
 export const DEFAULT = 'default'
 export const ROLE_SYS_ADMIN = 2
+export const TIMES_DAY = 'HH:mm:ss'
 export const TIMES_WITHOUT_YEAR = 'MM-DD HH:mm:ss'
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 export const CONTENT_TYPE_JSON = 'application/json'

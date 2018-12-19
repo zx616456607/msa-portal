@@ -18,11 +18,19 @@ import * as MsaAction from '../../actions/msa'
 import * as GateAction  from '../../actions/gateway'
 import * as CCAction from '../../actions/configCenter'
 import * as LTKAction from '../../actions/callLinkTrack'
+import * as ELLAction from '../../actions/eventManage'
 import { connect } from 'react-redux'
 import { getDeepValue } from '../../common/utils'
 
 interface SpringCloudOVProps {
   clusterID: string;
+  getMsaList: (clusterID: string) => any;
+  getGatewayRoutes: (clusterID: string) => any;
+  gatewayPagePoliciesList: (clusterID: string) => any;
+  getService: (clusterID: string, query: any) => any;
+  getZipkinTracesList: (clusterID: string, query: any) => any;
+  eventLogList: (clusterID: string, query: any) => any;
+  getBranchList: (clusterID: string, query: any) => any;
 }
 
 interface SpringCloudOVState {
@@ -60,14 +68,19 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
   async componentDidMount() {
     const query = {
       endTs: new Date().getTime(),
-      lookback: 300 * 100000 // TODO:
+      lookback: 300 * 100
     }
-    const [etMsaListRes, GateWayRes, PPLRes, SvcRes, ZTLRes ] = await Promise.all([
+    const defaultQuery = {
+      page: 1,
+      size: 0,
+    }
+    const [etMsaListRes, GateWayRes, PPLRes, SvcRes, ZTLRes, ELLREs ] = await Promise.all([
     this.props.getMsaList(this.props.clusterID),
     this.props.getGatewayRoutes(this.props.clusterID),
     this.props.gatewayPagePoliciesList(this.props.clusterID),
     this.props.getService(this.props.clusterID, {}),
     this.props.getZipkinTracesList(this.props.clusterID, query),
+    this.props.eventLogList(this.props.clusterID, defaultQuery)
     ])
     const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList'])
     const automaticNum = Object.values(msaList)
@@ -96,6 +109,9 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
 
     const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data'])
     const ZTLDataTime = ZTLData.map(({ duration, startTime }) => ({ duration, startTime }))
+
+    console.log('ELLREs', ELLREs)
+    // const ELLREs = getDeepValue(ELLREs)
     this.setState({ automaticNum, manualNum, geteWayOpen, geteWayClose, PoliciesOpen,
       PoliciesClose, BlLength, ZTLDataTime })
   }
@@ -177,4 +193,5 @@ export default connect(mapStateToPros, {
   getBranchList: CCAction.getBranchList,
   getService: CCAction.getService,
   getZipkinTracesList: LTKAction.getZipkinTracesList,
+  eventLogList: ELLAction.eventLogList,
 })(SpringCloudOV)

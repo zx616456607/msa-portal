@@ -11,13 +11,11 @@
 import * as React from 'react'
 import './styles/AnnularChar.less'
 import {
-  G2,
   Chart,
   Geom,
   Tooltip,
   Coord,
 } from 'bizcharts';
-import DataSet from '@antv/data-set';
 import { Row, Col } from 'antd'
 
 
@@ -53,7 +51,7 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
       }
     ]; // 可以通过调整这个数值控制分割空白处的间距，0-1 之间的数值
 
-    const sliceNumber = 0.01; // 自定义 other 的图形，增加两条线
+    /*const sliceNumber = 0.01; // 自定义 other 的图形，增加两条线
 
     G2.Shape.registerShape("interval", "sliceShape", {
       draw(cfg, container) {
@@ -72,7 +70,7 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
           }
         });
       }
-    });
+    }); */
 
     class SliderChart extends React.Component {
       render() {
