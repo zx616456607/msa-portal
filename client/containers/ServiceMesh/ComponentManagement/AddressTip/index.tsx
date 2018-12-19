@@ -86,8 +86,8 @@ class Tip extends React.Component<TipProps, TipState> {
   state = {
     copyStatus: false,
   }
-  copyCode = (e) => {
-    let code = document.getElementById('ServiceMeshTipsRouterAddress')
+  copyCode = () => {
+    let code: any = document.getElementById('ServiceMeshTipsRouterAddress')
     code.select();
     document.execCommand('Copy', false);
     this.setState({
@@ -95,7 +95,7 @@ class Tip extends React.Component<TipProps, TipState> {
     });
   }
   startCopyCode = (address) => {
-    let code = document.getElementById('ServiceMeshTipsRouterAddress')
+    let code: any = document.getElementById('ServiceMeshTipsRouterAddress')
     code.value = address;
   }
   returnDefaultTooltip = () => {
@@ -207,10 +207,10 @@ class Tips extends React.Component<TipsProps, TipsState> {
         const innerAddress = portArray.map(({ containerPort }) => ({ domain, containerPort }))
         const returnMessage = { name, innerAddress }
         // 获取服务网格相关的地址
-        if (!value.accessPoints) {
+        if (!(value as any).accessPoints) {
           return returnMessage
         }
-        const accessPointsAddress = value.accessPoints
+        const accessPointsAddress = (value as any ).accessPoints
           .map(({ hosts, match }) => {
             const Exact = match.uri.MatchType.Exact;
             const Prefix = match.uri.MatchType.Prefix;
