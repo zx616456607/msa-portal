@@ -9,7 +9,9 @@
  */
 const path = require('path')
 const webpack = require('webpack')
-const tsImportPluginFactory = require('ts-import-plugin')
+// const tsImportPluginFactory = require('ts-import-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+
 const siteConfig = require('../config')
 const { site } = siteConfig
 const env = process.env
@@ -33,8 +35,34 @@ const configBase = {
   },
   module: {
     rules: [
+      // {
+      //   test: /\.js$/,
+      //   loader: 'babel-loader',
+      //   exclude: /node_modules/,
+      // },
+      // {
+      //   test: /\.tsx?$/,
+      //   use: {
+      //     loader: 'ts-loader',
+      //     options: {
+      //       transpileOnly: true,
+      //       getCustomTransformers: () => ({
+      //         before: [
+      //           tsImportPluginFactory({
+      //             libraryName: 'antd',
+      //             libraryDirectory: 'lib',
+      //           }),
+      //         ],
+      //       }),
+      //       compilerOptions: {
+      //         module: 'es2015',
+      //       },
+      //     },
+      //   },
+      //   exclude: /node_modules/,
+      // },
       {
-        test: /\.js$/,
+        test: /\.(j|t)sx?$/,
         exclude: /node_modules/,
         use: [
           'react-hot-loader/webpack',
@@ -49,27 +77,30 @@ const configBase = {
           },
         ],
       },
-      {
-        test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true,
-            getCustomTransformers: () => ({
-              before: [
-                tsImportPluginFactory({
-                  libraryName: 'antd',
-                  libraryDirectory: 'lib',
-                }),
-              ],
-            }),
-            compilerOptions: {
-              module: 'es2015',
-            },
-          },
-        },
-        exclude: /node_modules/,
-      },
+      // {
+      //   test: /\.tsx?$/,
+      //   use: {
+      //     loader: 'babel-loader',
+      //     // options: {
+      //     //   cacheDirectory: true,
+      //     //   babelrc: false,
+      //     //   presets: [
+      //     //     [
+      //     //       '@babel/preset-env',
+      //     //       { targets: { browsers: 'last 2 versions' } }, // or whatever your project requires
+      //     //     ],
+      //     //     '@babel/preset-typescript',
+      //     //     '@babel/preset-react',
+      //     //   ],
+      //     //   plugins: [
+      //     //     // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
+      //     //     [ '@babel/plugin-proposal-decorators', { legacy: true }],
+      //     //     [ '@babel/plugin-proposal-class-properties', { loose: true }],
+      //     //     'react-hot-loader/babel',
+      //     //   ],
+      //     // },
+      //   },
+      // },
       {
         test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2|svg)$/,
         loader: 'url-loader',
@@ -86,6 +117,7 @@ const configBase = {
         NODE_ENV: JSON.stringify(env.NODE_ENV),
       },
     }),
+    new ForkTsCheckerWebpackPlugin(),
     // new SpriteLoaderPlugin(),
     new webpack.BannerPlugin({
       banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,
