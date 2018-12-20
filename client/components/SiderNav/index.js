@@ -42,7 +42,188 @@ class SiderNav extends React.Component {
       openKeys: [],
       isShowPoint: false,
     }
-    const { t } = this.props
+    this.menus = []
+  }
+  async componentDidMount() {
+    this.setState({
+      openKeys: this.findSelectedNOpenKeys().openKeys,
+    })
+    const { loadApply } = this.props
+    const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
+    await loadApply(UNUSED_CLUSTER_ID, query)
+  }
+  onCollapse = collapsed => {
+    this.setState({ collapsed })
+    if (collapsed) {
+      this.setState({
+        openKeys: [],
+      })
+    }
+    const { toggleCollapsed } = this.props
+    toggleCollapsed && toggleCollapsed(collapsed)
+  }
+  renderMenuItem = data => {
+    const { collapsed } = this.state
+    const { user, csbApply } = this.props
+    const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
+    const isShowPoint = !!user &&
+      user.role === ROLE_SYS_ADMIN &&
+      !!csbApply && csbApply.ids && csbApply.ids.length > 0
+    let iconDOM
+    if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
+    if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
+
+    if (tenxIcon && (typeof tenxIcon === 'string')) {
+      iconDOM = <TenxIcon
+        type={tenxIcon}
+        style={{
+          marginRight: 10,
+          fontSize: 12,
+        }} />
+    }
+    if (children && !declare) {
+      return (
+        <SubMenu
+          key={key}
+          title={<span>{iconDOM}
+            <span>{name}
+            </span>
+            {
+              data.key === 'k11' && isShowPoint ?
+                <span className="topRightPoint"><strong>●</strong></span>
+                :
+                null
+            }
+          </span>}
+          {...otherProps}
+        >
+          {
+            children.map(item => this.renderMenuItem(item))
+          }
+        </SubMenu>
+      )
+    }
+    if (children && declare) {
+      return (
+        <MenuItemGroup title={!collapsed ? declare.spread : declare.collapsed} key={declare.key} >
+          <SubMenu
+            key={key}
+            title={<span>{iconDOM}
+              <span>{name}</span>
+              {
+                data.key === 'k1' && isShowPoint ?
+                  <span className="topRightPoint"><strong>●</strong></span>
+                  :
+                  null
+              }
+            </span>}
+            {...otherProps}
+          >
+            {
+              children.map(item => this.renderMenuItem(item))
+            }
+          </SubMenu>
+        </MenuItemGroup>
+      )
+    }
+    /* let menuItems
+    // if (collapsed && to === '') {
+    //   menuItems = <Icon type="user" />
+    // } else
+    if (to !== '/management') {
+      menuItems = <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
+    } else if (!collapsed) {
+      menuItems =
+        <Tooltip placement="right" title={key === 'k4'
+          ? '作为某项目的管理员,有权限配置项目相关' : '作为系统管理员,有权限配置系统相关'}>
+          <span className="nav-text navFont">{name}</span>
+        </Tooltip>
+    } else {
+      menuItems = <Icon type="user" className="nav-text navFont"/>// <span className="navSolid">{name}</span>
+    } */
+
+    return <Menu.Item key={key} {...otherProps}>
+      {
+        // collapsed && to === '' ?
+        //   <Icon type="user" /> :
+        <Link to={to}>{iconDOM}
+          <span className="nav-text">{name}</span>
+          {
+            data.key === 'k011' && isShowPoint ?
+              <span className="topRightPoint"><strong>●</strong></span>
+              :
+              null
+          }
+        </Link>
+        // menuItems
+      }
+    </Menu.Item>
+  }
+  findSelectedNOpenKeys = () => {
+    const { location, collapsed } = this.props
+    const { pathname } = location
+    const pathnameList = pathname.split('/').filter(item => item !== '')
+    let defaultOpenKeys = []
+    this.menus.map(menu => {
+      let firstPathList = []
+      menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
+      if (pathnameList[0] === firstPathList[0]) defaultOpenKeys.push(menu.key)
+      return null
+    })
+    const finderPath = (obj, list) => {
+      const { to, children, defaultOpen, key } = obj
+      if (defaultOpen) defaultOpenKeys.push(key)
+      if (children) {
+        children.map(item => finderPath(item, list))
+        return
+      }
+      // (to === pathname) && list.push(key)
+      if (pathname.indexOf(to) > -1) {
+        (list.length === 0) && list.push(obj)
+        ; (list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
+      }
+      return list
+    }
+    let s = []
+    this.menus.map(menu => finderPath(menu, s))
+    ; (s.length > 0) && (s = [ s[0].key ])
+    if (collapsed) {
+      defaultOpenKeys = []
+      s = []
+    }
+    return {
+      openKeys: defaultOpenKeys,
+      selectedKeys: s,
+    }
+  }
+  onOpenChange = data => {
+    const { openKeys } = this.state
+    if (openKeys.length >= data.length) {
+      this.setState({
+        openKeys: data,
+      })
+      return
+    }
+    let add = ''
+    let addIsFirst = false
+    let finalKeys = []
+    data.map(i => (openKeys.indexOf(i) < 0) && (add = i))
+    add && this.menus.map(menu => {
+      if (menu.key === add) addIsFirst = true
+      return null
+    })
+    if (addIsFirst) {
+      openKeys.map(k => (!find(this.menus, [ 'key', k ])) && finalKeys.push(k))
+      add && finalKeys.push(add)
+    }
+    if (!addIsFirst) finalKeys = data
+    this.setState({
+      openKeys: finalKeys,
+    })
+  }
+
+  render() {
+    const { collapsed, currentUser, managedProjects, t } = this.props
     this.menus = [
       {
         to: '/',
@@ -229,7 +410,7 @@ class SiderNav extends React.Component {
               }, {
                 key: 'k301',
                 to: '/csb-instances/my-application',
-                name: t('sider."myCsbApplication"'), // 我的申请
+                name: t('sider.myCsbApplication'), // 我的申请
               },
             ],
           }, {
@@ -358,187 +539,6 @@ class SiderNav extends React.Component {
         ],
       },
     ]
-  }
-  async componentDidMount() {
-    this.setState({
-      openKeys: this.findSelectedNOpenKeys().openKeys,
-    })
-    const { loadApply } = this.props
-    const query = { flag: 1, page: 1, size: 10, filter: [ 'status-eq-1' ] }
-    await loadApply(UNUSED_CLUSTER_ID, query)
-  }
-  onCollapse = collapsed => {
-    this.setState({ collapsed })
-    if (collapsed) {
-      this.setState({
-        openKeys: [],
-      })
-    }
-    const { toggleCollapsed } = this.props
-    toggleCollapsed && toggleCollapsed(collapsed)
-  }
-  renderMenuItem = data => {
-    const { collapsed } = this.state
-    const { user, csbApply } = this.props
-    const { children, name, icon, key, to, tenxIcon, declare, ...otherProps } = data
-    const isShowPoint = !!user &&
-      user.role === ROLE_SYS_ADMIN &&
-      !!csbApply && csbApply.ids && csbApply.ids.length > 0
-    let iconDOM
-    if (icon && (typeof icon === 'string')) iconDOM = <Icon type={icon} />
-    if (icon && (typeof icon === 'object')) iconDOM = svgIcon(icon)
-
-    if (tenxIcon && (typeof tenxIcon === 'string')) {
-      iconDOM = <TenxIcon
-        type={tenxIcon}
-        style={{
-          marginRight: 10,
-          fontSize: 12,
-        }} />
-    }
-    if (children && !declare) {
-      return (
-        <SubMenu
-          key={key}
-          title={<span>{iconDOM}
-            <span>{name}
-            </span>
-            {
-              data.key === 'k11' && isShowPoint ?
-                <span className="topRightPoint"><strong>●</strong></span>
-                :
-                null
-            }
-          </span>}
-          {...otherProps}
-        >
-          {
-            children.map(item => this.renderMenuItem(item))
-          }
-        </SubMenu>
-      )
-    }
-    if (children && declare) {
-      return (
-        <MenuItemGroup title={!collapsed ? declare.spread : declare.collapsed} key={declare.key} >
-          <SubMenu
-            key={key}
-            title={<span>{iconDOM}
-              <span>{name}</span>
-              {
-                data.key === 'k1' && isShowPoint ?
-                  <span className="topRightPoint"><strong>●</strong></span>
-                  :
-                  null
-              }
-            </span>}
-            {...otherProps}
-          >
-            {
-              children.map(item => this.renderMenuItem(item))
-            }
-          </SubMenu>
-        </MenuItemGroup>
-      )
-    }
-    /* let menuItems
-    // if (collapsed && to === '') {
-    //   menuItems = <Icon type="user" />
-    // } else
-    if (to !== '/management') {
-      menuItems = <Link to={to}>{iconDOM}<span className="nav-text">{name}</span></Link>
-    } else if (!collapsed) {
-      menuItems =
-        <Tooltip placement="right" title={key === 'k4'
-          ? '作为某项目的管理员,有权限配置项目相关' : '作为系统管理员,有权限配置系统相关'}>
-          <span className="nav-text navFont">{name}</span>
-        </Tooltip>
-    } else {
-      menuItems = <Icon type="user" className="nav-text navFont"/>// <span className="navSolid">{name}</span>
-    } */
-
-    return <Menu.Item key={key} {...otherProps}>
-      {
-        // collapsed && to === '' ?
-        //   <Icon type="user" /> :
-        <Link to={to}>{iconDOM}
-          <span className="nav-text">{name}</span>
-          {
-            data.key === 'k011' && isShowPoint ?
-              <span className="topRightPoint"><strong>●</strong></span>
-              :
-              null
-          }
-        </Link>
-        // menuItems
-      }
-    </Menu.Item>
-  }
-  findSelectedNOpenKeys = () => {
-    const { location, collapsed } = this.props
-    const { pathname } = location
-    const pathnameList = pathname.split('/').filter(item => item !== '')
-    let defaultOpenKeys = []
-    this.menus.map(menu => {
-      let firstPathList = []
-      menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
-      if (pathnameList[0] === firstPathList[0]) defaultOpenKeys.push(menu.key)
-      return null
-    })
-    const finderPath = (obj, list) => {
-      const { to, children, defaultOpen, key } = obj
-      if (defaultOpen) defaultOpenKeys.push(key)
-      if (children) {
-        children.map(item => finderPath(item, list))
-        return
-      }
-      // (to === pathname) && list.push(key)
-      if (pathname.indexOf(to) > -1) {
-        (list.length === 0) && list.push(obj)
-        ; (list.length > 0) && (to.indexOf(list[0].to) > -1) && (list[0] = obj)
-      }
-      return list
-    }
-    let s = []
-    this.menus.map(menu => finderPath(menu, s))
-    ; (s.length > 0) && (s = [ s[0].key ])
-    if (collapsed) {
-      defaultOpenKeys = []
-      s = []
-    }
-    return {
-      openKeys: defaultOpenKeys,
-      selectedKeys: s,
-    }
-  }
-  onOpenChange = data => {
-    const { openKeys } = this.state
-    if (openKeys.length >= data.length) {
-      this.setState({
-        openKeys: data,
-      })
-      return
-    }
-    let add = ''
-    let addIsFirst = false
-    let finalKeys = []
-    data.map(i => (openKeys.indexOf(i) < 0) && (add = i))
-    add && this.menus.map(menu => {
-      if (menu.key === add) addIsFirst = true
-      return null
-    })
-    if (addIsFirst) {
-      openKeys.map(k => (!find(this.menus, [ 'key', k ])) && finalKeys.push(k))
-      add && finalKeys.push(add)
-    }
-    if (!addIsFirst) finalKeys = data
-    this.setState({
-      openKeys: finalKeys,
-    })
-  }
-
-  render() {
-    const { collapsed, currentUser, managedProjects } = this.props
     const finalMenus = this.menus.filter(({ key }) => {
       // filter 系统管理员
       if (key === 'k1') {

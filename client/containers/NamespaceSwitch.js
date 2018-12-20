@@ -331,7 +331,7 @@ class NamespaceSwitch extends React.Component {
                   {
                     projectsList.length === 0 && (
                       <Menu.Item key="no-project" disabled>
-                        {t('noProjects')}
+                        {t('header.noProjects')}
                       </Menu.Item>
                     )
                   }
