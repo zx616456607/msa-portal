@@ -24,7 +24,7 @@ import { scrollToTop, toQuerystring } from '../common/utils'
 import { renderLoading } from '../components/utils'
 import { JWT, AUTH_URL } from '../constants'
 import { Route, Switch } from 'react-router-dom'
-import { appChildRoutes } from '../RoutesDom'
+import { appChildRoutes } from '../'
 import CustomizeSider from '../components/SiderNav'
 import './style/App.less'
 import { footer } from '../../config/constants'
@@ -322,7 +322,7 @@ class App extends React.Component {
             collapsed={current.ui.collapsed}
             location={location}
             currentUser={current.user.info || {}}
-            forceUpdateApp={() => this.forceUpdate()}
+            forceUpdateApp={this.props.forceUpdateApp}
           >
             <NamespaceSwitch
               noSelfClassName

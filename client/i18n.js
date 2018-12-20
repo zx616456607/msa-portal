@@ -12,7 +12,7 @@
 import i18n from 'i18next';
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { reactI18nextModule } from 'react-i18next';
+// import { reactI18nextModule } from 'react-i18next';
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -25,7 +25,7 @@ i18n
   .use(LanguageDetector)
   // pass the i18n instance to the react-i18next components.
   // Alternative use the I18nextProvider: https://react.i18next.com/components/i18nextprovider
-  .use(reactI18nextModule)
+  // .use(reactI18nextModule)
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({

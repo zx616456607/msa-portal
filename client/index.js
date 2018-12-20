@@ -11,9 +11,13 @@
  */
 
 import React from 'react'
-import { Route } from 'react-router-dom'
 import App from './containers/App'
 import LoadableWrapper from './components/LoadableWrapper'
+import { I18nextProvider } from 'react-i18next'
+import i18n from './i18n'
+import { LocaleProvider } from 'antd'
+import zhCN from 'antd/lib/locale-provider/zh_CN'
+import enUS from 'antd/lib/locale-provider/en_US'
 
 export const appChildRoutes = [
   {
@@ -99,8 +103,14 @@ export const appChildRoutes = [
   },
 ]
 
-export class RoutesDom extends React.Component {
+export class AppWrapper extends React.Component {
   render() {
-    return <Route path="/" component={App} />
+    return (
+      <I18nextProvider i18n={i18n}>
+        <LocaleProvider locale={i18n.language === 'en' ? enUS : zhCN}>
+          <App {...this.props} forceUpdateApp={() => this.forceUpdate()} />
+        </LocaleProvider>
+      </I18nextProvider>
+    )
   }
 }

@@ -23,18 +23,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import { LocaleProvider } from 'antd'
-import zhCN from 'antd/lib/locale-provider/zh_CN'
-import { RoutesDom } from '../RoutesDom'
+import { AppWrapper } from '../'
+import { Route } from 'react-router-dom'
 
 const Root = ({ store, history }) => (
   <Provider store={store}>
-    <LocaleProvider locale={zhCN}>
-      { /* ConnectedRouter will use the store from Provider automatically */ }
-      <ConnectedRouter history={history}>
-        <RoutesDom />
-      </ConnectedRouter>
-    </LocaleProvider>
+    { /* ConnectedRouter will use the store from Provider automatically */ }
+    <ConnectedRouter history={history}>
+      <Route path="/" component={AppWrapper} />
+    </ConnectedRouter>
   </Provider>
 )
 
