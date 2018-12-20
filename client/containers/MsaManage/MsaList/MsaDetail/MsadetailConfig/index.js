@@ -18,7 +18,9 @@ import {
   refreshMsaConfig,
 } from '../../../../../actions/msa'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('MsaList')
 class MsaDetailConfig extends React.Component {
   state = {
     refreshConfigLoading: false,
@@ -27,11 +29,11 @@ class MsaDetailConfig extends React.Component {
   handleChange = () => { }
 
   loadMsaConfig = () => {
-    const { getMsaConfig, clusterID, name, instances } = this.props
+    const { t, getMsaConfig, clusterID, name, instances } = this.props
     getMsaConfig(clusterID, `${name}:${instances[0].port}`, { isHandleError: true }).then(res => {
       if (res.status === 404) {
         notification.warn({
-          message: '没有相关配置',
+          message: t('detail.MsadetailConfig.noConfigs'),
         })
       }
     })
@@ -42,7 +44,7 @@ class MsaDetailConfig extends React.Component {
   }
 
   refreshConfig = () => {
-    const { refreshMsaConfig, clusterID, name, instances } = this.props
+    const { t, refreshMsaConfig, clusterID, name, instances } = this.props
     this.setState({
       refreshConfigLoading: true,
     })
@@ -53,23 +55,23 @@ class MsaDetailConfig extends React.Component {
       if (res.error) {
         if (res.status === 404) {
           notification.warn({
-            message: '没有相关配置',
+            message: t('detail.MsadetailConfig.noConfigs'),
           })
           return
         }
         return notification.warn({
-          message: '更新配置失败',
+          message: t('detail.MsadetailConfig.updateFailed'),
         })
       }
       notification.success({
-        message: '更新配置成功',
+        message: t('detail.MsadetailConfig.updateSucc'),
       })
       this.loadMsaConfig()
     })
   }
 
   render() {
-    const { msaConfig } = this.props
+    const { msaConfig, t } = this.props
     const { isFetching: loading, data } = msaConfig
     const dataKeys = Object.keys(data || {})
     const dataSource = []
@@ -84,27 +86,27 @@ class MsaDetailConfig extends React.Component {
       })
     })
     const columns = [{
-      title: '配置属性',
+      title: t('detail.MsadetailConfig.configProp'),
       dataIndex: 'key',
     }, {
-      title: '属性值',
+      title: t('detail.MsadetailConfig.propValue'),
       dataIndex: 'value',
     }, {
-      title: '操作',
-      render: (text, record) => <a target="blank" href={record.url}>查看</a>,
+      title: t('detail.MsadetailConfig.opera'),
+      render: (text, record) => <a target="blank" href={record.url}>{t('detail.MsadetailConfig.check')}</a>,
     }]
     return (
       <div className="msaDetailConfig">
         <div className="layout-content-btns">
           <Button type="primary" icon="sync" onClick={this.loadMsaConfig}>
-            刷新
+            {t('detail.MsadetailConfig.reflesh')}
           </Button>
           <Button
             icon="reload"
             onClick={this.refreshConfig}
             loading={this.state.refreshConfigLoading}
           >
-            更新配置
+            {t('detail.MsadetailConfig.updateConfig')}
           </Button>
         </div>
         <Table

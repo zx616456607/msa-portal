@@ -20,6 +20,7 @@ import { getMsaBlownStrategy,
   delMsaBlownStrategy,
 } from '../../../../../actions/msa'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 const formItemLayout = {
@@ -40,6 +41,7 @@ const formItemLayout = {
   msaBlownOpen,
   delMsaBlownStrategy,
 })
+@withNamespaces('MsaList')
 class MsaDetailBlownStrategyComponent extends React.Component {
   state = {
     modalShow: false,
@@ -75,7 +77,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   setBlownRules = () => {
-    const { getMsaBlownStrategy, setMsaBlownStrategy, serviceName, clusterID } = this.props
+    const { getMsaBlownStrategy, setMsaBlownStrategy, serviceName, clusterID, t } = this.props
     const { validateFields } = this.props.form
     validateFields(async (err, values) => {
       if (!err) {
@@ -85,7 +87,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
         const result = await setMsaBlownStrategy(clusterID, body)
         this.setState({ confirmLoading: false })
         if (!result.error) {
-          notification.success({ message: '设置熔断规则成功' })
+          notification.success({ message: t('detail.MsaDetailBlownStrategy.setMsaBlownStrategySucc') })
           getMsaBlownStrategy(clusterID, serviceName)
           this.setState({
             modalShow: false,
@@ -95,7 +97,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   requestVolumeThresholdValidate = () => {
-    const { blownStrategy } = this.props
+    const { blownStrategy, t } = this.props
     const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('requestVolumeThreshold', {
@@ -104,10 +106,10 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       rules: [
         { validator: (rule, value, callback) => {
           if (value === '') {
-            return callback('请输入窗口请求数')
+            return callback(t('detail.MsaDetailBlownStrategy.requestVolumeThresholdErr1'))
           }
           if (value < 1 || value > 10000 || value % 1 !== 0) {
-            return callback('请输入1-10000之间的整数')
+            return callback(t('detail.MsaDetailBlownStrategy.requestVolumeThresholdErr2'))
           }
           callback()
         },
@@ -116,7 +118,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   errorThresholdPercentageValidate = () => {
-    const { blownStrategy } = this.props
+    const { blownStrategy, t } = this.props
     const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('errorThresholdPercentage', {
@@ -125,10 +127,10 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       rules: [
         { validator: (rule, value, callback) => {
           if (value === '') {
-            return callback('请输入窗口请求失败率')
+            return callback(t('detail.MsaDetailBlownStrategy.errorThresholdPercentageErr1'))
           }
           if (value < 0 || value > 100 || value % 1 !== 0) {
-            return callback('请输入0-100之间的整数')
+            return callback(t('detail.MsaDetailBlownStrategy.errorThresholdPercentageErr2'))
           }
           callback()
         },
@@ -138,7 +140,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   sleepWindowInMillisecondsValidate = () => {
-    const { blownStrategy } = this.props
+    const { blownStrategy, t } = this.props
     const { data } = blownStrategy
     const { getFieldDecorator } = this.props.form
     return getFieldDecorator('sleepWindowInMilliseconds', {
@@ -147,10 +149,10 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       rules: [
         { validator: (rule, value, callback) => {
           if (value === '') {
-            return callback('请输入窗口请求失败率')
+            return callback(t('detail.MsaDetailBlownStrategy.sleepWindowInMillisecondsErr1'))
           }
           if (value < 0 || value > 3600000 || value % 1 !== 0) {
-            return callback('请输入0-3,600,000之间的整数')
+            return callback(t('detail.MsaDetailBlownStrategy.sleepWindowInMillisecondsErr2'))
           }
           callback()
         },
@@ -159,11 +161,11 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   delBlownRules = async () => {
-    const { delMsaBlownStrategy, getMsaBlownStrategy, clusterID, serviceName } = this.props
+    const { t, delMsaBlownStrategy, getMsaBlownStrategy, clusterID, serviceName } = this.props
     this.setState({ delLoading: true })
     const result = await delMsaBlownStrategy(clusterID, serviceName)
     if (!result.error) {
-      notification.success({ message: '删除熔断规则成功' })
+      notification.success({ message: t('detail.MsaDetailBlownStrategy.delMsaBlownStrategySucc') })
       this.setState({ delModal: false })
       getMsaBlownStrategy(clusterID, serviceName)
     }
@@ -182,7 +184,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     }
   }
   render() {
-    const { blownStrategy } = this.props
+    const { blownStrategy, t } = this.props
     const { modalShow,
       delModal,
       blownOpen,
@@ -193,7 +195,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       delLoading,
     } = this.state
     const { data } = blownStrategy
-    const title = data && data.hasRule ? '编辑熔断规则' : '设置熔断规则'
+    const title = data && data.hasRule ? t('detail.MsaDetailBlownStrategy.editBlownStrategy') : t('detail.MsaDetailBlownStrategy.setBlownStrategy')
     return <div className="msa-detail-fusing">
       {
         blownOpenLoading ?
@@ -206,44 +208,44 @@ class MsaDetailBlownStrategyComponent extends React.Component {
               blownOpen ?
                 <div className="alert">
                   <TenxIcon type="tips"/>
-                  添加熔断策略，支持设置开启或关闭熔断策略, 若降级和熔断同时开启时，将执行降级策略
+                  {t('detail.MsaDetailBlownStrategy.alert')}
                 </div>
                 :
                 <div className="alert warning">
                   <TenxIcon type="warning"/>
-                  服务未配置熔断功能，暂不支持熔断策略
+                  {t('detail.MsaDetailBlownStrategy.alertWarning')}
                 </div>
             }
             {
               data && data.hasRule ?
                 blownOpen && <div className="strategy-wrapper">
                   <div className="btns">
-                    <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>编辑熔断策略</Button>
-                    <Button type="default" icon="delete" onClick={() => this.setState({ delModal: true })}>删除</Button>
+                    <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>{t('detail.MsaDetailBlownStrategy.edit')}</Button>
+                    <Button type="default" icon="delete" onClick={() => this.setState({ delModal: true })}>{t('detail.MsaDetailBlownStrategy.delete')}</Button>
                   </div>
                   <table>
                     <tbody>
                       <tr>
-                        <td>状态</td>
-                        <td style={{ color: data.hystrixOpen ? '#5cb85c' : '#f85a5a' }}>{data.hystrixOpen ? '已开启' : '已关闭'}</td>
+                        <td>{t('detail.MsaDetailBlownStrategy.status')}</td>
+                        <td style={{ color: data.hystrixOpen ? '#5cb85c' : '#f85a5a' }}>{data.hystrixOpen ? t('detail.MsaDetailBlownStrategy.opened') : t('detail.MsaDetailBlownStrategy.closed')}</td>
                       </tr>
                       <tr>
-                        <td>窗口请求数</td>
-                        <td>{data.requestVolumeThreshold}次</td>
+                        <td>{t('detail.MsaDetailBlownStrategy.requestVolumeThresholdCount')}</td>
+                        <td>{data.requestVolumeThreshold}{t('detail.MsaDetailBlownStrategy.count')}</td>
                       </tr>
                       <tr>
-                        <td>失败率</td>
+                        <td>{t('detail.MsaDetailBlownStrategy.errorThresholdPercentage')}</td>
                         <td>{data.errorThresholdPercentage}%</td>
                       </tr>
                       <tr>
-                        <td>熔断时间窗</td>
+                        <td>{t('detail.MsaDetailBlownStrategy.sleepWindowInMilliseconds')}</td>
                         <td>{data.sleepWindowInMilliseconds}ms</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 :
-                blownOpen && <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>添加熔断策略</Button>
+                blownOpen && <Button type="primary" icon="plus" onClick={() => this.setState({ modalShow: true })}>{t('detail.MsaDetailBlownStrategy.add')}</Button>
             }
 
           </div>
@@ -259,64 +261,64 @@ class MsaDetailBlownStrategyComponent extends React.Component {
           <Form>
             <FormItem
               {...formItemLayout}
-              label="默认开启">
+              label={t('detail.MsaDetailBlownStrategy.defaultOpened')}>
               <Switch
-                checkedChildren="开"
-                unCheckedChildren="关"
+                checkedChildren={t('detail.MsaDetailBlownStrategy.open')}
+                unCheckedChildren={t('detail.MsaDetailBlownStrategy.close')}
                 checked={switchChecked}
                 loading={switchLoading}
                 onChange={this.switchChange}
               />
               <div className="switch-tip">
-                开启后，服务本身的熔断策略生效，直到关闭策略。
+                {t('detail.MsaDetailBlownStrategy.openTip')}
               </div>
             </FormItem>
             <div className="split">
-              <span>触发条件，以下条件均满足时触发</span>
+              <span>{t('detail.MsaDetailBlownStrategy.triggerTip')}</span>
               <a/>
             </div>
             <FormItem
               {...formItemLayout}
-              label={<span>窗口请求数(次)
-                <Tooltip title="窗口收到的请求数">
+              label={<span>{t('detail.MsaDetailBlownStrategy.requestCount')}
+                <Tooltip title={t('detail.MsaDetailBlownStrategy.requestCountTip')}>
                   <Icon style={{ marginLeft: 4 }} type="question-circle" theme="outlined" />
                 </Tooltip>
               </span>}>
               {
-                this.requestVolumeThresholdValidate()(<Input type="text" placeholder="请输入1-10000之间的整数"/>)
+                this.requestVolumeThresholdValidate()(<Input type="text" placeholder={t('detail.MsaDetailBlownStrategy.requestVolumeThresholdErr2')}/>)
               }
             </FormItem>
             <FormItem
               {...formItemLayout}
-              label={<span>失败率 (%)
-                <Tooltip title="窗口请求失败率">
+              label={<span>{t('detail.MsaDetailBlownStrategy.failedPercent')} (%)
+                <Tooltip title={t('detail.MsaDetailBlownStrategy.failedPercentTip')}>
                   <Icon style={{ marginLeft: 4 }} type="question-circle" theme="outlined" />
                 </Tooltip>
               </span>}>
               {
-                this.errorThresholdPercentageValidate()(<Input type="text" placeholder="请输入0-100之间的整数"/>)
+                this.errorThresholdPercentageValidate()(<Input type="text" placeholder={t('detail.MsaDetailBlownStrategy.failedPercentPlaceholder')}/>)
               }
             </FormItem>
             <div className="split second">
-              <span>熔断触发后</span>
+              <span>{t('detail.MsaDetailBlownStrategy.afterBlown')}</span>
               <a/>
             </div>
             <FormItem
               {...formItemLayout}
-              label={<span>熔断时间窗(ms)
-                <Tooltip title="熔断的持续时间（该时间内不再响应请求）">
+              label={<span>{t('detail.MsaDetailBlownStrategy.blownTime')}(ms)
+                <Tooltip title={t('detail.MsaDetailBlownStrategy.blownTimeTip')}>
                   <Icon style={{ marginLeft: 4 }} type="question-circle" theme="outlined" />
                 </Tooltip>
               </span>}>
               {
-                this.sleepWindowInMillisecondsValidate()(<Input type="text" placeholder="请输入0-3,600,000之间的整数"/>)
+                this.sleepWindowInMillisecondsValidate()(<Input type="text" placeholder={t('detail.MsaDetailBlownStrategy.blownTimePlaceholder')}/>)
               }
             </FormItem>
           </Form>
         </div>
       </Modal>
       <Modal
-        title="删除熔断策略"
+        title={t('detail.MsaDetailBlownStrategy.delTitle')}
         visible={delModal}
         confirmLoading={delLoading}
         onOk={this.delBlownRules}
@@ -324,7 +326,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       >
         <div className="msa-detail-blown-rules-del">
           <Icon type="question-circle" theme="outlined" />
-          是否删除该服务的熔断策略？
+          {t('detail.MsaDetailBlownStrategy.delContent')}
         </div>
       </Modal>
     </div>
