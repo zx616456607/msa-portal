@@ -26,20 +26,26 @@ import {
   toQuerystring, formatDate,
 } from '../../../../../common/utils'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+@withNamespaces('MsaList')
 class MsaDetailList extends React.Component {
   state = {
     keyword: '',
   }
 
   removeRegister = record => {
-    const { delInstanceManualRules, clusterID, loadMsaDetail, instances } = this.props
+    const { t, delInstanceManualRules, clusterID, loadMsaDetail, instances } = this.props
     confirm({
-      modalTitle: '移除注册操作',
-      title: `确定将实例 ${record.instanceId} 移除注册吗？`,
-      content: instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
+      modalTitle: t('detail.MsaDetailList.removeRegisterTitle'),
+      title: t('detail.MsaDetailList.removeRegisterContent', {
+        replace: {
+          name: record.instanceId,
+        },
+      }),
+      content: instances.length > 1 ? '' : <div style={{ color: 'red' }}> <Icon type="exclamation-circle-o" /> {t('detail.MsaDetailList.onlyHint')}</div>,
       onOk() {
         return new Promise((resolve, reject) => {
           delInstanceManualRules(clusterID, record.id).then(res => {
@@ -47,7 +53,7 @@ class MsaDetailList extends React.Component {
               return reject()
             }
             notification.success({
-              message: '移除注册成功',
+              message: t('detail.MsaDetailList.removeSucc'),
             })
             resolve()
             loadMsaDetail()
@@ -68,40 +74,40 @@ class MsaDetailList extends React.Component {
   }
 
   render() {
-    const { instances, loadMsaDetail, msaDetail, loading } = this.props
+    const { t, instances, loadMsaDetail, msaDetail, loading } = this.props
     const { keyword } = this.state
     const instancesData = instances.filter(instance => instance.instanceId.indexOf(keyword) > -1)
     const pagination = {
       simple: true,
     }
     const columns = [{
-      title: '微服务实例 ID',
+      title: t('detail.MsaDetailList.instanceId'),
       dataIndex: 'instanceId',
       width: '25%',
     }, {
-      title: '实例状态',
+      title: t('detail.MsaDetailList.status'),
       dataIndex: 'status',
       width: '10%',
     }, {
-      title: '服务地址',
+      title: t('detail.MsaDetailList.addr'),
       dataIndex: 'ip',
       width: '15%',
     }, {
-      title: '服务端口',
+      title: t('detail.MsaDetailList.port'),
       dataIndex: 'port',
       width: '10%',
     }, {
-      title: '注册类型',
+      title: t('detail.MsaDetailList.type'),
       dataIndex: 'type',
       width: '10%',
       render: () => MSA_TYPES_TEXT[msaDetail.type],
     }, {
-      title: '心跳时间',
+      title: t('detail.MsaDetailList.lastHeartbeatAt'),
       dataIndex: 'lastHeartbeatAt',
       width: '15%',
       render: time => formatDate(time),
     }, {
-      title: '操作',
+      title: t('detail.MsaDetailList.opera'),
       width: '15%',
       render: record => {
         return (
@@ -109,7 +115,7 @@ class MsaDetailList extends React.Component {
             {
               msaDetail.type === MSA_TYPE_MAN ?
                 <Button onClick={this.removeRegister.bind(this, record)}>
-              移除注册
+                  {t('detail.MsaDetailList.removeRegister')}
                 </Button>
                 :
                 '-'
@@ -122,22 +128,22 @@ class MsaDetailList extends React.Component {
     return (
       <div className="msa-detail-list">
         <div className="layout-content-btns">
-          <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
+          <Tooltip title={isMsaAutomatic && t('detail.MsaDetailList.autoRegister')}>
             <Button
               type="primary"
               icon="plus"
               onClick={this.addInstances}
               disabled={isMsaAutomatic}
             >
-            添加实例
+              {t('detail.MsaDetailList.add')}
             </Button>
           </Tooltip>
           <Button icon="sync" onClick={loadMsaDetail}>
-          刷新
+            {t('detail.MsaDetailList.reflesh')}
           </Button>
           <Search
             className="msa-detail-list-search"
-            placeholder="按实例 ID 搜索"
+            placeholder={t('detail.MsaDetailList.searchPlaceholder')}
             onSearch={keyword => this.setState({ keyword })}
           />
         </div>

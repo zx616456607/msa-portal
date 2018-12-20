@@ -37,6 +37,7 @@ import {
 import confirm from '../../../components/Modal/confirm'
 import { toQuerystring, formatDate } from '../../../common/utils'
 import './style/msaList.less'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 const DropdownButton = Dropdown.Button
@@ -45,6 +46,7 @@ const TabPane = Tabs.TabPane
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
+@withNamespaces('MsaList')
 class MsaList extends React.Component {
   state = {
     keyword: '',
@@ -66,11 +68,15 @@ class MsaList extends React.Component {
   }
 
   hideService = record => {
-    const { addExpulsionsManualrules, clusterID } = this.props
+    const { addExpulsionsManualrules, clusterID, t } = this.props
     const self = this
     confirm({
       className: 'msa-list-hide',
-      title: `确定将服务${record.appName} 隐藏吗？`,
+      title: t('list.confirmHideService', {
+        replace: {
+          appName: record.appName,
+        },
+      }),
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -85,7 +91,7 @@ class MsaList extends React.Component {
             setTimeout(() => {
               resolve()
               notification.success({
-                message: '已成功将该服务标记为不可被发现，稍后服务会从后台隐藏。',
+                message: t('list.addExpulsionsManualrulesSucc'),
               })
               self.loadMsaList()
             }, 3000)
@@ -96,10 +102,14 @@ class MsaList extends React.Component {
   }
 
   cancelHideService = record => {
-    const { delExpulsionsManualrules, clusterID } = this.props
+    const { delExpulsionsManualrules, clusterID, t } = this.props
     const self = this
     confirm({
-      title: `确定将服务 ${record.appName} 取消隐藏吗？`,
+      title: t('list.confirmShowApp', {
+        replace: {
+          appName: record.appName,
+        },
+      }),
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -111,7 +121,7 @@ class MsaList extends React.Component {
             setTimeout(() => {
               resolve()
               notification.success({
-                message: '已成功将该服务标记为可被发现，稍后服务会从后台取消隐藏',
+                message: t('list.delExpulsionsManualrulesSucc'),
               })
               self.loadMsaList()
             }, 3000)
@@ -122,12 +132,16 @@ class MsaList extends React.Component {
   }
 
   removeRegister = record => {
-    const { delManualrules, clusterID } = this.props
+    const { delManualrules, clusterID, t } = this.props
     const ruleIds = record.id
     const self = this
     confirm({
-      modalTitle: '移除注册操作',
-      title: `确定将服务 ${record.appName} 移除注册吗？`,
+      modalTitle: t('list.removeRegisterTitle'),
+      title: t('list.confirmRemoveRegister', {
+        replace: {
+          appName: record.appName,
+        },
+      }),
       className: 'removeRegisterConfirm',
       // content: record.instances.length > 1 ? '' : <div className="hint"> <Icon type="exclamation-circle-o" /> 服务中唯一实例移除后，服务也将移除</div>,
       onOk() {
@@ -138,7 +152,7 @@ class MsaList extends React.Component {
             }
             resolve()
             notification.success({
-              message: '移除注册成功',
+              message: t('list.removeRegisterSucc'),
             })
             self.loadMsaList()
           })
@@ -197,12 +211,12 @@ class MsaList extends React.Component {
     }
   }
   render() {
-    const { msaList, msaListLoading, rpcList, rpcLoading } = this.props
+    const { msaList, msaListLoading, rpcList, rpcLoading, t } = this.props
     const { keyword } = this.state
     const msaData = msaList.filter(msa => msa.appName.indexOf(keyword) > -1)
     const restColumns = [
       {
-        title: '微服务名称',
+        title: t('list.appName'),
         dataIndex: 'appName',
         width: '20%',
         render: (text, record) => {
@@ -210,34 +224,34 @@ class MsaList extends React.Component {
             return <Link to={`/msa-manage/detail/${text}`}>{text}</Link>
           }
           return (
-            <Tooltip title="不可被发现">
+            <Tooltip title={t('list.noFound')}>
               <span>{text}</span>
             </Tooltip>
           )
         },
       }, {
-        title: '服务状态',
+        title: t('list.upSum'),
         dataIndex: 'upSum',
         width: '20%',
         render: (text, record) => `${text}/${record.instances.length}`,
       }, {
-        title: '注册类型',
+        title: t('list.type'),
         dataIndex: 'type',
         width: '20%',
         render: text => MSA_TYPES_TEXT[text],
       }, {
-        title: '状态',
+        title: t('list.discoverable'),
         dataIndex: 'discoverable',
         width: '20%',
         render: text =>
           <span>
             <Badge
               status={text ? 'success' : 'default'}
-              text={text ? '可被发现' : '不可被发现'}
+              text={text ? t('list.discover') : t('list.cover')}
             />
           </span>,
       }, {
-        title: '操作',
+        title: t('list.oprea'),
         width: '20%',
         render: record => {
           const isMsaAutomatic = record.type === MSA_TYPE_AUTO
@@ -246,8 +260,8 @@ class MsaList extends React.Component {
           const menu = (
             <Menu onClick={this.handleMenuClick.bind(this, record)} style={{ width: 103 }}>
               <MenuItem key="add" disabled={isMsaAutomatic}>
-                <Tooltip title={isMsaAutomatic && '自动注册的微服务不支持添加实例'}>
-                  添加实例
+                <Tooltip title={isMsaAutomatic && t('list.isMsaAutomatic')}>
+                  {t('list.add')}
                 </Tooltip>
               </MenuItem>
             </Menu>
@@ -260,7 +274,7 @@ class MsaList extends React.Component {
                     overlay={menu}
                     onClick={this.hideService.bind(this, record)}
                   >
-                  隐藏服务
+                    {t('list.hideService')}
                   </DropdownButton>
                 )
               }
@@ -270,7 +284,7 @@ class MsaList extends React.Component {
                     overlay={menu}
                     onClick={this.cancelHideService.bind(this, record)}
                   >
-                  取消隐藏
+                    {t('list.cancelHideService')}
                   </DropdownButton>
                 )
               }
@@ -280,7 +294,7 @@ class MsaList extends React.Component {
                   overlay={menu}
                   onClick={this.removeRegister.bind(this, record)}
                 >
-                移除注册
+                  {t('list.removeRegister')}
                 </DropdownButton>
               }
             </div>
@@ -290,22 +304,22 @@ class MsaList extends React.Component {
     ]
     const rpcColumns = [
       {
-        title: '服务名称',
+        title: t('list.serviceName'),
         dataIndex: 'serviceName',
       }, {
-        title: '服务版本',
+        title: t('list.version'),
         dataIndex: 'version',
       }, {
-        title: '所属应用',
+        title: t('list.side'),
         dataIndex: 'side',
       }, {
-        title: '服务分组',
+        title: t('list.group'),
         dataIndex: 'group',
       }, {
-        title: '服务IP',
+        title: t('list.ip'),
         dataIndex: 'ip',
       }, {
-        title: '注册时间',
+        title: t('list.creationTime'),
         dataIndex: 'creationTime',
         render: time => formatDate(time),
       },
@@ -324,17 +338,21 @@ class MsaList extends React.Component {
     return (
       <QueueAnim className="msa">
         <Tabs type="card" animated onChange={this.toggleTab}>
-          <TabPane tab="REST服务" key="REST">
+          <TabPane tab={t('list.restService')} key="REST">
             <div className="msa-btn-box layout-content-btns" key="btns">
-              <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />注册微服务</Button>
+              <Button type="primary" onClick={this.registerMsa}><Icon type="plus" />{t('list.registerMsa')}</Button>
               {/* <Button icon="poweroff">注销微服务</Button> */}
-              <Button icon="sync" onClick={() => this.loadMsaList()}>刷新</Button>
+              <Button icon="sync" onClick={() => this.loadMsaList()}>{t('list.reflesh')}</Button>
               <Search
                 className="msa-search"
-                placeholder="按微服务名称搜索"
+                placeholder={t('list.searchPlaceholder')}
                 onSearch={keyword => this.setState({ keyword })}
               />
-              <span className="float-right msa-btn-box-total">共计 {msaData.length} 条</span>
+              <span className="float-right msa-btn-box-total">{t('list.total', {
+                replace: {
+                  total: msaData.length,
+                },
+              })}</span>
             </div>
             <div className="layout-content-body" key="body">
               <Card>
@@ -351,22 +369,26 @@ class MsaList extends React.Component {
             </div>
 
           </TabPane>
-          <TabPane tab="RPC服务" key="RPC">
+          <TabPane tab={t('list.rpc')} key="RPC">
             <div className="msa-option">
               <div className="msa-classify">
-                <div className="title">分类 :</div>
+                <div className="title">{t('list.classify')}</div>
                 <RadioGroup onChange={this.classify} defaultValue="providersSet">
-                  <RadioButton value="providersSet">提供者</RadioButton>
-                  <RadioButton value="consumersSet">消费者</RadioButton>
+                  <RadioButton value="providersSet">{t('list.provider')}</RadioButton>
+                  <RadioButton value="consumersSet">{t('list.customer')}</RadioButton>
                 </RadioGroup>
               </div>
-              <span className="float-right msa-btn-box-total">共计 {rpcList[this.state.classify] ? rpcList[this.state.classify].length : 0} 条</span>
+              <span className="float-right msa-btn-box-total">{t('list.total', {
+                replace: {
+                  total: rpcList[this.state.classify] ? rpcList[this.state.classify].length : 0,
+                },
+              })}</span>
             </div>
             <Card>
               <div className="msa-rpc-table-filter">
-                <Button type="primary" onClick={this.rpcReload}>刷新</Button>
+                <Button type="primary" onClick={this.rpcReload}>{t('list.reflesh')}</Button>
                 <Input.Search
-                  placeholder="按服务名称、IP搜索"
+                  placeholder={t('list.searchByName')}
                   onSearch={this.rpcSearch}
                 />
               </div>

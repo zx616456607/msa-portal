@@ -24,12 +24,14 @@ import {
 import Metric from '@tenx-ui/monitorChart'
 import '@tenx-ui/monitorChart/assets/index.css'
 import '../style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const sourceTypeArray = [
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_TRANSMITTED,
   METRICS_NETWORK_RECEIVED, METRICS_DISK_READ, METRICS_DISK_WRITE,
 ]
 
+@withNamespaces('MsaList')
 class Monitor extends React.PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
@@ -38,7 +40,11 @@ class Monitor extends React.PureComponent {
 
   state = {
     currentValue: '1',
-    freshInterval: '1分钟',
+    freshInterval: this.props.t('detail.MsaMonitor.minuteWithCount', {
+      replace: {
+        i: 1,
+      },
+    }),
     loading: true,
     realTimeLoading: {},
     realTimeChecked: {},
