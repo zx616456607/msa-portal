@@ -23,57 +23,17 @@ import {
 import { parse as parseQuerystring } from 'query-string'
 import { DEFAULT_PAGESIZE } from '../../../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
+import { withNamespaces } from 'react-i18next'
 
 const { RangePicker } = DatePicker
 const Option = Select.Option
-
-const EVENT_TYPES = [
-  {
-    type: 'InstanceDown',
-    text: '服务下线',
-  }, {
-    type: 'InstanceUp',
-    text: '服务注册',
-  }, {
-    type: 'InstanceRenewed',
-    text: '服务续约',
-  }, {
-    type: 'EurekaServerStart',
-    text: 'Eureka server 启动',
-  }, {
-    type: 'EurekaREgistryStart',
-    text: '注册中心启动',
-  },
-]
-
-const EVENT_LEVELS = [
-  {
-    level: 'Major',
-    text: '重要',
-  }, {
-    level: 'Minor',
-    text: '轻微',
-  }, {
-    level: 'Normal',
-    text: '正常',
-  }, {
-    level: 'Critical',
-    text: '严重',
-  },
-]
-
-const ROOT_PLACES = [
-  {
-    root: 'discovery:spring-cloud-discovery:8761',
-    text: '注册中心',
-  },
-]
 
 const defaultQuery = {
   page: 1,
   size: 10,
 }
 
+@withNamespaces('springCloudEventManagement')
 class Event extends React.Component {
   state = {
     rangeDate: [],
@@ -83,6 +43,56 @@ class Event extends React.Component {
     this.loadData(null, true)
   }
 
+  eventTypes = () => {
+    const { t } = this.props
+    return [
+      {
+        type: 'InstanceDown',
+        text: t('eventList.offLine'),
+      }, {
+        type: 'InstanceUp',
+        text: t('eventList.instanceUp'),
+      }, {
+        type: 'InstanceRenewed',
+        text: t('eventList.instanceRenewed'),
+      }, {
+        type: 'EurekaServerStart',
+        text: t('eventList.eurekaServerStart'),
+      }, {
+        type: 'EurekaREgistryStart',
+        text: t('eventList.eurekaRegistryStart'),
+      },
+    ]
+  }
+
+  eventLevels = () => {
+    const { t } = this.props
+    return [
+      {
+        level: 'Major',
+        text: t('eventList.major'),
+      }, {
+        level: 'Minor',
+        text: t('eventList.slight'),
+      }, {
+        level: 'Normal',
+        text: t('eventList.normal'),
+      }, {
+        level: 'Critical',
+        text: t('eventList.critical'),
+      },
+    ]
+  }
+
+  rootPlaces = () => {
+    const { t } = this.props
+    return [
+      {
+        root: 'discovery:spring-cloud-discovery:8761',
+        text: t('eventList.eurekaRegistry'),
+      },
+    ]
+  }
   loadData = async (query, isFirst) => {
     query = query || {}
     const { eventLogList, clusterID, history, location } = this.props
@@ -159,37 +169,40 @@ class Event extends React.Component {
   }
 
   renderEventType = text => {
+    const { t } = this.props
     switch (text) {
       case 'InstanceDown':
-        return '服务下线'
+        return t('eventList.offLine')
       case 'InstanceUp':
-        return '服务注册'
+        return t('eventList.instanceUp')
       case 'InstanceRenewed':
-        return '服务续约'
+        return t('eventList.instanceRenewed')
       case 'EurekaServerStart':
-        return 'Eureka server 启动'
+        return t('eventList.eurekaServerStart')
       case 'EurekaRegistryStart':
-        return '注册中心启动'
+        return t('eventList.eurekaRegistryStart')
       default:
-        return '未知'
+        return t('eventList.unknown')
     }
   }
   renderRootPlace = text => {
+    const { t } = this.props
     switch (text) {
       case 'discovery:spring-cloud-discovery:8761':
-        return '注册中心'
+        return t('eventList.eurekaRegistry')
       default:
-        return '未知'
+        return t('eventList.unknown')
     }
   }
 
   renderEventLevel = text => {
+    const { t } = this.props
     let displayName = ''
     let icon
     let classname = ''
     switch (text) {
       case 'Critical':
-        displayName = '严重'
+        displayName = t('eventList.critical')
         icon = (
           <TenxIcon
             type="urgent"
@@ -200,7 +213,7 @@ class Event extends React.Component {
         classname = 'error-status'
         break
       case 'Minor':
-        displayName = '轻微'
+        displayName = t('eventList.slight')
         icon = (
           <TenxIcon
             type="down"
@@ -211,12 +224,12 @@ class Event extends React.Component {
         classname = 'primary-color'
         break
       case 'Major':
-        displayName = '重要'
+        displayName = t('eventList.major')
         icon = <Icon type="warning" />
         classname = 'warning-status'
         break
       case 'Normal':
-        displayName = '正常'
+        displayName = t('eventList.normal')
         icon = <Icon type="info-circle" />
         classname = 'success-status'
         break
@@ -234,29 +247,29 @@ class Event extends React.Component {
   render() {
     const { location, eventList, isFetching, totalElements } = this.props
     const { query } = location
-
+    const { t } = this.props
     const columns = [
       {
-        title: '事件类型',
+        title: t('eventList.eventType'),
         width: '10%',
         dataIndex: 'eventType',
         render: this.renderEventType,
       }, {
-        title: '事件级别',
+        title: t('eventList.eventLevel'),
         width: '10%',
         dataIndex: 'eventLevel',
         render: this.renderEventLevel,
       }, {
-        title: '事件源',
+        title: t('eventList.eventSource'),
         width: '20%',
         dataIndex: 'rootPlace',
         render: this.renderRootPlace,
       }, {
-        title: '服务名称',
+        title: t('eventList.serviceName'),
         width: '15%',
         dataIndex: 'appName',
       }, {
-        title: '服务实例 ID',
+        title: t('eventList.servicePodId'),
         width: '20%',
         dataIndex: 'instanceId',
       }, {
@@ -265,7 +278,7 @@ class Event extends React.Component {
         // dataIndex: 'describe',
         // render: _ => _ || '-',
       }, {
-        title: '产生时间',
+        title: t('eventList.createTime'),
         width: '20%',
         dataIndex: 'eventTime',
         sorter: true,
@@ -281,44 +294,44 @@ class Event extends React.Component {
     }
     return (
       <QueueAnim className="event-page">
-        <div className="alert-row" key="alert-row">事件页面中可查看微服务治理中需要关注的事件。</div>
+        <div className="alert-row" key="alert-row">{t('eventList.tip')}</div>
         <div className="layout-content-btns event-page-btns" key="btns">
           <Select
             style={{ width: 200 }}
-            placeholder="事件类型"
+            placeholder={t('eventList.eventType')}
             onChange={eventType => this.changeQueryType({ eventType })}
             value={this.state.eventType}
             allowClear={true}
           >
-            <Option key="all" value="">所有事件</Option>
+            <Option key="all" value="">{t('eventList.allEvents')}</Option>
             {
-              EVENT_TYPES.map(item => <Option key={item.type}>{item.text}</Option>)
+              this.eventTypes().map(item => <Option key={item.type}>{item.text}</Option>)
             }
           </Select>
           <Select
             style={{ width: 200 }}
-            placeholder="事件级别"
+            placeholder={t('eventList.eventLevel')}
             onChange={eventLevel => this.changeQueryType({ eventLevel })}
             value={this.state.eventLevel}
             allowClear={true}
           >
             {
-              EVENT_LEVELS.map(item => <Option key={item.level}>{item.text}</Option>)
+              this.eventLevels().map(item => <Option key={item.level}>{item.text}</Option>)
             }
           </Select>
           <Select
             style={{ width: 200 }}
-            placeholder="事件源"
+            placeholder={t('eventList.eventSource')}
             onChange={rootPlace => this.changeQueryType({ rootPlace })}
             value={this.state.rootPlace}
             allowClear={true}
           >
             {
-              ROOT_PLACES.map(item => <Option key={item.root}>{item.text}</Option>)
+              this.rootPlaces().map(item => <Option key={item.root}>{item.text}</Option>)
             }
           </Select>
           <Input
-            placeholder="服务名称"
+            placeholder={t('eventList.serviceName')}
             style={{ width: 200 }}
             value={this.state.appName}
             onChange={e => this.changeQueryType({ appName: e.target.value })}
@@ -331,10 +344,12 @@ class Event extends React.Component {
             onChange={this.rangeChange}
             onOk={this.rangeConfirm}
           />
-          <Button type="primary" icon="search" onClick={() => this.loadData()}>搜索</Button>
-          <Button type="primary" icon="reload" onClick={() => this.resetConfig()}>重置</Button>
+          <Button type="primary" icon="search" onClick={() => this.loadData()}>{t('eventList.search')}</Button>
+          <Button type="primary" icon="reload" onClick={() => this.resetConfig()}>{t('eventList.reset')}</Button>
           <div className="page-box">
-            <span className="total">共计 {totalElements} 条</span>
+            <span className="total">{t('eventList.totalCount', {
+              replace: { totalElements },
+            })}</span>
             <Pagination {...pagination}/>
           </div>
         </div>
