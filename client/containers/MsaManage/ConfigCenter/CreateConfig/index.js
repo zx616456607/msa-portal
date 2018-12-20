@@ -20,11 +20,13 @@ import YamlEditor from '../../../../components/Editor/Yaml'
 import { Row, Button, Select, Input, notification, Card, Form } from 'antd'
 import { REPOSITORY_REGEXP } from '../../../../constants'
 import filter from 'lodash/filter'
+import { withNamespaces } from 'react-i18next'
 
 const Option = Select.Option
 const FormItem = Form.Item
 const { TextArea } = Input
 
+@withNamespaces('ConfigCenter')
 class CreateConfig extends React.Component {
   state = {
     yaml: '',
@@ -112,24 +114,24 @@ class CreateConfig extends React.Component {
   handleSaveUpdate = () => {
     const { configGitUrl, branchName, inputValue, textAreaValue, currentYaml,
       yaml } = this.state
-    const { putCenterConfig, clusterID, location } = this.props
+    const { t, putCenterConfig, clusterID, location } = this.props
     const path = parse(location.search).path
     const query = {
       branch_name: encodeURIComponent(branchName),
       file_path: (path ? path + '/' : '') + encodeURIComponent(inputValue === '' ? this.props.location.pathname.split('/')[3] : inputValue),
-      commit_message: encodeURIComponent(textAreaValue === '' ? '添加一个配置' : textAreaValue),
+      commit_message: encodeURIComponent(textAreaValue === '' ? t('createConfig.addAConfig') : textAreaValue),
       project_url: encodeURIComponent(configGitUrl),
     }
     if (!currentYaml) {
       notification.warn({
-        message: '修改配置内容，方可保存更新',
+        message: t('createConfig.yamlMsg'),
       })
       return
     }
     const yamls = currentYaml === '' ? yaml : currentYaml
     if (yaml === '' && currentYaml === '') {
       notification.warn({
-        message: '请填写配置内容',
+        message: t('createConfig.noConfigContent'),
       })
       return
     }
@@ -144,13 +146,13 @@ class CreateConfig extends React.Component {
         })
         if (res.error) {
           notification.error({
-            message: '保存失败',
+            message: t('createConfig.putFailed'),
           })
           return
         }
         if (res.response.result.code === 200) {
           notification.success({
-            message: '保存成功',
+            message: t('createConfig.putSucc'),
           })
           this.setState({
             btnVasible: false,
@@ -193,14 +195,14 @@ class CreateConfig extends React.Component {
   }
 
   handleRelease = () => {
-    const { releaseConfigService, clusterID, history } = this.props
+    const { t, releaseConfigService, clusterID, history } = this.props
     this.setState({
       releaseLoading: true,
     })
     releaseConfigService(clusterID).then(res => {
       if (res.error) {
         notification.error({
-          message: '发布失败',
+          message: t('createConfig.releaseFailed'),
         })
         this.setState({
           releaseLoading: false,
@@ -209,7 +211,7 @@ class CreateConfig extends React.Component {
       }
       if (res.type === 'CENTER_RELEASE_SUCCESS') {
         notification.success({
-          message: '发布成功',
+          message: t('createConfig.releaseSucc'),
         })
         history.push('/msa-manage/config-center')
       }
@@ -218,14 +220,14 @@ class CreateConfig extends React.Component {
 
   handleAdd = () => {
     const { currentYaml, branchName, inputValue, textAreaValue, configGitUrl } = this.state
-    const { addCenterConfig, clusterID, history } = this.props
+    const { t, addCenterConfig, clusterID, history } = this.props
     if (this.onCheckName(inputValue)) {
       this.props.form.validateFields(err => {
         if (err) return
         if (currentYaml === '') {
           notification.warn({
-            message: '提交失败',
-            description: '请填写配置内容',
+            message: t('createConfig.submitFailed'),
+            description: t('createConfig.noConfigContent'),
           })
           return
         }
@@ -245,13 +247,13 @@ class CreateConfig extends React.Component {
               addLoading: false,
             })
             notification.error({
-              message: '添加失败',
+              message: t('createConfig.addFailed'),
             })
             return
           }
           if (res.response.result.code === 200) {
             notification.success({
-              message: '添加成功',
+              message: t('createConfig.addSucc'),
             })
             history.push('/msa-manage/config-center?from_add=true' + (path ? '&path=' + path : ''))
           }
@@ -260,23 +262,24 @@ class CreateConfig extends React.Component {
     }
   }
   onCheckName = value => {
+    const { t } = this.props
     notification.destroy()
     if (!value) {
       notification.warn({
-        message: '请输入文件名称',
+        message: t('createConfig.checkNameErr1'),
       })
       return false
     }
     if (value.startsWith('/') || value.endsWith('/')) {
       notification.warn({
-        message: '不能以 \'/\' 开头 和 结尾',
+        message: t('createConfig.checkNameErr2'),
       })
       return false
     }
     const arr = value.split('/')
     if (arr.length > 2) {
       notification.warn({
-        message: '配置名称中最多只能添加一级目录，目前存在多级目录',
+        message: t('createConfig.checkNameErr3'),
       })
       return false
     }
@@ -288,14 +291,14 @@ class CreateConfig extends React.Component {
         const temp = filter(data, { name: arr[i] })[0]
         if (temp) {
           notification.warn({
-            message: (arr.length > 1 ? '目录' : '文件') + '已存在',
+            message: (arr.length > 1 ? t('createConfig.checkNameErr4') : t('createConfig.checkNameErr5')) + t('createConfig.checkNameErr6'),
           })
           return false
         }
       }
       if (!REPOSITORY_REGEXP.test(arr[i])) {
         notification.warn({
-          message: '名称可由 2~50 位字母、数字、中划线下划线和点组成，以字母开头',
+          message: t('createConfig.checkNameErr7'),
         })
         return false
       }
@@ -342,7 +345,7 @@ class CreateConfig extends React.Component {
     const { detail, yaml, branchData, btnVasible, currentYaml,
       branchName, addLoading, editLoading, releaseLoading } = this.state
     // const defaultValue = branchData[0] !== undefined ? branchData[0].name : ''
-    const { location, form } = this.props
+    const { t, location, form } = this.props
     const projectName = location.pathname.split('/')[3]
     const { getFieldDecorator } = form
     const path = parse(location.search).path
@@ -357,7 +360,7 @@ class CreateConfig extends React.Component {
       <QueueAnim className="create">
         <Card className="info" key="body">
           <Row className="connent">
-            <FormItem className="config-name" {...fromLayout} label="名称">
+            <FormItem className="config-name" {...fromLayout} label={t('createConfig.name')}>
               {getFieldDecorator('configName', {
                 initialValue: detail !== 'false' ? projectName : undefined,
                 rules: [
@@ -366,17 +369,17 @@ class CreateConfig extends React.Component {
                 ],
                 validateTrigger: 'onSubmit',
               })(
-                <Input addonBefore={'.../' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder="输入文件名称, 支持输入目录, 如: /example/name" onChange={this.handleInput} />
+                <Input addonBefore={'.../' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder={t('createConfig.namePlaceholder')} onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
           <Row className="connent">
-            <FormItem {...fromLayout} label="配置版本">
+            <FormItem {...fromLayout} label={t('createConfig.configVersion')}>
               {getFieldDecorator('edition', {
                 initialValue: branchName || undefined,
-                rules: [{ required: true, whitespace: true, message: '请选择配置版本' }],
+                rules: [{ required: true, whitespace: true, message: t('createConfig.pleaseEnterVersion') }],
               })(
-                <Select className="selects" placeholder="请选择配置版本" disabled={detail === 'update' || detail === 'true'} onChange={this.handlechage}>
+                <Select className="selects" placeholder={t('createConfig.pleaseEnterVersion')} disabled={detail === 'update' || detail === 'true'} onChange={this.handlechage}>
                   {
                     branchData ?
                       branchData.map((item, index) => (
@@ -388,10 +391,10 @@ class CreateConfig extends React.Component {
             </FormItem>
           </Row>
           <Row className="connent yaml-box">
-            <FormItem {...fromLayout} label="配置内容">
+            <FormItem {...fromLayout} label={t('createConfig.configContent')}>
               {getFieldDecorator('info', {
                 initialValue: currentYaml === '' ? yaml : currentYaml,
-                rules: [{ required: true, whitespace: true, message: '请填写配置内容' }],
+                rules: [{ required: true, whitespace: true, message: t('createConfig.pleaseEnterContent') }],
               })(
                 <YamlEditor options={readOnly} style={{ width: '60%' }} onChange={this.handleYamlEditor} />
               )}
@@ -402,9 +405,9 @@ class CreateConfig extends React.Component {
               <Row className="connents connent">
                 <FormItem {...fromLayout} label="Commit">
                   {getFieldDecorator('configArea', {
-                    rules: [{ required: true, whitespace: true, message: '请填写Commit' }],
+                    rules: [{ required: true, whitespace: true, message: t('createConfig.pleaseEnterCommit') }],
                   })(
-                    <TextArea className="textArea" placeholder="输入Commit" autosize={{ minRows: 1.5, maxRows: 6 }} onChange={this.handleTextArea} />
+                    <TextArea className="textArea" placeholder={t('createConfig.pleaseEnterCommit1')} autosize={{ minRows: 1.5, maxRows: 6 }} onChange={this.handleTextArea} />
                   )}
                 </FormItem>
               </Row>
@@ -416,26 +419,26 @@ class CreateConfig extends React.Component {
               <div>
                 {
                   btnVasible ?
-                    [ <Button key="close" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>,
-                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> ]
+                    [ <Button key="close" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>{t('createConfig.cancelText')}</Button>,
+                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>{t('createConfig.saveText')}</Button> ]
                     :
                     [
-                      <Button key="ok" className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>发布</Button>,
-                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>保存更新</Button> ]
+                      <Button key="ok" className="ok" type="primary" loading={releaseLoading} onClick={this.handleRelease}>{t('createConfig.release')}</Button>,
+                      <Button key="confirm" className="close" type="primary" loading={editLoading} onClick={this.handleSaveUpdate}>{t('createConfig.saveText')}</Button> ]
                 }
               </div>
             }
             {
               detail === 'true' &&
               <div>
-                <Button type="primary" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>确定</Button>
+                <Button type="primary" className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>{t('createConfig.okText')}</Button>
               </div>
             }
             {
               detail === 'false' &&
               <div>
-                <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>取消</Button>
-                <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>确定</Button>
+                <Button className="close" onClick={() => this.props.history.push('/msa-manage/config-center')}>{t('createConfig.cancelText')}</Button>
+                <Button className="ok" type="primary" loading={addLoading} onClick={this.handleAdd}>{t('createConfig.okText')}</Button>
               </div>
             }
           </div>
