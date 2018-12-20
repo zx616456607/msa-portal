@@ -27,7 +27,7 @@
     "ip": "Service IP",
     "creationTime": "Registration time",
     "restService": "REST Service",
-    "registerMsa": "RegisterMsa",
+    "registerMsa": "RegisterMSA",
     "reflesh": "Refresh",
     "searchPlaceholder": "Enter a microservice name",
     "total": "Total  {{total}}  item",
