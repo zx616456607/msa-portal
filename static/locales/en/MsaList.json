@@ -35,7 +35,9 @@
     "provider": "Provider",
     "customer": "Consumer",
     "searchByName": "Enter a microservice name or IP",
-    "rpc": "RPC Service"
+    "rpc": "RPC Service",
+    "manual": "Manual",
+    "automatic": "Auto"
   },
   "register": {
     "portRepeat": "This serviceAddr:port already exists",
