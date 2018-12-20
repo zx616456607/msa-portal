@@ -1,0 +1,26 @@
+{
+  "eventList": {
+    "tip": "事件页面中可查看微服务治理中需要关注的事件。",
+    "eventType": "事件类型",
+    "eventLevel": "事件级别",
+    "eventSource": "事件源",
+    "serviceName": "服务名称",
+    "search": "搜索",
+    "reset": "重置",
+    "totalCount": "共计{{totalElements}}条",
+    "servicePodId": "服务实例 ID",
+    "createTime": "产生时间",
+    "allEvents": "所有事件",
+    "slight": "轻微",
+    "major": "重要",
+    "critical": "严重",
+    "normal": "正常",
+    "offLine": "服务下线",
+    "instanceUp": "服务注册",
+    "instanceRenewed": "服务续约",
+    "eurekaServerStart": "Eureka server 启动",
+    "eurekaRegistryStart": "注册中心启动",
+    "unknown": "未知",
+    "eurekaRegistry": "注册中心"
+  }
+}
