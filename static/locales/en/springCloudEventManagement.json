@@ -1,0 +1,26 @@
+{
+  "eventList": {
+    "tip": "The event querying service allows you to view events that you need to monitor to see how the system is operating.",
+    "eventType": "EventType",
+    "eventLevel": "EventLevel",
+    "eventSource": "EventSource",
+    "serviceName": "ServiceName",
+    "search": "Search",
+    "reset": "Reset",
+    "totalCount": "Total{{totalElements}}item",
+    "servicePodId": "Instance ID",
+    "createTime": "Generated",
+    "allEvents": "All Events",
+    "slight": "Minor",
+    "major": "Major",
+    "critical": "Critical",
+    "normal": "Normal",
+    "offLine": "InstanceCanceled",
+    "instanceUp": "InstanceRegistered",
+    "instanceRenewed": "InstanceRenewed",
+    "eurekaServerStart": "EurekaServerStarted",
+    "eurekaRegistryStart": "EurekaRegistryAvailable",
+    "unknown": "Unknown",
+    "eurekaRegistry": "EurekaRegistry"
+  }
+}
