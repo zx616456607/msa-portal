@@ -90,10 +90,10 @@ export const USER_CURRENT_CONFIG = 'msa_user_current_config'
 export const MY_PORJECT = '我的个人项目'
 export const MSA_TYPE_MAN = 'manual' // 手动注册
 export const MSA_TYPE_AUTO = 'automatic' // 自动注册
-export const MSA_TYPES_TEXT = {
-  [MSA_TYPE_MAN]: '手动注册',
-  [MSA_TYPE_AUTO]: '自动注册',
-}
+// export const MSA_TYPES_TEXT = {
+//   [MSA_TYPE_MAN]: '手动注册',
+//   [MSA_TYPE_AUTO]: '自动注册',
+// }
 // 角色
 export const ROLE_USER = 0
 export const ROLE_PLATFORM_ADMIN = 3 // 平台管理员

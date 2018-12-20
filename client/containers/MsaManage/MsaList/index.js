@@ -32,7 +32,6 @@ import {
 import {
   MSA_TYPE_MAN,
   MSA_TYPE_AUTO,
-  MSA_TYPES_TEXT,
 } from '../../../constants'
 import confirm from '../../../components/Modal/confirm'
 import { toQuerystring, formatDate } from '../../../common/utils'
@@ -238,7 +237,7 @@ class MsaList extends React.Component {
         title: t('list.type'),
         dataIndex: 'type',
         width: '20%',
-        render: text => MSA_TYPES_TEXT[text],
+        render: text => t('list.' + text),
       }, {
         title: t('list.discoverable'),
         dataIndex: 'discoverable',

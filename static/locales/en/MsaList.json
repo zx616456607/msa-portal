@@ -27,7 +27,7 @@
     "ip": "Service IP",
     "creationTime": "Registration time",
     "restService": "REST Service",
-    "registerMsa": "RegisterMsa",
+    "registerMsa": "RegisterMSA",
     "reflesh": "Refresh",
     "searchPlaceholder": "Enter a microservice name",
     "total": "Total  {{total}}  item",
@@ -35,7 +35,9 @@
     "provider": "Provider",
     "customer": "Consumer",
     "searchByName": "Enter a microservice name or IP",
-    "rpc": "RPC Service"
+    "rpc": "RPC Service",
+    "manual": "Manual",
+    "automatic": "Auto"
   },
   "register": {
     "portRepeat": "This serviceAddr:port already exists",

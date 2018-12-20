@@ -20,7 +20,6 @@ import {
 import {
   MSA_TYPE_MAN,
   MSA_TYPE_AUTO,
-  MSA_TYPES_TEXT,
 } from '../../../../../constants'
 import {
   toQuerystring, formatDate,
@@ -100,7 +99,7 @@ class MsaDetailList extends React.Component {
       title: t('detail.MsaDetailList.type'),
       dataIndex: 'type',
       width: '10%',
-      render: () => MSA_TYPES_TEXT[msaDetail.type],
+      render: () => t('list.' + msaDetail.type),
     }, {
       title: t('detail.MsaDetailList.lastHeartbeatAt'),
       dataIndex: 'lastHeartbeatAt',

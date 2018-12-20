@@ -35,7 +35,9 @@
     "provider": "提供者",
     "customer": "消费者",
     "searchByName": "按服务名称、IP搜索",
-    "rpc": "RPC服务"
+    "rpc": "RPC服务",
+    "manual": "手动注册",
+    "automatic": "自动注册"
   },
   "register": {
     "portRepeat": "服务地址:服务端口重复",
