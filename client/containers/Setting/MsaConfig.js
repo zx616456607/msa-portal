@@ -39,8 +39,8 @@ class MsaConfig extends React.Component {
 
   componentDidMount() {
     this.load()
-    const { getGlobalConfigByType, clusterID } = this.props
-    getGlobalConfigByType(clusterID, 'msa')
+    const { getGlobalConfigByType, clusterID, projectNamespace } = this.props
+    getGlobalConfigByType(clusterID, 'msa', projectNamespace)
   }
 
   load = () => {

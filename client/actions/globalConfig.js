@@ -68,8 +68,12 @@ export const GET_MSA_CONFIG_REQUEST = 'GET_MSA_CONFIG_REQUEST'
 export const GET_MSA_CONFIG_SUCCESS = 'GET_MSA_CONFIG_SUCCESS'
 export const GET_MSA_CONFIG_FAILURE = 'GET_MSA_CONFIG_FAILURE'
 
-const fetchGlobalConfigByType = (clusterID, type, callback) => {
+const fetchGlobalConfigByType = (clusterID, type, project, callback) => {
   const endpoint = `/configs/${type}`
+  const headers = {}
+  if (project) {
+    headers.project = project
+  }
   return {
     [CALL_API]: {
       types: [ GET_MSA_CONFIG_REQUEST,
@@ -79,14 +83,15 @@ const fetchGlobalConfigByType = (clusterID, type, callback) => {
       schema: {},
       options: {
         method: 'GET',
+        headers,
       },
     },
     callback,
   }
 }
 
-export const getGlobalConfigByType = (clusterID, type, callback) => {
-  return dispatch => dispatch(fetchGlobalConfigByType(clusterID, type, callback))
+export const getGlobalConfigByType = (clusterID, type, project, callback) => {
+  return dispatch => dispatch(fetchGlobalConfigByType(clusterID, type, project, callback))
 }
 
 // 创建配置
