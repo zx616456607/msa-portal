@@ -16,6 +16,7 @@ import { Modal, Form, Input, Icon, Row, Col, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import * as gatewayActions from '../../../../actions/gateway'
 import { getDeepValue } from '../../../../common/utils';
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 let uidd = 0
@@ -33,7 +34,7 @@ const mapStateToProps = state => {
   getGlobalRuleSetting: gatewayActions.getGlobalRuleSetting,
   updateGlobalRuleSetting: gatewayActions.updateGlobalRuleSetting,
 })
-
+@withNamespaces('springCloudRouteManage')
 class GlobalRuleSetting extends React.Component {
 
   state = {
@@ -71,7 +72,7 @@ class GlobalRuleSetting extends React.Component {
   }
 
   handleConfirm = async () => {
-    const { updateGlobalRuleSetting, clusterID, form, onCancel } = this.props
+    const { updateGlobalRuleSetting, clusterID, form, onCancel, t } = this.props
     const { validateFields } = form
     validateFields(async (errors, values) => {
       if (errors) {
@@ -92,11 +93,11 @@ class GlobalRuleSetting extends React.Component {
       })
       if (res.error) {
         return notification.warn({
-          message: '修改全局路由配置失败',
+          message: t('global.editConfFail'),
         })
       }
       notification.success({
-        message: '修改全局敏感头配置成功',
+        message: t('global.editConfScs'),
       })
       onCancel()
     })
@@ -137,13 +138,13 @@ class GlobalRuleSetting extends React.Component {
       .filter(_key => key !== _key)
       .some(_key => currentHeader === getFieldValue(`header-${_key}`))
     if (isExisted) {
-      return callback('Header 名称重复')
+      return callback(this.props.t('global.headerExist'))
     }
     callback()
   }
 
   renderHeaders = () => {
-    const { form } = this.props
+    const { form, t } = this.props
     const { getFieldValue, getFieldDecorator } = form
     const keys = getFieldValue('keys')
     if (isEmpty(keys)) {
@@ -163,7 +164,7 @@ class GlobalRuleSetting extends React.Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: 'Header 名称不能为空',
+                  message: t('global.headerNotNull'),
                 }, {
                   validator: (rules, value, callback) =>
                     this.checkHeader(rules, value, callback, key),
@@ -184,14 +185,14 @@ class GlobalRuleSetting extends React.Component {
 
   render() {
     const { loading, initialData } = this.state
-    const { visible, onCancel, form } = this.props
+    const { visible, onCancel, form, t } = this.props
     const { getFieldDecorator } = form
     getFieldDecorator('keys', {
       initialValue: initialData.keys,
     })
     return (
       <Modal
-        title={'全局路由配置'}
+        title={t('global.routeConf')}
         visible={visible}
         onCancel={onCancel}
         onOk={this.handleConfirm}
@@ -201,17 +202,17 @@ class GlobalRuleSetting extends React.Component {
         <Form>
           <Row type="flex" style={{ marginBottom: 16 }}>
             <Col span={5}>
-              默认敏感 Header
+              {t('global.defaultSensitiveH')}
             </Col>
             <Col span={19} className="empty-text">
-              全局默认配置，不向下游的服务传递以下敏感 Header，若未添加敏感 Header 代表向下游服务传递所有 Header
+              {t('global.notPassFor')}
             </Col>
           </Row>
           {this.renderHeaders()}
           <Row>
             <Col offset={5} className="primary-color">
               <span onClick={this.addHeader} className="pointer">
-                <Icon type="plus-circle"/> 添加 Header
+                <Icon type="plus-circle"/> {t('global.addHeader')}
               </span>
             </Col>
           </Row>
