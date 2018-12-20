@@ -44,5 +44,6 @@ i18n
       wait: true,
     },
   });
+window._i18n = i18n
 
 export default i18n

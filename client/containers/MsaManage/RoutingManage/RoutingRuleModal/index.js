@@ -14,7 +14,6 @@ import { Input, Modal, Form, Switch, Radio, Select, notification, Tooltip, Icon,
 import { connect } from 'react-redux'
 import {
   APP_NAME_REG,
-  APP_NAME_REG_NOTICE,
   URL_REG,
   ROUTE_REG,
   ASYNC_VALIDATOR_TIMEOUT,
@@ -26,12 +25,14 @@ import {
 } from '../../../../selectors/msa'
 import { getDeepValue, sleep } from '../../../../common/utils'
 import isEmpty from 'lodash/isEmpty';
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 const Option = Select.Option
 let uidd = 0
 
+@withNamespaces('springCloudRouteManage')
 class RoutingRuleModal extends React.Component {
   state = {
     confirmLoading: false,
@@ -116,7 +117,7 @@ class RoutingRuleModal extends React.Component {
   confirmModal = () => {
     const {
       clusterID, form, addGatewayRoute, onCancel, loadRoutesList, currentRoute,
-      updateGatewayRoute, globalRule,
+      updateGatewayRoute, globalRule, t,
     } = this.props
     const { validateFields, getFieldValue } = form
     const validateArray = [
@@ -186,7 +187,7 @@ class RoutingRuleModal extends React.Component {
           if (res.error) {
             let message = res.message
             if (res.error.indexOf('path exist') > -1) {
-              message = '路由路径已存在'
+              message = t('new.pathExist')
             }
             notification.warn({
               message,
@@ -194,7 +195,7 @@ class RoutingRuleModal extends React.Component {
             return
           }
           notification.success({
-            message: '添加路由规则成功',
+            message: t('new.addRuleSuccess'),
           })
           onCancel()
           loadRoutesList()
@@ -208,7 +209,7 @@ class RoutingRuleModal extends React.Component {
         if (res.error) {
           let message = res.message
           if (res.error.indexOf('path exist') > -1) {
-            message = '路由路径已存在'
+            message = t('new.pathExist')
           }
           notification.warn({
             message,
@@ -216,7 +217,7 @@ class RoutingRuleModal extends React.Component {
           return
         }
         notification.success({
-          message: '修改路由规则成功',
+          message: t('new.editRuleScs'),
         })
         onCancel()
         loadRoutesList()
@@ -239,7 +240,7 @@ class RoutingRuleModal extends React.Component {
   } */
 
   routeNameCheck = (rules, value, callback) => {
-    const { checkRouteName, clusterID, currentRoute } = this.props
+    const { checkRouteName, clusterID, currentRoute, t } = this.props
     clearTimeout(this.routeNameTimeout)
     if (currentRoute && (currentRoute.routeId === value)) {
       return callback()
@@ -248,22 +249,24 @@ class RoutingRuleModal extends React.Component {
       return callback()
     }
     if (!APP_NAME_REG.test(value)) {
-      return callback(APP_NAME_REG_NOTICE)
+      return callback(t('constants.APP_NAME_REG_NOTICE', {
+        ns: 'common',
+      }))
     }
     this.routeNameTimeout = setTimeout(() => {
       checkRouteName(clusterID, value).then(res => {
         if (res.response.result.data.has) {
-          callback('路由名称已经存在')
+          callback(t('new.routeNameExist'))
         } else {
           callback()
         }
       }).catch(() => {
-        callback('请求出错')
+        callback(t('new.requestErr'))
       })
     }, ASYNC_VALIDATOR_TIMEOUT)
   }
   routePathCheck = (rules, value, cb) => {
-    const { checkRoutePath, clusterID, currentRoute } = this.props
+    const { checkRoutePath, clusterID, currentRoute, t } = this.props
     clearTimeout(this.routePathTimeout)
     if (currentRoute && (currentRoute.path === value)) {
       return cb()
@@ -272,29 +275,30 @@ class RoutingRuleModal extends React.Component {
       return cb()
     }
     if (!ROUTE_REG.test(value)) {
-      return cb('以/开头，由数字、字母、中划线、下划线组成')
+      return cb(t('new.startWith'))
     }
     if (/^\/[*]+(\/.+)?$/.test(value)) {
-      return cb('一级路由路径不能以*结尾')
+      return cb(t('new.firstRouteNot'))
     }
     this.routePathTimeout = setTimeout(() => {
       checkRoutePath(clusterID, value).then(res => {
         if (res.response.result.data.has) {
-          cb('路由路径已经存在')
+          cb(t('new.routePathExist'))
         } else {
           cb()
         }
       }).catch(() => {
-        cb('请求出错')
+        cb(t('new.requestErr'))
       })
     }, ASYNC_VALIDATOR_TIMEOUT)
   }
   checkServiceAddress = (rules, value, cb) => {
+    const { t } = this.props
     if (!value) {
       return cb()
     }
     if (!URL_REG.test(value)) {
-      return cb('服务地址格式不正确')
+      return cb(t('new.serverPathErr'))
     }
     let hasError = false
     const newValue = value.replace(/https?:\/\/(www.)?/, '')
@@ -315,7 +319,7 @@ class RoutingRuleModal extends React.Component {
       })
     }
     if (hasError) {
-      return cb('服务地址IP或端口格式不正确')
+      return cb(t('new.serverIpErr'))
     }
     cb()
   }
@@ -374,7 +378,7 @@ class RoutingRuleModal extends React.Component {
       .filter(_key => key !== _key)
       .some(_key => currentHeader === getFieldValue(`header-${_key}`))
     if (isExisted) {
-      return callback('Header 名称重复')
+      return callback(this.props.t('new.headerExist'))
     }
     callback()
   }
@@ -457,7 +461,7 @@ class RoutingRuleModal extends React.Component {
 
   render() {
     const { globalData, diyData } = this.state
-    const { form, msaList, visible, onCancel, currentRoute } = this.props
+    const { form, msaList, visible, onCancel, currentRoute, t } = this.props
     const { getFieldDecorator, getFieldValue } = form
     const headerFlag = getFieldValue('headerFlag')
     getFieldDecorator('keys', {
@@ -467,15 +471,15 @@ class RoutingRuleModal extends React.Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 16 },
     }
-    const titleText = currentRoute ? '修改' : '添加'
+    const titleText = currentRoute ? t('table.modify') : t('new.add')
     const renderNotice = (
       <span>
-        路由路径&nbsp;
+        {t('table.path')}&nbsp;
         <Tooltip overlayClassName="routingTooltip" title={(
           <div>
-            <div key="notice-1">精确匹配 (/demo): 路径必须精确匹配/demo</div>
-            <div key="notice-2">单级目录 (/demo/<span>*</span>): 路由路径可匹配单级目录</div>
-            <div key="notice-3">多级目录 (/demo/<span>**</span>): 路由路径可匹配多级目录</div>
+            <div key="notice-1">{t('new.exactMatch1')}</div>
+            <div key="notice-2">{t('new.singlePath')}</div>
+            <div key="notice-3">{t('new.multiPath')}</div>
           </div>
         )}>
           <Icon type="question-circle-o" />
@@ -484,31 +488,33 @@ class RoutingRuleModal extends React.Component {
     )
     return (
       <Modal
-        title={`${titleText}路由规则`}
+        title={t('new.titleRouteRule', {
+          replace: { titleText },
+        })}
         width={560}
         visible={visible}
         onOk={this.confirmModal}
         onCancel={onCancel}
         confirmLoading={this.state.confirmLoading}
       >
-        <FormItem {...formItemLayout} label="路由名称">
+        <FormItem {...formItemLayout} label={t('table.name')}>
           {getFieldDecorator('routeId', {
             rules: [{
               required: true,
               whitespace: true,
-              message: '请输入路由名称',
+              message: t('new.inputName'),
             }, {
               validator: this.routeNameCheck,
             }],
           })(
-            <Input placeholder="请填写路由名称" />
+            <Input placeholder={t('new.inputRouteName')} />
           )}
         </FormItem>
         <FormItem {...formItemLayout} label={renderNotice}>
           {getFieldDecorator('path', {
             rules: [{
               required: true,
-              message: '请填写路由路径地址',
+              message: t('new.inputPath'),
             }, {
               validator: this.routePathCheck,
             }],
@@ -518,7 +524,7 @@ class RoutingRuleModal extends React.Component {
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="目标服务类型"
+          label={t('table.targetType')}
         >
           {getFieldDecorator('msa-url-type', {
             initialValue: 'id',
@@ -527,61 +533,61 @@ class RoutingRuleModal extends React.Component {
             }],
           })(
             <RadioGroup>
-              <Radio value="id">微服务 ID</Radio>
-              <Radio value="url">路由 URL</Radio>
+              <Radio value="id">{t('table.microId')}</Radio>
+              <Radio value="url">{t('table.url')}</Radio>
             </RadioGroup>
           )}
         </FormItem>
         {
           getFieldValue('msa-url-type') === 'id'
-            ? <FormItem {...formItemLayout} label="目标服务地址">
+            ? <FormItem {...formItemLayout} label={t('table.targetUrl')}>
               {getFieldDecorator('serviceId', {
                 rules: [{
                   required: true,
-                  message: '请选择一个微服务',
+                  message: t('new.choseOneMicro'),
                 }],
               })(
-                <Select style={{ width: '100%' }} placeholder="请选择微服务">
+                <Select style={{ width: '100%' }} placeholder={t('new.choseMicro')}>
                   {
                     msaList.map(msa => <Option key={msa.appName}>{msa.appName}</Option>)
                   }
                 </Select>
               )}
             </FormItem>
-            : <FormItem {...formItemLayout} label="目标服务地址">
+            : <FormItem {...formItemLayout} label={t('table.targetUrl')}>
               {getFieldDecorator('url', {
                 rules: [{
                   required: true,
                   whitespace: true,
                   // pattern: IP_REG,
-                  message: '请填写地址',
+                  message: t('new.plsInputPath'),
                 }, {
                   validator: this.checkServiceAddress,
                 }],
               })(
-                <Input placeholder="请填写完整的路由 URL，如：http://192.168.0.1/rule" />
+                <Input placeholder={t('new.iptFullUrl')} />
               )}
             </FormItem>
         }
-        <FormItem {...formItemLayout} label="描述">
+        <FormItem {...formItemLayout} label={t('table.desc')}>
           {getFieldDecorator('description')(
-            <Input.TextArea placeholder="请填写路由规则描述" />
+            <Input.TextArea placeholder={t('new.iptRuleDesc')} />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="去掉路径前缀">
+        <FormItem {...formItemLayout} label={t('table.noPrefix')}>
           {getFieldDecorator('stripPrefix', { valuePropName: 'checked' })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
+            <Switch checkedChildren={t('new.open')} unCheckedChildren={t('new.close')} />
           )}
-          <span className="empty-text">&nbsp;&nbsp;若开启去掉前缀，请求转发时将去掉路由路径中前缀</span>
+          <span className="empty-text">&nbsp;&nbsp;{t('new.ifNoPre')}</span>
         </FormItem>
-        <FormItem {...formItemLayout} label="失败重试机制">
+        <FormItem {...formItemLayout} label={t('new.failRetry')}>
           {getFieldDecorator('retryable', { valuePropName: 'checked' })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
+            <Switch checkedChildren={t('new.open')} unCheckedChildren={t('new.close')} />
           )}
         </FormItem>
-        <FormItem {...formItemLayout} label="默认开启">
+        <FormItem {...formItemLayout} label={t('new.defaultOpen')}>
           {getFieldDecorator('status', { valuePropName: 'checked' })(
-            <Switch checkedChildren="开" unCheckedChildren="关" />
+            <Switch checkedChildren={t('new.open')} unCheckedChildren={t('new.close')} />
           )}
         </FormItem>
         {/* <FormItem {...formItemLayout} label="路由策略">
@@ -601,9 +607,9 @@ class RoutingRuleModal extends React.Component {
         </FormItem> */}
         <Row>
           <Col span={6} style={{ textAlign: 'right' }}>
-            敏感 Header：
+            {t('table.sensitive')}：
           </Col>
-          <Col span={16} className="empty-text">不向下游的服务传递以下敏感 Header，若未添加敏 感 Header 代表向下游服务传递所有 Header</Col>
+          <Col span={16} className="empty-text">{t('new.noSensitiveToDown')}</Col>
         </Row>
         <FormItem
           wrapperCol={{
@@ -617,8 +623,8 @@ class RoutingRuleModal extends React.Component {
             onChange: this.changeHeaderType,
           })(
             <RadioGroup>
-              <Radio value="global">全局默认敏感 Header</Radio>
-              <Radio value="custom">自定义服务敏感 Header</Radio>
+              <Radio value="global">{t('new.globalDefaultSensitive')}</Radio>
+              <Radio value="custom">{t('new.customSensitive')}</Radio>
             </RadioGroup>
           )}
         </FormItem>
@@ -628,7 +634,7 @@ class RoutingRuleModal extends React.Component {
           <Row>
             <Col offset={6} className="primary-color">
               <span onClick={this.addHeader} className="pointer">
-                <Icon type="plus-circle"/> 添加 Header
+                <Icon type="plus-circle"/> {t('new.add')} Header
               </span>
             </Col>
           </Row>
