@@ -419,7 +419,7 @@ class ConfigCenter extends React.Component {
                 <div className="headers">
                   <Breadcrumb>
                     <Breadcrumb.Item>
-                      <Link to="/msa-manage/config-center">...</Link>
+                      <Link to="/msa-manage/config-center">{branchValue}</Link>
                     </Breadcrumb.Item>
                     {
                       (() => {

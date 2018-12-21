@@ -349,6 +349,7 @@ class CreateConfig extends React.Component {
     const projectName = location.pathname.split('/')[3]
     const { getFieldDecorator } = form
     const path = parse(location.search).path
+    const branch = parse(location.search).branch
     const fromLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 20 },
@@ -369,7 +370,7 @@ class CreateConfig extends React.Component {
                 ],
                 validateTrigger: 'onSubmit',
               })(
-                <Input addonBefore={'.../' + (path || '')} disabled={detail === 'update' || detail === 'true'} placeholder={t('createConfig.namePlaceholder')} onChange={this.handleInput} />
+                <Input addonBefore={(branch || '...') + '/' + (path ? path + '/' : '')} disabled={detail === 'update' || detail === 'true'} placeholder={t('createConfig.namePlaceholder')} onChange={this.handleInput} />
               )}
             </FormItem>
           </Row>
