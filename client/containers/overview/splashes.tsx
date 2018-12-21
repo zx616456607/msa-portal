@@ -38,13 +38,22 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
     //   { weight: 40, height: 500, size: 3},
     //   { weight: 30, height: 1000, size: 5},
     // ]
-    const data = this.props.ZTLDataTime.map((item) => {
+    let data = this.props.ZTLDataTime.map((item) => {
       return {
         weight: formatDate(item.startTime, TIMES_DAY),
         height: item.duration / 1000,
         size: Math.ceil(Math.random() * 6 - 3),
       }
     })
+    if (data.length === 0) {
+      data = [
+        {
+          weight: formatDate(Date.now()  , TIMES_DAY),
+          height: 1000,
+          size: 0,
+        },
+      ]
+    }
     const cols = {
       height: {
         alias: 'Daily fat intake',
@@ -75,7 +84,7 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
           height={160}
           data={data}
           scale={cols}
-          padding={[ 20, 30, 50, 50]}
+          padding={[ 20, 30, 50, 60]}
         // plotBackground={{
         //   stroke: "#ccc",
         //   // 边颜色
@@ -107,7 +116,7 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
             position="weight*height"
             opacity={0.65}
             shape="circle"
-            size={[ 'size', [3, 6] ]}
+            size={[ 'size', [0, 6] ]}
           />
         </Chart>
       </div>

@@ -23,8 +23,8 @@ export const appChildRoutes = [
   {
     path: '/',
     component: LoadableWrapper({
-      path: 'IndexPage', // path 是相对于 src/containers 的一个地址，且不能以 '/' 开头
-      loader: () => import('./containers/IndexPage' /* webpackChunkName: "index-page" */),
+      path: 'overview', // path 是相对于 src/containers 的一个地址，且不能以 '/' 开头
+      loader: () => import('./containers/overview' /* webpackChunkName: "index-page" */),
     }),
     exact: true,
     key: 'index',

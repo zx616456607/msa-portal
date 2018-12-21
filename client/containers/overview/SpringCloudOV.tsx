@@ -18,7 +18,8 @@ import * as MsaAction from '../../actions/msa'
 import * as GateAction  from '../../actions/gateway'
 import * as CCAction from '../../actions/configCenter'
 import * as LTKAction from '../../actions/callLinkTrack'
-import * as ELLAction from '../../actions/eventManage'
+import * as IPAction from '../../actions/indexPage'
+// import * as ELLAction from '../../actions/eventManage'
 import { connect } from 'react-redux'
 import { getDeepValue } from '../../common/utils'
 
@@ -29,7 +30,7 @@ interface SpringCloudOVProps {
   gatewayPagePoliciesList: (clusterID: string) => any;
   getService: (clusterID: string, query: any) => any;
   getZipkinTracesList: (clusterID: string, query: any) => any;
-  eventLogList: (clusterID: string, query: any) => any;
+  getMicroservice: (clusterID: string, query: any) => any;
   getBranchList: (clusterID: string, query: any) => any;
 }
 
@@ -42,6 +43,7 @@ interface SpringCloudOVState {
   PoliciesClose: number
   BlLength: number
   ZTLDataTime: ZTLDataTimeIF[]
+  MSResData: any
 }
 
 interface ZTLDataTimeIF {
@@ -64,23 +66,22 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     PoliciesClose: 0,
     BlLength: 0,
     ZTLDataTime: [] as ZTLDataTimeIF[],
+    MSResData: {},
   }
   async componentDidMount() {
     const query = {
       endTs: new Date().getTime(),
       lookback: 300 * 100,
     }
-    const defaultQuery = {
-      page: 1,
-      size: 0,
-    }
-    const [etMsaListRes, GateWayRes, PPLRes, SvcRes, ZTLRes, ELLREs ] = await Promise.all([
+    const MSstartTime = new Date().getTime() - 7 * 86400000
+    const MSendTime = new Date().getTime()
+    const [etMsaListRes, GateWayRes, PPLRes, SvcRes, ZTLRes, MSRes ] = await Promise.all([
     this.props.getMsaList(this.props.clusterID),
     this.props.getGatewayRoutes(this.props.clusterID),
     this.props.gatewayPagePoliciesList(this.props.clusterID),
     this.props.getService(this.props.clusterID, {}),
     this.props.getZipkinTracesList(this.props.clusterID, query),
-    this.props.eventLogList(this.props.clusterID, defaultQuery),
+    this.props.getMicroservice(this.props.clusterID, { startTime: MSstartTime, endTime: MSendTime }),
     ])
     const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList'])
     const automaticNum = Object.values(msaList)
@@ -110,10 +111,9 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data'])
     const ZTLDataTime = ZTLData.map(({ duration, startTime }) => ({ duration, startTime }))
 
-    // console.log('ELLREs', ELLREs)
-    // const ELLREs = getDeepValue(ELLREs)
+    const MSResData = getDeepValue(MSRes, ['response', 'result', 'data'])
     this.setState({ automaticNum, manualNum, geteWayOpen, geteWayClose, PoliciesOpen,
-      PoliciesClose, BlLength, ZTLDataTime })
+      PoliciesClose, BlLength, ZTLDataTime, MSResData})
   }
   render() {
     return(
@@ -173,10 +173,10 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
         <div className="content-two">
         <Row>
             <Col span={12}>
-              <SplashesChar ZTLDataTime={this.state.ZTLDataTime} />
+              <SplashesChar ZTLDataTime={this.state.ZTLDataTime}/>
             </Col>
             <Col span={12}>
-              <AnnularChar/>
+              <AnnularChar  MSResData={this.state.MSResData}/>
             </Col>
           </Row>
         </div>
@@ -193,5 +193,6 @@ export default connect(mapStateToPros, {
   getBranchList: CCAction.getBranchList,
   getService: CCAction.getService,
   getZipkinTracesList: LTKAction.getZipkinTracesList,
-  eventLogList: ELLAction.eventLogList,
+  // eventLogList: ELLAction.eventLogList,
+  getMicroservice: IPAction.getMicroservice,
 })(SpringCloudOV)

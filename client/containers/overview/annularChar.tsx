@@ -19,7 +19,7 @@ import {
 import { Row, Col } from 'antd'
 
 interface AnnularCharProp {
-
+  MSResData: any
 }
 
 interface AnnularCharState {
@@ -29,24 +29,24 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
   render() {
     const data = [
       {
-        type: '分类一',
-        value: 20,
+        type: '正常',
+        value: 0,
       },
       {
         type: '分类二',
-        value: 18,
+        value: 0,
       },
       {
-        type: '分类三',
-        value: 32,
+        type: '轻微',
+        value: 0,
       },
       {
-        type: '分类四',
-        value: 15,
+        type: '重要',
+        value: this.props.MSResData.majorCount || 0,
       },
       {
-        type: 'Other',
-        value: 15,
+        type: '严重',
+        value: this.props.MSResData.criticalCount || 0,
       },
     ]; // 可以通过调整这个数值控制分割空白处的间距，0-1 之间的数值
 
@@ -90,13 +90,17 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
     return (
       <div className="AnnularCharInner">
         <SliderChart />
-        <div className="centerText">共0个</div>
+        <div className="centerText">{`共${this.props.MSResData.eurekaEventLogCount || 0}个`}</div>
       </div>
     );
   }
 }
 
-export default class AnnularChar extends React.Component<any, any> {
+interface AnnularCharProps {
+  MSResData: any
+}
+
+export default class AnnularChar extends React.Component<AnnularCharProps, any> {
   render() {
     return(
       <div className="AnnularChar">
@@ -104,16 +108,16 @@ export default class AnnularChar extends React.Component<any, any> {
           事件数量
         </div>
         <Row>
-          <Col span={10}>
-            <AnnularCharInner/>
+          <Col span={11}>
+            <AnnularCharInner MSResData={this.props.MSResData}/>
           </Col>
           <Col span={2}/>
-          <Col span={12}>
+          <Col span={11}>
             <div className="messageBox">
-              <div><div className="color1">严重</div><div>0个</div></div>
-              <div><div className="color2">重要</div><div>0个</div></div>
-              <div><div className="color3">轻微</div><div>0个</div></div>
-              <div><div className="color4">正常</div><div>0个</div></div>
+              <div><div className="color1">严重</div><div>{`${this.props.MSResData.criticalCount || 0}个`}</div></div>
+              <div><div className="color2">重要</div><div>{`${this.props.MSResData.majorCount || 0}个`}</div></div>
+              <div><div className="color3">轻微</div><div>0个</div></div> {/* //TODO: 目前还没有 */}
+              <div><div className="color4">正常</div><div>0个</div></div> {/* // TODO: 需要后端加 */}
             </div>
           </Col>
         </Row>
