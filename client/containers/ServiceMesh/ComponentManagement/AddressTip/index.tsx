@@ -56,11 +56,13 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
               content={
                 <CTips
                   addressList={this.state.addressList}
+                  show={this.state.show}
                 />
               }
               trigger="click"
               onVisibleChange={this.showPop}
               arrowPointAtCenter
+              visible={this.state.show}
             // getTooltipContainer=
             // {(triggerNode) => triggerNode}
             >
@@ -177,6 +179,7 @@ interface TipsProps {
   getServiceListServiceMeshStatus:
   (clusterId: string, serviceList: string[], query: any, callback?: any) => any;
   clusterId: string;
+  show: boolean
 }
 interface TipsState {
   addressMessage:
@@ -232,13 +235,13 @@ class Tips extends React.Component<TipsProps, TipsState> {
   render() {
     return (
       <div className="Tips">
-        <input
+        { this.props.show && <input
           id="ServiceMeshTipsRouterAddress"
           style={{ position: 'absolute', opacity: 0 }}
-        />
+        />}
         {this.state.addressMessage === undefined && <Spin />}
         {this.state.addressMessage !== undefined &&
-          (this.state.addressMessage || []).map((config: ConfigI) => <Tip config={config} key={config}/>)
+          (this.state.addressMessage || []).map((config: ConfigI) => <Tip config={config} key={config.name}/>)
         }
       </div>
     )
@@ -266,19 +269,24 @@ export class ServiceAddressTip extends React.Component<ServiceTipprops, ServiceT
       show: !show,
     })
   }
+  onClick = (e) => {
+    e.stopPropagation()
+  }
   render() {
     return (
-      <div className="AddressTip">
+      <div className="AddressTip" onClick={this.onClick}>
         <Popover
           placement="right"
           content={
             <CTips
               addressList={this.props.dataList}
+              show={this.state.show}
             />
           }
           trigger="click"
           onVisibleChange={this.showPop}
           arrowPointAtCenter
+          visible={this.state.show}
         // getTooltipContainer=
         // {(triggerNode) => triggerNode}
         >
