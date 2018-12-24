@@ -1,0 +1,128 @@
+/*
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * ----
+ * ServiceBus.less page
+ *
+ * @author zhangtao
+ * @date Monday December 24th 2018
+ */
+@import "../../../assets/style/core/index.less";
+.ServiceBus {
+  margin-top: @padding-small !important;
+  .ant-card-body {
+    padding: 0 !important;
+  }
+  .title {
+    .info {
+      color: @font-color-2;
+    }
+  }
+  .IStatistics {
+    padding: @padding-medium;
+    border-right: 1px solid @border-color-split;
+    .title {
+      color: black;
+    }
+  }
+  .messageBox {
+    padding: @padding-base 0;
+    border-bottom: 1px solid @border-color-split;
+    .message {
+      display: flex;
+      line-height: 24px;
+      height: 24px;
+      justify-content: space-between;
+      > div {
+        width: 45%;
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+  .alreadySerive {
+    display: flex;
+    > div {
+      padding: @padding-large;
+      flex-grow: 1;
+      text-align: center;
+      > div {
+        line-height: 35px;
+        height: 35px;
+        &:last-child {
+          font-size: 32px;
+        }
+      }
+    }
+    .line {
+      width: 1px;
+      margin: @padding-small 0;
+      padding: 0;
+      flex-grow: 0;
+      background-color: @border-color-split;
+    }
+  }
+  .colorbase {
+    &::before {
+      @size: 10px;
+      contain: '';
+      display: inline-block;
+      width: @size;
+      border: calc(@size / 2);
+    }
+  }
+  .color1 {
+    &:before {
+      @size: 10px;
+      content: '';
+      display: inline-block;
+      width: @size;
+      height: @size;
+      border-radius: calc(@size / 2);
+      margin-right: 8px;
+      background-color: #d5d4da;
+    }
+  }
+  .color2 {
+    &:before {
+      @size: 10px;
+      content: '';
+      display: inline-block;
+      width: @size;
+      height: @size;
+      border-radius: calc(@size / 2);
+      margin-right: 8px;
+      background-color: #2abe84;
+    }
+  }
+  .color3 {
+    &:before {
+      @size: 10px;
+      content: '';
+      display: inline-block;
+      width: @size;
+      height: @size;
+      border-radius: calc(@size / 2);
+      margin-right: 8px;
+      background-color: #ffbf00;
+    }
+  }
+  .color4 {
+    &:before {
+      @size: 10px;
+      content: '';
+      display: inline-block;
+      width: @size;
+      height: @size;
+      border-radius: calc(@size / 2);
+      margin-right: 8px;
+      background-color: #f7565c;
+    }
+  }
+  .lineChart {
+    padding: @padding-medium;
+    .title {
+      margin-bottom: @padding-base;
+    }
+  }
+}
