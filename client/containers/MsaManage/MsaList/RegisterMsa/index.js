@@ -39,9 +39,11 @@ import {
   addInstancesIntoManualrules,
 } from '../../../../actions/msa'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 
+@withNamespaces('MsaList')
 class RegisterMsa extends React.Component {
   state = {
     ping: {},
@@ -70,7 +72,7 @@ class RegisterMsa extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
-    const { form } = this.props
+    const { form, t } = this.props
     const { validateFields } = form
     validateFields((err, values) => {
       if (err) {
@@ -91,7 +93,7 @@ class RegisterMsa extends React.Component {
       })
       if (hasRepeat) {
         notification.warn({
-          message: '服务地址:服务端口重复',
+          message: t('register.portRepeat'),
         })
         return
       }
@@ -107,7 +109,7 @@ class RegisterMsa extends React.Component {
   }
 
   createManualrules = values => {
-    const { form, addManualrules, clusterID, history } = this.props
+    const { form, addManualrules, clusterID, history, t } = this.props
     const { getFieldValue } = form
     const { appName, keys } = values
     const instances = keys.map(k => {
@@ -139,28 +141,28 @@ class RegisterMsa extends React.Component {
         let description = ''
         if (res.status === 500) {
           if (res.error === 'service name cannot be same with other service\'s name') {
-            description = '微服务名称重复'
+            description = t('register.appNameRepeat')
           }
           if (res.error === 'host:port cannot be same with other instances') {
-            description = '服务地址:服务端口重复'
+            description = t('register.portRepeat')
           }
         }
         notification.warn({
-          message: '注册失败',
+          message: t('register.registerFailed'),
           description,
         })
         return
       }
       notification.success({
-        message: '注册成功',
-        description: '手动注册完成，将在数秒内展示在微服务列表',
+        message: t('register.registerSucc'),
+        description: t('register.registerSuccDesc'),
       })
       history.push('/msa-manage')
     })
   }
 
   addInstances = values => {
-    const { form, addInstancesIntoManualrules, clusterID, history } = this.props
+    const { form, addInstancesIntoManualrules, clusterID, history, t } = this.props
     const { getFieldValue } = form
     const { appName, keys } = values
     const { ruleId } = this.state
@@ -188,17 +190,17 @@ class RegisterMsa extends React.Component {
         let description = ''
         if (res.status === 500) {
           if (res.error === 'host:port cannot be same with other instances') {
-            description = '服务地址:服务端口重复'
+            description = t('register.portRepeat')
           }
         }
         notification.warn({
-          message: '添加实例失败',
+          message: t('register.addInstFailed'),
           description,
         })
         return
       }
       notification.success({
-        message: '添加实例成功',
+        message: t('register.addInstSucc'),
       })
       history.push(`/msa-manage/detail/${appName}`)
     })
@@ -260,32 +262,33 @@ class RegisterMsa extends React.Component {
   }
 
   renderHealthCheck = k => {
+    const { t } = this.props
     const { ping } = this.state
     const currentPing = ping[k]
     if (!currentPing) {
-      return <a onClick={this.checkHealth.bind(this, k)}>测试健康状态</a>
+      return <a onClick={this.checkHealth.bind(this, k)}>{t('register.testHealth')}</a>
     }
     if (currentPing.loading) {
-      return <span><Icon type="loading" /> 测试健康状态中...</span>
+      return <span><Icon type="loading" /> {t('register.testHealthing')}</span>
     }
     if (currentPing.health) {
       return (
         <span className="success-status">
-          <Icon type="check-circle" /> 健康，
-          <a onClick={this.checkHealth.bind(this, k)}>点击重新检查</a>
+          <Icon type="check-circle" /> {t('register.healthy')}
+          <a onClick={this.checkHealth.bind(this, k)}>{t('register.reTestHealth')}</a>
         </span>
       )
     }
     return (
       <span className="error-status">
-        <Icon type="close-circle" /> 连接失败，
-        <a onClick={this.checkHealth.bind(this, k)}>点击重试</a>
+        <Icon type="close-circle" /> {t('register.testFalied')}
+        <a onClick={this.checkHealth.bind(this, k)}>{t('register.reTry')}</a>
       </span>
     )
   }
 
   render() {
-    const { form } = this.props
+    const { form, t } = this.props
     const { ping, mode } = this.state
     const { getFieldDecorator, getFieldValue } = form
     const formItemLayout = {
@@ -311,7 +314,7 @@ class RegisterMsa extends React.Component {
               onClick={() => this.remove(k)}
             />
           }
-          <FormItem {...formItemLayout} label="服务地址">
+          <FormItem {...formItemLayout} label={t('register.serverAddr')}>
             {getFieldDecorator(`host-${k}`, {
               rules: [{
                 required: true,
@@ -320,34 +323,34 @@ class RegisterMsa extends React.Component {
                   if (HOSTNAME_REG.test(value) || IP_REG.test(value)) {
                     return cb()
                   }
-                  cb('请填写正确的服务地址')
+                  cb(t('register.pleaseEnterCorrect'))
                 },
               }],
             })(
-              <Input placeholder="请确保 IP 或主机名可被当前集群访问（如 192.168.0.1）" />
+              <Input placeholder={t('register.hostPlaceHolder')} />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label="服务端口">
+          <FormItem {...formItemLayout} label={t('register.port')}>
             {getFieldDecorator(`port-${k}`, {
               rules: [{
                 required: true,
                 whitespace: true,
                 type: 'integer',
                 validator: (rule, value, cb) => {
-                  if (!toString(value)) return cb(new Error('请填写端口'))
-                  if (value < 1 || value > 65535) return cb(new Error('请输入正确的端口号'))
+                  if (value === undefined || !String(value)) return cb(new Error(t('register.pleaseEnterPort')))
+                  if (value < 1 || value > 65535) return cb(new Error(t('register.pleaseEnterCorrectPort')))
                   cb()
                 },
               }],
             })(
-              <InputNumber placeholder="如 8080, 输入范围 0~65535" min={1} max={65535} style={{ width: '30%' }} />
+              <InputNumber placeholder={t('register.portPlaceholder')} min={1} max={65535} style={{ width: '30%' }} />
             )}
           </FormItem>
           <FormItem {...formItemLayoutLast} label={
             <span>
-              健康检查地址
+              {t('register.healthAddr')}
               <Tooltip
-                title="手动注册的服务，通过健康检查地址（该服务本身的健康检查端点）检测服务的状态"
+                title={t('register.healthAddrTooltip')}
               ><Icon type="question-circle-o" className="msa-register-tip"/>
               </Tooltip>
             </span>
@@ -358,13 +361,13 @@ class RegisterMsa extends React.Component {
                 required: true,
                 whitespace: true,
                 pattern: URL_REG,
-                message: '请填写正确的地址',
+                message: t('register.pleaseEnterCorrectAddr'),
               }],
             })(
               <Row gutter={16}>
                 <Col span={19}>
                   <Input
-                    placeholder="该服务健康检查地址或外部主要依赖服务地址，如：http://192.168.1.1:8080/healthcheck.html"
+                    placeholder={t('register.healthPorbePlaceholder')}
                     disabled={ping[k] && ping[k].loading}
                   />
                 </Col>
@@ -383,28 +386,28 @@ class RegisterMsa extends React.Component {
         className="msa-register"
         title={
           isAddMode
-            ? '添加实例'
-            : '注册微服务'
+            ? t('list.add')
+            : t('list.registerMsa')
         }
       >
         <Form onSubmit={this.handleSubmit}>
-          <FormItem {...formItemLayout} label="微服务名称">
+          <FormItem {...formItemLayout} label={t('list.appName')}>
             {getFieldDecorator('appName', {
               rules: [{
                 required: true,
                 whitespace: true,
                 pattern: /^[a-z][a-z0-9\-]{1,48}[a-z0-9]$/,
-                message: '可由 3~50 位字母、数字、中划线组成，以字母开头，字母或者数字结尾【不支持大写】',
+                message: t('register.appNameMessage'),
               }],
             })(
-              <Input placeholder="填写手动注册微服务名称" disabled={isAddMode}/>
+              <Input placeholder={t('register.appNamePlaceHolder')} disabled={isAddMode}/>
             )}
           </FormItem>
-          <div style={{ paddingLeft: '36px' }}>微服务实例信息</div>
+          <div style={{ paddingLeft: '36px' }}>{t('register.appMsg')}</div>
           {formItems}
           <div className="dotted"/>
           <a onClick={this.add} className="msa-register-add">
-            <Icon type="plus-circle-o" />继续添加微服务实例
+            <Icon type="plus-circle-o" />{t('register.addMore')}
           </a>
           <FormItem
             wrapperCol={{
@@ -412,7 +415,7 @@ class RegisterMsa extends React.Component {
             }}
           >
             <Button type="primary" htmlType="submit">
-            提 交
+              {t('register.submit')}
             </Button>
           </FormItem>
         </Form>

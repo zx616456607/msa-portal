@@ -41,7 +41,7 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
   showPop = () => {
     const { show } = this.state
     this.setState({
-      show: !show
+      show: !show,
     })
   }
   render() {
@@ -52,15 +52,17 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
           addressList && addressList.length === 0 ?
             <span>-</span> :
             <Popover
-              placement='right'
+              placement="right"
               content={
                 <CTips
                   addressList={this.state.addressList}
+                  show={this.state.show}
                 />
               }
-              trigger='click'
+              trigger="click"
               onVisibleChange={this.showPop}
-              arrowPointAtCenter={true}
+              arrowPointAtCenter
+              visible={this.state.show}
             // getTooltipContainer=
             // {(triggerNode) => triggerNode}
             >
@@ -73,11 +75,13 @@ export default class AddressTip extends React.Component<Tipprops, Tipstate> {
 }
 
 interface TipProps {
-  config: {
-    name: string;
-    routerAddress?: { address: string, matchType: string, netType: string }[];
-    innerAddress: { containerPort: number, domain: string }[];
-  };
+  config: ConfigI;
+}
+
+interface ConfigI {
+  name: string;
+  routerAddress?: { address: string, matchType: string, netType: string }[];
+  innerAddress: { containerPort: number, domain: string }[];
 }
 interface TipState {
   copyStatus: boolean;
@@ -86,23 +90,23 @@ class Tip extends React.Component<TipProps, TipState> {
   state = {
     copyStatus: false,
   }
-  copyCode = (e) => {
-    let code = document.getElementById('ServiceMeshTipsRouterAddress')
+  copyCode = () => {
+    const code: any = document.getElementById('ServiceMeshTipsRouterAddress')
     code.select();
     document.execCommand('Copy', false);
     this.setState({
-      copyStatus: true
+      copyStatus: true,
     });
   }
   startCopyCode = (address) => {
-    let code = document.getElementById('ServiceMeshTipsRouterAddress')
+    const code: any = document.getElementById('ServiceMeshTipsRouterAddress')
     code.value = address;
   }
   returnDefaultTooltip = () => {
     setTimeout(
       () => this.setState({
-        copyStatus: false
-      }), 500
+        copyStatus: false,
+      }), 500,
     )
   }
   render() {
@@ -112,18 +116,18 @@ class Tip extends React.Component<TipProps, TipState> {
         <div className="primary">{name}</div>
         <Timeline>
           <Timeline.Item
-            dot={<div style={{ height: 5, width: 5, backgroundColor: '#2db7f5', margin: '0 auto' }}>
-            </div>}
-          >
-          </Timeline.Item>
+            dot={
+            <div style={{ height: 5, width: 5, backgroundColor: '#2db7f5', margin: '0 auto' }}/>}
+          />
           {
             innerAddress.map(({ containerPort, domain }) =>
-              <Timeline.Item dot={<div></div>}>
-                <TenxIcon type="branch" className='branchSvg' />
+              <Timeline.Item dot={<div/>} key={`${domain}:${containerPort}`}>
+                <TenxIcon type="branch" className="branchSvg" />
                 <span className="primary">
                   {`容器端口:${containerPort} 集群内:${domain}:${containerPort}`}
                   <Tooltip title={this.state.copyStatus === false ? '点击复制' : '复制成功'} >
-                    <TenxIcon type="copy"
+                    <TenxIcon
+                      type="copy"
                       className="marginCopy"
                       onClick={this.copyCode}
                       onMouseEnter={() => this.startCopyCode(`${domain}:${containerPort}`)}
@@ -131,21 +135,21 @@ class Tip extends React.Component<TipProps, TipState> {
                     />
                   </Tooltip>
                 </span>
-              </Timeline.Item>)
-          }
-          <Timeline.Item dot={<div></div>}>
-            <TenxIcon type="branch" className='branchSvg' />
+              </Timeline.Item>)}
+          <Timeline.Item dot={<div/>}>
+            <TenxIcon type="branch" className="branchSvg" />
             <span className="primary">路由地址</span>
             <div className="primary">
               <div>
                 {
                   routerAddress.length !== 0 ?
                     routerAddress.map(({ address, matchType, netType }) =>
-                      <div className="routerAddress">
+                      <div className="routerAddress" key={address}>
                         {`${netType}:`}
                         {address}
                         <Tooltip title={this.state.copyStatus === false ? '点击复制' : '复制成功'} >
-                          <TenxIcon type="copy"
+                          <TenxIcon
+                            type="copy"
                             className="marginCopy"
                             onClick={this.copyCode}
                             onMouseEnter={() => this.startCopyCode(address)}
@@ -154,7 +158,7 @@ class Tip extends React.Component<TipProps, TipState> {
                         </Tooltip>
                         {
                           matchType === 'prefix' &&
-                          <Tooltip title='匹配前缀'>
+                          <Tooltip title="匹配前缀">
                             <TenxIcon type="match" className="marginCopy" />
                           </Tooltip>
                         }
@@ -164,7 +168,7 @@ class Tip extends React.Component<TipProps, TipState> {
             </div>
           </Timeline.Item>
         </Timeline>
-        <div className="line"></div>
+        <div className="line"/>
       </div>
     )
   }
@@ -175,6 +179,7 @@ interface TipsProps {
   getServiceListServiceMeshStatus:
   (clusterId: string, serviceList: string[], query: any, callback?: any) => any;
   clusterId: string;
+  show: boolean
 }
 interface TipsState {
   addressMessage:
@@ -207,10 +212,10 @@ class Tips extends React.Component<TipsProps, TipsState> {
         const innerAddress = portArray.map(({ containerPort }) => ({ domain, containerPort }))
         const returnMessage = { name, innerAddress }
         // 获取服务网格相关的地址
-        if (!value.accessPoints) {
+        if (!(value as any).accessPoints) {
           return returnMessage
         }
-        const accessPointsAddress = value.accessPoints
+        const accessPointsAddress = (value as any ).accessPoints
           .map(({ hosts, match }) => {
             const Exact = match.uri.MatchType.Exact;
             const Prefix = match.uri.MatchType.Prefix;
@@ -230,12 +235,13 @@ class Tips extends React.Component<TipsProps, TipsState> {
   render() {
     return (
       <div className="Tips">
-        <input id="ServiceMeshTipsRouterAddress"
+        { this.props.show && <input
+          id="ServiceMeshTipsRouterAddress"
           style={{ position: 'absolute', opacity: 0 }}
-        />
+        />}
         {this.state.addressMessage === undefined && <Spin />}
         {this.state.addressMessage !== undefined &&
-          (this.state.addressMessage || []).map((config) => <Tip config={config} />)
+          (this.state.addressMessage || []).map((config: ConfigI) => <Tip config={config} key={config.name}/>)
         }
       </div>
     )
@@ -243,7 +249,7 @@ class Tips extends React.Component<TipsProps, TipsState> {
 }
 
 const CTips = connect(mapStateToProps, {
-  getServiceListServiceMeshStatus: serviceMeshActions.getServiceListServiceMeshStatus
+  getServiceListServiceMeshStatus: serviceMeshActions.getServiceListServiceMeshStatus,
 })(Tips)
 
 interface ServiceTipprops {
@@ -260,22 +266,27 @@ export class ServiceAddressTip extends React.Component<ServiceTipprops, ServiceT
   showPop = () => {
     const { show } = this.state
     this.setState({
-      show: !show
+      show: !show,
     })
+  }
+  onClick = (e) => {
+    e.stopPropagation()
   }
   render() {
     return (
-      <div className="AddressTip">
+      <div className="AddressTip" onClick={this.onClick}>
         <Popover
-          placement='right'
+          placement="right"
           content={
             <CTips
               addressList={this.props.dataList}
+              show={this.state.show}
             />
           }
-          trigger='click'
+          trigger="click"
           onVisibleChange={this.showPop}
-          arrowPointAtCenter={true}
+          arrowPointAtCenter
+          visible={this.state.show}
         // getTooltipContainer=
         // {(triggerNode) => triggerNode}
         >

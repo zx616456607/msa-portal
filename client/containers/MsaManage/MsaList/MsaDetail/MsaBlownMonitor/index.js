@@ -23,8 +23,10 @@ import PoolDemoModal from '../../../../../components/BlownChart/PoolDemo'
 import EmptyBlown from '../../../../../components/BlownChart/EmptyBlown'
 import isEmpty from 'lodash/isEmpty'
 import { sleep } from '../../../../../common/utils'
+import { withNamespaces } from 'react-i18next'
 const { MSA_API } = API_CONFIG
 
+@withNamespaces('MsaList')
 class MsaBlownMonitor extends React.PureComponent {
 
   state = {
@@ -106,7 +108,7 @@ class MsaBlownMonitor extends React.PureComponent {
 
   render() {
     const { visible, wsFetching, poolVisible } = this.state
-    const { blownMonitor } = this.props
+    const { blownMonitor, t } = this.props
     const host = MSA_API.replace('http', 'ws')
     if (wsFetching) {
       return <div className="loading">
@@ -120,17 +122,17 @@ class MsaBlownMonitor extends React.PureComponent {
           onSetup={this.wsOnSetup}
         />
         <span className="primary-color pointer" onClick={this.toggleVisible}>
-          <Icon type="picture" /> 查看示例图
+          <Icon type="picture" /> {t('detail.MsaBlownMonitor.viewPic')}
         </span>
         <div className="layout-content-body blown-monitor-body">
           <div>
-            <span className="first-title">断路器</span>
+            <span className="first-title">{t('detail.MsaBlownMonitor.breaker')}</span>
             <span
               style={{ marginLeft: 20 }}
               className={'primary-color pointer'}
               onClick={this.toggleVisible}
             >
-              <Icon type="picture" /> 查看示例图
+              <Icon type="picture" /> {t('detail.MsaBlownMonitor.viewPic')}
             </span>
           </div>
           {
@@ -145,13 +147,13 @@ class MsaBlownMonitor extends React.PureComponent {
               </div>
           }
           <div>
-            <span className="first-title">线程池</span>
+            <span className="first-title">{t('detail.MsaBlownMonitor.threadPool')}</span>
             <span
               style={{ marginLeft: 20 }}
               className={'primary-color pointer'}
               onClick={this.togglePoolVisible}
             >
-              <Icon type="picture" /> 查看示例图
+              <Icon type="picture" /> {t('detail.MsaBlownMonitor.viewPic')}
             </span>
           </div>
           {

@@ -4,7 +4,7 @@
   ],
   "linterOptions": {
     "exclude": [
-     ".history/**/*",
+      ".history/**/*"
     ]
   }
 }

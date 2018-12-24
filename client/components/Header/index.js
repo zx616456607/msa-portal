@@ -17,66 +17,61 @@ import {
 } from 'antd'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
-// import cloneDeep from 'lodash/cloneDeep'
-// import { getMenuSelectedKeys } from '../../common/utils'
-// import { ROLE_SYS_ADMIN } from '../../constants'
 import { ROLE_USER, ROLE_SYS_ADMIN, ROLE_BASE_ADMIN, ROLE_PLATFORM_ADMIN } from '../../constants'
-// import logo from '../../assets/img/logo.svg'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
+import moment from 'moment'
 
 const LayoutHeader = Layout.Header
-// const MENUS = [
-//   /* {
-//     to: '/',
-//     key: '/',
-//     text: '总览',
-//   }, */
-//   {
-//     to: '/msa-manage',
-//     key: 'msa-manage',
-//     text: '微服务治理',
-//   },
-//   {
-//     to: '/csb-instances',
-//     key: 'csb-instances',
-//     text: '服务总线',
-//     title: 'Cloud Service Bus',
-//   },
-//   {
-//     to: '/apms',
-//     key: 'apms',
-//     text: '性能管理（APM）',
-//   },
-//   {
-//     to: '/msa-om',
-//     key: 'msa-om',
-//     text: '微服务运维',
-//   },
-//   {
-//     to: '/setting',
-//     key: 'setting',
-//     text: '系统设置',
-//   },
-// ]
 
+@withNamespaces('common')
 export default class Header extends React.Component {
+  state = {
+    language: this.props.i18n.language,
+  }
+
+  momentLocale = language => {
+    if (language === 'en') {
+      moment.locale('en', {
+        relativeTime: {
+          future: 'in %s',
+          past: '%s ago',
+          s: '%d s',
+          m: 'a min',
+          mm: '%d min',
+          h: '1 h',
+          hh: '%d h',
+          d: 'a day',
+          dd: '%d days',
+          M: 'a month',
+          MM: '%d months',
+          y: 'a year',
+          yy: '%d years',
+        },
+      })
+      return
+    }
+    moment.locale('zh-cn')
+  }
+
+  componentDidMount() {
+    this.momentLocale(this.state.language)
+  }
+
+  changeLanguage = language => {
+    this.props.i18n.changeLanguage(language)
+    this.setState({ language })
+    this.momentLocale(language)
+    this.props.forceUpdateApp()
+  }
+
   render() {
     const {
-      // location,
-      currentUser,
+      currentUser, t,
     } = this.props
-    // const { pathname } = location
-    // const pathArray = pathname.split('/')
-    // let key = pathArray[1]
-    // if (key) {
-    //   if (key === 'csb-instances-available') {
-    //     key = 'csb-instances'
-    //   }
-    // } else {
-    //   key = '/'
-    // }
 
     const { children, collapsed } = this.props
+    const { language } = this.state
     const containerStyles = classNames({
       'layout-header': true,
       'width-wide': collapsed,
@@ -86,13 +81,13 @@ export default class Header extends React.Component {
     const roleName = role => {
       switch (role) {
         case ROLE_SYS_ADMIN:
-          return '系统管理员'
+          return t('header.sysAdmin')
         case ROLE_PLATFORM_ADMIN:
-          return '平台管理员'
+          return t('header.platformAdmin')
         case ROLE_BASE_ADMIN:
-          return '基础设施管理员'
+          return t('header.baseAdmin')
         case ROLE_USER:
-          return '普通成员'
+          return t('header.commonUser')
         default:
           break
       }
@@ -102,18 +97,24 @@ export default class Header extends React.Component {
         {children}
         {/* <div/>作为占位符, 当children不存在时, 防止name跑到左侧 */}
         <div />
-        <div>
+        <div className="user-panel-trigger userBtn">
+          <div
+            className="language"
+            onClick={() => this.changeLanguage(language === 'zh-CN' ? 'en' : 'zh-CN')}
+          >
+            { language === 'zh-CN' ? 'EN' : '中文' }
+          </div>
           <Dropdown
             overlay={
-              <Menu style={{ top: 55 }}>
+              <Menu>
                 <Menu.Item key="apm-setting">
                   <Link to="/setting/apms">
-                    APM 配置
+                    {t('header.apmConfig')}
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="test2">
                   <Link to="/setting/msa-config">
-                    微服务配置
+                    {t('header.msaConfig')}
                   </Link>
                 </Menu.Item>
               </Menu>
@@ -126,7 +127,8 @@ export default class Header extends React.Component {
               <span className="role">系统管理员</span>
               <Icon type="down" />
             </div> */}
-            <div className="user-panel-trigger userBtn">
+            {/* <div className="user-panel-trigger userBtn"> */}
+            <div className="userObj">
               <div className="userBtnText">
                 <div className="ant-dropdown-link">{currentUser.userName || '...'}</div>
                 <div>
@@ -141,54 +143,9 @@ export default class Header extends React.Component {
                 <Icon type="down" />
               </div>
             </div>
+            {/* </div> */}
           </Dropdown>
         </div>
-        {/*
-        <div className="user">
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key="apm-setting">
-                  <Link to="/setting/apms">
-                  APM 配置
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="test2">
-                  <Link to="/setting/msa-config">
-                  微服务配置
-                  </Link>
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={[ 'click' ]}>
-            <a className="ant-dropdown-link">
-              {currentUser.userName || '...'} <Icon type="down" />
-            </a>
-          </Dropdown>
-        </div>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={getMenuSelectedKeys(location, menus)}
-          className="layout-header-menu"
-          selectedKeys={selectedKeys}
-        >
-          {
-            menus.map(menu => {
-              const { key, to, text, ...otherProps } = menu
-              return (
-                <Menu.Item
-                  key={key}
-                  {...otherProps}
-                >
-                  <Link to={to}>
-                    {text}
-                  </Link>
-                </Menu.Item>
-              )
-            })
-          }
-        </Menu>*/}
       </LayoutHeader>
     )
   }

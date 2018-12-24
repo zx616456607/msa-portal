@@ -22,319 +22,28 @@ import { ROLE_SYS_ADMIN, ROLE_PLATFORM_ADMIN, ROLE_BASE_ADMIN } from '../../cons
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { UNUSED_CLUSTER_ID } from '../../constants'
 import { getDeepValue } from '../../common/utils';
+import { withNamespaces } from 'react-i18next'
 
 const { Sider } = Layout
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup;
-
-const menus = [
-  {
-    to: '/',
-    key: 'overview',
-    name: '微服务总览',
-    icon: 'bar-chart',
-  },
-  {
-    to: '/msa-manage',
-    key: 'msa-manage',
-    name: '治理-SpringCloud',
-    icon: 'api',
-    children: [
-      {
-        key: 'k40',
-        to: '/msa-manage',
-        icon: 'bars',
-        name: '微服务列表',
-      }, {
-        key: 'k41',
-        to: '/msa-manage/config-center',
-        tenxIcon: 'config-center',
-        name: '配置中心',
-      }, {
-        key: 'k42',
-        to: '/msa-manage/call-link-tracking',
-        icon: 'link',
-        name: '服务调用链',
-        children: [
-          {
-            key: 'call-link-tracking',
-            to: '/msa-manage/call-link-tracking',
-            name: '调用链查询',
-          }, {
-            key: 'call-link-tracking-relation',
-            to: '/msa-manage/call-link-tracking-relation',
-            name: '依赖关系',
-          },
-        ],
-      }, {
-        key: 'k43',
-        to: '/msa-manage/routing-manage',
-        tenxIcon: 'routing-manage',
-        name: '路由管理',
-      }, {
-        key: 'k44',
-        to: '/msa-manage/api-gateway',
-        tenxIcon: 'gateway',
-        name: '服务限流',
-      }, {
-        key: 'k45',
-        to: '/msa-manage/blown-monitoring',
-        tenxIcon: 'fusing',
-        name: '熔断监控',
-      }, {
-        key: 'k46',
-        to: '/msa-manage/certification-manage',
-        tenxIcon: 'authentication',
-        name: '认证管理',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'auth-zone',
-            to: '/msa-manage/certification-manage/auth-zone',
-            name: '认证域管理',
-          }, {
-            key: 'k462',
-            to: '/msa-manage/certification-manage/auth-mode',
-            name: '授权方式查看',
-          }, {
-            key: 'k63',
-            to: '/msa-manage/certification-manage/auth-scope',
-            name: '授权范围查看',
-          },
-        ],
-      }, {
-        key: 'event-manage',
-        to: '/msa-manage/event-manage',
-        tenxIcon: 'event-manage',
-        name: '事件管理',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'event',
-            to: '/msa-manage/event-manage/event',
-            name: '事件',
-          },
-        ],
-      }, {
-        key: 'distribute',
-        to: '/msa-manage/distribute',
-        tenxIcon: 'event-manage',
-        name: '分布式事务',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'distribute-list',
-            to: '/msa-manage/distribute/list',
-            name: '事务列表',
-          },
-          {
-            key: 'distribute-record',
-            to: '/msa-manage/distribute/distribute-record',
-            name: '事务执行记录',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'service-mesh',
-    to: '/service-mesh',
-    tenxIcon: 'lift-card',
-    name: '治理-服务网格',
-    children: [
-      {
-        key: 'k1',
-        to: '/service-mesh',
-        tenxIcon: 'topology',
-        name: '微服务拓扑',
-      }, {
-        key: 'k-mesh-gateway',
-        to: '/service-mesh/mesh-gateway',
-        tenxIcon: 'gateway-o',
-        name: '网关',
-      }, {
-        key: 'k2',
-        to: '/service-mesh/component-management',
-        tenxIcon: 'puzzle-o',
-        name: '组件管理',
-      }, {
-        key: 'k3',
-        to: '/service-mesh/routes-management',
-        tenxIcon: 'routing-manage',
-        name: '路由管理',
-      },
-    ],
-  },
-  {
-    key: 'dubbo',
-    to: '/dubbo',
-    tenxIcon: 'dubbo',
-    name: '治理-Dubbo',
-    children: [
-      {
-        key: 'dubbo-list',
-        to: '/dubbo/dubbo-manage',
-        tenxIcon: 'dubbo',
-        name: 'Dubbo 服务列表',
-      },
-    ],
-  },
-  {
-    key: 'k3',
-    to: '/csb-instances',
-    icon: 'fork',
-    name: '服务总线',
-    children: [
-      {
-        key: 'mine-csb-instances',
-        icon: 'user',
-        name: '我的实例',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'k300',
-            to: '/csb-instances/available',
-            name: '可用实例',
-          }, {
-            key: 'k301',
-            to: '/csb-instances/my-application',
-            name: '我的申请',
-          },
-        ],
-      }, {
-        key: 'k31',
-        icon: 'unlock',
-        name: '可申请实例',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'k310',
-            to: '/csb-instances/public',
-            name: '可申请实例',
-          },
-        ],
-      },
-    ],
-  }, {
-    key: 'k2',
-    to: '/apms',
-    icon: 'bar-chart',
-    name: '性能管理（APM）',
-    children: [
-      {
-        key: 'k20',
-        to: '/apms/topology',
-        tenxIcon: 'apm',
-        name: '微服务拓扑',
-      }, {
-        key: 'k21',
-        to: '/apms/performance',
-        tenxIcon: 'statistics',
-        name: '微服务性能',
-      }, {
-        key: 'k22',
-        to: '/apms/call-link-tracking',
-        tenxIcon: 'target',
-        name: '调用链路跟踪',
-      },
-    ],
-  }, {
-    declare: {
-      key: 'projectConfig',
-      spread: <Tooltip title="作为某项目的管理员,有权限配置项目相关"><span>项目管理员</span></Tooltip>, // 说明文字 | react Node 展开时渲染
-      collapsed: <span className="line"></span>, // 关闭时渲染
-    },
-    key: 'msa-om',
-    to: '/msa-om',
-    name: '项目基础安装与运维',
-    icon: 'tool',
-    children: [
-      {
-        key: 'k00',
-        to: '/setting/msa-config',
-        name: '微服务配置',
-        tenxIcon: 'msa',
-      }, {
-        key: 'k01',
-        to: '/setting/apms',
-        name: 'APM 配置',
-        tenxIcon: 'apm',
-      }, {
-        key: 'k02',
-        to: '/msa-om/components',
-        name: '微服务组件',
-        tenxIcon: 'inject',
-      }, {
-        key: 'k03',
-        to: '/msa-om/log',
-        name: '日志查询',
-        icon: 'file-text',
-      },
-    ],
-  }, {
-    declare: {
-      key: 'systemConfig',
-      spread: <Tooltip title="作为系统、平台、基础设施管理员,有权限配置系统相关"><span>系统、平台、基础设施管理员</span></Tooltip>, // 说明文字 | react Node
-      collapsed: <span className="line"></span>,
-    },
-    key: 'k1',
-    to: '/setting',
-    name: '系统设置',
-    icon: 'setting',
-    children: [
-      {
-        key: 'k10',
-        to: '/setting/global-setting',
-        name: '全局配置',
-        icon: 'setting',
-      }, {
-        key: 'k11',
-        to: '/cluster',
-        name: 'CSB 运维',
-        tenxIcon: 'tools',
-        defaultopen: 'true',
-        children: [
-          {
-            key: 'k010',
-            to: '/msa-om/csb-instance-om',
-            name: '实例列表',
-          }, {
-            key: 'k011',
-            to: '/msa-om/csb-instance-approval',
-            name: '实例审批',
-          }, {
-            key: 'k012',
-            to: '/msa-om/csb-cascading-link-rules',
-            name: '级联链路规则',
-          },
-        ],
-      },
-      //  {
-      //   key: 'k11',
-      //   to: '/setting/msa-config',
-      //   name: '微服务配置',
-      //   tenxIcon: 'msa',
-      // }, {
-      //   key: 'k12',
-      //   to: '/setting/apms',
-      //   name: 'APM 配置',
-      //   tenxIcon: 'apm',
-      // },
-    ],
-  },
-]
 const svgIcon = icon => (
   <svg className="itemIcon">
     <use xlinkHref={`#${icon.id}`} />
   </svg>
 )
 @withRouter
+@withNamespaces('common')
 class SiderNav extends React.Component {
-  state = {
-    collapsed: false,
-    openKeys: [],
-    isShowPoint: false,
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      collapsed: false,
+      openKeys: [],
+      isShowPoint: false,
+    }
+    this.menus = []
+  }
   async componentDidMount() {
     this.setState({
       openKeys: this.findSelectedNOpenKeys().openKeys,
@@ -455,7 +164,7 @@ class SiderNav extends React.Component {
     const { pathname } = location
     const pathnameList = pathname.split('/').filter(item => item !== '')
     let defaultOpenKeys = []
-    menus.map(menu => {
+    this.menus.map(menu => {
       let firstPathList = []
       menu.children && menu.to && (firstPathList = menu.to.split('/').filter(i => i !== ''))
       if (pathnameList[0] === firstPathList[0]) defaultOpenKeys.push(menu.key)
@@ -476,7 +185,7 @@ class SiderNav extends React.Component {
       return list
     }
     let s = []
-    menus.map(menu => finderPath(menu, s))
+    this.menus.map(menu => finderPath(menu, s))
     ; (s.length > 0) && (s = [ s[0].key ])
     if (collapsed) {
       defaultOpenKeys = []
@@ -499,12 +208,12 @@ class SiderNav extends React.Component {
     let addIsFirst = false
     let finalKeys = []
     data.map(i => (openKeys.indexOf(i) < 0) && (add = i))
-    add && menus.map(menu => {
+    add && this.menus.map(menu => {
       if (menu.key === add) addIsFirst = true
       return null
     })
     if (addIsFirst) {
-      openKeys.map(k => (!find(menus, [ 'key', k ])) && finalKeys.push(k))
+      openKeys.map(k => (!find(this.menus, [ 'key', k ])) && finalKeys.push(k))
       add && finalKeys.push(add)
     }
     if (!addIsFirst) finalKeys = data
@@ -514,8 +223,323 @@ class SiderNav extends React.Component {
   }
 
   render() {
-    const { collapsed, currentUser, managedProjects } = this.props
-    const finalMenus = menus.filter(({ key }) => {
+    const { collapsed, currentUser, managedProjects, t } = this.props
+    this.menus = [
+      {
+        to: '/',
+        key: 'overview',
+        name: t('sider.overview'), // 微服务总览
+        icon: 'bar-chart',
+      },
+      {
+        key: 'msa-develop',
+        to: '/msa-develop',
+        tenxIcon: 'develop',
+        name: t('sider.msaDevelop'), // 微服务开发
+        children: [
+          {
+            key: 'local-project',
+            to: '/msa-develop/local-project',
+            tenxIcon: 'helmet',
+            name: t('sider.localProject'), // 本地工程
+          },
+        ],
+      },
+      {
+        to: '/msa-manage',
+        key: 'msa-manage',
+        name: t('sider.msaManageSub'), // 治理-SpringCloud
+        icon: 'api',
+        children: [
+          {
+            key: 'k40',
+            to: '/msa-manage',
+            icon: 'bars',
+            name: t('sider.msaManage'), // 治理-微服务列表
+          }, {
+            key: 'k41',
+            to: '/msa-manage/config-center',
+            tenxIcon: 'config-center',
+            name: t('sider.configCenter'), // 配置中心
+          }, {
+            key: 'k42',
+            to: '/msa-manage/call-link-tracking',
+            icon: 'link',
+            name: t('sider.callLinkTrackingSub'), // 服务调用链
+            children: [
+              {
+                key: 'call-link-tracking',
+                to: '/msa-manage/call-link-tracking',
+                name: t('sider.callLinkTracking'), // 调用链查询
+              }, {
+                key: 'call-link-tracking-relation',
+                to: '/msa-manage/call-link-tracking-relation',
+                name: t('sider.callLinkTrackingRelation'), // 依赖关系
+              },
+            ],
+          }, {
+            key: 'k43',
+            to: '/msa-manage/routing-manage',
+            tenxIcon: 'routing-manage',
+            name: t('sider.routingManage'), // 路由管理
+          }, {
+            key: 'k44',
+            to: '/msa-manage/api-gateway',
+            tenxIcon: 'gateway',
+            name: t('sider.apiGateway'), // 服务限流
+          }, {
+            key: 'k45',
+            to: '/msa-manage/blown-monitoring',
+            tenxIcon: 'fusing',
+            name: t('sider.blownMonitoring'), // 熔断监控
+          }, {
+            key: 'k46',
+            to: '/msa-manage/certification-manage',
+            tenxIcon: 'authentication',
+            name: t('sider.certificationManageSub'), // 认证管理
+            defaultopen: 'true',
+            children: [
+              {
+                key: 'auth-zone',
+                to: '/msa-manage/certification-manage/auth-zone',
+                name: t('sider.authZone'), // 认证域管理
+              }, {
+                key: 'k462',
+                to: '/msa-manage/certification-manage/auth-mode',
+                name: t('sider.authMode'), // 授权方式查看
+              }, {
+                key: 'k63',
+                to: '/msa-manage/certification-manage/auth-scope',
+                name: t('sider.authScope'), // 授权范围查看
+              },
+            ],
+          }, {
+            key: 'event-manage',
+            to: '/msa-manage/event-manage',
+            tenxIcon: 'event-manage',
+            name: t('sider.eventManageSub'), // 事件管理
+            defaultopen: 'true',
+            children: [
+              {
+                key: 'event',
+                to: '/msa-manage/event-manage/event',
+                name: t('sider.eventManage'), // 事件
+              },
+            ],
+          },
+        ],
+      },
+      {
+        key: 'service-mesh',
+        to: '/service-mesh',
+        tenxIcon: 'lift-card',
+        name: t('sider.serviceMeshSub'), // 治理-服务网格
+        children: [
+          {
+            key: 'k1',
+            to: '/service-mesh',
+            tenxIcon: 'topology',
+            name: t('sider.serviceMeshTopology'), // 微服务拓扑
+          }, {
+            key: 'k-mesh-gateway',
+            to: '/service-mesh/mesh-gateway',
+            tenxIcon: 'gateway-o',
+            name: t('sider.serviceMeshGateway'), // 网关
+          }, {
+            key: 'k2',
+            to: '/service-mesh/component-management',
+            tenxIcon: 'puzzle-o',
+            name: t('sider.componentManagement'), // 组件管理
+          }, {
+            key: 'k3',
+            to: '/service-mesh/routes-management',
+            tenxIcon: 'routing-manage',
+            name: t('sider.routingManagement'), // 路由管理
+          },
+        ],
+      },
+      {
+        key: 'dubbo',
+        to: '/dubbo',
+        tenxIcon: 'dubbo',
+        name: t('sider.dubboSub'), // 治理-Dubbo
+        children: [
+          {
+            key: 'dubbo-list',
+            to: '/dubbo/dubbo-manage',
+            tenxIcon: 'dubbo',
+            name: t('sider.dubboManage'), // Dubbo 服务列表
+          },
+        ],
+      },
+      {
+        key: 'distribute',
+        to: '/distribute',
+        tenxIcon: 'event-manage',
+        name: t('sider.distributeSub'), // 分布式事务
+        defaultopen: 'true',
+        children: [
+          {
+            key: 'distribute-list',
+            to: '/distribute/list',
+            name: t('sider.distributeList'), // 事务列表
+          },
+          {
+            key: 'distribute-record',
+            to: '/distribute/distribute-record',
+            name: t('sider.distributeRecord'), // 事务执行记录
+          },
+        ],
+      },
+      {
+        key: 'k3',
+        to: '/csb-instances',
+        icon: 'fork',
+        name: t('sider.csbInstancesSub'), // 服务总线
+        children: [
+          {
+            key: 'mine-csb-instances',
+            icon: 'user',
+            name: t('sider.myCsbInstancesSub'), // 我的实例
+            defaultopen: 'true',
+            children: [
+              {
+                key: 'k300',
+                to: '/csb-instances/available',
+                name: t('sider.availableCsbInstances'), // 可用实例
+              }, {
+                key: 'k301',
+                to: '/csb-instances/my-application',
+                name: t('sider.myCsbApplication'), // 我的申请
+              },
+            ],
+          }, {
+            key: 'k31',
+            icon: 'unlock',
+            name: t('sider.applicableCsbInstancesSub'), // 可申请实例
+            defaultopen: 'true',
+            children: [
+              {
+                key: 'k310',
+                to: '/csb-instances/public',
+                name: t('sider.applicableCsbInstancesSub'), // 可申请实例
+              },
+            ],
+          },
+        ],
+      }, {
+        key: 'k2',
+        to: '/apms',
+        icon: 'bar-chart',
+        name: t('sider.apmsSub'), // 性能管理（APM）
+        children: [
+          {
+            key: 'k20',
+            to: '/apms/topology',
+            tenxIcon: 'apm',
+            name: t('sider.apmsTopology'), // 微服务拓扑
+          }, {
+            key: 'k21',
+            to: '/apms/performance',
+            tenxIcon: 'statistics',
+            name: t('sider.apmsPerformance'), // 微服务性能
+          }, {
+            key: 'k22',
+            to: '/apms/call-link-tracking',
+            tenxIcon: 'target',
+            name: t('sider.apmsCallLinkTracking'), // 调用链路跟踪
+          },
+        ],
+      }, {
+        declare: {
+          key: 'projectConfig',
+          spread: <Tooltip title={t('sider.projectAdminTips')}>
+            <span>{t('sider.projectAdmin')}</span>
+          </Tooltip>, // 说明文字 | react Node 展开时渲染
+          collapsed: <span className="line"></span>, // 关闭时渲染
+        },
+        key: 'msa-om',
+        to: '/msa-om',
+        name: t('sider.msaOmSub'), // 项目基础安装与运维
+        icon: 'tool',
+        children: [
+          {
+            key: 'k00',
+            to: '/setting/msa-config',
+            tenxIcon: 'msa',
+            name: t('sider.msaConfig'), // 微服务配置
+          }, {
+            key: 'k01',
+            to: '/setting/apms',
+            tenxIcon: 'apm',
+            name: t('sider.apmsConfig'), // APM 配置
+          }, {
+            key: 'k02',
+            to: '/msa-om/components',
+            tenxIcon: 'inject',
+            name: t('sider.msaOmComponents'), // 微服务组件
+          }, {
+            key: 'k03',
+            to: '/msa-om/log',
+            icon: 'file-text',
+            name: t('sider.msaOmLog'), // 日志查询
+          },
+        ],
+      }, {
+        declare: {
+          key: 'systemConfig',
+          spread: <Tooltip title={t('sider.sysAdminTips')}>
+            <span>{t('sider.sysAdmin')}</span>
+          </Tooltip>, // 说明文字 | react Node
+          collapsed: <span className="line"></span>,
+        },
+        key: 'k1',
+        to: '/setting',
+        name: t('sider.settingSub'), // 系统设置
+        icon: 'setting',
+        children: [
+          {
+            key: 'k10',
+            to: '/setting/global-setting',
+            icon: 'setting',
+            name: t('sider.globalSetting'), // 全局配置
+          }, {
+            key: 'k11',
+            to: '/cluster',
+            name: t('sider.csbOmSub'), // CSB 运维
+            tenxIcon: 'tools',
+            defaultopen: 'true',
+            children: [
+              {
+                key: 'k010',
+                to: '/msa-om/csb-instance-om',
+                name: t('sider.csbInstanceOm'), // 实例列表
+              }, {
+                key: 'k011',
+                to: '/msa-om/csb-instance-approval',
+                name: t('sider.csbInstanceApproval'), // 实例审批
+              }, {
+                key: 'k012',
+                to: '/msa-om/csb-cascading-link-rules',
+                name: t('sider.csbCascadingLinkRules'), // 级联链路规则
+              },
+            ],
+          },
+          //  {
+          //   key: 'k11',
+          //   to: '/setting/msa-config',
+          //   name: '微服务配置',
+          //   tenxIcon: 'msa',
+          // }, {
+          //   key: 'k12',
+          //   to: '/setting/apms',
+          //   name: 'APM 配置',
+          //   tenxIcon: 'apm',
+          // },
+        ],
+      },
+    ]
+    const finalMenus = this.menus.filter(({ key }) => {
       // filter 系统管理员
       if (key === 'k1') {
         return currentUser.role === ROLE_SYS_ADMIN || currentUser.role === ROLE_BASE_ADMIN ||

@@ -4,7 +4,9 @@ import { Icon, Switch, Modal, Spin } from 'antd'
 import { connect } from 'react-redux'
 import { getServiceDemoteStatus, getDemoteStatus, demoteSwitch } from '../../../../../actions/msa'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('MsaList')
 @connect(state => {
   const clusterID = state.current.config.cluster.id
   return { clusterID }
@@ -16,7 +18,7 @@ import './style/index.less'
 class MsaDetailDemote extends React.Component {
   state = {
     modalShow: false,
-    title: '开启降级策略',
+    title: this.props.t('detail.MsaDetailDemote.openTitle'),
     switchChecked: false,
     switchLoading: false,
     demoteEnabled: false,
@@ -55,6 +57,7 @@ class MsaDetailDemote extends React.Component {
     }
   }
   render() {
+    const { t } = this.props
     const { demoteEnabled, loading } = this.state
     return <div className="msa-detail-demote">
       {
@@ -68,25 +71,25 @@ class MsaDetailDemote extends React.Component {
               demoteEnabled ?
                 <div className="alert">
                   <TenxIcon type="tips"/>
-                  开启后，服务本身的降级策略生效，直到关闭策略；若服务本身未设置降级策略，开关不生效, 若降级和熔断同时开启时，将执行降级策略
+                  {t('detail.MsaDetailDemote.openAlert')}
                 </div>
                 :
                 <div className="alert warning">
                   <TenxIcon type="warning"/>
-                  服务未配置降级功能，暂不支持降级操作
+                  {t('detail.MsaDetailDemote.alertWarning')}
                 </div>
 
             }
             {
               demoteEnabled &&
                 <Switch
-                  checkedChildren="开"
-                  unCheckedChildren="关"
+                  checkedChildren={t('detail.MsaDetailDemote.open')}
+                  unCheckedChildren={t('detail.MsaDetailDemote.close')}
                   checked={this.state.switchChecked}
                   onChange={val => {
                     this.setState({
                       modalShow: true,
-                      title: val ? '开启降级策略' : '关闭降级策略',
+                      title: val ? t('detail.MsaDetailDemote.openTitle') : t('detail.MsaDetailDemote.closeTitle'),
                     })
                   }}
                 />
@@ -103,7 +106,7 @@ class MsaDetailDemote extends React.Component {
       >
         <div className="msa-detail-demote-modal">
           <Icon type="question-circle" theme="outlined" />
-          是否确定{this.state.title}
+          {t('detail.MsaDetailDemote.confirmHint')}{this.state.title}
         </div>
       </Modal>
     </div>

@@ -400,8 +400,8 @@ class ConsumerVouchers extends React.Component {
                     if (value.length > 63) {
                       return callback('消费凭证名称长度不能超过 63')
                     }
-                    if (/[\~\`\!\@\#\$\%\^\&\*\(\)\"\=\+\{\}\;\"\'\?\>\<\,\；\、\？\。\，\（\）\《\》]/g.test(value)) {
-                      return callback('特殊符号只能包含“.”、“:”、“-”、“_”')
+                    if (/[\_\~\`\!\@\#\$\%\^\&\*\(\)\"\=\+\{\}\;\"\'\?\>\<\,\；\、\？\。\，\（\）\《\》]/g.test(value)) {
+                      return callback('特殊符号只能包含“.”、“:”、“-”')
                     }
                     callback()
                   },

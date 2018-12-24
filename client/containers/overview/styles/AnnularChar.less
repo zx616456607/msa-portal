@@ -1,0 +1,81 @@
+/*
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2018 TenxCloud. All Rights Reserved.
+ * ----
+ * AnnularChar.less page
+ *
+ * @author zhangtao
+ * @date Tuesday December 18th 2018
+ */
+ @import "../../../assets/style/core/index.less";
+.AnnularChar {
+  // position: relative;
+  padding: @padding-small;
+  .head {
+    line-height: 14px;
+    font-size: 14px;
+    height: 20px;
+    color: #333;
+  }
+  .AnnularCharInner {
+    position: relative;
+    .centerText {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  .messageBox {
+    padding-top: 34px;
+    > div {
+      display: flex;
+      justify-content: space-between;
+      height: 24px;
+    }
+    .color1 {
+      &:before {
+        content: '';
+        display: inline-block;
+        margin-right: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: #f7565c;
+      }
+    }
+    .color2 {
+      &:before {
+        content: '';
+        display: inline-block;
+        margin-right: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: #ffbf00;
+      }
+    }
+    .color3 {
+      &:before {
+        content: '';
+        display: inline-block;
+        margin-right: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: #2abe84;
+      }
+    }
+    .color4 {
+      &:before {
+        content: '';
+        display: inline-block;
+        margin-right: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: #43b3fb;
+      }
+    }
+  }
+}

@@ -35,6 +35,7 @@ const vendors = [
   'react-redux',
   'react-router-dom',
   'react-router-redux',
+  '@hot-loader/react-dom',
   'redux',
   'redux-devtools-extension',
   'redux-thunk',
@@ -62,7 +63,7 @@ module.exports = {
     filename: '[name].js',
     library: '[name]',
   },
-  mode: 'production',
+  mode: 'development',
   entry: {
     lib: vendors,
   },

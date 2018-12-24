@@ -27,23 +27,40 @@
   .user-panel-trigger {
     &.userBtn {
       line-height: initial;
-      .userBtnText {
+      .language {
         float: left;
-        padding: 8px 0;
-        & > div + div {
-          .ant-tag {
-            padding: 0 4px;
-            background-color: #ecf0f4;
-            display: inline-block;
-            transform: scale(0.833);
-            transform-origin: 0% 50%;
+        height: 55px;
+        width: 60px;
+        color: @primary-color;
+        text-align: center;
+        line-height: 55px;
+        // padding: 0 @padding-small;
+        margin-right: @padding-small;
+        border-right: 1px solid @border-color-base;
+        border-left: 1px solid @border-color-base;
+        cursor: pointer;
+        user-select: none;
+      }
+      .userObj {
+        display: inline-block;
+        .userBtnText {
+          float: left;
+          padding: 8px 0;
+          & > div + div {
+            .ant-tag {
+              padding: 0 4px;
+              background-color: #ecf0f4;
+              display: inline-block;
+              transform: scale(0.833);
+              transform-origin: 0% 50%;
+            }
           }
         }
-      }
-      .userBtnIcon {
-        float: right;
-        height: 55px;
-        line-height: 55px;
+        .userBtnIcon {
+          float: right;
+          height: 55px;
+          line-height: 55px;
+        }
       }
     }
   }

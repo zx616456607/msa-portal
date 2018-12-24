@@ -17,100 +17,151 @@ import { Layout,
 } from 'antd'
 // import Sider from '../../components/Sider'
 import Content from '../../components/Content'
-import { Route, Switch } from 'react-router-dom'
-import { msaManageChildRoutes } from '../../RoutesDom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import { renderLoading } from '../../components/utils'
 import { fetchSpingCloud } from '../../actions/msaConfig'
 import spingCloud from '../../assets/img/apm/Sringcloud.png'
-// import configCenterIcon from '../../assets/img/msa-manage/config-center.svg'
-// import routingManageIcon from '../../assets/img/msa-manage/routing-manage.svg'
-// import apiGatewayIcon from '../../assets/img/msa-manage/api-gateway.svg'
-// import apiGatewayMonitoringIcon from '../../assets/img/msa-manage/api-gateway-monitoring.svg'
-// import blownMonitoringIcon from '../../assets/img/msa-manage/blown-monitoring.svg'
-// import certificationManageIcon from '../../assets/img/msa-manage/certification-manage.svg'
+import RegisterMsa from './MsaList/RegisterMsa'
+import MsaList from './MsaList/index'
+import MsaDetail from './MsaList/MsaDetail'
+import MsaConfigCenter from './ConfigCenter/ConfigCenter'
+import CreateConfig from './ConfigCenter/CreateConfig'
+import MsaCallLinkTracking from './CallLinkTracking/index'
+import MsaCallLinkTrackDetail from './CallLinkTracking/CallLinkTrackDetail/index'
+import MsaCallLinkTrackingRelation from './CallLinkTracking/RelationShip/index'
+import MsaRoutingManage from './RoutingManage/index'
+import ApiGateway from './ApiGateway'
+import ApiGatewayMonitoring from './ApiGatewayMonitoring'
+import BlownMonitoring from './BlownMonitoring'
+import CertificationManageAuthZone from './CertificationManage/AuthZone'
+import AuthZoneDetail from './CertificationManage/AuthZone/AuthZoneDetail'
+import CertificationManageAuthMode from './CertificationManage/AuthMode'
+import CertificationManageAuthScope from './CertificationManage/AuthScope'
+import Event from './EventManage/Event/index'
 
-// const menus = [
-//   {
-//     to: '/msa-manage',
-//     text: '微服务列表',
-//     icon: <Icon type="bars" style={{ fontSize: 16 }} />,
-//   },
-//   {
-//     to: '/msa-manage/config-center',
-//     text: '配置中心',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${configCenterIcon.id}`} />
-//       </svg>
-//     ),
-//   },
-//   {
-//     to: '/msa-manage/call-link-tracking',
-//     text: '服务调用链',
-//     icon: <Icon type="link" />,
-//   },
-//   {
-//     to: '/msa-manage/routing-manage',
-//     text: '路由管理',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${routingManageIcon.id}`} />
-//       </svg>
-//     ),
-//   },
-//   {
-//     to: '/msa-manage/api-gateway',
-//     text: '服务限流',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${apiGatewayIcon.id}`} />
-//       </svg>
-//     ),
-//   },
-//   /* {
-//     to: '/msa-manage/api-gateway-monitoring',
-//     text: 'API 网关监控',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${apiGatewayMonitoringIcon.id}`} />
-//       </svg>
-//     ),
-//   }, */
-//   {
-//     to: '/msa-manage/blown-monitoring',
-//     text: '熔断监控',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${blownMonitoringIcon.id}`} />
-//       </svg>
-//     ),
-//   },
-//   {
-//     type: 'SubMenu',
-//     text: '认证管理',
-//     to: '/msa-manage/certification-manage',
-//     icon: (
-//       <svg className="menu-icon">
-//         <use xlinkHref={`#${certificationManageIcon.id}`} />
-//       </svg>
-//     ),
-//     children: [
-//       {
-//         to: '/msa-manage/certification-manage/clients',
-//         text: '客户端管理',
-//         disabled: true,
-//       },
-//       {
-//         to: '/msa-manage/certification-manage/auth-mode',
-//         text: '授权方式查看',
-//       },
-//       {
-//         to: '/msa-manage/certification-manage/auth-scope',
-//         text: '授权范围查看',
-//       },
-//     ],
-//   },
-// ]
+const msaManageChildRoutes = [
+  {
+    path: '/msa-manage',
+    exact: true,
+    component: MsaList,
+    key: 'index',
+  },
+  {
+    path: '/msa-manage/register',
+    exact: true,
+    component: RegisterMsa,
+    key: 'register',
+  },
+  {
+    path: '/msa-manage/detail/:name',
+    exact: true,
+    component: MsaDetail,
+    key: 'msa-detail',
+  },
+  {
+    path: '/msa-manage/config-center',
+    exact: true,
+    component: MsaConfigCenter,
+    key: 'config-center',
+  },
+  {
+    path: '/msa-manage/config-center/config/create',
+    component: CreateConfig,
+    exact: true,
+    key: 'create-config',
+  },
+  {
+    path: '/msa-manage/config-center/:id',
+    component: CreateConfig,
+    exact: true,
+    key: 'config-detail',
+  },
+  {
+    path: '/msa-manage/call-link-tracking',
+    exact: true,
+    component: MsaCallLinkTracking,
+    key: 'call-link-tracking',
+  },
+  {
+    path: '/msa-manage/call-link-tracking/:id',
+    exact: true,
+    component: MsaCallLinkTrackDetail,
+    key: 'call-link-tracking-detail',
+  },
+  {
+    path: '/msa-manage/call-link-tracking-relation',
+    exact: true,
+    key: 'call-link-tracking-relation',
+    component: MsaCallLinkTrackingRelation,
+  },
+  {
+    path: '/msa-manage/routing-manage',
+    exact: true,
+    component: MsaRoutingManage,
+    key: 'routing-manage',
+  },
+  {
+    path: '/msa-manage/api-gateway',
+    exact: true,
+    component: ApiGateway,
+    key: 'api-gateway',
+  },
+  {
+    path: '/msa-manage/api-gateway-monitoring',
+    exact: true,
+    component: ApiGatewayMonitoring,
+    key: 'api-gateway-monitoring',
+  },
+  {
+    path: '/msa-manage/blown-monitoring',
+    exact: true,
+    component: BlownMonitoring,
+    key: 'blown-monitoring',
+  },
+  {
+    path: '/msa-manage/certification-manage',
+    exact: true,
+    render: () => <Redirect to="/msa-manage/certification-manage/auth-zone" component={CertificationManageAuthZone} />,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/certification-manage/auth-zone',
+    exact: true,
+    component: CertificationManageAuthZone,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/certification-manage/auth-zone/:zoneId',
+    exact: true,
+    component: AuthZoneDetail,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/certification-manage/auth-mode',
+    exact: true,
+    component: CertificationManageAuthMode,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/certification-manage/auth-scope',
+    exact: true,
+    component: CertificationManageAuthScope,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/event-manage',
+    exact: true,
+    render: () => <Redirect to="/msa-manage/event-manage/event" component={Event} />,
+    key: 'certification-manage',
+  },
+  {
+    path: '/msa-manage/event-manage/event',
+    exact: true,
+    component: Event,
+    key: 'event-manage',
+  },
+]
+
 class MsaManage extends React.Component {
   state = {
     isDeployed: false,

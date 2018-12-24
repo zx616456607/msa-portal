@@ -9,7 +9,9 @@
  */
 const path = require('path')
 const webpack = require('webpack')
-const tsImportPluginFactory = require('ts-import-plugin')
+// const tsImportPluginFactory = require('ts-import-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+
 const siteConfig = require('../config')
 const { site } = siteConfig
 const env = process.env
@@ -34,30 +36,20 @@ const configBase = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
+        test: /\.(j|t)sx?$/,
         exclude: /node_modules/,
-      },
-      {
-        test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true,
-            getCustomTransformers: () => ({
-              before: [
-                tsImportPluginFactory({
-                  libraryName: 'antd',
-                  libraryDirectory: 'lib',
-                }),
-              ],
-            }),
-            compilerOptions: {
-              module: 'es2015',
+        use: [
+          'react-hot-loader/webpack',
+          {
+            loader: 'babel-loader',
+            options: {
+              // This is a feature of `babel-loader` for webpack (not Babel itself).
+              // It enables caching results in ./node_modules/.cache/babel-loader/
+              // directory for faster rebuilds.
+              cacheDirectory: true,
             },
           },
-        },
-        exclude: /node_modules/,
+        ],
       },
       {
         test: /\.(jpe?g|png|gif|eot|ttf|woff|woff2|svg)$/,
@@ -75,6 +67,7 @@ const configBase = {
         NODE_ENV: JSON.stringify(env.NODE_ENV),
       },
     }),
+    new ForkTsCheckerWebpackPlugin(),
     // new SpriteLoaderPlugin(),
     new webpack.BannerPlugin({
       banner: `Licensed Materials - Property of ${site}\n(C) Copyright 2017~2018 ${site}. All Rights Reserved.\nhttp://${site}`,

@@ -39,8 +39,8 @@ class ApmSetting extends React.Component {
   }
 
   componentDidMount() {
-    const { clusterID, getGlobalConfigByType } = this.props
-    getGlobalConfigByType(clusterID, 'msa')
+    const { clusterID, getGlobalConfigByType, projectNamespace } = this.props
+    getGlobalConfigByType(clusterID, 'msa', projectNamespace)
     this.fetchapmsId()
     this.apmService()
   }

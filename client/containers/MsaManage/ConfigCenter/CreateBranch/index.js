@@ -4,12 +4,14 @@ import { connect } from 'react-redux'
 import { createBranch } from '../../../../actions/configCenter'
 import { Modal, Form, Input, Select } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
+import { withNamespaces } from 'react-i18next'
 
 const fromLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 20 },
 }
 
+@withNamespaces('ConfigCenter')
 class CreateBranch extends React.Component {
   state = {
     btnLoading: false,
@@ -35,7 +37,7 @@ class CreateBranch extends React.Component {
     })
   }
   render() {
-    const { visible, form, branchs, onCancel, current } = this.props
+    const { t, visible, form, branchs, onCancel, current } = this.props
     const { btnLoading } = this.state
     const { getFieldDecorator } = form
     const options = branchs.map(item =>
@@ -43,34 +45,34 @@ class CreateBranch extends React.Component {
     return (
       <Modal
         visible={visible}
-        title="添加分支"
+        title={t('createBranch.title')}
         onOk={this.onOk}
         onCancel={onCancel}
         confirmLoading={btnLoading}
       >
         <Form>
           <Form.Item
-            label="分支名称"
+            label={t('createBranch.branchName')}
             {...fromLayout}
           >
             {
               getFieldDecorator('branch_name', {
                 initialValue: undefined,
-                rules: [{ required: true, message: '请输入分支名称' }],
+                rules: [{ required: true, message: t('createBranch.branchNamePlaceholder') }],
               })(
-                <Input placeholder="请输入分支名称" />
+                <Input placeholder={t('createBranch.branchNamePlaceholder')} />
               )}
           </Form.Item>
           <Form.Item
-            label="基础分支"
+            label={t('createBranch.sourceBranch')}
             {...fromLayout}
           >
             {
               getFieldDecorator('ref_branch', {
                 initialValue: current,
-                rules: [{ required: true, message: '请选择基础分支' }],
+                rules: [{ required: true, message: t('createBranch.sourceBranchPlaceholder') }],
               })(
-                <Select placeholder="请选择基础分支">
+                <Select placeholder={t('createBranch.sourceBranchPlaceholder')}>
                   {options}
                 </Select>
               )}

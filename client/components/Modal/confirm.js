@@ -36,7 +36,6 @@ export default function confirm(config) {
     hideCancelButton,
     ...otherProps
   } = config
-
   iconType = iconType || 'question-circle'
   okType = okType || 'primary'
 
@@ -49,7 +48,7 @@ export default function confirm(config) {
 
   type = type || 'confirm'
 
-  modalTitle = modalTitle || '确定操作'
+  modalTitle = modalTitle || window._i18n.t('confirm.confirmAction')
 
   // 默认为 false，保持旧版默认行为
   maskClosable = maskClosable === undefined ? false : maskClosable
@@ -74,8 +73,8 @@ export default function confirm(config) {
     </div>
   )
 
-  cancelText = cancelText || '取消'
-  okText = okText || '确定'
+  cancelText = cancelText || window._i18n.t('confirm.cancel')
+  okText = okText || window._i18n.t('confirm.confirm')
   const footer = (
     [
       <ActionButton actionFn={onCancel} closeModal={close} key="cancel">

@@ -17,9 +17,13 @@ module.exports = merge(common, {
   devtool: '#cheap-module-eval-source-map',
   mode: 'development',
   entry: [
-    'react-hot-loader/patch',
     './client/entry/index.js',
   ],
+  resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom',
+    },
+  },
   output: {
     path: path.join(__dirname, '../static/public'),
     filename: '[name].js',
@@ -27,29 +31,6 @@ module.exports = merge(common, {
   },
   module: {
     rules: [
-      /* {
-      test: /\.svg$/,
-      use: [
-        {
-          loader: 'svg-sprite-loader',
-          options: {
-            extract: true,
-            esModule: false,
-            runtimeGenerator: require.resolve('./svg_runtime_generator'),
-          },
-        },
-        {
-          loader: 'svgo-loader',
-          options: {
-            plugins: [
-              { removeTitle: true },
-              { removeStyleElement: true },
-              { removeAttrs: { attrs: 'path:fill' } },
-            ],
-          },
-        },
-      ],
-      }, */
       {
         test: /\.css$/,
         use: [
@@ -82,5 +63,6 @@ module.exports = merge(common, {
     }),
     // webpack-hot-client will auto add this plugin
     // new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
   ],
 })

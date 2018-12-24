@@ -26,9 +26,11 @@ import MsaDetailDemote from './MsaDetailDemote'
 import './style/index.less'
 import Monitor from './MsaMonitor'
 import BlownMonitor from './MsaBlownMonitor'
+import { withNamespaces } from 'react-i18next'
 
 const TabPane = Tabs.TabPane
 
+@withNamespaces('MsaList')
 class MsaDetail extends React.Component {
   state = {
     activeKey: 'list',
@@ -51,7 +53,7 @@ class MsaDetail extends React.Component {
 
   render() {
     const { activeKey } = this.state
-    const { name, msaDetail, msaListLoading, clusterID, history } = this.props
+    const { name, msaDetail, msaListLoading, clusterID, history, t } = this.props
     const instances = msaDetail.instances || []
     return (
       <QueueAnim className="msa-detail">
@@ -64,8 +66,8 @@ class MsaDetail extends React.Component {
               {msaDetail.appName}
             </div>
             <div className="msa-detail-header-status">
-              实例状态：
-              <span className="success-status">在线</span>/总数
+              {t('detail.status')}
+              <span className="success-status">{t('detail.online')}</span>/{t('detail.total')}
               （{<span className="success-status">{msaDetail.upSum}</span>}/
               {instances.length}）
             </div>
@@ -76,7 +78,7 @@ class MsaDetail extends React.Component {
             activeKey={activeKey}
             onChange={this.callback}
           >
-            <TabPane tab="实例列表" key="list">
+            <TabPane tab={t('detail.detailList')} key="list">
               <MsaDetailList
                 name={name}
                 msaDetail={msaDetail}
@@ -87,7 +89,7 @@ class MsaDetail extends React.Component {
                 history={history}
               />
             </TabPane>
-            <TabPane tab="环境信息" key="env">
+            <TabPane tab={t('detail.envDetail')} key="env">
               <MsaDetailEnv
                 name={name}
                 instances={instances}
@@ -95,14 +97,14 @@ class MsaDetail extends React.Component {
                 registryType={msaDetail.type}
               />
             </TabPane>
-            <TabPane tab="日志信息" key="log">
+            <TabPane tab={t('detail.log')} key="log">
               <MsaDetailLogs
                 msaDetail={msaDetail}
                 clusterID={clusterID}
                 registryType={msaDetail.type}
               />
             </TabPane>
-            <TabPane tab="监控" key="monitor">
+            <TabPane tab={t('detail.monitor')} key="monitor">
               {
                 activeKey === 'monitor' &&
                 <Monitor
@@ -110,22 +112,22 @@ class MsaDetail extends React.Component {
                 />
               }
             </TabPane>
-            <TabPane tab="配置" key="config">
+            <TabPane tab={t('detail.config')} key="config">
               <MsaDetailConfig
                 name={name}
                 instances={instances}
                 clusterID={clusterID}
               />
             </TabPane>
-            <TabPane tab="熔断监控" key="blown">
+            <TabPane tab={t('detail.blownMonitor')} key="blown">
               <BlownMonitor
                 {...{ name, clusterID }}
               />
             </TabPane>
-            <TabPane tab="熔断" key="fusing">
+            <TabPane tab={t('detail.blown')} key="fusing">
               <MsaDetailBlownStrategy instances={instances} serviceName={name}/>
             </TabPane>
-            <TabPane tab="降级" key="demotion">
+            <TabPane tab={t('detail.demote')} key="demotion">
               <MsaDetailDemote instances={instances} serviceName={name}/>
             </TabPane>
           </Tabs>

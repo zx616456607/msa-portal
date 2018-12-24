@@ -20,6 +20,7 @@ import './style/UpdateConsumerVoucher.less'
 
 const RadioGroup = Radio.Group
 const { TextArea } = Input
+let interval
 
 class UpdateConsumerVoucher extends React.Component {
   static propTypes = {
@@ -34,16 +35,18 @@ class UpdateConsumerVoucher extends React.Component {
     updateSetting: 'delay',
     delayTime: 1,
     hideOld: false,
+    delaySecond: 0,
   }
 
   componentDidMount() {
+    clearInterval(interval)
     setTimeout(() => {
       this.delayTimeInput && this.delayTimeInput.focus()
     }, 200)
-    const timeout = this.renderTimeout()
-    if (typeof timeout === 'number') {
-      this.setState({ delayTime: timeout })
-    }
+    this.renderTimeout()
+    interval = setInterval(() => {
+      this.renderTimeout()
+    }, 1000)
   }
 
   handleOk = () => {
@@ -100,18 +103,25 @@ class UpdateConsumerVoucher extends React.Component {
     const updateTime = new Date(expireAt).getTime()
     const timeDifference = updateTime - nowTime
     if (timeDifference < 0) {
-      return 0
+      clearInterval(interval)
+      return { min: 0, sec: 0 }
     }
-    const min = parseInt(timeDifference / 1000 / 60, 10)
-    return min
+    const min = parseInt(timeDifference / 1000 / 60)
+    const sec = parseInt((timeDifference / 1000) % 60)
+    this.setState({
+      delayTime: min,
+      delaySecond: sec,
+    })
   }
-
+  componentWillUnmount() {
+    clearInterval(interval)
+  }
   render() {
     const { loading, closeModalMethod, record } = this.props
-    const { updateSetting, delayTime, hideOld } = this.state
+    const { updateSetting, delayTime, hideOld, delaySecond } = this.state
     const { expireAt, secret, clientId } = record
     const starStr = this.renderStarStr()
-    const timeout = this.renderTimeout()
+    // const timeout = this.renderTimeout()
     let oldKeys = `ak: ${clientId}\nsk: ${secret}`
     if (hideOld) {
       oldKeys = `ak: ${starStr}\nsk: ${starStr}`
@@ -177,7 +187,7 @@ class UpdateConsumerVoucher extends React.Component {
               <Col span={4}></Col>
               <Col span={20}>
                 <InputNumber
-                  min={1}
+                  min={delayTime === 0 ? delayTime : 1}
                   max={7000}
                   value={delayTime}
                   ref={input => { this.delayTimeInput = input }}
@@ -185,12 +195,15 @@ class UpdateConsumerVoucher extends React.Component {
                   onBlur={this.testDelayTime}
                   disabled={!!expireAt}
                 /> 分
+                <span
+                  style={{ marginLeft: 16 }}
+                > {delaySecond} 秒</span>
               </Col>
             </Row>
           )
         }
         {
-          timeout === 0 && <Row>
+          (delayTime === 0 && delaySecond === 0) && <Row>
             <Col span={4}></Col>
             <Col span={20} className="timeout-style">
               已超时，旧 ak / sk 不生效，完成更新后方可进行下次更新。

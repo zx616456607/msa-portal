@@ -349,9 +349,10 @@ class CreateComponent extends React.Component {
     return service
   }
 
-  tipService = () => {
+  tipService = name => {
     const listAry = this.filterService()
-    return listAry.length ?
+    const { form } = this.props
+    return listAry.length && listAry.indexOf(form.getFieldValue(name)) > -1 ?
       <Tooltip placement="top"
         title={`组件中的${listAry}服务已经不存在，请编辑移除该服务`}>
         <Icon type="exclamation-circle" className="ico" />
@@ -383,7 +384,7 @@ class CreateComponent extends React.Component {
                 <Select
                   placeholder="请选择服务"
                   style={{ width: '100%' }}
-                  disabled={this.state[`service${key}`]}>
+                  disabled={false && this.state[`service${key}`]}>
                   {
                     serviceList && Object.keys(serviceList).map((item, index) => {
                       if (serviceList[item].istioEnabled === true) {
@@ -473,18 +474,23 @@ class CreateComponent extends React.Component {
                     )}
                   </FormItem>
                 </Row>
-                <div className="dotted"><span>关联服务</span></div>
+                <div className="dotted">
+                  <div className="lineService">
+                    <Row><Col span={2} className="ServiceName"><span>关联服务</span></Col></Row>
+                  </div>
+                  <span className="line"></span>
+                </div>
               </div>
-              <div>
-                <div className="form-title">
-                  <Row>
-                    <span className="service">选择服务</span>
-                    <Button type="primary" ghost onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
-                    <span className="service-desc">
-                      <Icon type="info-circle-o" />
+              <FormItem {...formItemLayout} label="选择服务">
+                <Button type="primary" ghost onClick={() => this.handleAdd()}><Icon type="link" />关联后端服务</Button>
+              </FormItem>
+              <Row>
+                <Col span={2}></Col>
+                <Col span={22}>
+                  <span className="service-desc">
+                    <Icon type="info-circle-o" />
                       解除关联后端服务后，路由规则中相应的版本也将被移除，服务的对外访问方式将失效
-                    </span>
-                  </Row>
+                  </span>
                   <Row className="serviceHeader">
                     <Col span={8}>服务</Col>
                     <Col span={9}>组件服务版本</Col>
@@ -492,8 +498,8 @@ class CreateComponent extends React.Component {
                   </Row>
                   {serviceLists}
                   <p className="service-desc tip">Tips：组件创建后系统将重启该组件关联服务的所有实例。</p>
-                </div>
-              </div>
+                </Col>
+              </Row>
             </div>
           </div>
           <div className="btn-bottom">

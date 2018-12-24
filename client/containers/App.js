@@ -24,7 +24,7 @@ import { scrollToTop, toQuerystring } from '../common/utils'
 import { renderLoading } from '../components/utils'
 import { JWT, AUTH_URL } from '../constants'
 import { Route, Switch } from 'react-router-dom'
-import { appChildRoutes } from '../RoutesDom'
+import { appChildRoutes } from '../'
 import CustomizeSider from '../components/SiderNav'
 import './style/App.less'
 import { footer } from '../../config/constants'
@@ -70,6 +70,14 @@ class App extends React.Component {
     const query = parse(search)
     const { username, token, jwt, authUrl, redirectclusterID, redirectNamespace,
       ...otherQuery } = query
+    if (!!redirectclusterID && !!redirectNamespace) {
+      await this.props.setCurrentConfig({
+        project: {
+          namespace: redirectNamespace,
+        },
+        cluster: { id: redirectclusterID },
+      })
+    }
     await getAuth({ username, token, jwt }).then(res => {
       if (res.type === indexActions.AUTH_FAILURE) {
         Modal.error({
@@ -92,14 +100,6 @@ class App extends React.Component {
       // Get user detail info
       return getCurrentUser(userID)
     })
-    if (!!redirectclusterID && !!redirectNamespace) {
-      this.props.setCurrentConfig({
-        project: {
-          namespace: redirectNamespace,
-        },
-        cluster: { id: redirectclusterID },
-      })
-    }
   }
 
   componentDidUpdate(prevProps) {
@@ -322,6 +322,7 @@ class App extends React.Component {
             collapsed={current.ui.collapsed}
             location={location}
             currentUser={current.user.info || {}}
+            forceUpdateApp={this.props.forceUpdateApp}
           >
             <NamespaceSwitch
               noSelfClassName

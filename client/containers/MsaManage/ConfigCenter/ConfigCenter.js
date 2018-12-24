@@ -24,10 +24,12 @@ import TimeHover from '@tenx-ui/time-hover/lib'
 import cloneDeep from 'lodash/cloneDeep'
 import CreateBranch from './CreateBranch'
 import * as TenxModal from '@tenx-ui/modal'
+import { withNamespaces } from 'react-i18next'
 
 const Option = Select.Option
 const { TextArea } = Input
 
+@withNamespaces('ConfigCenter')
 class ConfigCenter extends React.Component {
 
   state = {
@@ -48,8 +50,9 @@ class ConfigCenter extends React.Component {
   }
 
   componentDidMount() {
-    const isForce = parse(this.props.location.search).from_add
-    this.loadData(Boolean(isForce))
+    const isForce = Boolean(parse(this.props.location.search).from_add) ||
+      Boolean(parse(this.props.location.search).from_del)
+    this.loadData(isForce)
   }
 
   loadData = isForce => {
@@ -162,13 +165,13 @@ class ConfigCenter extends React.Component {
 
   handleDel = isLast => {
     const { configGitUrl, configName, message, branchValue } = this.state
-    const { delCenterConfig, clusterID, location } = this.props
+    const { t, delCenterConfig, clusterID, location } = this.props
     const path = parse(location.search).path || ''
     const query = {
       project_url: configGitUrl,
       branch_name: branchValue,
       file_path: (path ? path + '/' : '') + configName,
-      commit_message: message === '' ? '删除一个配置' : message,
+      commit_message: message === '' ? t('list.delConfigMsg') : message,
     }
     this.setState({
       isDelFetching: true,
@@ -180,19 +183,29 @@ class ConfigCenter extends React.Component {
       })
       if (res.error) {
         notification.error({
-          message: `删除配置 ${configName} 失败`,
+          message: t('list.delConfigFailed', {
+            replace: {
+              configName,
+            },
+          }),
         })
         return
       }
       if (res.response.result.code === 200) {
-        if (isLast && path) {
-          const arr = path.split('/')
-          const tempPath = arr.splice(arr.length - 1).join('/')
-          this.props.history.push(`/msa-manage/config-center${tempPath ? '?path=' + tempPath : ''}`)
+        if (isLast) {
+        // if (isLast && path) {
+          // const arr = path.split('/')
+          // const tempPath = arr.splice(arr.length - 1).join('/')
+          // this.props.history.push(`/msa-manage/config-center${tempPath ? '?path=' + tempPath : ''}`)
+          this.props.history.push('/msa-manage/config-center?from_del=true')
         }
         this.fetchList('', true)
         notification.success({
-          message: `删除配置 ${configName} 成功`,
+          message: t('list.delConfigSucc', {
+            replace: {
+              configName,
+            },
+          }),
         })
       }
     })
@@ -216,7 +229,7 @@ class ConfigCenter extends React.Component {
   }
   onAddOk = branch_name => {
     notification.success({
-      message: '添加分支成功',
+      message: this.props.t('list.addBranchSucc'),
     })
     this.setState({
       branchValue: branch_name,
@@ -226,13 +239,17 @@ class ConfigCenter extends React.Component {
   }
   onDelClick = () => {
     const { branchValue, configGitUrl } = this.state
-    const { deleteBranch, clusterID } = this.props
+    const { deleteBranch, clusterID, t } = this.props
     const _this = this
     TenxModal.confirm({
-      modalTitle: '删除分支',
-      title: '删除后无法恢复',
-      content: `确定删除分支 [${branchValue}]?`,
-      okText: '确定',
+      modalTitle: t('list.delTitle'),
+      title: t('list.delContentTitle'),
+      content: t('list.delContent', {
+        replace: {
+          branchValue,
+        },
+      }),
+      okText: t('list.confirm'),
       onOk() {
         const query = {
           project_url: configGitUrl,
@@ -243,7 +260,11 @@ class ConfigCenter extends React.Component {
             if (res.response && res.response.result && res.response.result.code === 200) {
               resolve()
               notification.success({
-                message: `删除分支 ${branchValue} 成功`,
+                message: t('list.delBranchSucc', {
+                  replace: {
+                    branchValue,
+                  },
+                }),
               })
               _this.setState({
                 branchValue: undefined,
@@ -252,7 +273,11 @@ class ConfigCenter extends React.Component {
               })
             } else {
               notification.warn({
-                message: `删除分支 ${branchValue} 失败`,
+                message: t('list.delBranchFailed', {
+                  replace: {
+                    branchValue,
+                  },
+                }),
               })
               reject()
             }
@@ -263,7 +288,7 @@ class ConfigCenter extends React.Component {
     })
   }
   render() {
-    const { isFetching, location } = this.props
+    const { t, isFetching, location } = this.props
     const path = parse(location.search).path || ''
     const { branchData, branchValue, isLoadingLast, isShowAddModal, configGitUrl } = this.state
     const envData = this.props.envData[branchValue + '/' + (path || '')]
@@ -276,7 +301,7 @@ class ConfigCenter extends React.Component {
     }
     const columns = [{
       id: 'id',
-      title: '配置名称',
+      title: t('list.name'),
       dataIndex: 'name',
       width: '25%',
       render: (text, record) => {
@@ -296,7 +321,7 @@ class ConfigCenter extends React.Component {
         return text
       },
     }, {
-      title: '最近更新时间',
+      title: t('list.time'),
       dataIndex: 'time',
       width: '20%',
       render: (text, record, i) => {
@@ -305,14 +330,14 @@ class ConfigCenter extends React.Component {
         }
         if (isLoadingLast) {
           if (i === 0 || (i === 1 && tempEnvData[0].type === 'returnBack')) {
-            return <span className="loading-icon-wrapper"><Icon className="loading-icon" type="loading-3-quarters" /> 正在加载数据...</span>
+            return <span className="loading-icon-wrapper"><Icon className="loading-icon" type="loading-3-quarters" /> {t('list.loading')}</span>
           }
           return ''
         }
-        return text ? <TimeHover time={text} /> : '未知'
+        return text ? <TimeHover time={text} /> : t('list.unknown')
       },
     }, {
-      title: '最近一次提交',
+      title: t('list.lastCommit'),
       dataIndex: 'info',
       width: '20%',
       render: (text, record) => {
@@ -324,7 +349,7 @@ class ConfigCenter extends React.Component {
       },
     },
     // {
-    //   title: '最近一次修改人',
+    //   title: t('list.lastEditor'),
     //   dataIndex: 'user',
     //   width: '15%',
     //   render: (text, record) => {
@@ -337,7 +362,7 @@ class ConfigCenter extends React.Component {
     // },
     {
       id: 'id',
-      title: '操作',
+      title: t('list.opera'),
       dataIndex: 'operation',
       width: '40%',
       render: (text, record) => {
@@ -352,15 +377,15 @@ class ConfigCenter extends React.Component {
           linkTo = `/msa-manage/config-center/${decodeURIComponent(record.name)}?detail=true&id=${record.id}&branch=${branchValue}&path=${path}`
         }
         let btns = [
-          <Button key="1" className="detail" type="primary" onClick={() => this.props.history.push(linkTo)}>查看详情</Button>,
+          <Button key="1" className="detail" type="primary" onClick={() => this.props.history.push(linkTo)}>{t('list.viewDetail')}</Button>,
         ]
         if (record.type === 'blob') {
           btns = [].concat(btns, [
-            <Button key="2" className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branchValue}&path=${path}`)}>更新</Button>,
+            <Button key="2" className="detail" onClick={() => this.props.history.push(`/msa-manage/config-center/${record.name}?detail=update&id=${record.id}&branch=${branchValue}&path=${path}`)}>{t('list.update')}</Button>,
             <Button key="3"
               onClick={() => this.handleDelVisible(record.name)}
               disabled={this.state.isDelFetching && this.state.configName === record.name}>
-            删除</Button>,
+              {t('list.del')}</Button>,
           ])
         }
         return <div>
@@ -373,20 +398,20 @@ class ConfigCenter extends React.Component {
       <QueueAnim className="center config-center" >
         <div key="body">
           <div className="branch">
-            <span>版本分支：</span>
+            <span>{t('list.branchLabel')}</span>
             <Select style={{ width: 200 }} onChange={this.handleChang}
               value={branchValue}>
               {data}
             </Select>
-            <Tooltip title="添加分支">
+            <Tooltip title={t('list.addBranch')}>
               <Button className="icon-btn" size="default" onClick={() => this.setState({
                 isShowAddModal: true,
               })}><Icon type="plus" /></Button>
             </Tooltip>
-            <Tooltip title="删除当前分支">
+            <Tooltip title={t('list.delCurrentBranch')}>
               <Button className="icon-btn" size="default" onClick={this.onDelClick}><Icon type="delete" /></Button>
             </Tooltip>
-            <Button className="refresh" icon="sync" onClick={() => this.loadData(true)}>刷新</Button>
+            <Button className="refresh" icon="sync" onClick={() => this.loadData(true)}>{t('list.reflesh')}</Button>
           </div>
           <Card>
             <div>
@@ -394,7 +419,7 @@ class ConfigCenter extends React.Component {
                 <div className="headers">
                   <Breadcrumb>
                     <Breadcrumb.Item>
-                      <Link to="/msa-manage/config-center">...</Link>
+                      <Link to="/msa-manage/config-center">{branchValue}</Link>
                     </Breadcrumb.Item>
                     {
                       (() => {
@@ -411,7 +436,7 @@ class ConfigCenter extends React.Component {
                   </Breadcrumb>
                   <Button type="primary" onClick={() => this.props.history.push(`/msa-manage/config-center/config/create?detail=false&branch=${branchValue}&path=${path}`)}>
                     <Icon type="plus" style={{ color: '#fff' }} />
-                    <span className="font">添加配置</span>
+                    <span className="font">{t('list.addConfig')}</span>
                   </Button>
                 </div>
               </div>
@@ -424,25 +449,27 @@ class ConfigCenter extends React.Component {
             </div>
             {
               this.state.deleteVisible ?
-                <Modal title="删除配置操作" visible={this.state.deleteVisible} onCancel={this.handleCancel}
+                <Modal title={t('list.delConfigTitle')} visible={this.state.deleteVisible} onCancel={this.handleCancel}
                   footer={[
-                    <Button key="back" type="ghost" onClick={this.handleCancel}>取 消</Button>,
-                    <Button key="submit" type="primary" onClick={() => this.handleDel(tempEnvData.length === 1)} loading={this.state.isDelFetching}>确 定</Button>,
+                    <Button key="back" type="ghost" onClick={this.handleCancel}>{t('list.cencelText')}</Button>,
+                    <Button key="submit" type="primary" onClick={() => this.handleDel(envData.length === 1 && tempEnvData.length === 2)} loading={this.state.isDelFetching}>{t('list.confirmText')}</Button>,
                   ]}>
                   <div className="prompt" style={{ height: 45, backgroundColor: '#fffaf0', border: '1px dashed #ffc125', padding: 10 }}>
-                    <span>删除当前配置操作完成后，客户端如有重启情况，将无法再继续读取该配置信息。</span>
+                    <span>{t('list.delConfigContent')}</span>
                   </div>
                   <div style={{ marginTop: 10 }}>
                     {
                       envData.length === 1 && tempEnvData.length === 2 ?
-                        <p style={{ color: '#f85a5a' }}>该配置为 {path} 目录下的唯一文件, 删除后 {path} 目录也将被删除</p>
+                        <p style={{ color: '#f85a5a' }}>{t('list.delConfigOnlyOneFile', {
+                          replace: { path },
+                        })}</p>
                         :
                         ''
                     }
-                    <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;确定删除该配置 ?</span>
+                    <span><Icon type="question-circle-o" style={{ color: '#2db7f5' }} />&nbsp;&nbsp;{t('list.confirmDel')} ?</span>
                     <div className="remark">
-                      <span style={{ lineHeight: '65px' }}>添加备注 &nbsp;</span>
-                      <TextArea className="text" placeholder="删除一个配置" autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
+                      <span style={{ lineHeight: '65px' }}>{t('list.addComment')} &nbsp;</span>
+                      <TextArea className="text" placeholder={t('list.delCommentPlaceholder')} autosize={{ minRows: 2, maxRows: 6 }} style={{ width: '87%' }} onChange={this.handleDelInfo} />
                     </div>
                   </div>
                 </Modal>
