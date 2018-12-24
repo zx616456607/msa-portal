@@ -1,0 +1,11 @@
+{
+  "blownMonitor": {
+    "loadBlownClusterFailed": "请求熔断集群失败",
+    "blownClusterPld": "服务监控组（默认）",
+    "breaker": "断路器",
+    "viewDemo": "查看示例图",
+    "threadPool": "线程池",
+    "gotIt": "知道了",
+    "sample": "示例图"
+  }
+}

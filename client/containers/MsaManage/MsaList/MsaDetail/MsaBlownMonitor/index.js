@@ -121,11 +121,8 @@ class MsaBlownMonitor extends React.PureComponent {
           url={`${host}/api/v1/clusters/hystrix/ws`}
           onSetup={this.wsOnSetup}
         />
-        <span className="primary-color pointer" onClick={this.toggleVisible}>
-          <Icon type="picture" /> {t('detail.MsaBlownMonitor.viewPic')}
-        </span>
         <div className="layout-content-body blown-monitor-body">
-          <div>
+          <div style={{ marginBottom: 20 }}>
             <span className="first-title">{t('detail.MsaBlownMonitor.breaker')}</span>
             <span
               style={{ marginLeft: 20 }}
@@ -146,7 +143,7 @@ class MsaBlownMonitor extends React.PureComponent {
                 {this.renderBlownCharts()}
               </div>
           }
-          <div>
+          <div style={{ marginBottom: 20 }}>
             <span className="first-title">{t('detail.MsaBlownMonitor.threadPool')}</span>
             <span
               style={{ marginLeft: 20 }}
