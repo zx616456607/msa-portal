@@ -73,7 +73,6 @@ class ServiceMeshOV extends React.Component<ServiceMeshOVProps, ServiceMeshOVSta
   }
 }
 
-
 export default connect(mapStateToProps, {
   getMeshGateway: MGWAction.getMeshGateway,
   loadComponent: SMAction.loadComponent,

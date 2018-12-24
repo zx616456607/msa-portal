@@ -1,0 +1,11 @@
+{
+  "blownMonitor": {
+    "loadBlownClusterFailed": "Failed to request the breaker cluster",
+    "blownClusterPld": "MonitorGroup（default）",
+    "breaker": "Circuit Breaker",
+    "viewDemo": "View Diagram",
+    "threadPool": "ThreadPool",
+    "gotIt": "OK",
+    "sample": "Diagram"
+  }
+}
