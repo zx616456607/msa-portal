@@ -13,20 +13,22 @@ import EmptyBlown from '../../components/BlownChart/EmptyBlown'
 import * as msaActions from '../../actions/msa'
 import { sleep } from '../../common/utils'
 import { API_CONFIG } from '../../constants'
+import { withNamespaces } from 'react-i18next'
 const { MSA_API } = API_CONFIG
 
 const Option = Select.Option
 
+@withNamespaces('blownMonitor')
 class BlownMonitoring extends React.Component {
 
   state = {}
 
   async componentDidMount() {
-    const { msaBlownClusters, clusterId } = this.props
+    const { msaBlownClusters, clusterId, t } = this.props
     const result = await msaBlownClusters(clusterId)
     if (result.error) {
       notification.warn({
-        message: '请求熔断集群失败',
+        message: t('blownMonitor.loadBlownClusterFailed'),
       })
       return
     }
@@ -128,7 +130,7 @@ class BlownMonitoring extends React.Component {
 
   render() {
     const { visible, blownCluster, wsFetching, poolVisible } = this.state
-    const { clusterFetching, blownClusters, blownMonitor } = this.props
+    const { clusterFetching, blownClusters, blownMonitor, t } = this.props
     if (clusterFetching || wsFetching) {
       return <div className="loading">
         <Spin size={'large'}/>
@@ -146,7 +148,7 @@ class BlownMonitoring extends React.Component {
         }
         <div className="layout-content-btns" key={'btns'}>
           <Select
-            placeholder={'服务监控组（默认）'}
+            placeholder={t('blownMonitor.blownClusterPld')}
             style={{ width: 200 }}
             value={blownCluster}
             onSelect={this.selectBlownCluster}
@@ -155,14 +157,14 @@ class BlownMonitoring extends React.Component {
           </Select>
         </div>
         <div className="layout-content-body" key="body">
-          <div>
-            <span className="first-title">断路器</span>
+          <div style={{ marginBottom: 20 }}>
+            <span className="first-title">{t('blownMonitor.breaker')}</span>
             <span
               style={{ marginLeft: 20 }}
               className={'primary-color pointer'}
               onClick={this.toggleVisible}
             >
-              <Icon type="picture" /> 查看示例图
+              <Icon type="picture" /> {t('blownMonitor.viewDemo')}
             </span>
           </div>
           {
@@ -177,14 +179,14 @@ class BlownMonitoring extends React.Component {
                 {this.renderBlownCharts()}
               </div>
           }
-          <div>
-            <span className="first-title">线程池</span>
+          <div style={{ marginBottom: 20 }}>
+            <span className="first-title">{t('blownMonitor.threadPool')}</span>
             <span
               style={{ marginLeft: 20 }}
               className={'primary-color pointer'}
               onClick={this.togglePoolVisible}
             >
-              <Icon type="picture" /> 查看示例图
+              <Icon type="picture" /> {t('blownMonitor.viewDemo')}
             </span>
           </div>
           {

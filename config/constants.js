@@ -12,5 +12,5 @@
 
 module.exports = {
   title: '微服务治理平台',
-  footer: '© 2018 微服务治理平台 v1.2',
+  footer: '© 2018 微服务治理平台 v1.5',
 }

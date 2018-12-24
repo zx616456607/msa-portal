@@ -16,28 +16,75 @@ import {
   Coord,
 } from 'bizcharts';
 import './styles/DubboOV.less'
+import { connect } from 'react-redux'
+import { getDeepValue } from '../../common/utils'
+import * as DubAction from '../../actions/dubbo'
 
-export default class DubboOV extends React.Component<{}, {}> {
+function mapStateToProps(state) {
+  const clusterID = getDeepValue(state, ['current', 'config', 'cluster', 'id'])
+  return { clusterID }
+}
+
+interface DubboOVProps {
+  clusterID: string
+  getDubboList: ( clusterID: string, options?: any ) => any
+}
+interface DubboOVState {
+  tatalService: number
+  ConsumersService: number
+  ProvidersService: number
+  CPService: number
+}
+class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
+  state = {
+    tatalService: 0,
+    ConsumersService: 0,
+    ProvidersService: 0,
+    CPService: 0,
+  }
+  async componentDidMount() {
+    const dubRes = await this.props.getDubboList(this.props.clusterID)
+    const dubboData: any[] = getDeepValue(dubRes, ['response', 'result', 'data', 'items']) || []
+    const tatalService = dubboData.length || 0
+    const ConsumersService = dubboData.filter((node) => {
+      const consumers = getDeepValue(node, ['status', 'consumers'])
+      const providers = getDeepValue(node, ['status', 'providers'])
+      return consumers && !providers
+    }).length
+    const ProvidersService = dubboData.filter((node) => {
+      const consumers = getDeepValue(node, ['status', 'consumers'])
+      const providers = getDeepValue(node, ['status', 'providers'])
+      return !consumers && providers
+    }).length
+    const CPService = dubboData.filter((node) => {
+      const consumers = getDeepValue(node, ['status', 'consumers'])
+      const providers = getDeepValue(node, ['status', 'providers'])
+      return consumers && providers
+    }).length
+    this.setState({
+      tatalService, ConsumersService, ProvidersService, CPService,
+    })
+  }
   render() {
     const data = [
       {
-        type: '正常',
-        value: 1,
+        type: '仅消费者',
+        value: this.state.ConsumersService,
       },
       {
         type: '分类二',
         value: 0,
       },
       {
-        type: '轻微',
-        value: 0,
+        type: '两者都有',
+        value: this.state.CPService,
       },
       {
-        type: '重要',
-        value: 0,
+        type: '仅提供者',
+        value: this.state.ProvidersService,
       },
       {
-        type: '严重',
+        type: '仅消费者',
         value: 0,
       },
     ]
@@ -66,15 +113,15 @@ export default class DubboOV extends React.Component<{}, {}> {
           <Col span={11}>
           <div className="SliderChart">
           <SliderChart />
-          <div className="centerText">{`共${0}个`}</div>
+          <div className="centerText">{`共${this.state.tatalService}个`}</div>
           </div>
           </Col>
           <Col span={2}/>
           <Col span={11}>
           <div className="messageBox">
-              <div><div className="color1">仅消费者</div><div>{`${0}个`}</div></div>
-              <div><div className="color2">仅提供者</div><div>{`${0}个`}</div></div>
-              <div><div className="color3">两者均有</div><div>{`${0}个`}</div></div>
+              <div><div className="color4">仅消费者</div><div>{`${this.state.ConsumersService}个`}</div></div>
+              <div><div className="color2">仅提供者</div><div>{`${this.state.ProvidersService}个`}</div></div>
+              <div><div className="color3">两者均有</div><div>{`${this.state.CPService}个`}</div></div>
             </div>
           </Col>
         </Row>
@@ -82,3 +129,7 @@ export default class DubboOV extends React.Component<{}, {}> {
     )
   }
 }
+
+export default connect(mapStateToProps, {
+  getDubboList : DubAction.getDubboList,
+})(DubboOV)
