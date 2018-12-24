@@ -53,7 +53,7 @@ export default class MsaConfigInstallModal extends React.PureComponent {
           }
         </FormItem>
         <FormItem
-          label={'Gitlab 地址'}
+          label={'Gitlab 项目地址'}
           {...formItemLayout}
         >
           {
