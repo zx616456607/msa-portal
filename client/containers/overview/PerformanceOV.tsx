@@ -51,10 +51,6 @@ class PerformanceOV extends React.Component<PerformanceOVProps, PerformanceOVSta
     loading: true,
   }
   async componentDidMount() {
-    const body = {
-      id: this.props.clusterID,
-      pinpoint: 'pinpoint',
-    }
     await this.props.loadApms(this.props.clusterID, this.props.current.config.project.namespace)
     if (!this.props.apms.ids || this.props.apms.ids.length === 0) { return }
     const startTime = new Date().getTime() - 2 * 86400000

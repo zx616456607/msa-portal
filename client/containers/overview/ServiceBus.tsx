@@ -23,7 +23,7 @@ interface ServiceBusState {
   loading: boolean
 }
 
-function mapStateToProps(state) {
+function mapStateToProps() {
   return {}
 }
 
@@ -135,7 +135,7 @@ class LineChart extends React.Component<LineChartProps, LineChartState> {
           <Tooltip showTitle={false} />
           <Legend
             name="city"
-            position="top-right"
+            position={'top-right' as any}
           />
           <Geom type="line" position="month*temperature" color="city" />
           <Geom type="point" position="month*temperature" color="city" style={{ lineWidth: 1, stroke: '#FFF' }} />
