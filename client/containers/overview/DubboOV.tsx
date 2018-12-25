@@ -8,7 +8,7 @@
  * @date Friday December 21st 2018
  */
 import * as React from 'react'
-import { Card, Row, Col } from 'antd'
+import { Card, Row, Col, Spin } from 'antd'
 import {
   Chart,
   Geom,
@@ -19,6 +19,9 @@ import './styles/DubboOV.less'
 import { connect } from 'react-redux'
 import { getDeepValue } from '../../common/utils'
 import * as DubAction from '../../actions/dubbo'
+import * as OVAction from '../../actions/overview'
+import { Dubbo as DubboIcon  } from '@tenx-ui/icon'
+import '@tenx-ui/icon/assets/index.css'
 
 function mapStateToProps(state) {
   const clusterID = getDeepValue(state, ['current', 'config', 'cluster', 'id'])
@@ -28,12 +31,15 @@ function mapStateToProps(state) {
 interface DubboOVProps {
   clusterID: string
   getDubboList: ( clusterID: string, options?: any ) => any
+  getDubboInstall: (clusterID: string) => any
 }
 interface DubboOVState {
   tatalService: number
   ConsumersService: number
   ProvidersService: number
   CPService: number
+  loading: boolean
+  install: boolean
 }
 class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
   state = {
@@ -41,9 +47,17 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
     ConsumersService: 0,
     ProvidersService: 0,
     CPService: 0,
+    loading: true,
+    install: true,
   }
   async componentDidMount() {
-    const dubRes = await this.props.getDubboList(this.props.clusterID)
+    const DubInRes = await  this.props.getDubboInstall(this.props.clusterID)
+    const install = getDeepValue(DubInRes, ['response', 'result', 'data', 'dubbo-operator']) || false
+    this.setState({ install })
+    if (!install) { return }
+    const [dubRes] = await Promise.all([
+      this.props.getDubboList(this.props.clusterID),
+    ])
     const dubboData: any[] = getDeepValue(dubRes, ['response', 'result', 'data', 'items']) || []
     const tatalService = dubboData.length || 0
     const ConsumersService = dubboData.filter((node) => {
@@ -62,7 +76,7 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
       return consumers && providers
     }).length
     this.setState({
-      tatalService, ConsumersService, ProvidersService, CPService,
+      tatalService, ConsumersService, ProvidersService, CPService, loading: false,
     })
   }
   render() {
@@ -104,7 +118,18 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
         );
       }
     }
+    if (!this.state.install) {
+      return (
+        <div className="DubboOVunInstall">
+          <div className="infoWrap">
+            <DubboIcon size={35} style={{ color: '#ccc' }}/>
+            <div className="info">该项目&集群未开启 Dubbo</div>
+          </div>
+        </div>
+      )
+    }
     return(
+      <Spin spinning={this.state.loading}>
       <Card title="治理-Dubbo" className="DubboOV">
         <div>
           <div>服务数量</div>
@@ -126,10 +151,12 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
           </Col>
         </Row>
       </Card>
+    </Spin>
     )
   }
 }
 
 export default connect(mapStateToProps, {
   getDubboList : DubAction.getDubboList,
+  getDubboInstall: OVAction.getDubboInstall,
 })(DubboOV)
