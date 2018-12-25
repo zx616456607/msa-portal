@@ -20,7 +20,6 @@ const formItemLayout = {
   },
 }
 const specialCharacterReg = /[\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F\u4e00-\u9fa5]/g
-
 @connect(null, {
   getLocalProjectDependency,
   getGlobalConfigByType,
