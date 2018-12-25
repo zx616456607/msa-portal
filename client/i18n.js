@@ -43,6 +43,10 @@ i18n
     react: {
       wait: true,
     },
+
+    backend: {
+      queryStringParams: { v: process.env.TIMESTAMP },
+    },
   });
 window._i18n = i18n
 
