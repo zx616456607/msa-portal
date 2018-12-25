@@ -64,7 +64,6 @@ class Event extends React.Component {
       },
     ]
   }
-
   eventLevels = () => {
     const { t } = this.props
     return [
@@ -83,7 +82,6 @@ class Event extends React.Component {
       },
     ]
   }
-
   rootPlaces = () => {
     const { t } = this.props
     return [

@@ -34,6 +34,7 @@ import { getMsaList } from '../../actions/msa'
 import { msaListSlt } from '../../selectors/msa'
 import { gatewayPolicesListSlt, gatewayHasOpenPolicySlt } from '../../selectors/gateway'
 import confirm from '../../components/Modal/confirm'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 const FormItem = Form.Item
@@ -43,7 +44,7 @@ const DEFAULT_QUERY = {
   page: 0,
   size: 10,
 }
-
+@withNamespaces('apiGateway')
 class ApiGateway extends React.Component {
   state = {
     visible: false,
@@ -64,7 +65,7 @@ class ApiGateway extends React.Component {
   }
 
   confirmCreateGateway = values => {
-    const { createGatewayPolicy, clusterID } = this.props
+    const { createGatewayPolicy, clusterID, t } = this.props
     const { type } = values
     const body = Object.assign({}, values, { type: type.join(',') })
     createGatewayPolicy(clusterID, body).then(res => {
@@ -75,7 +76,7 @@ class ApiGateway extends React.Component {
         return
       }
       notification.success({
-        message: '创建成功',
+        message: t('list.createSuccess'),
       })
       this.reloadGatewayPolicyList()
       this.setState({
@@ -87,7 +88,7 @@ class ApiGateway extends React.Component {
 
   confirmEditGateway = values => {
     const { currentRecord } = this.state
-    const { clusterID, editGatewayPolicy } = this.props
+    const { clusterID, editGatewayPolicy, t } = this.props
     const { id: policyID } = currentRecord
     const { type } = values
     const body = Object.assign(
@@ -103,7 +104,7 @@ class ApiGateway extends React.Component {
         return
       }
       notification.success({
-        message: '编辑成功',
+        message: t('list.updateSuccess'),
       })
       const { currentPage } = this.state
       this.loadGatewayPoliciesList({ page: currentPage - 1 })
@@ -115,11 +116,13 @@ class ApiGateway extends React.Component {
   }
 
   deleteGateWay = item => {
-    const { deleteGatewayPolicy, clusterID } = this.props
+    const { deleteGatewayPolicy, clusterID, t } = this.props
     const self = this
     confirm({
-      modalTitle: '删除操作',
-      title: `确定将微服务 ${item.service_id} 的限流规则删除吗？`,
+      modalTitle: t('list.optionDelete'),
+      title: t('list.deleteAlertMsg', {
+        replace: { service_id: item.service_id },
+      }),
       content: '',
       onOk() {
         return new Promise((resolve, reject) => {
@@ -130,7 +133,7 @@ class ApiGateway extends React.Component {
             }
             resolve()
             notification.success({
-              message: '删除微服务限流规则成功',
+              message: t('list.deleteSuccess'),
             })
             self.reloadGatewayPolicyList()
           })
@@ -178,7 +181,7 @@ class ApiGateway extends React.Component {
   }
 
   getMicroServiceList = () => {
-    const { clusterID, getMsaList } = this.props
+    const { clusterID, getMsaList, t } = this.props
     this.setState({
       visible: true,
     })
@@ -188,10 +191,10 @@ class ApiGateway extends React.Component {
           visible: false,
         })
         return Modal.info({
-          title: '提示',
+          title: t('list.alert'),
           content: (
             <div>
-              获取微服务列表失败，请点击重试！
+              { t('list.retry') }
             </div>
           ),
           onOk() {},
@@ -220,7 +223,7 @@ class ApiGateway extends React.Component {
 
   handleOk = () => {
     const { currentHandle } = this.state
-    const { form } = this.props
+    const { form, t } = this.props
     const { validateFields, setFields } = form
     validateFields((errors, values) => {
       if (errors) {
@@ -230,7 +233,7 @@ class ApiGateway extends React.Component {
         setFields({
           limits: {
             value: values.limits,
-            errors: [ new Error('不支持小数点') ],
+            errors: [ new Error(t('list.validateMsg')) ],
           },
         })
         return
@@ -239,7 +242,7 @@ class ApiGateway extends React.Component {
         setFields({
           refresh_interval: {
             value: values.refresh_interval,
-            errors: [ new Error('不支持小数点') ],
+            errors: [ new Error(t('list.validateMsg')) ],
           },
         })
         return
@@ -385,7 +388,7 @@ class ApiGateway extends React.Component {
       isLoadingStopOrStart: true,
     })
     const { stopOrStartItem } = this.state
-    const { editGatewayPolicy, clusterID } = this.props
+    const { editGatewayPolicy, clusterID, t } = this.props
     const {
       id: policyID, type, service_id,
       limits, refresh_interval, status,
@@ -394,7 +397,7 @@ class ApiGateway extends React.Component {
     const body = { type, service_id, limits, refresh_interval, status: !status }
     await editGatewayPolicy(clusterID, policyID, body)
     notification.success({
-      message: `${status ? '停用' : '启用'}微服务限流规则成功`,
+      message: status ? t('list.disableSuccess') : t('list.enableSuccess'),
     })
     self.reloadGatewayPolicyList()
     self.setState({
@@ -407,27 +410,30 @@ class ApiGateway extends React.Component {
   renderStopOrStartModal = () => {
     const {
       stopOrStartVisible, stopOrStartItem, iHasKnowCheckbox, isLoadingStopOrStart } = this.state
+    const { t } = this.props
     if (!stopOrStartItem || !stopOrStartItem.service_id) return null
     const {
       service_id, status,
     } = stopOrStartItem
-    const handlerName = status ? '停用' : '启用'
+    const handlerName = status ? t('list.disable') : t('list.enable')
     const footer = [
       <Button
         key="back"
-        onClick={this.handleStopOrStartCancel}>取消</Button>,
+        onClick={this.handleStopOrStartCancel}>{t('list.cancelText')}</Button>,
       <Button
         key="submit"
         type="primary"
         loading={isLoadingStopOrStart}
         disabled={!status && this.hasOpenPolicy() && !iHasKnowCheckbox}
         onClick={this.handleStopOrStartOk}>
-        确定
+        {t('list.okText')}
       </Button>,
     ]
     return (
       <Modal
-        title={`${handlerName}操作`}
+        title={t('list.optionName', {
+          replace: { name: handlerName },
+        })}
         visible={stopOrStartVisible}
         onCancel={this.handleStopOrStartCancel}
         footer={footer}
@@ -435,7 +441,11 @@ class ApiGateway extends React.Component {
       >
         <div className={'title'}>
           <Icon className={'icon'} type="question-circle" />
-          {`确定将微服务 ${service_id} 的限流规则${handlerName}吗？`}
+          {
+            t('list.optionAlert', {
+              replace: { service_id, handlerName },
+            })
+          }
         </div>
         {
           !status && this.hasOpenPolicy() &&
@@ -443,7 +453,11 @@ class ApiGateway extends React.Component {
             value={iHasKnowCheckbox}
             onChange={e => this.setState({ iHasKnowCheckbox: e.target.checked })}
             className={'checkbox'}>
-            启用此规则的同时, 将停用微服务 {service_id} 的其他限流规则
+            {
+              t('list.enableMsg', {
+                replace: { service_id },
+              })
+            }
           </Checkbox>
         }
       </Modal>
@@ -451,17 +465,18 @@ class ApiGateway extends React.Component {
   }
 
   renderLabel = () => {
+    const { t } = this.props
     return (
       <span>
-        选择微服务&nbsp;
-        <Tooltip title={'所选服务被移除后，该限流规则同时被移除'}><Icon type="info-circle-o" /></Tooltip>
+        { t('list.selectMicroService') } &nbsp;
+        <Tooltip title={t('list.tooltip')}><Icon type="info-circle-o" /></Tooltip>
       </span>
     )
   }
   render() {
     const {
       form, policesList, isFetching,
-      totalElements,
+      totalElements, t,
     } = this.props
     const {
       visible, confirmLoading,
@@ -475,45 +490,45 @@ class ApiGateway extends React.Component {
           style={{ width: '79px' }}
           onClick={this.menuClick.bind(this, item)}
         >
-          <Menu.Item key="disable">{ item.status ? '停用' : '启用'}</Menu.Item>
-          <Menu.Item key="delete">删除</Menu.Item>
+          <Menu.Item key="disable">{ item.status ? t('list.disable') : t('list.enable')}</Menu.Item>
+          <Menu.Item key="delete">{ t('list.delete') }</Menu.Item>
         </Menu>
       })
     }
     const columns = [{
-      title: '微服务名称',
+      title: t('list.microServiceName'),
       size: 14,
       dataIndex: 'service_id',
     }, {
-      title: '限流类型',
+      title: t('list.limitType'),
       dataIndex: 'type',
-      render: text => <div>{ text ? text : '暂无' }</div>,
+      render: text => <div>{ text ? text : t('list.nothing') }</div>,
     // }, {
     //  title: '具体对象',
     //  dataIndex: 'object',
     }, {
-      title: '限流阈值（次）',
+      title: t('list.maxLimit'),
       dataIndex: 'limits',
     }, {
-      title: '窗口（秒）',
+      title: t('list.window'),
       dataIndex: 'refresh_interval',
     }, {
-      title: '规则状态',
+      title: t('list.ruleStatus'),
       dataIndex: 'status',
       render: status => <div>
         {
           status
-            ? <Badge status="success" text="启用"/>
-            : <Badge status="error" text="停用"/>
+            ? <Badge status="success" text={t('list.enable')}/>
+            : <Badge status="error" text={t('list.disable')}/>
         }
       </div>,
     }, {
-      title: '操作',
+      title: t('list.option'),
       dataIndex: 'operation',
       render: (text, record, index) => <div>
         {
           <Dropdown.Button overlay={menu[index]} type="ghost" onClick={this.editGateway.bind(this, record) }>
-            编辑
+            {t('list.edit')}
           </Dropdown.Button>
         }
       </div>,
@@ -533,25 +548,29 @@ class ApiGateway extends React.Component {
       <QueueAnim className="api-gateway">
         <div className="router-manage-btn-box layout-content-btns" key="header">
           <Button icon="plus" className="add" type="primary" onClick={() => this.handleAdd()}>
-            <span style={{ color: '#fff' }}>添加限流规则</span>
+            <span style={{ color: '#fff' }}>{t('list.addLimitRules')}</span>
           </Button>
           <Button className="search" onClick={this.reloadGatewayPolicyList}>
             <Icon type="sync" />
-            <span>刷新</span>
+            <span>{t('list.refresh')}</span>
           </Button>
           {/* <Button>
             <Icon type="delete" />
             <span>删除</span>
           </Button> */}
           <Search
-            placeholder="按微服务名称搜索"
+            placeholder={t('list.searchWithName')}
             style={{ width: 200 }}
             onSearch={this.searchGateway}
             onChange={this.searchInputChange}
           />
           {
             totalElements !== 0 && <div className="page">
-              <span className="total">共 { totalElements } 条</span>
+              <span className="total">{
+                t('list.totalElements', {
+                  replace: { totalElements },
+                })
+              }</span>
               <Pagination
                 simple
                 current={currentPage}
@@ -576,7 +595,7 @@ class ApiGateway extends React.Component {
           </Card>
         </div>
         { visible && <Modal
-          title={ currentHandle === 'create' ? '添加限流规则' : '编辑限流规则' }
+          title={ currentHandle === 'create' ? t('list.addLimitRules') : t('list.editLimitRules') }
           visible
           onOk={ this.handleOk }
           onCancel={ () => { this.setState({ visible: false }) } }
@@ -593,11 +612,11 @@ class ApiGateway extends React.Component {
                 getFieldDecorator('service_id', {
                   rules: [{
                     required: true,
-                    message: '请选择微服务',
+                    message: t('list.addLimitRules'),
                   }],
                 })(
                   <Select
-                    placeholder="请选择微服务"
+                    placeholder={ t('list.pleaseSelectMicroService') }
                     disabled={currentHandle === 'edit'}
                     onChange={this.onSelectServiceChange}
                   >
@@ -607,7 +626,7 @@ class ApiGateway extends React.Component {
               }
             </FormItem>
             <FormItem
-              label="限流类型"
+              label={ t('list.limitType') }
               key="gatewayType"
               {...formItemLayout}
             >
@@ -616,11 +635,11 @@ class ApiGateway extends React.Component {
                   initialValue: [],
                   rules: [{
                     required: false,
-                    message: '请选择限流类型',
+                    message: t('list.pleaseSelectLimitType'),
                   }],
                 })(
                   <Select
-                    placeholder="请选择限流类型"
+                    placeholder={t('list.pleaseSelectLimitType')}
                     allowClear={true}
                     mode="multiple"
                   >
@@ -648,7 +667,7 @@ class ApiGateway extends React.Component {
               }
             </FormItem> */}
             <FormItem
-              label="限流阈值"
+              label={t('list.maxLimitLabel')}
               key="gatewayThreshold"
               {...formItemLayout}
             >
@@ -657,16 +676,16 @@ class ApiGateway extends React.Component {
                   initialValue: 1,
                   rules: [{
                     required: true,
-                    message: '请输入限流阈值,0~999999',
+                    message: t('list.maxLimitValidateMsg'),
                   }],
                 })(
-                  <InputNumber placeholder="请输入限流阈值" min={0} step={100} max={999999} />
+                  <InputNumber placeholder={t('list.pleaseInputMaxLimit')} min={0} step={100} max={999999} />
                 )
               }
-              &nbsp;&nbsp;次
+              &nbsp;&nbsp;{t('list.times')}
             </FormItem>
             <FormItem
-              label="窗口"
+              label={t('list.window')}
               key="gatewayInterval"
               {...formItemLayout}
             >
@@ -675,16 +694,16 @@ class ApiGateway extends React.Component {
                   initialValue: 1,
                   rules: [{
                     required: true,
-                    message: '请输入窗口',
+                    message: t('list.pleaseInputWindow'),
                   }],
                 })(
-                  <InputNumber placeholder="请输入窗口" min={1} max={60} />
+                  <InputNumber placeholder={t('list.pleaseInputWindow')} min={1} max={60} />
                 )
               }
-              &nbsp;&nbsp;秒
+              &nbsp;&nbsp;{t('list.seconds')}
             </FormItem>
             { currentHandle === 'create' && <FormItem
-              label="默认开启"
+              label={t('list.enableDefault')}
               key="status"
               {...formItemLayout}
             >
@@ -698,8 +717,8 @@ class ApiGateway extends React.Component {
                     }],
                   })(
                     <Switch
-                      checkedChildren="开"
-                      unCheckedChildren="关"
+                      checkedChildren={t('list.on')}
+                      unCheckedChildren={t('list.off')}
                       className="gateway-switch"
                     />
                   )
@@ -708,7 +727,7 @@ class ApiGateway extends React.Component {
                   this.hasOpenPolicy() &&
                   <span className={'api-gateway-has-open-policy'}>
                     <Icon type="info-circle-o" className={'gateway-info-o'}/>
-                    <span className="right-text">该服务已存在启用状态的限流规则，开启后将停用该服务的其他限流规则</span>
+                    <span className="right-text">{t('list.msg')}</span>
                   </span>
                 }
               </div>
