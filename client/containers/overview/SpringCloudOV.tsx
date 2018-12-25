@@ -8,7 +8,7 @@
  * @date Monday December 17th 2018
  */
 import * as React from 'react'
-import { Card, Row, Col } from 'antd'
+import { Card, Row, Col, Spin } from 'antd'
 import { Circle as CircleIcon  } from '@tenx-ui/icon'
 import '@tenx-ui/icon/assets/index.css'
 import './styles/SpringCloudOV.less'
@@ -19,12 +19,16 @@ import * as GateAction  from '../../actions/gateway'
 import * as CCAction from '../../actions/configCenter'
 import * as LTKAction from '../../actions/callLinkTrack'
 import * as IPAction from '../../actions/indexPage'
+import * as msaCAction from '../../actions/msaConfig'
 // import * as ELLAction from '../../actions/eventManage'
 import { connect } from 'react-redux'
 import { getDeepValue } from '../../common/utils'
+import isEmpty from 'lodash/isEmpty'
+import SCuninstaled from '../../../client/assets/img/overview/SpringCloudunInstaled.svg'
 
 interface SpringCloudOVProps {
   clusterID: string;
+  namespace: string
   getMsaList: (clusterID: string) => any;
   getGatewayRoutes: (clusterID: string) => any;
   gatewayPagePoliciesList: (clusterID: string) => any;
@@ -32,6 +36,7 @@ interface SpringCloudOVProps {
   getZipkinTracesList: (clusterID: string, query: any) => any;
   getMicroservice: (clusterID: string, query: any) => any;
   getBranchList: (clusterID: string, query: any) => any;
+  fetchSpingCloud: (clusterID: string, project?: string) => any;
 }
 
 interface SpringCloudOVState {
@@ -44,6 +49,8 @@ interface SpringCloudOVState {
   BlLength: number
   ZTLDataTime: ZTLDataTimeIF[]
   MSResData: any
+  loading: boolean
+  install: boolean
 }
 
 interface ZTLDataTimeIF {
@@ -53,7 +60,8 @@ interface ZTLDataTimeIF {
 
 function mapStateToPros(state) {
   const clusterID = getDeepValue(state, ['current', 'config', 'cluster', 'id'])
-  return { clusterID }
+  const namespace = getDeepValue(state, ['current', 'config', 'project', 'namespace'])
+  return { clusterID, namespace }
 }
 
 class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVState> {
@@ -67,8 +75,15 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     BlLength: 0,
     ZTLDataTime: [] as ZTLDataTimeIF[],
     MSResData: {},
+    loading: true,
+    install: true,
   }
   async componentDidMount() {
+    const SCRes = await this.props.fetchSpingCloud(this.props.clusterID)
+    const SCResData: any[] = (getDeepValue(SCRes, ['response', 'result', 'data']) || [])
+    .find(({ namespace: inamespace }) => { return inamespace === this.props.namespace })
+    this.setState({ install: !isEmpty(SCResData) })
+    if (isEmpty(SCResData)) { return }
     const query = {
       endTs: new Date().getTime(),
       lookback: 300 * 100,
@@ -83,21 +98,21 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     this.props.getZipkinTracesList(this.props.clusterID, query),
     this.props.getMicroservice(this.props.clusterID, { startTime: MSstartTime, endTime: MSendTime }),
     ])
-    const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList'])
+    const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList']) || {}
     const automaticNum = Object.values(msaList)
     .filter(({ type }) => type === 'automatic')
     .length
     const manualNum = Object.values(msaList)
     .filter(({ type }) => type === 'manual')
     .length
-    const gateway = getDeepValue(GateWayRes, [ 'response', 'entities', 'gatewayRoutes' ])
+    const gateway = getDeepValue(GateWayRes, [ 'response', 'entities', 'gatewayRoutes' ]) || {}
     const geteWayOpen = Object.values(gateway)
     .filter(({ status }) => status)
     .length
     const geteWayClose = Object.values(gateway)
     .filter(({ status }) => !status)
     .length
-    const gatewayPolicies = getDeepValue(PPLRes, [ 'response', 'entities', 'gatewayPolicies' ])
+    const gatewayPolicies = getDeepValue(PPLRes, [ 'response', 'entities', 'gatewayPolicies' ]) || {}
     const PoliciesOpen = Object.values(gatewayPolicies)
     .filter(({ status }) => status)
     .length
@@ -108,15 +123,26 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     const BLRes = await this.props.getBranchList(this.props.clusterID, { project_url: projectUrl })
     const BlLength = (getDeepValue(BLRes, ['response', 'result', 'data']) || []).length
 
-    const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data'])
+    const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data']) || []
     const ZTLDataTime = ZTLData.map(({ duration, startTime }) => ({ duration, startTime }))
 
     const MSResData = getDeepValue(MSRes, ['response', 'result', 'data'])
     this.setState({ automaticNum, manualNum, geteWayOpen, geteWayClose, PoliciesOpen,
-      PoliciesClose, BlLength, ZTLDataTime, MSResData})
+      PoliciesClose, BlLength, ZTLDataTime, MSResData, loading: false})
   }
   render() {
+    if (!this.state.install) {
+      return(
+        <div className="SpringCloudOVunInstanled">
+          <div className="infoWrap">
+            <img src={SCuninstaled} alt="该项目集群下未安装SpringCloud"/>
+            <div className="info">该项目&集群未安装SpringCloud</div>
+          </div>
+        </div>
+      )
+    }
     return(
+      <Spin spinning={this.state.loading}>
       <div className="SpringCloudOV">
       <Card title={'治理-SpringCloud'}>
         <div className="content-one">
@@ -176,12 +202,13 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
               <SplashesChar ZTLDataTime={this.state.ZTLDataTime}/>
             </Col>
             <Col span={12}>
-              <AnnularChar  MSResData={this.state.MSResData}/>
+              <AnnularChar  MSResData={this.state.MSResData || {}}/>
             </Col>
           </Row>
         </div>
       </Card>
       </div>
+      </Spin>
     )
   }
 }
@@ -195,4 +222,5 @@ export default connect(mapStateToPros, {
   getZipkinTracesList: LTKAction.getZipkinTracesList,
   // eventLogList: ELLAction.eventLogList,
   getMicroservice: IPAction.getMicroservice,
+  fetchSpingCloud: msaCAction.fetchSpingCloud,
 })(SpringCloudOV)

@@ -11,30 +11,55 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 
-const { MSA_DEVELOP_API } = API_CONFIG
+const { MSA_API_URL, PAAS_API_URL } = API_CONFIG
 
 // 治理Spring-Cloud
 // 服务数量
 
-export const SC_SERVIE_NUM__REQUEST = 'SC_SERVIE_NUM__REQUEST'
-export const SC_SERVIE_NUM_SUCCESS = 'SC_SERVIE_NUM_SUCCESS'
-export const SC_SERVIE_NUM_FAILURE = 'SC_SERVIE_NUM_FAILURE'
+export const SERVICE_BUS_REQUEST = 'SERVICE_BUS_REQUEST'
+export const SERVICE_BUS_SUCCESS = 'SERVICE_BUS_SUCCESS'
+export const SERVICE_BUS_FAILURE = 'SERVICE_BUS_FAILURE'
 
-const fetchLocalProjectDependency = () => {
-  const endpoint = `${MSA_DEVELOP_API}/dependency`
+const fetchServiceBus = () => {
+  const endpoint = `${MSA_API_URL}/overview/5`
   return {
     [CALL_API]: {
-      types: [ SC_SERVIE_NUM__REQUEST,
-        SC_SERVIE_NUM_SUCCESS,
-        SC_SERVIE_NUM_FAILURE ],
+      types: [ SERVICE_BUS_REQUEST,
+        SERVICE_BUS_SUCCESS,
+        SERVICE_BUS_FAILURE ],
       endpoint,
       schema: {},
     },
   }
 }
 
-export function getLocalProjectDependency() {
+export function getServiceBus() {
   return dispatch => {
-    return dispatch(fetchLocalProjectDependency())
+    return dispatch(fetchServiceBus())
+  }
+}
+
+// 判断当前集群是否开启了Dubbo
+
+export const DUBBO_INSTALL_REQUEST = 'DUBBO_INSTALL_REQUEST'
+export const DUBBO_INSTALL_SUCCESS = 'DUBBO_INSTALL_SUCCESS'
+export const DUBBO_INSTALL_FAILURE = 'DUBBO_INSTALL_FAILURE'
+
+const fetchDubboInstall = clusterID => {
+  const endpoint = `${PAAS_API_URL}/projects/plugins/enabled?clusterID=${clusterID}`
+  return {
+    [CALL_API]: {
+      types: [ DUBBO_INSTALL_REQUEST,
+        DUBBO_INSTALL_SUCCESS,
+        DUBBO_INSTALL_FAILURE ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+
+export function getDubboInstall(clusterID) {
+  return dispatch => {
+    return dispatch(fetchDubboInstall(clusterID))
   }
 }
