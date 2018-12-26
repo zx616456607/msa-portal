@@ -109,7 +109,7 @@ export default class AnnularChar extends React.Component<AnnularCharProps, any> 
         </div>
         <Row>
           <Col span={11}>
-            <AnnularCharInner MSResData={this.props.MSResData}/>
+            <AnnularCharInner MSResData={this.props.MSResData || {}}/>
           </Col>
           <Col span={2}/>
           <Col span={11}>

@@ -7,6 +7,7 @@
  * @author zhangtao
  * @date Friday December 21st 2018
  */
+ @import "../../../assets/style/core/index.less";
 .DubboOV {
   .ant-card-body {
     padding: 16px 16px 10px 16px;
@@ -70,6 +71,25 @@
         border-radius: 2px;
         background-color: #43b3fb;
       }
+    }
+  }
+}
+.DubboOVunInstall {
+  height: 249px;
+  background-color: white;
+  position: relative;
+  text-align: center;
+  .infoWrap {
+    img {
+      display: inline-block;
+    }
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    .info {
+      color: @font-color-4;
+      line-height: 24px;
     }
   }
 }
