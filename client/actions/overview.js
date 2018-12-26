@@ -11,7 +11,7 @@
 import { CALL_API } from '../middleware/api'
 import { API_CONFIG } from '../constants'
 
-const { MSA_API_URL, PAAS_API_URL } = API_CONFIG
+const { PAAS_API_URL, CSB_API_URL } = API_CONFIG
 
 // 治理Spring-Cloud
 // 服务数量
@@ -21,7 +21,7 @@ export const SERVICE_BUS_SUCCESS = 'SERVICE_BUS_SUCCESS'
 export const SERVICE_BUS_FAILURE = 'SERVICE_BUS_FAILURE'
 
 const fetchServiceBus = () => {
-  const endpoint = `${MSA_API_URL}/overview/5`
+  const endpoint = `${CSB_API_URL}/overview/5`
   return {
     [CALL_API]: {
       types: [ SERVICE_BUS_REQUEST,
