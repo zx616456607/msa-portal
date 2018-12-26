@@ -19,18 +19,9 @@ import { getZipkinDependencies, getActiveRelationChartNode } from '../../../../a
 import RelationChart from '@tenx-ui/relation-chart'
 import ApmTimePicker from '../../../../components/ApmTimePicker'
 import { formatDate } from '../../../../common/utils'
+import { withNamespaces } from 'react-i18next'
 
-const btnArr = [{
-  key: 'fiveMin',
-  text: '最近5分钟',
-}, {
-  key: 'thirty',
-  text: '最近30分钟',
-}, {
-  key: 'anHour',
-  text: '最近1小时',
-}]
-
+@withNamespaces('callLinkTracking')
 class RelationShip extends React.Component {
   state = {
     timers: '',
@@ -41,6 +32,17 @@ class RelationShip extends React.Component {
   componentDidMount() {
     this.loadData()
   }
+
+  btnArr = [{
+    key: 'fiveMin',
+    text: this.props.t('index.last5min'),
+  }, {
+    key: 'thirty',
+    text: this.props.t('index.last30Min'),
+  }, {
+    key: 'anHour',
+    text: this.props.t('index.last1Hour'),
+  }]
 
   loadData = () => {
     const { rangeDateTime } = this.state
@@ -120,7 +122,7 @@ class RelationShip extends React.Component {
   }
   render() {
     const { loading, rangeDateTime } = this.state
-    const { data } = this.props
+    const { data, t } = this.props
     const onClickNode = this.onClickNode
     const config = {
       rankdir: 'LR',
@@ -168,15 +170,15 @@ class RelationShip extends React.Component {
     }
     const tipText = (<div>
       <span></span>
-      <div className="">服务名称下方的数值表示：平均请求频率</div>
-      <div className="">线上的数值表示：错误调用量／总调用量</div>
-      <div className="content">发出的调用全部成功</div>
+      <div className="">{t('relationShip.belowForAvgF')}</div>
+      <div className="">{t('relationShip.onlineFor')}</div>
+      <div className="content">{t('relationShip.outAllSuccess')}</div>
       <div className="line allLine"></div>
       <div className="arrow allArrow"></div>
-      <div className="content">发出的调用部分成功/失败</div>
+      <div className="content">{t('relationShip.outPartSuccess')}</div>
       <div className="line partLine"></div>
       <div className="arrow partArrow"></div>
-      <div className="content">发出的调用全部失败</div>
+      <div className="content">{t('relationShip.outAllFail')}</div>
       <div className="line errorLine"></div>
       <div className="arrow errorArrow"></div>
     </div>)
@@ -184,12 +186,12 @@ class RelationShip extends React.Component {
       <QueueAnim className="relation-ship">
         <div className="timer" key="time">
           <Button style={{ marginRight: 5 }} icon="reload" onClick={() => this.loadData()}>
-            刷新
+            {t('relationShip.refresh')}
           </Button>
           <ApmTimePicker
             value={rangeDateTime}
             onChange={rangeDateTime => this.setState({ rangeDateTime })}
-            timeArr={btnArr}
+            timeArr={this.btnArr}
             onOk={this.loadData}
           />
           <div className="tip">

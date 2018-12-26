@@ -19,7 +19,9 @@ import { Card, Table, Button, Badge, Progress, Modal, Row, Col } from 'antd'
 import CallLinkTrackIcon from '../../../../assets/img/msa-manage/call-link-track.png'
 import { getZipkinTrace } from '../../../../actions/callLinkTrack'
 import { formatFromnow } from '../../../../common/utils'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('callLinkTracking')
 class CallLinkTrackDetail extends React.PureComponent {
 
   state = {
@@ -92,39 +94,39 @@ class CallLinkTrackDetail extends React.PureComponent {
   render() {
     const { serverDetail, serviceList, detailTimestamp, serverUrl, serverName, serverDuration } =
       this.state
-    const { isFetching, detailData } = this.props
+    const { isFetching, detailData, t } = this.props
     const columns = [{
       id: 'id',
-      title: '微服务名称',
+      title: t('detail.msName'),
       dataIndex: 'serverName',
       width: '15%',
     }, {
-      title: '方法名',
+      title: t('detail.funcName'),
       dataIndex: 'name',
       width: '15%',
     }, {
-      title: '状态',
+      title: t('detail.status'),
       dataIndex: 'success',
       width: '10%',
       render: status => <div className={status ? 'success-status' : 'error-status'}>
         <Badge status={status ? 'success' : 'error'} />
-        {status ? '成功' : '失败'}
+        {status ? t('index.success') : t('index.fail')}
       </div>,
     }, {
-      title: '耗时(ms)',
+      title: t('index.timeMs'),
       dataIndex: 'duration',
       width: '10%',
       render: text => text / 1000,
     }, {
-      title: `时间线 0 ms - ${detailData.length > 0 && detailData[0].duration / 1000} ms`,
+      title: t('detail.timelineTo', { replace: { ms: detailData.length > 0 && detailData[0].duration / 1000 } }),
       dataIndex: 'annotations',
       width: '20%',
       render: (text, record) => this.filterProgress(record.success, record.duration),
     }, {
-      title: '操作',
+      title: t('index.action'),
       width: '15%',
       render: text => <Button type="primary"
-        onClick={() => this.handleDetail(text)}>查看详情</Button>,
+        onClick={() => this.handleDetail(text)}>{t('index.lookDetail')}</Button>,
     }]
     const modalColums = [{
       key: 'id',
@@ -139,8 +141,10 @@ class CallLinkTrackDetail extends React.PureComponent {
 
     return (
       <QueueAnim className="call-link-track-detail">
-        <ReturnButton onClick={this.backToList}>返回</ReturnButton>
-        <span className="title">{`${detailData.length > 0 && detailData[0].traceId}`} 调用关系</span>
+        <ReturnButton onClick={this.backToList}>{t('detail.back')}</ReturnButton>
+        <span className="title">{t('detail.numberRelationship', {
+          replace: { number: detailData.length > 0 && detailData[0].traceId },
+        })}</span>
         <Card
           className="call-link-track-detail-header"
           key="call-link-track-detail-header"
@@ -150,15 +154,15 @@ class CallLinkTrackDetail extends React.PureComponent {
           <div className="call-link-track-detail-header-right">
             <div className="call-link-track-detail-id"></div>
             <ul className="call-link-track-detail-middle">
-              <li>开始时间：
+              <li>{t('detail.startTime')}：
                 {detailData.length > 0 && formatFromnow(detailData[0].timestamp / 1000)}
               </li>
-              <li>调用深度：{detailData.length > 0 && detailData[0].spanCount}</li>
-              <li>调用耗时：{detailData.length > 0 && detailData[0].duration / 1000} ms</li>
-              <li>总span数：{detailData.length > 0 && detailData[0].spanCount}</li>
+              <li>{t('detail.callDepth')}：{detailData.length > 0 && detailData[0].spanCount}</li>
+              <li>{t('detail.callTime')}：{detailData.length > 0 && detailData[0].duration / 1000} ms</li>
+              <li>{t('detail.allSpan')}：{detailData.length > 0 && detailData[0].spanCount}</li>
             </ul>
             <div className="call-link-track-detail-service-count">
-              <span>服务数：
+              <span>{t('detail.serviceNum')}：
                 {detailData.length > 0 && Object.keys(detailData[0].services).length}
               </span>
               <span>
@@ -187,17 +191,17 @@ class CallLinkTrackDetail extends React.PureComponent {
           width={'50%'}
           onCancel={this.handleClose}
           footer={[
-            <Button key="back" type="ghost" onClick={this.handleClose}>取 消</Button>,
-            <Button key="submit" type="primary" onClick={this.handleClose}>确 定</Button>,
+            <Button key="back" type="ghost" onClick={this.handleClose}>{t('detail.cancel')}</Button>,
+            <Button key="submit" type="primary" onClick={this.handleClose}>{t('detail.confirm')}</Button>,
           ]}>
           {
             <div className="modal-server">
               <div className="top">
-                <div>请求相对开始时间：
+                <div>{t('detail.reqStartTime')}：
                   {
                     detailData.length > 0 && (detailTimestamp - detailData[0].timestamp) / 1000
                   } ms</div>
-                <div>span 总耗时：{serverDuration && serverDuration / 1000} ms</div>
+                <div>{t('detail.spanAllTime')}：{serverDuration && serverDuration / 1000} ms</div>
               </div>
               {
                 serviceList.length === 4 &&
@@ -209,14 +213,14 @@ class CallLinkTrackDetail extends React.PureComponent {
                       </div>
                     </Col>
                     <Col span={6}>
-                      <div className="send">发送请求耗时：
+                      <div className="send">{t('detail.sendReqTime')}：
                         {
                           serviceList.length > 0 &&
                           (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
                         } ms
                       </div>
                       <div className="arrow-left sx-arrow-left"></div>
-                      <div className="end">收到响应耗时：
+                      <div className="end">{t('detail.getResTime')}：
                         {
                           serviceList.length > 0 &&
                           (serviceList[3].timestamp - serviceList[2].timestamp) / 1000
@@ -230,7 +234,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       </div>
                     </Col>
                     <Col span={6}>
-                      <div className="server-time">服务端处理请求耗时：
+                      <div className="server-time">{t('detail.serverHandleTime')}：
                         {
                           serviceList.length > 0 &&
                           (serviceList[2].timestamp - serviceList[1].timestamp) / 1000
@@ -251,7 +255,7 @@ class CallLinkTrackDetail extends React.PureComponent {
                       </div>
                     </Col>
                     <Col span={6}>
-                      <div className="server-time">服务端处理请求耗时：
+                      <div className="server-time">{t('detail.serverHandleTime')}：
                         {
                           serviceList.length > 0 &&
                           (serviceList[1].timestamp - serviceList[0].timestamp) / 1000
