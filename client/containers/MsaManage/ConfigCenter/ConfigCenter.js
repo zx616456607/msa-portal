@@ -345,7 +345,8 @@ class ConfigCenter extends React.Component {
           return ''
         }
         if (isLoadingLast) return ''
-        return text ? decodeURIComponent(text) : ''
+        return text
+        // return text ? decodeURIComponent(text) : ''
       },
     },
     // {
