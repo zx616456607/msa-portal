@@ -270,7 +270,8 @@ class LocalProject extends React.Component {
                     <OptGroup label={this.dependencyKeys(v)} key={v}>
                       {
                         dependencies[v].map(k => (
-                          <Option key={k.id}>
+                          <Option key={k.id} style={developmentStyle === 'Spring-MVC' && k.id === 'my-cloud-dubbo' ?
+                            { display: 'none' } : null }>
                             {k.name}
                           </Option>
                         ))
