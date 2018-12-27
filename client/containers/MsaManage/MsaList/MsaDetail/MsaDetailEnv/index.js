@@ -30,6 +30,11 @@ class MsaDetailEnv extends React.Component {
         message: t('detail.MsaDetailEnv.noConfig'),
       })
     }
+    if (res.status === 503) {
+      notification.warn({
+        message: t('detail.MsaDetailEnv.serviceError'),
+      })
+    }
   }
 
   componentDidMount() {
