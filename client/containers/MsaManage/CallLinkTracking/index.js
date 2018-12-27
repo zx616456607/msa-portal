@@ -29,6 +29,7 @@ import {
 } from '../../../actions/callLinkTrack'
 import ApmTimePicker from '../../../components/ApmTimePicker'
 import moment from 'moment'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -37,17 +38,7 @@ const colorMap = {
   error: G2.Global.colors[7],
 }
 
-const btnArr = [{
-  key: 'fiveMin',
-  text: '最近5分钟',
-}, {
-  key: 'thirty',
-  text: '最近30分钟',
-}, {
-  key: 'anHour',
-  text: '最近1小时',
-}]
-
+@withNamespaces('callLinkTracking')
 class CallLinkTracking extends React.Component {
 
   state = {
@@ -58,6 +49,17 @@ class CallLinkTracking extends React.Component {
     filterSuccess: '',
     current: DEFAULT_PAGE,
   }
+
+  btnArr = [{
+    key: 'fiveMin',
+    text: this.props.t('index.last5min'),
+  }, {
+    key: 'thirty',
+    text: this.props.t('index.last30Min'),
+  }, {
+    key: 'anHour',
+    text: this.props.t('index.last1Hour'),
+  }]
 
   componentDidMount() {
     const { clusterID, getZipkinServices } = this.props
@@ -124,12 +126,13 @@ class CallLinkTracking extends React.Component {
   fliterChartData = data => {
     if (!data) return
     let dataAry = []
+    const { t } = this.props
     data.forEach(item => {
       const columns = {
         gender: 'female',
         continent: item.success ? 'success' : 'error',
         traceId: item.traceId,
-        success: item.success ? '成功' : '失败',
+        success: item.success ? t('index.success') : t('index.fail'),
         serviceName: item.serviceName,
         duration: item.duration / 1000,
         startTime: `${formatDate(item.startTime)}`, // item.startTime
@@ -155,7 +158,7 @@ class CallLinkTracking extends React.Component {
     this.setState({
       rangeDateTime: [ moment(time - fiveMin), moment(new Date().getTime()) ],
       resetTime: true,
-      currentRadio: btnArr[0].key,
+      currentRadio: this.btnArr[0].key,
     }, () => this.setState({ resetTime: false })
     )
     getZipkinTracesList(clusterID, query)
@@ -195,24 +198,24 @@ class CallLinkTracking extends React.Component {
   render() {
     const {
       spanList, isFliter, filterList, rangeDateTime, resetTime } = this.state
-    const { history, form, dataList, isFetching, servicesList } = this.props
+    const { history, form, dataList, isFetching, servicesList, t } = this.props
     const { getFieldDecorator } = form
     const cols = {
       traceId: {
         alias: 'TraceID',
       },
       serviceName: {
-        alias: '微服务名称',
+        alias: t('index.msName'),
       },
       success: {
-        alias: '状态',
+        alias: t('index.status'),
       },
       duration: {
-        alias: '总调用耗时',
+        alias: t('index.callAllTime'),
         tickCount: 3,
       },
       startTime: {
-        alias: '开始时间',
+        alias: t('index.startTime'),
         // type: 'timeCat',
         mask: DEFAULT_TIME_FORMAT,
         tickCount: 5,
@@ -224,49 +227,49 @@ class CallLinkTracking extends React.Component {
       width: '13%',
       render: id => <Link to={`/msa-manage/call-link-tracking/${id}`}>{id}</Link>,
     }, {
-      title: '微服务名称',
+      title: t('index.msName'),
       dataIndex: 'spans',
       width: '15%',
       render: keys => this.filterSpans(keys),
     }, {
-      title: '状态',
+      title: t('index.status'),
       dataIndex: 'success',
       width: '10%',
       filterMultiple: false,
       filters: [{
-        text: '成功', value: true,
+        text: t('index.success'), value: true,
       }, {
-        text: '失败', value: false,
+        text: t('index.fail'), value: false,
       }],
       render: status => <div className={status ? 'success-status' : 'error-status'}>
         <Badge status={status ? 'success' : 'error'} />
-        {status ? '成功' : '失败'}
+        {status ? t('index.success') : t('index.fail')}
       </div>,
     }, {
-      title: '总span数',
+      title: t('index.allSpan'),
       dataIndex: 'spanCount',
       width: '10%',
       sorter: (a, b) => a.spanCount - b.spanCount,
     }, {
-      title: '总耗时数（ms）',
+      title: t('index.allTime'),
       width: '13%',
       dataIndex: 'duration',
       sorter: (a, b) => a.duration - b.duration,
       render: text => <div>{text / 1000}</div>,
     }, {
-      title: '开始时间',
+      title: t('index.startTime'),
       width: '15%',
       dataIndex: 'startTime',
       sorter: (a, b) => a.startTime - b.startTime,
       render: time => formatDate(time),
     }, {
-      title: '操作',
+      title: t('index.action'),
       width: '10%',
       render: record => <Button
         type={'primary'}
         onClick={() => history.push(`/msa-manage/call-link-tracking/${record.traceId}`)}
       >
-        查看详情
+        {t('index.lookDetail')}
       </Button>,
     }]
 
@@ -281,11 +284,11 @@ class CallLinkTracking extends React.Component {
                   onChange: e => this.handleServer(e),
                 })(
                   <Select
-                    placeholder="选择微服务"
+                    placeholder={t('index.chooseMS')}
                     className="select-style"
                     showSearch={true}
                   >
-                    <Option value="all">所有服务</Option>
+                    <Option value="all">{t('index.allService')}</Option>
                     {
                       servicesList && servicesList.map(item => {
                         return <Option key={item}>{item}</Option>
@@ -300,10 +303,10 @@ class CallLinkTracking extends React.Component {
                 {getFieldDecorator('spanName', {
                   initialValue: 'all',
                 })(
-                  <Select placeholder="选择span"
+                  <Select placeholder={t('index.sltSpan')}
                     className="select-style"
                     showSearch={true}>
-                    <Option value="all">所有span</Option>
+                    <Option value="all">{t('index.allSpan')}</Option>
                     {
                       spanList.length > 1 && spanList.map(item => {
                         return <Option key={item}>{item}</Option>
@@ -316,14 +319,14 @@ class CallLinkTracking extends React.Component {
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('limit', {})(
-                  <InputNumber min={1} max={900} placeholder="返回条数，默认10条" className="resCount" />
+                  <InputNumber min={1} max={900} placeholder={t('index.rtnItems10')} className="resCount" />
                 )}
               </FormItem>
             </Col>
             <Col span={5}>
               <FormItem>
                 {getFieldDecorator('minDuration', {})(
-                  <InputNumber min={1} max={3600000} placeholder="耗时（ms）>=" className="input-style" />
+                  <InputNumber min={1} max={3600000} placeholder={t('index.timeMSLarge')} className="input-style" />
                 )}
               </FormItem>
             </Col>
@@ -334,8 +337,8 @@ class CallLinkTracking extends React.Component {
                     {
                       validator: (rule, value, cb) => {
                         const reg = /[g-zA-Z\x21-\x2f\x3a-\x40\x5b-\x60\x7B-\x7F\u4e00-\u9fa5]/g
-                        if (value && reg.test(value)) cb('输入的字符只能是 0-9 a-f（16进制）')
-                        if (value && value.length > 32) cb('长度不超过32位')
+                        if (value && reg.test(value)) cb(t('index.only16Str'))
+                        if (value && value.length > 32) cb(t('index.lth32max'))
                         cb()
                       },
                     },
@@ -343,7 +346,7 @@ class CallLinkTracking extends React.Component {
 
                 })(
                   <div>
-                    <Input placeholder="Trace ID，其它条件设置无效" className="trace" />
+                    <Input placeholder={t('index.traceOtherUseless')} className="trace" />
                   </div>
                 )}
               </FormItem>
@@ -355,17 +358,22 @@ class CallLinkTracking extends React.Component {
                 value={rangeDateTime}
                 resetTime={resetTime}
                 onChange={rangeDateTime => this.setState({ rangeDateTime })}
-                timeArr={btnArr}
+                timeArr={this.btnArr}
               />
             </Col>
             <Col>
               <Button type={'primary'} icon={'search'} className="search"
-                onClick={() => this.handleSearch()}>搜索</Button>
+                onClick={() => this.handleSearch()}>{t('index.search')}</Button>
               <Button type={'primary'} icon={'rollback'}
-                onClick={() => this.handleReset()}>重置</Button>
+                onClick={() => this.handleReset()}>{t('index.reset')}</Button>
               {
-                dataList && <span className="total">共 {
-                  isFliter ? filterList.length : dataList.length || 0} 条</span>
+                dataList && <span className="total">{
+                  t('index.allElements', {
+                    replace: {
+                      allElements: isFliter ? filterList.length : dataList.length || 0,
+                    },
+                  })
+                }</span>
               }
             </Col>
           </Row>
@@ -389,8 +397,8 @@ class CallLinkTracking extends React.Component {
               }]} />
             {/* </View> */}
           </Chart>
-          <div className="kaing">耗时(ms)</div>
-          <div className="sTime">产生时间</div>
+          <div className="kaing">{t('index.timeMs')}</div>
+          <div className="sTime">{t('index.bronTime')}</div>
         </div>
         <div className="layout-content-body" key="body">
           <Card>

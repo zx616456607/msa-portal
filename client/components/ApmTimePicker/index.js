@@ -15,27 +15,13 @@ import PropTypes from 'prop-types'
 import { Button, DatePicker, Radio } from 'antd'
 import moment from 'moment'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const { RangePicker } = DatePicker
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
-const btnArr = [{
-  key: 'fiveMin',
-  text: '最近5分钟',
-}, {
-  key: 'threeHour',
-  text: '最近3小时',
-}, {
-  key: 'today',
-  text: '今天',
-}, {
-  key: 'yesterday',
-  text: '昨天',
-}, {
-  key: 'beforeYes',
-  text: '最近2天',
-}]
 
+@withNamespaces('callLinkTracking')
 export default class ApmTimePicker extends React.Component {
   static propTypes = {
     // 时间范围
@@ -51,6 +37,24 @@ export default class ApmTimePicker extends React.Component {
     currentRadio: 'fiveMin',
     hasClicked: false,
   }
+
+  btnArr = [{
+    key: 'fiveMin',
+    text: this.props.t('apmTimerPicker.last5min'),
+  }, {
+    key: 'threeHour',
+    text: this.props.t('apmTimerPicker.last3Hours'),
+  }, {
+    key: 'today',
+    text: this.props.t('apmTimerPicker.today'),
+  }, {
+    key: 'yesterday',
+    text: this.props.t('apmTimerPicker.yesterday'),
+  }, {
+    key: 'beforeYes',
+    text: this.props.t('apmTimerPicker.last2Days'),
+  }]
+
   componentDidMount() {
     const { value } = this.props
     this.setDefaultTime(value)
@@ -199,7 +203,7 @@ export default class ApmTimePicker extends React.Component {
   }
   render() {
     const { value, isRangeTime, currentRadio, hasClicked } = this.state
-    const { timeArr, limitDays } = this.props
+    const { timeArr, limitDays, t } = this.props
     return (
       <div className="apm-timepicker">
         <Button
@@ -208,7 +212,7 @@ export default class ApmTimePicker extends React.Component {
           onClick={this.toogleTimePicker}
           icon="calendar"
         >
-          自定义日期
+          {t('apmTimerPicker.customDate')}
         </Button>
         {
           isRangeTime ?
@@ -221,9 +225,11 @@ export default class ApmTimePicker extends React.Component {
               dateRender={current => <div className="ant-calendar-date" onClick={() => this.dateClick(current)}>{current.date()}</div>}
               disabledDate={limitDays && hasClicked ? this.disabledDate : () => false}
               disabledTime={limitDays && hasClicked ? this.disabledRangeTime : () => false}
-              renderExtraFooter={() => (limitDays ? <span className="apm-range-picker-tip">时间长度不超过{limitDays}天</span> : '')}
+              renderExtraFooter={() => (limitDays ? <span className="apm-range-picker-tip">{
+                t('apmTimerPicker.timeBelowLimitDays', { replace: { limitDays } })
+              }</span> : '')}
               format="YYYY-MM-DD HH:mm"
-              placeholder={[ '开始日期', '结束日期' ]}
+              placeholder={[ t('apmTimerPicker.startDate'), t('apmTimerPicker.endDate') ]}
               value={value}
               onChange={this.onChange}
               onOk={this.onOk}
@@ -235,7 +241,7 @@ export default class ApmTimePicker extends React.Component {
               value={currentRadio}
             >
               {
-                (timeArr || btnArr).map(item => (
+                (timeArr || this.btnArr).map(item => (
                   <RadioButton key={item.key} value={item.key}>{item.text}</RadioButton>
                 ))
               }

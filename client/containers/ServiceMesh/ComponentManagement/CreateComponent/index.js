@@ -352,9 +352,10 @@ class CreateComponent extends React.Component {
   tipService = name => {
     const listAry = this.filterService()
     const { form } = this.props
-    return listAry.length && listAry.indexOf(form.getFieldValue(name)) > -1 ?
+    const showName = form.getFieldValue(name)
+    return listAry.length && listAry.indexOf(showName) > -1 ?
       <Tooltip placement="top"
-        title={`组件中的${listAry}服务已经不存在，请编辑移除该服务`}>
+        title={`组件中的 ${showName} 服务已经不存在，请编辑移除该服务`}>
         <Icon type="exclamation-circle" className="ico" />
       </Tooltip> : ''
   }
