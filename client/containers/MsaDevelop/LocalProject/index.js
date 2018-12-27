@@ -117,14 +117,20 @@ class LocalProject extends React.Component {
       this.setState({
         expendAdvance: false,
       })
-
     })
   }
   render() {
     const { getFieldDecorator, getFieldsValue, setFieldsValue } = this.props.form
     const { versionOfJavaArr, developStyle,
       dependencies, expendAdvance, bootVersion } = this.state
+    const targetDependencies = JSON.parse(JSON.stringify(dependencies))
     const { name, developmentStyle } = getFieldsValue()
+    const dependenciesList = Object.keys(dependencies)
+    dependenciesList.forEach(v => {
+      if (developmentStyle === 'Spring-MVC') {
+        targetDependencies[v] = targetDependencies[v].filter(v => v.id !== 'my-cloud-dubbo')
+      }
+    })
     return <div className="local-project">
       <div className="alert">
         直接创建微服务工程并下载，简化微服务工程的初始搭建，省去样板化配置步骤，直接快速进入业务代码开发阶段
@@ -269,9 +275,8 @@ class LocalProject extends React.Component {
                   Object.keys(dependencies).map(v => (
                     <OptGroup label={this.dependencyKeys(v)} key={v}>
                       {
-                        dependencies[v].map(k => (
-                          <Option key={k.id} style={developmentStyle === 'Spring-MVC' && k.id === 'my-cloud-dubbo' ?
-                            { display: 'none' } : null }>
+                        targetDependencies[v].map(k => (
+                          <Option key={k.id}>
                             {k.name}
                           </Option>
                         ))
