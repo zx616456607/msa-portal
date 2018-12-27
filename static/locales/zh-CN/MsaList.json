@@ -136,7 +136,8 @@
       "opera": "操作",
       "reflesh": "刷新",
       "updateConfig": "更新配置",
-      "check": "查看"
+      "check": "查看",
+      "serviceError": "当前服务运行状态不正常"
     },
     "MsaDetailDemote": {
       "openTitle": "开启降级策略",
@@ -151,7 +152,8 @@
       "onConfig": "暂无配置",
       "noData": "暂无数据",
       "wrong1": "无法获取外部服务数据",
-      "reflesh": "刷新"
+      "reflesh": "刷新",
+      "serviceError": "当前服务运行状态不正常"
     },
     "MsaDetailList": {
       "removeRegisterTitle": "移除注册操作",
