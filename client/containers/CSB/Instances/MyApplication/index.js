@@ -214,7 +214,10 @@ class MyApplication extends React.Component {
     switch (row.status) {
       case 2:
         return <div>
-          <Button type="primary" onClick={() => history.push(`/csb-instances/available/${row.instance.id}`)}>实例详情</Button>
+          <Button
+            type="primary"
+            disabled={row.instance.status !== 1}
+            onClick={() => history.push(`/csb-instances/available/${row.instance.id}`)}>实例详情</Button>
           <Button className="btn-abandon" onClick={() => this.handleAbandonInstance(row.instance.id)}>放弃使用</Button>
         </div>
       case 1:
