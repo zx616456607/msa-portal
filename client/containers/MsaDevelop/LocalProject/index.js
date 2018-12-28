@@ -341,7 +341,7 @@ class LocalProject extends React.Component {
                 })(<Input placeholder="请输入Artifact ID"/>)}
               </FormItem>
               <FormItem
-                label="PackageName"
+                label="Package"
                 {...formItemLayout}
               >
                 {getFieldDecorator('packageName', {
