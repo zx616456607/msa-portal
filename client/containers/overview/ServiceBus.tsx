@@ -128,7 +128,7 @@ class LineChart extends React.Component<LineChartProps, LineChartState> {
     return(
       <div className="lineChart">
         <div className="title">近5天我发布的服务累计调用量 / 累计错误量 </div>
-        <Chart height={200} forceFit padding={'auto'} data={realChartData} pixelRatio={window.devicePixelRatio * 2} >
+        <Chart height={155} forceFit padding={'auto'} data={realChartData} pixelRatio={window.devicePixelRatio * 2} >
           {/* <Legend /> */}
           <Axis name="month" />
           <Axis name="temperature" />

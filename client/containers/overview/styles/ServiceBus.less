@@ -9,17 +9,17 @@
  */
 @import "../../../assets/style/core/index.less";
 .ServiceBus {
-  margin-top: @padding-small !important;
+  // margin-top: @padding-small !important;
   .ant-card-body {
     padding: 0 !important;
   }
   .title {
     .info {
-      color: @font-color-2;
+      color: @font-color-3;
     }
   }
   .IStatistics {
-    padding: @padding-medium;
+    padding: @padding-medium @padding-medium 0 @padding-medium;
     border-right: 1px solid @border-color-split;
     .title {
       color: black;
@@ -43,7 +43,7 @@
   .alreadySerive {
     display: flex;
     > div {
-      padding: @padding-large;
+      padding: 29px;
       flex-grow: 1;
       text-align: center;
       > div {
@@ -134,6 +134,7 @@
     }
     .title {
       margin-bottom: @padding-base;
+      color: @font-color-2;
     }
   }
 }

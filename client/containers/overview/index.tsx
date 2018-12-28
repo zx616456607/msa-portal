@@ -12,7 +12,6 @@ import { Row, Col } from 'antd'
 import SpringCloudOV from './SpringCloudOV'
 import ServiceMeshOV from './serviceMeshOV'
 import DubboOV from './DubboOV'
-import PerformanceOV from './PerformanceOV'
 import MSDTCOV from './MSDTCOV'
 import ServiceBus from './ServiceBus'
 import './styles/index.less'
@@ -39,13 +38,13 @@ export default class Overview extends React.Component<OverviewProps, OverviewSta
         </Row>
         <Row gutter={16} className="secondSection">
           <Col span={16}>
-            <PerformanceOV/>
+            <ServiceBus/>
           </Col>
           <Col span={8}>
             <MSDTCOV/>
           </Col>
         </Row>
-        <ServiceBus/>
+        {/* <ServiceBus/> */}
       </div>
     )
   }

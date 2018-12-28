@@ -17,6 +17,7 @@ import {
   Coord,
 } from 'bizcharts';
 import { Row, Col } from 'antd'
+import isEmpty from 'lodash/isEmpty'
 
 interface AnnularCharProp {
   MSResData: any
@@ -30,15 +31,15 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
     const data = [
       {
         type: '正常',
-        value: 0,
+        value: this.props.MSResData.normalCount || 0,
       },
       {
-        type: '分类二',
-        value: 0,
+        type: '无数据',
+        value: (isEmpty(this.props.MSResData) ? 1 : 0),
       },
       {
         type: '轻微',
-        value: 0,
+        value: this.props.MSResData.minorCount || 0,
       },
       {
         type: '重要',
@@ -49,7 +50,7 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
         value: this.props.MSResData.criticalCount || 0,
       },
     ]; // 可以通过调整这个数值控制分割空白处的间距，0-1 之间的数值
-
+    const MSResData = this.props.MSResData
     /*const sliceNumber = 0.01; // 自定义 other 的图形，增加两条线
 
     G2.Shape.registerShape("interval", "sliceShape", {
@@ -74,13 +75,21 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
     class SliderChart extends React.Component {
       render() {
         return (
-          <Chart height={160} data={data} forceFit padding={'auto'} >
+          <Chart height={140} data={data} forceFit padding={'auto'} >
             <Coord type="theta" innerRadius={0.75} />
-            <Tooltip showTitle={false} />
+            { !isEmpty(MSResData) &&
+              <Tooltip showTitle={false} />
+            }
             <Geom
               type="intervalStack"
               position="value"
-              color="type"
+              color={[ 'type', type => {
+                if (type === '正常') { return '#43b3fb' }
+                if (type === '轻微') { return '#2abe84' }
+                if (type === '重要') { return '#ffbf00' }
+                if (type === '严重') { return '#f7565c' }
+                return 'rgb(169,224,250)'
+              } ]}
               shape="sliceShape"
             />
           </Chart>
@@ -90,7 +99,10 @@ class AnnularCharInner extends React.Component<AnnularCharProp, AnnularCharState
     return (
       <div className="AnnularCharInner">
         <SliderChart />
-        <div className="centerText">{`共${this.props.MSResData.eurekaEventLogCount || 0}个`}</div>
+        <div className="centerText">
+        <div>共</div>
+        <div>{`${this.props.MSResData.eurekaEventLogCount || 0}个`}</div>
+        </div>
       </div>
     );
   }
@@ -116,8 +128,8 @@ export default class AnnularChar extends React.Component<AnnularCharProps, any> 
             <div className="messageBox">
               <div><div className="color1">严重</div><div>{`${this.props.MSResData.criticalCount || 0}个`}</div></div>
               <div><div className="color2">重要</div><div>{`${this.props.MSResData.majorCount || 0}个`}</div></div>
-              <div><div className="color3">轻微</div><div>0个</div></div> {/* //TODO: 目前还没有 */}
-              <div><div className="color4">正常</div><div>0个</div></div> {/* // TODO: 需要后端加 */}
+              <div><div className="color3">轻微</div><div>{`${this.props.MSResData.minorCount || 0}个`}</div></div>
+              <div><div className="color4">正常</div><div>{`${this.props.MSResData.normalCount || 0}个`}</div></div>
             </div>
           </Col>
         </Row>

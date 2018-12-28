@@ -76,7 +76,7 @@ export default class SplashesChar extends React.Component<SplashesCharProps, Spl
     }
     return (
       <div className="SplashesCharWrap">
-      <div className="head">近五分钟调用</div>
+      <div className="head">近 5 分钟调用</div>
       <div className="weightInfo">耗时</div>
       <div className="heightInfo" >产生时间</div>
       <div className="SplashesChar">
