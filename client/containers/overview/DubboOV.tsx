@@ -80,17 +80,18 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
     })
   }
   render() {
+    const noData = this.state.ConsumersService || this.state.CPService || this.state.ProvidersService
     const data = [
       {
         type: '仅消费者',
         value: this.state.ConsumersService,
       },
       {
-        type: '分类二',
-        value: 0,
+        type: '无数据',
+        value: (noData ? 0 : 1),
       },
       {
-        type: '两者都有',
+        type: '两者均有',
         value: this.state.CPService,
       },
       {
@@ -98,20 +99,27 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
         value: this.state.ProvidersService,
       },
       {
-        type: '仅消费者',
+        type: '',
         value: 0,
       },
     ]
     class SliderChart extends React.Component {
       render() {
         return (
-          <Chart height={160} data={data} forceFit padding={'auto'} >
+          <Chart height={140} data={data} forceFit padding={'auto'} >
             <Coord type="theta" innerRadius={0.75} />
-            <Tooltip showTitle={false} />
+            { noData ?
+            <Tooltip showTitle={false} /> : null
+            }
             <Geom
               type="intervalStack"
               position="value"
-              color="type"
+              color={[ 'type', type => {
+                if (type === '仅消费者') { return '#43b3fb' }
+                if (type === '两者均有') { return '#2abe84' }
+                if (type === '仅提供者') { return '#ffbf00' }
+                return 'rgb(169,224,250)'
+              } ]}
               shape="sliceShape"
             />
           </Chart>
@@ -132,13 +140,16 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
       <Spin spinning={this.state.loading}>
       <Card title="治理-Dubbo" className="DubboOV">
         <div>
-          <div>服务数量</div>
+          <div className="title">服务数量</div>
         </div>
         <Row>
           <Col span={11}>
           <div className="SliderChart">
           <SliderChart />
-          <div className="centerText">{`共${this.state.tatalService}个`}</div>
+          <div className="centerText">
+            <div>共</div>
+            <div>{`${this.state.tatalService}个`}</div>
+          </div>
           </div>
           </Col>
           <Col span={2}/>

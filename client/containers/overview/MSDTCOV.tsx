@@ -56,14 +56,15 @@ class MSDTCOV extends React.Component<MSDTCOVPros, MSDTCOVState> {
     this.setState({ totalAffair, todayFail, todaySuccess, loading: false })
   }
   render() {
+    const noData = this.state.todaySuccess || this.state.todayFail
     const data = [
       {
         type: '成功事务',
         value: this.state.todaySuccess,
       },
       {
-        type: '分类二',
-        value: 0,
+        type: '无数据',
+        value: noData ? 0 : 1,
       },
       {
         type: '两者都有',
@@ -81,13 +82,19 @@ class MSDTCOV extends React.Component<MSDTCOVPros, MSDTCOVState> {
     class SliderChart extends React.Component {
       render() {
         return (
-          <Chart height={160} data={data} forceFit padding={'auto'} >
+          <Chart height={140} data={data} forceFit padding={'auto'} >
             <Coord type="theta" innerRadius={0.75} />
-            <Tooltip showTitle={false} />
+            { noData ?
+            <Tooltip showTitle={false} /> : null
+            }
             <Geom
               type="intervalStack"
               position="value"
-              color="type"
+              color={[ 'type', type => {
+                if (type === '成功事务') { return '#43b3fb' }
+                if (type === '回滚事务') { return '#f7565c' }
+                return 'rgb(169,224,250)'
+              } ]}
               shape="sliceShape"
             />
           </Chart>
@@ -100,15 +107,18 @@ class MSDTCOV extends React.Component<MSDTCOVPros, MSDTCOVState> {
         className="MSDTCOV"
         title={<div className="title">
         <span>分布式事务</span>
-        <span className="grey">{`父事务统计 ${this.state.totalAffair}`}</span>
+        <span className="grey">{`父事务统计 ${this.state.totalAffair} 个`}</span>
         </div>}
       >
-        <div className="info">当前事务执行记录</div>
+        <div className="info">当天事务执行记录</div>
         <Row>
           <Col span={11}>
           <div className="SliderChart">
           <SliderChart />
-          <div className="centerText">{`共${this.state.todayFail + this.state.todaySuccess}个`}</div>
+          <div className="centerText">
+            <div>共执行</div>
+            <div>{`${this.state.todayFail + this.state.todaySuccess}个`}</div>
+          </div>
           </div>
           </Col>
           <Col span={2}/>
