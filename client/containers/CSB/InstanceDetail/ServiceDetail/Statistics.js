@@ -58,6 +58,12 @@ const Chart = CreateG2(chart => {
     title: '调用监控趋势',
     position: 'right', // 设置图例的显示位置
   })
+  chart.point().position('dateTime*count').size(4)
+    .shape('circle')
+    .style({
+      stroke: '#fff',
+      lineWidth: 1,
+    });
   chart.render()
 })
 
