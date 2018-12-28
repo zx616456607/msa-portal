@@ -137,7 +137,8 @@
       "opera": "Operation",
       "reflesh": "Refresh",
       "updateConfig": "Update",
-      "check": "View"
+      "check": "View",
+      "serviceError": "The current service running status is abnormal"
     },
     "MsaDetailDemote": {
       "openTitle": "Enable",
@@ -152,7 +153,8 @@
       "onConfig": "No configuration",
       "noData": "No data available.",
       "wrong1": "Unable to get external service data",
-      "reflesh": "Refresh"
+      "reflesh": "Refresh",
+      "serviceError": "The current service running status is abnormal"
     },
     "MsaDetailList": {
       "removeRegisterTitle": "Remove operation ",

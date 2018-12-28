@@ -36,6 +36,11 @@ class MsaDetailConfig extends React.Component {
           message: t('detail.MsadetailConfig.noConfigs'),
         })
       }
+      if (res.status === 503) {
+        notification.warn({
+          message: t('detail.MsadetailConfig.serviceError'),
+        })
+      }
     })
   }
 

@@ -154,7 +154,8 @@ class App extends React.Component {
     }
     const { message, status, options } = errorObject
     if (message === 'Failed to fetch' ||
-    (status === 503 && message === '503 Service Unavailable')) {
+    (status === 503 && message === '503 Service Unavailable'
+    && !pathname.includes('/msa-manage/detail'))) {
       messageTip.warn('网络或服务暂时不可用，请稍后重试')
       resetErrorMessage()
       return
