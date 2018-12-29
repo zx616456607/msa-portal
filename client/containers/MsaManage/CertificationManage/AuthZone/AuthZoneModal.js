@@ -15,10 +15,12 @@ import PropTypes from 'prop-types'
 import { Modal, Form, Input, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import { createIdentityZones, updateIdentityZone } from '../../../../actions/certification'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea
 
+@withNamespaces('identityManage')
 class AuthZoneModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
@@ -32,7 +34,7 @@ class AuthZoneModal extends React.Component {
   handleConfirm = async () => {
     const {
       form, createIdentityZones, updateIdentityZone,
-      closeModal, loadDate, currentAuthZone,
+      closeModal, loadDate, currentAuthZone, t,
     } = this.props
     form.validateFields(async (errors, values) => {
       if (errors) {
@@ -47,7 +49,7 @@ class AuthZoneModal extends React.Component {
         if (updateRes.error) {
           if (updateRes.status === 409) {
             notification.warn({
-              message: '认证域名称重复',
+              message: t('addIdentityZones.identityZonesRepeat'),
             })
             this.setState({
               loading: false,
@@ -55,7 +57,7 @@ class AuthZoneModal extends React.Component {
             return
           }
           notification.warn({
-            message: '修改认证域失败',
+            message: t('addIdentityZones.changeZoneFailed'),
           })
           this.setState({
             loading: false,
@@ -63,7 +65,7 @@ class AuthZoneModal extends React.Component {
           return
         }
         notification.success({
-          message: '修改认证域成功',
+          message: t('addIdentityZones.changeZoneSuccess'),
         })
         this.setState({
           loading: false,
@@ -76,7 +78,7 @@ class AuthZoneModal extends React.Component {
       if (createRes.error) {
         if (createRes.status === 409) {
           notification.warn({
-            message: '认证域名称重复',
+            message: t('addIdentityZones.identityZonesRepeat'),
           })
           this.setState({
             loading: false,
@@ -84,7 +86,7 @@ class AuthZoneModal extends React.Component {
           return
         }
         notification.warn({
-          message: '创建认证域失败',
+          message: t('addIdentityZones.createZoneFailed'),
         })
         this.setState({
           loading: false,
@@ -92,7 +94,7 @@ class AuthZoneModal extends React.Component {
         return
       }
       notification.success({
-        message: '创建认证域成功',
+        message: t('addIdentityZones.createZoneSuccess'),
       })
       this.setState({
         loading: false,
@@ -107,18 +109,19 @@ class AuthZoneModal extends React.Component {
     closeModal && closeModal()
   }
   checkName = (rule, value, callback) => {
+    const { t } = this.props
     const reg = /[%_]/
     if (!(value.length >= 1 && value.length <= 255)) {
-      return callback('请输入1~255个字符')
+      return callback(t('addIdentityZones.input255Char'))
     }
     if (reg.test(value)) {
-      return callback('不支持%和_')
+      return callback(t('addIdentityZones.notInpChar'))
     }
     return callback()
   }
   render() {
     const { loading } = this.state
-    const { visible, currentAuthZone, form } = this.props
+    const { visible, currentAuthZone, form, t } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -128,14 +131,14 @@ class AuthZoneModal extends React.Component {
     return (
       <Modal
         visible={visible}
-        title={`${isEmpty(currentAuthZone) ? '添加' : '编辑'}认证域`}
+        title={isEmpty(currentAuthZone) ? t('addIdentityZones.addIdentityZones') : t('addIdentityZones.editorIdentityZones')}
         onOk={this.handleConfirm}
         onCancel={this.handleClose}
         confirmLoading={loading}
       >
         <Form>
           <FormItem
-            label={'认证域名称'}
+            label={t('addIdentityZones.identityZonesName')}
             {...formItemLayout}
           >
             {
@@ -148,7 +151,7 @@ class AuthZoneModal extends React.Component {
                   },
                 ],
               })(
-                <Input placeholder={'请输入认证域名称'}/>
+                <Input placeholder={t('addIdentityZones.inputZonesName')}/>
               )
             }
           </FormItem>
@@ -160,25 +163,25 @@ class AuthZoneModal extends React.Component {
               getFieldDecorator('subdomain', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.subdomain : '',
                 rules: [
-                  { required: true, max: 255, message: '请输入1~255个字符' },
+                  { required: true, max: 255, message: t('addIdentityZones.input255Char') },
                 ],
               })(
-                <Input placeholder={'请输入 SubDomain 名称'}/>
+                <Input placeholder={t('addIdentityZones.inputSubDomainName')}/>
               )
             }
           </FormItem>
           <FormItem
-            label={'描述'}
+            label={t('addIdentityZones.desc')}
             {...formItemLayout}
           >
             {
               getFieldDecorator('description', {
                 initialValue: !isEmpty(currentAuthZone) ? currentAuthZone.description : '',
                 rules: [
-                  { required: false, max: 255, message: '请输入1~255个字符' },
+                  { required: false, max: 255, message: t('addIdentityZones.input255Char') },
                 ],
               })(
-                <TextArea placeholder={'请输入描述'}/>
+                <TextArea placeholder={t('addIdentityZones.inputDesc')}/>
               )
             }
           </FormItem>
