@@ -20,6 +20,7 @@ import './style/AddClientModal.less'
 import { createClient, editClient } from '../../../../../../actions/certification'
 import { REDIRECT_URL_REG } from '../../../../../../constants'
 import { sleep } from '../../../../../../common/utils'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 const CheckboxGroup = Checkbox.Group
@@ -29,6 +30,7 @@ const authModeOpts = [ 'authorization_code', 'implicit', 'password', 'client_cre
 
 let uuid = 0
 
+@withNamespaces('authZoneDetail')
 class AddClientModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
@@ -262,7 +264,7 @@ class AddClientModal extends React.Component {
   }
 
   renderItem = (key, index) => {
-    const { form, isView, identityZoneDetail } = this.props
+    const { form, isView, identityZoneDetail, t } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 10 },
@@ -284,7 +286,7 @@ class AddClientModal extends React.Component {
     return (
       <Row key={`item-${key}`} className="scope-row">
         <Col span={12}>
-          <FormItem {...formItemLayout} label={index ? ' ' : '授权范围'}>
+          <FormItem {...formItemLayout} label={index ? ' ' : t('tabOAuth.authRound')}>
             {
               getFieldDecorator(`scope-${key}`, {
                 // initialValue: 'uaa.none',
@@ -317,7 +319,7 @@ class AddClientModal extends React.Component {
                 valuePropName: 'checked',
                 initialValue: false,
               })(
-                <Checkbox disabled={isView}>自动审批</Checkbox>
+                <Checkbox disabled={isView}>{t('tabOAuth.autoApproval')}</Checkbox>
               )
             }
           </FormItem>
@@ -327,7 +329,7 @@ class AddClientModal extends React.Component {
     )
   }
   render() {
-    const { form, visible, isView, currentClient, closeModal } = this.props
+    const { form, visible, isView, currentClient, closeModal, t } = this.props
     const { confirmLoading } = this.state
     const { getFieldDecorator, getFieldValue } = form
     const formItemLayout = {
@@ -349,7 +351,7 @@ class AddClientModal extends React.Component {
         confirmLoading={confirmLoading}
         footer={this.renderFooter()}
       >
-        <FormItem {...formItemLayout} label="名称">
+        <FormItem {...formItemLayout} label={t('tabOAuth.name')}>
           {
             getFieldDecorator('name', {
               initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.name) ? currentClient.name : '',
@@ -358,7 +360,7 @@ class AddClientModal extends React.Component {
             )
           }
         </FormItem>
-        <FormItem {...formItemLayout} label="授权方式">
+        <FormItem {...formItemLayout} label={ t('tabOAuth.authMethod')}>
           {
             getFieldDecorator('authorized_grant_types', {
               initialValue: !isEmpty(currentClient) &&
@@ -432,7 +434,7 @@ class AddClientModal extends React.Component {
         {
           !isEmpty(authorizedGrantTypes) &&
           (authorizedGrantTypes.includes('authorization_code') || authorizedGrantTypes.includes('implicit')) &&
-          <FormItem {...formItemLayout} label="重定向 URL">
+          <FormItem {...formItemLayout} label={t('tabOAuth.redirectUrl')}>
             {
               getFieldDecorator('redirect_uri', {
                 initialValue: !isEmpty(currentClient) && !isEmpty(currentClient.redirect_uri) ? currentClient.redirect_uri.join(',') : '',
@@ -453,7 +455,7 @@ class AddClientModal extends React.Component {
         {keys.map(this.renderItem)}
         <Row style={{ marginTop: 10 }}>
           <Col offset={5}>
-            <Button disabled={isView} icon="plus" type="primary" ghost onClick={this.addScope}>添加授权范围</Button>
+            <Button disabled={isView} icon="plus" type="primary" ghost onClick={this.addScope}>{t('tabOAuth.addAuthRange')}</Button>
           </Col>
         </Row>
       </Modal>

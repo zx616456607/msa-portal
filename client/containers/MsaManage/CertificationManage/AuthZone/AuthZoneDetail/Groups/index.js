@@ -30,9 +30,11 @@ import GroupsDetailDock from './Dock'
 import GroupsModal from './GroupsModal'
 import GroupUsersModal from './GroupUsersModal'
 import { zoneUserListSlt } from '../../../../../../selectors/certification'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+@withNamespaces('authZoneDetail')
 class Groups extends React.Component {
 
   state = {
@@ -127,7 +129,7 @@ class Groups extends React.Component {
   }
 
   handleOk = async () => {
-    const { targetKeys, originKeys } = this.state
+    const { targetKeys, originKeys, t } = this.state
     const commonKeys = intersection(targetKeys, originKeys)
     const addKeys = difference(targetKeys, commonKeys)
     const delKeys = difference(originKeys, commonKeys)
@@ -144,10 +146,18 @@ class Groups extends React.Component {
       delResult = await this.handleDelGroupUsers(delKeys)
     }
     if (!isEmpty(addResult)) {
-      failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+      failedMessage += `${t('tabGroup.addUserFailed', {
+        replace: {
+          userName: addResult.toString(),
+        },
+      })}\n`
     }
     if (!isEmpty(delResult)) {
-      failedMessage += `移除用户 ${delResult.toString()} 失败；\n`
+      failedMessage += `${t('tabGroup.removeUserFailed', {
+        replace: {
+          userName: addResult.toString(),
+        },
+      })}\n`
     }
     if (failedMessage) {
       notification.warn({
@@ -155,7 +165,7 @@ class Groups extends React.Component {
       })
     } else {
       notification.success({
-        message: '操作成功',
+        message: t('tabGroup.success'),
       })
     }
     this.loadGroupList()
@@ -179,20 +189,32 @@ class Groups extends React.Component {
   }
 
   handleDeleteGroup = record => {
-    const { deleteGroup } = this.props
+    const { deleteGroup, t } = this.props
     confirm({
-      modalTitle: '删除',
-      title: `确定删除组 ${record.displayName}`,
+      modalTitle: t('public.delete'),
+      title: t('tabGroup.deleteGroupMessage', {
+        replace: {
+          groupName: record.displayName,
+        },
+      }),
       onOk: () => {
         return deleteGroup(record.id).then(res => {
           if (res.error) {
             notification.warn({
-              message: `${record.displayName}删除失败`,
+              message: t('tabGroup.deleteFailed', {
+                replace: {
+                  groupName: record.displayName,
+                },
+              }),
             })
             return
           }
           notification.success({
-            message: `${record.displayName}删除成功`,
+            message: t('tabGroup.deleteSuccess', {
+              replace: {
+                groupName: record.displayName,
+              },
+            }),
           })
           this.loadGroupList()
         })
@@ -222,7 +244,7 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { dataList, isFetching, zoneUsers, userCount } = this.props
+    const { dataList, isFetching, zoneUsers, userCount, t } = this.props
     const { resources, totalResults } = dataList
     const pagination = {
       simple: true,
@@ -233,7 +255,7 @@ class Groups extends React.Component {
     const columns = [
       {
         id: 'id',
-        title: '组名',
+        title: t('tabGroup.groupName'),
         key: 'displayName',
         dataIndex: 'displayName',
         width: '16%',
@@ -241,47 +263,47 @@ class Groups extends React.Component {
           <a onClick={() => this.handleDetail(record)}>{text}</a>),
       },
       {
-        title: '类型',
+        title: t('tabGroup.type'),
         width: '16%',
         key: 'isDefaultGroup',
         dataIndex: 'displayName',
-        render: text => (isUaaDefaultGroup(text) ? '系统默认' : '自定义'),
+        render: text => (isUaaDefaultGroup(text) ? t('tabGroup.sysDefault') : t('tabGroup.custom')),
       },
       {
-        title: '用户（个）',
+        title: t('tabGroup.user'),
         dataIndex: 'members',
         key: 'members',
         width: '16%',
         render: (text, record) => (isUaaDefaultGroup(record.displayName) ? userCount : text.length),
       },
       {
-        title: '描述',
+        title: t('public.description'),
         dataIndex: 'description',
         key: 'description',
         width: '16%',
         render: desc => desc || '-',
       },
       {
-        title: '创建时间',
+        title: t('public.creationTime'),
         dataIndex: 'meta.created',
         key: 'meta.created',
         width: '16%',
         render: time => formatDate(time),
       },
       {
-        title: '操作',
+        title: t('public.option'),
         width: '16%',
         render: record => {
           const menu = (
             <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e, record)}>
-              <Menu.Item key="groupName">管理组用户</Menu.Item>
-              <Menu.Item key="del">删除</Menu.Item>
+              <Menu.Item key="groupName">{t('tabGroup.manageGroupUser')}</Menu.Item>
+              <Menu.Item key="del">{t('public.delete')}</Menu.Item>
             </Menu>
           )
           return (
             isUaaDefaultGroup(record.displayName) ? '-' :
               <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup(record)}>
-              编辑
+                {t('public.edit')}
               </Dropdown.Button>
           )
         },
@@ -296,16 +318,20 @@ class Groups extends React.Component {
     return (
       <div className="zone-groups">
         <div className="layout-content-btns" key="btns">
-          <Button icon="plus" type="primary" onClick={this.handleAddGroup}>添加组</Button>
-          <Button icon="reload" onClick={this.loadGroupList}>刷新</Button>
+          <Button icon="plus" type="primary" onClick={this.handleAddGroup}>{t('tabGroup.addNewGroup')}</Button>
+          <Button icon="reload" onClick={this.loadGroupList}>{t('public.refresh')}</Button>
           <Search
-            placeholder="请输入组名搜索"
+            placeholder={t('tabGroup.searchWithGroupName')}
             style={{ width: 200 }}
             onChange={e => this.setState({ inputValue: e.target.value })}
             onSearch={this.loadGroupList}
           />
           <div className={classNames('page-box', { hide: !totalResults })}>
-            <span className="total">共 {totalResults} 条</span>
+            <span className="total">{
+              t('public.totalResults', {
+                replace: { totalResults },
+              })
+            }</span>
           </div>
         </div>
         <div className="layout-content-body" key="body">

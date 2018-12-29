@@ -14,13 +14,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Modal, Input, Form, notification } from 'antd'
 import { createGroup, updateGroup } from '../../../../../../actions/certification'
+import { withNamespaces } from 'react-i18next'
 const FormItem = Form.Item
 
+@withNamespaces('authZoneDetail')
 class GroupsModal extends React.Component {
 
   handleOk = () => {
     const { createGroup, updateGroup, form,
-      editGroup, editData, closeModal, loadGroup } = this.props
+      editGroup, editData, closeModal, loadGroup, t } = this.props
     const { validateFields } = form
     validateFields(async (err, value) => {
       if (err) {
@@ -43,17 +45,27 @@ class GroupsModal extends React.Component {
       if (result.error) {
         if (editGroup && result.error.indexOf('already exists') || result.status === 409) {
           notification.warn({
-            message: `${value.groupName}组名称已存在`,
+            message: t('groupDetail.groupExist', {
+              replace: { name: value.groupName },
+            }),
           })
           return
         }
         notification.warn({
-          message: editGroup ? `${value.groupName}组更新失败` : `${value.groupName}组添加失败`,
+          message: editGroup ? t('groupDetail.groupUpdateFailed', {
+            replace: { name: value.groupName },
+          }) : t('groupDetail.groupAddFailed', {
+            replace: { name: value.groupName },
+          }),
         })
         return
       }
       notification.success({
-        message: editGroup ? `${value.groupName}组更新成功` : `${value.groupName}组添加成功`,
+        message: editGroup ? t('groupDetail.groupUpdateSuccess', {
+          replace: { name: value.groupName },
+        }) : t('groupDetail.groupAddSuccess', {
+          replace: { name: value.groupName },
+        }),
       })
       loadGroup()
       closeModal()
@@ -61,18 +73,19 @@ class GroupsModal extends React.Component {
     })
   }
   checkUserName = (rules, value, cb) => {
+    const { t } = this.props
     if (!(value.length >= 1 && value.length <= 64)) {
-      return cb('用户名长度为1 ~ 64位字符')
+      return cb(t('groupDetail.nameCheckMsg1'))
     }
     const reg = /[%_]/
     if (reg.test(value)) {
-      return cb('不支持%和_')
+      return cb(t('groupDetail.nameCheckMsg2'))
     }
     return cb()
 
   }
   render() {
-    const { form, editGroup, editData, visible, closeModal } = this.props
+    const { form, editGroup, editData, visible, closeModal, t } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -80,32 +93,34 @@ class GroupsModal extends React.Component {
     }
     return (
       <Modal
-        title={`${editGroup ? '编辑组' : '添加组'}`}
+        title={`${editGroup ? t('groupDetail.editGroup') : t('groupDetail.addGroup')}`}
         visible={visible}
         onOk={this.handleOk}
         onCancel={closeModal}
+        okText={t('public.confirm')}
+        cancelText={t('public.cancel')}
       >
-        <FormItem {...formItemLayout} label="组名称">
+        <FormItem {...formItemLayout} label={t('groupDetail.groupName')}>
           {
             getFieldDecorator('groupName', {
               rules: [{
                 required: true,
-                message: '请输入组名称',
+                message: t('groupDetail.groupName'),
               }, {
                 validator: this.checkUserName,
               }],
               initialValue: editGroup ? editData.displayName : '',
             })(
-              <Input placeholder="请输入组名称" />
+              <Input placeholder={t('groupDetail.pleaseInputGroupName')} />
             )
           }
         </FormItem>
-        <FormItem {...formItemLayout} label="描述">
+        <FormItem {...formItemLayout} label={t('public.description')}>
           {
             getFieldDecorator('desc', {
               initialValue: editGroup ? editData.description : '',
             })(
-              <Input placeholder="请输入描述" />
+              <Input placeholder={t('public.inputDescription')} />
             )
           }
         </FormItem>

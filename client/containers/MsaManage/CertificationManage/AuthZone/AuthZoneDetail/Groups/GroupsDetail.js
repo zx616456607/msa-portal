@@ -32,7 +32,9 @@ import GroupsModal from './GroupsModal'
 import GroupUsersModal from './GroupUsersModal'
 import intersection from 'lodash/intersection'
 import difference from 'lodash/difference'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('authZoneDetail')
 class GroupsDetail extends React.Component {
   state = {
     targetKeys: [],
@@ -72,20 +74,28 @@ class GroupsDetail extends React.Component {
   }
 
   handlDeleteUser = record => {
-    const { deleteGroupUser, groupInfo, getGroupList } = this.props
+    const { deleteGroupUser, groupInfo, getGroupList, t } = this.props
     confirm({
-      modalTitle: '删除',
-      title: `确定移除用户 ${record.entity.userName}`,
+      modalTitle: t('public.delete'),
+      title: t('groupDetail.removeUserText', {
+        replace: { userName: record.entity.userName },
+      }),
+      okText: t('public.confirm'),
+      cancelText: t('public.cancel'),
       onOk: () => {
         return deleteGroupUser(groupInfo.id, record.value).then(res => {
           if (res.error) {
             notification.warn({
-              message: `移除 ${record.entity.userName} 失败`,
+              message: t('groupDetail.removeUserFailed', {
+                replace: { userName: record.entity.userName },
+              }),
             })
             return
           }
           notification.success({
-            message: `移除 ${record.entity.userName} 成功`,
+            message: t('groupDetail.removeUserFailed', {
+              replace: { userName: record.entity.userName },
+            }),
           })
           this.loadGroupDetailList()
           getGroupList()
@@ -122,7 +132,7 @@ class GroupsDetail extends React.Component {
 
   handleOk = async () => {
     const { targetKeys, originKeys } = this.state
-    const { getGroupList } = this.props
+    const { getGroupList, t } = this.props
     const commonKeys = intersection(targetKeys, originKeys)
     const addKeys = difference(targetKeys, commonKeys)
     const delKeys = difference(originKeys, commonKeys)
@@ -140,13 +150,21 @@ class GroupsDetail extends React.Component {
     }
     if (!isEmpty(addResult)) {
       if (addResult.includes(409)) {
-        failedMessage += '默认的组不允许添加用户'
+        failedMessage += t('tabGroup.notAllowAddUser')
       } else {
-        failedMessage += `添加用户 ${addResult.toString()} 失败；\n`
+        failedMessage += `${t('tabGroup.addUserFailed', {
+          replace: {
+            userName: addResult.toString(),
+          },
+        })}\n`
       }
     }
     if (!isEmpty(delResult)) {
-      failedMessage += `移除用户 ${delResult.toString()} 失败；\n`
+      failedMessage += `${t('tabGroup.removeUserFailed', {
+        replace: {
+          userName: addResult.toString(),
+        },
+      })}\n`
     }
     if (failedMessage) {
       notification.warn({
@@ -154,7 +172,7 @@ class GroupsDetail extends React.Component {
       })
     } else {
       notification.success({
-        message: '操作成功',
+        message: t('tabGroup.success'),
       })
     }
     this.loadGroupDetailList()
@@ -229,11 +247,11 @@ class GroupsDetail extends React.Component {
 
   render() {
     const { visibleGroupUser, visibleEdit, groupUsersLoading, targetKeys } = this.state
-    const { groupInfo, zoneGroupUsers, groupUsersFetching, loadGroup, zoneUsers } = this.props
+    const { groupInfo, zoneGroupUsers, groupUsersFetching, loadGroup, zoneUsers, t } = this.props
     const _DataAry = !isEmpty(zoneGroupUsers) ? zoneGroupUsers.filter(item => item.type !== 'GROUP') : []
     const menu = (
       <Menu style={{ width: 90 }} onClick={e => this.handleMenu(e)}>
-        <Menu.Item key="groupName">管理组用户</Menu.Item>
+        <Menu.Item key="groupName">{t('tabGroup.manageGroupUser')}</Menu.Item>
       </Menu>
     )
     const pagination = {
@@ -244,23 +262,23 @@ class GroupsDetail extends React.Component {
     const columns = [
       {
         id: 'entity.id',
-        title: '用户名',
+        title: t('tabUser.userName'),
         key: 'entity.userName',
         dataIndex: 'entity.userName',
         width: '40%',
       },
       {
-        title: '用户来源',
+        title: t('groupDetail.userResource'),
         dataIndex: 'entity.origin',
         key: 'entity.origin',
         width: '40%',
       },
       {
-        title: '操作',
+        title: t('public.option'),
         width: '20%',
         render: record => {
           return (
-            <Button onClick={() => this.handlDeleteUser(record)}>移除用户</Button>
+            <Button onClick={() => this.handlDeleteUser(record)}>{t('groupDetail.removeUser')}</Button>
           )
         },
       },
@@ -275,20 +293,20 @@ class GroupsDetail extends React.Component {
           <div className="groups-detail-header-right">
             <div>
               <h2 className="txt-of-ellipsis">
-                组：{groupInfo.id}
+                {t('groupDetail.group')}：{groupInfo.id}
               </h2>
             </div>
             <Row>
               <Col span={9}>
                 <div className="txt-of-ellipsis">
-                  组名：{groupInfo.displayName}
+                  {t('tabGroup.groupName')}：{groupInfo.displayName}
                 </div>
               </Col>
               <Col span={12} className="groups-detail-header-btns">
                 {
                   !isUaaDefaultGroup(groupInfo.displayName) &&
                   <Dropdown.Button overlay={menu} onClick={() => this.handlEditGroup()}>
-                    编辑
+                    {t('public.edit')}
                   </Dropdown.Button>
                 }
               </Col>
@@ -296,12 +314,12 @@ class GroupsDetail extends React.Component {
             <Row>
               <Col span={6}>
                 <div className="txt-of-ellipsis">
-                  创建时间：{formatDate(groupInfo.meta.created)}
+                  {t('public.creationTime')}：{formatDate(groupInfo.meta.created)}
                 </div>
               </Col>
               <Col span={14}>
                 <div className="txt-of-ellipsis">
-                  描述：{groupInfo.description || '--'}
+                  {t('public.description')}：{groupInfo.description || '--'}
                 </div>
               </Col>
             </Row>
@@ -310,10 +328,10 @@ class GroupsDetail extends React.Component {
         <div className="groups-detail-body" key="body">
           <Card>
             <div className="title">
-              <span>组用户</span>
+              <span>{t('groupDetail.groupUsers')}</span>
             </div>
             <div className="layout-content-btns">
-              <Button icon="reload" type="primary" onClick={this.loadGroupDetailList}>刷新</Button>
+              <Button icon="reload" type="primary" onClick={this.loadGroupDetailList}>{t('public.refresh')}</Button>
               {/* <Search
                 placeholder="请输入客户端ID搜索"
                 style={{ width: 200 }}
@@ -321,7 +339,11 @@ class GroupsDetail extends React.Component {
                 onSearch={this.loadGroupDetailList}
               /> */}
               <div className={classNames('page-box', { hide: !_DataAry.length })}>
-                <span className="total">共 {_DataAry.length} 条</span>
+                <span className="total">{
+                  t('public.totalResults', {
+                    replace: { totalResults: _DataAry.length },
+                  })
+                }</span>
               </div>
             </div>
             <div className="layout-content-body">
