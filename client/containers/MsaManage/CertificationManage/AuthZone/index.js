@@ -25,9 +25,11 @@ import { DEFAULT_PAGE, DEFAULT_PAGESIZE, UAA_JWT, UAA_TOKEN_EXPIRE, DEFAULT_UAA 
 import { formatDate } from '../../../../common/utils'
 import AuthZoneModal from './AuthZoneModal'
 import Confirm from '../../../../components/Modal/confirm'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+@withNamespaces('identityManage')
 class AuthZone extends React.Component {
   state = {
     current: DEFAULT_PAGE,
@@ -69,7 +71,7 @@ class AuthZone extends React.Component {
   }
 
   getUaaAuthToken = async () => {
-    const { getUaaAuth } = this.props
+    const { getUaaAuth, t } = this.props
     const { client_id, client_secret, username, password } = DEFAULT_UAA
     const body = {
       username,
@@ -87,7 +89,7 @@ class AuthZone extends React.Component {
       //   onOk: () => history.go(0),
       // })
       notification.warn({
-        message: '认证服务不可用，请检查认证服务状态',
+        message: t('identityZones.checkIdentityStatus'),
       })
       return Promise.reject({ error: 'failure' })
     }
@@ -141,20 +143,20 @@ class AuthZone extends React.Component {
   }
 
   deleteZone = record => {
-    const { deleteIdentityZone } = this.props
+    const { deleteIdentityZone, t } = this.props
     Confirm({
-      modalTitle: '删除认证域',
-      title: '确定要删除该认证域吗？',
-      content: '注：删除后将无法恢复',
+      modalTitle: t('delIdentityZones.delIdentityZones'),
+      title: t('delIdentityZones.willDelIdentityZones'),
+      content: t('delIdentityZones.delDonestReset'),
       onOk: () => {
         return deleteIdentityZone(record.id).then(() => {
           notification.success({
-            message: '删除成功',
+            message: t('delIdentityZones.delSuccessful'),
           })
           this.getZones()
         }).catch(() => {
           notification.warn({
-            message: '删除失败',
+            message: t('delIdentityZones.delFailed'),
           })
         })
       },
@@ -186,7 +188,7 @@ class AuthZone extends React.Component {
 
   render() {
     const { current, visible, currentAuthZone, authList, useStream } = this.state
-    const { identityZoneList, zonesFetching, history } = this.props
+    const { identityZoneList, zonesFetching, history, t } = this.props
     let authLists = identityZoneList
     if (useStream) {
       authLists = authList
@@ -201,7 +203,7 @@ class AuthZone extends React.Component {
 
     const columns = [
       {
-        title: '认证域名称',
+        title: t('identityZones.identityName'),
         dataIndex: 'name',
         width: '25%',
         render: (name, record) => <Link to={`/msa-manage/certification-manage/auth-zone/${record.id}`}>{name}</Link>,
@@ -213,13 +215,13 @@ class AuthZone extends React.Component {
         render: text => text || '-',
       },
       {
-        title: '更新时间',
+        title: t('identityZones.refreshTime'),
         dataIndex: 'last_modified',
         width: '25%',
         render: text => formatDate(text),
       },
       {
-        title: '操作',
+        title: t('identityZones.operate'),
         width: '25%',
         render: (_, record) => (
           <Dropdown.Button
@@ -227,12 +229,12 @@ class AuthZone extends React.Component {
             onClick={() => history.push(`/msa-manage/certification-manage/auth-zone/${record.id}`)}
             overlay={
               <Menu style={{ width: 110 }} onClick={e => this.handleClick(e, record)}>
-                <Menu.Item key="edit">编辑</Menu.Item>
-                <Menu.Item key="delete">删除</Menu.Item>
+                <Menu.Item key="edit">{t('identityZones.editorRow')}</Menu.Item>
+                <Menu.Item key="delete">{t('identityZones.delRow')}</Menu.Item>
               </Menu>
             }
           >
-            查看详情
+            {t('identityZones.watchDetail')}
           </Dropdown.Button>
         ),
       },
@@ -249,23 +251,23 @@ class AuthZone extends React.Component {
             />
           }
           <Button icon="plus" type="primary" onClick={() => this.setState({ visible: true })}>
-            添加认证域
+            {t('identityZones.addIdentityZone')}
           </Button>
           <Button icon="reload" onClick={this.getZones}>
-            刷新
+            {t('identityZones.refresh')}
           </Button>
           {/* <Button icon="delete">*/}
           {/* 删除*/}
           {/* </Button>*/}
           <Search
-            placeholder="按认证域名称搜索"
+            placeholder={t('identityZones.searchByName')}
             style={{ width: 200 }}
             // value={inputValue}
             // onChange={e => this.setState({ inputValue: e.target.value })}
             onSearch={this.queryList}
           />
           <div className="page-box">
-            <span className="total">共 {authLists.length || 0} 条</span>
+            <span className="total">{t('identityZones.totalData', { total: authLists.length || 0 })}</span>
             <Pagination {...pagination}/>
           </div>
         </div>

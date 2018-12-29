@@ -45,7 +45,7 @@ class ServiceBus extends React.Component<ServiceBusProps, ServiceBusState> {
         title={<div className="title"><span>服务总线</span><span className="info">（项目&集群无关）</span></div>}
       >
         <Row>
-          <Col span={8}>
+          <Col span={10}>
             <div className="IStatistics">
               <div className="instance">
                 <div className="title">实例统计</div>
@@ -85,7 +85,7 @@ class ServiceBus extends React.Component<ServiceBusProps, ServiceBusState> {
               </div>
             </div>
           </Col>
-          <Col span={16}>
+          <Col span={14}>
             <LineChart callInfo={this.state.SVCBusData.callInfo || {}}/>
           </Col>
         </Row>
