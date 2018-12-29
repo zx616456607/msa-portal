@@ -25,10 +25,12 @@ import { formatDate } from '../../../../../../common/utils'
 import AddUserModal from './AddUserModal'
 import UserDetailDock from './UserDetail/Dock'
 import PasswordModal from './UserDetail/PasswordModal'
+import { withNamespaces } from 'react-i18next'
 import './style/index.less'
 
 const Search = Input.Search
 
+@withNamespaces('authZoneDetail')
 class Users extends React.Component {
   state = {
     current: DEFAULT_PAGE,
@@ -71,17 +73,21 @@ class Users extends React.Component {
   }
 
   deleteUser = record => {
-    const { deleteZoneUser } = this.props
+    const { deleteZoneUser, t } = this.props
     confirm({
-      modalTitle: '删除',
-      title: `确定删除用户 ${record.userName}?`,
-      okText: '确定',
-      cancelText: '取消',
+      modalTitle: t('public.delete'),
+      title: t('tabUser.deleteText', {
+        replace: {
+          userName: record.userName,
+        },
+      }),
+      okText: t('public.confirm'),
+      cancelText: t('public.cancel'),
       onOk: () => {
         return deleteZoneUser(record.id).then(res => {
           if (res.error) {
             notification.warn({
-              message: '删除失败',
+              message: t('public.deleteFailed'),
             })
             return
           }
@@ -89,12 +95,12 @@ class Users extends React.Component {
             currentUser: null,
           })
           notification.success({
-            message: '删除成功',
+            message: t('public.deleteSuccess'),
           })
           this.loadUserList()
         }).catch(() => {
           notification.warn({
-            message: '删除失败',
+            message: t('public.deleteFailed'),
           })
         })
       },
@@ -118,31 +124,42 @@ class Users extends React.Component {
   }
 
   toggleActive = record => {
-    const { patchZoneUser } = this.props
-    const text = record.active ? '停用' : '启用'
+    const { patchZoneUser, t } = this.props
+    const text = record.active ? t('tabUser.disableUser') : t('tabUser.enableUser')
     const body = {
       active: !record.active,
     }
     confirm({
       modalTitle: text,
-      title: `确定${text}用户 ${record.userName}`,
-      okText: '确定',
-      cancelText: '取消',
+      title: t('tabUser.confirmText', {
+        replace: {
+          text,
+          userName: record.userName,
+        },
+      }),
+      okText: t('public.confirm'),
+      cancelText: t('public.cancel'),
       onOk: () => {
         return patchZoneUser(record, body).then(res => {
           if (res.error) {
             notification.warn({
-              message: `${text}失败`,
+              message: t('tabUser.failedMsg', {
+                replace: { text },
+              }),
             })
             return
           }
           notification.success({
-            message: `${text}成功`,
+            message: t('tabUser.successMsg', {
+              replace: { text },
+            }),
           })
           this.loadUserList()
         }).catch(() => {
           notification.warn({
-            message: `${text}失败`,
+            message: t('tabUser.failedMsg', {
+              replace: { text },
+            }),
           })
         })
       },
@@ -166,6 +183,7 @@ class Users extends React.Component {
   }
 
   renderGroups = groups => {
+    const { t } = this.props
     if (isEmpty(groups)) {
       return
     }
@@ -181,7 +199,7 @@ class Users extends React.Component {
             </Tooltip>
           </Col>
           <Col span={4}>
-            <Tooltip title={this.state[`group-${group.value}`] ? '复制成功' : '点击复制'}>
+            <Tooltip title={this.state[`group-${group.value}`] ? t('tabUser.copySuccess') : t('tabUser.clickToCopy')}>
               <Icon
                 type="copy"
                 className="pointer"
@@ -199,7 +217,7 @@ class Users extends React.Component {
     const {
       inputValue, current, addVisible, currentUser, detailVisible, passwordVisible,
     } = this.state
-    const { zoneUsers, usersFetching, totalResults } = this.props
+    const { zoneUsers, usersFetching, totalResults, t } = this.props
     const propsFunc = {
       toggleActive: this.toggleActive,
       handleClick: this.handleClick,
@@ -213,7 +231,7 @@ class Users extends React.Component {
     }
     const columns = [
       {
-        title: '用户名', dataIndex: 'userName', width: '15%',
+        title: t('tabUser.userName'), dataIndex: 'userName', width: '15%',
         render: (text, record) =>
           <span
             className="primary-color pointer"
@@ -223,17 +241,17 @@ class Users extends React.Component {
           </span>,
       },
       {
-        title: '状态',
+        title: t('tabUser.status'),
         dataIndex: 'active',
         key: 'active',
         width: '10%',
         render: text => <div className={text ? 'success-status' : 'error-status'}>
           <Badge status={text ? 'success' : 'error'}/>
-          {text ? '可用' : '不可用'}
+          {text ? t('tabUser.enable') : t('tabUser.disable')}
         </div>,
       },
       {
-        title: '所属组',
+        title: t('tabUser.group'),
         dataIndex: 'groups',
         key: 'groups',
         width: '10%',
@@ -256,14 +274,14 @@ class Users extends React.Component {
         </div>,
       },
       {
-        title: '授权记录',
+        title: t('tabUser.authRecord'),
         dataIndex: 'approvals',
         key: 'approvals',
         width: '10%',
         render: approvals => approvals.length,
       },
       {
-        title: '邮箱',
+        title: t('tabUser.email'),
         dataIndex: 'emails',
         key: 'emails',
         width: '15%',
@@ -287,26 +305,26 @@ class Users extends React.Component {
         </div>,
       },*/
       {
-        title: '创建时间',
+        title: t('public.creationTime'),
         dataIndex: 'meta.created',
         key: 'meta.created',
         width: '15%',
         render: time => formatDate(time),
       },
       {
-        title: '操作',
+        title: t('public.option'),
         width: '15%',
         render: (_, record) => {
           const menu = (
             <Menu style={{ width: 90 }} onClick={e => this.handleClick(e, record)}>
-              <Menu.Item key="edit">编辑</Menu.Item>
-              <Menu.Item key="delete">删除</Menu.Item>
-              <Menu.Item key="password" >修改密码</Menu.Item>
+              <Menu.Item key="edit">{t('public.edit')}</Menu.Item>
+              <Menu.Item key="delete">{t('public.delete')}</Menu.Item>
+              <Menu.Item key="password" >{t('public.updatePwd')}</Menu.Item>
             </Menu>
           )
           return (
             <Dropdown.Button overlay={menu} onClick={() => this.toggleActive(record)}>
-              {record.active ? '停用' : '启用'}
+              {record.active ? t('public.updatePwd') : t('public.updatePwd')}
             </Dropdown.Button>
           )
         },
@@ -317,20 +335,24 @@ class Users extends React.Component {
       <div className="zone-users">
         <div className="layout-content-btns" key="btns">
           <Button icon="plus" type="primary" onClick={() => this.toggleVisible('addVisible')}>
-            添加用户
+            {t('tabUser.addUser')}
           </Button>
           <Button icon="reload" onClick={this.refreshData}>
-            刷新
+            {t('public.refresh')}
           </Button>
           <Search
-            placeholder="按用户名搜索"
+            placeholder={t('tabUser.searchWithUserName')}
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}
             onSearch={this.loadUserList}
           />
           <div className={classNames('page-box', { hide: !totalResults })}>
-            <span className="total">共 {totalResults} 条</span>
+            <span className="total">{
+              t('public.totalResults', {
+                replace: { totalResults },
+              })
+            }</span>
             <Pagination {...pagination}/>
           </div>
         </div>
