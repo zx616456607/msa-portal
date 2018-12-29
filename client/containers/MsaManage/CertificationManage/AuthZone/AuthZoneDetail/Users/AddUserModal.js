@@ -16,9 +16,11 @@ import { Modal, Form, Input, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import { EMAIL_REG, PHONE_REG } from '../../../../../../constants'
 import { createZoneUser, patchZoneUser } from '../../../../../../actions/certification'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
 
+@withNamespaces('authZoneDetail')
 class AddUserModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
@@ -32,7 +34,7 @@ class AddUserModal extends React.Component {
   handleConfirm = async () => {
     const {
       form, currentUser, loadData, closeModal,
-      createZoneUser, patchZoneUser,
+      createZoneUser, patchZoneUser, t,
     } = this.props
     const { validateFields } = form
     validateFields(async (errors, values) => {
@@ -62,7 +64,7 @@ class AddUserModal extends React.Component {
             loading: false,
           })
           notification.warn({
-            message: '创建用户失败',
+            message: t('tabUser.createUserFailed'),
           })
           return
         }
@@ -70,7 +72,7 @@ class AddUserModal extends React.Component {
           loading: false,
         })
         notification.success({
-          message: '创建用户成功',
+          message: t('tabUser.createUserSuccess'),
         })
         loadData && loadData()
         closeModal()
@@ -84,7 +86,7 @@ class AddUserModal extends React.Component {
           loading: false,
         })
         notification.warn({
-          message: '修改用户失败',
+          message: t('tabUser.updateUserFailed'),
         })
         return
       }
@@ -92,7 +94,7 @@ class AddUserModal extends React.Component {
         loading: false,
       })
       notification.success({
-        message: '修改用户成功',
+        message: t('tabUser.updateUserSuccess'),
       })
       loadData && loadData()
       closeModal()
@@ -102,27 +104,29 @@ class AddUserModal extends React.Component {
 
   confirmPasswordCheck = (rules, value, callback) => {
     const { getFieldValue } = this.props.form
+    const { t } = this.props
     // if (!value) {
     //   callback('请输入确认密码')
     // }
     const password = getFieldValue('password')
     if (value && value !== password) {
-      return callback('两次密码不一致')
+      return callback(t('tabUser.pwdError'))
     }
     callback()
   }
 
   checkUserName = (rules, value, cb) => {
+    const { t } = this.props
     if (!value) {
       return cb()// view have message
     }
     const { userList, currentUser } = this.props
     if (value.length < 3 || value.length > 64) {
-      return cb('用户名长度为3 ~ 64位字符')
+      return cb(t('tabUser.nameCheckMsg1'))
     }
     const reg = /[%_]/
     if (reg.test(value)) {
-      return cb('不支持%和_')
+      return cb(t('tabUser.nameCheckMsg2'))
     }
     if (isEmpty(currentUser)) {
       let hasUserName = false
@@ -134,7 +138,7 @@ class AddUserModal extends React.Component {
         return true
       })
       if (hasUserName) {
-        return cb('用户名已存在')
+        return cb(t('tabUser.nameCheckMsg3'))
       }
       return cb()
     }
@@ -143,7 +147,7 @@ class AddUserModal extends React.Component {
 
   render() {
     const { loading } = this.state
-    const { form, visible, closeModal, currentUser } = this.props
+    const { form, visible, closeModal, currentUser, t } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -152,14 +156,16 @@ class AddUserModal extends React.Component {
     return (
       <Modal
         visible={visible}
-        title={isEmpty(currentUser) ? '添加用户' : '修改用户'}
+        title={isEmpty(currentUser) ? t('tabUser.addUser') : t('tabUser.updateUser')}
         onCancel={closeModal}
         onOk={this.handleConfirm}
         confirmLoading={loading}
+        okText={t('public.confirm')}
+        cancelText={t('public.cancel')}
       >
         <Form>
           <FormItem
-            label={'用户名'}
+            label={t('tabUser.userName')}
             {...formItemLayout}
           >
             {
@@ -168,7 +174,7 @@ class AddUserModal extends React.Component {
                   {
                     required: true,
                     whitespace: true,
-                    message: '请填写用户名称',
+                    message: t('tabUser.nameCheckMsg4'),
                   },
                   {
                     validator: this.checkUserName,
@@ -176,7 +182,7 @@ class AddUserModal extends React.Component {
                 ],
                 initialValue: !isEmpty(currentUser) ? currentUser.userName : '',
               })(
-                <Input placeholder="用户名称"/>
+                <Input placeholder={t('tabUser.userName')}/>
               )
             }
           </FormItem>
@@ -184,7 +190,7 @@ class AddUserModal extends React.Component {
             isEmpty(currentUser) &&
             <React.Fragment>
               <FormItem
-                label={'密码'}
+                label={t('tabUser.pwd')}
                 {...formItemLayout}
               >
                 {
@@ -193,17 +199,17 @@ class AddUserModal extends React.Component {
                       {
                         required: true,
                         whitespace: true,
-                        message: '请填写密码',
+                        message: t('tabUser.pwdRequired'),
                       },
                     ],
                     initialValue: !isEmpty(currentUser) ? currentUser.password : '',
                   })(
-                    <Input type={'password'} placeholder="请输入密码"/>
+                    <Input type={'password'} placeholder={t('tabUser.pwdRequired')}/>
                   )
                 }
               </FormItem>
               <FormItem
-                label={'确认密码'}
+                label={t('tabUser.confirmPwd')}
                 {...formItemLayout}
               >
                 {
@@ -212,7 +218,7 @@ class AddUserModal extends React.Component {
                       {
                         required: true,
                         whitespace: true,
-                        message: '请填写确认密码',
+                        message: t('tabUser.pleaseConfirmPwd'),
                       },
                       {
                         validator: this.confirmPasswordCheck,
@@ -220,14 +226,14 @@ class AddUserModal extends React.Component {
                     ],
                     initialValue: !isEmpty(currentUser) ? currentUser.password : '',
                   })(
-                    <Input type={'password'} placeholder="请再次输入密码"/>
+                    <Input type={'password'} placeholder={t('tabUser.pleaseConfirmPwdAgain')}/>
                   )
                 }
               </FormItem>
             </React.Fragment>
           }
           <FormItem
-            label={'邮箱'}
+            label={t('tabUser.email')}
             {...formItemLayout}
           >
             {
@@ -237,17 +243,17 @@ class AddUserModal extends React.Component {
                     required: true,
                     whitespace: true,
                     pattern: EMAIL_REG,
-                    message: '请填写正确的邮箱地址',
+                    message: t('tabUser.emailCheckMsg1'),
                   },
                 ],
                 initialValue: !isEmpty(currentUser) ? currentUser.emails[0].value : '',
               })(
-                <Input placeholder="用户邮箱，需要验证"/>
+                <Input placeholder={t('tabUser.emailCheckMsg2')}/>
               )
             }
           </FormItem>
           <FormItem
-            label={'手机'}
+            label={t('tabUser.phone')}
             {...formItemLayout}
           >
             {
@@ -256,14 +262,14 @@ class AddUserModal extends React.Component {
                   {
                     whitespace: true,
                     pattern: PHONE_REG,
-                    message: '请填写正确的手机号',
+                    message: t('tabUser.phoneCheckMsg1'),
                   },
                 ],
                 initialValue:
                   !isEmpty(currentUser) && !isEmpty(currentUser.phoneNumbers)
                     ? currentUser.phoneNumbers[0].value : '',
               })(
-                <Input placeholder="用户手机"/>
+                <Input placeholder={t('tabUser.phoneCheckMsg2')}/>
               )
             }
           </FormItem>
