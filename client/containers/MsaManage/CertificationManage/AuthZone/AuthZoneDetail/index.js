@@ -19,10 +19,11 @@ import AUTH_ZONE_ICON from '../../../../../assets/img/msa-manage/auth-zone.png'
 import Clients from './Clients'
 import Users from './Users'
 import Groups from './Groups'
+import { withNamespaces } from 'react-i18next'
 import './style/index.less'
 
 const TabPane = Tabs.TabPane
-
+@withNamespaces('authZoneDetail')
 class AuthZoneDetail extends React.Component {
 
   componentDidMount() {
@@ -47,17 +48,17 @@ class AuthZoneDetail extends React.Component {
 
   render() {
     const { activeKey } = this.state
-    const { identityZoneDetail } = this.props
+    const { identityZoneDetail, t } = this.props
     return (
       <QueueAnim className="auth-zone-detail">
         <Card key={'auth-zone-detail-header'} className="auth-zone-detail-header">
           <div className="header-detail-box">
             <img src={AUTH_ZONE_ICON} className="auth-zone-icon" alt="auth-zone-icon"/>
             <div className="auth-zone-info">
-              <div className="auth-zone-name">认证域：{identityZoneDetail.name}</div>
+              <div className="auth-zone-name">{ t('header.authZone') }：{identityZoneDetail.name}</div>
               <Row>
-                <Col span={12}>认证域 ID：{identityZoneDetail.id}</Col>
-                <Col span={12}>描述：{identityZoneDetail.description || '-'}</Col>
+                <Col span={12}>{ t('header.authZoneID') }：{identityZoneDetail.id}</Col>
+                <Col span={12}>{ t('header.description') }：{identityZoneDetail.description || '-'}</Col>
               </Row>
               <div>SubDomain：{identityZoneDetail.subdomain || '-'}</div>
             </div>
@@ -65,9 +66,9 @@ class AuthZoneDetail extends React.Component {
         </Card>
         <Card key={'auth-zone-detail-body'}>
           <Tabs activeKey={activeKey} onChange={this.handleTabs}>
-            <TabPane tab="用户" key="user"><Users/></TabPane>
-            <TabPane tab="组" key="group"><Groups/></TabPane>
-            <TabPane tab="OAuth 应用" key="client"><Clients/></TabPane>
+            <TabPane tab={ t('public.user') } key="user"><Users/></TabPane>
+            <TabPane tab={ t('public.group') } key="group"><Groups/></TabPane>
+            <TabPane tab={ t('public.OAuthApp') } key="client"><Clients/></TabPane>
           </Tabs>
         </Card>
       </QueueAnim>
