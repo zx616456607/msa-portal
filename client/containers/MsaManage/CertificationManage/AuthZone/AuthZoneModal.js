@@ -138,7 +138,7 @@ class AuthZoneModal extends React.Component {
       >
         <Form>
           <FormItem
-            label={t('addIdentityZones.identityZonesName')}// {'认证域名称'}
+            label={t('addIdentityZones.identityZonesName')}
             {...formItemLayout}
           >
             {

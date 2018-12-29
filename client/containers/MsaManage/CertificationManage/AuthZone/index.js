@@ -145,18 +145,18 @@ class AuthZone extends React.Component {
   deleteZone = record => {
     const { deleteIdentityZone, t } = this.props
     Confirm({
-      modalTitle: t('delIdentityZones.delIdentityZones'), // '删除认证域',
-      title: t('delIdentityZones.willDelIdentityZones'), // '确定要删除该认证域吗？',
-      content: t('delIdentityZones.delDonestReset'), // '注：删除后将无法恢复',
+      modalTitle: t('delIdentityZones.delIdentityZones'),
+      title: t('delIdentityZones.willDelIdentityZones'),
+      content: t('delIdentityZones.delDonestReset'),
       onOk: () => {
         return deleteIdentityZone(record.id).then(() => {
           notification.success({
-            message: t('delIdentityZones.delSuccessful'), // '删除成功',
+            message: t('delIdentityZones.delSuccessful'),
           })
           this.getZones()
         }).catch(() => {
           notification.warn({
-            message: t('delIdentityZones.delFailed'), // '删除失败',
+            message: t('delIdentityZones.delFailed'),
           })
         })
       },
