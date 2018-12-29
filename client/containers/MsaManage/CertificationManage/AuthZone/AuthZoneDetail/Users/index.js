@@ -319,12 +319,12 @@ class Users extends React.Component {
             <Menu style={{ width: 90 }} onClick={e => this.handleClick(e, record)}>
               <Menu.Item key="edit">{t('public.edit')}</Menu.Item>
               <Menu.Item key="delete">{t('public.delete')}</Menu.Item>
-              <Menu.Item key="password" >{t('public.updatePwd')}</Menu.Item>
+              <Menu.Item key="password" >{t('tabUser.updatePwd')}</Menu.Item>
             </Menu>
           )
           return (
             <Dropdown.Button overlay={menu} onClick={() => this.toggleActive(record)}>
-              {record.active ? t('public.updatePwd') : t('public.updatePwd')}
+              {record.active ? t('tabUser.disableUser') : t('tabUser.enableUser')}
             </Dropdown.Button>
           )
         },

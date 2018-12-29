@@ -12,7 +12,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Transfer, Row, Col, Tooltip } from 'antd'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('authZoneDetail')
 export default class GroupUsersModal extends React.PureComponent {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
@@ -47,39 +49,42 @@ export default class GroupUsersModal extends React.PureComponent {
   }
 
   render() {
-    const { visible, onCancel, dataSource, targetKeys, handleChange, loading } = this.props
+    const { visible, onCancel, dataSource, targetKeys, handleChange, loading, t } = this.props
     return (
       <Modal
-        title="管理组用户"
+        title={t('tabGroup.manageGroupUser')}
         visible={visible}
         width={660}
         className="modalTransfer"
         onOk={this.handleOk}
         onCancel={onCancel}
         confirmLoading={loading}
+        okText={t('public.confirm')}
+        cancelText={t('public.cancel')}
       >
         <div className="prompt" style={{ backgroundColor: '#fffaf0', borderRadius: 4, border: '1px dashed #ffc125' }}>
-          <span>用户加入后，即拥有改组的授权范围中的权限，一个组内同一用户不能被重复添加</span>
+          <span>{t('groupDetail.tip')}</span>
         </div>
         <Row className="listTitle">
-          <Col span={14}>成员名</Col>
-          <Col span={10}>邮箱</Col>
+          <Col span={14}>{t('groupDetail.membersName')}</Col>
+          <Col span={10}>{t('groupDetail.email')}</Col>
         </Row>
         <Row className="listTitle" style={{ left: 380 }}>
-          <Col span={14}>成员名</Col>
-          <Col span={10}>邮箱</Col>
+          <Col span={14}>{t('groupDetail.membersName')}</Col>
+          <Col span={10}>{t('groupDetail.email')}</Col>
         </Row>
         <Transfer
           dataSource={dataSource}
           showSearch
           filterOption={this.filterOption}
-          titles={[ '筛选用户', '已选择用户' ]}
+          titles={[ t('groupDetail.filterUser'), t('groupDetail.selectedUser') ]}
           listStyle={{ width: 250, height: 300 }}
-          operations={[ '添加', '移除' ]}
+          operations={[ t('groupDetail.add'), t('groupDetail.remove') ]}
           targetKeys={targetKeys}
           onChange={handleChange}
           render={item => this.renderItem(item)}
           rowKey={record => record.id}
+          locale={{ searchPlaceholder: t('groupDetail.searchPlaceHolder') }}
         />
       </Modal>
     )

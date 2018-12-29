@@ -22,9 +22,11 @@ import AddClientModal from './AddClientModal'
 import SecretModal from './SecretModal'
 import confirm from '../../../../../../components/Modal/confirm'
 import './style/index.less'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+@withNamespaces('authZoneDetail')
 class Clients extends React.Component {
   state = {
     visible: false,
@@ -89,21 +91,21 @@ class Clients extends React.Component {
   }
 
   deleteClient = record => {
-    const { deleteClient } = this.props
+    const { deleteClient, t } = this.props
     confirm({
-      modalTitle: '删除',
-      title: `确定删除 OAuth 应用 ${record.client_id}?`,
-      okText: '确定',
-      cancelText: '取消',
+      modalTitle: t('public.delete'),
+      title: t('tabOAuth.deleteMsg', { app: record.client_id }),
+      okText: t('public.confirm'),
+      cancelText: t('public.cancel'),
       onOk: () => {
         return deleteClient(record.client_id).then(() => {
           notification.success({
-            message: '删除成功',
+            message: t('tabOAuth.deleteSuccess'),
           })
           this.loadClientList()
         }).catch(() => {
           notification.warn({
-            message: '删除失败',
+            message: t('tabOAuth.deleteFailed'),
           })
         })
       },
@@ -135,7 +137,7 @@ class Clients extends React.Component {
 
   render() {
     const { current, isView } = this.state
-    const { clientList, totalResults, isFetching } = this.props
+    const { clientList, totalResults, isFetching, t } = this.props
     const columns = [
       {
         title: 'ID',
@@ -146,34 +148,34 @@ class Clients extends React.Component {
           <span className="primary-color pointer" onClick={() => this.viewClient(record)}>{text}</span>,
       },
       {
-        title: 'OAuth 应用名称',
+        title: t('public.OAuthApp'),
         dataIndex: 'name',
         key: 'name',
         width: '20%',
         render: text => (text ? text : '--'),
       },
       {
-        title: '重定向 URL',
+        title: t('tabOAuth.redirectUrl'),
         dataIndex: 'redirect_uri',
         key: 'redirect_uri',
         width: '20%',
         render: this.renderTableCol,
       },
       {
-        title: '授权方式',
+        title: t('tabOAuth.authMethod'),
         dataIndex: 'authorized_grant_types',
         key: 'authorized_grant_types',
         width: '20%',
         render: this.renderTableCol,
       },
       {
-        title: '操作',
+        title: t('public.option'),
         dataIndex: 'action',
         key: 'action',
         width: '20%',
         render: (_, record) => {
           return (
-            <Button type={'default'} onClick={() => this.viewClient(record)}>查看</Button>
+            <Button type={'default'} onClick={() => this.viewClient(record)}>{t('tabOAuth.check')}</Button>
           )
           // return ( // 只保留查看, 暂时隐藏
           //   <Dropdown.Button
@@ -208,10 +210,10 @@ class Clients extends React.Component {
             添加 OAuth 应用
           </Button> */}
           <Button icon="reload" onClick={this.refreshData}>
-            刷新
+            {t('public.refresh')}
           </Button>
           <Search
-            placeholder="只支持全名匹配"
+            placeholder={t('tabOAuth.onlyNameMatched')}
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}

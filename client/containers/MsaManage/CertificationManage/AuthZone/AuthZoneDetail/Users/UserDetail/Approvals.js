@@ -17,9 +17,11 @@ import isEmpty from 'lodash/isEmpty'
 import './style/UserGroups.less'
 import { formatDate } from '../../../../../../../common/utils'
 import classNames from 'classnames'
+import { withNamespaces } from 'react-i18next'
 
 const Search = Input.Search
 
+@withNamespaces('authZoneDetail')
 export default class Approvals extends React.Component {
   state = {
     current: DEFAULT_PAGE,
@@ -66,6 +68,7 @@ export default class Approvals extends React.Component {
 
   render() {
     const { current, inputValue, approvalList, total } = this.state
+    const { t } = this.props
     const pagination = {
       simple: true,
       total,
@@ -74,21 +77,21 @@ export default class Approvals extends React.Component {
       onChange: current => this.setState({ current }, this.filterGroups),
     }
     const columns = [
-      { title: '授权客户端 ID', dataIndex: 'clientId', key: 'clientId', width: '20%' },
-      { title: '授权范围', dataIndex: 'scope', key: 'scope', width: '20%' },
+      { title: t('userDetail.authedClientId'), dataIndex: 'clientId', key: 'clientId', width: '20%' },
+      { title: t('userDetail.authRange'), dataIndex: 'scope', key: 'scope', width: '20%' },
       {
-        title: '授权状态', dataIndex: 'status', key: 'status', width: '20%',
+        title: t('userDetail.authStatus'), dataIndex: 'status', key: 'status', width: '20%',
         render: text => <div className={text === 'APPROVED' ? 'success-status' : 'error-status'}>
           <Badge status={text === 'APPROVED' ? 'success' : 'error'}/>
-          {text === 'APPROVED' ? '允许' : '拒绝'}
+          {text === 'APPROVED' ? t('userDetail.allow') : t('userDetail.notAllow')}
         </div>,
       },
       {
-        title: '授权时间', dataIndex: 'lastUpdatedAt', key: 'lastUpdatedAt', width: '20%',
+        title: t('userDetail.authTime'), dataIndex: 'lastUpdatedAt', key: 'lastUpdatedAt', width: '20%',
         render: time => formatDate(time),
       },
       {
-        title: '授权过期时间', dataIndex: 'expiresAt', key: 'expiresAt', width: '20%',
+        title: t('userDetail.authOverTime'), dataIndex: 'expiresAt', key: 'expiresAt', width: '20%',
         render: time => formatDate(time),
       },
     ]
@@ -96,16 +99,21 @@ export default class Approvals extends React.Component {
     return (
       <div className="user-approvals">
         <div className="layout-content-btns">
-          <Button icon={'reload'} type={'primary'} onClick={this.refreshData}>刷新</Button>
+          <Button icon={'reload'} type={'primary'} onClick={this.refreshData}>
+            {t('userDetail.refresh')}
+          </Button>
           <Search
-            placeholder="请输入客户端 ID 搜索"
+            placeholder={t('userDetail.searchWithUserID')}
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}
             onSearch={this.filterApprovals}
           />
           <div className={classNames('page-box', { hide: !total })}>
-            <span className="total">共 {total} 条</span>
+            <span className="total">{t('public.totalResults', {
+              replace: { totalResults: total },
+            })}
+            </span>
             <Pagination {...pagination}/>
           </div>
         </div>

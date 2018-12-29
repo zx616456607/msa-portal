@@ -14,9 +14,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Form, Modal, Input, notification } from 'antd'
 import { updateZoneUserPassword } from '../../../../../../../actions/certification'
+import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item
-
+@withNamespaces('authZoneDetail')
 class PasswordModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
@@ -27,7 +28,7 @@ class PasswordModal extends React.Component {
   state = {}
 
   handleConfirm = async () => {
-    const { updateZoneUserPassword, detail, form, closeModal } = this.props
+    const { updateZoneUserPassword, detail, form, closeModal, t } = this.props
     form.validateFields(async (errors, values) => {
       if (errors) {
         return
@@ -38,7 +39,7 @@ class PasswordModal extends React.Component {
       const result = await updateZoneUserPassword(detail, values)
       if (result.error) {
         notification.warn({
-          message: '修改密码失败',
+          message: t('tabUser.updatePwdFailed'),
         })
         this.setState({
           loading: false,
@@ -49,7 +50,7 @@ class PasswordModal extends React.Component {
         loading: false,
       })
       notification.success({
-        message: '修改密码成功',
+        message: t('tabUser.updatePwdSuccess'),
       })
       closeModal()
     })
@@ -57,7 +58,7 @@ class PasswordModal extends React.Component {
 
   render() {
     const { loading } = this.state
-    const { visible, closeModal, form } = this.props
+    const { visible, closeModal, form, t } = this.props
     const { getFieldDecorator } = form
     const formItemLayout = {
       labelCol: { span: 5 },
@@ -66,7 +67,7 @@ class PasswordModal extends React.Component {
 
     return (
       <Modal
-        title={'修改用户密码'}
+        title={t('tabUser.updatePwdTitle')}
         visible={visible}
         onCancel={closeModal}
         onOk={this.handleConfirm}
@@ -74,7 +75,7 @@ class PasswordModal extends React.Component {
       >
         <Form hideRequiredMark={true}>
           <FormItem
-            label={'旧密码'}
+            label={t('tabUser.oldPwd')}
             {...formItemLayout}
           >
             {
@@ -82,15 +83,15 @@ class PasswordModal extends React.Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '请输入旧密码',
+                  message: t('tabUser.pleaseInputOldPwd'),
                 }],
               })(
-                <Input type={'password'} placeholder="请输入旧密码"/>
+                <Input type={'password'} placeholder={t('tabUser.pleaseInputOldPwd')}/>
               )
             }
           </FormItem>
           <FormItem
-            label={'新密码'}
+            label={t('tabUser.newPwd')}
             {...formItemLayout}
           >
             {
@@ -98,10 +99,10 @@ class PasswordModal extends React.Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '请输入新密码',
+                  message: t('tabUser.newPwd'),
                 }],
               })(
-                <Input type={'password'} placeholder="请输入新密码"/>
+                <Input type={'password'} placeholder={t('tabUser.pleaseInputNewPwd')}/>
               )
             }
           </FormItem>

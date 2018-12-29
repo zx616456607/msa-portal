@@ -18,10 +18,12 @@ import cloneDeep from 'lodash/cloneDeep'
 import { DEFAULT_PAGESIZE, DEFAULT_PAGE } from '../../../../../../../constants'
 import { deleteGroupUser, getUserList } from '../../../../../../../actions/certification'
 import confirm from '../../../../../../../components/Modal/confirm'
+import { withNamespaces } from 'react-i18next'
 import './style/UserGroups.less'
 
 const Search = Input.Search
 
+@withNamespaces('authZoneDetail')
 class UserGroups extends React.Component {
   state = {
     current: DEFAULT_PAGE,
@@ -60,21 +62,28 @@ class UserGroups extends React.Component {
   }
 
   removeUser = record => {
-    const { deleteGroupUser, detail, getUserList } = this.props
+    const { deleteGroupUser, detail, getUserList, t } = this.props
     confirm({
-      modalTitle: '移出',
-      title: `确定将用户 ${detail.userName} 从组 ${record.display} 中移出？`,
+      modalTitle: t('userDetail.removeTitle'),
+      title: t('userDetail.removeText', {
+        replace: {
+          userName: detail.userName,
+          group: detail.group,
+        },
+      }),
+      okText: t('public.confirm'),
+      cancelText: t('public.cancel'),
       onOk: () => {
         return deleteGroupUser(record.value, detail.id).then(res => {
           if (res.error) {
             notification.warn({
-              message: '移出失败',
+              message: t('userDetail.removeFailed'),
             })
             return
           }
           getUserList()
           notification.success({
-            message: '移出成功',
+            message: t('userDetail.removeSuccess'),
           })
         })
       },
@@ -90,6 +99,7 @@ class UserGroups extends React.Component {
 
   render() {
     const { current, inputValue, groupList, total } = this.state
+    const { t } = this.props
     const pagination = {
       simple: true,
       total,
@@ -98,26 +108,30 @@ class UserGroups extends React.Component {
       onChange: current => this.setState({ current }, this.filterGroups),
     }
     const columns = [
-      { title: '组名称', dataIndex: 'display', key: 'display', width: '70%' },
+      { title: t('userDetail.groupName'), dataIndex: 'display', key: 'display', width: '70%' },
       {
-        title: '操作', width: '30%',
+        title: t('public.option'), width: '30%',
         render: (_, record) =>
-          <Button type="danger" ghost onClick={() => this.removeUser(record)}>移出该组</Button>,
+          <Button type="danger" ghost onClick={() => this.removeUser(record)}>{t('userDetail.removeFromGroup')}</Button>,
       },
     ]
     return (
       <div className="user-groups">
         <div className="layout-content-btns">
-          <Button icon={'reload'} type={'primary'} onClick={this.refreshData}>刷新</Button>
+          <Button icon={'reload'} type={'primary'} onClick={this.refreshData}>{t('userDetail.refresh')}</Button>
           <Search
-            placeholder="请输入组名称搜索"
+            placeholder={t('userDetail.searchWithGroupName')}
             style={{ width: 200 }}
             value={inputValue}
             onChange={e => this.setState({ inputValue: e.target.value })}
             onSearch={this.filterGroups}
           />
           <div className={classNames('page-box', { hide: !total })}>
-            <span className="total">共 {total} 条</span>
+            <span className="total">
+              {t('public.totalResults', {
+                replace: { totalResults: total },
+              })}
+            </span>
             <Pagination {...pagination}/>
           </div>
         </div>

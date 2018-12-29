@@ -19,9 +19,11 @@ import { patchZoneUser } from '../../../../../../../actions/certification'
 import PasswordModal from './PasswordModal'
 import UserGroups from './UserGroups'
 import Approvals from './Approvals'
+import { withNamespaces } from 'react-i18next'
 
 const TabPane = Tabs.TabPane
 
+@withNamespaces('authZoneDetail')
 class UserDetail extends React.Component {
 
   state = {}
@@ -50,24 +52,24 @@ class UserDetail extends React.Component {
   }
 
   renderDropdown = () => {
-    const { detail, propsFunc } = this.props
+    const { detail, propsFunc, t } = this.props
     const { toggleActive } = propsFunc
     const menu = (
       <Menu onClick={e => this.handleMenu(e, detail)} style={{ width: 88 }}>
-        <Menu.Item key="edit">编辑</Menu.Item>
-        <Menu.Item key="password" >修改密码</Menu.Item>
+        <Menu.Item key="edit">{t('userDetail.edit')}</Menu.Item>
+        <Menu.Item key="password" >{t('userDetail.updatePwd')}</Menu.Item>
       </Menu>
     )
     return (
       <Dropdown.Button overlay={menu} onClick={() => toggleActive(detail)}>
-        { detail.active ? '停用' : '启用'}
+        { detail.active ? t('userDetail.disable') : t('userDetail.enable')}
       </Dropdown.Button>
     )
   }
 
   render() {
     const { passwordVisible } = this.state
-    const { detail } = this.props
+    const { detail, t } = this.props
     return (
       <div className="zone-user-detail">
         <div className="zone-user-detail-header">
@@ -76,25 +78,25 @@ class UserDetail extends React.Component {
           </div>
           <div className="zone-user-detail-header-right">
             <h2 className="txt-of-ellipsis">
-              用户ID：{detail.id}
+              {t('userDetail.userId')}：{detail.id}
             </h2>
             <Row>
               <Col span={9}>
-                <div className="zone-user-info">用户名：{detail.userName}</div>
+                <div className="zone-user-info">{t('userDetail.userName')}：{detail.userName}</div>
                 <div className="zone-user-info">
                   邮箱：{detail.emails[0].value}
                   <span className={detail.verified ? 'success-status' : 'error-status'}>
-                   （{detail.verified ? '已验证' : '未验证'}）
+                   （{detail.verified ? t('userDetail.validated') : t('userDetail.unValidated')}）
                   </span>
                 </div>
               </Col>
               <Col span={9}>
-                <div className="zone-user-info">状态：
+                <div className="zone-user-info">{t('userDetail.status')}：
                   <span className={detail.verified ? 'success-status' : 'error-status'}>
-                    {detail.active ? '可用' : '不可用'}
+                    {detail.active ? t('userDetail.enable') : t('userDetail.disable')}
                   </span>
                 </div>
-                <div className="zone-user-info">创建时间：{formatDate(detail.meta.created)}</div>
+                <div className="zone-user-info">{t('userDetail.creationTime')}：{formatDate(detail.meta.created)}</div>
               </Col>
               <Col span={6}>
                 {this.renderDropdown()}
@@ -106,12 +108,12 @@ class UserDetail extends React.Component {
           <Tabs
             tabPosition="left"
           >
-            <TabPane tab="所属组" key="groups">
+            <TabPane tab={t('userDetail.group')} key="groups">
               <UserGroups
                 {...{ detail }}
               />
             </TabPane>
-            <TabPane tab="授权记录" key="approvals">
+            <TabPane tab={t('userDetail.authRecord')} key="approvals">
               <Approvals
                 {...{ detail }}
               />
