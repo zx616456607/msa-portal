@@ -14,9 +14,12 @@ import React from 'react'
 import { Card, Table } from 'antd'
 import QueueAnim from 'rc-queue-anim'
 import './style/AuthMode.less'
+import { withNamespaces } from 'react-i18next'
 
+@withNamespaces('identityManage')
 export default class AuthMode extends React.Component {
   render() {
+    const { t } = this.props
     const columns = [
       {
         title: '#',
@@ -24,12 +27,12 @@ export default class AuthMode extends React.Component {
         key: 'key',
       },
       {
-        title: '授权方式',
+        title: t('authModeTable.authMode'),
         dataIndex: 'authMode',
         key: 'authMode',
       },
       {
-        title: '说明',
+        title: t('authModeTable.desc'),
         dataIndex: 'desc',
         key: 'desc',
       },
@@ -38,22 +41,22 @@ export default class AuthMode extends React.Component {
       {
         key: 1,
         authMode: 'authorization_code',
-        desc: '标准服务端授权模式',
+        desc: t('authModeTable.normalAuth'),
       },
       {
         key: 2,
         authMode: 'implicit',
-        desc: '标准服务端授权简化模式',
+        desc: t('authModeTable.simpleAuth'),
       },
       {
         key: 3,
         authMode: 'password',
-        desc: '用户密码授权模式',
+        desc: t('authModeTable.secretsAuth'),
       },
       {
         key: 4,
         authMode: 'client_credentials',
-        desc: '应用端密钥授权模式',
+        desc: t('authModeTable.appSecretsAuth'),
       },
     ]
     return (
