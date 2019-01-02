@@ -81,5 +81,16 @@
     "csbInstanceOm": "实例列表",
     "csbInstanceApproval": "实例审批",
     "csbCascadingLinkRules": "级联链路规则"
+  },
+  "springCloudNotInstalled": {
+    "noSpringCloud": "当前项目对应的集群，未安装 SpringCloud 基础服务组件，",
+    "install": "请『联系系统管理员』安装",
+    "springCloudLoading": "加载 SpingCloud 中 ..."
+  },
+  "pinPointNotInstalled": {
+    "noPinPoint": "当前项目对应的集群，未安装 PinPoint 基础服务组件，",
+    "install": "请『联系系统管理员』安装",
+    "apmLoading": "加载 APM 中 ..."
   }
+
 }
