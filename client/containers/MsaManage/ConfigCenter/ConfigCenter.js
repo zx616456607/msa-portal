@@ -171,7 +171,7 @@ class ConfigCenter extends React.Component {
       project_url: configGitUrl,
       branch_name: branchValue,
       file_path: (path ? path + '/' : '') + configName,
-      commit_message: message === '' ? t('list.delConfigMsg') : message,
+      commit_message: message === '' ? t('list.delConfigMsg') : encodeURIComponent(message),
     }
     this.setState({
       isDelFetching: true,
