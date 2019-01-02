@@ -57,7 +57,7 @@ const apmChildRoutes = [
   },
 ]
 
-@withNamespaces('noSpringCloud')
+@withNamespaces('common')
 class Apm extends React.Component {
   componentDidMount() {
     const { loadApms, current, getApmService } = this.props
@@ -77,13 +77,13 @@ class Apm extends React.Component {
   renderChildren = () => {
     const { apms, children, t } = this.props
     if (!apms || apms.isFetching === true) {
-      return renderLoading(t('apmLoading'))
+      return renderLoading(t('springCloud404.apmLoading'))
     }
     if (!apms.ids || apms.ids.length === 0) {
       return <div className="loading">
         <img alt="pinpoint-not-intall" src={pinPoint}/>
-        <div>{t('noSpringCloud')}</div>
-        <div>{t('install')}</div>
+        <div>{t('springCloud404.noSpringCloud')}</div>
+        <div>{t('springCloud404.install')}</div>
       </div>
     }
     return [

@@ -1,6 +1,0 @@
-{
-  "noSpringCloud": "Current project and cluster, the PinPoint components are not installed，",
-  "install": "Please contact『 the system admin』 to install",
-  "apmLoading": "Loading APM ...",
-  "springCloudLoading": "Loading SpingCloud ..."
-}

@@ -163,7 +163,7 @@ const msaManageChildRoutes = [
   },
 ]
 
-@withNamespaces('noSpringCloud')
+@withNamespaces('common')
 class MsaManage extends React.Component {
   state = {
     isDeployed: false,
@@ -185,7 +185,7 @@ class MsaManage extends React.Component {
     const { children, t } = this.props
     const { isDeployed, loading } = this.state
     if (loading) {
-      return renderLoading(t('springCloudLoading'))
+      return renderLoading(t('springCloud404.springCloudLoading'))
     }
     if (!isDeployed) {
       return notInstallSpringCloud()
@@ -250,14 +250,14 @@ const mapStateToProps = state => {
 }
 
 export function notInstallSpringCloud() {
-  @withNamespaces('noSpringCloud')
+  @withNamespaces('common')
   class NotInstallComponent extends React.Component {
     render() {
       const { t } = this.props
       return <div className="loading">
         <img alt="spingcloud-not-intall" src={spingCloud}/>
-        <div>{t('noSpringCloud')}</div>
-        <div>{t('install')}</div>
+        <div>{t('springCloud404.noSpringCloud')}</div>
+        <div>{t('springCloud404.install')}</div>
       </div>
     }
   }
