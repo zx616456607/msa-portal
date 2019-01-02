@@ -126,12 +126,13 @@ export const COMPONENT_LIST_SUCCESS = 'COMPONENT_LIST_SUCCESS'
 export const COMPONENT_LIST_FAILURE = 'COMPONENT_LIST_FAILURE'
 
 // Fetches component list from API.
-const fetchComponentList = (clusterID, project) => {
+const fetchComponentList = (clusterID, project, options) => {
   let headers
   if (project && project !== 'default') {
     headers = project
   }
   return {
+    options,
     [CALL_API]: {
       types: [ COMPONENT_LIST_REQUEST, COMPONENT_LIST_SUCCESS, COMPONENT_LIST_FAILURE ],
       endpoint: `${SERVICEMESH_API_URL}/servicemesh/clusters/${clusterID}/networking/destinationrule`,
@@ -146,8 +147,8 @@ const fetchComponentList = (clusterID, project) => {
   }
 }
 
-export const loadComponent = (clusterID, project) => dispatch => {
-  return dispatch(fetchComponentList(clusterID, project))
+export const loadComponent = (clusterID, project, options) => dispatch => {
+  return dispatch(fetchComponentList(clusterID, project, options))
 }
 
 export const COMPONENT_ADD_REQUEST = 'COMPONENT_ADD_REQUEST'
@@ -308,8 +309,9 @@ export const fetchServiceList = (clusterID, project) => dispatch => {
 export const GET_ISTIO_ENABLED_PROJECTS_REQUEST = 'GET_ISTIO_ENABLED_PROJECTS_REQUEST'
 export const GET_ISTIO_ENABLED_PROJECTS_SUCCESS = 'GET_ISTIO_ENABLED_PROJECTS_SUCCESS'
 export const GET_ISTIO_ENABLED_PROJECTS_FAILURE = 'GET_ISTIO_ENABLED_PROJECTS_FAILURE'
-function getIstioEnabledProjects(callback) {
+function getIstioEnabledProjects(callback, options) {
   return {
+    options,
     [CALL_API]: {
       types: [ GET_ISTIO_ENABLED_PROJECTS_REQUEST,
         GET_ISTIO_ENABLED_PROJECTS_SUCCESS,
@@ -323,9 +325,9 @@ function getIstioEnabledProjects(callback) {
   }
 }
 
-export function loadIstioEnabledProjects(callback) {
+export function loadIstioEnabledProjects(callback, options) {
   return dispatch => {
-    return dispatch(getIstioEnabledProjects(callback))
+    return dispatch(getIstioEnabledProjects(callback, options))
   }
 }
 

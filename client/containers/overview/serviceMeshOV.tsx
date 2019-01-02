@@ -30,10 +30,10 @@ function mapStateToProps(state) {
 interface ServiceMeshOVProps {
   clusterID: string,
   projectName: string
-  getMeshGateway: (clusterId: string) => any
-  loadComponent: (clusteriD: string, projectName: string ) => any,
-  loadVirtualServiceList: (query: any) => any,
-  loadIstioEnabledProjects: () => any,
+  getMeshGateway: (clusterId: string, options: any) => any
+  loadComponent: (clusteriD: string, projectName: string, options: any) => any,
+  loadVirtualServiceList: (query: any, options: any) => any,
+  loadIstioEnabledProjects: (options: any) => any,
 }
 
 interface ServiceMeshOVState {
@@ -53,7 +53,7 @@ class ServiceMeshOV extends React.Component<ServiceMeshOVProps, ServiceMeshOVSta
     install: true,
   }
   async componentDidMount() {
-    const IEPRes = await this.props.loadIstioEnabledProjects()
+    const IEPRes = await this.props.loadIstioEnabledProjects({ isHandleError: true })
     const IEPResData: any[] = getDeepValue(IEPRes, ['response', 'result', 'projects']) || []
     const install = IEPResData
     .find(({ namespace, istioEnabledClusterIds }: { namespace: string, istioEnabledClusterIds: string[] }) =>
@@ -61,9 +61,9 @@ class ServiceMeshOV extends React.Component<ServiceMeshOVProps, ServiceMeshOVSta
     this.setState({ install: !isEmpty(install) })
     if (isEmpty(install)) { return }
     const [ MGWRes, CMRes, VSLRes ] = await Promise.all([
-      this.props.getMeshGateway(this.props.clusterID),
-      this.props.loadComponent(this.props.clusterID, this.props.projectName),
-      this.props.loadVirtualServiceList({ clusterId: this.props.clusterID }),
+      this.props.getMeshGateway(this.props.clusterID, { isHandleError: true }),
+      this.props.loadComponent(this.props.clusterID, this.props.projectName, { isHandleError: true }),
+      this.props.loadVirtualServiceList({ clusterId: this.props.clusterID }, { isHandleError: true }),
     ])
     const MGWResData: string[] = getDeepValue(MGWRes, ['response', 'result' ]) || []
     const MGWResLenght = MGWResData.length

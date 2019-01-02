@@ -31,7 +31,7 @@ function mapStateToProps(state) {
 interface DubboOVProps {
   clusterID: string
   getDubboList: ( clusterID: string, options?: any ) => any
-  getDubboInstall: (clusterID: string) => any
+  getDubboInstall: (clusterID: string, options?: any) => any
 }
 interface DubboOVState {
   tatalService: number
@@ -56,7 +56,7 @@ class DubboOV extends React.Component<DubboOVProps, DubboOVState> {
     this.setState({ install })
     if (!install) { return }
     const [dubRes] = await Promise.all([
-      this.props.getDubboList(this.props.clusterID),
+      this.props.getDubboList(this.props.clusterID, { isHandleError: true }),
     ])
     const dubboData: any[] = getDeepValue(dubRes, ['response', 'result', 'data', 'items']) || []
     const tatalService = dubboData.length || 0

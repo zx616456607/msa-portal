@@ -29,14 +29,14 @@ import SCuninstaled from '../../../client/assets/img/overview/SpringCloudunInsta
 interface SpringCloudOVProps {
   clusterID: string;
   namespace: string
-  getMsaList: (clusterID: string) => any;
-  getGatewayRoutes: (clusterID: string) => any;
-  gatewayPagePoliciesList: (clusterID: string) => any;
-  getService: (clusterID: string, query: any) => any;
-  getZipkinTracesList: (clusterID: string, query: any) => any;
-  getMicroservice: (clusterID: string, query: any) => any;
-  getBranchList: (clusterID: string, query: any) => any;
-  fetchSpingCloud: (clusterID: string, project?: string) => any;
+  getMsaList: (clusterID: string, options: any) => any;
+  getGatewayRoutes: (clusterID: string, options: any) => any;
+  gatewayPagePoliciesList: (clusterID: string, options: any) => any;
+  getService: (clusterID: string, query: any, options: any) => any;
+  getZipkinTracesList: (clusterID: string, query: any, options: any) => any;
+  getMicroservice: (clusterID: string, query: any, options: any) => any;
+  getBranchList: (clusterID: string, query: any, options: any) => any;
+  fetchSpingCloud: (clusterID: string, project?: string, options?: any) => any;
 }
 
 interface SpringCloudOVState {
@@ -91,12 +91,13 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     const MSstartTime = new Date().getTime() - 7 * 86400000
     const MSendTime = new Date().getTime()
     const [etMsaListRes, GateWayRes, PPLRes, SvcRes, ZTLRes, MSRes ] = await Promise.all([
-    this.props.getMsaList(this.props.clusterID),
-    this.props.getGatewayRoutes(this.props.clusterID),
-    this.props.gatewayPagePoliciesList(this.props.clusterID),
-    this.props.getService(this.props.clusterID, {}),
-    this.props.getZipkinTracesList(this.props.clusterID, query),
-    this.props.getMicroservice(this.props.clusterID, { startTime: MSstartTime, endTime: MSendTime }),
+    this.props.getMsaList(this.props.clusterID, { isHandleError: true }),
+    this.props.getGatewayRoutes(this.props.clusterID, { isHandleError: true }),
+    this.props.gatewayPagePoliciesList(this.props.clusterID, { isHandleError: true }),
+    this.props.getService(this.props.clusterID, {}, { isHandleError: true }),
+    this.props.getZipkinTracesList(this.props.clusterID, query, { isHandleError: true }),
+    this.props.getMicroservice(this.props.clusterID, { startTime: MSstartTime, endTime: MSendTime },
+       { isHandleError: true }),
     ])
     const msaList = getDeepValue(etMsaListRes, ['response', 'entities', 'msaList']) || {}
     const automaticNum = Object.values(msaList)
@@ -120,7 +121,8 @@ class SpringCloudOV extends React.Component<SpringCloudOVProps, SpringCloudOVSta
     .filter(({ status }) => !status)
     .length
     const projectUrl = getDeepValue(SvcRes, ['response', 'result', 'data', 'configGitUrl'])
-    const BLRes = await this.props.getBranchList(this.props.clusterID, { project_url: projectUrl })
+    const BLRes = await this.props.getBranchList(this.props.clusterID,
+      { project_url: projectUrl }, { isHandleError: true })
     const BlLength = (getDeepValue(BLRes, ['response', 'result', 'data']) || []).length
 
     const ZTLData = getDeepValue(ZTLRes, ['response', 'result', 'data']) || []

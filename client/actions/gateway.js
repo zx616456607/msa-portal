@@ -21,12 +21,13 @@ export const GET_GATEWAY_POLICIES_LIST_REQUEST = 'GET_GATEWAY_POLICIES_LIST_REQU
 export const GET_GATEWAY_POLICIES_LIST_SUCCESS = 'GET_GATEWAY_POLICIES_LIST_SUCCESS'
 export const GET_GATEWAY_POLICIES_LIST_FAILURE = 'GET_GATEWAY_POLICIES_LIST_FAILURE'
 
-const fetchGatewayPagePoliciesList = (clusterID, query) => {
+const fetchGatewayPagePoliciesList = (clusterID, query, options) => {
   let endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/policy`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_GATEWAY_POLICIES_LIST_REQUEST,
@@ -42,9 +43,9 @@ const fetchGatewayPagePoliciesList = (clusterID, query) => {
   }
 }
 
-export function gatewayPagePoliciesList(clusterID, query) {
+export function gatewayPagePoliciesList(clusterID, query, options) {
   return dispatch => {
-    return dispatch(fetchGatewayPagePoliciesList(clusterID, query))
+    return dispatch(fetchGatewayPagePoliciesList(clusterID, query, options))
   }
 }
 
@@ -167,12 +168,13 @@ export const GET_GATEWAY_ROUTES_LIST_REQUEST = 'GET_GATEWAY_ROUTES_LIST_REQUEST'
 export const GET_GATEWAY_ROUTES_LIST_SUCCESS = 'GET_GATEWAY_ROUTES_LIST_SUCCESS'
 export const GET_GATEWAY_ROUTES_LIST_FAILURE = 'GET_GATEWAY_ROUTES_LIST_FAILURE'
 
-const fetchGatewayRoutes = (clusterID, query) => {
+const fetchGatewayRoutes = (clusterID, query, options) => {
   let endpoint = `${MSA_API_URL}/clusters/${clusterID}/gateway/route`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_GATEWAY_ROUTES_LIST_REQUEST,
@@ -188,9 +190,9 @@ const fetchGatewayRoutes = (clusterID, query) => {
   }
 }
 
-export function getGatewayRoutes(clusterID, query) {
+export function getGatewayRoutes(clusterID, query, options) {
   return dispatch => {
-    return dispatch(fetchGatewayRoutes(clusterID, query))
+    return dispatch(fetchGatewayRoutes(clusterID, query, options))
   }
 }
 

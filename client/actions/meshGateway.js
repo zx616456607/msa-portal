@@ -48,8 +48,9 @@ export const MESH_GATEWAY_REQUEST = 'MESH_GATEWAY_REQUEST'
 export const MESH_GATEWAY_SUCCESS = 'MESH_GATEWAY_SUCCESS'
 export const MESH_GATEWAY_FAILURE = 'MESH_GATEWAY_FAILURE'
 
-function fetchMeshGateway(clusterId) {
+function fetchMeshGateway(clusterId, options) {
   return {
+    options,
     [CALL_API]: {
       types: [
         MESH_GATEWAY_REQUEST,
@@ -65,9 +66,9 @@ function fetchMeshGateway(clusterId) {
   }
 }
 
-export function getMeshGateway(clusterId) {
+export function getMeshGateway(clusterId, options) {
   return dispatch => {
-    return dispatch(fetchMeshGateway(clusterId))
+    return dispatch(fetchMeshGateway(clusterId, options))
   }
 }
 

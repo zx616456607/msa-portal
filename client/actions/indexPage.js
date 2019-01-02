@@ -40,9 +40,10 @@ export const getLimitAndRoutes = clusterId => {
 export const MICROSERVICE_REQUEST = 'MICROSERVICE_REQUEST'
 export const MICROSERVICE_SUCCESS = 'MICROSERVICE_SUCCESS'
 export const MICROSERVICE_FAILURE = 'MICROSERVICE_FAILURE'
-const fetchMicroservice = (clusterId, query) => {
+const fetchMicroservice = (clusterId, query, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterId}/overview/microservice?${toQuerystring(query)}`
   return {
+    options,
     [CALL_API]: {
       types: [
         MICROSERVICE_REQUEST,
@@ -54,8 +55,8 @@ const fetchMicroservice = (clusterId, query) => {
     },
   }
 }
-export const getMicroservice = (clusterId, query) => {
-  return dispatch => dispatch(fetchMicroservice(clusterId, query))
+export const getMicroservice = (clusterId, query, options) => {
+  return dispatch => dispatch(fetchMicroservice(clusterId, query, options))
 }
 
 // RPC服务数据

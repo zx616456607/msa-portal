@@ -20,9 +20,10 @@ export const SERVICE_BUS_REQUEST = 'SERVICE_BUS_REQUEST'
 export const SERVICE_BUS_SUCCESS = 'SERVICE_BUS_SUCCESS'
 export const SERVICE_BUS_FAILURE = 'SERVICE_BUS_FAILURE'
 
-const fetchServiceBus = () => {
+const fetchServiceBus = options => {
   const endpoint = `${CSB_API_URL}/overview/5`
   return {
+    options,
     [CALL_API]: {
       types: [ SERVICE_BUS_REQUEST,
         SERVICE_BUS_SUCCESS,
@@ -33,9 +34,9 @@ const fetchServiceBus = () => {
   }
 }
 
-export function getServiceBus() {
+export function getServiceBus(options) {
   return dispatch => {
-    return dispatch(fetchServiceBus())
+    return dispatch(fetchServiceBus(options))
   }
 }
 
@@ -45,9 +46,10 @@ export const DUBBO_INSTALL_REQUEST = 'DUBBO_INSTALL_REQUEST'
 export const DUBBO_INSTALL_SUCCESS = 'DUBBO_INSTALL_SUCCESS'
 export const DUBBO_INSTALL_FAILURE = 'DUBBO_INSTALL_FAILURE'
 
-const fetchDubboInstall = clusterID => {
+const fetchDubboInstall = (clusterID, options) => {
   const endpoint = `${PAAS_API_URL}/projects/plugins/enabled?clusterID=${clusterID}`
   return {
+    options,
     [CALL_API]: {
       types: [ DUBBO_INSTALL_REQUEST,
         DUBBO_INSTALL_SUCCESS,
@@ -58,8 +60,8 @@ const fetchDubboInstall = clusterID => {
   }
 }
 
-export function getDubboInstall(clusterID) {
+export function getDubboInstall(clusterID, options) {
   return dispatch => {
-    return dispatch(fetchDubboInstall(clusterID))
+    return dispatch(fetchDubboInstall(clusterID, options))
   }
 }
