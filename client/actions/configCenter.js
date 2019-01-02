@@ -21,8 +21,9 @@ export const CENTER_SERVICE_URL_REQUEST = 'CENTER_SERVICE_URL_REQUEST'
 export const CENTER_SERVICE_URL_SUCCESS = 'CENTER_SERVICE_URL_SUCCESS'
 export const CENTER_SERVICE_URL_FAILURE = 'CENTER_SERVICE_URL_FAILURE'
 
-const fetchServiceUrl = clusterId => {
+const fetchServiceUrl = (clusterId, options) => {
   return {
+    options,
     clusterId,
     [CALL_API]: {
       types: [ CENTER_SERVICE_URL_REQUEST, CENTER_SERVICE_URL_SUCCESS, CENTER_SERVICE_URL_FAILURE ],
@@ -35,17 +36,18 @@ const fetchServiceUrl = clusterId => {
   }
 }
 
-export const getService = clusterId => dispatch => {
-  return dispatch(fetchServiceUrl(clusterId))
+export const getService = (clusterId, options) => dispatch => {
+  return dispatch(fetchServiceUrl(clusterId, options))
 }
 
 export const CENTER_BRANCH_LIST_REQUEST = 'CENTER_BRANCH_LIST_REQUEST'
 export const CENTER_BRANCH_LIST_SUCCESS = 'CENTER_BRANCH_LIST_SUCCESS'
 export const CENTER_BRANCH_LIST_FAILURE = 'CENTER_BRANCH_LIST_FAILURE'
 
-const fetchBranch = (clusterId, query) => {
+const fetchBranch = (clusterId, query, options) => {
   const endpoint = `${MSA_API_URL}/clusters/${clusterId}/configserver/branches?${toQuerystring(query)}`
   return {
+    options,
     query,
     clusterId,
     [CALL_API]: {
@@ -59,8 +61,8 @@ const fetchBranch = (clusterId, query) => {
   }
 }
 
-export const getBranchList = (clusterId, query) => dispatch => {
-  return dispatch(fetchBranch(clusterId, query))
+export const getBranchList = (clusterId, query, options) => dispatch => {
+  return dispatch(fetchBranch(clusterId, query, options))
 }
 
 export const CENTER_SERVICE_INFO_REQUEST = 'CENTER_SERVICE_INFO_REQUEST'

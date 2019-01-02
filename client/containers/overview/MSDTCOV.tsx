@@ -22,8 +22,8 @@ import { getDeepValue } from '../../common/utils'
 
 interface MSDTCOVPros {
   clusterID: string
-  getDistributeList: (clusterId: string, query?: any) => any
-  getExecuctionRecordOverview: (clusterId: string) => any
+  getDistributeList: (clusterId: string, query?: any, options?: any) => any
+  getExecuctionRecordOverview: (clusterId: string, options: any) => any
 }
 
 interface MSDTCOVState {
@@ -47,8 +47,8 @@ class MSDTCOV extends React.Component<MSDTCOVPros, MSDTCOVState> {
   async componentDidMount() {
     const [GDBRes, GERRes] = await
       Promise.all([
-        this.props.getDistributeList(this.props.clusterID, { page: 1, size: 10 }),
-        this.props.getExecuctionRecordOverview(this.props.clusterID),
+        this.props.getDistributeList(this.props.clusterID, { page: 1, size: 10 }, { isHandleError: true }),
+        this.props.getExecuctionRecordOverview(this.props.clusterID, { isHandleError: true }),
       ])
     const totalAffair = getDeepValue(GDBRes, ['response', 'result', 'data', 'count']) || 0
     const todayFail = getDeepValue(GERRes, ['response', 'result', 'data', 'content', 'todayFail']) || 0

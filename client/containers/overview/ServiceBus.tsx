@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { getDeepValue } from '../../common/utils'
 import * as OVSActions from '../../actions/overview'
 interface ServiceBusProps {
-  getServiceBus: () => any
+  getServiceBus: (options?: any) => any
 }
 
 interface ServiceBusState {
@@ -33,7 +33,7 @@ class ServiceBus extends React.Component<ServiceBusProps, ServiceBusState> {
     loading: true,
   }
   async componentDidMount() {
-    const SVCBus = await this.props.getServiceBus()
+    const SVCBus = await this.props.getServiceBus({ isHandleError: true })
     const SVCBusData = getDeepValue(SVCBus, ['response', 'result', 'data']) || {}
     this.setState({ SVCBusData, loading: false })
   }

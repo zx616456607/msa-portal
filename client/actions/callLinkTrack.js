@@ -67,12 +67,13 @@ export const GET_ZIPKIN_TRACES_REQUEST = 'GET_ZIPKIN_TRACES_REQUEST'
 export const GET_ZIPKIN_TRACES_SUCCESS = 'GET_ZIPKIN_TRACES_SUCCESS'
 export const GET_ZIPKIN_TRACES_FAILURE = 'GET_ZIPKIN_TRACES_FAILURE'
 
-const fetchZipkinTracesList = (clusterId, query) => {
+const fetchZipkinTracesList = (clusterId, query, options) => {
   let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/traces`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_ZIPKIN_TRACES_REQUEST,
@@ -85,8 +86,8 @@ const fetchZipkinTracesList = (clusterId, query) => {
   }
 }
 
-export const getZipkinTracesList = (clusterId, query) =>
-  dispatch => dispatch(fetchZipkinTracesList(clusterId, query))
+export const getZipkinTracesList = (clusterId, query, options) =>
+  dispatch => dispatch(fetchZipkinTracesList(clusterId, query, options))
 
 export const GET_ZIPKIN_TRACE_REQUEST = 'GET_ZIPKIN_TRACE_REQUEST'
 export const GET_ZIPKIN_TRACE_SUCCESS = 'GET_ZIPKIN_TRACE_SUCCESS'

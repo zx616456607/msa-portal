@@ -22,12 +22,13 @@ export const MSA_LIST_SUCCESS = 'MSA_LIST_SUCCESS'
 export const MSA_LIST_FAILURE = 'MSA_LIST_FAILURE'
 
 // Fetches a page of msa.
-const fetchMsaList = (clusterID, query) => {
+const fetchMsaList = (clusterID, query, options) => {
   let endpoint = `${MSA_API_URL}/clusters/${clusterID}/discovery/services`
   if (query) {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    options,
     [CALL_API]: {
       types: [ MSA_LIST_REQUEST, MSA_LIST_SUCCESS, MSA_LIST_FAILURE ],
       endpoint,
@@ -36,9 +37,9 @@ const fetchMsaList = (clusterID, query) => {
   }
 }
 
-export function getMsaList(clusterID, query) {
+export function getMsaList(clusterID, query, options) {
   return dispatch => {
-    return dispatch(fetchMsaList(clusterID, query))
+    return dispatch(fetchMsaList(clusterID, query, options))
   }
 }
 
@@ -713,8 +714,9 @@ export const GET_DISTRIBUTE_LIST_REQUEST = 'GET_DISTRIBUTE_LIST_REQUEST'
 export const GET_DISTRIBUTE_LIST_SUCCESS = 'GET_DISTRIBUTE_LIST_SUCCESS'
 export const GET_DISTRIBUTE_LIST_FAILURE = 'GET_DISTRIBUTE_LIST_FAILURE'
 
-const fetchDistributeList = (clusterId, query) => {
+const fetchDistributeList = (clusterId, query, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_DISTRIBUTE_LIST_REQUEST,
@@ -728,8 +730,8 @@ const fetchDistributeList = (clusterId, query) => {
   }
 }
 
-export const getDistributeList = (clusterId, query) =>
-  dispatch => dispatch(fetchDistributeList(clusterId, query))
+export const getDistributeList = (clusterId, query, options) =>
+  dispatch => dispatch(fetchDistributeList(clusterId, query, options))
 
 // 查询子事务
 export const GET_CHILD_TRANSACTION_REQUEST = 'GET_CHILD_TRANSACTION_REQUEST'
@@ -759,8 +761,9 @@ export const GET_EXECUTION_RECORD_OVERVIEW_REQUEST = 'GET_EXECUTION_RECORD_OVERV
 export const GET_EXECUTION_RECORD_OVERVIEW_SUCCESS = 'GET_EXECUTION_RECORD_OVERVIEW_SUCCESS'
 export const GET_EXECUTION_RECORD_OVERVIEW_FAILURE = 'GET_EXECUTION_RECORD_OVERVIEW_FAILURE'
 
-const fetchExecuctionRecordOverview = clusterID => {
+const fetchExecuctionRecordOverview = (clusterID, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_EXECUTION_RECORD_OVERVIEW_REQUEST,
@@ -774,8 +777,8 @@ const fetchExecuctionRecordOverview = clusterID => {
   }
 }
 
-export const getExecuctionRecordOverview = clusterId =>
-  dispatch => dispatch(fetchExecuctionRecordOverview(clusterId))
+export const getExecuctionRecordOverview = (clusterId, options) =>
+  dispatch => dispatch(fetchExecuctionRecordOverview(clusterId, options))
 
 // 查询事务执行记录列表
 export const GET_EXECUTION_RECORD_LIST_REQUEST = 'GET_EXECUTION_RECORD_LIST_REQUEST'

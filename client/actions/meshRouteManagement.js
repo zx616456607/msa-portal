@@ -19,8 +19,9 @@ const { SERVICEMESH_API_URL } = API_CONFIG
 export const MESH_ROUTE_LIST_REQUEST = 'MESH_ROUTE_LIST_REQUEST'
 export const MESH_ROUTE_LIST_SUCCESS = 'MESH_ROUTE_LIST_SUCCESS'
 export const MESH_ROUTE_LIST_FAILURE = 'MESH_ROUTE_LIST_FAILURE'
-function getVirtualServiceList(query, callback) {
+function getVirtualServiceList(query, callback, options) {
   return {
+    options,
     [CALL_API]: {
       types: [ MESH_ROUTE_LIST_REQUEST,
         MESH_ROUTE_LIST_SUCCESS,
@@ -33,9 +34,9 @@ function getVirtualServiceList(query, callback) {
   }
 }
 
-export function loadVirtualServiceList(query, callback) {
+export function loadVirtualServiceList(query, callback, options) {
   return dispatch => {
-    return dispatch(getVirtualServiceList(query, callback))
+    return dispatch(getVirtualServiceList(query, callback, options))
   }
 }
 
