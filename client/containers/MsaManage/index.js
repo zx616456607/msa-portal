@@ -185,7 +185,7 @@ class MsaManage extends React.Component {
     const { children, t } = this.props
     const { isDeployed, loading } = this.state
     if (loading) {
-      return renderLoading(t('springCloud404.springCloudLoading'))
+      return renderLoading(t('springCloudNotInstalled.springCloudLoading'))
     }
     if (!isDeployed) {
       return notInstallSpringCloud()
@@ -256,8 +256,8 @@ export function notInstallSpringCloud() {
       const { t } = this.props
       return <div className="loading">
         <img alt="spingcloud-not-intall" src={spingCloud}/>
-        <div>{t('springCloud404.noSpringCloud')}</div>
-        <div>{t('springCloud404.install')}</div>
+        <div>{t('springCloudNotInstalled.noSpringCloud')}</div>
+        <div>{t('springCloudNotInstalled.install')}</div>
       </div>
     }
   }

@@ -82,10 +82,14 @@
     "csbInstanceApproval": "Instance Approval",
     "csbCascadingLinkRules": "Cascading Link Rule"
   },
-  "springCloud404": {
-    "noSpringCloud": "Current project and cluster, the PinPoint components are not installed，",
+  "springCloudNotInstalled": {
+    "noSpringCloud": "Current project and cluster, the SpringCloud components are not installed，",
     "install": "Please contact『 the system admin』 to install",
-    "apmLoading": "Loading APM ...",
     "springCloudLoading": "Loading SpingCloud ..."
-   }
+   },
+  "pinPointNotInstalled": {
+    "noPinPoint": "Current project and cluster, the PinPoint components are not installed，",
+    "install": "Please contact『 the system admin』 to install",
+    "apmLoading": "Loading APM ..."
+  }
 }

@@ -77,13 +77,13 @@ class Apm extends React.Component {
   renderChildren = () => {
     const { apms, children, t } = this.props
     if (!apms || apms.isFetching === true) {
-      return renderLoading(t('springCloud404.apmLoading'))
+      return renderLoading(t('pinPointNotInstalled.apmLoading'))
     }
     if (!apms.ids || apms.ids.length === 0) {
       return <div className="loading">
         <img alt="pinpoint-not-intall" src={pinPoint}/>
-        <div>{t('springCloud404.noSpringCloud')}</div>
-        <div>{t('springCloud404.install')}</div>
+        <div>{t('pinPointNotInstalled.noPinPoint')}</div>
+        <div>{t('pinPointNotInstalled.install')}</div>
       </div>
     }
     return [
