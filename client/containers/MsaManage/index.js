@@ -38,6 +38,7 @@ import AuthZoneDetail from './CertificationManage/AuthZone/AuthZoneDetail'
 import CertificationManageAuthMode from './CertificationManage/AuthMode'
 import CertificationManageAuthScope from './CertificationManage/AuthScope'
 import Event from './EventManage/Event/index'
+import { withNamespaces } from 'react-i18next'
 
 const msaManageChildRoutes = [
   {
@@ -162,6 +163,7 @@ const msaManageChildRoutes = [
   },
 ]
 
+@withNamespaces('noSpringCloud')
 class MsaManage extends React.Component {
   state = {
     isDeployed: false,
@@ -180,10 +182,10 @@ class MsaManage extends React.Component {
   }
 
   renderChildren = () => {
-    const { children } = this.props
+    const { children, t } = this.props
     const { isDeployed, loading } = this.state
     if (loading) {
-      return renderLoading('加载 SpingCloud 中 ...')
+      return renderLoading(t('springCloudLoading'))
     }
     if (!isDeployed) {
       return notInstallSpringCloud()
@@ -248,11 +250,18 @@ const mapStateToProps = state => {
 }
 
 export function notInstallSpringCloud() {
-  return <div className="loading">
-    <img alt="spingcloud-not-intall" src={spingCloud}/>
-    <div>当前项目对应的集群，未安装 SpingCloud 基础服务组件，</div>
-    <div>请『联系系统管理员』安装</div>
-  </div>
+  @withNamespaces('noSpringCloud')
+  class NotInstallComponent extends React.Component {
+    render() {
+      const { t } = this.props
+      return <div className="loading">
+        <img alt="spingcloud-not-intall" src={spingCloud}/>
+        <div>{t('noSpringCloud')}</div>
+        <div>{t('install')}</div>
+      </div>
+    }
+  }
+  return <NotInstallComponent/>
 }
 
 export function checkSpringCloudInstall(res, current) {

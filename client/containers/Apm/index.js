@@ -27,6 +27,8 @@ import pinPoint from '../../assets/img/apm/Pinpoint.png'
 import Topology from './Topology'
 import Performance from './Performance'
 import CallLinkTracking from './CallLinkTracking'
+import { withNamespaces } from 'react-i18next'
+
 
 const apmChildRoutes = [
   {
@@ -55,6 +57,7 @@ const apmChildRoutes = [
   },
 ]
 
+@withNamespaces('noSpringCloud')
 class Apm extends React.Component {
   componentDidMount() {
     const { loadApms, current, getApmService } = this.props
@@ -72,15 +75,15 @@ class Apm extends React.Component {
   }
 
   renderChildren = () => {
-    const { apms, children } = this.props
+    const { apms, children, t } = this.props
     if (!apms || apms.isFetching === true) {
-      return renderLoading('加载 APM 中 ...')
+      return renderLoading(t('apmLoading'))
     }
     if (!apms.ids || apms.ids.length === 0) {
       return <div className="loading">
         <img alt="pinpoint-not-intall" src={pinPoint}/>
-        <div>当前项目对应的集群，未安装 PinPoint 基础服务组件，</div>
-        <div>请『联系系统管理员』安装</div>
+        <div>{t('noSpringCloud')}</div>
+        <div>{t('install')}</div>
       </div>
     }
     return [
