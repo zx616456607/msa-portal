@@ -109,7 +109,6 @@
     "sysDefault": "系统默认",
     "custom": "自定义",
     "manageGroupUser": "管理组用户",
-
     "addUserFailed": "添加用户 {{userName}} 失败；",
     "removeUserFailed": "移除用户 {{userName}} 失败；"
   },
