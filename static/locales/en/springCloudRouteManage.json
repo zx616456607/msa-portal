@@ -23,7 +23,7 @@
     "searchByName": "Enter a Route name",
     "globalRouteConf": "Global Route Config",
     "totalElements": "Total {{totalElements}} item",
-    "routeSuccess": "`{{statusText}}Route successfully",
+    "routeSuccess": "{{statusText}}Route successfully",
     "sureToRoute": "Are you sure you want to {{statusText}}  {{routeId}}？",
     "deleteRouteSuccess": "Delete route successfully",
     "sureToDeleteRoute": "Are you sure you want to delete the {{routeId}} ？"
