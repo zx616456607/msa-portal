@@ -55,6 +55,8 @@ const dubboDetail = (state = {}, action) => {
     case ActionTypes.GET_DUBBO_DETAIL_FAILURE:
       return {
         ...state,
+        data: {},
+        dataBackup: {},
         isFetching: false,
       }
     case ActionTypes.SEARCH_DUBBO_CONSUMER_OR_PROVIDER:

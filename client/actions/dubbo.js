@@ -42,6 +42,9 @@ export const GET_DUBBO_DETAIL_FAILURE = 'GET_DUBBO_DETAIL_FAILURE'
 
 const fetchDubboDetail = (clusterId, name, groupversion, callback) => {
   return {
+    options: {
+      isHandleError: true,
+    },
     [CALL_API]: {
       types: [ GET_DUBBO_DETAIL_REQUEST,
         GET_DUBBO_DETAIL_SUCCESS,

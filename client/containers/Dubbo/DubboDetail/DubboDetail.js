@@ -73,6 +73,7 @@ class DubboDetail extends React.Component {
   componentDidMount() {
     const { getDubboDetail, match, clusterId } = this.props
     const { name, groupVersion } = match.params
+
     getDubboDetail(clusterId, name, groupVersion).then(res => {
       if (res.response) {
         this.setState({
@@ -85,6 +86,7 @@ class DubboDetail extends React.Component {
     this.setState({ visible: false })
   }
   serviceStatus = status => {
+    if (!status) return
     if (status.consumers === 0 && status.providers === 0) {
       return <span>无提供者 及 消费者</span>
     }
@@ -121,11 +123,11 @@ class DubboDetail extends React.Component {
           <h2>{dubboDetail.data.name}</h2>
           <div className="base-info">
             <div>
-              <div className="version">服务版本: {dubboDetail.data.groupVersion.split(':')[1]}</div>
+              <div className="version">服务版本: {dubboDetail.data.groupVersion && dubboDetail.data.groupVersion.split(':')[1]}</div>
               <div className="status">服务状态: {this.serviceStatus(dubboDetail.data.status)}</div>
             </div>
-            <div className="belong">所属应用: {dubboDetail.data.applications.join(',') || '无'}</div>
-            <div className="group">所属分组: {dubboDetail.data.groupVersion.split(':')[0]}</div>
+            <div className="belong">所属应用: {dubboDetail.data.applications && dubboDetail.data.applications.join(',') || '无'}</div>
+            <div className="group">所属分组: {dubboDetail.data.groupVersion && dubboDetail.data.groupVersion.split(':')[0]}</div>
           </div>
         </div>
       </Card>
