@@ -130,12 +130,10 @@ class DistributedList extends React.Component {
         dataIndex: 'txName',
       },
       {
-        /*
         title: '子事务数量',
         dataIndex: 'detailCount',
         sorter: (a, b) => a.detailCount - b.detailCount,
         width: 200,
-*/
       },
       {
         title: '超时时间(ms)',
