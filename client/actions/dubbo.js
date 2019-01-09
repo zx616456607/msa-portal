@@ -11,8 +11,8 @@
  */
 import { CALL_API } from '../middleware/api'
 import { toQuerystring } from '../common/utils'
-import { METRICS_DEFAULT_SOURCE, API_CONFIG } from '../constants';
-import { getDeepValue } from '../common/utils';
+import { METRICS_DEFAULT_SOURCE, API_CONFIG } from '../constants'
+import _ from 'lodash'
 
 const { PAAS_API_URL } = API_CONFIG
 
@@ -42,6 +42,9 @@ export const GET_DUBBO_DETAIL_FAILURE = 'GET_DUBBO_DETAIL_FAILURE'
 
 const fetchDubboDetail = (clusterId, name, groupversion, callback) => {
   return {
+    options: {
+      isHandleError: true,
+    },
     [CALL_API]: {
       types: [ GET_DUBBO_DETAIL_REQUEST,
         GET_DUBBO_DETAIL_SUCCESS,
@@ -62,10 +65,12 @@ export const SEARCH_DUBBO_CONSUMER_OR_PROVIDER = 'SEARCH_DUBBO_CONSUMER_OR_PROVI
 export const searchConsumerOrProvider = (type, keyWord, data) => {
   return (dispatch, getState) => {
     // const { dubboDetail } = getState().dubbo
-    const nextDubboDetail = getDeepValue(getState().dubbo, [ 'dubboDetail' ])
-    const list = getDeepValue(nextDubboDetail.data, [ type ])
+    const nextDubboDetail = _.cloneDeep(getState().dubbo.dubboDetail)
+    const list = _.cloneDeep(nextDubboDetail.dataBackup[ type ])
     if (!list) return
-    const filteredData = list.filter(v => v.podName.indexOf(keyWord) >= 0)
+    const filteredData = list.filter(v => {
+      return v.podName.indexOf(keyWord) >= 0
+    })
     nextDubboDetail.data[type] = filteredData
     dispatch({
       type: SEARCH_DUBBO_CONSUMER_OR_PROVIDER,
