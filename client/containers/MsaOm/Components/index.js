@@ -158,7 +158,7 @@ class MsaComponents extends React.Component {
 
   filterTimer = value => {
     if (value === undefined && !value) return
-    const start = value.replace('T', ' ').replace('Z', '')
+    const start = new Date(value)
     return formatFromnow(start)
   }
 
