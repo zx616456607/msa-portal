@@ -23,7 +23,7 @@
     "searchByName": "按路由名称搜索",
     "globalRouteConf": "全局路由配置",
     "totalElements": "共 {{totalElements}} 条",
-    "routeSuccess": "`{{statusText}}路由成功",
+    "routeSuccess": "{{statusText}}路由成功",
     "sureToRoute": "确定将路由 {{routeId}} {{statusText}}吗？",
     "deleteRouteSuccess": "删除路由成功",
     "sureToDeleteRoute": "确定将路由 {{routeId}} 删除吗？"
