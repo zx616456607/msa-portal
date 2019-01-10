@@ -294,6 +294,29 @@ const msaBlownClusters = (state = {}, action) => {
   }
 }
 
+const msaBlownServices = (state = {}, action) => {
+  const { type } = action
+  switch (type) {
+    case ActionTypes.GET_MSA_BLOWN_SERVICE_REQUEST:
+      return Object.assign({}, state, {
+        isFetching: true,
+        data: {},
+      })
+    case ActionTypes.GET_MSA_BLOWN_SERVICE_SUCCESS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: action.response.result.data,
+      })
+    case ActionTypes.GET_MSA_BLOWN_SERVICE_FAILURE:
+      return Object.assign({}, state, {
+        isFetching: false,
+        data: {},
+      })
+    default:
+      return state
+  }
+}
+
 const msaBlownMonitor = (state = {}, action) => {
   const { type } = action
   switch (type) {
@@ -481,6 +504,7 @@ const msa = (state = {
   msaMonitor: {},
   msaRealTimeMonitor: {},
   msaBlownClusters: {},
+  msaBlownServices: {},
   msaBlownMonitor: {},
   msaBlownStrategy: {},
   distributeList: {},
@@ -509,6 +533,7 @@ const msa = (state = {
     msaMonitor: msaMonitor(state.msaMonitor, action),
     msaRealTimeMonitor: msaRealTimeMonitor(state.msaRealTimeMonitor, action),
     msaBlownClusters: msaBlownClusters(state.msaBlownClusters, action),
+    msaBlownServices: msaBlownServices(state.msaBlownServices, action),
     msaBlownMonitor: msaBlownMonitor(state.msaBlownMonitor, action),
     msaBlownStrategy: msaBlownStrategy(state.msaBlownStrategy, action),
     distributeList: distributeList(state.distributeList, action),
