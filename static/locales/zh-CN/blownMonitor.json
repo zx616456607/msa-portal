@@ -6,6 +6,12 @@
     "viewDemo": "查看示例图",
     "threadPool": "线程池",
     "gotIt": "知道了",
-    "sample": "示例图"
+    "sample": "示例图",
+    "blownServicePld": "选择服务",
+    "serviceApiPld": "选择服务接口名",
+    "search": "搜索",
+    "datePld": "请选择时间（当前时刻）",
+    "reset": "重置",
+    "selectService": "请先选择服务"
   }
 }

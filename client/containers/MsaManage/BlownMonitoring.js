@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import QueueAnim from 'rc-queue-anim'
-import { Icon, Select, Spin, notification } from 'antd'
+import { Icon, Select, Spin, notification, DatePicker, Button } from 'antd'
 import WebSocket from '@tenx-ui/webSocket/lib/websocket'
 import isEmpty from 'lodash/isEmpty'
 import './style/BlownMonitoring.less'
@@ -11,9 +11,11 @@ import BlownDemoModal from '../../components/BlownChart/BlownDemo'
 import PoolDemoModal from '../../components/BlownChart/PoolDemo'
 import EmptyBlown from '../../components/BlownChart/EmptyBlown'
 import * as msaActions from '../../actions/msa'
-import { sleep } from '../../common/utils'
+import { getDeepValue, sleep } from '../../common/utils'
 import { API_CONFIG } from '../../constants'
 import { withNamespaces } from 'react-i18next'
+import moment from 'moment'
+
 const { MSA_API } = API_CONFIG
 
 const Option = Select.Option
@@ -67,18 +69,14 @@ class BlownMonitoring extends React.Component {
   }
 
   selectBlownCluster = async clusterName => {
+    const { msaBlownServices, clusterId } = this.props
     if (clusterName === this.state.blownCluster) {
       return
     }
+    await msaBlownServices(clusterId, clusterName)
     this.setState({
       blownCluster: clusterName,
-    })
-    this.setState({
-      wsFetching: true,
-    })
-    await sleep(200)
-    this.setState({
-      wsFetching: false,
+      currentService: undefined,
     })
   }
 
@@ -113,7 +111,7 @@ class BlownMonitoring extends React.Component {
   }
 
   wsOnSetup = socket => {
-    const { blownCluster } = this.state
+    const { blownCluster, currentService, currentApi, dateValue } = this.state
     const { setBlownMonitor, namespace, userInfo, clusterId } = this.props
     const { namespace: userNamespace } = userInfo
     const finalNamespace = namespace === 'default' ? userNamespace : namespace
@@ -121,6 +119,9 @@ class BlownMonitoring extends React.Component {
       clusterId,
       namespace: finalNamespace,
       clusterName: blownCluster,
+      serviceName: currentService,
+      methodName: currentApi,
+      time: dateValue ? parseInt((dateValue / 1000)) : undefined,
     }
     socket.send(JSON.stringify(body))
     socket.onmessage = data => {
@@ -128,8 +129,78 @@ class BlownMonitoring extends React.Component {
     }
   }
 
+  selectBlownService = currentService => {
+    this.setState({
+      currentService,
+      currentApi: undefined,
+    })
+  }
+
+  selectBlownApi = currentApi => {
+    this.setState({
+      currentApi,
+    })
+  }
+
+  dateChange = time => {
+    this.setState({
+      dateValue: time.valueOf(),
+    })
+  }
+
+  renderBlownServices = () => {
+    const { blownServices } = this.props
+    if (isEmpty(blownServices)) {
+      return
+    }
+    return Object.keys(blownServices).map(service => <Option key={service}>{service}</Option>)
+  }
+
+  renderBlownApis = () => {
+    const { blownServices } = this.props
+    const { currentService } = this.state
+    if (isEmpty(blownServices) || !currentService) {
+      return
+    }
+    if (isEmpty(blownServices[currentService])) {
+      return
+    }
+    return blownServices[currentService].map(api => <Option key={api}>{api}</Option>)
+  }
+
+  searchMonitor = async () => {
+    const { clearBlownMonitor } = this.props
+    await clearBlownMonitor()
+    this.setState({
+      wsFetching: true,
+    })
+    await sleep(200)
+    this.setState({
+      wsFetching: false,
+    })
+  }
+
+  resetBtn = async () => {
+    const { blownClusters } = this.props
+    if (!isEmpty(blownClusters)) {
+      this.setState({
+        blownCluster: blownClusters[0],
+      })
+    }
+    this.setState({
+      currentService: undefined,
+      currentApi: undefined,
+      dateValue: null,
+    })
+    await sleep()
+    this.searchMonitor()
+  }
+
   render() {
-    const { visible, blownCluster, wsFetching, poolVisible } = this.state
+    const {
+      visible, blownCluster, wsFetching, poolVisible,
+      currentService, currentApi, dateValue,
+    } = this.state
     const { clusterFetching, blownClusters, blownMonitor, t } = this.props
     if (clusterFetching || wsFetching) {
       return <div className="loading">
@@ -152,9 +223,50 @@ class BlownMonitoring extends React.Component {
             style={{ width: 200 }}
             value={blownCluster}
             onSelect={this.selectBlownCluster}
+            showSearch
           >
             {this.renderBlownClusters()}
           </Select>
+          <Select
+            placeholder={t('blownMonitor.blownServicePld')}
+            style={{ width: 200 }}
+            value={currentService}
+            onSelect={this.selectBlownService}
+            showSearch
+          >
+            {this.renderBlownServices()}
+          </Select>
+          <Select
+            placeholder={t('blownMonitor.serviceApiPld')}
+            style={{ width: 200 }}
+            value={currentApi}
+            onSelect={this.selectBlownApi}
+            showSearch
+            notFoundContent={t('blownMonitor.selectService')}
+          >
+            {this.renderBlownApis()}
+          </Select>
+          <DatePicker
+            onChange={this.dateChange}
+            showTime
+            value={dateValue ? moment(dateValue) : null}
+            format={'YYYY-MM-DD hh:mm:ss'}
+            placeholder={t('blownMonitor.datePld')}
+          />
+          <Button
+            type={'primary'}
+            icon="search"
+            onClick={this.searchMonitor}
+          >
+            {t('blownMonitor.search')}
+          </Button>
+          <Button
+            type={'primary'}
+            icon={'rollback'}
+            onClick={this.resetBtn}
+          >
+            {t('blownMonitor.reset')}
+          </Button>
         </div>
         <div className="layout-content-body" key="body">
           <div style={{ marginBottom: 20 }}>
@@ -226,6 +338,7 @@ const mapStateToProps = state => {
   const { msaBlownClusters, msaBlownMonitor } = msa
   const { data: blownClusters, isFetching: clusterFetching } = msaBlownClusters
   const { data: blownMonitor } = msaBlownMonitor
+  const blownServices = getDeepValue(state, [ 'msa', 'msaBlownServices', 'data' ])
   return {
     clusterId,
     namespace,
@@ -233,12 +346,13 @@ const mapStateToProps = state => {
     blownClusters,
     blownMonitor,
     clusterFetching,
+    blownServices,
   }
 }
 
 export default connect(mapStateToProps, {
   msaBlownClusters: msaActions.msaBlownClusters,
-  msaBlownMonitor: msaActions.msaBlownMonitor,
+  msaBlownServices: msaActions.msaBlownServices,
   setBlownMonitor: msaActions.setBlownMonitor,
   clearBlownMonitor: msaActions.clearBlownMonitor,
 })(BlownMonitoring)
