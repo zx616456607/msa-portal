@@ -66,7 +66,7 @@ class LogTemplate extends React.Component {
     }
     if (this.logRef) {
       this.logRef.clearLogs()
-      this.logRef.writeln(logsArr)
+      this.logRef.writelns(logsArr)
     }
   }
   render() {
@@ -86,7 +86,6 @@ class LogTemplate extends React.Component {
             <Icon type="reload" onClick={() => this.loadData()}/>
           </div>}
           isDangerouslySetInnerHTML={true}
-
         />
       </div>
     )
