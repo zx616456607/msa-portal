@@ -31,7 +31,7 @@ class MsaDetailDemote extends React.Component {
       instances,
       clusterID } = this.props
     this.setState({ loading: true })
-    const result = await getServiceDemoteStatus(clusterID, `${serviceName}:${instances[0].port}`)
+    const result = await getServiceDemoteStatus(clusterID, `${serviceName}:${instances[0].port}`, { isHandleError: true })
     const statusResult = await getDemoteStatus(clusterID, serviceName)
     if (!statusResult.error) {
       this.setState({

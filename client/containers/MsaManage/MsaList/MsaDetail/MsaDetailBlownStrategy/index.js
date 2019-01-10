@@ -60,7 +60,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
       clusterID,
       getMsaBlownOpenStatus } = this.props
     this.setState({ blownOpenLoading: true })
-    getMsaBlownOpenStatus(clusterID, `${serviceName}:${instances[0].port}`).then(res => {
+    getMsaBlownOpenStatus(clusterID, `${serviceName}:${instances[0].port}`, { isHandleError: true }).then(res => {
       if (res.response) {
         this.setState({
           blownOpen: res.response.result.data,

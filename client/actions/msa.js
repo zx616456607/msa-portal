@@ -547,8 +547,9 @@ export const GET_MSA_BLOWN_OPEN_REQUEST = 'GET_MSA_BLOWN_OPEN_REQUEST'
 export const GET_MSA_BLOWN_OPEN_SUCCESS = 'GET_MSA_BLOWN_OPEN_SUCCESS'
 export const GET_MSA_BLOWN_OPEN_FAILURE = 'GET_MSA_BLOWN_OPEN_FAILURE'
 
-const fetchMsaBlownOpen = (clusterId, serviceName) => {
+const fetchMsaBlownOpen = (clusterId, serviceName, options) => {
   return {
+    options,
     [CALL_API]: {
       types: [
         GET_MSA_BLOWN_OPEN_REQUEST,
@@ -561,8 +562,8 @@ const fetchMsaBlownOpen = (clusterId, serviceName) => {
   }
 }
 
-export const getMsaBlownOpenStatus = (clusterId, serviceName) =>
-  dispatch => dispatch(fetchMsaBlownOpen(clusterId, serviceName))
+export const getMsaBlownOpenStatus = (clusterId, serviceName, options) =>
+  dispatch => dispatch(fetchMsaBlownOpen(clusterId, serviceName, options))
 
 // 熔断开启、关闭接口
 export const MSA_BLOWN_OPEN_REQUEST = 'MSA_BLOWN_OPEN_REQUEST'
