@@ -6,6 +6,12 @@
     "viewDemo": "View Diagram",
     "threadPool": "ThreadPool",
     "gotIt": "OK",
-    "sample": "Diagram"
+    "sample": "Diagram",
+    "blownServicePld": "Service",
+    "serviceApiPld": "Service API ",
+    "search": "Search",
+    "datePld": "Select time（Now）",
+    "reset": "Reset",
+    "selectService": "Select service first "
   }
 }

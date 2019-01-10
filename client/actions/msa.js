@@ -500,6 +500,29 @@ const fetchMsaBlownMonitor = (clusterId, clusterName) => {
 export const msaBlownMonitor = (clusterID, clusterName) =>
   dispatch => dispatch(fetchMsaBlownMonitor(clusterID, clusterName))
 
+// 获取熔断监控服务以及接口
+
+export const GET_MSA_BLOWN_SERVICE_REQUEST = 'GET_MSA_BLOWN_SERVICE_REQUEST'
+export const GET_MSA_BLOWN_SERVICE_SUCCESS = 'GET_MSA_BLOWN_SERVICE_SUCCESS'
+export const GET_MSA_BLOWN_SERVICE_FAILURE = 'GET_MSA_BLOWN_SERVICE_FAILURE'
+
+const fetchMsaBlownServices = (clusterId, clusterName) => {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_MSA_BLOWN_SERVICE_REQUEST,
+        GET_MSA_BLOWN_SERVICE_SUCCESS,
+        GET_MSA_BLOWN_SERVICE_FAILURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/hystrix/services/${clusterName}`,
+      schema: {},
+    },
+  }
+}
+
+export const msaBlownServices = (clusterID, clusterName) =>
+  dispatch => dispatch(fetchMsaBlownServices(clusterID, clusterName))
+
 // 将熔断监控数据放入store
 export const SET_BLOWN_MONITOR = 'SET_BLOWN_MONITOR'
 
