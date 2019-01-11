@@ -11,11 +11,16 @@
  */
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Layout } from 'antd'
 import Content from '../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import DistributedList from './DistributedList'
 import ExecutionRecord from './ExecutionRecord'
+import * as SpingCloudActions from '../../actions/msaConfig'
+import { checkSpringCloudInstall } from '../MsaManage';
+import { renderLoading } from '../../components/utils'
+import DistributedImg from '../../assets/img/distributed/distributed.png'
 
 const distributeChildRoutes = [
   {
@@ -31,9 +36,37 @@ const distributeChildRoutes = [
   },
 ]
 
+
 class Distributed extends React.Component {
+  state = {
+    isDeployed: false,
+    loading: true,
+  }
+
+  componentDidMount() {
+    const { current, fetchSpingCloud } = this.props
+    const clusterID = current.config.cluster.id
+    fetchSpingCloud(clusterID).then(res => {
+      this.setState({
+        isDeployed: checkSpringCloudInstall(res, current),
+        loading: false,
+      })
+    })
+  }
+
   renderChildren = () => {
     const { children } = this.props
+    const { isDeployed, loading } = this.state
+    if (loading) {
+      return renderLoading('加载 SpingCloud 中 ...')
+    }
+    if (!isDeployed) {
+      return <div className="loading">
+        <img alt="distribute-not-enabled" src={DistributedImg} />
+        <div>当前项目对应的集群，未安装分布式事务基础服务组件</div>
+        <div>请『联系系统管理员』安装</div>
+      </div>
+    }
     return [
       children,
       <Switch key="switch">
@@ -51,4 +84,15 @@ class Distributed extends React.Component {
     </Layout>
   }
 }
-export default Distributed
+const mapStateToProps = state => {
+  const { current } = state
+  return {
+    auth: state.entities.auth,
+    current: current || {},
+  }
+}
+
+export default connect(mapStateToProps, {
+  fetchSpingCloud: SpingCloudActions.fetchSpingCloud,
+})(Distributed)
+
