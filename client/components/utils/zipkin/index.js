@@ -48,6 +48,7 @@ export function convertSuccessResponseDetail(rawResponse, logsUrl) {
   })
   const mymodelView = {}
   mymodelView.traceId = modelview.traceId
+  mymodelView.depth = modelview.depth
   mymodelView.spanCount = modelview.spans.length
   mymodelView.services = services
   const newModelNode = Object.assign({}, modelview.spans[0], mymodelView)
@@ -70,10 +71,21 @@ function Copy(operationModel, node) {
   operationModel.id = node.spanId
   operationModel.name = node.spanName
   operationModel.timestamp = node.timestamp
-  operationModel.annotations = node.annotations
+  operationModel.annotations = formate(node.annotations)
   operationModel.binaryAnnotations = node.tags
   operationModel.success = node.errorType === 'none'
   operationModel.serverName = node.serviceName
   operationModel.timestamp = node.timestamp
   operationModel.duration = node.duration
+}
+function formate(annotations) {
+  const newAnnotation = annotations.map(anno => {
+    const endpoint = anno.endpoint
+    const newendpoint = {
+      serviceName: endpoint.slice(endpoint.indexOf('(') + 1, endpoint.lastIndexOf(')')),
+    }
+    anno.endpoint = newendpoint
+    return anno
+  })
+  return newAnnotation
 }
