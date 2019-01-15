@@ -21,12 +21,14 @@ const tracesList = (state = {}, action) => {
         ...state,
         isFetching: true,
       }
-    case ActionTypes.GET_ZIPKIN_TRACES_SUCCESS:
+    case ActionTypes.GET_ZIPKIN_TRACES_SUCCESS: {
+      const data = action.traceId ? [ action.response.result.data ] : action.response.result.data
       return {
         ...state,
         isFetching: false,
-        data: ZipkinC.convertSuccessResponse(action.response.result.data, serviceName),
+        data: ZipkinC.convertSuccessResponse(data, serviceName),
       }
+    }
     case ActionTypes.GET_ZIPKIN_TRACES_FAILURE:
       return {
         ...state,

@@ -69,10 +69,13 @@ export const GET_ZIPKIN_TRACES_FAILURE = 'GET_ZIPKIN_TRACES_FAILURE'
 
 const fetchZipkinTracesList = (clusterId, query = {}, options) => {
   let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/traces`
-  if (query) {
+  if (query.traceId) {
+    endpoint += `/${query.traceId}`
+  } else {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    traceId: query.traceId,
     serviceName: query.serviceName,
     options,
     [CALL_API]: {
