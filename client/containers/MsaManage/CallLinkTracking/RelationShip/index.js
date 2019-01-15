@@ -15,11 +15,13 @@ import QueueAnim from 'rc-queue-anim'
 import { Card, Button, Tooltip, Icon } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import './style/index.less'
-import { getZipkinDependencies, getActiveRelationChartNode } from '../../../../actions/callLinkTrack'
+import { getZipkinDependencies, getActiveRelationChartNode, callZipkinAnalyse,
+  callZipkinAnalyseStatus } from '../../../../actions/callLinkTrack'
 import RelationChart from '@tenx-ui/relation-chart'
 import ApmTimePicker from '../../../../components/ApmTimePicker'
 import { formatDate } from '../../../../common/utils'
 import { withNamespaces } from 'react-i18next'
+import { getDeepValue } from '../../../../common/utils'
 
 @withNamespaces('callLinkTracking')
 class RelationShip extends React.Component {
@@ -44,7 +46,7 @@ class RelationShip extends React.Component {
     text: this.props.t('index.last1Hour'),
   }]
 
-  loadData = () => {
+  loadData = async () => {
     const { rangeDateTime } = this.state
     const { clusterID, getZipkinDependencies } = this.props
     const time = new Date().getTime()
@@ -53,15 +55,28 @@ class RelationShip extends React.Component {
       endTs: rangeDateTime.length > 0 ? Date.parse(formatDate(rangeDateTime[1])) : time,
       lookback: rangeDateTime.length > 0 ? rangeDateTime[1] - rangeDateTime[0] : time - five,
     }
-    this.setState({
-      loading: true,
-    }, () => {
-      getZipkinDependencies(clusterID, query).then(() => {
-        this.setState({
-          loading: false,
-        })
-      })
-    })
+    this.setState({ loading: true })
+    const ZDRes = await getZipkinDependencies(clusterID, query)
+    const ZDData = getDeepValue(ZDRes, [ 'response', 'result', 'data' ])
+    const { edges = [], nodes = [] } = ZDData
+    const rotate = () => {
+      setTimeout(async () => {
+        const zkRes = await this.props.callZipkinAnalyseStatus(clusterID)
+        const status = getDeepValue(zkRes, [ 'response', 'result', 'data' ])
+        if (!status) {
+          await getZipkinDependencies(clusterID, query)
+          this.setState({ loading: false })
+        } else {
+          rotate()
+        }
+      }, 2000)
+    }
+    if (edges.length === 0 && nodes.length === 0) {
+      await this.props.callZipkinAnalyse(clusterID, { timestamp: query.endTs })
+      rotate()
+    } else {
+      this.setState({ loading: false })
+    }
   }
 
   filterNodes = edges => {
@@ -236,4 +251,6 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   getZipkinDependencies,
   getActiveRelationChartNode,
+  callZipkinAnalyse,
+  callZipkinAnalyseStatus,
 })(RelationShip)

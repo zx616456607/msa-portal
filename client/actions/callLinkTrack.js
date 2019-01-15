@@ -67,12 +67,16 @@ export const GET_ZIPKIN_TRACES_REQUEST = 'GET_ZIPKIN_TRACES_REQUEST'
 export const GET_ZIPKIN_TRACES_SUCCESS = 'GET_ZIPKIN_TRACES_SUCCESS'
 export const GET_ZIPKIN_TRACES_FAILURE = 'GET_ZIPKIN_TRACES_FAILURE'
 
-const fetchZipkinTracesList = (clusterId, query, options) => {
+const fetchZipkinTracesList = (clusterId, query = {}, options) => {
   let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/traces`
-  if (query) {
+  if (query.traceId) {
+    endpoint += `/${query.traceId}`
+  } else {
     endpoint += `?${toQuerystring(query)}`
   }
   return {
+    traceId: query.traceId,
+    serviceName: query.serviceName,
     options,
     [CALL_API]: {
       types: [
@@ -135,6 +139,52 @@ const fetchZipkinDependencies = (clusterId, query) => {
 
 export const getZipkinDependencies = (clusterId, query) =>
   dispatch => dispatch(fetchZipkinDependencies(clusterId, query))
+
+export const PUT_ZIPKIN_ANALYSE_REQUEST = 'PUT_ZIPKIN_ANALYSE_REQUEST'
+export const PUT_ZIPKIN_ANALYSE_SUCCESS = 'PUT_ZIPKIN_ANALYSE_SUCCESS'
+export const PUT_ZIPKIN_ANALYSE_FAILURE = 'PUT_ZIPKIN_ANALYSE_FAILURE'
+const putZipkinAnalyse = (clusterId, query) => {
+  let endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/analyse`
+  if (query) {
+    endpoint += `?${toQuerystring(query)}`
+  }
+  return {
+    [CALL_API]: {
+      types: [
+        PUT_ZIPKIN_ANALYSE_REQUEST,
+        PUT_ZIPKIN_ANALYSE_SUCCESS,
+        PUT_ZIPKIN_ANALYSE_FAILURE,
+      ],
+      endpoint,
+      schema: {},
+      options: {
+        method: 'PUT',
+      },
+    },
+  }
+}
+export const callZipkinAnalyse = (clusterId, query) =>
+  dispatch => dispatch(putZipkinAnalyse(clusterId, query))
+
+export const GET_ZIPKIN_ANALYSE_STATUS_REQUEST = 'GET_ZIPKIN_ANALYSE_STATUS_REQUEST'
+export const GET_ZIPKIN_ANALYSE_STATUS_SUCCESS = 'GET_ZIPKIN_ANALYSE_STATUS_SUCCESS'
+export const GET_ZIPKIN_ANALYSE_STATUS_FAILURE = 'GET_ZIPKIN_ANALYSE_STATUS_FAILURE'
+const getZipkinAnalyseStatus = clusterId => {
+  const endpoint = `${ZIPKIN_API_URL}/clusters/${clusterId}/trace/zipkin/analyse/status`
+  return {
+    [CALL_API]: {
+      types: [
+        GET_ZIPKIN_ANALYSE_STATUS_REQUEST,
+        GET_ZIPKIN_ANALYSE_STATUS_SUCCESS,
+        GET_ZIPKIN_ANALYSE_STATUS_FAILURE,
+      ],
+      endpoint,
+      schema: {},
+    },
+  }
+}
+export const callZipkinAnalyseStatus = clusterId =>
+  dispatch => dispatch(getZipkinAnalyseStatus(clusterId))
 
 // 给被点击的调用链上的node添加active: true 属性
 export const ACTIVE_RElATION_CHART_NODE = 'ACTIVE_RElATION_CHART_NODE'

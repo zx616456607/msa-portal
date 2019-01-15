@@ -379,13 +379,13 @@ class CallLinkTracking extends React.Component {
           </Row>
         </div>
         <div className="chart" key="chart">
-          <Chart height="225" padding={{ top: 40, right: '4%', bottom: '25%', left: '6%' }}
+          <Chart height="225" padding={{ top: 40, right: '4%', bottom: '25%', left: '4%' }}
             scale={cols} data={isFliter ?
               this.fliterChartData(filterList) : this.fliterChartData(dataList)} forceFit>
             <Tooltip crosshairs={{ type: 'cross' }} />
             {/* <View data={isFliter ? filterList : this.fliterChartData(dataList)}> */}
             <Axis name="startTime" />
-            <Axis name="duration" />
+            <Axis name="duration" label={{ formatter: val => `${parseInt(val)}` }}/>
             <Geom type="point" position="startTime*duration" opacity={0.65}
               shape="circle" size={[ 'spanCount', [ 4, 10 ]]}
               tooltip="traceId*serviceName*success*duration*startTime"

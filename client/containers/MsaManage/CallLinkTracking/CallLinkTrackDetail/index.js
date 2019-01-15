@@ -157,7 +157,7 @@ class CallLinkTrackDetail extends React.PureComponent {
               <li>{t('detail.startTime')}：
                 {detailData.length > 0 && formatFromnow(detailData[0].timestamp / 1000)}
               </li>
-              <li>{t('detail.callDepth')}：{detailData.length > 0 && detailData[0].spanCount}</li>
+              <li>{t('detail.callDepth')}：{detailData.length > 0 && detailData[0].depth}</li>
               <li>{t('detail.callTime')}：{detailData.length > 0 && detailData[0].duration / 1000} ms</li>
               <li>{t('detail.allSpan')}：{detailData.length > 0 && detailData[0].spanCount}</li>
             </ul>

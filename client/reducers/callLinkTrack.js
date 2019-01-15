@@ -11,21 +11,24 @@
  */
 
 import * as ActionTypes from '../actions/callLinkTrack'
+import * as ZipkinC from '../components/utils/zipkin'
 
 const tracesList = (state = {}, action) => {
-  const { type } = action
+  const { type, serviceName } = action
   switch (type) {
     case ActionTypes.GET_ZIPKIN_TRACES_REQUEST:
       return {
         ...state,
         isFetching: true,
       }
-    case ActionTypes.GET_ZIPKIN_TRACES_SUCCESS:
+    case ActionTypes.GET_ZIPKIN_TRACES_SUCCESS: {
+      const data = action.traceId ? [ action.response.result.data ] : action.response.result.data
       return {
         ...state,
         isFetching: false,
-        data: action.response.result.data,
+        data: ZipkinC.convertSuccessResponse(data, serviceName),
       }
+    }
     case ActionTypes.GET_ZIPKIN_TRACES_FAILURE:
       return {
         ...state,
@@ -62,6 +65,9 @@ const servicesList = (state = {}, action) => {
 
 const traceList = (state = {}, action) => {
   const { type } = action
+  // if (type === ActionTypes.GET_ZIPKIN_TRACE_SUCCESS) {
+  //   console.log('hadfasd', JSON.stringify(ZipkinC.convertSuccessResponseDetail(action.response.result.data)))
+  // }
   switch (type) {
     case ActionTypes.GET_ZIPKIN_TRACE_REQUEST:
       return {
@@ -72,7 +78,8 @@ const traceList = (state = {}, action) => {
       return {
         ...state,
         isFetching: false,
-        data: action.response.result.data,
+        // data: action.response.result.data,
+        data: ZipkinC.convertSuccessResponseDetail(action.response.result.data),
       }
     case ActionTypes.GET_ZIPKIN_TRACE_FAILURE:
       return {
