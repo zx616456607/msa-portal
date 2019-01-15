@@ -495,8 +495,8 @@ export function formatServiceOpenProtocol(type) {
  * @return {any} if read error, return null
  * @example getDeepValue(userList, ['group', 0, 'name'])
  */
-export const getDeepValue = (target, propsList) => propsList.reduce(
-  (result, prop) => ((result && result[prop]) ? result[prop] : null), target)
+export const getDeepValue = (target, propsList) => propsList.reduce((result, prop) =>
+  (result && result[prop] !== undefined ? result[prop] : null), target)
 
 /**
  * validator: service export check ip or domain
