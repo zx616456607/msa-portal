@@ -23,7 +23,8 @@ import * as gateWayAction from '../../../../actions/gateway'
 import {
   msaListSlt,
 } from '../../../../selectors/msa'
-import { getDeepValue, sleep } from '../../../../common/utils'
+import { sleep } from '../../../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import isEmpty from 'lodash/isEmpty';
 import { withNamespaces } from 'react-i18next'
 

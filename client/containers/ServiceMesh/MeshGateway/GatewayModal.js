@@ -16,7 +16,7 @@ import { Modal, Form, Input, Select, Icon, notification, Button, Tooltip } from 
 import './style/GatewayModal.less'
 import * as actions from '../../../actions/meshGateway'
 import { IP_REG } from '../../../constants'
-import { getDeepValue } from '../../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const { Option } = Select
 const FormItem = Form.Item

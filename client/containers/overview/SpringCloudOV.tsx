@@ -22,7 +22,7 @@ import * as IPAction from '../../actions/indexPage'
 import * as msaCAction from '../../actions/msaConfig'
 // import * as ELLAction from '../../actions/eventManage'
 import { connect } from 'react-redux'
-import { getDeepValue } from '../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import isEmpty from 'lodash/isEmpty'
 import SCuninstaled from '../../../client/assets/img/overview/SpringCloudunInstaled.svg'
 

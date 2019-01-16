@@ -12,7 +12,7 @@ import { Card, Row, Col, Spin } from 'antd'
 import { Chart, Axis, Geom, Tooltip, Legend } from 'bizcharts'
 import './styles/ServiceBus.less'
 import { connect } from 'react-redux'
-import { getDeepValue } from '../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as OVSActions from '../../actions/overview'
 interface ServiceBusProps {
   getServiceBus: (options?: any) => any

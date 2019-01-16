@@ -18,7 +18,7 @@ import {
 } from 'bizcharts'
 import * as msaActions from '../../actions/msa'
 import { connect } from 'react-redux'
-import { getDeepValue } from '../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 interface MSDTCOVPros {
   clusterID: string

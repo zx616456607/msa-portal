@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { Modal, Form, Input, Icon, Row, Col, notification } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import * as gatewayActions from '../../../../actions/gateway'
-import { getDeepValue } from '../../../../common/utils';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { withNamespaces } from 'react-i18next'
 
 const FormItem = Form.Item

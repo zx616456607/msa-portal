@@ -13,7 +13,7 @@ import './styles/index.less'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { connect } from 'react-redux';
 import * as serviceMeshActions from '../../../../actions/serviceMesh'
-import { getDeepValue } from '../../../../common/utils';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 // import { Tooltip } from 'bizcharts';
 interface Tipprops {
   dataList: any[];

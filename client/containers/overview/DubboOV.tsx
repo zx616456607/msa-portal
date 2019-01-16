@@ -17,7 +17,7 @@ import {
 } from 'bizcharts';
 import './styles/DubboOV.less'
 import { connect } from 'react-redux'
-import { getDeepValue } from '../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as DubAction from '../../actions/dubbo'
 import * as OVAction from '../../actions/overview'
 import { Dubbo as DubboIcon  } from '@tenx-ui/icon'

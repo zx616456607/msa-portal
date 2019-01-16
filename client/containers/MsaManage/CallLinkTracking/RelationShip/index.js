@@ -21,7 +21,7 @@ import RelationChart from '@tenx-ui/relation-chart'
 import ApmTimePicker from '../../../../components/ApmTimePicker'
 import { formatDate } from '../../../../common/utils'
 import { withNamespaces } from 'react-i18next'
-import { getDeepValue } from '../../../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 @withNamespaces('callLinkTracking')
 class RelationShip extends React.Component {

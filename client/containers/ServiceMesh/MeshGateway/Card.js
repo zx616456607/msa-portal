@@ -17,7 +17,7 @@ import './style/Card.less'
 import { Icon, Popover, Tooltip } from 'antd'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import Ellipsis from '@tenx-ui/ellipsis'
-import { getDeepValue } from '../../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 export default class GatewayCard extends React.Component {
   popoverContent = rules => (
