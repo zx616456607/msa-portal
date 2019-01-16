@@ -11,13 +11,15 @@ import './style/DubboDetail.less'
 const TabPane = Tabs.TabPane
 const Search = Input.Search;
 @connect(state => {
-  const { dubbo } = state
+  const { dubbo, current } = state
   const { cluster } = state.current.config
   const { dubboDetail, supplierList, consumerList } = dubbo
   return { dubboDetail,
     supplierList,
     consumerList,
-    clusterId: cluster.id }
+    clusterId: cluster.id,
+    namespace: current.config.project.namespace,
+  }
 }, {
   getDubboDetail,
   getSupplierList,
@@ -81,6 +83,11 @@ class DubboDetail extends React.Component {
         })
       }
     })
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.namespace !== nextProps.namespace) {
+      this.props.history.push('/dubbo/dubbo-manage')
+    }
   }
   onClose = () => {
     this.setState({ visible: false })

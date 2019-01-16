@@ -26,6 +26,7 @@ const dubboList = (state = {}, action) => {
         isFetching: false,
         total: action.response.result.data.total,
         data: action.response.result.data.items || [],
+        dataBackup: action.response.result.data.items || [],
       }
     case ActionTypes.FETCH_DUBBO_LIST_FAILURE:
       return {
@@ -33,6 +34,13 @@ const dubboList = (state = {}, action) => {
         isFetching: false,
         total: 0,
         data: [],
+        dataBackup: [],
+      }
+    case ActionTypes.SEARCH_DUBBO_LIST:
+      return {
+        ...state,
+        data: action.payload,
+        isFetching: false,
       }
     default:
       return state
