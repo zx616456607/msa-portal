@@ -41,6 +41,7 @@
   },
   "register": {
     "portRepeat": "服务地址:服务端口重复",
+    "portAlreadyExist": "该服务地址：服务端口已存在",
     "appNameRepeat": "微服务名称重复",
     "registerFailed": "注册失败",
     "registerSucc": "注册成功",

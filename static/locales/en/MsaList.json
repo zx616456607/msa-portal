@@ -41,6 +41,7 @@
   },
   "register": {
     "portRepeat": "This serviceAddr:port already exists",
+    "portAlreadyExist": "This serviceAddr:port already exists",
     "appNameRepeat": "This microservice already exists",
     "registerFailed": "registration failed",
     "registerSucc": "registration successfully",

@@ -190,7 +190,7 @@ class RegisterMsa extends React.Component {
         let description = ''
         if (res.status === 500) {
           if (res.error === 'host:port cannot be same with other instances') {
-            description = t('register.portRepeat')
+            description = t('register.portAlreadyExist')
           }
         }
         notification.warn({
@@ -343,7 +343,7 @@ class RegisterMsa extends React.Component {
                 },
               }],
             })(
-              <InputNumber placeholder={t('register.portPlaceholder')} min={1} max={65535} style={{ width: '30%' }} />
+              <InputNumber placeholder={t('register.portPlaceHolder')} min={1} max={65535} style={{ width: '30%' }} />
             )}
           </FormItem>
           <FormItem {...formItemLayoutLast} label={
