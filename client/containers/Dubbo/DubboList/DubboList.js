@@ -16,8 +16,10 @@ import { Card, Table, Button, Input, Pagination, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import Ellipsis from '@tenx-ui/ellipsis'
 import { formatDate } from '../../../common/utils';
-import { getDubboList } from '../../../actions/dubbo'
+import { getDubboList, searchDubboList } from '../../../actions/dubbo'
 import './style/DubboList.less'
+
+const Search = Input.Search
 
 @connect(state => {
   const { dubbo } = state
@@ -29,6 +31,7 @@ import './style/DubboList.less'
   }
 }, {
   getDubboList,
+  searchDubboList,
 })
 class DubboList extends React.Component {
   state = {
@@ -101,13 +104,20 @@ class DubboList extends React.Component {
       })
     }
   }
+  searchDubbo = val => {
+    this.props.searchDubboList(val)
+  }
   render() {
     const { dubboList } = this.props
     return <div className="dubbo-list">
       <div className="dubbo-list-top">
         <div>
           <Button icon="sync" onClick={() => this.getData()}>刷新</Button>
-          <Input style={{ width: 200, marginLeft: 16 }} placeholder="请输入服务名称搜索"/>
+          <Search
+            style={{ width: 200, marginLeft: 16 }}
+            placeholder="请输入服务名称搜索"
+            onSearch={this.searchDubbo}
+          />
         </div>
         <div className="pagination">
           <Pagination

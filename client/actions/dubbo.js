@@ -78,6 +78,26 @@ export const searchConsumerOrProvider = (type, keyWord, data) => {
     })
   }
 }
+
+export const SEARCH_DUBBO_LIST = 'SEARCH_DUBBO_LIST'
+export const searchDubboList = keyWord => {
+  return (dispatch, getState) => {
+    // const { dubboDetail } = getState().dubbo
+    const nextDubboList = _.cloneDeep(getState().dubbo.dubboList)
+    const list = _.cloneDeep(nextDubboList.dataBackup)
+    if (!list) return
+    const filteredData = list.filter(v => {
+      return v.name.indexOf(keyWord) >= 0
+    })
+    nextDubboList.data = filteredData
+    dispatch({
+      type: SEARCH_DUBBO_LIST,
+      payload: nextDubboList.data,
+    })
+  }
+}
+
+
 export const FETCH_SUPPLIER_LIST_REQUEST = 'FETCH_SUPPLIER_LIST_REQUEST'
 export const FETCH_SUPPLIER_LIST_SUCCESS = 'FETCH_SUPPLIER_LIST_SUCCESS'
 export const FETCH_SUPPLIER_LIST_FAILURE = 'FETCH_SUPPLIER_LIST_FAILURE'
