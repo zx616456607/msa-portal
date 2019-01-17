@@ -21,7 +21,7 @@ import find from 'lodash/find'
 import { ROLE_SYS_ADMIN, ROLE_PLATFORM_ADMIN, ROLE_BASE_ADMIN } from '../../constants'
 import TenxIcon from '@tenx-ui/icon/es/_old'
 import { UNUSED_CLUSTER_ID } from '../../constants'
-import { getDeepValue } from '../../common/utils';
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { withNamespaces } from 'react-i18next'
 
 const { Sider } = Layout

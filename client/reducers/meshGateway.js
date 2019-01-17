@@ -11,7 +11,7 @@
 import * as ActionTypes from '../actions/meshGateway'
 import moment from 'moment'
 import sortBy from 'lodash/sortBy'
-import { getDeepValue } from '../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const sortByCreateTime = res => {
   const { entities, result } = res || {}

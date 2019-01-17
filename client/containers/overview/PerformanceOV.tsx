@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from 'bizcharts';
 import { connect } from 'react-redux'
-import { getDeepValue } from '../../common/utils'
+import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import * as IPActions from '../../actions/indexPage'
 import * as ApmAction from '../../actions/apm'
 import APMunInstalled from '../../../client/assets/img/overview/APMunInstalled.svg'
