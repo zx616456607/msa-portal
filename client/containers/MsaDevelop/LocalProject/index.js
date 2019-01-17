@@ -120,7 +120,7 @@ class LocalProject extends React.Component {
     })
   }
   render() {
-    const { getFieldDecorator, getFieldsValue, setFieldsValue } = this.props.form
+    const { getFieldDecorator, getFieldsValue, setFieldsValue, resetFields } = this.props.form
     const { versionOfJavaArr, developStyle,
       dependencies, expendAdvance, bootVersion } = this.state
     const targetDependencies = JSON.parse(JSON.stringify(dependencies))
@@ -205,6 +205,20 @@ class LocalProject extends React.Component {
             {
               getFieldDecorator('developmentStyle', {
                 initialValue: developStyle[0].value,
+                onChange: val => {
+                  if (val === 'RPC') {
+                    setFieldsValue({
+                      style: 'my-cloud-dubbo',
+                    })
+                    setTimeout(() => {
+                      const disabledOption = document.getElementsByClassName('ant-select-selection__choice')[0]
+                      const closedIcon = disabledOption.getElementsByClassName('ant-select-selection__choice__remove')[0]
+                      closedIcon.style.display = 'none'
+                    })
+                  } else {
+                    resetFields([ 'style' ])
+                  }
+                },
                 rules: [
                   {
                     required: true,
@@ -270,13 +284,20 @@ class LocalProject extends React.Component {
             {...formItemLayout}
           >
             {
-              getFieldDecorator('style')(<Select placeholder="选择工程中需添加的依赖组件" mode="multiple">
+              getFieldDecorator('style', {
+              })(<Select
+                placeholder="选择工程中需添加的依赖组件"
+                mode="multiple"
+              >
                 {
                   Object.keys(dependencies).map(v => (
                     <OptGroup label={this.dependencyKeys(v)} key={v}>
                       {
                         targetDependencies[v].map(k => (
-                          <Option key={k.id}>
+                          <Option
+                            key={k.id}
+                            disabled={k.id === 'my-cloud-dubbo'}
+                          >
                             {k.name}
                           </Option>
                         ))
