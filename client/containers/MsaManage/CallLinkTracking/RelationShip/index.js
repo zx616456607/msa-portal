@@ -97,7 +97,8 @@ class RelationShip extends React.Component {
     const { rangeDateTime } = this.state
     const { data } = this.props
     let avgTimer
-    const timers = (rangeDateTime[1] - rangeDateTime[0]) / 1000 / 60
+    let timers = (rangeDateTime[1] - rangeDateTime[0]) / 1000 / 60
+    timers = timers === 0 ? 1 : timers
     const avgAry = this.filterNodes(data.edges)
     // let time = 5
     // switch (timers) {
