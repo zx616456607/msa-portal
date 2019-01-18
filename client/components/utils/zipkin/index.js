@@ -34,6 +34,9 @@ export function convertSuccessResponse(rawResponse, serviceName, utc = false) {
     const serviceNameI = entry[0] && entry[0].localEndpoint.serviceName
     node.serviceName = serviceNameI
   })
+  traces.sort((a, b) => {
+    return b.startTime - a.startTime
+  })
   return traces
 }
 
