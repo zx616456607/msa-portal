@@ -40,7 +40,6 @@ class Monitor extends React.PureComponent {
 
   state = {
     currentValue: '1',
-    freshInterval: this.props.t('detail.MsaMonitor.1minute'),
     loading: true,
     realTimeLoading: {},
     realTimeChecked: {},
@@ -55,25 +54,6 @@ class Monitor extends React.PureComponent {
     sourceTypeArray.forEach(item => {
       clearInterval(this[`${item}RealTimeInterval`])
     })
-  }
-  FRESH_FREQUENCY = t => {
-    return {
-      1: {
-        freshInterval: t('detail.MsaMonitor.1minute'),
-      },
-      6: {
-        freshInterval: t('detail.MsaMonitor.5minutes'),
-      },
-      24: {
-        freshInterval: t('detail.MsaMonitor.20minutes'),
-      },
-      168: {
-        freshInterval: t('detail.MsaMonitor.2hours'),
-      },
-      720: {
-        freshInterval: t('detail.MsaMonitor.6hours'),
-      },
-    }
   }
   intervalLoadMetrics = () => {
     clearInterval(this.metricsInterval)
@@ -113,9 +93,7 @@ class Monitor extends React.PureComponent {
 
   handleTimeChange = e => {
     const { value } = e.target
-    const { freshInterval } = this.FRESH_FREQUENCY(this.props.t)[value]
     this.setState({
-      freshInterval,
       currentValue: value,
     }, () => {
       this.intervalLoadMetrics()
@@ -221,16 +199,12 @@ class Monitor extends React.PureComponent {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.lng !== nextProps.lng) {
-      const { freshInterval } = this.FRESH_FREQUENCY(this.props.t)[this.state.currentValue]
-      this.setState({
-        freshInterval,
-      })
       this.intervalLoadMetrics()
     }
   }
 
   render() {
-    const { loading, currentValue, freshInterval, realTimeChecked, realTimeLoading } = this.state
+    const { loading, currentValue, realTimeChecked, realTimeLoading } = this.state
     const { msaMetrics, msaRealTimeMetrics } = this.props
     return (
       <div className="msa-detail-monitor">
@@ -242,7 +216,7 @@ class Monitor extends React.PureComponent {
               dataSource={msaMetrics}
               realTimeDataSource={msaRealTimeMetrics}
               handleSwitch={this.handleSwitch}
-              {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
+              {...{ loading, realTimeChecked, realTimeLoading }}
             />
             :
             <div className="loading">

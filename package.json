@@ -89,7 +89,7 @@
     "@tenx-ui/loader": "^0.0.3",
     "@tenx-ui/logs": "^1.2.2",
     "@tenx-ui/modal": "^1.0.9",
-    "@tenx-ui/monitorChart": "^1.0.4",
+    "@tenx-ui/monitorChart": "^1.0.5",
     "@tenx-ui/utils": "^1.0.1",
     "@tenx-ui/page": "^1.0.2",
     "@tenx-ui/relation-chart": "^0.2.9",

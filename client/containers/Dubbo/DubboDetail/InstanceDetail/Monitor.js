@@ -20,7 +20,7 @@ import { dubboInstanceMonitor, dubboInstanceRealTimeMonitor } from '../../../../
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
   METRICS_NETWORK_TRANSMITTED, METRICS_DISK_READ, METRICS_DISK_WRITE,
-  UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
+  UPDATE_INTERVAL, REALTIME_INTERVAL,
 } from '../../../../constants'
 import Metric from '@tenx-ui/monitorChart'
 import '@tenx-ui/monitorChart/assets/index.css'
@@ -39,7 +39,6 @@ class Monitor extends React.Component {
 
   state = {
     currentValue: '1',
-    freshInterval: '1分钟',
     loading: true,
     realTimeLoading: {},
     realTimeChecked: {},
@@ -95,9 +94,7 @@ class Monitor extends React.Component {
 
   handleTimeChange = e => {
     const { value } = e.target
-    const { freshInterval } = FRESH_FREQUENCY[value]
     this.setState({
-      freshInterval,
       currentValue: value,
     }, () => {
       this.intervalLoadMetrics()
@@ -202,7 +199,7 @@ class Monitor extends React.Component {
   }
 
   render() {
-    const { loading, currentValue, freshInterval, realTimeChecked, realTimeLoading } = this.state
+    const { loading, currentValue, realTimeChecked, realTimeLoading } = this.state
     const { instanceMetrics, realTimeMonitor } = this.props
     return (
       <div id="instance-detail-monitor">
@@ -214,7 +211,7 @@ class Monitor extends React.Component {
               dataSource={instanceMetrics}
               realTimeDataSource={realTimeMonitor}
               handleSwitch={this.handleSwitch}
-              {...{ loading, freshInterval, realTimeChecked, realTimeLoading }}
+              {...{ loading, realTimeChecked, realTimeLoading }}
             />
             :
             <div className="loading">
