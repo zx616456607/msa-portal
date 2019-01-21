@@ -178,13 +178,6 @@
     "MsaDetailLogs": {
       "noLogs": "No log",
       "errorMessage": "Unable to get external service data"
-    },
-    "MsaMonitor": {
-      "1minute": "1minute",
-      "5minutes": "5minutes",
-      "20minutes": "20minutes",
-      "2hours": "2hours",
-      "6hours": "6hours"
     }
   }
 }
