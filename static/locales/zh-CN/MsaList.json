@@ -177,9 +177,6 @@
     "MsaDetailLogs": {
       "noLogs": "暂无日志",
       "errorMessage": "无法获取外部服务数据"
-    },
-    "MsaMonitor": {
-      "minuteWithCount": "{{i}}分钟"
     }
   }
 }
