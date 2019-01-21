@@ -19,7 +19,7 @@ import { msaMonitor, msaRealTimeMonitor } from '../../../../../actions/msa'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
   METRICS_NETWORK_TRANSMITTED, METRICS_DISK_READ, METRICS_DISK_WRITE,
-  UPDATE_INTERVAL, FRESH_FREQUENCY, REALTIME_INTERVAL,
+  UPDATE_INTERVAL, REALTIME_INTERVAL,
 } from '../../../../../constants'
 import Metric from '@tenx-ui/monitorChart'
 import '@tenx-ui/monitorChart/assets/index.css'
@@ -40,15 +40,12 @@ class Monitor extends React.PureComponent {
 
   state = {
     currentValue: '1',
-    freshInterval: this.props.t('detail.MsaMonitor.minuteWithCount', {
-      replace: {
-        i: 1,
-      },
-    }),
+    freshInterval: this.props.t('detail.MsaMonitor.1minute'),
     loading: true,
     realTimeLoading: {},
     realTimeChecked: {},
   }
+
   componentDidMount() {
     this.intervalLoadMetrics()
   }
@@ -59,7 +56,25 @@ class Monitor extends React.PureComponent {
       clearInterval(this[`${item}RealTimeInterval`])
     })
   }
-
+  FRESH_FREQUENCY = t => {
+    return {
+      1: {
+        freshInterval: t('detail.MsaMonitor.1minute'),
+      },
+      6: {
+        freshInterval: t('detail.MsaMonitor.5minutes'),
+      },
+      24: {
+        freshInterval: t('detail.MsaMonitor.20minutes'),
+      },
+      168: {
+        freshInterval: t('detail.MsaMonitor.2hours'),
+      },
+      720: {
+        freshInterval: t('detail.MsaMonitor.6hours'),
+      },
+    }
+  }
   intervalLoadMetrics = () => {
     clearInterval(this.metricsInterval)
     this.loadInstanceAllMetrics()
@@ -98,7 +113,7 @@ class Monitor extends React.PureComponent {
 
   handleTimeChange = e => {
     const { value } = e.target
-    const { freshInterval } = FRESH_FREQUENCY[value]
+    const { freshInterval } = this.FRESH_FREQUENCY(this.props.t)[value]
     this.setState({
       freshInterval,
       currentValue: value,
@@ -201,6 +216,16 @@ class Monitor extends React.PureComponent {
     })
     if (checked) {
       this.realTimeMonitor(type)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.lng !== nextProps.lng) {
+      const { freshInterval } = this.FRESH_FREQUENCY(this.props.t)[this.state.currentValue]
+      this.setState({
+        freshInterval,
+      })
+      this.intervalLoadMetrics()
     }
   }
 

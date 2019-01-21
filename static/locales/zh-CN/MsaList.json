@@ -179,7 +179,11 @@
       "errorMessage": "无法获取外部服务数据"
     },
     "MsaMonitor": {
-      "minuteWithCount": "{{i}}分钟"
+      "1minute": "1分钟",
+      "5minutes": "5分钟",
+      "20minutes": "20分钟",
+      "2hours": "2小时",
+      "6hours": "6小时"
     }
   }
 }
