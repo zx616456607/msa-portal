@@ -12,9 +12,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
-import isEmpty from 'lodash/isEmpty'
 import { msaMonitor, msaRealTimeMonitor } from '../../../../../actions/msa'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
@@ -204,25 +202,17 @@ class Monitor extends React.PureComponent {
   }
 
   render() {
-    const { loading, currentValue, realTimeChecked, realTimeLoading } = this.state
+    const { loading, realTimeChecked, realTimeLoading } = this.state
     const { msaMetrics, msaRealTimeMetrics } = this.props
     return (
       <div className="msa-detail-monitor">
-        {
-          !isEmpty(msaMetrics) && !msaMetrics[METRICS_CPU].isFetching ?
-            <Metric
-              value={currentValue}
-              onChange={this.handleTimeChange}
-              dataSource={msaMetrics}
-              realTimeDataSource={msaRealTimeMetrics}
-              handleSwitch={this.handleSwitch}
-              {...{ loading, realTimeChecked, realTimeLoading }}
-            />
-            :
-            <div className="loading">
-              <Spin size="large"/>
-            </div>
-        }
+        <Metric
+          onChange={this.handleTimeChange}
+          dataSource={msaMetrics}
+          realTimeDataSource={msaRealTimeMetrics}
+          handleSwitch={this.handleSwitch}
+          {...{ loading, realTimeChecked, realTimeLoading }}
+        />
       </div>
     )
   }

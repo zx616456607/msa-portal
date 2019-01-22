@@ -13,9 +13,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Spin } from 'antd'
 import cloneDeep from 'lodash/cloneDeep'
-import isEmpty from 'lodash/isEmpty'
 import { instanceMonitor, instanceRealTimeMonitor } from '../../../../actions/CSB/instance'
 import {
   METRICS_CPU, METRICS_MEMORY, METRICS_NETWORK_RECEIVED,
@@ -198,25 +196,17 @@ class Monitor extends React.Component {
   }
 
   render() {
-    const { loading, currentValue, realTimeChecked, realTimeLoading } = this.state
+    const { loading, realTimeChecked, realTimeLoading } = this.state
     const { instanceMetrics, realTimeMonitor } = this.props
     return (
       <div id="instance-detail-monitor">
-        {
-          !isEmpty(instanceMetrics) && !isEmpty(instanceMetrics[METRICS_CPU].data) ?
-            <Metric
-              value={currentValue}
-              onChange={this.handleTimeChange}
-              dataSource={instanceMetrics}
-              realTimeDataSource={realTimeMonitor}
-              handleSwitch={this.handleSwitch}
-              {...{ loading, realTimeChecked, realTimeLoading }}
-            />
-            :
-            <div className="loading">
-              <Spin size="large"/>
-            </div>
-        }
+        <Metric
+          onChange={this.handleTimeChange}
+          dataSource={instanceMetrics}
+          realTimeDataSource={realTimeMonitor}
+          handleSwitch={this.handleSwitch}
+          {...{ loading, realTimeChecked, realTimeLoading }}
+        />
       </div>
     )
   }
