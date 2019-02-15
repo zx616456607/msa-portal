@@ -13,7 +13,7 @@ const url = require('url')
 
 // get config from env for prod
 const { env } = process
-const api = env.PAAS_API || 'http://192.168.1.230:48000'
+const api = env.PAAS_API || 'http://192.168.1.33:48080'
 const {
   protocol: PAAS_API_PROTOCOL,
   host: PAAS_API_HOST,
@@ -22,11 +22,11 @@ const PAAS_API_PREFIX = env.PAAS_API_PREFIX || '/api/v2'
 const PAAS_SPI_PREFIX = env.PAAS_SPI_PREFIX || '/spi/v2'
 const PAAS_API_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_API_PREFIX}`
 const PAAS_SPI_URL = `${PAAS_API_PROTOCOL}//${PAAS_API_HOST}${PAAS_SPI_PREFIX}`
-const MSA_API = env.MSA_API || 'http://192.168.1.58:8080'
-const MSA_DEVELOP_API = env.MSA_DEVELOP_API || 'http://192.168.1.45:8080'
+const MSA_API = env.MSA_API || 'http://192.168.1.33:48080'
+const MSA_DEVELOP_API = env.MSA_DEVELOP_API || 'http://192.168.0.45:8080'
 const MSA_API_PREFIX = env.MSA_API_PREFIX || '/api/v1'
 const MSA_API_URL = MSA_API + MSA_API_PREFIX
-const CSB_API = env.CSB_API || 'http://192.168.1.58:9090'
+const CSB_API = env.CSB_API || 'http://192.168.1.58:9091'
 const CSB_API_PREFIX = env.CSB_API_PREFIX || '/api/v1'
 const CSB_API_URL = CSB_API + CSB_API_PREFIX
 const CLIENT_API = env.CLIENT_API || 'http://192.168.1.254:8080'
@@ -35,8 +35,10 @@ const ZIPKIN_API_PREFIX = env.ZIPKIN_API_PREFIX || '/api/v1'
 const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
 const ZIPKIN_API_URL = `${MSA_API}${ZIPKIN_API_PREFIX}`
 const SERVICEMESH_API_PREFIX = env.SERVICEMESH_API_PREFIX || '/api/v3'
-const SERVICEMESH_API = env.SERVICEMESH_API || env.PAAS_API || 'http://192.168.1.59:65532'
+const SERVICEMESH_API = env.SERVICEMESH_API || env.PAAS_API || 'http://192.168.1.33:48080'
 const SERVICEMESH_API_URL = `${SERVICEMESH_API}${SERVICEMESH_API_PREFIX}`
+// 统一导航使用，不配置的话 PAAS 相关的菜单不会出现
+const USERPORTAL_URL = env.USERPORTAL_URL || 'http://enterprise.tenxcloud.com'
 const initialConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -54,6 +56,7 @@ const initialConfig = {
   CLIENT_API_URL,
   ZIPKIN_API_URL,
   SERVICEMESH_API_URL,
+  USERPORTAL_URL,
 }
 
 const config = {
