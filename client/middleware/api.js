@@ -12,7 +12,7 @@
 
 import fetch from 'isomorphic-fetch'
 import { normalize } from 'normalizr'
-import { JWT, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
+import { AUTH_DATA, API_CONFIG, CONTENT_TYPE_JSON, CONTENT_TYPE_URLENCODED } from '../constants'
 import { toQuerystring, getType } from '../common/utils'
 
 const { PAAS_API_URL, PAAS_SPI_URL } = API_CONFIG
@@ -140,12 +140,9 @@ export default store => next => action => {
   options = options || {}
 
   // Set jwt token to headers
-  const jwtAuth = store.getState().entities.auth[JWT] || {}
-  let jwt = jwtAuth.token
-  if (!jwt && localStorage) {
-    jwt = localStorage.getItem(JWT)
-  }
-  options.headers = Object.assign({}, { Authorization: `Bearer ${jwt}` }, options.headers)
+  // 统一使用 authData 中的 jwt 做认证
+  const authData = JSON.parse(localStorage.getItem(AUTH_DATA))
+  options.headers = Object.assign({}, { Authorization: `Bearer ${authData.jwtToken.token}` }, options.headers)
   // Set project to headers
   const currentConfig = store.getState().current.config
   const project = currentConfig.project && currentConfig.project.namespace

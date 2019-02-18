@@ -14,9 +14,6 @@
 @import './core/index.less';
 @import './core/overwrite.less';
 
-@namespace-switch-height: 30px;
-@content-margin-top: @header-height + @namespace-switch-height + @padding-medium;
-
 body {
   background-color: @backgroud-color-body;
   width: 100%;
@@ -76,34 +73,10 @@ body {
 .ant-layout {
   background-color: @backgroud-color-body;
   overflow-x: hidden;
-  .ant-layout-header {
-    background-color: #fff;
-    //min-width: @body-min-width;
-    padding: 0 @padding-medium;
-    height: 55px;
-    line-height: 55px;
-  }
-  .layout-sider {
-    background: @backgroud-color-body;
-    left: 0;
-    margin-top: @content-margin-top;
-    margin-left: @padding-medium;
-    &.layout-sider-extra {
-      .ant-card-head {
-        .ant-card-head-title {
-          .apm-switch {
-            font-size: 12px;
-            font-weight: initial;
-            margin-top: 5px;
-          }
-        }
-      }
-    }
-  }
   .layout-content {
-    padding-right: @padding-medium;
-    padding-left: @padding-medium;
-    margin-top: @content-margin-top - 40px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 20px;
     //margin-left: 200px + @padding-medium;
     margin-left: 0;
     min-height: 750px;

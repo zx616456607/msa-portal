@@ -40,6 +40,7 @@ const CLIENT_API_PREFIX = '/uaa'
 const ZIPKIN_API_PREFIX = '/api/v1'
 const CLIENT_API_URL = `${CLIENT_API}${CLIENT_API_PREFIX}`
 const ZIPKIN_API_URL = `${MSA_API}${ZIPKIN_API_PREFIX}`
+const USERPORTAL_URL = 'http://enterprise.tenxcloud.com'
 let apiConfig = {
   PAAS_API_PROTOCOL,
   PAAS_API_HOST,
@@ -57,6 +58,7 @@ let apiConfig = {
   CLIENT_API_URL,
   ZIPKIN_API_URL,
   SERVICEMESH_API_URL,
+  USERPORTAL_URL,
 }
 // prod api config
 if (isProd) {
@@ -65,6 +67,7 @@ if (isProd) {
 export const API_CONFIG = apiConfig
 
 export const JWT = 'jwt'
+export const AUTH_DATA = 'authData'
 export const UAA_JWT = 'uaa_jwt'
 export const AUTH_URL = 'auth_url'
 export const DEFAULT = 'default'

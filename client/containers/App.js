@@ -13,24 +13,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import ClassNames from 'classnames'
+// import ClassNames from 'classnames'
 import { Layout, Modal, notification, message as messageTip } from 'antd'
 import { parse } from 'query-string'
-import Header from '../components/Header'
-import NamespaceSwitch from './NamespaceSwitch'
+// import Header from '../components/Header'
+// import NamespaceSwitch from './NamespaceSwitch'
 import * as indexActions from '../actions'
 import * as currentActions from '../actions/current'
 import { scrollToTop, toQuerystring } from '../common/utils'
 import { renderLoading } from '../components/utils'
-import { JWT, AUTH_URL } from '../constants'
-import { Route, Switch } from 'react-router-dom'
+import { AUTH_URL, API_CONFIG } from '../constants'
+import { Route, Switch, Link } from 'react-router-dom'
 import { appChildRoutes } from '../'
-import CustomizeSider from '../components/SiderNav'
+// import CustomizeSider from '../components/SiderNav'
 import './style/App.less'
 import { footer } from '../../config/constants'
 import noProjectsImage from '../assets/img/no-projects.png'
 import noClustersImage from '../assets/img/no-clusters.png'
+import { withNamespaces } from 'react-i18next'
+import UnifiedNav from '@tenx-ui/b-unified-navigation'
+import '@tenx-ui/b-unified-navigation/assets/index.css'
+import moment from 'moment'
 
+const { PAAS_API_URL, USERPORTAL_URL } = API_CONFIG
 const { Footer } = Layout
 let errorMessageBefore
 let errorMessageBeforeDateTime
@@ -44,10 +49,17 @@ const HIDE_NAMESPACE_SWITCH_ROUTES = [ // 路由filter
   // /^\/service-mesh$/,
 ]
 
+@withNamespaces('common')
 class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.query = parse(location.search)
+  }
+
   state = {
     switchProjectOrCluster: false,
     switchProjectOrClusterText: null,
+    locale: this.props.i18n.language.split('-')[0],
   }
 
   static propTypes = {
@@ -59,7 +71,33 @@ class App extends React.Component {
     toggleCollapsed: PropTypes.func.isRequired,
   }
 
+  momentLocale = language => {
+    if (language === 'en') {
+      moment.locale('en', {
+        relativeTime: {
+          future: 'in %s',
+          past: '%s ago',
+          s: '%d s',
+          m: 'a min',
+          mm: '%d min',
+          h: '1 h',
+          hh: '%d h',
+          d: 'a day',
+          dd: '%d days',
+          M: 'a month',
+          MM: '%d months',
+          y: 'a year',
+          yy: '%d years',
+        },
+      })
+      return
+    }
+    moment.locale('zh-cn')
+  }
+
+
   async componentDidMount() {
+    /* console.log('locale', this.state.locale)
     const {
       getAuth,
       getCurrentUser,
@@ -68,7 +106,8 @@ class App extends React.Component {
     } = this.props
     const { pathname, search, hash } = location
     const query = parse(search)
-    const { username, token, jwt, authUrl, redirectclusterID, redirectNamespace,
+    this.setState({ query }) */
+    /* const { username, token, jwt, authUrl, redirectclusterID, redirectNamespace,
       ...otherQuery } = query
     if (!!redirectclusterID && !!redirectNamespace) {
       await this.props.setCurrentConfig({
@@ -99,7 +138,21 @@ class App extends React.Component {
       history.replace(`${pathname}?${toQuerystring(otherQuery)}${hash}`)
       // Get user detail info
       return getCurrentUser(userID)
-    })
+    }) */
+  }
+
+  onAuthReady = (authData, loginUser) => {
+    const { setCurrentUser, location, history } = this.props
+    // set loginUser to store
+    setCurrentUser(loginUser)
+    const { pathname, hash } = location
+    const { authUrl, ...otherQuery } = this.query
+    // save auth url to localStorage
+    authUrl && localStorage.setItem(AUTH_URL, authUrl)
+    // replace location
+    const authQuery = [ 'username', 'token', 'jwt', 'authUrl', 'redirectclusterID', 'redirectNamespace' ]
+    authQuery.forEach(key => delete otherQuery[key])
+    history.replace(`${pathname}?${toQuerystring(otherQuery)}${hash}`)
   }
 
   componentDidUpdate(prevProps) {
@@ -120,7 +173,7 @@ class App extends React.Component {
     const newPath = newPathname + newSearch
     const oldPath = oldPathname + oldSearch
     if (newPath !== oldPath) {
-      scrollToTop()
+      scrollToTop('.unified-nav-layout-has-sider .unified-nav-layout-content')
     }
     // Show switch project/cluster
     const switchProjectOrClusterText = '切换项目/集群中 ...'
@@ -278,11 +331,40 @@ class App extends React.Component {
           appChildRoutes.map(routeProps => <Route {...routeProps} />)
         }
       </Switch>,
+      <Footer key="footer" style={{ textAlign: 'center' }} id="footer">
+        {footer}
+      </Footer>,
     ]
   }
 
+  changeLocale = locale => {
+    this.props.i18n.changeLanguage(locale)
+    this.momentLocale(locale)
+    this.setState({ locale })
+    this.props.forceUpdateApp()
+  }
+
+  onProjectChange = (project, projects) => {
+    const { setCurrentConfig, setListProjects } = this.props
+    setCurrentConfig({
+      project,
+      cluster: {},
+    })
+    setListProjects(projects)
+  }
+
+  onClusterChange = (cluster, clusters) => {
+    const { setCurrentConfig, setProjectClusters, currentConfig } = this.props
+    cluster.id = cluster.clusterID
+    setCurrentConfig({
+      cluster,
+    })
+    const { namespace } = currentConfig.project
+    setProjectClusters(namespace, clusters[namespace])
+  }
+
   render() {
-    const {
+    /* const {
       auth,
       location,
       current,
@@ -308,8 +390,41 @@ class App extends React.Component {
     const appStyle = ClassNames({
       appSiderWide: collapsed,
       appSiderSmall: !collapsed,
-    })
+    }) */
+    const { location } = this.props
+    const { pathname } = location
+    // const { query } = this.state
+    const {
+      username, token, jwt, redirectclusterID, redirectNamespace,
+    } = this.query
+    const config = {
+      paasApiUrl: PAAS_API_URL,
+      userPortalUrl: USERPORTAL_URL,
+      msaPortalUrl: window.location.origin,
+      defaultProject: redirectNamespace,
+      defaultCluster: redirectclusterID,
+    }
     return (
+      <UnifiedNav
+        portal="msa-portal"
+        pathname={pathname}
+        showSider={true}
+        showHeader={true}
+        Link={Link}
+        config={config}
+        onProjectChange={this.onProjectChange}
+        onClusterChange={this.onClusterChange}
+        onAuthReady={this.onAuthReady}
+        username={username}
+        token={token}
+        jwt={jwt}
+        locale={this.state.locale}
+        changeLocale={this.changeLocale}
+      >
+        { this.renderChildren() }
+      </UnifiedNav>
+    )
+    /* return (
       <Layout className={'app'}>
         <CustomizeSider
           currentUser={current.user.info || {}}
@@ -338,7 +453,7 @@ class App extends React.Component {
           </Footer>
         </Layout>
       </Layout>
-    )
+    ) */
   }
 }
 
@@ -364,4 +479,7 @@ export default connect(mapStateToProps, {
   getCurrentUser: currentActions.getCurrentUser,
   toggleCollapsed: currentActions.toggleCollapsed,
   setCurrentConfig: currentActions.setCurrentConfig,
+  setCurrentUser: currentActions.setCurrentUser,
+  setListProjects: currentActions.setListProjects,
+  setProjectClusters: currentActions.setProjectClusters,
 })(App)

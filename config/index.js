@@ -37,7 +37,7 @@ const ZIPKIN_API_URL = `${MSA_API}${ZIPKIN_API_PREFIX}`
 const SERVICEMESH_API_PREFIX = env.SERVICEMESH_API_PREFIX || '/api/v3'
 const SERVICEMESH_API = env.SERVICEMESH_API || env.PAAS_API || 'http://192.168.1.33:48080'
 const SERVICEMESH_API_URL = `${SERVICEMESH_API}${SERVICEMESH_API_PREFIX}`
-// 统一导航使用，不配置的话 PAAS 相关的菜单不会出现
+// 统一导航使用，v2.0+ 必须配置
 const USERPORTAL_URL = env.USERPORTAL_URL || 'http://enterprise.tenxcloud.com'
 const initialConfig = {
   PAAS_API_PROTOCOL,

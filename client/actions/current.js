@@ -13,7 +13,8 @@
 import { CALL_API } from '../middleware/api'
 import { Schemas } from '../middleware/schemas'
 import { toQuerystring } from '../common/utils'
-import { USER_CURRENT_CONFIG, DEFAULT } from '../constants'
+import { DEFAULT } from '../constants'
+import { normalize } from 'normalizr'
 
 export const TOGGLE_COLLAPSED = 'TOGGLE_COLLAPSED'
 
@@ -27,19 +28,6 @@ export function toggleCollapsed(collapsed) {
 export const SET_CURRENT_CONFIG = 'SET_CURRENT_CONFIG'
 
 export function setCurrentConfig(current) {
-  if (localStorage) {
-    const config = localStorage.getItem(USER_CURRENT_CONFIG)
-    const [ namespace ] = config && config.split(',') || []
-    if (current.project && current.cluster.id) { // 如果两个参数都有的时候
-      localStorage.setItem(USER_CURRENT_CONFIG, `${current.project.namespace},${current.cluster.id}`)
-    }
-    if (current.project && !current.cluster.id) {
-      localStorage.setItem(USER_CURRENT_CONFIG, `${current.project.namespace},`)
-    }
-    if (!current.project && current.cluster) {
-      localStorage.setItem(USER_CURRENT_CONFIG, `${namespace},${current.cluster.id}`)
-    }
-  }
   return {
     current,
     type: SET_CURRENT_CONFIG,
@@ -193,4 +181,40 @@ const fetchProjectList = query => {
 
 export const getProjectList = query => dispatch => {
   return dispatch(fetchProjectList(query))
+}
+
+export function setCurrentUser(user) {
+  return {
+    response: {
+      result: {
+        data: {
+          user,
+        },
+      },
+    },
+    type: CURRENT_USER_SUCCESS,
+  }
+}
+
+export function setListProjects(projects) {
+  let response = {
+    data: { projects },
+  }
+  response = normalize(response, Schemas.PROJECTLIST_ARRAY_DATA)
+  return {
+    response,
+    type: FETCH_PROJECT_LIST_SUCCESS,
+  }
+}
+
+export function setProjectClusters(namespace, clusters) {
+  let response = {
+    data: { clusters },
+  }
+  response = normalize(response, Schemas.CLUSTER_ARRAY_DATA)
+  return {
+    namespace,
+    response,
+    type: PROJECT_CLUSTERS_SUCCESS,
+  }
 }
