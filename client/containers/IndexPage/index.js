@@ -571,7 +571,6 @@ const mapStateToProps = state => {
   }
   return {
     errorObject: state.errorObject,
-    auth: state.entities.auth,
     current,
     clusterID,
     overView,

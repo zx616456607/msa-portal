@@ -458,24 +458,17 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { entities } = state
-  const { auth, projects } = entities
   const current = state.current || {}
-  const userProjects = current.projects && current.projects.ids || []
-  const managedProjects = userProjects.map(namespace => projects[namespace])
-    .filter(({ outlineRoles }) => !outlineRoles.includes('no-participator') && outlineRoles.includes('manager'))
   return {
     errorObject: state.errorObject,
-    auth,
     current,
     currentConfig: current.config || {},
-    managedProjects,
   }
 }
 
 export default connect(mapStateToProps, {
   resetErrorMessage: indexActions.resetErrorMessage,
-  getAuth: indexActions.getAuth,
+  // getAuth: indexActions.getAuth,
   getCurrentUser: currentActions.getCurrentUser,
   toggleCollapsed: currentActions.toggleCollapsed,
   setCurrentConfig: currentActions.setCurrentConfig,

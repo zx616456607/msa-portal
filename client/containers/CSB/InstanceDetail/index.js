@@ -22,7 +22,7 @@ import Content from '../../../components/Content'
 import { Route, Switch } from 'react-router-dom'
 import { renderLoading, formatWSMessage } from '../../../components/utils'
 import {
-  UNUSED_CLUSTER_ID, API_CONFIG,
+  UNUSED_CLUSTER_ID, API_CONFIG, AUTH_DATA,
 } from '../../../constants'
 import {
   toQuerystring,
@@ -280,17 +280,18 @@ class CSBInstanceDetail extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { entities, CSB } = state
-  const { csbAvaInstances, auth } = entities
+  const { csbAvaInstances } = entities
   const { cascadedServicesWebsocket } = CSB
   const { match } = ownProps
   const { instanceID } = match.params
   const cascadingLinkRules = cascadingLinkRuleSlt(state, ownProps)
   let instanceList = []
   cascadingLinkRules.content.map(ins => (instanceList = instanceList.concat(ins.instances)))
+  const authData = JSON.parse(localStorage.getItem(AUTH_DATA))
   return {
     instanceID,
     currentInstance: csbAvaInstances && csbAvaInstances[instanceID],
-    jwtToken: auth.jwt.token,
+    jwtToken: authData.jwtToken.token,
     cascadedServicesWebsocket,
     instanceList,
   }

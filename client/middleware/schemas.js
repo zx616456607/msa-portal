@@ -197,9 +197,9 @@ export const Schemas = {
     clusters: [ clusterSchema ],
   },
   AUTH: authSchema,
-  AUTH_DATA: {
+  /* AUTH_DATA: {
     data: authSchema,
-  },
+  }, */
   PP_APPS: ppAppsSchema,
   PP_APPS_ARRAY: [ ppAppsSchema ],
   MSALIST_ARRAY_DATA: {

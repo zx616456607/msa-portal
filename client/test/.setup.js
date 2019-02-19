@@ -7,11 +7,11 @@ const middlewares = [ thunk, api ]
 const mockStore = configureMockStore(middlewares)
 const initStore = () => mockStore({
   entities: {
-    auth: {
+    /* auth: {
       jwt: {
         token: 'test',
       },
-    },
+    }, */
   },
   current: {
     config: {},

@@ -34,7 +34,7 @@ import dubbo from './dubbo'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
-  auth: {},
+  // auth: {},
   apms: {},
   projects: {},
   // projectsList: {},

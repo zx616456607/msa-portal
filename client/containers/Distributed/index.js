@@ -87,7 +87,6 @@ class Distributed extends React.Component {
 const mapStateToProps = state => {
   const { current } = state
   return {
-    auth: state.entities.auth,
     current: current || {},
   }
 }

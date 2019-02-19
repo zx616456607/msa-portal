@@ -142,7 +142,6 @@ const mapStateToProps = state => {
   let apms = queryApms[project.namespace] || {}
   apms = apms[cluster.id] || { isFetching: true }
   return {
-    auth: state.entities.auth,
     current: current || {},
     apms,
   }
