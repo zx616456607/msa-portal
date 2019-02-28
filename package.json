@@ -83,7 +83,7 @@
     "@babel/preset-typescript": "^7.1.0",
     "@babel/runtime": "^7.2.0",
     "@hot-loader/react-dom": "^16.7.0-alpha.2.3",
-    "@tenx-ui/b-unified-navigation": "^0.1.4",
+    "@tenx-ui/b-unified-navigation": "^0.1.5",
     "@tenx-ui/ellipsis": "0.0.4",
     "@tenx-ui/icon": "^2.1.50",
     "@tenx-ui/loader": "^0.0.3",
