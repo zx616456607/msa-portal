@@ -62,7 +62,7 @@ export default class GatewayCard extends React.Component {
             </div>
             <div className="out-address">{`出口地址: ${out || '--'}`}</div>
             <Popover content={this.popoverContent(rules)} placement="right">
-              <Ellipsis lines={2} tooltip={false}>{`关联路由规则: ${rules.join(',') || '--'}`}</Ellipsis>
+              <div className="rulesJoin">{`关联路由规则: ${rules.join(',') || '--'}`}</div>
             </Popover>
           </span>
         </div>
