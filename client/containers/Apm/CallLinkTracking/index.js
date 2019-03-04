@@ -65,7 +65,7 @@ class CallLinkTracking extends React.Component {
         this.loadData()
       })
     }
-    this.appDom = document.getElementById('app')
+    this.appDom = document.getElementById('unified-navigation')
     this.footerDom = document.getElementById('footer')
   }
 
