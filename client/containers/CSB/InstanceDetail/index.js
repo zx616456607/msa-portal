@@ -261,6 +261,7 @@ class CSBInstanceDetail extends React.Component {
         </Breadcrumb>
         <Layout>
           <Sider
+            theme="light"
             key="sider"
             extra={false}
             location={location}
