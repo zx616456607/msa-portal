@@ -370,7 +370,12 @@ class CSBInstanceOm extends React.Component {
       },
     ]
     const selectBefore = (
-      <Select defaultValue="creator" style={{ width: 90 }} onSelect={currentSearchType => this.setState({ currentSearchType })}>
+      <Select
+        defaultValue="creator"
+        style={{ width: 90 }}
+        onSelect={currentSearchType => this.setState({ currentSearchType })}
+        className="csbSelect"
+      >
         <Option value="creator">创建人</Option>
         <Option value="name">实例名称</Option>
       </Select>

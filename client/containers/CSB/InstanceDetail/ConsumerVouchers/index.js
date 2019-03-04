@@ -70,7 +70,7 @@ class ConsumerVouchers extends React.Component {
     const { name, id } = record
     const self = this
     return confirm({
-      modalTitle: '使用实例',
+      modalTitle: '删除操作',
       title: `确定删除消费凭证 ${name} 吗？`,
       content: '',
       onOk() {
