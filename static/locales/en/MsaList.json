@@ -91,6 +91,9 @@
     },
     "MsaDetailBlownStrategy": {
       "setMsaBlownStrategySucc": "Set the Circuit Breaker successfully",
+      "setMsaBlownStrategyFailed": "Set the Circuit Breaker failed",
+      "openMsaBlownStrategySucc": "Open the Circuit Breaker successfully",
+      "openMsaBlownStrategyFailed": "Open the Circuit Breaker failed",
       "requestVolumeThresholdErr1": "Please enter the number of window requests",
       "requestVolumeThresholdErr2": "Enter an integer ranging from 1 to 10000",
       "errorThresholdPercentageErr1": "Please enter the failure rate",
