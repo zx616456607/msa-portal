@@ -77,7 +77,13 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     })
   }
   setBlownRules = () => {
-    const { getMsaBlownStrategy, setMsaBlownStrategy, serviceName, clusterID, t } = this.props
+    const { getMsaBlownStrategy,
+      setMsaBlownStrategy,
+      msaBlownOpen,
+      serviceName,
+      clusterID,
+      t } = this.props
+    const { switchChecked } = this.state
     const { validateFields } = this.props.form
     validateFields(async (err, values) => {
       if (!err) {
@@ -85,6 +91,8 @@ class MsaDetailBlownStrategyComponent extends React.Component {
         const body = Object.assign({}, values)
         body.serviceName = serviceName
         const result = await setMsaBlownStrategy(clusterID, body)
+        const blownSwitchResult =
+          await msaBlownOpen(clusterID, { open: switchChecked, serviceName })
         this.setState({ confirmLoading: false })
         if (!result.error) {
           notification.success({ message: t('detail.MsaDetailBlownStrategy.setMsaBlownStrategySucc') })
@@ -92,6 +100,13 @@ class MsaDetailBlownStrategyComponent extends React.Component {
           this.setState({
             modalShow: false,
           })
+        } else {
+          notification.warn({ message: t('detail.MsaDetailBlownStrategy.setMsaBlownStrategyFailed') })
+        }
+        if (!blownSwitchResult.error) {
+          notification.success({ message: t('detail.MsaDetailBlownStrategy.openMsaBlownStrategySucc') })
+        } else {
+          notification.warn({ message: t('detail.MsaDetailBlownStrategy.openMsaBlownStrategyFailed') })
         }
       }
     })
@@ -171,18 +186,7 @@ class MsaDetailBlownStrategyComponent extends React.Component {
     }
     this.setState({ delLoading: false })
   }
-  switchChange = async val => {
-    const { msaBlownOpen, getMsaBlownStrategy, serviceName, clusterID } = this.props
-    this.setState({ switchLoading: true })
-    const result = await msaBlownOpen(clusterID, { open: val, serviceName })
-    this.setState({ switchLoading: false })
-    if (!result.error) {
-      getMsaBlownStrategy(clusterID, serviceName)
-      this.setState({
-        switchChecked: val,
-      })
-    }
-  }
+  switchChange = val => this.setState({ switchChecked: val })
   render() {
     const { blownStrategy, t } = this.props
     const { modalShow,

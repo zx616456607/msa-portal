@@ -90,6 +90,9 @@
     },
     "MsaDetailBlownStrategy": {
       "setMsaBlownStrategySucc": "设置熔断规则成功",
+      "setMsaBlownStrategyFailed": "设置熔断规则失败",
+      "openMsaBlownStrategySucc": "熔断规则开启成功",
+      "openMsaBlownStrategyFailed": "熔断规则开启失败",
       "requestVolumeThresholdErr1": "请输入窗口请求数",
       "requestVolumeThresholdErr2": "请输入1-10000之间的整数",
       "errorThresholdPercentageErr1": "请输入窗口请求失败率",
