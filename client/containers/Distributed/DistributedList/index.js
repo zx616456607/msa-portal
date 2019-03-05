@@ -84,7 +84,6 @@ class DistributedList extends React.Component {
                       {v.methodName}
                     </span>
                   </Ellipsis>
-                  )
                 </span>
               </li>)
             }
