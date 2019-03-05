@@ -19,7 +19,7 @@
     margin-left: 10px;
   }
   .bigLogBox {
-    z-index: 100;
+    z-index: 1030;
     position: fixed;
     margin-top: 0 !important;
     top: 0;
@@ -27,25 +27,31 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    .ant-card-body {
+    .ant-card {
       height: 100%;
+      &-body {
+        height: 100%;
+        .log-body {
+          height: ~"calc(100% - 40px)";
+        }
+      }
     }
   }
   .ant-input-wrapper {
     margin-top: 4px;
   }
   .selectInput {
-  .ant-select-dropdown {
-    width: 85px;
+    .ant-select-dropdown {
+      width: 85px;
+    }
   }
-}
-.ant-input-group-addon {
-.ant-select.ant-select-enabled {
-  width: 60px !important;
-}
-.ant-select-selection-selected-value {
-  text-overflow: clip;
-  width: 24px;
-}
-}
+  .ant-input-group-addon {
+    .ant-select.ant-select-enabled {
+      width: 60px !important;
+    }
+    .ant-select-selection-selected-value {
+      text-overflow: clip;
+      width: 24px;
+    }
+  }
 }

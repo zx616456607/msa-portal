@@ -3,7 +3,7 @@
 .csb-instance-detail {
   & > .ant-breadcrumb {
     position: fixed;
-    margin-top: 80px;
+    margin-top: @padding-medium;
     padding: 0 @padding-medium;
     .instance-name-bread {
       display: inline-block;
@@ -16,8 +16,15 @@
     }
   }
   & > .ant-layout {
-    div.layout-sider, div.layout-content {
-      margin-top: 110px;
+    padding: 0 0 0 @padding-medium;
+    @csb-detail-content-margin-top: @padding-medium + 24px + @padding-base;
+    & > .layout-sider {
+      margin-top: @csb-detail-content-margin-top;
+      align-self: flex-start;
+    }
+    & > .layout-content {
+      margin-top: @csb-detail-content-margin-top;
+      padding-top: 0;
     }
   }
 }

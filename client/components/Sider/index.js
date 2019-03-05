@@ -47,7 +47,9 @@ export default class Sider extends React.Component {
    * @return {element} menu element
    */
   renderMenu = menu => {
-    const { type, to, icon, text, children, skiped, ...otherProps } = menu
+    const { type, to, icon, text, children, skiped, ..._otherProps } = menu
+    const otherProps = { ..._otherProps }
+    delete otherProps.includePaths
     if (skiped) {
       return
     }

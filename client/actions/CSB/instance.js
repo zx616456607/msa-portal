@@ -40,9 +40,12 @@ export const CSB_PUBLIC_INSTANCES_FAILURE = 'CSB_PUBLIC_INSTANCES_FAILURE'
 // Relies on the custom API middleware defined in ../middleware/api.js.
 export const fetchInstances = (clusterID, query = {}) => {
   const _query = cloneDeep(query)
-  const { flag, page } = _query
+  const { flag, page, name } = _query
   if (page !== undefined) {
     _query.page = page - 1 // for api page start from 0
+  }
+  if (name) {
+    _query.name = encodeURIComponent(name)
   }
   let types
   let schema
