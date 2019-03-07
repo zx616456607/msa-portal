@@ -448,7 +448,7 @@ class Performance extends React.Component {
         time: {
           type: 'time',
           tickCount: 20,
-          mask: 'hh:MM:ss',
+          mask: 'HH:MM:ss',
         },
       })
       chart.col('count', {
@@ -488,7 +488,7 @@ class Performance extends React.Component {
         time: {
           type: 'time',
           tickCount: 20,
-          mask: 'hh:MM:ss',
+          mask: 'HH:MM:ss',
         },
       })
       chart.col('value', {
@@ -520,7 +520,7 @@ class Performance extends React.Component {
         time: {
           type: 'time',
           tickCount: 20,
-          mask: 'hh:MM:ss',
+          mask: 'HH:MM:ss',
         },
       })
       chart.col('count', {
@@ -555,7 +555,7 @@ class Performance extends React.Component {
         time: {
           type: 'time',
           tickCount: 20,
-          mask: 'hh:MM:ss',
+          mask: 'HH:MM:ss',
         },
       })
       chart.col('count', {
