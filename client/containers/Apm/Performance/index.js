@@ -26,6 +26,7 @@ import {
 import { Row, Icon, Button, Select, DatePicker } from 'antd'
 import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
+import { formatDate } from '../../../common/utils'
 
 const Option = Select.Option
 const { RangePicker } = DatePicker
@@ -447,8 +448,10 @@ class Performance extends React.Component {
       chart.source(heapData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'HH:MM:ss',
+          tickCount: 10,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
+          },
         },
       })
       chart.col('count', {
@@ -487,8 +490,10 @@ class Performance extends React.Component {
       chart.source(cpuData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'HH:MM:ss',
+          tickCount: 10,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
+          },
         },
       })
       chart.col('value', {
@@ -519,8 +524,10 @@ class Performance extends React.Component {
       chart.source(tranData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'HH:MM:ss',
+          tickCount: 10,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
+          },
         },
       })
       chart.col('count', {
@@ -554,8 +561,10 @@ class Performance extends React.Component {
       chart.source(gcData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'HH:MM:ss',
+          tickCount: 10,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
+          },
         },
       })
       chart.col('count', {
