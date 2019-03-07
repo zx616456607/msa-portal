@@ -89,11 +89,11 @@ class Performance extends React.Component {
    * 已定义日期
    */
   handleCustomTimer = () => {
-    const { Timer, serviceName } = this.state
-    if (serviceName === null) {
+    const { timer, serviceName } = this.state
+    if (serviceName !== null) {
       const curTimer = {
-        sTimer: Date.parse(Timer[0]),
-        eTimer: Date.parse(Timer[1]),
+        sTimer: Date.parse(timer[0]),
+        eTimer: Date.parse(timer[1]),
       }
       this.setState({
         timers: curTimer,
@@ -448,7 +448,7 @@ class Performance extends React.Component {
       chart.source(heapData, {
         time: {
           type: 'time',
-          tickCount: 10,
+          tickCount: 7,
           formatter: timeStamp => {
             return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
           },
@@ -490,7 +490,7 @@ class Performance extends React.Component {
       chart.source(cpuData, {
         time: {
           type: 'time',
-          tickCount: 10,
+          tickCount: 7,
           formatter: timeStamp => {
             return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
           },
@@ -524,7 +524,7 @@ class Performance extends React.Component {
       chart.source(tranData, {
         time: {
           type: 'time',
-          tickCount: 10,
+          tickCount: 7,
           formatter: timeStamp => {
             return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
           },
@@ -561,7 +561,7 @@ class Performance extends React.Component {
       chart.source(gcData, {
         time: {
           type: 'time',
-          tickCount: 10,
+          tickCount: 7,
           formatter: timeStamp => {
             return formatDate(timeStamp, 'YYYY-MM-DD HH:MM:ss')
           },
