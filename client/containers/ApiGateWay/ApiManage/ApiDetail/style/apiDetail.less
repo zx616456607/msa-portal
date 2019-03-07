@@ -1,0 +1,44 @@
+@import "../../../../../assets/style/core/index.less";
+.api-detail {
+  .top {
+    display: flex;
+    align-items: center;
+    margin-bottom: @padding-medium;
+    & > span:nth-child(2) {
+      margin-left: @padding-medium;
+      position: relative;
+      &:before {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 14px;
+        background: @primary-color;
+        position: absolute;
+        top: 2px;
+        left: -8px;
+      }
+    }
+  }
+  .header {
+    margin-bottom: @padding-medium;
+    .img {
+      width: 120px;
+      height: 120px;
+      background: #e4e4e4;
+    }
+    .description {
+      display: flex;
+      button {
+        margin-top: -4px;
+        margin-right: @padding-base;
+      }
+      i {
+        color: @primary-color;
+        margin-left: @padding-base;
+      }
+    }
+    textarea {
+      margin-top: -8px;
+    }
+  }
+}
