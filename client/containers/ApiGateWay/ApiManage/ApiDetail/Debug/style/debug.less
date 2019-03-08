@@ -1,0 +1,36 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2019 TenxCloud. All Rights Reserved.
+ * ----
+ * style of debug
+ *
+ * @author ZhouHaitao
+ * @date 2019-03-08 10:42
+ */
+@import "../../../../../../assets/style/core/index.less";
+
+.api-debug {
+  h1 {
+    font-size: @font-size-large;
+  }
+  .url-config {
+    margin: @padding-small 0;
+    padding-bottom: @padding-medium;
+    border-bottom: 1px dashed @border-color-split;
+  }
+  .auth {
+    margin: @padding-small 0;
+    padding-bottom: @padding-medium;
+    border-bottom: 1px dashed @border-color-split;
+    .ant-form-item {
+      margin-bottom: @padding-base;
+    }
+    .ant-form-item-label {
+      text-align: left;
+    }
+  }
+  .request-headers {
+    border: 1px solid @border-color-split;
+    border-radius: @border-radius-medium;
+  }
+}

@@ -1,0 +1,74 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2019 TenxCloud. All Rights Reserved.
+ * ----
+ * style of apiManageEdit
+ *
+ * @author ZhouHaitao
+ * @date 2019-03-06 10:42
+ */
+
+@import "../../../../../assets/style/core/index.less";
+
+.api-manage-detail {
+  .top {
+    display: flex;
+    align-items: center;
+    margin-bottom: @padding-medium;
+    & > span:nth-child(2) {
+      margin-left: @padding-medium;
+      position: relative;
+      &:before {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 14px;
+        background: @primary-color;
+        position: absolute;
+        top: 2px;
+        left: -8px;
+      }
+    }
+  }
+  .form-content {
+    width: 600px;
+    .api-group-box {
+      position: relative;
+      .api-group-operation {
+        position: absolute;
+        top: -1px;
+        right: -126px;
+        button {
+          margin-right: @padding-base;
+        }
+      }
+    }
+    .tip {
+      color: @font-color-3;
+      position: relative;
+      top: 20px;
+    }
+    .ant-form-item:last-child {
+      .ant-form-explain {
+        position: relative;
+        top: -40px;
+      }
+    }
+  }
+  .ant-card-actions {
+    background: #fff;
+    .ant-col-16 {
+      text-align: left;
+    }
+    li {
+      padding: 0 24px;
+      & > span {
+        width: 600px;
+        display: block;
+      }
+      button {
+        margin-right: @padding-base;
+      }
+    }
+  }
+}

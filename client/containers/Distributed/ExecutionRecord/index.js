@@ -68,7 +68,9 @@ class ExecutionRecord extends React.Component {
       {
         title: '父事务地址',
         dataIndex: 'address',
-        render: text => <Ellipsis>{text}</Ellipsis>,
+        render: text => <span className="parentAddress">
+          <Ellipsis>{text.substr(1)}</Ellipsis>
+        </span>,
       },
       {
         title: '子事务数量',
