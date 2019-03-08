@@ -23,13 +23,16 @@ import {
   fetchJVMCPUData,
   fetchJVMTRANData,
 } from '../../../actions/pinpoint'
-import { Row, Icon, Button, Select, DatePicker } from 'antd'
+import { Row, Icon, Button, Select, DatePicker, Radio } from 'antd'
 import CreateG2Group from '../../../components/CreateG2/Group'
 import performance from '../../../assets/img/apm/performance.png'
+import { formatDate } from '../../../common/utils'
 
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const ButtonGroup = Button.Group
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 const Frame = G2.Frame
 const images = [
   '/img/service/java.png',
@@ -88,11 +91,11 @@ class Performance extends React.Component {
    * 已定义日期
    */
   handleCustomTimer = () => {
-    const { Timer, serviceName } = this.state
-    if (serviceName === null) {
+    const { timer, serviceName } = this.state
+    if (serviceName !== null) {
       const curTimer = {
-        sTimer: Date.parse(Timer[0]),
-        eTimer: Date.parse(Timer[1]),
+        sTimer: Date.parse(timer[0]),
+        eTimer: Date.parse(timer[1]),
       }
       this.setState({
         timers: curTimer,
@@ -155,9 +158,10 @@ class Performance extends React.Component {
       fetchJVMCPUData,
       fetchJVMTRANData,
     } = this.props
+    const from = Object.keys(timers).length > 0 ? timers.sTimer : customTimer
     const query = {
       agentId: value,
-      from: Object.keys(timers).length > 0 ? timers.sTimer : customTimer,
+      from,
       to: Object.keys(timers).length > 0 ? timers.eTimer : sTimer,
     }
     fetchJVMGCData(clusterID, apmID, query).then(res => {
@@ -174,7 +178,7 @@ class Performance extends React.Component {
         permGenMax: JVM_MEMORY_NON_HEAP_MAX, // PermGen Usage
         permGenSued: JVM_MEMORY_NON_HEAP_USED,
       }
-      const heapAry = chartJVM.heapMax.points.map((item, index) => (
+      const heapAry = chartJVM.heapMax && chartJVM.heapMax.points.map((item, index) => (
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(this.bytesToSize(item.maxYVal)),
@@ -183,12 +187,12 @@ class Performance extends React.Component {
             : this.bytesToSize(chartJVM.heapSued.points[index].maxYVal),
         }
       ))
-      let frame = new Frame(heapAry)
+      let frame = new Frame(heapAry.filter(item => new Date(item.time) > new Date(from)))
       frame = Frame.combinColumns(frame, [ 'xVal' ], 'count')
       this.setState({
         heapData: frame,
       })
-      const permAry = chartJVM.permGenMax.points.map((item, index) => (
+      const permAry = chartJVM.permGenMax && chartJVM.permGenMax.points.map((item, index) => (
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
@@ -197,7 +201,7 @@ class Performance extends React.Component {
             : this.bytesToSize(chartJVM.permGenSued.points[index].maxYVal),
         }
       ))
-      let frames = new Frame(permAry)
+      let frames = new Frame(permAry.filter(item => new Date(item.time) > new Date(from)))
       frames = Frame.combinColumns(frames, [ 'xVal' ], 'count')
       this.setState({
         gcData: frames,
@@ -213,7 +217,7 @@ class Performance extends React.Component {
         system: CPU_LOAD_SYSTEM,
         jvm: CPU_LOAD_JVM,
       }
-      const cpumAry = chartJVM.system.points.map((item, index) => (
+      const cpumAry = chartJVM.system && chartJVM.system.points.map((item, index) => (
         {
           time: this.dateFtt(item.xVal),
           xVal: item.maxYVal === -1 ? 0 : this.bytesToSize(item.maxYVal),
@@ -222,7 +226,7 @@ class Performance extends React.Component {
             : this.bytesToSize(chartJVM.jvm.points[index].maxYVal),
         }
       ))
-      let frame = new Frame(cpumAry)
+      let frame = new Frame(cpumAry.filter(item => new Date(item.time) > new Date(from)))
       frame = Frame.combinColumns(frame, [ 'yVal', 'xVal' ], 'value')
       this.setState({
         cpuData: frame,
@@ -244,7 +248,7 @@ class Performance extends React.Component {
         sampled_n: TPS_SAMPLED_NEW,
       }
 
-      const tranAry = chartJVM.unsampled_c.points.map((item, index) => (
+      const tranAry = chartJVM.unsampled_c && chartJVM.unsampled_c.points.map((item, index) => (
         {
           time: this.dateFtt(item.xVal),
           total: chartJVM.total.points[index].maxYVal === -1
@@ -261,7 +265,7 @@ class Performance extends React.Component {
             : chartJVM.sampled_n.points[index].maxYVal,
         }
       ))
-      let frame = new Frame(tranAry)
+      let frame = new Frame(tranAry.filter(item => new Date(item.time) > new Date(from)))
       frame = Frame.combinColumns(
         frame,
         [ 'total', 'unsampledNew', 'sampledNew', 'sampledContinuation' ],
@@ -332,11 +336,12 @@ class Performance extends React.Component {
     return Number((bytes / Math.pow(k, i)).toFixed(1))
   }
   dateFtt = value => {
-    const date = new Date(value)
-    const dd = date.toLocaleDateString().replace(/\//g, '/')
-      + ' '
-      + date.toTimeString().substr(0, 8)
-    return dd
+    return value
+    // const date = new Date(value)
+    // const dd = date.toLocaleDateString().replace(/\//g, '/')
+    //   + ' '
+    //   + date.toTimeString().substr(0, 8)
+    // return dd
   }
   handleRefresh = () => {
     const { serverName } = this.state
@@ -447,8 +452,10 @@ class Performance extends React.Component {
       chart.source(heapData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'hh:MM:ss',
+          tickCount: 7,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:mm:ss')
+          },
         },
       })
       chart.col('count', {
@@ -487,8 +494,10 @@ class Performance extends React.Component {
       chart.source(cpuData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'hh:MM:ss',
+          tickCount: 7,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:mm:ss')
+          },
         },
       })
       chart.col('value', {
@@ -519,8 +528,10 @@ class Performance extends React.Component {
       chart.source(tranData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'hh:MM:ss',
+          tickCount: 7,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:mm:ss')
+          },
         },
       })
       chart.col('count', {
@@ -554,8 +565,10 @@ class Performance extends React.Component {
       chart.source(gcData, {
         time: {
           type: 'time',
-          tickCount: 20,
-          mask: 'hh:MM:ss',
+          tickCount: 7,
+          formatter: timeStamp => {
+            return formatDate(timeStamp, 'YYYY-MM-DD HH:mm:ss')
+          },
         },
       })
       chart.col('count', {
@@ -605,11 +618,13 @@ class Performance extends React.Component {
               {
                 isTimerShow ?
                   <Row>
-                    <Button className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</Button>
-                    <Button className="btn" onClick={() => this.handleLatelyTimer('three')}>3小时</Button>
-                    <Button className="btn" onClick={() => this.handleLatelyTimer('today')}>今天</Button>
-                    <Button className="btn" onClick={() => this.handleLatelyTimer('yesterday')}>昨天</Button>
-                    <Button className="btn" onClick={() => this.handleLatelyTimer('seven')}>最近7天</Button>
+                    <RadioGroup>
+                      <RadioButton value="five" className="btn" onClick={() => this.handleLatelyTimer('five')} >最近5分钟</RadioButton>
+                      <RadioButton value="three" className="btn" onClick={() => this.handleLatelyTimer('three')}>3小时</RadioButton>
+                      <RadioButton value="today" className="btn" onClick={() => this.handleLatelyTimer('today')}>今天</RadioButton>
+                      <RadioButton value="yesterday" className="btn" onClick={() => this.handleLatelyTimer('yesterday')}>昨天</RadioButton>
+                      <RadioButton value="seven" className="btn" onClick={() => this.handleLatelyTimer('seven')}>最近7天</RadioButton>
+                    </RadioGroup>
                   </Row> :
                   <Row>
                     <RangePicker
