@@ -47,7 +47,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   onSubmit = () => {
     const { validateFields } = this.props.form
     validateFields((err, values) => {
-      if (!err) {
+      if (!err) {}
     })
   }
   render() {
