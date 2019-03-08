@@ -1,3 +1,13 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2019 TenxCloud. All Rights Reserved.
+ * ----
+ * page ApiManage
+ *
+ * @author ZhouHaitao
+ * @date 2019-03-06 10:42
+ */
+
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Input, Table, Pagination, Menu, Dropdown, Icon } from 'antd'
