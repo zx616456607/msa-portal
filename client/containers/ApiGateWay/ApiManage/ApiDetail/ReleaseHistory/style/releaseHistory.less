@@ -1,0 +1,50 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2019 TenxCloud. All Rights Reserved.
+ * ----
+ * style of ReleaseHistory
+ *
+ * @author ZhouHaitao
+ * @date 2019-03-08 10:42
+ */
+@import "../../../../../../assets/style/core/index.less";
+.release-history {
+  .top-operation {
+    width: 100%;
+    margin-bottom: @padding-base;
+    height: 32px;
+    .left {
+      float: left;
+      display: flex;
+      align-items: center;
+      button {
+        &:nth-child(1) {
+          i {
+            font-size: 14px;
+            margin: 2px 4px 0 0;
+          }
+        }
+        margin-right: @padding-base;
+      }
+    }
+    .right {
+      float: right;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+.release-history-switch {
+  span {
+    color: @primary-color;
+  }
+  p:last-child {
+    color: @success-color;
+  }
+}
+
+.release-history-release {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}

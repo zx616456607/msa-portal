@@ -11,6 +11,8 @@
 import * as React from 'react'
 import { Card, Tabs, Button, Icon, Input, Row, Col } from 'antd'
 import ReturnButton from '@tenx-ui/return-button'
+import ReleaseHistory from './ReleaseHistory'
+import Debug from './Debug'
 import './style/apiDetail.less'
 
 const { TextArea } = Input
@@ -36,6 +38,10 @@ class ApiDetail extends React.Component<ApiDetailProps> {
   }
   render() {
     const { edit, description } = this.state
+    const apiData = {
+      name: 'API NAME',
+      version: '201906032451',
+    }
     return <div className="api-detail">
       <div className="top">
         <ReturnButton onClick={this.onReturn}>返回</ReturnButton>
@@ -63,9 +69,9 @@ class ApiDetail extends React.Component<ApiDetailProps> {
                 <p>创建：{'2019-11-20'}</p>
               </Col>
               <Col span={8}>
-                <p className="description">
+                <div className="description">
                   描述：
-                  <p>
+                  <div>
                     <>
                       {!edit ?
                         <>可{description ? '编辑' : '添加'}描述
@@ -78,8 +84,8 @@ class ApiDetail extends React.Component<ApiDetailProps> {
                         </>
                       }
                     </>
-                  </p>
-                </p>
+                  </div>
+                </div>
                 {
                   description && <TextArea disabled={!edit}/>}
               </Col>
@@ -91,9 +97,15 @@ class ApiDetail extends React.Component<ApiDetailProps> {
         hoverable
       >
         <Tabs defaultActiveKey="release-history">
-          <TabPane tab="发布历史" key="release-history">Content of Tab Pane 1</TabPane>
-          <TabPane tab="调试API" key="debug-api">Content of Tab Pane 2</TabPane>
-        </Tabs>,
+          <TabPane tab="发布历史" key="release-history">
+            <ReleaseHistory
+              apiData={apiData}
+            />
+          </TabPane>
+          <TabPane tab="调试API" key="debug-api">
+            <Debug/>
+          </TabPane>
+        </Tabs>
       </Card>
     </div>
   }
