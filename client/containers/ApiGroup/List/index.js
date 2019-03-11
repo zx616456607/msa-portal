@@ -19,12 +19,12 @@ import { Button, Input, Icon, Card, Table, Pagination, notification } from 'antd
 import {
   getGatewayApiGroupList,
   delGatewayApiGroup,
-} from '../../../../actions/gateway'
+} from '../../../actions/gateway'
 import * as TenxModal from '@tenx-ui/modal'
 import {
   formatDate,
   formatFilterConditions,
-} from '../../../../common/utils'
+} from '../../../common/utils'
 import './style/index.less'
 import TimeHover from '@tenx-ui/time-hover/lib'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
