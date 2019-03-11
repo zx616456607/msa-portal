@@ -19,9 +19,9 @@ import { Button, Input, Icon, Card, Table, Pagination } from 'antd'
 import * as TenxModal from '@tenx-ui/modal'
 import {
   formatDate,
-} from '../../../../common/utils'
+} from '../../../common/utils'
 import './style/index.less'
-import { getGatewayApiGroupTargets } from '../../../../actions/gateway'
+import { getGatewayApiGroupTargets } from '../../../actions/gateway'
 import AddModal from './AddModal'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
