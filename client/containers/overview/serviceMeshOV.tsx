@@ -89,7 +89,7 @@ class ServiceMeshOV extends React.Component<ServiceMeshOVProps, ServiceMeshOVSta
       <Spin spinning={this.state.loading}>
       <Card title="治理服务网格" className="ServiceMeshOV">
         <Row>
-          <Col span={8} className="split"><div className="info">网格数量</div>
+          <Col span={8} className="split"><div className="info">网关数量</div>
           <div className="info big">{`${this.state.MGWResLenght}个`}</div></Col>
           <Col span={8} className="split"><div className="info">组件数量</div>
           <div className="info big">{`${this.state.CMResLenght}个`}</div></Col>
