@@ -1,0 +1,82 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2019 03nxCloud. All Rights Reserved.
+ */
+
+/**
+ * group detail style
+ *
+ * 2019-03-04
+ * @author rensiwei
+ */
+
+ @import '~assets/style/core/index.less';
+
+.detail-wrapper {
+  .second-title {
+    margin: 16px 0 16px 5%;
+  }
+  .detail-top {
+    .back {
+      display: inline-block;
+      float: left;
+      height: 40px;
+      .backjia {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-bottom: 15px solid transparent;
+        border-top: 15px solid transparent;
+        border-right: 15px solid #00b8f2;
+        font-size: 0;
+        line-height: 0;
+      }
+      .btn-back {
+        display: inline-block;
+        background: #00b8f2;
+        color: white;
+        height: 30px;
+        line-height: 28px;
+        vertical-align: top;
+        padding-right: 10px;
+        padding-left: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        cursor: pointer;
+      }
+    }
+    .title {
+      vertical-align: middle;
+      line-height: 30px;
+      padding-left: 10px;
+      border-left: 5px solid #00a0e9;
+      margin-right: 50px;
+    }
+  }
+  .header-detail {
+    display: flex;
+    align-items: center;
+    .api-group-detail-icon {
+      flex: 0 0 60px;
+      margin-right: @padding-medium;
+    }
+    .api-group-detail-info {
+      flex: 1 1 auto;
+      .api-group-detail-name {
+        font-size: @font-size-large;
+        font-weight: 500;
+        margin-bottom: @padding-base;
+      }
+      .detail-row {
+        margin-bottom: @padding-base;
+        .edit_desc {
+          color: @primary-color;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .api-detail-list {
+    margin-top: @padding-medium;
+  }
+}

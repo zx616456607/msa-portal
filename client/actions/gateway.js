@@ -372,3 +372,157 @@ const fetchUpdateGlobalRuleSetting = (clusterID, body, options) => {
 
 export const updateGlobalRuleSetting = (clusterID, body, options) =>
   dispatch => dispatch(fetchUpdateGlobalRuleSetting(clusterID, body, options))
+
+export const CREATE_GATEWAY_APIGROUP_REQUEST = 'CREATE_GATEWAY_APIGROUP_REQUEST'
+export const CREATE_GATEWAY_APIGROUP_SUCCESS = 'CREATE_GATEWAY_APIGROUP_SUCCESS'
+export const CREATE_GATEWAY_APIGROUP_FALIURE = 'CREATE_GATEWAY_APIGROUP_FALIURE'
+
+function fetchCreateGatewayApiGroup(clusterID, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        CREATE_GATEWAY_APIGROUP_REQUEST,
+        CREATE_GATEWAY_APIGROUP_SUCCESS,
+        CREATE_GATEWAY_APIGROUP_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function createGatewayApiGroup(clusterID, body) {
+  return dispatch => {
+    return dispatch(fetchCreateGatewayApiGroup(clusterID, body))
+  }
+}
+
+export const UPDATE_GATEWAY_APIGROUP_REQUEST = 'UPDATE_GATEWAY_APIGROUP_REQUEST'
+export const UPDATE_GATEWAY_APIGROUP_SUCCESS = 'UPDATE_GATEWAY_APIGROUP_SUCCESS'
+export const UPDATE_GATEWAY_APIGROUP_FALIURE = 'UPDATE_GATEWAY_APIGROUP_FALIURE'
+
+function fetchUpdateGatewayApiGroup(clusterID, groupid, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        UPDATE_GATEWAY_APIGROUP_REQUEST,
+        UPDATE_GATEWAY_APIGROUP_SUCCESS,
+        UPDATE_GATEWAY_APIGROUP_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${groupid}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function updateGatewayApiGroup(clusterID, groupid, body) {
+  return dispatch => {
+    return dispatch(fetchUpdateGatewayApiGroup(clusterID, groupid, body))
+  }
+}
+
+export const GET_GATEWAY_APIGROUP_LIST_REQUEST = 'GET_GATEWAY_APIGROUP_LIST_REQUEST'
+export const GET_GATEWAY_APIGROUP_LIST_SUCCESS = 'GET_GATEWAY_APIGROUP_LIST_SUCCESS'
+export const GET_GATEWAY_APIGROUP_LIST_FALIURE = 'GET_GATEWAY_APIGROUP_LIST_FALIURE'
+
+function fetchGetGatewayApiGroupList(clusterID, query) {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GATEWAY_APIGROUP_LIST_REQUEST,
+        GET_GATEWAY_APIGROUP_LIST_SUCCESS,
+        GET_GATEWAY_APIGROUP_LIST_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export function getGatewayApiGroupList(clusterID, query) {
+  return dispatch => {
+    return dispatch(fetchGetGatewayApiGroupList(clusterID, query))
+  }
+}
+
+export const GET_GATEWAY_APIGROUP_REQUEST = 'GET_GATEWAY_APIGROUP_REQUEST'
+export const GET_GATEWAY_APIGROUP_SUCCESS = 'GET_GATEWAY_APIGROUP_SUCCESS'
+export const GET_GATEWAY_APIGROUP_FALIURE = 'GET_GATEWAY_APIGROUP_FALIURE'
+
+function fetchGetGatewayApiGroup(clusterID, id) {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GATEWAY_APIGROUP_REQUEST,
+        GET_GATEWAY_APIGROUP_SUCCESS,
+        GET_GATEWAY_APIGROUP_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${id}`,
+      schema: {},
+    },
+  }
+}
+export function getGatewayApiGroup(clusterID, id) {
+  return dispatch => {
+    return dispatch(fetchGetGatewayApiGroup(clusterID, id))
+  }
+}
+
+export const GET_GATEWAY_APIGROUP_TARGETS_REQUEST = 'GET_GATEWAY_APIGROUP_TARGETS_REQUEST'
+export const GET_GATEWAY_APIGROUP_TARGETS_SUCCESS = 'GET_GATEWAY_APIGROUP_TARGETS_SUCCESS'
+export const GET_GATEWAY_APIGROUP_TARGETS_FALIURE = 'GET_GATEWAY_APIGROUP_TARGETS_FALIURE'
+
+function fetchGetGatewayApiGroupTargets(clusterID, id, query) {
+  return {
+    [CALL_API]: {
+      types: [
+        GET_GATEWAY_APIGROUP_TARGETS_REQUEST,
+        GET_GATEWAY_APIGROUP_TARGETS_SUCCESS,
+        GET_GATEWAY_APIGROUP_TARGETS_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${id}/targets?${toQuerystring(query)}`,
+      schema: {},
+    },
+  }
+}
+
+export function getGatewayApiGroupTargets(clusterID, id, query) {
+  return dispatch => {
+    return dispatch(fetchGetGatewayApiGroupTargets(clusterID, id, query))
+  }
+}
+
+export const DELETE_GATEWAY_APIGROUP_REQUEST = 'DELETE_GATEWAY_APIGROUP_REQUEST'
+export const DELETE_GATEWAY_APIGROUP_SUCCESS = 'DELETE_GATEWAY_APIGROUP_SUCCESS'
+export const DELETE_GATEWAY_APIGROUP_FALIURE = 'DELETE_GATEWAY_APIGROUP_FALIURE'
+
+function fetchDelGatewayApiGroup(clusterID, id) {
+  return {
+    [CALL_API]: {
+      types: [
+        DELETE_GATEWAY_APIGROUP_REQUEST,
+        DELETE_GATEWAY_APIGROUP_SUCCESS,
+        DELETE_GATEWAY_APIGROUP_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${id}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export function delGatewayApiGroup(clusterID, id) {
+  return dispatch => {
+    return dispatch(fetchDelGatewayApiGroup(clusterID, id))
+  }
+}

@@ -109,6 +109,14 @@ export const appChildRoutes = [
     }),
     key: 'apiGateWay',
   },
+  {
+    path: '/api-group',
+    component: LoadableWrapper({
+      path: 'ApiGroup',
+      loader: () => import('./containers/ApiGroup' /* webpackChunkName: "api-group" */),
+    }),
+    key: 'api-group',
+  },
 ]
 
 export class AppWrapper extends React.Component {
