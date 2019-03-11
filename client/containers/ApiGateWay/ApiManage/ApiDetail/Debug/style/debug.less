@@ -10,6 +10,9 @@
 @import "../../../../../../assets/style/core/index.less";
 
 .api-debug {
+  .input {
+    border-right: 1px solid @border-color-split;
+  }
   h1 {
     font-size: @font-size-large;
   }
@@ -29,8 +32,51 @@
       text-align: left;
     }
   }
-  .request-headers {
-    border: 1px solid @border-color-split;
-    border-radius: @border-radius-medium;
+  .req-params {
+    margin-bottom: @padding-medium;
+  }
+  .req-body {
+    .title {
+      display: flex;
+      align-items: center;
+      h1 {
+        margin-right: @padding-medium;
+      }
+      .ant-form-item {
+        margin-bottom: 4px;
+      }
+    }
+  }
+  .req-params, .req-body {
+    .content {
+      padding: @padding-base 0 4px 0;
+      border: 1px solid @border-color-split;
+      border-radius: @border-radius-medium;
+      .req-params-item {
+        margin-right: 0 !important;
+        margin-bottom: @padding-base;
+        padding: 0 @padding-small 0 @padding-small;
+        border-bottom: 1px solid @border-color-split;
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+        }
+        .del-button {
+          line-height: 38px;
+        }
+      }
+      .ant-form-item {
+        margin-bottom: @padding-base;
+      }
+    }
+    .add-btn {
+      display: block;
+      width: 100px;
+      padding: @padding-base @padding-base @padding-base 0;
+      color: @primary-color;
+      i {
+        margin-right: 4px;
+      }
+    }
   }
 }

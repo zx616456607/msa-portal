@@ -14,10 +14,8 @@ import ReturnButton from '@tenx-ui/return-button'
 import ReleaseHistory from './ReleaseHistory'
 import Debug from './Debug'
 import './style/apiDetail.less'
-
 const { TextArea } = Input
 const TabPane = Tabs.TabPane
-
 interface ApiDetailProps {
 
 }
