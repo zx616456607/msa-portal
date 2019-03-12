@@ -31,6 +31,7 @@ import meshGateway from './meshGateway'
 import meshRouteManagement from './meshRouteManagement'
 import overView from './indexPage'
 import dubbo from './dubbo'
+import apiManage from './apiManage'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {
@@ -90,6 +91,7 @@ const rootReducer = combineReducers({
   serviceMesh,
   meshGateway,
   overView,
+  apiManage,
 })
 
 export default rootReducer
