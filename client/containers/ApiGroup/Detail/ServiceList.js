@@ -15,13 +15,14 @@ import { connect } from 'react-redux'
 // import { Link } from 'react-router-dom'
 import QueueAnim from 'rc-queue-anim'
 import { parse as parseQuerystring } from 'query-string'
-import { Button, Input, Icon, Card, Table, Pagination } from 'antd'
+import { Button, Input, Icon, Card, Table, Pagination, notification } from 'antd'
 import * as TenxModal from '@tenx-ui/modal'
 import {
   formatDate,
 } from '../../../common/utils'
 import './style/index.less'
-import { getGatewayApiGroupTargets } from '../../../actions/gateway'
+import { loadAllServices } from '../../../actions/serviceMesh'
+import { getGatewayApiGroupTargets, removeGatewayApiGroupTarget } from '../../../actions/gateway'
 import AddModal from './AddModal'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
@@ -33,7 +34,8 @@ class ServiceList extends React.Component {
     searchValue: '',
     page: 1,
     isShowAdd: false,
-    targts: [],
+    targets: [],
+    loading: false,
   }
 
   componentDidMount() {
@@ -45,13 +47,21 @@ class ServiceList extends React.Component {
     const { searchValue, page } = this.state
     searchValue && (query.name = encodeURIComponent(searchValue))
     query.page = page - 1
-    getGatewayApiGroupTargets(clusterID, apiGroupId, query).then(res => {
-      const result = getDeepValue(res, [ 'response', 'result' ]) || {}
-      if (result.code === 200) {
+    query.size = 9999
+    this.setState({
+      loading: true,
+    }, () => {
+      getGatewayApiGroupTargets(clusterID, apiGroupId, query).then(res => {
+        const result = getDeepValue(res, [ 'response', 'result' ]) || {}
+        if (result.code === 200) {
+          this.setState({
+            targets: result.data || {},
+          })
+        }
         this.setState({
-          targts: result.data || {},
+          loading: false,
         })
-      }
+      })
     })
   }
 
@@ -77,23 +87,36 @@ class ServiceList extends React.Component {
     })
   }
   handleDelete = record => {
+    const { removeGatewayApiGroupTarget, clusterID, apiGroupId } = this.props
+    const loadData = this.lodaData
     TenxModal.confirm({
       modalTitle: '解除绑定后端服务',
-      title: `确定解除绑定服务 ${record.host + ':' + record.port} 吗`,
+      title: `确定解除绑定服务 ${record.host} : ${record.port} 吗`,
       onOk() {
         return new Promise((resolve, reject) => {
-          console.warn('record', record)
-          resolve()
-          reject()
+          removeGatewayApiGroupTarget(clusterID, apiGroupId, record.id).then(res => {
+            const result = getDeepValue(res, [ 'response', 'result' ]) || {}
+            if (result.code === 200) {
+              notification.success({
+                message: `解除绑定服务 ${record.host} : ${record.port} 成功`,
+              })
+              loadData()
+              return resolve()
+            }
+            notification.warn({
+              message: `解除绑定服务 ${record.host} : ${record.port} 失败`,
+            })
+            reject()
+          })
         })
       },
       onCancel() {},
     })
   }
   render() {
-    const { location } = this.props
-    const { sortOrder, searchValue, isShowAdd, targts } = this.state
-    const { totalElements: total, size, content: data } = targts || {}
+    const { location, proxyType, apiGroupId } = this.props
+    const { sortOrder, searchValue, isShowAdd, targets, loading } = this.state
+    const { totalElements: total, content: data } = targets || {}
     const { query } = location
     const columns = [
       {
@@ -134,7 +157,7 @@ class ServiceList extends React.Component {
     const paginationProps = {
       simple: true,
       total,
-      pageSize: size,
+      pageSize: 10,
       current: parseInt(query.page, 10) || 1,
       onChange: page => this.setState({ page }, () => {
         this.loadData()
@@ -146,11 +169,12 @@ class ServiceList extends React.Component {
           <Button
             type="primary"
             onClick={() => this.showAddModal()}
+            disabled={loading || proxyType === 0}
           >
             <Icon type="link" /> 关联后端服务
           </Button>
           <Button
-            onClick={() => this.loadData()}
+            onClick={this.loadData}
           >
             <Icon type="sync" /> 刷新
           </Button>
@@ -176,14 +200,18 @@ class ServiceList extends React.Component {
               pagination={false}
               rowKey={row => row.id}
               onChange={this.tableOnchange}
+              loading={loading}
             />
           </Card>
         </div>
         {
           isShowAdd ?
             <AddModal
+              targets={data}
+              apiGroupId={apiGroupId}
               visible={isShowAdd}
               onCancel={() => this.setState({ isShowAdd: false })}
+              onOk={this.loadData}
             />
             :
             null
@@ -199,16 +227,15 @@ const mapStateToProps = (state, ownProps) => {
   const { cluster } = current.config
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
-  const temp = location.pathname.split('/')
-  const apiGroupId = temp.pop()
   return {
     clusterID: cluster.id,
-    apiGroupId,
     currentUser,
     location,
   }
 }
 
 export default connect(mapStateToProps, {
+  loadAllServices,
   getGatewayApiGroupTargets,
+  removeGatewayApiGroupTarget,
 })(ServiceList)

@@ -526,3 +526,58 @@ export function delGatewayApiGroup(clusterID, id) {
     return dispatch(fetchDelGatewayApiGroup(clusterID, id))
   }
 }
+export const REMOVE_GATEWAY_APIGROUP_TARGET_REQUEST = 'REMOVE_GATEWAY_APIGROUP_TARGET_REQUEST'
+export const REMOVE_GATEWAY_APIGROUP_TARGET_SUCCESS = 'REMOVE_GATEWAY_APIGROUP_TARGET_SUCCESS'
+export const REMOVE_GATEWAY_APIGROUP_TARGET_FALIURE = 'REMOVE_GATEWAY_APIGROUP_TARGET_FALIURE'
+
+function fetchRemoveGatewayApiGroupTarget(clusterID, apiGroupId, targetId) {
+  return {
+    [CALL_API]: {
+      types: [
+        REMOVE_GATEWAY_APIGROUP_TARGET_REQUEST,
+        REMOVE_GATEWAY_APIGROUP_TARGET_SUCCESS,
+        REMOVE_GATEWAY_APIGROUP_TARGET_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${apiGroupId}/targets/${targetId}`,
+      options: {
+        method: 'DELETE',
+      },
+      schema: {},
+    },
+  }
+}
+
+export function removeGatewayApiGroupTarget(clusterID, apiGroupId, targetId) {
+  return dispatch => {
+    return dispatch(fetchRemoveGatewayApiGroupTarget(clusterID, apiGroupId, targetId))
+  }
+}
+
+export const ADD_GATEWAY_APIGROUP_TARGET_REQUEST = 'ADD_GATEWAY_APIGROUP_TARGET_REQUEST'
+export const ADD_GATEWAY_APIGROUP_TARGET_SUCCESS = 'ADD_GATEWAY_APIGROUP_TARGET_SUCCESS'
+export const ADD_GATEWAY_APIGROUP_TARGET_FALIURE = 'ADD_GATEWAY_APIGROUP_TARGET_FALIURE'
+
+function fetchAddGatewayApiGroupTarget(clusterID, apiGroupId, body) {
+  return {
+    [CALL_API]: {
+      types: [
+        ADD_GATEWAY_APIGROUP_TARGET_REQUEST,
+        ADD_GATEWAY_APIGROUP_TARGET_SUCCESS,
+        ADD_GATEWAY_APIGROUP_TARGET_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/${apiGroupId}/targets`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {},
+    },
+  }
+}
+
+export function addGatewayApiGroupTarget(clusterID, apiGroupId, body) {
+  return dispatch => {
+    return dispatch(fetchAddGatewayApiGroupTarget(clusterID, apiGroupId, body))
+  }
+}
+

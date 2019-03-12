@@ -51,7 +51,8 @@ class CreateConfig extends React.Component {
             })
           }
         })
-        await getGatewayApiGroupTargets(clusterID, apiGroupId).then(async res => {
+        await getGatewayApiGroupTargets(clusterID, apiGroupId,
+          { page: 0, size: 9999 }).then(async res => {
           const result = getDeepValue(res, [ 'response', 'result' ]) || {}
           if (result.code === 200) {
             const { form: { setFieldsValue } } = this.props
@@ -89,13 +90,34 @@ class CreateConfig extends React.Component {
       keys: nextKeys,
     })
   }
+  checkPortAndName = (values, keys) => {
+    let b
+    for (let i = 0; i < keys.length; i++) {
+      for (let j = 0; j < keys.length; j++) {
+        if (i !== j
+          && values[`port-${keys[i].key}`] === values[`port-${keys[j].key}`]
+          && values[`serviceName-${keys[i].key}`] === values[`serviceName-${keys[j].key}`]) {
+          notification.destroy()
+          notification.warn({
+            message: `服务地址 ${values[`serviceName-${keys[i].key}`]} + 服务端口 ${values[`port-${keys[i].key}`]} 重复`,
+          })
+          b = true
+          break;
+        }
+      }
+      if (b) break
+    }
+    return b
+  }
   handleAdd = () => {
     const { form: { validateFields }, createGatewayApiGroup, updateGatewayApiGroup,
       clusterID, history, isEdit, apiGroupId } = this.props
     validateFields((err, values) => {
       if (err) return
+      const keys = values.keys.filter(item => !item._delete)
+      if (this.checkPortAndName(values, keys)) return
       const targets = []
-      values.keys.forEach(item => {
+      keys.forEach(item => {
         if (!item._delete) {
           const key = item.key
           targets.push({
@@ -157,7 +179,7 @@ class CreateConfig extends React.Component {
     }
     callback()
   }
-  getServices = async () => {
+  getServices = () => {
     const { clusterID, loadAllServices, project } = this.props
     loadAllServices(
       clusterID,
@@ -176,23 +198,12 @@ class CreateConfig extends React.Component {
       }),
     })
   }
-  checkPort = (rule, value, cb, idx) => {
+  checkPort = (rule, value, cb) => {
     if (!value) return cb('请输入服务端口')
     if (value < 1 || value > 65535) return cb('服务端口范围 1~65535')
-    const { form: { getFieldValue } } = this.props
-    const keys = getFieldValue('keys')
-    let b
-    keys.forEach(item => {
-      if (!item._delete && item.key !== idx && getFieldValue('port-' + item.key) === value
-        && getFieldValue('serviceName-' + item.key) === getFieldValue('serviceName-' + idx)) {
-        // serviceName + port 重复
-        b = true
-      }
-    })
-    if (b) return cb('服务地址, 服务端口重复')
     cb()
   }
-  validateService = (rule, value, cb, idx) => {
+  validateService = (rule, value, cb) => {
     const { getFieldValue } = this.props.form
     const isAgent = getFieldValue('proxyType') === 0
     if (isAgent) {
@@ -200,17 +211,6 @@ class CreateConfig extends React.Component {
       return ipOrDomainValidator(rule, value, cb)
     }
     if (!value) return cb('请选择服务')
-
-    const keys = getFieldValue('keys')
-    let b
-    keys.forEach(item => {
-      if (!item._delete && item.key !== idx && getFieldValue('serviceName-' + item.key) === value
-        && getFieldValue('port-' + item.key) === getFieldValue('port-' + idx)) {
-        // serviceName + port 重复
-        b = true
-      }
-    })
-    if (b) return cb('服务地址, 服务端口重复')
     cb()
   }
   renderServices = () => {
@@ -237,7 +237,7 @@ class CreateConfig extends React.Component {
                 >
                   {getFieldDecorator(`serviceName-${key}`, {
                     rules: [{
-                      validator: (rule, value, cb) => this.validateService(rule, value, cb, key),
+                      validator: this.validateService,
                     }],
                     validateTrigger: [ 'onChange', 'onSubmit' ],
                   })(
@@ -248,7 +248,7 @@ class CreateConfig extends React.Component {
                       >
                         {
                           serviceList && serviceList.map(_item => {
-                            const name = getDeepValue(_item, [ 'service', 'metadata', 'name' ])
+                            const name = getDeepValue(_item, [ 'service', 'metadata', 'name' ]) || ''
                             return <Option key={name} value={name}>
                               {name}</Option>
                           })
@@ -264,8 +264,9 @@ class CreateConfig extends React.Component {
                 >
                   {getFieldDecorator(`port-${key}`, {
                     rules: [{
-                      validator: (rule, value, cb) => this.checkPort(rule, value, cb, key),
+                      validator: this.checkPort,
                     }],
+                    validateTrigger: [ 'onChange', 'onSubmit' ],
                   }
                   )(
                     <Input
@@ -367,7 +368,7 @@ class CreateConfig extends React.Component {
             </FormItem>
             <FormItem {...fromLayout} label="访问协议">
               {getFieldDecorator('protocol', {
-                initialValue: initialValues.protocol || '',
+                initialValue: initialValues.protocol || undefined,
                 rules: [
                   { required: true, message: '请选择访问协议' },
                 ],
@@ -424,10 +425,8 @@ const mapStateToProps = (state, ownProps) => {
   const serviceList = getDeepValue(serviceMesh, [ 'serviceList', 'data', 'services' ]) || []
   const { location } = ownProps
   const isEdit = location.pathname.indexOf('/update/') > -1
-  let apiGroupId
-  if (isEdit) {
-    apiGroupId = location.pathname.split('/update/')[1]
-  }
+  const { match } = ownProps
+  const { apiGroupId } = match.params
   return {
     clusterID,
     namespace,
