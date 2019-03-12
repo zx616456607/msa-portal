@@ -103,12 +103,15 @@ class APIGroupList extends React.Component {
   handleDelete = record => {
     const { delGatewayApiGroup, clusterID, history } = this.props
     const loadData = this.loadData
-    TenxModal.confirm({
+    const modal = TenxModal.confirm({
       modalTitle: '删除 API 组',
       title: `确定删除该 API 组 ${record.name} 吗`,
       content: record.apis && record.apis.length ?
-        <div> {record.name} 分组下有 {record.apis.length} 个 API ({record.apis.join(', ')}), 请先删除这些API, 再删除该 API 组<br />
-          <a onClick={() => history.push(`/api-group/detail/${record.id}`)}>去删除 API</a>
+        <div> {record.name} 分组下有 {record.apis.length} 个 API ({record.apis.map(item => item.name).join(', ')}), 请先删除这些API, 再删除该 API 组.
+          &nbsp;<a onClick={() => {
+            modal.destroy()
+            history.push(`/api-group/detail/${record.id}`)
+          }}>去删除 API</a>
         </div>
         :
         '',
@@ -168,11 +171,11 @@ class APIGroupList extends React.Component {
       },
       {
         title: '后端服务源',
-        dataIndex: 'source',
+        dataIndex: 'proxyType',
         width: '10%',
         filters: [{
           text: '代理',
-          value: 2,
+          value: 0,
         }, {
           text: '负载均衡',
           value: 1,
@@ -182,7 +185,7 @@ class APIGroupList extends React.Component {
           switch (text) {
             case 1:
               return '负载均衡'
-            case 2:
+            case 0:
             default:
               return '代理'
           }

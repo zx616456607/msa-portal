@@ -36,7 +36,7 @@ const apiGroupChildRoutes = [
     key: 'list',
   },
   {
-    path: '/api-group/detail/:id',
+    path: '/api-group/detail/:apiGroupId',
     component: GroupDetail,
     exact: true,
     key: 'detail',
@@ -48,7 +48,7 @@ const apiGroupChildRoutes = [
     key: 'list-create',
   },
   {
-    path: '/api-group/update/:id',
+    path: '/api-group/update/:apiGroupId',
     component: GroupListCreate,
     exact: true,
     key: 'list-create',

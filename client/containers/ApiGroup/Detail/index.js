@@ -70,9 +70,9 @@ class APIGroupDetail extends React.Component {
     })
   }
   render() {
-    const { location } = this.props
-    const { apiDetail, apiGroupId, isShowDescModal } = this.state
-    const { protocol, createTime, description, path, serviceName, name } = apiDetail
+    const { location, apiGroupId } = this.props
+    const { apiDetail, isShowDescModal } = this.state
+    const { protocol, createTime, description, path, serviceName, name, proxyType } = apiDetail
     return <QueueAnim className="detail-wrapper">
       <div className="detail-top layout-content-btns" keys="btn">
         <div className="back">
@@ -106,7 +106,7 @@ class APIGroupDetail extends React.Component {
             ApiList (apiGroupId)
           </TabPane>
           <TabPane tab="后端服务" key="service_list">
-            <ServiceList apiGroupId={apiGroupId} location={location} />
+            <ServiceList proxyType={proxyType} apiGroupId={apiGroupId} location={location} />
           </TabPane>
         </Tabs>
       </Card>
@@ -150,8 +150,8 @@ const mapStateToProps = (state, ownProps) => {
   const { cluster } = current.config
   const { location } = ownProps
   location.query = parseQuerystring(location.search)
-  const temp = location.pathname.split('/')
-  const apiGroupId = temp.pop()
+  const { match } = ownProps
+  const { apiGroupId } = match.params
   return {
     clusterID: cluster.id,
     apiGroupId,
