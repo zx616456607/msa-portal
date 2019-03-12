@@ -9,9 +9,13 @@
  */
 
 import * as React from 'react'
-import { Card, Input, Form, Select, Icon, Button, Radio, Checkbox, Row, Col } from 'antd'
+import { Card, Input, Form, Select, Icon, Button, Radio, Checkbox, Row, Col, notification } from 'antd'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import * as Redux from 'redux'
 import ReturnButton from '@tenx-ui/return-button'
+import * as apiGroupAction from '../../../../actions/gateway'
+import * as apiManageAction from '../../../../actions/apiManage'
 import './style/ApiManageEdit.less'
 
 const { TextArea } = Input
@@ -26,11 +30,45 @@ const formItemLayout = {
     sm: { span: 16, pull: 4 },
   },
 };
-interface ApiDetailProps {
+
+interface ComponentProps {
 
 }
+interface StateProps {
+  clusterID: string
+}
+interface DispatchProps {
+  getGatewayApiGroupList(clusterID: string, query: object): any
+  createApi(clusterID: string, body: object): any
+}
+type ApiDetailProps = StateProps & DispatchProps & ComponentProps
 
 class ApiManageEdit extends React.Component<ApiDetailProps> {
+  state = {
+    apiGroupList: [],
+    loading: false,
+    submitLoading: false,
+  }
+  componentDidMount() {
+    this.onLoadApiGroupList()
+  }
+  onLoadApiGroupList = async () => {
+    this.setState({
+      loading: true,
+    })
+    const { clusterID, getGatewayApiGroupList } = this.props
+    // @TODO 需要传递分页信息，但参数还未支持
+    const result = await getGatewayApiGroupList(clusterID, {})
+    if (result.response && result.response.result.code === 200) {
+      this.setState({
+        apiGroupList: result.response.result.data.content,
+      })
+    }
+    this.setState({
+      loading: false,
+    })
+
+  }
   onApiGroupChange = () => {
 
   }
@@ -46,13 +84,27 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   onReturn = () => this.props.history.push('/api-gateway')
   onSubmit = () => {
     const { validateFields } = this.props.form
-    validateFields((err, values) => {
-      if (!err) {}
+    const { createApi, clusterID } = this.props
+    validateFields(async (err, values) => {
+      if (!err) {
+        this.setState({ submitLoading: true })
+        values.methods = values.methods.join(',')
+        values.protocols = values.protocols.join(',')
+        const res = await createApi(clusterID, { ...values })
+        this.setState({ submitLoading: false })
+        if (res.response && res.response.result.code === 200) {
+          notification.success({ message: '创建API成功', description: '' })
+          this.onReturn()
+        } else {
+          notification.warn({ message: '创建API失败', description: res.error })
+        }
+      }
     })
   }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const nameValidator = getFieldDecorator('apiName', {
+    const { apiGroupList, loading, submitLoading } = this.state
+    const nameValidator = getFieldDecorator('name', {
       rules: [{
         required: true,
         validator: (rule, val, cb) => {
@@ -74,21 +126,21 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
         },
       }],
     })
-    const apiGroupValidator = getFieldDecorator('apiGroup', {
+    const apiGroupValidator = getFieldDecorator('apiGroupId', {
       onChange: this.onApiGroupChange,
       rules: [{
           required: true,
           message: '请选择 API 组',
         }],
     })
-    const visitValidator = getFieldDecorator('visitControl', {
+    const visitValidator = getFieldDecorator('authType', {
       initialValue: 'Basic-Auth',
       rules: [{
         required: true,
         message: '请选择访问控制方式',
       }],
     })
-    const protocalValidator = getFieldDecorator('protocal', {
+    const protocalValidator = getFieldDecorator('protocols', {
       initialValue: ['HTTP'],
       rules: [{
         required: true,
@@ -102,7 +154,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
         message: '请选择请求方法',
       }],
     })
-    const pathValidator = getFieldDecorator('apiPath', {
+    const pathValidator = getFieldDecorator('path', {
       rules: [{
         required: true,
         validator: (rule, val, cb) => {
@@ -128,14 +180,14 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
               <Col span={8} pull={4}/>
               <Col span={16} pull={4}>
                 <Button key="cancel" onClick={this.onReturn}>取消</Button>,
-                <Button key="ok" type="primary" onClick={this.onSubmit}>确定</Button>,
+                <Button key="ok" type="primary" onClick={this.onSubmit} loading={submitLoading}>确定</Button>,
               </Col>
             </Row>,
           ]}
         >
           <div className="form-content">
             <Form.Item
-              label="API 组名称"
+              label="API 名称"
               {...formItemLayout}
             >
               {
@@ -165,15 +217,18 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
                       onBlur={this.onApiGroupBlur}
                       filterOption={this.onFilterApiGroup}
                     >
-                      <Option key="jack" value="jack">Jack</Option>
-                      <Option key="lucy" value="lucy">Lucy</Option>
-                      <Option key="tom" value="tom">Tom</Option>
+                      {
+                        apiGroupList.length === 0 ?
+                          <Option key="nodata" value="">暂无分组</Option>
+                          :
+                          apiGroupList.map((v: object) => <Option key={v.id} value={v.id}>{v.name}</Option>)
+                      }
                     </Select>,
                   )
                 }
                 <div className="api-group-operation">
-                  <Button icon="sync"/>
-                  <Link to="/">新建 API 组 >></Link>
+                  <Button icon="sync" onClick={this.onLoadApiGroupList} loading={loading}/>
+                  <Link to="/api-group">新建 API 组 >></Link>
                 </div>
               </div>
             </Form.Item>
@@ -187,7 +242,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
                     <Radio key="Basic-Auth" value={'Basic-Auth'}>Basic Auth</Radio>
                     <Radio key="JWT" value={'JWT'}>JWT</Radio>
                     <Radio key="OAuth2" value={'OAuth2'}>OAuth2</Radio>
-                    <Radio key="0" value={'0'}>无认证</Radio>
+                    <Radio key="none" value={'0'}>无认证</Radio>
                   </RadioGroup>,
                 )
               }
@@ -213,7 +268,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
             >
               {
                 methodsValidator(
-                  <Select mode="multiple">
+                  <Select mode="multiple" placeholder="请选择请求方法">
                     <Option key="GET" value="GET">GET</Option>
                     <Option key="POST" value="POST">POST</Option>
                     <Option key="PUT" value="PUT">PUT</Option>
@@ -242,4 +297,15 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   }
 }
 
-export default Form.create()(ApiManageEdit)
+const mapStateToProps = (state: object): StateProps => {
+  const { current: { config: { cluster: { clusterID } } } } = state
+  return {
+    clusterID,
+  }
+}
+const mapDispatchToProps = {
+  getGatewayApiGroupList: apiGroupAction.getGatewayApiGroupList,
+  createApi: apiManageAction.createApi,
+}
+export default connect<StateProps, DispatchProps, ComponentProps>
+(mapStateToProps, mapDispatchToProps)(Form.create()(ApiManageEdit))

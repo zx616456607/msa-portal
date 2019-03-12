@@ -27,7 +27,6 @@ let reqbodyId = 1000
 interface DebugProps {
 
 }
-
 class Debug extends React.Component<DebugProps> {
   onReqParamAdd = () => {
     const { getFieldValue } = this.props.form
