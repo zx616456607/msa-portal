@@ -70,17 +70,49 @@ export const deleteApi = (clusterId:string, id:string) => dispatch => dispatch(d
 export const PUBLISH_API_REQUEST = 'PUBLISH_API_REQUEST'
 export const PUBLISH_API_SUCCESS = 'PUBLISH_API_SUCCESS'
 export const PUBLISH_API_FAILURE = 'PUBLISH_API_FAILURE'
-const publishApiRequest = (clusterId:string, id:string, env:string) => {
+const publishApiRequest = (clusterId:string, id:string, env:string, body:object) => {
   return {
     [CALL_API]: {
       types: [PUBLISH_API_REQUEST, PUBLISH_API_SUCCESS, PUBLISH_API_FAILURE],
       endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}/publish/${env}`,
       options: {
         method: 'PUT',
+        body,
       },
       schema: {}
     }
   }
 }
-export const publishApi = (clusterId:string, id:string, env:string) => dispatch => dispatch(publishApiRequest(clusterId,id,env))
+export const publishApi = (clusterId:string, id:string, env:string, body:object) => dispatch => dispatch(publishApiRequest(clusterId,id,env, body))
 
+export const GET_API_DETAIL_REQUEST = 'GET_API_DETAIL_REQUEST'
+export const GET_API_DETAIL_SUCCESS = 'GET_API_DETAIL_SUCCESS'
+export const GET_API_DETAIL_FAILURE = 'GET_API_DETAIL_FAILURE'
+const fetchApiDetail = (clusterId:string, id:string) => {
+  return {
+    [CALL_API]: {
+      types: [GET_API_DETAIL_REQUEST, GET_API_DETAIL_SUCCESS, GET_API_DETAIL_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}`,
+      schema: {}
+    }
+  }
+}
+export const getApiDetail = (clusterId:string, id:string) => dispatch => dispatch(fetchApiDetail(clusterId,id))
+
+export const UPDATE_API_REQUEST = 'UPDATE_API_REQUEST'
+export const UPDATE_API_SUCCESS = 'UPDATE_API_SUCCESS'
+export const UPDATE_API_FAILURE = 'UPDATE_API_FAILURE'
+const updateApiRequest = (clusterId:string, id:string, body:string) => {
+  return {
+    [CALL_API]: {
+      types: [UPDATE_API_REQUEST, UPDATE_API_SUCCESS, UPDATE_API_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}`,
+      options: {
+        method: 'PUT',
+        body,
+      },
+      schema: {}
+    }
+  }
+}
+export const updateApi = (clusterId:string, id:string, body:string) => dispatch => dispatch(updateApiRequest(clusterId,id,body))

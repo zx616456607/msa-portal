@@ -38,11 +38,14 @@ interface ComponentProps {
 }
 interface StateProps {
   clusterID: string
+  list: [object],
+  isFetching: boolean,
+  total: number,
 }
 interface DispatchProps {
   getApiList(clusterID: string, query: object): any
   deleteApi(clusterID: string, id: string): any
-  publishApi(clusterID: string, id: string, env: string): any
+  publishApi(clusterID: string, id: string, env: string, body: object): any
 }
 
 type ApiManageProps = ComponentProps & StateProps & DispatchProps
@@ -56,6 +59,7 @@ class ApiManage extends React.Component<ApiManageProps> {
     deleteModal: false,
     offlineModal: false,
     currentApi: { name: '' },
+    loading: false,
   }
   componentDidMount() {
     this.onLoadList()
@@ -144,14 +148,16 @@ class ApiManage extends React.Component<ApiManageProps> {
     }
   }
   onDropdownBtnClick = () => {
+
   }
   onPublishOk = () => {
     const { clusterID, publishApi, form } = this.props
     form.validateFields(async err => {
       if (err) { return }
-      const { publishEnv, publishRemark } = form.getFieldsValue()
+      this.setState({ loading: true })
+      const { publishEnv, memo } = form.getFieldsValue()
       const { id } = this.state.currentApi
-      const res = await publishApi(clusterID, id, publishEnv)
+      const res = await publishApi(clusterID, id, publishEnv, { memo })
       if (res.error) {
         notification.warn({
           message: '发布API失败',
@@ -163,6 +169,7 @@ class ApiManage extends React.Component<ApiManageProps> {
           description: '',
         })
       }
+      this.setState({ loading: false })
     })
     this.setState({
       releaseModal: false,
@@ -173,9 +180,26 @@ class ApiManage extends React.Component<ApiManageProps> {
       offlineModal: false,
     })
   }
-  onDeleteOk = () => {
+  onDeleteOk = async () => {
+    const { currentApi } = this.state
+    const { clusterID, deleteApi } = this.props
+    this.setState({ loading: true })
+    const res = await deleteApi(clusterID, currentApi.id)
+    if (!res.error) {
+      notification.success({
+        message: '删除成功',
+        description: '',
+      })
+      this.onLoadList()
+    } else {
+      notification.warn({
+        message: '删除失败',
+        description: '',
+      })
+    }
     this.setState({
       deleteModal: false,
+      loading: false,
     })
   }
   onCancel = () => {
@@ -187,14 +211,14 @@ class ApiManage extends React.Component<ApiManageProps> {
     })
   }
   render() {
-    const { publishModal, deleteModal, offlineModal, currentApi } = this.state
+    const { publishModal, deleteModal, offlineModal, currentApi, loading } = this.state
     const { list, isFetching, total } = this.props
     const { getFieldDecorator } = this.props.form
     const operationMenu = item => (
       <Menu onClick={target => this.onMenuClick(item, target)}>
         <Menu.Item key="stop">停止</Menu.Item>
         <Menu.Item key="edit">
-          <Link to="/api-gateway/api-manage-edit">编辑</Link>
+          <Link to={`/api-gateway/api-manage-edit/${item.id}`}>编辑</Link>
         </Menu.Item>
         <Menu.Item key="debug">API调试</Menu.Item>
         <Menu.Item key="publish">发布API</Menu.Item>
@@ -207,7 +231,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         title: 'API 名称',
         dataIndex: 'name',
         key: 'name',
-        render: text => <Link to="/api-gateway/api-detail">{text}</Link>,
+        render: (text, record) => <Link to={`/api-gateway/api-detail/${record.id}`}>{text}</Link>,
       },
       {
         title: '所属API组',
@@ -254,7 +278,7 @@ class ApiManage extends React.Component<ApiManageProps> {
           overlay={operationMenu(record)}
           onClick={() => this.onDropdownBtnClick(record)}
         >
-          管理
+          <Link to={`/api-gateway/api-detail/${record.id}`}>管理</Link>
         </Dropdown.Button>,
       },
     ]
@@ -296,6 +320,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         visible={publishModal}
         onOk={this.onPublishOk}
         onCancel={this.onCancel}
+        confirmLoading={loading}
       >
         <Form className="api-manage-release">
           <FormItem key="name" label="API" {...formItemLayout}>{currentApi.name}</FormItem>
@@ -306,14 +331,14 @@ class ApiManage extends React.Component<ApiManageProps> {
               })(
                 <RadioGroup>
                   <Radio value="test">测试环境</Radio>
-                  <Radio value="market">API市场</Radio>
+                  <Radio value="public">API市场</Radio>
                 </RadioGroup>,
               )
             }
           </FormItem>
           <FormItem key="remark" label="填写发布备注" {...formItemLayout}>
             {
-              getFieldDecorator('publishRemark', {
+              getFieldDecorator('memo', {
                 initialValue: '',
                 rules: [{
                   required: true,
@@ -365,6 +390,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         visible={deleteModal}
         onOk={this.onDeleteOk}
         onCancel={this.onCancel}
+        confirmLoading={loading}
       >
         <Form className="api-manage-delete">
           <div className="warning-tips">

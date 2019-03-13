@@ -8,7 +8,6 @@ function apiList(state:object, action) {
         isFetching:true,
       }
     case ActionTypes.GET_API_LIST_SUCCESS:
-      console.log(action);
       return {
         ...state,
         isFetching:false,
@@ -21,6 +20,8 @@ function apiList(state:object, action) {
         isFetching:false,
         list: [],
       }
+    default:
+      return state
   }
 }
 
@@ -30,11 +31,8 @@ const apiManage = (state = {
     isFetching: false,
     total: 0
   },
-}, action) => {
-  return {
+}, action) => ({
     apiList: apiList(state.apiList, action),
-  }
-}
-
+})
 export default apiManage
 

@@ -9,37 +9,91 @@
  */
 
 import * as React from 'react'
-import { Card, Tabs, Button, Icon, Input, Row, Col } from 'antd'
+import { Card, Tabs, Button, Icon, Input, Row, Col, notification } from 'antd'
 import ReturnButton from '@tenx-ui/return-button'
 import ReleaseHistory from './ReleaseHistory'
 import Debug from './Debug'
+import * as apiManageAction from '../../../../actions/apiManage'
 import './style/apiDetail.less'
+import { connect } from 'react-redux';
+import apiIcon from '../../../../assets/img/apiGateway/apiIcon.png'
+import * as apiGroupAction from '../../../../actions/gateway';
+import { formatDate } from '../../../../common/utils'
 const { TextArea } = Input
 const TabPane = Tabs.TabPane
-interface ApiDetailProps {
-
+interface ComponentProps {
 }
+interface StateProps {
+  clusterID: string
+}
+interface DispatchProps {
+  getApiDetail(clusterID: string, id: string): any
+  updateApi(clusterID: string, id: string, body: object): any
+}
+type ApiDetailProps = StateProps & DispatchProps & ComponentProps
+
 class ApiDetail extends React.Component<ApiDetailProps> {
   state = {
     edit: false,
     description: false,
+    apiData: {
+      apiGroup: { name: '' },
+    },
+    desText: '',
+  }
+  componentDidMount() {
+    this.onLoadApiData()
+  }
+  onLoadApiData = async () => {
+    const { clusterID, getApiDetail } = this.props
+    const { id } = this.props.match.params
+    const res = await getApiDetail(clusterID, id)
+    if (!res.error) {
+      this.setState({
+        apiData: res.response.result.data,
+      }, () => {
+        if (this.state.apiData.description) {
+          this.setState({
+            description: true,
+            desText: this.state.apiData.description,
+          })
+        }
+      })
+    }
   }
   onEdit = () => this.setState({
     edit: !this.state.edit,
-    description: !this.state.description,
+    description: true,
   })
+  onEditCancel = () => this.setState({
+    edit: !this.state.edit,
+    description: this.state.apiData.description ? true : false,
+    desText: this.state.apiData.description,
+  })
+  onDescriptionChange = e => {
+    this.setState({
+      desText: e.target.value,
+    })
+  }
   onReturn = () => this.props.history.push('/api-gateway')
-  onEditSubmit = () => {
+  onEditSubmit = async () => {
+    const { clusterID, updateApi } = this.props
+    const { id } = this.props.match.params
+    const { apiData } = this.state
+    const res = await updateApi(clusterID, id, { apiData })
+    if (!res.error) {
+      this.onLoadApiData()
+      notification.success({
+        message: '更新描述成功',
+        description: '',
+      })
+    }
     this.setState({
       edit: !this.state.edit,
     })
   }
   render() {
-    const { edit, description } = this.state
-    const apiData = {
-      name: 'API NAME',
-      version: '201906032451',
-    }
+    const { edit, description, apiData, desText } = this.state
     return <div className="api-detail">
       <div className="top">
         <ReturnButton onClick={this.onReturn}>返回</ReturnButton>
@@ -51,20 +105,20 @@ class ApiDetail extends React.Component<ApiDetailProps> {
       >
         <Row>
           <Col span={2}>
-            <a className="img"/>
+            <img src={apiIcon} className="img"/>
           </Col>
           <Col span={22}>
-            <h2>{'API NAME'}</h2>
+            <h2>{apiData.name}</h2>
             <Row>
               <Col span={8}>
-                <p>所属API组：{'fdasfsffe'}</p>
-                <p>协议：{'HTTP'}</p>
-                <p>请求方法：{'GET'}</p>
+                <p>所属API组：{apiData.apiGroup.name}</p>
+                <p>协议：{apiData.protocols}</p>
+                <p>请求方法：{apiData.methods}</p>
               </Col>
               <Col span={8}>
-                <p>访问路径：{'/api'}</p>
-                <p>访问控制：{'JWT'}</p>
-                <p>创建：{'2019-11-20'}</p>
+                <p>访问路径：{apiData.path}</p>
+                <p>访问控制：{apiData.authType}</p>
+                <p>创建：{formatDate(apiData.createTime)}</p>
               </Col>
               <Col span={8}>
                 <div className="description">
@@ -77,15 +131,15 @@ class ApiDetail extends React.Component<ApiDetailProps> {
                         </>
                         :
                         <>
-                          <Button onClick={this.onEdit}>取消</Button>
+                          <Button onClick={this.onEditCancel}>取消</Button>
                           <Button type="primary" onClick={this.onEditSubmit}>确定</Button>
                         </>
                       }
                     </>
                   </div>
                 </div>
-                {
-                  description && <TextArea disabled={!edit}/>}
+                {description &&
+                <TextArea disabled={!edit} defaultValue={apiData.description} onChange={this.onDescriptionChange}/>}
               </Col>
             </Row>
           </Col>
@@ -109,4 +163,15 @@ class ApiDetail extends React.Component<ApiDetailProps> {
   }
 }
 
-export default ApiDetail
+const mapStateToProps = (state: object): StateProps => {
+  const { current: { config: { cluster: { clusterID } } } } = state
+  return {
+    clusterID,
+  }
+}
+const mapDispatchToProps = {
+  getApiDetail: apiManageAction.getApiDetail,
+  updateApi: apiManageAction.updateApi,
+}
+export default connect<StateProps, DispatchProps, ComponentProps>
+(mapStateToProps, mapDispatchToProps)(ApiDetail)
