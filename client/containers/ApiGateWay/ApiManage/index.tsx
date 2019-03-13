@@ -10,7 +10,7 @@
 
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Input, Table, Pagination, Menu, Form, Dropdown, Modal, notification, Radio } from 'antd'
+import { Button, Input, Table, Pagination, Menu, Form, Dropdown, Modal, notification, Icon, Radio } from 'antd'
 import { connect } from 'react-redux'
 import * as apiManageAction from '../../../actions/apiManage'
 import QueueAnim from 'rc-queue-anim'
@@ -34,7 +34,7 @@ const formItemLayout = {
 };
 
 interface ComponentProps {
-
+  apiGroupId?: number
 }
 interface StateProps {
   clusterID: string
@@ -42,26 +42,28 @@ interface StateProps {
 interface DispatchProps {
   getApiList(clusterID: string, query: object): any
   deleteApi(clusterID: string, id: string): any
+  publishApi(clusterID: string, id: string, env: string): any
 }
 
 type ApiManageProps = ComponentProps & StateProps & DispatchProps
 class ApiManage extends React.Component<ApiManageProps> {
-
   state = {
     name: '',
     page: 0,
     size: 10,
     sort: 'd,createTime',
-    releaseModal: false,
+    publishModal: false,
+    deleteModal: false,
+    offlineModal: false,
     currentApi: { name: '' },
   }
   componentDidMount() {
     this.onLoadList()
   }
   onLoadList = async () => {
-    const { getApiList, clusterID } = this.props
+    const { getApiList, clusterID, apiGroupId } = this.props
     const { name, page, size, sort } = this.state
-    const query = { name, page, size, sort }
+    const query = { name, page, size, sort, apiGroupId }
     const res = await getApiList(clusterID, query)
     if (res.error) {
       notification.warn({
@@ -82,9 +84,45 @@ class ApiManage extends React.Component<ApiManageProps> {
     switch (target.key) {
       case 'stop':
         return
-      case 'release':
+      case 'publish':
         this.setState({
-          releaseModal: true,
+          publishModal: true,
+        })
+        return
+      case 'delete':
+        if (item.publishInfo) {
+          Modal.info({
+            title: `API: ${item.name}`,
+            icon: <Icon type="exclamation-circle" theme="filled" />,
+            content: (
+              <div>
+                该 API 已经发布至 【测试环境 & API 市场】，请先从发布的环境中下线该API，方可删除该API
+              </div>
+            ),
+            onOk() {},
+          });
+          return
+        }
+        this.setState({
+          deleteModal: true,
+        })
+        return
+      case 'offline':
+        if (!item.publishInfo) {
+          Modal.info({
+            title: `API: ${item.name}`,
+            icon: <Icon type="exclamation-circle" theme="filled" />,
+            content: (
+              <div>
+                此Api还没有发布，暂不支持下线
+              </div>
+            ),
+            onOk() {},
+          });
+          return
+        }
+        this.setState({
+          offlineModal: true,
         })
         return
       default:
@@ -107,13 +145,49 @@ class ApiManage extends React.Component<ApiManageProps> {
   }
   onDropdownBtnClick = () => {
   }
-  onReleaseOk = () => {
+  onPublishOk = () => {
+    const { clusterID, publishApi, form } = this.props
+    form.validateFields(async err => {
+      if (err) { return }
+      const { publishEnv, publishRemark } = form.getFieldsValue()
+      const { id } = this.state.currentApi
+      const res = await publishApi(clusterID, id, publishEnv)
+      if (res.error) {
+        notification.warn({
+          message: '发布API失败',
+          description: res.error,
+        })
+      } else {
+        notification.success({
+          message: '发布API成功',
+          description: '',
+        })
+      }
+    })
     this.setState({
       releaseModal: false,
     })
   }
+  onOfflineOk = () => {
+    this.setState({
+      offlineModal: false,
+    })
+  }
+  onDeleteOk = () => {
+    this.setState({
+      deleteModal: false,
+    })
+  }
+  onCancel = () => {
+    this.props.form.resetFields()
+    this.setState({
+      offlineModal: false,
+      publishModal: false,
+      deleteModal: false,
+    })
+  }
   render() {
-    const { releaseModal, currentApi } = this.state
+    const { publishModal, deleteModal, offlineModal, currentApi } = this.state
     const { list, isFetching, total } = this.props
     const { getFieldDecorator } = this.props.form
     const operationMenu = item => (
@@ -123,12 +197,11 @@ class ApiManage extends React.Component<ApiManageProps> {
           <Link to="/api-gateway/api-manage-edit">编辑</Link>
         </Menu.Item>
         <Menu.Item key="debug">API调试</Menu.Item>
-        <Menu.Item key="release">发布API</Menu.Item>
+        <Menu.Item key="publish">发布API</Menu.Item>
         <Menu.Item key="offline">下线</Menu.Item>
         <Menu.Item key="delete">删除</Menu.Item>
       </Menu>
     );
-
     const columns = [
       {
         title: 'API 名称',
@@ -157,6 +230,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         title: '发布环境',
         dataIndex: 'publishedInfo',
         key: 'publishedInfo',
+        render: () => <>-</>,
       },
       {
         title: '创建时间',
@@ -219,9 +293,9 @@ class ApiManage extends React.Component<ApiManageProps> {
       />
       <Modal
         title="发布 API"
-        visible={releaseModal}
-        onOk={this.onReleaseOk}
-        onCancel={() => this.setState({ releaseModal: false })}
+        visible={publishModal}
+        onOk={this.onPublishOk}
+        onCancel={this.onCancel}
       >
         <Form className="api-manage-release">
           <FormItem key="name" label="API" {...formItemLayout}>{currentApi.name}</FormItem>
@@ -260,6 +334,48 @@ class ApiManage extends React.Component<ApiManageProps> {
           </div>
         </Form>
       </Modal>
+      <Modal
+        title="下线 API"
+        visible={offlineModal}
+        onOk={this.onOfflineOk}
+        onCancel={this.onCancel}
+      >
+        <Form className="api-manage-publish">
+          <FormItem key="name" label="API" {...formItemLayout}>{currentApi.name}</FormItem>
+          <FormItem key="env" label="选择要下线的环境" {...formItemLayout}>
+            {
+              getFieldDecorator('offlineEnv', {
+                initialValue: 'test',
+              })(
+                <RadioGroup>
+                  <Radio value="test">测试环境</Radio>
+                  <Radio value="market">API市场</Radio>
+                </RadioGroup>,
+              )
+            }
+          </FormItem>
+          <div className="warning-tips">
+            <WarningIcon/>
+            在此环境下线后将导致此API在指定的环境无法被访问，可能会影响相当一部分应用和用户。请确保已经告知用户，或者确认需要强制下线
+          </div>
+        </Form>
+      </Modal>
+      <Modal
+        title="删除 API"
+        visible={deleteModal}
+        onOk={this.onDeleteOk}
+        onCancel={this.onCancel}
+      >
+        <Form className="api-manage-delete">
+          <div className="warning-tips">
+            <><Icon type="warning" theme="filled" /></>
+            <>
+              删除API会导致调用该API的用户无法继续使用，请谨慎操作。<br/>
+              确定要删除API“evaapi”吗？
+            </>
+          </div>
+        </Form>
+      </Modal>
     </QueueAnim>
   }
 }
@@ -288,6 +404,7 @@ const mapStateToProps = (state: object) => {
 const mapDispatchToProps = {
   getApiList: apiManageAction.getApiList,
   deleteApi: apiManageAction.deleteApi,
+  publishApi: apiManageAction.publishApi,
 }
 
 export default connect<StateProps, DispatchProps, ComponentProps>
