@@ -34,13 +34,30 @@
     background: #fff;
   }
 }
-.api-manage-release {
+.api-manage-release, .api-manage-publish {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
   .warning-tips {
     color: @warning-color;
     margin: @padding-medium 0 0 20px;
     i {
       font-size: 16px;
       margin-right: 4px;
+    }
+  }
+}
+.api-manage-delete {
+  .warning-tips {
+    padding: @padding-small @padding-base;
+    border: 1px dashed @warning-color;
+    border-radius: @border-radius-base;
+    background: #fefbf4;
+    display: flex;
+    i {
+      font-size: 16px;
+      margin-right: @padding-base;
+      color: @warning-color;
     }
   }
 }

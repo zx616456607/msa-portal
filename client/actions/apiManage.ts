@@ -36,10 +36,14 @@ export const GET_API_LIST_REQUEST = 'GET_API_LIST_REQUEST'
 export const GET_API_LIST_SUCCESS = 'GET_API_LIST_SUCCESS'
 export const GET_API_LIST_FAILURE = 'GET_API_LIST_FAILURE'
 const fetchApiList = (clusterId:string, query:object) => {
+  let endpoint = `${MSA_API_URL}/clusters/${clusterId}/gateway/api?${toQuerystring(query)}`
+  if (query.apiGroupId) {
+    endpoint = `${MSA_API_URL}/clusters/${clusterId}/gateway/apigroup/${query.apiGroupId}/apis`
+  }
   return {
     [CALL_API]: {
       types: [GET_API_LIST_REQUEST, GET_API_LIST_SUCCESS, GET_API_LIST_FAILURE],
-      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api?${toQuerystring(query)}`,
+      endpoint,
       schema: {}
     }
   }
@@ -62,4 +66,21 @@ const deleteApiRequest = (clusterId:string, id:string) => {
   }
 }
 export const deleteApi = (clusterId:string, id:string) => dispatch => dispatch(deleteApiRequest(clusterId,id))
+
+export const PUBLISH_API_REQUEST = 'PUBLISH_API_REQUEST'
+export const PUBLISH_API_SUCCESS = 'PUBLISH_API_SUCCESS'
+export const PUBLISH_API_FAILURE = 'PUBLISH_API_FAILURE'
+const publishApiRequest = (clusterId:string, id:string, env:string) => {
+  return {
+    [CALL_API]: {
+      types: [PUBLISH_API_REQUEST, PUBLISH_API_SUCCESS, PUBLISH_API_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}/publish/${env}`,
+      options: {
+        method: 'PUT',
+      },
+      schema: {}
+    }
+  }
+}
+export const publishApi = (clusterId:string, id:string, env:string) => dispatch => dispatch(publishApiRequest(clusterId,id,env))
 
