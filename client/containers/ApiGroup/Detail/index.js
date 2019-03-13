@@ -104,7 +104,7 @@ class APIGroupDetail extends React.Component {
       <Card className="api-detail-list">
         <Tabs defaultActiveKey="service_list">
           <TabPane tab="API 列表" key="api_list">
-            <ApiList apiGroupId={apiGroupId} />
+            <ApiList apiGroupId={Number(apiGroupId)} />
           </TabPane>
           <TabPane tab="后端服务" key="service_list">
             <ServiceList proxyType={proxyType} apiGroupId={apiGroupId} location={location} />
