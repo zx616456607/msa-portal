@@ -73,7 +73,8 @@ class APIGroupDetail extends React.Component {
   render() {
     const { location, apiGroupId } = this.props
     const { apiDetail, isShowDescModal } = this.state
-    const { protocol, createTime, description, path, serviceName, name, proxyType } = apiDetail
+    const { protocol, createTime, description, path,
+      name, proxyType, apis } = apiDetail
     return <QueueAnim className="detail-wrapper">
       <div className="detail-top layout-content-btns" keys="btn">
         <div className="back">
@@ -96,15 +97,15 @@ class APIGroupDetail extends React.Component {
             </Row>
             <Row className="detail-row">
               <Col span={8}>URL 前缀：{path || '-'}</Col>
-              <Col span={8}>后端服务源：{serviceName || '-'}</Col>
+              <Col span={8}>后端服务源：{proxyType === 0 ? '代理' : '负载均衡'}</Col>
             </Row>
           </div>
         </div>
       </Card>
       <Card className="api-detail-list">
-        <Tabs defaultActiveKey="service_list">
+        <Tabs defaultActiveKey="api_list">
           <TabPane tab="API 列表" key="api_list">
-            <ApiList apiGroupId={Number(apiGroupId)} />
+            <ApiList apiGroupId={Number(apiGroupId)} apis={apis} />
           </TabPane>
           <TabPane tab="后端服务" key="service_list">
             <ServiceList proxyType={proxyType} apiGroupId={apiGroupId} location={location} />
