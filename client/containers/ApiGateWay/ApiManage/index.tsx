@@ -169,7 +169,11 @@ class ApiManage extends React.Component<ApiManageProps> {
           description: '',
         })
       }
-      this.setState({ loading: false })
+      this.onLoadList()
+      this.setState({
+        loading: false,
+        publishModal: false,
+      })
     })
     this.setState({
       releaseModal: false,
@@ -254,7 +258,21 @@ class ApiManage extends React.Component<ApiManageProps> {
         title: '发布环境',
         dataIndex: 'publishedInfo',
         key: 'publishedInfo',
-        render: () => <>-</>,
+        render: (text, record) => {
+          if (record.publishedInfo) {
+            const publishedInfo = JSON.parse(record.publishedInfo)
+            let envName = ''
+            switch (publishedInfo[0].envName) {
+              case 'public':
+                envName = 'API 市场'
+                break
+              default:
+                envName = '-'
+            }
+            return <>{envName}</>
+          }
+          return <>-</>
+        },
       },
       {
         title: '创建时间',
