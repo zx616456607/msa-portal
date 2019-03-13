@@ -31,7 +31,7 @@ import meshGateway from './meshGateway'
 import meshRouteManagement from './meshRouteManagement'
 import overView from './indexPage'
 import dubbo from './dubbo'
-import apiManage from './apiManage'
+import apiManage from './apiManage.ts'
 
 // Updates an entity cache in response to any action with response.entities.
 const entities = (state = {

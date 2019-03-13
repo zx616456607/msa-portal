@@ -26,13 +26,19 @@ const apiGateWayChildRoutes = [
     path: '/api-gateway/api-manage-edit',
     component: ApiManageEdit,
     exact: true,
+    key: 'api-gateway-new',
+  },
+  {
+    path: '/api-gateway/api-manage-edit/:id',
+    component: ApiManageEdit,
+    exact: true,
     key: 'api-gateway-edit',
   },
   {
-    path: '/api-gateway/api-detail',
+    path: '/api-gateway/api-detail/:id',
     component: ApiDetail,
     exact: true,
-    key: 'api-gateway-edit',
+    key: 'api-gateway-detail',
   },
 ]
 

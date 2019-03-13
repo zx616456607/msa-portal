@@ -32,7 +32,6 @@ const formItemLayout = {
 };
 
 interface ComponentProps {
-
 }
 interface StateProps {
   clusterID: string
@@ -40,6 +39,8 @@ interface StateProps {
 interface DispatchProps {
   getGatewayApiGroupList(clusterID: string, query: object): any
   createApi(clusterID: string, body: object): any
+  getApiDetail(clusterID: string, id: string): any
+  updateApi(clusterID: string, id: string, body: object): any
 }
 type ApiDetailProps = StateProps & DispatchProps & ComponentProps
 
@@ -48,9 +49,21 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
     apiGroupList: [],
     loading: false,
     submitLoading: false,
+    detailData: '',
   }
   componentDidMount() {
     this.onLoadApiGroupList()
+    this.onLoadApiDetail()
+  }
+  onLoadApiDetail = async () => {
+    const { id } = this.props.match.params
+    const { getApiDetail, clusterID } = this.props
+    const res = await getApiDetail(clusterID, id)
+    if (!res.error) {
+      this.setState({
+        detailData: res.response.result.data,
+      })
+    }
   }
   onLoadApiGroupList = async () => {
     this.setState({
@@ -84,12 +97,27 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   onReturn = () => this.props.history.push('/api-gateway')
   onSubmit = () => {
     const { validateFields } = this.props.form
-    const { createApi, clusterID } = this.props
+    const { createApi, updateApi, clusterID } = this.props
+    const { id } = this.props.match.params
     validateFields(async (err, values) => {
       if (!err) {
         this.setState({ submitLoading: true })
         values.methods = values.methods.join(',')
         values.protocols = values.protocols.join(',')
+        if (id) {
+          const { detailData } = this.state
+          for (const k of Object.keys(values)) {
+            detailData[k] = values[k]
+          }
+          const result = await updateApi(clusterID, id, { ...detailData })
+          this.setState({ submitLoading: false })
+          if (result.response && result.response.result.code === 200) {
+            notification.success({ message: '编辑API成功', description: '' })
+          } else {
+            notification.warn({ message: '编辑API失败', description: result.error })
+          }
+          return
+        }
         const res = await createApi(clusterID, { ...values })
         this.setState({ submitLoading: false })
         if (res.response && res.response.result.code === 200) {
@@ -103,8 +131,10 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   }
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { apiGroupList, loading, submitLoading } = this.state
+    const { id } = this.props.match.params
+    const { apiGroupList, loading, submitLoading, detailData } = this.state
     const nameValidator = getFieldDecorator('name', {
+      initialValue: detailData && detailData.name,
       rules: [{
         required: true,
         validator: (rule, val, cb) => {
@@ -116,6 +146,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
       }],
     })
     const desValidator = getFieldDecorator('description', {
+      initialValue: detailData && detailData.description,
       rules: [{
         validator: (rule, val, cb) => {
           if (!val) { return cb() }
@@ -127,6 +158,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
       }],
     })
     const apiGroupValidator = getFieldDecorator('apiGroupId', {
+      initialValue: detailData && detailData.apiGroup.id,
       onChange: this.onApiGroupChange,
       rules: [{
           required: true,
@@ -134,27 +166,28 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
         }],
     })
     const visitValidator = getFieldDecorator('authType', {
-      initialValue: 'Basic-Auth',
+      initialValue: detailData ? detailData.authType : 'Basic-Auth',
       rules: [{
         required: true,
         message: '请选择访问控制方式',
       }],
     })
     const protocalValidator = getFieldDecorator('protocols', {
-      initialValue: ['HTTP'],
+      initialValue: detailData ? detailData.protocols.split(',') : ['http'],
       rules: [{
         required: true,
         message: '请选择协议',
       }],
     })
     const methodsValidator = getFieldDecorator('methods', {
-      initialValue: [],
+      initialValue: detailData ? detailData.methods.split(',') : [],
       rules: [{
         required: true,
         message: '请选择请求方法',
       }],
     })
     const pathValidator = getFieldDecorator('path', {
+      initialValue: detailData ? detailData.path : '',
       rules: [{
         required: true,
         validator: (rule, val, cb) => {
@@ -170,7 +203,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
     return <div className="api-manage-detail">
       <div className="top">
         <ReturnButton onClick={this.onReturn}>返回</ReturnButton>
-        <span>创建 API</span>
+        <span>{id ? '编辑' : '创建'} API</span>
       </div>
       <Form>
         <Card
@@ -255,8 +288,8 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
                 protocalValidator(
                   <CheckboxGroup
                     options={[
-                      { label: 'HTTP', value: 'HTTP' },
-                      { label: 'HTTPS', value: 'HTTPS' },
+                      { label: 'HTTP', value: 'http' },
+                      { label: 'HTTPS', value: 'https' },
                     ]}
                   />,
                 )
@@ -273,6 +306,9 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
                     <Option key="POST" value="POST">POST</Option>
                     <Option key="PUT" value="PUT">PUT</Option>
                     <Option key="DELETE" value="DELETE">DELETE</Option>
+                    <Option key="PATCH" value="PATCH">PATCH</Option>
+                    <Option key="HEAD" value="HEAD">HEAD</Option>
+                    <Option key="OPTIONS" value="OPTIONS">OPTIONS</Option>
                   </Select>,
                 )
               }
@@ -306,6 +342,8 @@ const mapStateToProps = (state: object): StateProps => {
 const mapDispatchToProps = {
   getGatewayApiGroupList: apiGroupAction.getGatewayApiGroupList,
   createApi: apiManageAction.createApi,
+  getApiDetail: apiManageAction.getApiDetail,
+  updateApi: apiManageAction.updateApi,
 }
 export default connect<StateProps, DispatchProps, ComponentProps>
 (mapStateToProps, mapDispatchToProps)(Form.create()(ApiManageEdit))
