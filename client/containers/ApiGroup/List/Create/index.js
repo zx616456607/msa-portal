@@ -153,7 +153,13 @@ class CreateConfig extends React.Component {
       })
       const body = Object.assign({
         targets,
-      }, values)
+      }, {
+        description: values.description,
+        name: values.name,
+        path: values.path,
+        protocol: values.protocol,
+        proxyType,
+      })
       notification.destroy()
       if (isEdit) {
         updateGatewayApiGroup(clusterID, apiGroupId, body).then(res => {
@@ -207,9 +213,12 @@ class CreateConfig extends React.Component {
           }
           return callback('校验失败')
         })
+      } else {
+        callback()
       }
+    } else {
+      callback('请输入 API 组名称')
     }
-    callback('请输入 API 组名称')
   }
   onCheckDesc = (rule, value, callback) => {
     if (value) {
