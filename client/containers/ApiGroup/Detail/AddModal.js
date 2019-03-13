@@ -205,6 +205,11 @@ class AddModal extends React.Component {
           onOk()
           return onCancel()
         }
+        if (result.code === 409 || res.status === 409) {
+          return notification.warn({
+            message: '服务地址: 服务端口重复',
+          })
+        }
         notification.warn({
           message: '关联失败',
         })
