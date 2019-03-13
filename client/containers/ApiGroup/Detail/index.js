@@ -19,6 +19,7 @@ import { parse as parseQuerystring } from 'query-string'
 import { Icon, Card, Row, Col, Tabs, Modal, Form, Input, notification } from 'antd'
 import { getGatewayApiGroup, updateGatewayApiGroup } from '../../../actions/gateway'
 import ServiceList from './ServiceList'
+import ApiList from '../../ApiGateWay/ApiManage'
 import './style/index.less'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 import { formatDate } from '../../../common/utils'
@@ -103,7 +104,7 @@ class APIGroupDetail extends React.Component {
       <Card className="api-detail-list">
         <Tabs defaultActiveKey="service_list">
           <TabPane tab="API 列表" key="api_list">
-            ApiList (apiGroupId)
+            <ApiList apiGroupId={apiGroupId} />
           </TabPane>
           <TabPane tab="后端服务" key="service_list">
             <ServiceList proxyType={proxyType} apiGroupId={apiGroupId} location={location} />
