@@ -16,9 +16,14 @@ import './style/index.less'
 // import { parse } from 'query-string'
 import QueueAnim from 'rc-queue-anim'
 import { loadAllServices } from '../../../../actions/serviceMesh'
-import { createGatewayApiGroup, updateGatewayApiGroup, getGatewayApiGroup, getGatewayApiGroupTargets } from '../../../../actions/gateway'
-import { ipOrDomainValidator } from '../../../../common/utils'
-import { Button, Select, Input, InputNumber, Card, Form, Radio, Icon, Row, Col, notification, Spin } from 'antd'
+import { createGatewayApiGroup, updateGatewayApiGroup,
+  getGatewayApiGroup, getGatewayApiGroupTargets,
+  checkApiGroupName } from '../../../../actions/gateway'
+// import { ipOrDomainValidator } from '../../../../common/utils'
+import {
+  ROUTE_REG,
+} from '../../../../constants'
+import { Button, Select, Input, InputNumber, Card, Form, Radio, Icon, Row, Col, notification, Spin, Tooltip } from 'antd'
 import getDeepValue from '@tenx-ui/utils/lib/getDeepValue'
 
 const Option = Select.Option
@@ -30,7 +35,7 @@ let uuid = 1
 class CreateConfig extends React.Component {
   state = {
     confirmLoading: false,
-    initialValues: {},
+    initialValues: undefined,
     isLoading: false,
   }
   componentDidMount() {
@@ -57,19 +62,21 @@ class CreateConfig extends React.Component {
           if (result.code === 200) {
             const { form: { setFieldsValue } } = this.props
             const content = result.data.content
+            const proxyType = initialValues.proxyType
             setFieldsValue({
-              keys: content.map((item, key) => {
+              [`keys${proxyType}`]: content.map((item, key) => {
                 return {
                   key,
                 }
               }),
             })
             await this.forceUpdate()
+            uuid = content.length || 1
             content.forEach((item, key) => {
               setFieldsValue({
-                [`serviceName-${key}`]: initialValues.proxyType === 0 ? item.host : item.serviceName,
-                [`port-${key}`]: item.port,
-                [`weight-${key}`]: item.weight,
+                [`keys${proxyType}-serviceName-${key}`]: item.serviceName,
+                [`keys${proxyType}-port-${key}`]: item.port,
+                [`keys${proxyType}-weight-${key}`]: item.weight,
               })
             })
           }
@@ -82,12 +89,12 @@ class CreateConfig extends React.Component {
   }
   handleAddService = () => {
     const { form: { getFieldValue, setFieldsValue } } = this.props
-    const keys = getFieldValue('keys')
+    const keys = getFieldValue('keys1') // 负载均衡时 可以添加
     const nextKeys = keys.concat({
       key: uuid++,
     })
     setFieldsValue({
-      keys: nextKeys,
+      keys1: nextKeys,
     })
   }
   checkPortAndName = (values, keys) => {
@@ -95,11 +102,11 @@ class CreateConfig extends React.Component {
     for (let i = 0; i < keys.length; i++) {
       for (let j = 0; j < keys.length; j++) {
         if (i !== j
-          && values[`port-${keys[i].key}`] === values[`port-${keys[j].key}`]
-          && values[`serviceName-${keys[i].key}`] === values[`serviceName-${keys[j].key}`]) {
+          && values[`keys1-port-${keys[i].key}`] === values[`keys1-port-${keys[j].key}`]
+          && values[`keys1-serviceName-${keys[i].key}`] === values[`keys1-serviceName-${keys[j].key}`]) {
           notification.destroy()
           notification.warn({
-            message: `服务地址 ${values[`serviceName-${keys[i].key}`]} + 服务端口 ${values[`port-${keys[i].key}`]} 重复`,
+            message: `服务地址 ${values[`keys1-serviceName-${keys[i].key}`]} + 服务端口 ${values[`keys1-port-${keys[i].key}`]} 重复`,
           })
           b = true
           break;
@@ -110,27 +117,44 @@ class CreateConfig extends React.Component {
     return b
   }
   handleAdd = () => {
-    const { form: { validateFields }, createGatewayApiGroup, updateGatewayApiGroup,
+    const { form: { validateFields, getFieldValue }, createGatewayApiGroup, updateGatewayApiGroup,
       clusterID, history, isEdit, apiGroupId } = this.props
-    validateFields((err, values) => {
+    const proxyType = getFieldValue('proxyType')
+    const keys0 = getFieldValue('keys0')
+    const keys1 = getFieldValue('keys1')
+    let arr = [ 'description', 'name', 'path', 'protocol', 'proxyType' ];
+
+    (proxyType === 0 ? keys0 : keys1).forEach(item => {
+      if (!item._delete) {
+        arr = arr.concat([
+          `keys${proxyType}-port-${item.key}`,
+          `keys${proxyType}-serviceName-${item.key}`,
+          `keys${proxyType}-weight-${item.key}`,
+        ])
+      }
+    })
+    validateFields(arr, (err, values) => {
       if (err) return
-      const keys = values.keys.filter(item => !item._delete)
+      const { proxyType } = values
+      const keys = (values.proxyType === 0 ? keys0 : keys1)
+        .filter(item => !item._delete)
       if (this.checkPortAndName(values, keys)) return
       const targets = []
       keys.forEach(item => {
         if (!item._delete) {
           const key = item.key
           targets.push({
-            host: values[`serviceName-${key}`],
-            serviceName: values.proxyType === 0 ? values.name : values[`serviceName-${key}`],
-            port: values[`port-${key}`],
-            weight: values[`weight-${key}`],
+            host: values[`keys${proxyType}-serviceName-${key}`],
+            serviceName: values[`keys${proxyType}-serviceName-${key}`],
+            port: values[`keys${proxyType}-port-${key}`],
+            weight: values[`keys${proxyType}-weight-${key}`],
           })
         }
       })
       const body = Object.assign({
         targets,
       }, values)
+      notification.destroy()
       if (isEdit) {
         updateGatewayApiGroup(clusterID, apiGroupId, body).then(res => {
           if (getDeepValue(res, [ 'response', 'result', 'code' ]) === 200) {
@@ -160,7 +184,9 @@ class CreateConfig extends React.Component {
       }
     })
   }
-  onCheckName = (rule, value, callback) => {
+  onCheckName = async (rule, value, callback) => {
+    const { isEdit, clusterID, checkApiGroupName } = this.props
+    const { initialValues } = this.state
     if (value) {
       if (value.length > 64) {
         return callback('最多可输入 63 位字符')
@@ -168,8 +194,22 @@ class CreateConfig extends React.Component {
       if (!/^[a-zA-Z0-9\-]+$/.test(value)) {
         return callback('仅支持字母、数字、中划线')
       }
+      if ((isEdit && initialValues && initialValues.name && value !== initialValues.name)
+        || !isEdit) {
+        await checkApiGroupName(clusterID, value).then(res => {
+          const result = getDeepValue(res, [ 'response', 'result' ]) || {}
+          if (result.code === 200) {
+            if (JSON.stringify(result.data) === '{}' || !result.data) {
+              callback()
+            } else {
+              callback('API 组名称重复')
+            }
+          }
+          return callback('校验失败')
+        })
+      }
     }
-    callback()
+    callback('请输入 API 组名称')
   }
   onCheckDesc = (rule, value, callback) => {
     if (value) {
@@ -188,9 +228,9 @@ class CreateConfig extends React.Component {
   }
   deleteService = i => {
     const { form } = this.props
-    const keys = form.getFieldValue('keys')
+    const keys = form.getFieldValue('keys1') // 负载均衡时可以删除
     form.setFieldsValue({
-      keys: keys.map(item => {
+      keys1: keys.map(item => {
         if (item.key === i) {
           item._delete = true
         }
@@ -199,24 +239,24 @@ class CreateConfig extends React.Component {
     })
   }
   checkPort = (rule, value, cb) => {
-    if (!value) return cb('请输入服务端口')
+    if (!value) return cb('请选择服务端口')
     if (value < 1 || value > 65535) return cb('服务端口范围 1~65535')
     cb()
   }
   validateService = (rule, value, cb) => {
-    const { getFieldValue } = this.props.form
-    const isAgent = getFieldValue('proxyType') === 0
-    if (isAgent) {
-      if (!value) return cb('请输入服务地址')
-      return ipOrDomainValidator(rule, value, cb)
-    }
+    // const { getFieldValue } = this.props.form
+    // const isAgent = getFieldValue('proxyType') === 0
+    // if (isAgent) {
+    //   if (!value) return cb('请输入服务地址')
+    //   return ipOrDomainValidator(rule, value, cb)
+    // }
     if (!value) return cb('请选择服务')
     cb()
   }
-  renderServices = () => {
-    const { form: { getFieldDecorator, getFieldValue }, serviceList } = this.props
-    const keys = getFieldValue('keys')
-    const isAgent = getFieldValue('proxyType') === 0
+  renderServices = proxyType => {
+    const { form: { getFieldDecorator, getFieldValue, resetFields }, serviceList } = this.props
+    const keys = proxyType === 0 ? getFieldValue('keys0') : getFieldValue('keys1')
+    const isAgent = proxyType === 0
     const len = keys.filter(item => !item._delete).length
     return <div>
       <Button type="ghost" disabled={isAgent} onClick={this.handleAddService}><Icon type="link" /> 添加后端服务</Button>
@@ -224,65 +264,78 @@ class CreateConfig extends React.Component {
         <Row className="_serviceHeader">
           <Col span={8}>服务地址</Col>
           <Col span={8}>服务端口</Col>
-          <Col span={5}>权重 <Icon type="question-circle" /></Col>
+          <Col span={5}>权重 <Tooltip title="填写0-100 数值越大权重越大">
+            <Icon type="question-circle" /></Tooltip></Col>
           <Col span={3}>操作</Col>
         </Row>
         {keys.length > 0 ? keys.map(item => {
           const { key, _delete } = item
+          const service_name = getFieldValue(`keys${proxyType}-serviceName-${key}`)
           if (_delete) return null
           return (
             <Row className="_serviceList" key={key}>
               <Col span={8} className="service">
                 <FormItem
                 >
-                  {getFieldDecorator(`serviceName-${key}`, {
+                  {getFieldDecorator(`keys${proxyType}-serviceName-${key}`, {
                     rules: [{
                       validator: this.validateService,
                     }],
                     validateTrigger: [ 'onChange', 'onSubmit' ],
+                    onChange: () => resetFields([ `keys${proxyType}-port-${key}` ]),
                   })(
-                    !isAgent ?
-                      <Select
-                        placeholder="请选择服务"
-                        style={{ width: '100%' }}
-                      >
-                        {
-                          serviceList && serviceList.map(_item => {
-                            const name = getDeepValue(_item, [ 'service', 'metadata', 'name' ]) || ''
-                            return <Option key={name} value={name}>
-                              {name}</Option>
-                          })
-                        }
-                      </Select>
-                      :
-                      <Input placeholder="请输入服务 IP 地址" />
+                    // !isAgent ?
+                    <Select
+                      placeholder="请选择服务"
+                      style={{ width: '100%' }}
+                    >
+                      {
+                        serviceList && serviceList.map(_item => {
+                          const name = getDeepValue(_item, [ 'service', 'metadata', 'name' ]) || ''
+                          return <Option key={name} value={name}>
+                            {name}</Option>
+                        })
+                      }
+                    </Select>
+                    // :
+                    // <Input placeholder="请输入服务 IP 地址" />
                   )}
                 </FormItem>
               </Col>
               <Col span={8}>
                 <FormItem
                 >
-                  {getFieldDecorator(`port-${key}`, {
+                  {getFieldDecorator(`keys${proxyType}-port-${key}`, {
                     rules: [{
                       validator: this.checkPort,
                     }],
                     validateTrigger: [ 'onChange', 'onSubmit' ],
                   }
                   )(
-                    <Input
-                      placeholder="8080"
-                      style={{ width: '100%' }} />
+                    <Select
+                      placeholder="请先选择服务地址"
+                      style={{ width: '100%' }}>
+                      {serviceList.filter(_item => {
+                        return service_name && (service_name === getDeepValue(_item, [ 'service', 'metadata', 'name' ]))
+                      }).map(__item => {
+                        const ports = getDeepValue(__item, [ 'service', 'spec', 'ports' ]) || []
+                        return ports.map(___item =>
+                          <Option key={___item.port}>{___item.port}</Option>)
+                      })}
+                    </Select>
                   )}
                 </FormItem>
               </Col>
               <Col span={5}>
                 <FormItem>
-                  {getFieldDecorator(`weight-${key}`, {
+                  {getFieldDecorator(`keys${proxyType}-weight-${key}`, {
                     rules: [{ required: true, message: '权重不能为空' }],
                     initialValue: 100,
                   }
                   )(
                     <InputNumber
+                      min={0}
+                      max={100}
                       placeholder="0"
                       style={{ width: '100%' }} />
                   )}
@@ -307,30 +360,23 @@ class CreateConfig extends React.Component {
       </div>
     </div>
   }
-  onSourceChange = value => {
-    const { setFieldsValue, getFieldValue, resetFields } = this.props.form
-    const temp_keys = getFieldValue('keys')
-    if (value === '0') {
-      setFieldsValue({
-        keys: temp_keys.map((item, idx) => {
-          idx > 0 && (item._delete = true)
-          return item
-        }),
-        'serviceName-0': '',
-      })
-    } else {
-      resetFields(temp_keys.map(item => 'serviceName-' + item.key))
+  validatePath = (rules, value, cb) => {
+    if (value && !ROUTE_REG.test(value)) {
+      return cb('以 / 开头，由数字、字母、中划线、下划线组成')
     }
+    cb()
   }
   render() {
     const { form, isEdit } = this.props
-    const { confirmLoading, initialValues, isLoading } = this.state
-    const { getFieldDecorator } = form
+    const { confirmLoading, initialValues = {}, isLoading } = this.state
+    const { getFieldDecorator, getFieldValue } = form
     const fromLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 10 },
     }
-    getFieldDecorator('keys', { initialValue: [{ key: 0 }] })
+    getFieldDecorator('keys0', { initialValue: [{ key: 0 }] })
+    getFieldDecorator('keys1', { initialValue: [{ key: 0 }] })
+    const proxyType = getFieldValue('proxyType')
     return (
       <QueueAnim className="create-wrapper">
         <div className="create-top layout-content-btns" keys="btn">
@@ -349,7 +395,6 @@ class CreateConfig extends React.Component {
               {getFieldDecorator('name', {
                 initialValue: initialValues.name || '',
                 rules: [
-                  { required: true, whitespace: true, message: '请输入 API 组名称' },
                   { validator: this.onCheckName },
                 ],
               })(
@@ -379,9 +424,13 @@ class CreateConfig extends React.Component {
                 </Select>
               )}
             </FormItem>
-            <FormItem {...fromLayout} label={<span>URL 前缀 <Icon type="question-circle" /></span>}>
+            <FormItem {...fromLayout} label={<span>URL 前缀 <Tooltip title="后端服务url前缀，填写前缀时代表访问时无需输入此路径，为空时表示不自动路由">
+              <Icon type="question-circle" /></Tooltip></span>}>
               {getFieldDecorator('path', {
                 initialValue: initialValues.path || '',
+                rules: [{
+                  validator: this.validatePath,
+                }],
               })(
                 <Input placeholder="例如: /demo" />
               )}
@@ -395,7 +444,6 @@ class CreateConfig extends React.Component {
                 rules: [
                   { required: true, message: '请选择后端服务源' },
                 ],
-                onChange: this.onSourceChange,
               })(<RadioGroup>
                 <Radio value={0}>代理</Radio>
                 <Radio value={1}>负载均衡</Radio>
@@ -403,7 +451,14 @@ class CreateConfig extends React.Component {
               <div className="hint" key="hint">选择代理仅支持添加一个后端服务，选择应用负载服务支持添加多个后端服务</div>
             </FormItem>
             <FormItem {...fromLayout} wrapperCol={{ span: 20 }} label="后端服务">
-              {this.renderServices()}
+              {getFieldDecorator('_service', {
+                initialValue: 'unused',
+                rules: [{ required: true }],
+              })(
+                <Input hidden />
+              )}
+              <div style={{ display: proxyType === 1 ? 'none' : 'block' }}>{this.renderServices(0)}</div>
+              <div style={{ display: proxyType === 0 ? 'none' : 'block' }}>{this.renderServices(1)}</div>
             </FormItem>
             <div className="operation" >
               <div>
@@ -423,15 +478,13 @@ const mapStateToProps = (state, ownProps) => {
   const { cluster, project, project: { namespace } } = current.config
   const clusterID = cluster.id
   const serviceList = getDeepValue(serviceMesh, [ 'serviceList', 'data', 'services' ]) || []
-  const { location } = ownProps
-  const isEdit = location.pathname.indexOf('/update/') > -1
   const { match } = ownProps
   const { apiGroupId } = match.params
   return {
     clusterID,
     namespace,
     serviceList,
-    isEdit,
+    isEdit: !!apiGroupId,
     apiGroupId,
     project: project.namespace,
   }
@@ -443,4 +496,5 @@ export default connect(mapStateToProps, {
   createGatewayApiGroup,
   getGatewayApiGroupTargets,
   updateGatewayApiGroup,
+  checkApiGroupName,
 })(Form.create()(CreateConfig))

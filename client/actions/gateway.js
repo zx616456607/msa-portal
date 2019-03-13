@@ -581,3 +581,26 @@ export function addGatewayApiGroupTarget(clusterID, apiGroupId, body) {
   }
 }
 
+export const CHECK_GATEWAY_APIGROUP_NAME_REQUEST = 'CHECK_GATEWAY_APIGROUP_NAME_REQUEST'
+export const CHECK_GATEWAY_APIGROUP_NAME_SUCCESS = 'CHECK_GATEWAY_APIGROUP_NAME_SUCCESS'
+export const CHECK_GATEWAY_APIGROUP_NAME_FALIURE = 'CHECK_GATEWAY_APIGROUP_NAME_FALIURE'
+
+function fetchCheckApiGroupName(clusterID, name) {
+  return {
+    [CALL_API]: {
+      types: [
+        CHECK_GATEWAY_APIGROUP_NAME_REQUEST,
+        CHECK_GATEWAY_APIGROUP_NAME_SUCCESS,
+        CHECK_GATEWAY_APIGROUP_NAME_FALIURE,
+      ],
+      endpoint: `${MSA_API_URL}/clusters/${clusterID}/gateway/apigroup/search/name?${toQuerystring({ name })}`,
+      schema: {},
+    },
+  }
+}
+
+export function checkApiGroupName(clusterID, name) {
+  return dispatch => {
+    return dispatch(fetchCheckApiGroupName(clusterID, name))
+  }
+}

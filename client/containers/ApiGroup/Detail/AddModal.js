@@ -12,7 +12,8 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Modal, Row, Col, Button, Icon, Form, Input, InputNumber, Select, notification } from 'antd'
+import { Modal, Row, Col, Button, Icon, Form, InputNumber,
+  Tooltip, Select, notification } from 'antd'
 import './style/AddModal.less'
 import cloneDeep from 'lodash/cloneDeep'
 import filter from 'lodash/filter'
@@ -59,16 +60,18 @@ class AddModal extends React.Component {
 
   renderList = () => {
     const { keys } = this.state
-    const { form: { getFieldDecorator }, serviceList } = this.props
+    const { form: { getFieldDecorator, getFieldValue, resetFields }, serviceList } = this.props
     return keys.map((item, index) => {
       if (item._delete) return null
       const { key } = item
+      const service_name = getFieldValue(`serviceName-${key}`)
       return <Row key={`server-item-${key}`}>
         <Col span={8}>
           <FormItem className="server-item-formitem">
             {
               getFieldDecorator(`serviceName-${key}`, {
                 rules: [{ required: true, message: '请选择一个服务' }],
+                onChange: () => resetFields([ `port-${key}` ]),
               })(
                 <Select
                   placeholder="请选择服务"
@@ -86,7 +89,7 @@ class AddModal extends React.Component {
             }
           </FormItem>
         </Col>
-        <Col span={8}>
+        <Col span={7}>
           <FormItem className="server-item-formitem">
             {
               getFieldDecorator(`port-${key}`, {
@@ -95,14 +98,22 @@ class AddModal extends React.Component {
                 }],
               }
               )(
-                <Input
-                  placeholder="8080"
-                  style={{ width: '85%' }} />
+                <Select
+                  placeholder="请先选择服务地址"
+                  style={{ width: '85%' }}>
+                  {serviceList.filter(_item => {
+                    return service_name && (service_name === getDeepValue(_item, [ 'service', 'metadata', 'name' ]))
+                  }).map(__item => {
+                    const ports = getDeepValue(__item, [ 'service', 'spec', 'ports' ]) || []
+                    return ports.map(___item =>
+                      <Option key={___item.port}>{___item.port}</Option>)
+                  })}
+                </Select>
               )
             }
           </FormItem>
         </Col>
-        <Col span={4}>
+        <Col span={5}>
           <FormItem className="server-item-formitem">
             {
               getFieldDecorator(`weight-${key}`, {
@@ -112,7 +123,7 @@ class AddModal extends React.Component {
                 <InputNumber
                   min={0}
                   placeholder="0"
-                  style={{ width: '85%' }} />
+                  style={{ width: '70%' }} />
               )
             }
           </FormItem>
@@ -230,8 +241,9 @@ class AddModal extends React.Component {
         <Form>
           <Row>
             <Col span={8}>服务地址</Col>
-            <Col span={8}>服务端口</Col>
-            <Col span={4}>权重</Col>
+            <Col span={7}>服务端口</Col>
+            <Col span={5}>权重 <Tooltip title="填写0-100 数值越大权重越大">
+              <Icon type="question-circle" /></Tooltip></Col>
             <Col span={4}>操作</Col>
           </Row>
           {this.renderList()}
