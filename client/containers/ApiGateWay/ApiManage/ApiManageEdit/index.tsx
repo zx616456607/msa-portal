@@ -57,6 +57,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
   }
   onLoadApiDetail = async () => {
     const { id } = this.props.match.params
+    if (!id) { return }
     const { getApiDetail, clusterID } = this.props
     const res = await getApiDetail(clusterID, id)
     if (!res.error) {
@@ -158,7 +159,7 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
       }],
     })
     const apiGroupValidator = getFieldDecorator('apiGroupId', {
-      initialValue: detailData && detailData.apiGroup.id,
+      initialValue: detailData && detailData.apiGroup && detailData.apiGroup.id,
       onChange: this.onApiGroupChange,
       rules: [{
           required: true,

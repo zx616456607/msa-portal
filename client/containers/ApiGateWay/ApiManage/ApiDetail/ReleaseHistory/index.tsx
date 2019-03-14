@@ -94,15 +94,7 @@ class ReleaseHistory extends React.Component<ReleaseHistoryProps> {
         },
       },
     ]
-    const data = [
-      {
-        version: '2019-08-25 dadsapretkdgfklpdflk;gkmdflk',
-        remark: 'dsaewtdsfsd',
-        env: 'v1.043',
-        createTime: '2019-08-23',
-
-      },
-    ]
+    const data = []
     return <div className="release-history">
       <div className="top-operation">
         <div className="left">

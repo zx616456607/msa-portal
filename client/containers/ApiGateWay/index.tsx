@@ -35,7 +35,7 @@ const apiGateWayChildRoutes = [
     key: 'api-gateway-edit',
   },
   {
-    path: '/api-gateway/api-detail/:id',
+    path: '/api-gateway/api-detail/:id/:activeTab',
     component: ApiDetail,
     exact: true,
     key: 'api-gateway-detail',

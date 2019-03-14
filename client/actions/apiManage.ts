@@ -116,3 +116,49 @@ const updateApiRequest = (clusterId:string, id:string, body:string) => {
   }
 }
 export const updateApi = (clusterId:string, id:string, body:string) => dispatch => dispatch(updateApiRequest(clusterId,id,body))
+
+export const DEBUG_API_REQUEST = 'DEBUG_API_REQUEST'
+export const DEBUG_API_SUCCESS = 'DEBUG_API_SUCCESS'
+export const DEBUG_API_FAILURE = 'DEBUG_API_FAILURE'
+const debugApiRequest = (clusterId:string, body:string) => {
+  return {
+    [CALL_API]: {
+      types: [DEBUG_API_REQUEST, DEBUG_API_SUCCESS, DEBUG_API_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/test`,
+      options: {
+        method: 'POST',
+        body,
+      },
+      schema: {}
+    }
+  }
+}
+export const debugApi = (clusterId:string, body:string) => dispatch => dispatch(debugApiRequest(clusterId,body))
+
+export const GET_PUBLISH_ENV_REQUEST = 'GET_PUBLISH_ENV_REQUEST'
+export const GET_PUBLISH_ENV_SUCCESS = 'GET_PUBLISH_ENV_SUCCESS'
+export const GET_PUBLISH_ENV_FAILURE = 'GET_PUBLISH_ENV_FAILURE'
+const fetchPublishEnv = (clusterId:string) => {
+  return {
+    [CALL_API]: {
+      types: [GET_PUBLISH_ENV_REQUEST, GET_PUBLISH_ENV_SUCCESS, GET_PUBLISH_ENV_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/env/available`,
+      schema: {}
+    }
+  }
+}
+export const getPublishEnv = (clusterId:string) => dispatch => dispatch(fetchPublishEnv(clusterId))
+
+export const OFFLINE_REQUEST = 'OFFLINE_REQUEST'
+export const OFFLINE_SUCCESS = 'OFFLINE_SUCCESS'
+export const OFFLINE_FAILURE = 'OFFLINE_FAILURE'
+const offlineApiRequest = (clusterId:string, id: string, envId: string) => {
+  return {
+    [CALL_API]: {
+      types: [OFFLINE_REQUEST, OFFLINE_SUCCESS, OFFLINE_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}/offline/${envId}`,
+      schema: {}
+    }
+  }
+}
+export const offlineApi = (clusterId:string, id:string, envId:string) => dispatch => dispatch(fetchPublishEnv(clusterId, id, envId))

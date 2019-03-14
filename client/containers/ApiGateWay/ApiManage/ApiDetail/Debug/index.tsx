@@ -9,9 +9,10 @@
  */
 
 import * as React from 'react'
-import { Button, Row, Col, Input, Select, Form, Icon, Radio, Checkbox } from 'antd'
-
+import { Button, Row, Col, Input, Select, Form, Icon, Radio, Checkbox, notification } from 'antd'
+import * as apiManageAction from '../../../../../actions/apiManage'
 import './style/debug.less'
+import { connect } from 'react-redux';
 
 const RadioGroup = Radio.Group
 const { Option } = Select
@@ -22,12 +23,27 @@ const formLayout = {
   wrapperCol: { span: 16 },
 }
 let reqParamId = 0
-let reqbodyId = 1000
+let reqbodyId = 1003
 
-interface DebugProps {
-
+interface ComponentProps {
+  apiGroupId?: number
 }
+interface StateProps {
+  clusterID: string
+  apiId: string
+}
+interface DispatchProps {
+  debugApi(clusterID: string, body: object): any
+}
+
+type DebugProps = ComponentProps & StateProps & DispatchProps
+
 class Debug extends React.Component<DebugProps> {
+  state = {
+    timeout: 0,
+    loading: false,
+    responseBody: '',
+  }
   onReqParamAdd = () => {
     const { getFieldValue } = this.props.form
     const reqParam = getFieldValue('reqParam')
@@ -58,8 +74,9 @@ class Debug extends React.Component<DebugProps> {
       reqFormData: reqFormData.filter(key => key !== k),
     });
   }
-  onApiRequest = () => {
+  onApiRequest = async () => {
     const { getFieldsValue } = this.props.form
+    const { apiId, debugApi, clusterID } = this.props
     const apiData = getFieldsValue()
     const { contentType,
       formDataCheck,
@@ -83,23 +100,51 @@ class Debug extends React.Component<DebugProps> {
       }
       return resultData
     }
-    const apiRequest = (url: string,
-                        authData: object,
-                        headers: object,
-                        body?: any, type?: any, requestMethod: string) => {
-      return { url, authData, headers, body, type, requestMethod }
-    }
+
     let reqBody = null
     const reqHeader = formatData(reqHeaderCheck, reqHeaderName, reqHeaderValue)
-    if (contentType === 'application/x-www-form-urlencoded') {
+    if (contentType === '0') {
       reqBody = formatData(formDataCheck, formDataName, formDataValue)
+    } else if (contentType === '2') {
+      try {
+        reqBody = JSON.parse(apiData.reqBodyData)
+      } catch (e) {
+        notification.warn({
+          message: '参数格式错误',
+          description: '',
+        })
+        return
+      }
     } else {
       reqBody = apiData.reqBodyData
     }
-    apiRequest(api, auth, reqHeader, reqBody, contentType, method)
+    const body = {
+      url: api,
+      headers: reqHeader,
+      param: reqBody,
+      method,
+      paramType: contentType,
+      apiId,
+    }
+    this.setState({ loading: true })
+    const res = await debugApi(clusterID, body)
+    this.setState({ loading: false })
+    if (!res.error) {
+      this.setState({
+        timeout: res.response.result.data.deny,
+        responseBody: res.response.result.data.body,
+      })
+    } else {
+      notification.warn({
+        message: '请求失败',
+        description: res.error,
+      })
+    }
+
   }
   render() {
     const { getFieldDecorator, getFieldValue } = this.props.form
+    const { loading, timeout, responseBody } = this.state
     getFieldDecorator('reqParam', { initialValue: [401, 402] })
     const reqParams = getFieldValue('reqParam')
     const reqParamsItems = reqParams.map(v => {
@@ -164,6 +209,9 @@ class Debug extends React.Component<DebugProps> {
                     <Option value="POST">POST</Option>
                     <Option value="PUT">PUT</Option>
                     <Option value="DELETE">DELETE</Option>
+                    <Option value="PATCH">PATCH</Option>
+                    <Option value="HEAD">HEAD</Option>
+                    <Option value="OPTIONS">OPTIONS</Option>
                   </Select>,
                 )
               }
@@ -172,9 +220,10 @@ class Debug extends React.Component<DebugProps> {
               {getFieldDecorator('api')(<Input/>)}
             </Col>
             <Col span={2}>
-              <Button type="primary" onClick={this.onApiRequest}>发送</Button>
+              <Button type="primary" onClick={this.onApiRequest} loading={loading}>发送</Button>
             </Col>
           </Row>
+{/*
           <h1 key="auth">认证</h1>
           <div className="auth">
             <FormItem
@@ -196,6 +245,7 @@ class Debug extends React.Component<DebugProps> {
               {getFieldDecorator('password')(<Input.Password placeholder="请输入密码"/>)}
             </FormItem>
           </div>
+*/}
           <h1>请求头参数 Headers</h1>
           <div className="req-params" key="reqHeaderContent">
             {
@@ -214,28 +264,28 @@ class Debug extends React.Component<DebugProps> {
               <h1>请求体 Body</h1>
               <FormItem>
                 {getFieldDecorator('contentType', {
-                  initialValue: 'application/x-www-form-urlencoded',
+                  initialValue: '0',
                 })(
                   <RadioGroup>
-                    <Radio value="application/x-www-form-urlencoded">表单</Radio>
-                    <Radio value="text/xml">XML 格式</Radio>
-                    <Radio value="application/json">JSON 格式</Radio>
+                    <Radio value="0">表单</Radio>
+                    <Radio value="1">XML 格式</Radio>
+                    <Radio value="2">JSON 格式</Radio>
                   </RadioGroup>,
                 )}
               </FormItem>
             </div>
             {
-              (reqFormData.length !== 0 && contentType === 'application/x-www-form-urlencoded') &&
+              (reqFormData.length !== 0 && contentType === '0') &&
               <div className="content">
                 {reqFormDataItems}
               </div>
             }
             {
-              contentType !== 'application/x-www-form-urlencoded' &&
+              contentType !== '0' &&
                 getFieldDecorator('reqBodyData')(<TextArea rows={6}/>)
             }
             {
-              contentType === 'application/x-www-form-urlencoded' &&
+              contentType === '0' &&
                 <span className="add-btn" onClick={this.onReqFormDataAdd}>
                   <Icon type="plus-circle" />
                   添加参数
@@ -245,13 +295,24 @@ class Debug extends React.Component<DebugProps> {
         </Col>
         <Col span={12}>
           <h1>返回结果</h1>
-          <p>耗时：{3}秒</p>
+          <p>耗时：{timeout} ms</p>
           <h3>响应结果 Result</h3>
-          <TextArea rows={20} value={123} editable={false}/>
+          <TextArea rows={20} value={responseBody} editable={false}/>
         </Col>
       </Row>
     </Form>
   }
 }
 
-export default Form.create()(Debug)
+const mapStateToProps = (state: object) => {
+  const { current: { config: { cluster: { clusterID } } } } = state
+  return {
+    clusterID,
+  }
+}
+const mapDispatchToProps = {
+  debugApi: apiManageAction.debugApi,
+}
+
+export default connect<StateProps, DispatchProps, ComponentProps>
+(mapStateToProps, mapDispatchToProps)(Form.create()(Debug))
