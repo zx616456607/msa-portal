@@ -46,6 +46,8 @@ interface DispatchProps {
   getApiList(clusterID: string, query: object): any
   deleteApi(clusterID: string, id: string): any
   publishApi(clusterID: string, id: string, env: string, body: object): any
+  offlineApi(clusterID: string, id: string, envId: string): any
+  getPublishEnv(clusterID: string): any
 }
 
 type ApiManageProps = ComponentProps & StateProps & DispatchProps
@@ -59,10 +61,28 @@ class ApiManage extends React.Component<ApiManageProps> {
     deleteModal: false,
     offlineModal: false,
     currentApi: { name: '' },
+    publishEnv: [],
     loading: false,
   }
   componentDidMount() {
     this.onLoadList()
+    this.onLoadPublishEnv()
+  }
+  onLoadPublishEnv = async () => {
+    const { clusterID, getPublishEnv } = this.props
+    const res = await getPublishEnv(clusterID)
+
+    if (!res.error) {
+      this.setState({
+        publishEnv: res.response.result.data,
+      })
+    } else {
+      notification.warn({
+        message: '获取发布环境失败',
+        description: res.error,
+      })
+    }
+
   }
   onLoadList = async () => {
     const { getApiList, clusterID, apiGroupId } = this.props
@@ -94,7 +114,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         })
         return
       case 'delete':
-        if (item.publishInfo) {
+        if (item.publishedInfo && item.publishedInfo !== '[]') {
           Modal.info({
             title: `API: ${item.name}`,
             icon: <Icon type="exclamation-circle" theme="filled" />,
@@ -112,7 +132,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         })
         return
       case 'offline':
-        if (!item.publishInfo) {
+        if (!item.publishedInfo || item.publishedInfo === '[]') {
           Modal.info({
             title: `API: ${item.name}`,
             icon: <Icon type="exclamation-circle" theme="filled" />,
@@ -153,9 +173,9 @@ class ApiManage extends React.Component<ApiManageProps> {
   onPublishOk = () => {
     const { clusterID, publishApi, form } = this.props
     form.validateFields(async err => {
-      if (err) { return }
-      this.setState({ loading: true })
       const { publishEnv, memo } = form.getFieldsValue()
+      if (!publishEnv || !memo) { return }
+      this.setState({ loading: true })
       const { id } = this.state.currentApi
       const res = await publishApi(clusterID, id, publishEnv, { memo })
       if (res.error) {
@@ -175,13 +195,38 @@ class ApiManage extends React.Component<ApiManageProps> {
         publishModal: false,
       })
     })
+    form.resetFields()
     this.setState({
       releaseModal: false,
     })
   }
   onOfflineOk = () => {
-    this.setState({
-      offlineModal: false,
+    const { currentApi } = this.state
+    const { clusterID, offlineApi, form } = this.props
+    form.validateFields(async err => {
+      const envId = form.getFieldValue('offlineEnv')
+      if (!envId) { return }
+      const apiId = currentApi.id
+      this.setState({ loading: true })
+      const res = await offlineApi(clusterID, apiId, envId)
+      if (!res.error) {
+        notification.success({
+          message: '下线成功',
+          description: '',
+        })
+        this.onLoadList()
+      } else {
+        notification.warn({
+          message: '下线失败',
+          description: res.error,
+        })
+      }
+      form.resetFields()
+      this.setState({
+        offlineModal: false,
+        loading: false,
+      })
+
     })
   }
   onDeleteOk = async () => {
@@ -214,17 +259,29 @@ class ApiManage extends React.Component<ApiManageProps> {
       deleteModal: false,
     })
   }
+  onSwitchEnvName = flag => {
+    switch (flag) {
+      case 'public':
+        return 'API 市场'
+      case 'test':
+        return '测试环境'
+      default:
+        return '-'
+    }
+  }
   render() {
-    const { publishModal, deleteModal, offlineModal, currentApi, loading } = this.state
+    const { publishModal, deleteModal, offlineModal, currentApi, loading, publishEnv } = this.state
     const { list, isFetching, total } = this.props
     const { getFieldDecorator } = this.props.form
     const operationMenu = item => (
       <Menu onClick={target => this.onMenuClick(item, target)}>
-        <Menu.Item key="stop">停止</Menu.Item>
+        {/*<Menu.Item key="stop">停止</Menu.Item>*/}
         <Menu.Item key="edit">
           <Link to={`/api-gateway/api-manage-edit/${item.id}`}>编辑</Link>
         </Menu.Item>
-        <Menu.Item key="debug">API调试</Menu.Item>
+        <Menu.Item key="debug">
+          <Link to={`/api-gateway/api-detail/${item.id}/debug-api`}>API调试</Link>
+        </Menu.Item>
         <Menu.Item key="publish">发布API</Menu.Item>
         <Menu.Item key="offline">下线</Menu.Item>
         <Menu.Item key="delete">删除</Menu.Item>
@@ -235,7 +292,7 @@ class ApiManage extends React.Component<ApiManageProps> {
         title: 'API 名称',
         dataIndex: 'name',
         key: 'name',
-        render: (text, record) => <Link to={`/api-gateway/api-detail/${record.id}`}>{text}</Link>,
+        render: (text, record) => <Link to={`/api-gateway/api-detail/${record.id}/default`}>{text}</Link>,
       },
       {
         title: '所属API组',
@@ -262,7 +319,7 @@ class ApiManage extends React.Component<ApiManageProps> {
           if (record.publishedInfo) {
             const publishedInfo = JSON.parse(record.publishedInfo)
             let envName = ''
-            switch (publishedInfo[0].envName) {
+            switch (publishedInfo[0] && publishedInfo[0].envName) {
               case 'public':
                 envName = 'API 市场'
                 break
@@ -345,11 +402,16 @@ class ApiManage extends React.Component<ApiManageProps> {
           <FormItem key="env" label="选择发布环境" {...formItemLayout}>
             {
               getFieldDecorator('publishEnv', {
-                initialValue: 'test',
+                initialValue: '',
+                rules: [
+                  {
+                    required: true,
+                    message: '请选择发布环境',
+                  },
+                ],
               })(
                 <RadioGroup>
-                  <Radio value="test">测试环境</Radio>
-                  <Radio value="public">API市场</Radio>
+                  {publishEnv.map(v => <Radio value={v.id} key={v.id}>{this.onSwitchEnvName(v.flag)}</Radio>)}
                 </RadioGroup>,
               )
             }
@@ -382,17 +444,23 @@ class ApiManage extends React.Component<ApiManageProps> {
         visible={offlineModal}
         onOk={this.onOfflineOk}
         onCancel={this.onCancel}
+        confirmLoading={loading}
       >
         <Form className="api-manage-publish">
           <FormItem key="name" label="API" {...formItemLayout}>{currentApi.name}</FormItem>
           <FormItem key="env" label="选择要下线的环境" {...formItemLayout}>
             {
               getFieldDecorator('offlineEnv', {
-                initialValue: 'test',
+                initialValue: '',
+                rules: [
+                  {
+                    required: true,
+                    message: '请选择发布环境',
+                  },
+                ],
               })(
                 <RadioGroup>
-                  <Radio value="test">测试环境</Radio>
-                  <Radio value="market">API市场</Radio>
+                  {publishEnv.map(v => <Radio value={v.id} key={v.id}>{this.onSwitchEnvName(v.flag)}</Radio>)}
                 </RadioGroup>,
               )
             }
@@ -435,7 +503,7 @@ const mapStateToProps = (state: object) => {
     isFetching = apiList.isFetching
     total = apiList.total
     for (const v of list) {
-      v.apiGroupName = v.apiGroup.name
+      v.apiGroupName = v.apiGroup && v.apiGroup.name
     }
   }
   return {
@@ -449,6 +517,8 @@ const mapDispatchToProps = {
   getApiList: apiManageAction.getApiList,
   deleteApi: apiManageAction.deleteApi,
   publishApi: apiManageAction.publishApi,
+  getPublishEnv: apiManageAction.getPublishEnv,
+  offlineApi: apiManageAction.offlineApi,
 }
 
 export default connect<StateProps, DispatchProps, ComponentProps>

@@ -19,6 +19,7 @@ import { connect } from 'react-redux';
 import apiIcon from '../../../../assets/img/apiGateway/apiIcon.png'
 import * as apiGroupAction from '../../../../actions/gateway';
 import { formatDate } from '../../../../common/utils'
+
 const { TextArea } = Input
 const TabPane = Tabs.TabPane
 interface ComponentProps {
@@ -94,6 +95,7 @@ class ApiDetail extends React.Component<ApiDetailProps> {
   }
   render() {
     const { edit, description, apiData, desText } = this.state
+    const { id, activeTab } = this.props.match.params
     return <div className="api-detail">
       <div className="top">
         <ReturnButton onClick={this.onReturn}>返回</ReturnButton>
@@ -108,17 +110,17 @@ class ApiDetail extends React.Component<ApiDetailProps> {
             <img src={apiIcon} className="img"/>
           </Col>
           <Col span={22}>
-            <h2>{apiData.name}</h2>
+            <h2>{apiData && apiData.name}</h2>
             <Row>
               <Col span={8}>
-                <p>所属API组：{apiData.apiGroup.name}</p>
-                <p>协议：{apiData.protocols}</p>
-                <p>请求方法：{apiData.methods}</p>
+                <p>所属API组：{apiData && apiData.apiGroup && apiData.apiGroup.name}</p>
+                <p>协议：{apiData && apiData.protocols}</p>
+                <p>请求方法：{apiData && apiData.methods}</p>
               </Col>
               <Col span={8}>
-                <p>访问路径：{apiData.path}</p>
-                <p>访问控制：{apiData.authType}</p>
-                <p>创建：{formatDate(apiData.createTime)}</p>
+                <p>访问路径：{apiData && apiData.path}</p>
+                <p>访问控制：{apiData && apiData.authType}</p>
+                <p>创建：{formatDate(apiData && apiData.createTime)}</p>
               </Col>
               <Col span={8}>
                 <div className="description">
@@ -139,7 +141,11 @@ class ApiDetail extends React.Component<ApiDetailProps> {
                   </div>
                 </div>
                 {description &&
-                <TextArea disabled={!edit} defaultValue={apiData.description} onChange={this.onDescriptionChange}/>}
+                <TextArea
+                  disabled={!edit}
+                  defaultValue={apiData && apiData.description}
+                  onChange={this.onDescriptionChange}
+                />}
               </Col>
             </Row>
           </Col>
@@ -148,14 +154,14 @@ class ApiDetail extends React.Component<ApiDetailProps> {
       <Card
         hoverable
       >
-        <Tabs defaultActiveKey="release-history">
+        <Tabs activeKey={activeTab === 'default' ? 'release-history' : 'debug-api'}>
           <TabPane tab="发布历史" key="release-history">
             <ReleaseHistory
               apiData={apiData}
             />
           </TabPane>
           <TabPane tab="调试API" key="debug-api">
-            <Debug/>
+            <Debug apiId={id}/>
           </TabPane>
         </Tabs>
       </Card>
