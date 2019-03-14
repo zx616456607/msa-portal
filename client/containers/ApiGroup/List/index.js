@@ -23,7 +23,6 @@ import {
 import * as TenxModal from '@tenx-ui/modal'
 import {
   formatDate,
-  formatFilterConditions,
 } from '../../../common/utils'
 import './style/index.less'
 import TimeHover from '@tenx-ui/time-hover/lib'
@@ -76,11 +75,7 @@ class APIGroupList extends React.Component {
 
   tableOnchange = (pagination, filters, sorter) => {
     const { columnKey, order } = sorter
-    const { role } = filters
-    const filter = formatFilterConditions(filters)
-    this.setState({
-      filteredValue: role,
-    })
+    const filter = filters
     if (order) {
       this.setState({
         sortOrder: order,
@@ -162,7 +157,7 @@ class APIGroupList extends React.Component {
       {
         title: '远程访问协议',
         dataIndex: 'protocol',
-        width: '10%',
+        width: 100,
       },
       {
         title: 'URL 前缀',
@@ -172,7 +167,7 @@ class APIGroupList extends React.Component {
       {
         title: '后端服务源',
         dataIndex: 'proxyType',
-        width: '10%',
+        width: 100,
         filters: [{
           text: '代理',
           value: 0,
@@ -195,6 +190,7 @@ class APIGroupList extends React.Component {
         title: 'API 数量',
         dataIndex: 'count',
         width: '10%',
+        render: (t, record) => record.apis.length || 0,
       },
       {
         title: '描述',
@@ -248,7 +244,7 @@ class APIGroupList extends React.Component {
             type="primary"
             onClick={() => this.add()}
           >
-            <Icon type="plus" /> 添加 API 分组
+            <Icon type="plus" /> 创建 API 分组
           </Button>
           <Button
             onClick={() => this.loadData()}
