@@ -118,14 +118,23 @@ class Debug extends React.Component<DebugProps> {
     } else {
       reqBody = apiData.reqBodyData
     }
-    const body = {
+
+    const body = contentType !== '1' ? {
       url: api,
       headers: reqHeader,
       param: reqBody,
       method,
       paramType: contentType,
       apiId,
+    } : {
+      url: api,
+      headers: reqHeader,
+      xml: reqBody,
+      method,
+      paramType: contentType,
+      apiId,
     }
+
     this.setState({ loading: true })
     const res = await debugApi(clusterID, body)
     this.setState({ loading: false })

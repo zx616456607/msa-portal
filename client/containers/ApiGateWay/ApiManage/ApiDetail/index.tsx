@@ -154,10 +154,11 @@ class ApiDetail extends React.Component<ApiDetailProps> {
       <Card
         hoverable
       >
-        <Tabs activeKey={activeTab === 'default' ? 'release-history' : 'debug-api'}>
+        <Tabs defaultActiveKey={activeTab === 'default' ? 'release-history' : 'debug-api'}>
           <TabPane tab="发布历史" key="release-history">
             <ReleaseHistory
               apiData={apiData}
+              onLoadApiData={this.onLoadApiData}
             />
           </TabPane>
           <TabPane tab="调试API" key="debug-api">

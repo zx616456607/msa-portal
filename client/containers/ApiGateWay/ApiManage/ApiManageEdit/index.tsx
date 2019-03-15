@@ -213,8 +213,8 @@ class ApiManageEdit extends React.Component<ApiDetailProps> {
             <Row className="btn-group" key="btn-group">
               <Col span={8} pull={4}/>
               <Col span={16} pull={4}>
-                <Button key="cancel" onClick={this.onReturn}>取消</Button>,
-                <Button key="ok" type="primary" onClick={this.onSubmit} loading={submitLoading}>确定</Button>,
+                <Button key="cancel" onClick={this.onReturn}>取消</Button>
+                <Button key="ok" type="primary" onClick={this.onSubmit} loading={submitLoading}>确定</Button>
               </Col>
             </Row>,
           ]}
