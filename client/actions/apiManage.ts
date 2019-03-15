@@ -157,8 +157,25 @@ const offlineApiRequest = (clusterId:string, id: string, envId: string) => {
     [CALL_API]: {
       types: [OFFLINE_REQUEST, OFFLINE_SUCCESS, OFFLINE_FAILURE],
       endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}/offline/${envId}`,
+      options: {
+        method: 'PUT',
+      },
       schema: {}
     }
   }
 }
-export const offlineApi = (clusterId:string, id:string, envId:string) => dispatch => dispatch(fetchPublishEnv(clusterId, id, envId))
+export const offlineApi = (clusterId:string, id:string, envId:string) => dispatch => dispatch(offlineApiRequest(clusterId, id, envId))
+
+export const PUBLISH_HISTORY_REQUEST = 'PUBLISH_HISTORY_REQUEST'
+export const PUBLISH_HISTORY_SUCCESS = 'PUBLISH_HISTORY_SUCCESS'
+export const PUBLISH_HISTORY_FAILURE = 'PUBLISH_HISTORY_FAILURE'
+const fetchPublicHistory = (clusterId:string, id: string, query: object) => {
+  return {
+    [CALL_API]: {
+      types: [PUBLISH_HISTORY_REQUEST, PUBLISH_HISTORY_SUCCESS, PUBLISH_HISTORY_FAILURE],
+      endpoint: `${MSA_API_URL}/clusters/${clusterId}/gateway/api/${id}/published/versions?${toQuerystring(query)}`,
+      schema: {}
+    }
+  }
+}
+export const getPublicHistory = (clusterId:string, id:string, query: object) => dispatch => dispatch(fetchPublicHistory(clusterId, id, query))

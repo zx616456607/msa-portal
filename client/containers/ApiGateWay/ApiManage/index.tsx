@@ -172,9 +172,9 @@ class ApiManage extends React.Component<ApiManageProps> {
   }
   onPublishOk = () => {
     const { clusterID, publishApi, form } = this.props
-    form.validateFields(async err => {
-      const { publishEnv, memo } = form.getFieldsValue()
-      if (!publishEnv || !memo) { return }
+    form.validateFields(['publishEnv', 'memo'], async (err, values) => {
+      if (err) { return }
+      const { publishEnv, memo } = values
       this.setState({ loading: true })
       const { id } = this.state.currentApi
       const res = await publishApi(clusterID, id, publishEnv, { memo })
@@ -194,21 +194,18 @@ class ApiManage extends React.Component<ApiManageProps> {
         loading: false,
         publishModal: false,
       })
-    })
-    form.resetFields()
-    this.setState({
-      releaseModal: false,
+      form.resetFields()
     })
   }
   onOfflineOk = () => {
     const { currentApi } = this.state
     const { clusterID, offlineApi, form } = this.props
-    form.validateFields(async err => {
-      const envId = form.getFieldValue('offlineEnv')
-      if (!envId) { return }
+    form.validateFields(['offlineEnv'], async (err, values) => {
+      if (err) { return }
+      const { offlineEnv } = values
       const apiId = currentApi.id
       this.setState({ loading: true })
-      const res = await offlineApi(clusterID, apiId, envId)
+      const res = await offlineApi(clusterID, apiId, offlineEnv)
       if (!res.error) {
         notification.success({
           message: '下线成功',
@@ -357,6 +354,10 @@ class ApiManage extends React.Component<ApiManageProps> {
         </Dropdown.Button>,
       },
     ]
+    let envId = ''
+    if (currentApi.publishedInfo && currentApi.publishedInfo !== '[]') {
+      envId = JSON.parse(currentApi.publishedInfo)[0].envId
+    }
     return <QueueAnim className="api-manage">
       <div className="operation-box">
         <div className="left">
@@ -411,7 +412,13 @@ class ApiManage extends React.Component<ApiManageProps> {
                 ],
               })(
                 <RadioGroup>
-                  {publishEnv.map(v => <Radio value={v.id} key={v.id}>{this.onSwitchEnvName(v.flag)}</Radio>)}
+                  {publishEnv.map(v => <Radio
+                    value={v.id}
+                    disabled={envId === v.id}
+                    key={v.id}
+                  >
+                    {this.onSwitchEnvName(v.flag)}
+                  </Radio>)}
                 </RadioGroup>,
               )
             }
@@ -451,11 +458,10 @@ class ApiManage extends React.Component<ApiManageProps> {
           <FormItem key="env" label="选择要下线的环境" {...formItemLayout}>
             {
               getFieldDecorator('offlineEnv', {
-                initialValue: '',
                 rules: [
                   {
                     required: true,
-                    message: '请选择发布环境',
+                    message: '请选择要下线的环境',
                   },
                 ],
               })(
